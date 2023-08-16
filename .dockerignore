@@ -1,0 +1,10 @@
+.git/ 
+node_modules/ 
+devops/
+Dockerfile
+Jenkinsfile_dev
+Jenkinsfile_prod
+Jenkinsfile_qa
+.env_dev
+.env_qa
+.env_prod
