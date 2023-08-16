@@ -1,0 +1,10 @@
+#!groovy
+@Library('jenkins-shared-libraries') _
+
+DeployPipeline {
+   framework             = 'Laravel-Vite'
+   projectName           = 'opertecnologica'
+   https_port            = '8473'
+
+}
+
