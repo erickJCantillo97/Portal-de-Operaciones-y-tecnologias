@@ -13,7 +13,15 @@ export default {
     ],
 
     theme: {
+
         extend: {
+            colors: {
+                primary: {
+                    DEFAULT: '#2E3092',
+                    light: "#eaf1ff",
+                    "dark-light": "rgba(67,97,238,.15)",
+                },
+            },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
