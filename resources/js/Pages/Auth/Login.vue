@@ -87,8 +87,6 @@ const submit = () => {
 
             <div class="mt-10">
 
-
-
             </div>
           </div>
         </div>
