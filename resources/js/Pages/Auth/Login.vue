@@ -1,12 +1,11 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import AuthenticationCard from '@/Components/AuthenticationCard.vue';
-import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
+import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Checkbox from '@/Components/Checkbox.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
+import Button from '@/Components/Button.vue';
+
 
 defineProps({
     canResetPassword: Boolean,
@@ -14,7 +13,7 @@ defineProps({
 });
 
 const form = useForm({
-    email: '',
+    username: '',
     password: '',
     remember: false,
 });
@@ -43,8 +42,8 @@ const submit = () => {
       <div class="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div class="mx-auto w-full max-w-sm lg:w-96">
           <div>
-            <img class="h-10 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company" />
-            <h2 class="mt-8 text-2xl font-bold leading-9 tracking-tight text-gray-900">Inicia sesión ocn tu cuenta</h2>
+           <ApplicationLogo></ApplicationLogo>
+            <h2 class="mt-8 text-2xl font-bold leading-9 tracking-tight text-gray-900">Inicia sesión con tu cuenta</h2>
             <p class="mt-2 text-sm leading-6 text-gray-500">
                 Si eres un Cliente
                 <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Entra aqui</a>
@@ -57,32 +56,32 @@ const submit = () => {
                 <div>
                   <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email address</label>
                   <div class="mt-2">
-                    <input id="email" v-model="form.email" name="email" type="email" autocomplete="email" required="" class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                    <input id="email" v-model="form.username" name="email" type="text" autocomplete="email" required="" class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                   </div>
                 </div>
 
                 <div>
-                  <label for="password" class="block text-sm font-medium leading-6 text-gray-900">Password</label>
-                  <div class="mt-2">
-                    <input id="password" v-model="form.password" name="password" type="password" autocomplete="current-password" required="" class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
-                  </div>
+                    <label for="password" class="block text-sm font-medium leading-6 text-gray-900">Password</label>
+                    <div class="mt-2">
+                        <input id="password" v-model="form.password" name="password" type="password" autocomplete="current-password" required="" class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                    </div>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <div class="flex items-center">
-                    <input id="remember-me" v-model="form.remember" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" />
-                    <label for="remember-me" class="ml-3 block text-sm leading-6 text-gray-700">Remember me</label>
-                  </div>
+                    <div class="flex items-center">
+                        <input id="remember-me" v-model="form.remember" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" />
+                        <label for="remember-me" class="ml-3 block text-sm leading-6 text-gray-700">Remember me</label>
+                    </div>
 
-                  <div class="text-sm leading-6">
-                    <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
-                  </div>
+                    <div class="text-sm leading-6">
+                        <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+                    </div>
                 </div>
 
                 <div>
-                  <button type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Entrar</button>
+                    <Button severity="primary" :loading="form.processing">Entrar</Button>
                 </div>
-              </form>
+                </form>
             </div>
 
             <div class="mt-10">

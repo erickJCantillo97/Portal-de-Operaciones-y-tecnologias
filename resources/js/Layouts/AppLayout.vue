@@ -12,10 +12,10 @@
                             <TransitionChild as="template" enter="ease-in-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in-out duration-300" leave-from="opacity-100" leave-to="opacity-0">
                                 <div class="absolute right-0 top-0 -mr-12 pt-2">
                                     <button type="button" class="relative ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="sidebarOpen = false">
-                          <span class="absolute -inset-0.5" />
-                          <span class="sr-only">Close sidebar</span>
-                          <XMarkIcon class="h-6 w-6 text-white" aria-hidden="true" />
-                        </button>
+                              <span class="absolute -inset-0.5" />
+                              <span class="sr-only">Close sidebar</span>
+                              <XMarkIcon class="h-6 w-6 text-white" aria-hidden="true" />
+                            </button>
                                 </div>
                             </TransitionChild>
                             <MenuSidebar></MenuSidebar>
@@ -39,32 +39,56 @@
             <div class="sticky z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8 justify-between">
                 <div>
                     <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="sidebarOpen = true">
-                        <span class="sr-only">Open sidebar</span>
-                        <Bars3CenterLeftIcon class="h-6 w-6" aria-hidden="true" />
-                  </button>
+                            <span class="sr-only">Open sidebar</span>
+                            <Bars3CenterLeftIcon class="h-6 w-6" aria-hidden="true" />
+                      </button>
                 </div>
 
                 <div class="flex ">
 
                     <div class="flex items-center gap-x-4 lg:gap-x-6">
                         <button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
-                        <span class="sr-only">View notifications</span>
-                        <BellIcon class="h-6 w-6" aria-hidden="true" />
-                      </button>
+                            <span class="sr-only">View notifications</span>
+                            <BellIcon class="h-6 w-6" aria-hidden="true" />
+                          </button>
 
                         <!-- Separator -->
                         <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true" />
 
+                        <Menu as="div" class="relative inline-block text-left">
+                            <div>
+                                <MenuButton class="inline-flex w-full items-center justify-center rounded-md  px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                                    <span class="sr-only">Open user menu</span>
+                                    <img class="h-8 w-8 rounded-full bg-gray-50" :src="$page.props.auth.user.profile_photo_url" alt="" />
+                                    <span class="hidden lg:flex lg:items-center">
+                                    <span class="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">{{$page.props.auth.user.short_name}}</span>
+                                    </span>
+                                    <ChevronDownIcon class="ml-2 -mr-1 h-5 w-5 text-violet-200 hover:text-violet-100" aria-hidden="true" />
+                                </MenuButton>
+                            </div>
+
+                            <transition enter-active-class="transition duration-100 ease-out" enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100" leave-active-class="transition duration-75 ease-in" leave-from-class="transform scale-100 opacity-100"
+                                leave-to-class="transform scale-95 opacity-0">
+                                <MenuItems class="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                    <div class="px-1 py-1">
+                                        <MenuItem v-slot="{ active }">
+                                        <button @click="logout" :class="[
+                                            active ? 'bg-primary text-white' : 'text-gray-900',
+                                            'group flex w-full items-center rounded-md px-2 py-2 text-sm',]">
+                                          <ArrowLeftCircleIcon
+                                            :active="active"
+                                            class="mr-2 h-5 w-5 text-violet-400"
+                                            aria-hidden="true"
+                                          />
+                                          Salir
+                                        </button>
+                                        </MenuItem>
+                                    </div>
+                                </MenuItems>
+                            </transition>
+                        </Menu>
                         <!-- Profile dropdown -->
-                        <DownMenu :options="[ { name: 'Home', href: '#', icon: HomeIcon, current: true },]">
 
-                            <span class="sr-only">Open user menu</span>
-                            <img class="h-8 w-8 rounded-full bg-gray-50" :src="$page.props.auth.user.profile_photo_url" alt="" />
-                            <span class="hidden lg:flex lg:items-center">
-                            <span class="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">{{$page.props.auth.user.name}}</span>
-                            </span>
-
-                          </DownMenu>
                     </div>
                 </div>
             </div>
@@ -80,20 +104,12 @@
 
 <script setup>
 import { ref } from 'vue'
-import {
-    Dialog,
-    DialogPanel,
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuItems,
-    TransitionChild,
-    TransitionRoot,
-} from '@headlessui/vue'
+import { Dialog, DialogPanel, TransitionChild, TransitionRoot, Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
+import { router } from '@inertiajs/vue3'
 import { Bars3CenterLeftIcon, Bars4Icon, ClockIcon, HomeIcon, XMarkIcon } from '@heroicons/vue/24/outline'
-import { ChevronRightIcon, ChevronUpDownIcon, EllipsisVerticalIcon, MagnifyingGlassIcon, BellIcon, ChevronDownIcon } from '@heroicons/vue/20/solid'
+import { BellIcon, ChevronDownIcon, ArrowLeftCircleIcon } from '@heroicons/vue/20/solid'
 import MenuSidebar from '@/Components/MenuSidebar.vue';
-import DownMenu from '@/Components/DownMenu.vue';
+
 
 const navigation = [
     { name: 'Home', href: '#', icon: HomeIcon, current: true },
@@ -141,4 +157,9 @@ const projects = [{
 const pinnedProjects = projects.filter((project) => project.pinned)
 
 const sidebarOpen = ref(false)
+
+const logout = () => {
+    router.post(route('logout'));
+};
+
 </script>

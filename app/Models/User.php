@@ -8,15 +8,19 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
+use LdapRecord\Laravel\Auth\HasLdapUser;
 use Laravel\Sanctum\HasApiTokens;
+use LdapRecord\Laravel\Auth\LdapAuthenticatable;
+use LdapRecord\Laravel\Auth\AuthenticatesWithLdap;
 
-class User extends Authenticatable
+class User extends Authenticatable implements LdapAuthenticatable
 {
     use HasApiTokens;
     use HasFactory;
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
+    use HasLdapUser, AuthenticatesWithLdap;
 
     /**
      * The attributes that are mass assignable.
@@ -25,7 +29,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'email',
+        'username',
         'password',
     ];
 
@@ -50,12 +54,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array<int, string>
-     */
+
     protected $appends = [
         'profile_photo_url',
+        'short_name'
     ];
+
+
+    public function getShortNameAttribute(){
+        return explode(' ', $this->name)[0] .' '.explode(' ', $this->name)[count(explode(' ', $this->name)) - 2];
+    }
 }
