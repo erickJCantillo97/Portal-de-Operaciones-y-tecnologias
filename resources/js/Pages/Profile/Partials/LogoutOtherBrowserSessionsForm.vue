@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
-import ActionMessage from '@/Components/ActionMessage.vue';
+import Button from '@/Components/Button.vue';
 import ActionSection from '@/Components/ActionSection.vue';
 import DialogModal from '@/Components/DialogModal.vue';
 import InputError from '@/Components/InputError.vue';
@@ -92,9 +92,9 @@ const closeModal = () => {
                     Log Out Other Browser Sessions
                 </Button>
 
-                <ActionMessage :on="form.recentlySuccessful" class="ml-3">
+                <Button :on="form.recentlySuccessful" class="ml-3">
                     Done.
-                </ActionMessage>
+                </Button>
             </div>
 
             <!-- Log Out Other Devices Confirmation Modal -->

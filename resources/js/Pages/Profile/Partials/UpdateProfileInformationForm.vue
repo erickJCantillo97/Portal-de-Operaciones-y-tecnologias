@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { Link, router, useForm } from '@inertiajs/vue3';
-import ActionMessage from '@/Components/ActionMessage.vue';
+import Button from '@/Components/Button.vue';
 import FormSection from '@/Components/FormSection.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
@@ -177,9 +177,9 @@ const clearPhotoFileInput = () => {
         </template>
 
         <template #actions>
-            <ActionMessage :on="form.recentlySuccessful" class="mr-3">
+            <Button :on="form.recentlySuccessful" class="mr-3">
                 Saved.
-            </ActionMessage>
+            </Button>
 
             <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                 Save
