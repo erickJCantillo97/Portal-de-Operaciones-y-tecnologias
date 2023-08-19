@@ -10,7 +10,7 @@ import DialogModal from '@/Components/DialogModal.vue';
 import FormSection from '@/Components/FormSection.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Button from '@/Components/Button.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import SectionBorder from '@/Components/SectionBorder.vue';
 import TextInput from '@/Components/TextInput.vue';
@@ -118,9 +118,9 @@ const deleteApiToken = () => {
                     Created.
                 </ActionMessage>
 
-                <PrimaryButton :class="{ 'opacity-25': createApiTokenForm.processing }" :disabled="createApiTokenForm.processing">
+                <Button :class="{ 'opacity-25': createApiTokenForm.processing }" :disabled="createApiTokenForm.processing">
                     Create
-                </PrimaryButton>
+                </Button>
             </template>
         </FormSection>
 
@@ -215,14 +215,14 @@ const deleteApiToken = () => {
                     Cancel
                 </SecondaryButton>
 
-                <PrimaryButton
+                <Button
                     class="ml-3"
                     :class="{ 'opacity-25': updateApiTokenForm.processing }"
                     :disabled="updateApiTokenForm.processing"
                     @click="updateApiToken"
                 >
                     Save
-                </PrimaryButton>
+                </Button>
             </template>
         </DialogModal>
 

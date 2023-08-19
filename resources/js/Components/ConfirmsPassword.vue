@@ -2,7 +2,7 @@
 import { ref, reactive, nextTick } from 'vue';
 import DialogModal from './DialogModal.vue';
 import InputError from './InputError.vue';
-import PrimaryButton from './PrimaryButton.vue';
+import Button from './Button.vue';
 import SecondaryButton from './SecondaryButton.vue';
 import TextInput from './TextInput.vue';
 
@@ -104,14 +104,14 @@ const closeModal = () => {
                     Cancel
                 </SecondaryButton>
 
-                <PrimaryButton
+                <Button
                     class="ml-3"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                     @click="confirmPassword"
                 >
                     {{ button }}
-                </PrimaryButton>
+                </Button>
             </template>
         </DialogModal>
     </span>
