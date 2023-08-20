@@ -12,9 +12,11 @@ use LdapRecord\Laravel\Auth\HasLdapUser;
 use Laravel\Sanctum\HasApiTokens;
 use LdapRecord\Laravel\Auth\LdapAuthenticatable;
 use LdapRecord\Laravel\Auth\AuthenticatesWithLdap;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements LdapAuthenticatable
 {
+    use HasRoles;
     use HasApiTokens;
     use HasFactory;
     use HasProfilePhoto;
@@ -22,6 +24,7 @@ class User extends Authenticatable implements LdapAuthenticatable
     use TwoFactorAuthenticatable;
     use HasLdapUser, AuthenticatesWithLdap;
 
+    protected $guard_name = 'web';
     /**
      * The attributes that are mass assignable.
      *

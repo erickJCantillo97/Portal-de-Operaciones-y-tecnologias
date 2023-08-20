@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\RoleController;
 use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,13 +29,8 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
+Route::middleware([ 'auth:sanctum', config('jetstream.auth_session'),'verified'])->group(function () {
     Route::get('/dashboard', function () {
-
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
@@ -42,25 +39,31 @@ Route::middleware([
     })->name('settings.basic');
 
     Route::get('pruebaApi', function (){
-        return getEmpleadosAPI()->groupBy('GERENCIA');
+        if(auth()->user()->hasRole('Super Admin')){
+
+            return getEmpleadosAPI()->groupBy('GERENCIA');
+        }
+        return searchEmpleados('GERENCIA', auth()->user()->gerencia)->groupBy('OFICINA');
+
+
     })->name('pruebaApi');
     Route::get('simple/crud', function(Request $request){
-        return $request;
+        $request = $request->all();
     })->name('simple.crud');
 
+    Route::resource('roles', RoleController::class);
+
     Route::get('get/gerencias', function(){
-        $gerencias = array_map(function ($object) {
-            $object->nombre = $object->name;
-            unset($object->name);
-            return $object;
-        }, gerencias());
-        return response()->json(['gerencias'=>$gerencias]);
+
+        return response()->json(['gerencias'=>gerencias()]);
     })->name('get.gerencias');
 
     Route::get('seguridad',  function (Request $request){
-        $users = User::orderBy('gerencia')->get();
+
+        $users = User::with('roles')->orderBy('gerencia')->get();
+        $roles = Role::orderBy('name')->get();
         return Inertia::render('Security/Index',[
-            'users' => $users
+            'users' => $users,'roles' => $roles
         ]);
     })->name('security');
 

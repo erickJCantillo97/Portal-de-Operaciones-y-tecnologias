@@ -1,12 +1,12 @@
 <template>
-    <div class="px-2 shadow-md py-4 rounded-b-xl max-w-screen">
-        <div class="flex items-center">
+    <div class="px-auto shadow-md py-4 rounded-b-xl w-full">
+        <div class="flex items-center px-10">
             <div class="flex-auto">
                 <h1 class="text-xl capitalize font-semibold leading-6 text-primary">{{title}}</h1>
             </div>
 
-            <div class="mt-4 ml-16" v-show="add">
-                <Button type="button" @click="open = !open" severity="success">
+            <div class="mt-2 ml-16 " v-show="add">
+                <Button type="button" @click="addItem()" severity="success">
                     <PlusIcon class="h-6 w-6 mr-2" aria-hidden="true" />
                     Nuevo
                 </Button>
@@ -19,14 +19,33 @@
                         <thead>
                             <tr>
                                 <th v-for="( header, index) of headers" :key="header" scope="col" class=" sticky -top-2 border-b border-gray-300 bg-gray-200 bg-opacity-75 py-3.5 pl-8 pr-3 text-left text-sm font-semibold text-gray-900 capitalize backdrop-blur backdrop-filter sm:pl-6 lg:pl-8"
-                                    :class="index == 0 ?'hidden lg:table-cell':''">{{header}}</th>
+                                    :class="index == 0 ?'hidden lg:table-cell':''">{{header.header}}</th>
+
+                                <th v-if="props.edit || props.delete" scope="col" class="sticky -top-2 border-b border-gray-300 bg-gray-200 bg-opacity-75 py-3.5 pl-8 pr-3 text-left text-sm font-semibold text-gray-900 capitalize backdrop-blur backdrop-filter sm:pl-6 lg:pl-8"
+                                >Actions</th>
                             </tr>
                         </thead>
                         <tbody >
                             <tr v-for="(person, personIdx) in elements" :key="person.email">
-                                <td v-for="(header, index) of headers" :class="[personIdx !== elements.length - 1 ? 'border-b border-gray-200' : '', 'whitespace-normal  py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8', index == 0 ? 'hidden lg:table-cell':'']">
-                                    {{ person[header] }}</td>
+                                <td v-for="(header, index) of headers" :class="['border-b border-gray-200 whitespace-normal  py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8', index == 0 ? 'hidden lg:table-cell':'']">
+                                    {{ index == 0 ? personIdx+1:person[header.field] }}</td>
+
+                                <td v-if="props.edit || props.delete"  :class="['whitespace-normal  py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8 flex space-x-2 border-b border-gray-200']">
+                                    <div class="" v-if="props.edit">
+                                        <Button  severity="primary" class="hover:bg-primary">
+                                            <PencilIcon class="h-4 w-4 " aria-hidden="true" />
+                                        </Button>
+                                    </div>
+                                    <div class="" @click="deleteItem(person.id)"  v-if="props.delete">
+                                        <Button severity="danger">
+                                            <TrashIcon class="h-4 w-4 " aria-hidden="true" />
+                                        </Button>
+                                    </div>
+
+
+                                </td>
                             </tr>
+
                         </tbody>
                     </table>
                 </div>
@@ -50,14 +69,20 @@
                                 <div class="text-center mt-2">
                                     <DialogTitle as="h3" class="text-xl font-semibold text-primary ">Crear {{title}}</DialogTitle>
                                     <div class="mt-2 space-y-4 border border-gray-200 p-2 rounded-lg">
-                                        <TextInput class="mt-2 text-left" :label="header" v-for="header of headers" v-model="form.object[header]">
-                                        </TextInput>
+                                        <template v-for="header of headers">
+                                            <TextInput class="mt-2 text-left"
+                                            v-if="header.input !== false"
+                                            :label="header.header"
+                                            :error="router.page.props.errors[header.field]"
+                                            v-model="form.object[header.field]"></TextInput>
+                                        </template>
+
                                     </div>
                                 </div>
                             </div>
                             <div class="mt-2 flex space-x-4">
-                                <Button severity="danger" @click="open = false" >Cancelar</Button>
-                                <Button severity="success" @click="submit">Guardar</Button>
+                                <Button class="hover:bg-danger text-danger border-danger" severity="danger" @click="open = false" >Cancelar</Button>
+                                <Button severity="success" :loading="loading" class="text-success hover:bg-success" @click="submit">Guardar</Button>
                             </div>
                         </DialogPanel>
                     </TransitionChild>
@@ -69,30 +94,16 @@
 
 <script setup>
 import Button from './Button.vue';
-import { PlusIcon } from '@heroicons/vue/24/outline'
+import { PlusIcon,PencilIcon,TrashIcon } from '@heroicons/vue/24/outline'
 import { router, useForm } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import TextInput from './TextInput.vue';
+import {useSweetalert} from '@/composable/sweetAlert'
 
-const form = useForm({
-    object: {}
-})
-const open = ref(false)
+const {toast} = useSweetalert();
 
-onMounted(() => {
-    for (let header of props.headers) {
-        form.object[header] = '';
-    }
-})
-
-const submit = () => {
-    router.get(route('simple.crud'), form.object,{
-        onSuccess: (res) => {
-            console.log(res);
-        }
-    })
-}
+const {confirmDelete} = useSweetalert();
 
 const props = defineProps({
     headers: {
@@ -107,6 +118,61 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
+    edit: {
+        type: Boolean,
+        default: false
+    },
+    delete: {
+        type: Boolean,
+        default: false
+    },
+    url: {
+        type: String,
+        required: false
+    },
     title: String,
 })
+const open = ref(false)
+const loading = ref(false)
+const form = useForm({
+    object: {}
+})
+
+
+const submit = () => {
+    loading.value = true;
+    router.post(route(props.url+'.store'), form.object,{
+        onSuccess: (res) => {
+            open.value = false;
+            toast(props.title + ' Creado Exitosamente', 'success');
+
+        },
+        onError: (errors) => {
+            toast('Ha surgido un error', 'error');
+        },
+        onFinish: visit => {
+            loading.value = false;
+        }
+    })
+}
+
+const deleteItem = (id) => {
+    confirmDelete(id, props.title)
+}
+
+const addItem = () => {
+    resetValues();
+    open.value = true;
+}
+
+const resetValues = () => {
+
+    for (let header of props.headers) {
+        form.object[header.field] = '';
+        router.page.props.errors[header.field] = null
+    }
+}
+
+
+
 </script>

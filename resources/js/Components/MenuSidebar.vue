@@ -14,7 +14,7 @@
                 <li class="nav-item">
                 <ul>
                     <li v-for="item in navigation" :key="item.name" class=" nav-item">
-                    <Link v-if="!item.children" :href="route(item.href)" class="group">
+                    <Link v-if="!item.children" v-show="item.show" :href="route(item.href)" class="group">
                         <div class="flex items-center group-hover:!text-primary">
                             <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400" aria-hidden="true" />
                             <span class="pl-3 text-black dark:text-[#506690] dark:group-hover:text-white">{{
@@ -65,6 +65,8 @@
     import { ref } from 'vue'
     import { Link } from '@inertiajs/vue3';
     import ApplicationLogo from '@/Components/ApplicationLogo.vue'
+    import { usePermissions } from '@/composable/permission';
+
     import VueCollapsible from 'vue-height-collapsible/vue3';
     import {
     CalendarIcon,
@@ -75,9 +77,9 @@
     UsersIcon,
     } from '@heroicons/vue/24/outline'
     const activeDropdown = ref();
-
+    const {hasRole} = usePermissions();
     const navigation = [
-        { name: 'Dashboard', href: 'dashboard', icon: HomeIcon, current: true },
+        { name: 'Dashboard', href: 'dashboard', icon: HomeIcon, current: true, show: true},
         {
             name: 'Gestion de Personal',
             icon: UsersIcon,

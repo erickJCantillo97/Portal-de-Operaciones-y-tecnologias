@@ -77,7 +77,8 @@ return [
                     'gerencia' => 'department',
                     'oficina' => 'physicaldeliveryofficename',
                     'num_sap' => 'employeenumber',
-                    'identificacion' => 'employeeid'
+                    'identificacion' => 'employeeid',
+                    'cargo' => 'title'
                 ],
             ],
         ],

@@ -2,7 +2,9 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { usePermissions } from '@/composable/permission';
 
+const {hasRole} = usePermissions();
 
 const colors = { GEDIN: 'bg-blue-500', VPEXE: 'bg-gray-500', GEMAM: 'bg-teal-500', 'VPT&O': 'bg-yellow-500', GEBOC: 'bg-cyan-500', GECTI: 'bg-indigo-500',GETHU: 'bg-red-500', PCTMAR: 'bg-purple-500',GEFAD: 'bg-sky-500',GECON: 'bg-pink-500'}
 
@@ -13,7 +15,7 @@ onMounted(() => {
         for(var  gerencia of Object.values(res.data)){
             personal.value.push(
                 {
-                    title: gerencia[0].GERENCIA,
+                    title: hasRole('Super Admin') ? gerencia[0].GERENCIA: gerencia[0].OFICINA,
                     initials: gerencia.length,
                     totalMembers: gerencia.length,
                     bgColorClass: gerencia[0].GERENCIA != 'GECON' ? colors[gerencia[0].GERENCIA]: 'bg-'+gerencia[0].GERENCIA,

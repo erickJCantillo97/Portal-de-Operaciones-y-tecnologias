@@ -7,12 +7,13 @@
                 <div class="fixed inset-0 bg-[black]/60 z-10" :class="{ hidden: !menu }" @click="menu = !menu"></div>
 
                 <MenuSidebar class="lg:block " :class="{ hidden: !menu }"></MenuSidebar>
-                <div class="sticky z-10 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white pl-8 px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8 justify-between">
+                <div class="sticky z-10 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white pl-8 px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8 justify-between md:ml-16">
                     <div>
                         <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="menu = !menu">
                                 <span class="sr-only">Open sidebar</span>
                                 <Bars3CenterLeftIcon class="h-6 w-6" aria-hidden="true" />
                             </button>
+                            <h1 class="hidden lg:block text-primary font-extrabold text-xl">Portal de Operaciones Tecnologicas</h1>
                     </div>
                     <div class="flex ">
                         <div class="flex items-center ">
