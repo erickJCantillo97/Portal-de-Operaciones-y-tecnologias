@@ -43,10 +43,9 @@ const submit = () => {
         <div class="mx-auto w-full max-w-sm lg:w-96">
           <div>
            <ApplicationLogo></ApplicationLogo>
-            <h2 class="mt-8 text-2xl font-bold leading-9 tracking-tight text-gray-900">Inicia sesión con tu cuenta</h2>
+            <h2 class="mt-8 text-2xl font-bold leading-9 tracking-tight text-gray-900">Binevenido al Portal de Operaciones Tecnologicas</h2>
             <p class="mt-2 text-sm leading-6 text-gray-500">
-                Si eres un Cliente
-                <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Entra aqui</a>
+                Inicia Sesion con tu tuario de dominio
             </p>
           </div>
 
@@ -54,10 +53,16 @@ const submit = () => {
             <div>
               <form action="#" method="POST" @submit.prevent="submit" class="space-y-6">
                 <div>
-                  <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email address</label>
-                  <div class="mt-2">
-                    <input id="email" v-model="form.username" name="email" type="text" autocomplete="email" required="" class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
-                  </div>
+                    <label for="price" class="block text-sm font-medium leading-6 text-gray-900">Price</label>
+                        <div class="relative mt-2 rounded-md shadow-sm">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+
+                        </div>
+                        <input type="text" v-model="form.username" class="block w-full rounded-md border-0 py-1.5 pr-12 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"  aria-describedby="price-currency" />
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                            <span class="text-gray-500 sm:text-sm" id="price-currency">@cotecmar.com</span>
+                        </div>
+                        </div>
                 </div>
 
                 <div>

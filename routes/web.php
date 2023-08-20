@@ -1,8 +1,12 @@
 <?php
 
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use LdapRecord\Container;
+use LdapRecord\Models\ActiveDirectory\User as LdapUser;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +20,7 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -32,4 +37,21 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+});
+
+Route::get('pruebaApi', function (){
+   return getEmpleadosAPI()->groupBy('GERENCIA');
+})->name('pruebaApi');
+
+
+Route::get('chagePassword', function (){
+    // Obtén el usuario autenticado (por ejemplo, usando Auth::user())
+    $authenticatedUser = Auth::user();
+
+    // Recupera el modelo LDAP del usuario autenticado
+    $ldapUser = \LdapRecord\Models\ActiveDirectory\User::where('samaccountname', 'ecantillo')->first();
+    // Guarda los cambios en el servidor LDAP
+    $ldapUser->password = "Agosto2022";
+    $ldapUser->save();
+    return $ldapUser;
 });

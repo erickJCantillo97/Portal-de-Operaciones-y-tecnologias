@@ -1,51 +1,71 @@
 <template>
-    <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pt-2 custom-scroll">
-        <div class="flex flex-shrink-0 items-center px-2 space-x-4 text-2xl text-primary justify-center">
-            <ApplicationLogo :letras="false"  :width-logo="50" :height-logo="50"></ApplicationLogo>
-            <h1 class="font-extrabold">COTECAMAR</h1>
+    <div class="sidebar fixed min-h-screen h-full top-0 bottom-0 w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] z-50 transition-all duration-300">
+        <div class="bg-white  h-full">
+        <div class="flex justify-between items-center px-4 py-3">
+            <div class="main-logo flex items-center shrink-0">
+                <ApplicationLogo :letras="false"  :width-logo="50" :height-logo="50"></ApplicationLogo>
+                <span class="text-2xl ml-1.5 rtl:mr-1.5 font-semibold align-middle lg:inline dark:text-white-light text-primary">COTECAMAR</span>
+            </div>
+
         </div>
 
-        <nav class="flex flex-1 flex-col">
-            <ul role="list" class="flex flex-1 flex-col gap-y-7">
-                <li>
-                <ul role="list" class="-mx-2 space-y-1">
-                    <li v-for="item in navigation" :key="item.name">
-                    <a v-if="!item.children" :href="item.href" :class="[item.current ? 'bg-blue-100' : 'hover:bg-blue-100', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-gray-800']">
-                        <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400" aria-hidden="true" />
-                        {{ item.name }}
+        <nav class="h-[calc(100vh-80px)] relative">
+            <ul role="list" class="relative font-semibold space-y-0.5 p-4 py-0">
+                <li class="nav-item">
+                <ul>
+                    <li v-for="item in navigation" :key="item.name" class=" nav-item">
+                    <a v-if="!item.children" :href="item.href" class="group">
+                        <div class="flex items-center group-hover:!text-primary">
+                            <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400" aria-hidden="true" />
+                            <span class="pl-3 text-black dark:text-[#506690] dark:group-hover:text-white">{{
+                                item.name
+                            }}</span>
+                        </div>
                     </a>
-                    <Disclosure as="div" v-else v-slot="{ open }">
-                        <DisclosureButton :class="[item.current ? 'bg-blue-100' : 'hover:bg-blue-100', 'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold text-gray-700']">
+                    <button
+                    v-else
+                    type="button"
+                    class="nav-link group w-full"
+                    :class="{ active: activeDropdown === item.name }"
+                    @click="activeDropdown === item.name ? (activeDropdown = null) : (activeDropdown = item.name)"
+                >
+                    <div class="flex items-center">
                         <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400" aria-hidden="true" />
-                        {{ item.name }}
-                        <ChevronRightIcon :class="[open ? 'rotate-90 text-gray-500' : 'text-gray-400', 'ml-auto h-5 w-5 shrink-0']" aria-hidden="true" />
-                        </DisclosureButton>
-                        <DisclosurePanel as="ul" class="mt-1 px-2">
-                        <li v-for="subItem in item.children" :key="subItem.name">
-                            <!-- 44px -->
-                            <DisclosureButton as="a" :href="subItem.href" :class="[subItem.current ? 'bg-gray-50' : 'hover:bg-gray-50', 'block rounded-md py-2 pr-2 pl-9 text-sm leading-6 text-gray-700']">{{ subItem.name }}</DisclosureButton>
+
+                        <span class="pl-3  text-black dark:text-[#506690] dark:group-hover:text-white-dark">{{
+                           item.name
+                        }}</span>
+                    </div>
+                    <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === item.name }">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                </button>
+                <vue-collapsible :isOpen="activeDropdown === item.name">
+                    <ul class="sub-menu text-gray-500" v-for="children of item.children">
+                        <li>
+                            <Link :href="'/'" @click="toggleMobileMenu">{{ children.name }}</Link>
                         </li>
-                        </DisclosurePanel>
-                    </Disclosure>
+                    </ul>
+                </vue-collapsible>
+
                     </li>
                 </ul>
                 </li>
-                <li class="-mx-6 mt-auto">
-                <a href="#" class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50">
-                    <img class="h-8 w-8 rounded-full bg-gray-50" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
-                    <span class="sr-only">Your profile</span>
-                    <span aria-hidden="true">Tom Cook</span>
-                </a>
-                </li>
+
             </ul>
         </nav>
+        </div>
+
     </div>
 </template>
 
 <script setup>
+    import { ref } from 'vue'
+    import { Link } from '@inertiajs/vue3';
     import ApplicationLogo from '@/Components/ApplicationLogo.vue'
-    import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
-    import { ChevronRightIcon } from '@heroicons/vue/20/solid'
+    import VueCollapsible from 'vue-height-collapsible/vue3';
     import {
     CalendarIcon,
     ChartPieIcon,
@@ -54,6 +74,7 @@
     HomeIcon,
     UsersIcon,
     } from '@heroicons/vue/24/outline'
+    const activeDropdown = ref();
 
     const navigation = [
         { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },

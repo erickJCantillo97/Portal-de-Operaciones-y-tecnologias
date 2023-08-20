@@ -72,8 +72,12 @@ return [
             'database' => [
                 'model' => App\Models\User::class,
                 'sync_attributes' => [
-                    'name' => 'cn',
+                    'name' => 'displayname',
                     'username' => 'samaccountname',
+                    'gerencia' => 'department',
+                    'oficina' => 'physicaldeliveryofficename',
+                    'num_sap' => 'employeenumber',
+                    'identificacion' => 'employeeid'
                 ],
             ],
         ],

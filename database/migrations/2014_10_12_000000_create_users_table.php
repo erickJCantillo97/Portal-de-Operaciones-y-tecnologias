@@ -15,6 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('username')->unique();
+            $table->string('gerencia')->nullable();
+            $table->string('oficina')->nullable();
+            $table->string('identificacion')->unique();
+            $table->integer('num_sap')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->bigInteger('division_id')->unsigned()->nullable()->index();
             $table->string('password');
