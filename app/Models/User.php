@@ -63,12 +63,12 @@ class User extends Authenticatable implements LdapAuthenticatable
 
 
     public function getShortNameAttribute(){
-        return explode(' ', $this->name)[0] .' '.explode(' ', $this->name)[count(explode(' ', $this->name)) - 2];
+        return explode(' ', $this->name)[0] .' '.explode(' ', $this->name)[count(explode(' ', $this->name)) - 2 > -1 ? count(explode(' ', $this->name)) - 2: 0];
     }
 
     public function getPhotoAttribute()
     {
-        $value = $this->ldap->thumbnailphoto;
+        $value = $this->ldap->thumbnailphoto ?? null;
         // Due to LDAP's multi-valued nature, all values will be
         // contained inside of an array. We will attempt to
         // retrieve the first one, or supply a default.

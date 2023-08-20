@@ -1,12 +1,10 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use LdapRecord\Container;
-use LdapRecord\Models\ActiveDirectory\User as LdapUser;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,23 +33,48 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
+
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
+    Route::get('settings/basic', function (){
+        return Inertia::render('Settings/Basic/Index');
+    })->name('settings.basic');
+
+    Route::get('pruebaApi', function (){
+        return getEmpleadosAPI()->groupBy('GERENCIA');
+    })->name('pruebaApi');
+    Route::get('simple/crud', function(Request $request){
+        return $request;
+    })->name('simple.crud');
+
+    Route::get('get/gerencias', function(){
+        $gerencias = array_map(function ($object) {
+            $object->nombre = $object->name;
+            unset($object->name);
+            return $object;
+        }, gerencias());
+        return response()->json(['gerencias'=>$gerencias]);
+    })->name('get.gerencias');
+
+    Route::get('seguridad',  function (Request $request){
+        $users = User::orderBy('gerencia')->get();
+        return Inertia::render('Security/Index',[
+            'users' => $users
+        ]);
+    })->name('security');
+
+
 });
+// Route::get('chagePassword', function (){
+//     // Obtén el usuario autenticado (por ejemplo, usando Auth::user())
+//     $authenticatedUser = Auth::user();
 
-Route::get('pruebaApi', function (){
-   return getEmpleadosAPI()->groupBy('GERENCIA');
-})->name('pruebaApi');
+//     // Recupera el modelo LDAP del usuario autenticado
+//     $ldapUser = \LdapRecord\Models\ActiveDirectory\User::where('samaccountname', 'ecantillo')->first();
+//     // Guarda los cambios en el servidor LDAP
+//     $ldapUser->password = "Agosto2022";
+//     $ldapUser->save();
+//     return $ldapUser;
+// });
 
-
-Route::get('chagePassword', function (){
-    // Obtén el usuario autenticado (por ejemplo, usando Auth::user())
-    $authenticatedUser = Auth::user();
-
-    // Recupera el modelo LDAP del usuario autenticado
-    $ldapUser = \LdapRecord\Models\ActiveDirectory\User::where('samaccountname', 'ecantillo')->first();
-    // Guarda los cambios en el servidor LDAP
-    $ldapUser->password = "Agosto2022";
-    $ldapUser->save();
-    return $ldapUser;
-});

@@ -53,7 +53,7 @@ const submit = () => {
             <div>
               <form action="#" method="POST" @submit.prevent="submit" class="space-y-6">
                 <div>
-                    <label for="price" class="block text-sm font-medium leading-6 text-gray-900">Price</label>
+                    <label for="price" class="block text-sm font-medium leading-6 text-gray-900">Nombre de Usuario</label>
                         <div class="relative mt-2 rounded-md shadow-sm">
                         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
 

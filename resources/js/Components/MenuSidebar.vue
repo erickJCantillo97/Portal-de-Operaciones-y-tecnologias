@@ -1,10 +1,10 @@
 <template>
     <div class="sidebar fixed min-h-screen h-full top-0 bottom-0 w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] z-50 transition-all duration-300">
         <div class="bg-white  h-full">
-        <div class="flex justify-between items-center px-4 py-3">
+        <div class="flex justify-between items-center px-2 py-3">
             <div class="main-logo flex items-center shrink-0">
                 <ApplicationLogo :letras="false"  :width-logo="50" :height-logo="50"></ApplicationLogo>
-                <span class="text-2xl ml-1.5 rtl:mr-1.5 font-semibold align-middle lg:inline dark:text-white-light text-primary">COTECAMAR</span>
+                <span class="text-2xl ml-2  font-semibold align-middle lg:inline dark:text-white-light text-primary">COTECAMAR</span>
             </div>
 
         </div>
@@ -14,14 +14,14 @@
                 <li class="nav-item">
                 <ul>
                     <li v-for="item in navigation" :key="item.name" class=" nav-item">
-                    <a v-if="!item.children" :href="item.href" class="group">
+                    <Link v-if="!item.children" :href="route(item.href)" class="group">
                         <div class="flex items-center group-hover:!text-primary">
                             <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400" aria-hidden="true" />
                             <span class="pl-3 text-black dark:text-[#506690] dark:group-hover:text-white">{{
                                 item.name
                             }}</span>
                         </div>
-                    </a>
+                    </Link>
                     <button
                     v-else
                     type="button"
@@ -45,7 +45,7 @@
                 <vue-collapsible :isOpen="activeDropdown === item.name">
                     <ul class="sub-menu text-gray-500" v-for="children of item.children">
                         <li>
-                            <Link :href="'/'" @click="toggleMobileMenu">{{ children.name }}</Link>
+                            <Link :href="'/'">{{ children.name }}</Link>
                         </li>
                     </ul>
                 </vue-collapsible>
@@ -77,7 +77,7 @@
     const activeDropdown = ref();
 
     const navigation = [
-        { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },
+        { name: 'Dashboard', href: 'dashboard', icon: HomeIcon, current: true },
         {
             name: 'Gestion de Personal',
             icon: UsersIcon,
@@ -99,8 +99,8 @@
             { name: 'Clases', href: '#' },
             ],
         },
-        { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
-        { name: 'Documents', href: '#', icon: DocumentDuplicateIcon, current: false },
-        { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
+        // { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
+        // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon, current: false },
+        // { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
     ]
 </script>
