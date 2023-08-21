@@ -1,9 +1,9 @@
 <?php
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
-use Ramsey\Collection\Collection;
 
-function getEmpleadosAPI()
+function getEmpleadosAPI(): mixed
 {
     try {
         if (getToken()){
@@ -12,12 +12,14 @@ function getEmpleadosAPI()
                     )->json();
             return  collect($json);
         }
+        return false;
+        
     } catch (\Throwable $th) {
         return false;
     }
 }
 
-function getToken(){
+function getToken(): bool{
 
     if(session()->get('token') == null)
     {
@@ -32,7 +34,7 @@ function getToken(){
     return true;
 }
 
-function login(){
+function login(): bool{
     try{
         $login = Http::acceptJson()->post(env('ROUTE_API').'/auth/login',
             [
@@ -50,7 +52,8 @@ function login(){
     }
 }
 
-function searchEmpleados($clave, $valor){
+function searchEmpleados(String $clave, String $valor): array
+{
     return getEmpleadosAPI()->filter(function ($employee) use ($clave, $valor){
             return $employee[$clave] == $valor;
     });
