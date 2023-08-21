@@ -26,7 +26,7 @@ export function useSweetalert(){
         confirmButtonColor: '#e7515a',
         showLoaderOnConfirm: true,
         preConfirm: () => {
-            router.delete(route(url.toLowerCase()+'.destroy', id), {
+            router.delete(route(url+'.destroy', id), {
                 onSuccess: () => {
                     Toast.fire({ icon: 'success', title: title +' Elimnado'})
                 }

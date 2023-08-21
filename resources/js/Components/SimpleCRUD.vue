@@ -1,18 +1,18 @@
 <template>
-    <div class="px-auto shadow-md py-4 rounded-b-xl w-full">
-        <div class="flex items-center px-10">
-            <div class="flex-auto">
+    <div class="px-auto shadow-md py-1 rounded-b-xl w-full">
+        <div class="flex items-center  px-10">
+            <div class="flex-auto mt-4">
                 <h1 class="text-xl capitalize font-semibold leading-6 text-primary">{{getPlurar(title)}}</h1>
             </div>
 
-            <div class="mt-2 ml-16 " v-show="add">
+            <div class="ml-16 " v-show="add">
                 <Button type="button" @click="addItem()" severity="success">
                     <PlusIcon class="h-6 w-6 mr-2" aria-hidden="true" />
                     Nuevo
                 </Button>
             </div>
         </div>
-        <div class="mt-2 flow-root">
+        <div class="flow-root">
             <div class="m-2">
                 <div class="inline-block min-w-full py-2 align-middle max-h-64 hover:overflow-y-auto overflow-y-hidden custom-scroll">
                     <table class="min-w-full border-separate border-spacing-0">
@@ -26,7 +26,7 @@
                             </tr>
                         </thead>
                         <tbody >
-                            <tr v-for="(person, personIdx) in elements" :key="person.email">
+                            <tr v-for="(person, personIdx) in elementos" >
                                 <td v-for="(header, index) of headers" :class="['border-b border-gray-200 whitespace-normal  py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8', index == 0 ? 'hidden lg:table-cell':'', header.show !== false ? '':'hidden']">
                                     {{ index == 0 ? personIdx+1:person[header.field] }}</td>
 
@@ -118,10 +118,12 @@ import Multiselect from '@suadelabs/vue3-multiselect'
 import {useSweetalert} from '@/composable/sweetAlert'
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
 import plural from 'pluralize-es'
+import axios from 'axios';
 const {toast} = useSweetalert();
 
 const {confirmDelete} = useSweetalert();
 
+const elementos = ref(props.elements);
 const props = defineProps({
     headers: {
         type: Array,
@@ -129,7 +131,7 @@ const props = defineProps({
     },
     elements: {
         type: Array,
-        required: true
+        default: []
     },
     add: {
         type: Boolean,
@@ -155,17 +157,28 @@ const props = defineProps({
 })
 const open = ref(false)
 const loading = ref(false)
+
+const selected = ref()
+
 const form = useForm({
     object: {}
 })
-const selected = ref()
-const  options= ref(['list', 'of', 'options']);
+
+//Function
+
+/* Funcion Incial de componente*/
+onMounted(() => {
+    getElements()
+})
+
+/* Funcion para AGREGAR Elementos al modelo*/
 const submit = () => {
     loading.value = true;
     router.post(route(props.url+'.store'), form.object,{
         onSuccess: (res) => {
             open.value = false;
             toast(props.title + ' Creado Exitosamente', 'success');
+            getElements()
         },
         onError: (errors) => {
             toast('Ha surgido un error', 'error');
@@ -176,15 +189,19 @@ const submit = () => {
     })
 }
 
-const deleteItem = (id) => {
-    confirmDelete(id, props.title, props.url)
+/* Funcion para ELIMINAR Elementos al modelo*/
+const deleteItem = async (id) => {
+    await confirmDelete(id, props.title, props.url)
+    getElements()
 }
 
+/* Funcion para abril el modal con los campos vacios*/
 const addItem = () => {
     resetValues();
     open.value = true;
 }
 
+/* Limpiar todo los campo*/
 const resetValues = () => {
     for (let header of props.headers) {
         form.object[header.field] = header.type === 'multiple' ? []:'';
@@ -192,10 +209,18 @@ const resetValues = () => {
     }
 }
 
+/* Obtener los elementos del modelo */
+const getElements = () => {
+    if(props.elements.length == 0 && props.url){
+        axios.get(route(props.url+'.index')).then((res) => {
+            elementos.value = res.data[0];
+        })
+    }
+}
+
+/* Poner en Plurar un srt*/
 const getPlurar = (str) =>{
     return plural(str);
 }
-
-
 
 </script>

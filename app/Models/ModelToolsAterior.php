@@ -9,7 +9,7 @@ class ModelToolsAterior extends Model
 {
     use HasFactory;
 
-    protected $table = 'customers';
+    protected $table = 'swbs_base_activities';
     protected $connection = 'sqlsrv_anterior';
     protected $guard = 'personal_sap';
 }

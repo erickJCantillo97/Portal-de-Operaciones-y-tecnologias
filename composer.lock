@@ -121,12 +121,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Cotecmar/libreria.git",
-                "reference": "36007a7b80fa30a6a4718e241a0bec36f00148e7"
+                "reference": "e9ddc36d16a053129d610052dbf8c8a61990b216"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Cotecmar/libreria/zipball/36007a7b80fa30a6a4718e241a0bec36f00148e7",
-                "reference": "36007a7b80fa30a6a4718e241a0bec36f00148e7",
+                "url": "https://api.github.com/repos/Cotecmar/libreria/zipball/e9ddc36d16a053129d610052dbf8c8a61990b216",
+                "reference": "e9ddc36d16a053129d610052dbf8c8a61990b216",
                 "shasum": ""
             },
             "require": {
@@ -149,7 +149,7 @@
                 "issues": "https://github.com/Cotecmar/libreria/issues",
                 "source": "https://github.com/Cotecmar/libreria/tree/main"
             },
-            "time": "2023-08-19T04:15:34+00:00"
+            "time": "2023-08-21T23:00:11+00:00"
         },
         {
             "name": "dasprid/enum",
@@ -9007,16 +9007,16 @@
         },
         {
             "name": "spatie/ignition",
-            "version": "1.9.0",
+            "version": "1.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/ignition.git",
-                "reference": "de24ff1e01814d5043bd6eb4ab36a5a852a04973"
+                "reference": "d92b9a081e99261179b63a858c7a4b01541e7dd1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/ignition/zipball/de24ff1e01814d5043bd6eb4ab36a5a852a04973",
-                "reference": "de24ff1e01814d5043bd6eb4ab36a5a852a04973",
+                "url": "https://api.github.com/repos/spatie/ignition/zipball/d92b9a081e99261179b63a858c7a4b01541e7dd1",
+                "reference": "d92b9a081e99261179b63a858c7a4b01541e7dd1",
                 "shasum": ""
             },
             "require": {
@@ -9086,7 +9086,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-06-28T13:24:59+00:00"
+            "time": "2023-08-21T15:06:37+00:00"
         },
         {
             "name": "spatie/laravel-ignition",

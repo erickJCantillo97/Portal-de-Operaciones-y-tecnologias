@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\ModelToolsAterior;
+use App\Models\SWBS\BaseActivity;
 use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -35,9 +36,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified','
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    Route::get('settings/basic', function (){
-        return Inertia::render('Settings/Basic/Index');
-    })->name('settings.basic');
+
 
     Route::get('pruebaApi', function (){
         if(auth()->user()->hasRole('Super Admin')){
@@ -72,3 +71,12 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified','
 //     return $ldapUser;
 // });
 
+
+Route::get('recuperarDatos',function (){
+
+    $datos = ModelToolsAterior::select('name', 'ord', 'validity', 'status')->get();
+    foreach ($datos as $dato) {
+        # code...
+        BaseActivity::create(json_decode($dato, true));
+    }
+});

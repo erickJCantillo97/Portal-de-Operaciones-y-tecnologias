@@ -3,7 +3,7 @@ use Cotecmar\Servicio\Main;
 
 
 
-function gerencias(): object
+function gerencias(): array
 {
     return Main::gerencias();
 }

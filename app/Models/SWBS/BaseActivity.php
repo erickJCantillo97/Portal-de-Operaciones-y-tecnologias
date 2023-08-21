@@ -11,5 +11,5 @@ class BaseActivity extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $guard = [];
+    protected $guarded = [];
 }

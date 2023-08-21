@@ -1,19 +1,26 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\SWBS;
 
+use App\Http\Controllers\Controller;
 use App\Models\SWBS\BaseActivity;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class BaseActivityController extends Controller
 {
+   // Illuminate\Http\JsonResponse
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $baseActivity = BaseActivity::orderBy('name')->get();
+
+        return response()->json([
+                $baseActivity
+            ], 200);
     }
 
     /**
@@ -21,7 +28,7 @@ class BaseActivityController extends Controller
      */
     public function create()
     {
-        //
+        return 'Holaaaaaaaaaa';
     }
 
     /**
@@ -30,7 +37,7 @@ class BaseActivityController extends Controller
     public function store(Request $request)
     {
         $validateData = $request->validate([
-            //
+            'name' => 'required|unique:base_activities,name'
         ]);
 
         try{

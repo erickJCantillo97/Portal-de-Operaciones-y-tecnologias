@@ -13,7 +13,10 @@ return new class extends Migration
     {
         Schema::create('base_activities', function (Blueprint $table) {
             $table->id();
-            
+            $table->string('name', 200);
+            $table->unsignedBigInteger('ord')->unsigned()->default(0);
+            $table->boolean('validity')->default(0);
+            $table->boolean('status')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });
