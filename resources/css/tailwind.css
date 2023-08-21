@@ -9,9 +9,6 @@
 
 /* swiper */
 @import './custom/swiper.css';
-
-
-
 /* tippy */
 @import './custom/tippy.css';
 
@@ -102,7 +99,7 @@
         @apply bg-[#000]/[0.08] text-black dark:bg-[#181f32]  ;
     }
 
-    
+
 
     .sidebar ul.sub-menu li button,
     .sidebar ul.sub-menu li a {

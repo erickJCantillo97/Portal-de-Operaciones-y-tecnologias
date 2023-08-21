@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\RoleController;
+use App\Models\ModelToolsAterior;
 use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -29,8 +29,9 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware([ 'auth:sanctum', config('jetstream.auth_session'),'verified'])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified','verifyRol'])->group(function () {
     Route::get('/dashboard', function () {
+        //return ModelToolsAterior::get();
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
@@ -40,32 +41,22 @@ Route::middleware([ 'auth:sanctum', config('jetstream.auth_session'),'verified']
 
     Route::get('pruebaApi', function (){
         if(auth()->user()->hasRole('Super Admin')){
-
             return getEmpleadosAPI()->groupBy('GERENCIA');
         }
         return searchEmpleados('GERENCIA', auth()->user()->gerencia)->groupBy('OFICINA');
-
-
     })->name('pruebaApi');
+
     Route::get('simple/crud', function(Request $request){
         $request = $request->all();
     })->name('simple.crud');
 
-    Route::resource('roles', RoleController::class);
 
     Route::get('get/gerencias', function(){
 
         return response()->json(['gerencias'=>gerencias()]);
     })->name('get.gerencias');
 
-    Route::get('seguridad',  function (Request $request){
 
-        $users = User::with('roles')->orderBy('gerencia')->get();
-        $roles = Role::orderBy('name')->get();
-        return Inertia::render('Security/Index',[
-            'users' => $users,'roles' => $roles
-        ]);
-    })->name('security');
 
 
 });

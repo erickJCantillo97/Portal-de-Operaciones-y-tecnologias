@@ -1,0 +1,64 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ namespacedModel }};
+use Exception;
+use {{ rootNamespace }}Http\Controllers\Controller;
+use {{ namespacedRequests }}
+
+class {{ class }} extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store({{ storeRequest }} $request)
+    {
+
+        $validateData = $request->validate([
+            //
+        ]);
+
+        try{
+            {{ model }}->create($validateData);
+        }catch(Exception $e){
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show({{ model }} ${{ modelVariable }})
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update({{ updateRequest }} $request, {{ model }} ${{ modelVariable }})
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy({{ model }} ${{ modelVariable }})
+    {
+        try{
+            ${{ modelVariable }}->delete();
+        }catch(Exception $e){
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+        }
+    }
+}

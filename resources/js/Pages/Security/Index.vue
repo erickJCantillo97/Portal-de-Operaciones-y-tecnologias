@@ -8,16 +8,48 @@ const headerRoles = ref([
     {
         header: 'id',
         field: 'id',
-        input: false
+        input: false,
+        show: false
     },
     {
         header: 'Nombre',
         field: 'name',
+        type: 'text',
+    },
+    {
+        header: 'Permisos',
+        field: 'permisos',
+        input: true,
+        type: 'multiple',
+        options: props.permisos,
+        show: false
     },
 ])
-defineProps({
+const headerPermisos = ref([
+    {
+        header: 'id',
+        field: 'id',
+        input: false,
+        show: false
+    },
+    {
+        header: 'Nombre',
+        field: 'name',
+        type: 'text',
+    },
+    {
+        header: 'Roles',
+        field: 'roles',
+        input: true,
+        type: 'multiple',
+        options: props.roles,
+        show: false
+    },
+])
+const props = defineProps({
     users: Array,
-    roles:Array
+    roles:Array,
+    permisos:Array,
 })
 </script>
 
@@ -38,6 +70,14 @@ defineProps({
                     'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none ',
                     selected ? 'bg-white border-b-2 border-primary': 'text-primary hover:bg-white/[0.12] ',]">
                         Roles
+                    </button>
+                </Tab>
+                <Tab as="template" v-slot="{ selected }">
+                    <button :class="[
+                    'w-full  py-2.5 text-sm font-medium leading-5 text-primary',
+                    'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none ',
+                    selected ? 'bg-white border-b-2 border-primary': 'text-primary hover:bg-white/[0.12] ',]">
+                        Permisos
                     </button>
                 </Tab>
             </TabList>
@@ -94,9 +134,13 @@ defineProps({
                     </div>
                 </TabPanel>
                 <TabPanel :class="['rounded-xl bg-white p-1', 'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 ']">
-                    <SimpleCRUD :add="true" url="roles" :edit="true" :delete="true"  :headers="headerRoles" :elements="roles" title="Roles"></SimpleCRUD>
+                    <SimpleCRUD :add="true" url="roles" :edit="true" :delete="true"  :headers="headerRoles" :elements="roles" title="Rol"></SimpleCRUD>
+                </TabPanel>
+                <TabPanel :class="['rounded-xl bg-white p-1', 'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 ']">
+                    <SimpleCRUD :add="true" url="permissions" :edit="true" :delete="true"  :headers="headerPermisos" :elements="permisos" title="Permiso"></SimpleCRUD>
                 </TabPanel>
             </TabPanels>
+
         </TabGroup>
 
     </AppLayout>

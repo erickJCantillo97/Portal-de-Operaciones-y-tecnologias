@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Security;
 
+use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -31,11 +32,20 @@ class RoleController extends Controller
     {
         $validateData = $request->validate(
             [
-                'name' => 'required|unique:roles,name'
+                'name'=>'required|unique:roles,name',
             ]
         );
-        Role::create($validateData);
+        try{
+            $validateData['guard_name'] = 'web';
+            $permisos =  collect($request->permisos)->map(function ($permiso) {
+                return $permiso['name'];
+            });
+            $role = Role::create($validateData);
+            $role->syncPermissions($permisos);
 
+        }catch (\Exception $e) {
+            return back()->withErrors('message' , 'Ocurrio un Error: '.$e);
+        }
     }
 
     /**

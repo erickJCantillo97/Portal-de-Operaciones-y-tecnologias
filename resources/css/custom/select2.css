@@ -8,12 +8,14 @@
     @apply !text-sm;
 }
 
-
+.custom-multiselect .multiselect__content-wrapper{
+    @apply bg-white dark:bg-[#1b2e4b]  border-[rgb(224,230,237)] dark:border-[#253b5c] h-32 ;
+}
 
 .custom-multiselect.multiselect .multiselect__tags,
-.custom-multiselect .multiselect__content-wrapper,
+
 .custom-multiselect .multiselect--above .multiselect__content-wrapper {
-    @apply bg-white dark:bg-[#1b2e4b] border-[rgb(224,230,237)] dark:border-[#253b5c];
+    @apply bg-white dark:bg-[#1b2e4b] border-[rgb(224,230,237)] dark:border-[#253b5c] ;
 }
 
 .custom-multiselect .multiselect__single,
@@ -41,11 +43,11 @@
 }
 
 .custom-multiselect .multiselect__tag {
-    @apply !mb-0 !py-[3px] ;
+    @apply !mb-0 !py-[4px] bg-primary;
 }
 
 .custom-multiselect .multiselect__tags-wrap {
-    @apply !flex;
+    @apply !flex-wrap;
 }
 
 .custom-multiselect .multiselect__tag-icon {
