@@ -19,10 +19,28 @@ const baseActivitiesHeader = ref([
         field: 'name',
         type: 'text',
     },
-
 ])
 
+const gruposConstructivosHeader = ref([
+    {
+        header: 'id',
+        field: 'id',
+        input: false,
+        show: false
+    },
+    {
+        header: 'Nuemro de Grupo',
+        field: 'name',
+        type: 'text',
+    },
 
+    {
+        header: 'Nombre',
+        field: 'descripcion',
+        type: 'text',
+    },
+
+])
 
 onMounted(() => {
     axios.get(route('get.gerencias')).then((res) => {
@@ -37,6 +55,8 @@ onMounted(() => {
     <AppLayout>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <SimpleCRUD   :headers="[{header: 'id', field: 'id'}, {header: 'nombre', field:'name'}, { header: 'descripción', field: 'descripcion'}]" url="gerencias" title="Gerencias"></SimpleCRUD>
+
+        <SimpleCRUD url="gruposConstructivos" :headers="gruposConstructivosHeader" :delete="true" :edit="true" :add="true"  title="Grupo Constructivos"></SimpleCRUD>
 
         <SimpleCRUD url="baseActivities" :headers="baseActivitiesHeader" :delete="true" :edit="true" :add="true"  title="Actividad Base"></SimpleCRUD>
 
