@@ -4,7 +4,7 @@
             <div class="flex justify-between items-center px-2 py-3">
                 <div class="main-logo flex items-center shrink-0">
                     <ApplicationLogo :letras="false"  :width-logo="50" :height-logo="50"></ApplicationLogo>
-                    <span class="text-2xl ml-2  font-semibold align-middle lg:inline dark:text-white-light text-primary">COTECAMAR</span>
+                    <span class="text-2xl ml-2  font-semibold align-middle lg:inline dark:text-white-light text-primary">COTECMAR</span>
                 </div>
 
             </div>

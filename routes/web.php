@@ -2,11 +2,13 @@
 
 use App\Models\ModelToolsAterior;
 use App\Models\SWBS\BaseActivity;
+use App\Models\SWBS\System;
 use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 
 /*
@@ -30,12 +32,11 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified','verifyRol'])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',])->group(function () {
     Route::get('/dashboard', function () {
         //return ModelToolsAterior::get();
         return Inertia::render('Dashboard');
     })->name('dashboard');
-
 
 
     Route::get('pruebaApi', function (){
@@ -74,9 +75,13 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified','
 
 Route::get('recuperarDatos',function (){
 
-    $datos = ModelToolsAterior::select('name', 'ord', 'validity', 'status')->get();
+    System::truncate();
+    $datos = DB::connection('sqlsrv_anterior')->table('swbs_systems')->select(['code', 'name', 'validity', 'status','constructive_group_id'])->get();
+
     foreach ($datos as $dato) {
-        # code...
-        BaseActivity::create(json_decode($dato, true));
+
+        System::create((array) $dato);
     }
+
+    return System::get();
 });

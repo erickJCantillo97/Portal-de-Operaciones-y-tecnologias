@@ -14,7 +14,7 @@
         </div>
         <div class="flow-root">
             <div class="m-2">
-                <div class="inline-block min-w-full py-2 align-middle max-h-64 hover:overflow-y-auto overflow-y-hidden custom-scroll">
+                <div class="inline-block min-w-full py-2 align-middle max-h-96 hover:overflow-y-auto overflow-y-hidden custom-scroll">
                     <table class="min-w-full border-separate border-spacing-0">
                         <thead>
                             <tr>
@@ -96,6 +96,7 @@
                                 </div>
                             </div>
                             <div class="mt-2 flex space-x-4 px-2">
+
                                 <Button class="hover:bg-danger text-danger border-danger" severity="danger" @click="open = false" >Cancelar</Button>
                                 <Button severity="success" :loading="loading" class="text-success hover:bg-success" @click="submit">Guardar</Button>
                             </div>
