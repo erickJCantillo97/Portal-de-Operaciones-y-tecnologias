@@ -1,0 +1,39 @@
+//Variables
+$backgroundColor: #ffffffe0;
+$primaryColor: #2E3092;
+
+//Estilos
+.p-datatable {
+    font-size: 0.8rem;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.p-paginator{
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+:deep(.p-datatable-header) {
+    background-color: $backgroundColor;
+    color: $primaryColor;
+    font-weight: bold;
+    text-align: center;
+}
+
+.p-column-header {
+    color: #2E3092;
+    font-weight: bold;
+    padding: 10px;
+    text-align: center;
+}
+
+.p-column-title {
+    color: #2E3092;
+    font-weight: bold;
+    padding: 10px;
+    text-transform: uppercase;
+}
+
+.td{
+    text-align: center;
+}
