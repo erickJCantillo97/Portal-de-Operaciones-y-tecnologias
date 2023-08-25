@@ -1,5 +1,5 @@
 <script setup>
-import {ref, onMounted} from "vue";
+import { ref, onMounted } from "vue";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import SimpleCRUD from '@/Components/SimpleCRUD.vue';
 import axios from 'axios';

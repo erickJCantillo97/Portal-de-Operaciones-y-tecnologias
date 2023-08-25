@@ -3,7 +3,7 @@
 
 DeployPipeline {
    framework             = 'Laravel-Vite'
-   projectName           = 'opertecnologica'
+   projectName           = 'operacionesytecnologias'
    https_port            = '9513'
 
 }
