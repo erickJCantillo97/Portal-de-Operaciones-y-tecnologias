@@ -17,4 +17,11 @@ export default defineConfig({
             },
         }),
     ],
+    optimizeDeps: {
+        include: [
+              '@bryntum/calendar',
+              '@bryntum/calendar-vue-3',
+          ],
+      }
+
 });

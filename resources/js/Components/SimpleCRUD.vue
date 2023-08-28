@@ -1,6 +1,6 @@
 <template>
-    <div class="px-auto shadow-md py-1 rounded-b-xl w-full">
-        <div class="flex items-center  px-10">
+    <div class="w-full">
+        <!-- <div class="flex items-center  px-10">
             <div class="flex-auto mt-4">
                 <h1 class="text-xl capitalize font-semibold leading-6 text-primary">{{getPlurar(title)}}</h1>
             </div>
@@ -11,42 +11,10 @@
                     Nuevo
                 </Button>
             </div>
-        </div>
+        </div> -->
         <div class="flow-root">
-            <div class="m-2">
-                <div class="inline-block min-w-full py-2 align-middle max-h-96 hover:overflow-y-auto overflow-y-hidden custom-scroll">
-                    <table class="min-w-full border-separate border-spacing-0">
-                        <thead>
-                            <tr>
-                                <th v-for="( header, index) of headers" :key="header" scope="col" class=" sticky -top-2 border-b border-gray-300 bg-gray-200 bg-opacity-75 py-3.5 pl-8 pr-3 text-left text-sm font-semibold text-gray-900 capitalize backdrop-blur backdrop-filter sm:pl-6 lg:pl-8"
-                                    :class="[index == 0 ? 'hidden lg:table-cell':'', header.show !== false ? '':'hidden']">{{header.header}}</th>
-
-                                <th v-if="props.edit || props.delete" scope="col" class="sticky -top-2 border-b border-gray-300 bg-gray-200 bg-opacity-75 py-3.5 pl-8 pr-3 text-left text-sm font-semibold text-gray-900 capitalize backdrop-blur backdrop-filter sm:pl-6 lg:pl-8"
-                                >Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody >
-                            <tr v-for="(person, personIdx) in elementos" >
-                                <td v-for="(header, index) of headers" :class="['border-b border-gray-200 whitespace-normal  py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8', index == 0 ? 'hidden lg:table-cell':'', header.show !== false ? '':'hidden']">
-                                    {{ index == 0 ? personIdx+1:person[header.field] }}</td>
-
-                                <td v-if="props.edit || props.delete"  :class="['whitespace-normal  py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8 flex space-x-2 border-b border-gray-200']">
-                                    <div class="" v-if="props.edit">
-                                        <Button  severity="primary" class="hover:bg-primary">
-                                            <PencilIcon class="h-4 w-4 " aria-hidden="true" />
-                                        </Button>
-                                    </div>
-                                    <div class="" @click="deleteItem(person.id)"  v-if="props.delete">
-                                        <Button severity="danger">
-                                            <TrashIcon class="h-4 w-4 " aria-hidden="true" />
-                                        </Button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                        </tbody>
-                    </table>
-                </div>
+            <div class="">
+                  <dataTableCustomized :add="props.add" :edit-item="props.edit" :delete="props.delete" :url="props.url" height="300px" :headers="headers" :title="title" :loading="loading"></dataTableCustomized>
             </div>
         </div>
     </div>
@@ -120,6 +88,7 @@ import {useSweetalert} from '@/composable/sweetAlert'
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
 import plural from 'pluralize-es'
 import axios from 'axios';
+import dataTableCustomized from '@/Components/DataTableCustom.vue'
 const {toast} = useSweetalert();
 
 const {confirmDelete} = useSweetalert();
@@ -191,10 +160,7 @@ const submit = () => {
 }
 
 /* Funcion para ELIMINAR Elementos al modelo*/
-const deleteItem = async (id) => {
-    await confirmDelete(id, props.title, props.url)
-    getElements()
-}
+
 
 /* Funcion para abril el modal con los campos vacios*/
 const addItem = () => {
@@ -202,7 +168,7 @@ const addItem = () => {
     open.value = true;
 }
 
-/* Limpiar todo los campo*/
+/* Limpiar todos los campo*/
 const resetValues = () => {
     for (let header of props.headers) {
         form.object[header.field] = header.type === 'multiple' ? []:'';
@@ -212,9 +178,11 @@ const resetValues = () => {
 
 /* Obtener los elementos del modelo */
 const getElements = () => {
+    loading.value = true
     if(props.elements.length == 0 && props.url){
         axios.get(route(props.url+'.index')).then((res) => {
             elementos.value = res.data[0];
+            loading.value = false;
         })
     }
 }

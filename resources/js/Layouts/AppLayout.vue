@@ -73,7 +73,6 @@ import { Bars3CenterLeftIcon, Bars4Icon, ClockIcon, HomeIcon, XMarkIcon } from '
 import { BellIcon, ChevronDownIcon, ArrowLeftCircleIcon } from '@heroicons/vue/20/solid'
 import MenuSidebar from '@/Components/MenuSidebar.vue';
 import DropdownSetting from '@/Components/DropdownSetting.vue';
-
 const menu = ref(false)
 
 

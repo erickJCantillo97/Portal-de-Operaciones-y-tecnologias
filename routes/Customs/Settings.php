@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\SubSystemController;
 use App\Http\Controllers\SWBS\BaseActivityController;
 use App\Http\Controllers\SWBS\SpecificActivityController;
 use App\Http\Controllers\SWBS\SystemController;
+use App\Models\SWBS\SubSystem;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -15,6 +17,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified'])
     Route::resource('baseActivities', BaseActivityController::class);
     Route::resource('specificActivities', SpecificActivityController::class);
     Route::resource('system', SystemController::class);
+    Route::resource('subSystem', SubSystemController::class);
 
 
     Route::get('gerencias/get', function (){

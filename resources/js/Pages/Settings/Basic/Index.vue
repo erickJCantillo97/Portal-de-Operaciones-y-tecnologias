@@ -3,8 +3,10 @@ import { ref, onMounted } from "vue";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import SimpleCRUD from '@/Components/SimpleCRUD.vue';
 import axios from 'axios';
+import DataTableCustom from '@/Components/DataTableCustom.vue'
 
 const gerencias = ref([])
+const gruposConstructivos = ref([]) //
 const baseActivities = ref([]);
 
 const baseActivitiesHeader = ref([
@@ -46,6 +48,9 @@ onMounted(() => {
     axios.get(route('get.gerencias')).then((res) => {
         gerencias.value = res.data.gerencias
     })
+    axios.get(route('gruposConstructivos.index')).then((res) => {
+        gruposConstructivos.value = res.data
+    })
 })
 
 const systemsHeaders = ref([
@@ -56,10 +61,11 @@ const systemsHeaders = ref([
         show: false
     },
     {
-        header: 'Grupo Cosntructivo',
+        header: 'Grupo Constructivo',
         field: 'constructive_group_id',
-        input: false,
-        show: false
+        type: 'multiple',
+        show: false,
+        options: gruposConstructivos
     },
     {
         field: 'code',
@@ -83,11 +89,15 @@ const systemsHeaders = ref([
 
             <SimpleCRUD url="gruposConstructivos" :headers="gruposConstructivosHeader"   title="Grupo Constructivos"></SimpleCRUD>
 
+            <DataTableCustom url="system" :headers="systemsHeaders" :delete="true"  :add="true"  title="Sistema"></DataTableCustom>
+
+            <DataTableCustom url="subSystem" :headers="systemsHeaders"   :add="true" :delete="true"  title="Sub Sistema"></DataTableCustom>
+
             <SimpleCRUD url="baseActivities" :headers="baseActivitiesHeader" :delete="true" :edit="true" :add="true"  title="Actividad Base"></SimpleCRUD>
 
             <SimpleCRUD url="specificActivities" :headers="baseActivitiesHeader" :delete="true"  :add="true"  title="Actividad Especifica"></SimpleCRUD>
 
-            <SimpleCRUD url="system" :headers="systemsHeaders" :delete="true"  :add="true"  title="Sistema"></SimpleCRUD>
+
 
         </div>
     </AppLayout>

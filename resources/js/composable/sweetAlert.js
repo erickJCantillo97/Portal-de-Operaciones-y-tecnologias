@@ -27,8 +27,9 @@ export function useSweetalert(){
         showLoaderOnConfirm: true,
         preConfirm: () => {
             router.delete(route(url+'.destroy', id), {
+                preserveScroll: true,
                 onSuccess: () => {
-                    Toast.fire({ icon: 'success', title: title +' Elimnado'})
+                    Toast.fire({ icon: 'success', title: title +' Eliminado'})
                 }
             })
         },

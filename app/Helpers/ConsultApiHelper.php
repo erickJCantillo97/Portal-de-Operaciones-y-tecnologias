@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 
@@ -12,10 +13,10 @@ function getEmpleadosAPI(): mixed
                     )->json();
             return  collect($json);
         }
-        return false;
-        
+        dd('Sin token');
+
     } catch (\Throwable $th) {
-        return false;
+        dd($th);
     }
 }
 
@@ -52,7 +53,7 @@ function login(): bool{
     }
 }
 
-function searchEmpleados(String $clave, String $valor): array
+function searchEmpleados(String $clave, String $valor)
 {
     return getEmpleadosAPI()->filter(function ($employee) use ($clave, $valor){
             return $employee[$clave] == $valor;

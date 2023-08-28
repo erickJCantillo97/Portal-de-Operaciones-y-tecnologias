@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('sub_systems', function (Blueprint $table) {
             $table->id();
-            
+            $table->unsignedBigInteger('system_id')->index();
+            $table->foreign('system_id')->references('id')->on('systems');
+            $table->string('code',45)->unique();
+            $table->string('name',200);
+            $table->boolean('validity')->default(0);
+            $table->boolean('status')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });

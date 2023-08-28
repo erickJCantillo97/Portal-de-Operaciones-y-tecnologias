@@ -13,7 +13,11 @@ class SubSystemController extends Controller
      */
     public function index()
     {
-        //
+        $subsystems = SubSystem::get();
+
+        return response()->json([
+            $subsystems
+        ]);
     }
 
     /**

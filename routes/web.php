@@ -1,29 +1,12 @@
 <?php
 
-use App\Models\ModelToolsAterior;
-use App\Models\SWBS\BaseActivity;
-use App\Models\SWBS\System;
-use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Role;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
 
 Route::get('/', function () {
-
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -33,11 +16,11 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',])->group(function () {
+
     Route::get('/dashboard', function () {
         //return ModelToolsAterior::get();
         return Inertia::render('Dashboard');
     })->name('dashboard');
-
 
     Route::get('pruebaApi', function (){
         if(auth()->user()->hasRole('Super Admin')){
@@ -50,38 +33,28 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         $request = $request->all();
     })->name('simple.crud');
 
-
     Route::get('get/gerencias', function(){
-
         return response()->json(['gerencias'=>gerencias()]);
     })->name('get.gerencias');
 
-
-
+    Route::get('dashboard/{gerencia}', function($gerencia){
+        $personal =  searchEmpleados('GERENCIA', $gerencia)->groupBy('OFICINA');
+        return Inertia::render('Dashboards/Gerencias', ['personal' => $personal, 'GERENCIA' => $gerencia]);
+    })->name('dashboard.gerencias');
 
 });
-// Route::get('chagePassword', function (){
-//     // Obtén el usuario autenticado (por ejemplo, usando Auth::user())
-//     $authenticatedUser = Auth::user();
 
-//     // Recupera el modelo LDAP del usuario autenticado
-//     $ldapUser = \LdapRecord\Models\ActiveDirectory\User::where('samaccountname', 'ecantillo')->first();
-//     // Guarda los cambios en el servidor LDAP
-//     $ldapUser->password = "Agosto2022";
-//     $ldapUser->save();
-//     return $ldapUser;
-// });
-
-
+/*
 Route::get('recuperarDatos',function (){
 
-    System::truncate();
-    $datos = DB::connection('sqlsrv_anterior')->table('swbs_systems')->select(['code', 'name', 'validity', 'status','constructive_group_id'])->get();
+    // System::truncate();
+    $datos = DB::connection('sqlsrv_anterior')->table('swbs_subsystems')->select(['system_id', 'code', 'validity', 'status','name'])->get();
 
     foreach ($datos as $dato) {
 
-        System::create((array) $dato);
+        SubSystem::create((array) $dato);
     }
 
-    return System::get();
+    return SubSystem::get();
 });
+*/
