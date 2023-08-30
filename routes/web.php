@@ -4,7 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -41,6 +41,14 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         $personal =  searchEmpleados('GERENCIA', $gerencia)->groupBy('OFICINA');
         return Inertia::render('Dashboards/Gerencias', ['personal' => $personal, 'GERENCIA' => $gerencia]);
     })->name('dashboard.gerencias');
+
+    Route::get('gantt', function () {
+        return Inertia::render('GanttBryntum');
+    });
+
+    Route::post('gantt/data', function (Request $request) {
+        dd(Auth::user());
+    })->name('ganttData');
 
 });
 

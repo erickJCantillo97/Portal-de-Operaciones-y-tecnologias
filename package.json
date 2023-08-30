@@ -35,6 +35,7 @@
         "primeicons": "^6.0.1",
         "primevue": "^3.32.2",
         "sweetalert2": "^11.7.27",
-        "vue-height-collapsible": "^0.1.1"
+        "vue-height-collapsible": "^0.1.1",
+        "sass": "^1.66.1"
     }
 }
