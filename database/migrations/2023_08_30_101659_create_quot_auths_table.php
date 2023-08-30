@@ -11,14 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('projects', function (Blueprint $table) {
+        Schema::create('quot_auths', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->unsignedBigInteger('contract_id');
-            $table->date('startDate');
-            $table->float('hoursPerDay')->default(floatval(8.5));
-            $table->integer('daysPerWeek')->default(5);
-            $table->integer('daysPerMonth')->default(20);
+            $table->unsignedBigInteger('authorization_id')->index()->nullable();
+            $table->unsignedBigInteger('quote_id')->index()->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -29,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('projects');
+        Schema::dropIfExists('quot_auths');
     }
 };
