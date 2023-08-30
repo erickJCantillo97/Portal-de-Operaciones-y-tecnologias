@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ship;
-use Exception;
-use App\Http\Requests\StoreShipRequest;
-use App\Http\Requests\UpdateShipRequest;
 
-class ShipController extends Controller
+use Exception;
+use App\Http\Requests\StoreQuotAuthRequest;
+use App\Http\Requests\UpdateQuotAuthRequest;
+use App\Models\Projects\QuotAuthorization;
+use Illuminate\Support\Facades\Request;
+
+class QuotAuthorizationController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -28,14 +30,14 @@ class ShipController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreShipRequest $request)
+    public function store(Request $request)
     {
         $validateData = $request->validate([
             //
         ]);
 
         try{
-            Ship::create($validateData);
+            QuotAuthorization::create($validateData);
         }catch(Exception $e){
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
@@ -44,7 +46,7 @@ class ShipController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Ship $ship)
+    public function show(QuotAuthorization $quotAuth)
     {
         //
     }
@@ -52,7 +54,7 @@ class ShipController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Ship $ship)
+    public function edit(QuotAuthorization $quotAuth)
     {
         //
     }
@@ -60,14 +62,14 @@ class ShipController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateShipRequest $request, Ship $ship)
+    public function update(Request $request, QuotAuthorization $quotAuth)
     {
         $validateData = $request->validate([
             //
         ]);
 
         try{
-            $ship->update($validateData);
+            $quotAuth->update($validateData);
         }catch(Exception $e){
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
@@ -76,10 +78,10 @@ class ShipController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Ship $ship)
+    public function destroy(QuotAuthorization $quotAuth)
     {
         try{
-            $ship->delete();
+            $quotAuth->delete();
         }catch(Exception $e){
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }

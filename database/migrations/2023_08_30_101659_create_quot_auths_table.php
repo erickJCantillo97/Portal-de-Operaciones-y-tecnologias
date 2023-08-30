@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('quot_auths', function (Blueprint $table) {
+        Schema::create('quot_authorizations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('authorization_id')->index()->nullable();
             $table->unsignedBigInteger('quote_id')->index()->nullable();

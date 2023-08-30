@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Projects;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Ship extends Model
+class QuotAuthorization extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
+    protected $table = 'quot_authorizations';
     protected $guarded = [];
 }

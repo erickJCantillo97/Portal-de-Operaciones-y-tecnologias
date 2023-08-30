@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Projects;
 
+use App\Http\Controllers\Controller;
 use App\Models\Projects\Quote;
-use Exception;
 use Illuminate\Http\Request;
+use Exception;
 
 class QuoteController extends Controller
 {
