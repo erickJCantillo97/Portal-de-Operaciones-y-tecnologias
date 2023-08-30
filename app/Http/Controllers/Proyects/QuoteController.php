@@ -1,24 +1,24 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Projects;
 
-use App\Models\QuotAuth;
+use App\Http\Controllers\Controller;
+use App\Models\Projects\Quote;
+use Illuminate\Http\Request;
 use Exception;
-use App\Http\Requests\StoreQuotAuthRequest;
-use App\Http\Requests\UpdateQuotAuthRequest;
 use Illuminate\Http\JsonResponse;
 
-class QuotAuthController extends Controller
+class QuoteController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(): JsonResponse
     {
-        $quotauth = QuotAuth::orderBy('name')->get();
+        $quote = Quote::orderBy('id')->get();
 
         return response()->json([
-            $quotauth
+            $quote
         ], 200);
     }
 
@@ -33,14 +33,14 @@ class QuotAuthController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreQuotAuthRequest $request)
+    public function store(Request $request)
     {
         $validateData = $request->validate([
             //
         ]);
 
         try{
-            QuotAuth::create($validateData);
+            Quote::create($validateData);
         }catch(Exception $e){
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
@@ -49,7 +49,7 @@ class QuotAuthController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(QuotAuth $quotAuth)
+    public function show(Quote $quote)
     {
         //
     }
@@ -57,7 +57,7 @@ class QuotAuthController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(QuotAuth $quotAuth)
+    public function edit(Quote $quote)
     {
         //
     }
@@ -65,14 +65,14 @@ class QuotAuthController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateQuotAuthRequest $request, QuotAuth $quotAuth)
+    public function update(Request $request, Quote $quote)
     {
         $validateData = $request->validate([
             //
         ]);
 
         try{
-            $quotAuth->update($validateData);
+            $quote->update($validateData);
         }catch(Exception $e){
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
@@ -81,10 +81,10 @@ class QuotAuthController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(QuotAuth $quotAuth)
+    public function destroy(Quote $quote)
     {
         try{
-            $quotAuth->delete();
+            $quote->delete();
         }catch(Exception $e){
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }

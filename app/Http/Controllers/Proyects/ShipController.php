@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Projects;
 
-use App\Models\Ship;
+use App\Http\Controllers\Controller;
+use App\Models\Projects\Ship;
 use Exception;
 use App\Http\Requests\StoreShipRequest;
 use App\Http\Requests\UpdateShipRequest;
