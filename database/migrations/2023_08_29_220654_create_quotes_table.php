@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('quotes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('authorization_id')->index();
+            $table->unsignedBigInteger('quotauth_id')->index()->nullable();
             $table->date('start_date');
             $table->date('end_date');
             $table->timestamps();
