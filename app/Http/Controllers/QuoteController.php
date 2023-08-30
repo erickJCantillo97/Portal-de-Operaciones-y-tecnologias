@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Projects\Quote;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class QuoteController extends Controller
@@ -11,9 +12,13 @@ class QuoteController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $quote = Quote::orderBy('id')->get();
+
+        return response()->json([
+            $quote
+        ], 200);
     }
 
     /**
