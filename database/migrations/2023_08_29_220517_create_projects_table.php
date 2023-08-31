@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->unsignedBigInteger('contract_id');
+            $table->unsignedBigInteger('ship_id')->index();
+            $table->string('name'); //Este nombre debe ser calculado (Ship - Contrato )
             $table->date('startDate');
             $table->float('hoursPerDay')->default(floatval(8.5));
             $table->integer('daysPerWeek')->default(5);

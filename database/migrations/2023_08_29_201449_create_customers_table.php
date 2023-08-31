@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
-            $table->integer('doc');
+            $table->integer('NIT')->unique();
             $table->string('name');
             $table->string('type');
-            $table->string('mail');
+            $table->string('mail')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

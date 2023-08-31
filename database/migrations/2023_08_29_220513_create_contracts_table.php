@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('contracts', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('customer_id')->index();
+            $table->double('cost');
             $table->date('start_date');
             $table->date('end_date');
             $table->timestamps();

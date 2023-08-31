@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('customer_id')->index();
             $table->string('name');
             $table->string('type');
-            $table->string('details');
+            $table->string('details')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

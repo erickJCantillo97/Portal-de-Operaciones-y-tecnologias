@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('quotes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('quotauth_id')->index()->nullable();
+            $table->double('cost');
+            $table->unsignedBigInteger('ship_id')->index();
             $table->date('start_date');
             $table->date('end_date');
             $table->timestamps();
