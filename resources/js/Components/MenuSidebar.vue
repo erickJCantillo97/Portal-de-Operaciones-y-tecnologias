@@ -45,7 +45,7 @@
                     <vue-collapsible :isOpen="activeDropdown === item.name">
                         <ul class="sub-menu text-gray-500" v-for="children of item.children">
                             <li>
-                                <Link :href="'/'">{{ children.name }}</Link>
+                                <Link :href="route(children.href)">{{ children.name }}</Link>
                             </li>
                         </ul>
                     </vue-collapsible>
@@ -85,10 +85,10 @@
             icon: UsersIcon,
             current: false,
             children: [
-            { name: 'Planilla', href: '#' },
-            { name: 'Programación', href: '#' },
-            { name: 'Parte Diario', href: '#' },
-            { name: 'Informes', href: '#' },
+            // { name: 'Planilla', href: '#' },
+            // { name: 'Programación', href: '#' },
+            // { name: 'Parte Diario', href: '#' },
+            // { name: 'Informes', href: '#' },
             ],
         },
         {
@@ -96,9 +96,10 @@
             icon: FolderIcon,
             current: false,
             children: [
-                { name: 'Proyectos', href: '#' }, //gerencia (auth()->user()gerencia)
-                { name: 'Informes', href: '#' },
-                { name: 'Buques', href: '#' },
+                // { name: 'Proyectos', href: '#' }, //gerencia (auth()->user()gerencia)
+                // { name: 'Informes', href: '#' },
+                 { name: 'Cronograma', href: 'showGantt' },
+                // { name: 'Buques', href: '#' },
             ],
         },
         {
@@ -106,10 +107,10 @@
             icon: FolderIcon,
             current: false,
             children: [
-                { name: 'Contratos', href: '#' },
-                { name: 'Autorizaciones', href: '#' },
-                { name: 'Estimaciones', href: '#' },
-                { name: 'Clientes', href: '#' },
+                // { name: 'Contratos', href: '#' },
+                // { name: 'Autorizaciones', href: '#' },
+                // { name: 'Estimaciones', href: '#' },
+                // { name: 'Clientes', href: '#' },
             ],
         },
         // { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },

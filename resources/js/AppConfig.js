@@ -14,7 +14,7 @@ const useGanttConfig = function () {
                     url: './datos/launch-saas.json'
                 },
                 sync: {
-                    url : 'gantt/data',
+                    url : route('syncGantt'),
                     headers     : {
                         'Content-Type' : 'application/json',
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

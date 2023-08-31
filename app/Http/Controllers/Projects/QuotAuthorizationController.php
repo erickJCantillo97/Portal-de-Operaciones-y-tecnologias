@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Projects;
 
-
+use App\Http\Controllers\Controller;
 use Exception;
 use App\Models\Projects\QuotAuthorization;
 use Illuminate\Http\JsonResponse;
