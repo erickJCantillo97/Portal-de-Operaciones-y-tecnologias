@@ -12,7 +12,7 @@ import ToastService from "primevue/toastservice";
 import "primevue/resources/themes/mdc-light-indigo/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
-const appName = import.meta.env.VITE_APP_NAME || "Laravel";
+const appName = import.meta.env.VITE_APP_NAME || "Portal de Operaciones Tecnológicas";
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
