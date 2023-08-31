@@ -6,15 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Models\Projects\Quote;
 use Illuminate\Http\Request;
 use Exception;
+use Illuminate\Http\JsonResponse;
 
 class QuoteController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $quote = Quote::orderBy('id')->get();
+
+        return response()->json([
+            $quote
+        ], 200);
     }
 
     /**

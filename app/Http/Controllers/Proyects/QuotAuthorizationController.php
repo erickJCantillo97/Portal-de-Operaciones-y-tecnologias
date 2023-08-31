@@ -7,6 +7,7 @@ use Exception;
 use App\Http\Requests\StoreQuotAuthRequest;
 use App\Http\Requests\UpdateQuotAuthRequest;
 use App\Models\Projects\QuotAuthorization;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Request;
 
 class QuotAuthorizationController extends Controller
@@ -14,9 +15,13 @@ class QuotAuthorizationController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $quotauth = QuotAuthorization::orderBy('name')->get();
+
+        return response()->json([
+            $quotauth
+        ], 200);
     }
 
     /**

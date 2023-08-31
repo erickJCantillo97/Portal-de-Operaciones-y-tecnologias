@@ -7,15 +7,20 @@ use App\Models\Projects\Ship;
 use Exception;
 use App\Http\Requests\StoreShipRequest;
 use App\Http\Requests\UpdateShipRequest;
+use Illuminate\Http\JsonResponse;
 
 class ShipController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $ship = Ship::orderBy('name')->get();
+
+        return response()->json([
+            $ship
+        ], 200);
     }
 
     /**
