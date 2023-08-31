@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\Projects\CustomerController;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -45,7 +45,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     })->name('dashboard.gerencias');
 
     //CRUD Customers
-    Route::get('dashboard/customers', [CustomerController::class, 'index'])->name('dashboard-customers');
+    Route::resource('customers', CustomerController::class);
 
 });
 

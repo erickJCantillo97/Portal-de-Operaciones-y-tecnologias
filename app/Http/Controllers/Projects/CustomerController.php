@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Projects;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StorecustomerRequest;
 use App\Http\Requests\UpdatecustomerRequest;
-use App\Models\customer;
-use App\Models\Projects\Customers;
+use App\Models\Projects\Customer;
 use Exception;
 use Illuminate\Http\JsonResponse;
 
@@ -16,7 +16,7 @@ class CustomerController extends Controller
      */
     public function index(): JsonResponse
     {
-        $customer = Customers::orderBy('name')->get();
+        $customer = Customer::orderBy('name')->get();
 
         return Inertia::render(['']);
         // return response()->json([
@@ -42,7 +42,7 @@ class CustomerController extends Controller
         ]);
 
         try {
-            customer::create($validateData);
+            Customer::create($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
@@ -67,7 +67,7 @@ class CustomerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatecustomerRequest $request, customer $customer)
+    public function update(UpdatecustomerRequest $request, Customer $customer)
     {
         $validateData = $request->validate([
             //
