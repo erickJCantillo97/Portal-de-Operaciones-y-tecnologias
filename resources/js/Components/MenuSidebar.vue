@@ -47,19 +47,19 @@
                                 <vue-collapsible :isOpen="activeDropdown === item.name">
                                     <ul class="sub-menu text-gray-500" v-for="children of item.children">
                                         <li>
-                                            <Link :href="'/'">{{ children.name }}</Link>
+                                            <Link :href="route(children.href)">{{ children.name }}</Link>
                                         </li>
                                     </ul>
                                 </vue-collapsible>
-
+                                <span class="pl-3  text-black dark:text-[#506690] dark:group-hover:text-white-dark">{{
+                                    item.name
+                                }}</span>
                             </li>
                         </ul>
                     </li>
-
                 </ul>
             </nav>
         </div>
-
     </div>
 </template>
 
@@ -111,7 +111,7 @@ const navigation = [
             { name: 'Contratos', href: '#' },
             { name: 'Autorizaciones', href: '#' },
             { name: 'Estimaciones', href: '#' },
-            { name: 'Clientes', href: 'dashboard-customers' },
+            { name: 'Clientes', href: '#' },
         ],
     },
     // { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },

@@ -3,7 +3,6 @@
 use App\Http\Controllers\CustomerController;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -44,14 +43,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
         return Inertia::render('Dashboards/Gerencias', ['personal' => $personal, 'GERENCIA' => $gerencia]);
     })->name('dashboard.gerencias');
-
-    Route::get('gantt', function () {
-        return Inertia::render('GanttBryntum');
-    });
-
-    Route::post('gantt/data', function (Request $request) {
-        dd(Auth::user());
-    })->name('ganttData');
 
     //CRUD Customers
     Route::get('dashboard/customers', [CustomerController::class, 'index'])->name('dashboard-customers');
