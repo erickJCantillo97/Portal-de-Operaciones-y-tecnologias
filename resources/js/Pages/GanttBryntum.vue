@@ -15,7 +15,7 @@ const ganttConfig = reactive(useGanttConfig());
 </script>
 <template>
     <AppLayout title="Prueba Cronograma">
-        <div class="-my-4">
+        <div class="">
             <div class="h-screen">
                 <div class="overflow-hidden shadow-xl sm:rounded-lg h-full">
                     <bryntum-gantt v-bind="ganttConfig" :barMargin="barMargin"/>

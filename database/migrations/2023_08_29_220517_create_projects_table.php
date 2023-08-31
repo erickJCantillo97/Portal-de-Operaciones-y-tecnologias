@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('ship_id')->index();
             $table->string('name'); //Este nombre debe ser calculado (Ship - Contrato )
+            $table->string('gerencia');
             $table->date('startDate');
             $table->float('hoursPerDay')->default(floatval(8.5));
             $table->integer('daysPerWeek')->default(5);

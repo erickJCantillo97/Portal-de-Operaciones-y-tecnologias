@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 
 use Exception;
-use App\Http\Requests\StoreQuotAuthRequest;
-use App\Http\Requests\UpdateQuotAuthRequest;
 use App\Models\Projects\QuotAuthorization;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Request;

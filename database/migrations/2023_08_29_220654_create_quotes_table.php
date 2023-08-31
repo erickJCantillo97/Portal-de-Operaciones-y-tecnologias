@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('quotes', function (Blueprint $table) {
             $table->id();
-            $table->double('cost');
             $table->unsignedBigInteger('ship_id')->index();
+            $table->string('gerencia');
+            $table->double('cost');
             $table->date('start_date');
             $table->date('end_date');
             $table->timestamps();

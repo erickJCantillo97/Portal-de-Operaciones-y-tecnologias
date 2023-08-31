@@ -96,9 +96,20 @@
             icon: FolderIcon,
             current: false,
             children: [
-            { name: 'Proyectos', href: '#' },
-            { name: 'Contratos', href: '#' },
-            { name: 'Clases', href: '#' },
+                { name: 'Proyectos', href: '#' }, //gerencia (auth()->user()gerencia)
+                { name: 'Informes', href: '#' },
+                { name: 'Buques', href: '#' },
+            ],
+        },
+        {
+            name: 'Gestión Comercial',
+            icon: FolderIcon,
+            current: false,
+            children: [
+                { name: 'Contratos', href: '#' },
+                { name: 'Autorizaciones', href: '#' },
+                { name: 'Estimaciones', href: '#' },
+                { name: 'Clientes', href: '#' },
             ],
         },
         // { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
