@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('NIT')->unique();
             $table->string('name');
             $table->string('type');
-            $table->string('mail')->nullable();
+            $table->string('email')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

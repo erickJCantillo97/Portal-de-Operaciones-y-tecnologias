@@ -11,5 +11,10 @@ class Contract extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $guarded = [];
+    protected $guarded = ['customer_id', 'gerencia', 'cost', 'start_date', 'end_date'];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
 }

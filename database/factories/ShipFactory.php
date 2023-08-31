@@ -17,7 +17,11 @@ class ShipFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'customer_id' => $this->faker->numberBetween(1, 10),
+            'gerencia' => $this->faker->gerencia,
+            'name' => $this->faker->name,
+            'type' => $this->faker->type,
+            'details' => $this->faker->details,
         ];
     }
 }

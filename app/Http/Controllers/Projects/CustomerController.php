@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\customer;
-use Exception;
 use App\Http\Requests\StorecustomerRequest;
 use App\Http\Requests\UpdatecustomerRequest;
+use App\Models\customer;
+use App\Models\Projects\Customers;
+use Exception;
 use Illuminate\Http\JsonResponse;
 
 class CustomerController extends Controller
@@ -15,11 +16,12 @@ class CustomerController extends Controller
      */
     public function index(): JsonResponse
     {
-        $customer = customer::orderBy('name')->get();
+        $customer = Customers::orderBy('name')->get();
 
-        return response()->json([
-            $customer
-        ], 200);
+        return Inertia::render(['']);
+        // return response()->json([
+        //     $customer,
+        // ], 200);
     }
 
     /**
@@ -42,7 +44,7 @@ class CustomerController extends Controller
         try {
             customer::create($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
     }
 
@@ -74,7 +76,7 @@ class CustomerController extends Controller
         try {
             $customer->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
 
@@ -86,7 +88,7 @@ class CustomerController extends Controller
         try {
             $customer->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }
 }

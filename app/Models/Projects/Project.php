@@ -11,5 +11,10 @@ class Project extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $guarded = [];
+    protected $guarded = ['ship_id', 'name', 'gerencia', 'start_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth'];
+
+    public function contracts()
+    {
+        return $this->belongsTo(Contract::class);
+    }
 }

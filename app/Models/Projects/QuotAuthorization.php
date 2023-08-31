@@ -12,5 +12,16 @@ class QuotAuthorization extends Model
     use SoftDeletes;
 
     protected $table = 'quot_authorizations';
-    protected $guarded = [];
+
+    protected $guarded = ['authorization_id', 'quote_id'];
+
+    public function authorizations()
+    {
+        return $this->belongsTo(Authorization::class);
+    }
+
+    public function quotes()
+    {
+        return $this->belongsTo(Quote::class);
+    }
 }

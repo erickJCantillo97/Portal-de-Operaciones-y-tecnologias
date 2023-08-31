@@ -1,10 +1,11 @@
 <?php
 
+use App\Http\Controllers\CustomerController;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -15,30 +16,32 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
     Route::get('/dashboard', function () {
         //return ModelToolsAterior::get();
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    Route::get('pruebaApi', function (){
-        if(auth()->user()->hasRole('Super Admin')){
+    Route::get('pruebaApi', function () {
+        if (auth()->user()->hasRole('Super Admin')) {
             return getEmpleadosAPI()->groupBy('GERENCIA');
         }
+
         return searchEmpleados('GERENCIA', auth()->user()->gerencia)->groupBy('OFICINA');
     })->name('pruebaApi');
 
-    Route::get('simple/crud', function(Request $request){
+    Route::get('simple/crud', function (Request $request) {
         $request = $request->all();
     })->name('simple.crud');
 
-    Route::get('get/gerencias', function(){
-        return response()->json(['gerencias'=>gerencias()]);
+    Route::get('get/gerencias', function () {
+        return response()->json(['gerencias' => gerencias()]);
     })->name('get.gerencias');
 
-    Route::get('dashboard/{gerencia}', function($gerencia){
-        $personal =  searchEmpleados('GERENCIA', $gerencia)->groupBy('OFICINA');
+    Route::get('dashboard/{gerencia}', function ($gerencia) {
+        $personal = searchEmpleados('GERENCIA', $gerencia)->groupBy('OFICINA');
+
         return Inertia::render('Dashboards/Gerencias', ['personal' => $personal, 'GERENCIA' => $gerencia]);
     })->name('dashboard.gerencias');
 
@@ -49,6 +52,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
     Route::post('gantt/data', function (Request $request) {
         dd(Auth::user());
     })->name('ganttData');
+
+    //CRUD Customers
+    Route::get('dashboard/customers', [CustomerController::class, 'index'])->name('dashboard-customers');
 
 });
 
