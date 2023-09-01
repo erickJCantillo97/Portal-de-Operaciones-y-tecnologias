@@ -11,14 +11,14 @@ class Ship extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $guarded = ['customer_id', 'gerencia', 'name', 'type', 'details'];
+    protected $guarded = [];
 
     public function customer()
     {
         return $this->belongsTo(Customer::class);
     }
 
-    public function projects()
+    public function project()
     {
         return $this->belongsTo(Project::class);
     }

@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 
@@ -14,10 +13,10 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        Role::create(['name' =>'Super Admin']);
-        Role::create(['name' =>'Administrador']);
-        Role::create(['name' =>'Visitante']);
-        Role::create(['name' =>'Cliente']);
+        Role::create(['name' => 'Super Admin']);
+        Role::create(['name' => 'Administrador']);
+        Role::create(['name' => 'Visitante']);
+        Role::create(['name' => 'Cliente']);
 
         User::where('username', 'ecantillo')->first()->assignRole('Super Admin');
     }

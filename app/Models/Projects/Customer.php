@@ -11,35 +11,40 @@ class Customer extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $guarded = ['NIT', 'name', 'type', 'email'];
+    protected $guarded = [];
 
-    public function contracts()
+    public function contract()
     {
         return $this->hasMany(Contract::class);
     }
 
-    public function ships()
+    public function ship()
     {
         return $this->hasMany(Ship::class);
     }
 
-    public function projects()
+    public function project()
     {
         return $this->hasMany(Project::class);
     }
 
-    public function authorizations()
+    public function authorization()
     {
         return $this->hasMany(Authorization::class);
     }
 
-    public function quotes()
+    public function quot()
     {
         return $this->hasMany(Quote::class);
     }
 
-    public function quotes_authorizations()
+    public function quote_authorization()
     {
         return $this->hasMany(QuotAuthorization::class);
     }
+
+    // public function getKeyName()
+    // {
+    //     return $this->slug;
+    // }
 }

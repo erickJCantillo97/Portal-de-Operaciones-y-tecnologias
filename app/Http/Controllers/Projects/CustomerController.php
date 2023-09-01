@@ -3,22 +3,21 @@
 namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StorecustomerRequest;
-use App\Http\Requests\UpdatecustomerRequest;
 use App\Models\Projects\Customer;
 use Exception;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CustomerController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index(Customer $customers)
     {
-        $customer = Customer::orderBy('name')->get();
+        $customers = Customer::orderBy('name')->get();
 
-        return Inertia::render(['']);
+        return Inertia::render('Project/Customers', ['customers' => $customers]);
         // return response()->json([
         //     $customer,
         // ], 200);
@@ -29,23 +28,31 @@ class CustomerController extends Controller
      */
     public function create()
     {
-        //
+        // return Inertia::render('Project/CustomersForm');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorecustomerRequest $request)
+    public function store(Request $request)
     {
+        // dd($request);
         $validateData = $request->validate([
-            //
+            'NIT' => 'required',
+            'name' => 'required',
+            'type' => 'required',
+            'email' => 'required|email',
         ]);
 
         try {
             Customer::create($validateData);
+
+            return back()->with(['message' => 'Cliente creado correctamente'], 200);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+            return back()->with(['message' => 'Ocurrió un error al crear el cliente: '.$e->getMessage()], 500);
         }
+
+        return redirect('customers.index');
     }
 
     /**
@@ -59,7 +66,7 @@ class CustomerController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(customer $customer)
+    public function edit(Customer $customer)
     {
         //
     }
@@ -67,10 +74,13 @@ class CustomerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatecustomerRequest $request, Customer $customer)
+    public function update(Request $request, Customer $customer)
     {
         $validateData = $request->validate([
-            //
+            'NIT' => 'required',
+            'name' => 'required',
+            'type' => 'required',
+            'email' => 'required|email',
         ]);
 
         try {
@@ -83,12 +93,16 @@ class CustomerController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(customer $customer)
+    public function destroy(Customer $customer)
     {
         try {
             $customer->delete();
+
+            return back()->with(['message' => 'Usuario eliminado de la reunión']);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+            return back()->with('message', 'Ocurrio un error el eliminar : '.$e);
         }
+
+        return redirect('customers.index');
     }
 }

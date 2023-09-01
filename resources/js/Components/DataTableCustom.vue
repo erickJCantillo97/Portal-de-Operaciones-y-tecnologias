@@ -36,7 +36,7 @@ const props = defineProps({
         default: false
     },
 
-    title: String,
+    tittle: String,
 
     url: { // Hace referecia al nombre del modelo que su usa en las url resorces para formas la rutas (index, create, store, update, Etc..)
         type: String,
@@ -165,7 +165,7 @@ const resetValues = () => {
     <div class="px-auto  w-full">
         <div class="flex items-center mx-2 mb-2">
             <div class="flex-auto">
-                <h1 class="text-xl capitalize font-semibold leading-6 text-primary">{{ getPlural(title) }}</h1>
+                <h1 class="text-xl capitalize font-semibold leading-6 text-primary">{{ getPlural(tittle) }}</h1>
             </div>
 
             <div class="">
@@ -258,7 +258,8 @@ const resetValues = () => {
 
                                             <div v-if="header.input !== false && header.type == 'multiple'">
                                                 <label for="password"
-                                                    class="block capitalize text-left text-sm text-gray-900">{{ header.header }}</label>
+                                                    class="block capitalize text-left text-sm text-gray-900">{{
+                                                        header.header }}</label>
                                                 <Dropdown v-model="form.object[header.field]" :options="header.options[0]"
                                                     filter optionLabel="name" placeholder="Selecccionar"
                                                     class="w-full md:w-14rem">
@@ -267,17 +268,18 @@ const resetValues = () => {
                                         </template>
                                     </div>
                                 </div>
-                        </div>
-                        <div class="mt-2 flex space-x-4 px-2">
+                            </div>
+                            <div class="mt-2 flex space-x-4 px-2">
 
-                            <Button class="hover:bg-danger text-danger border-danger" severity="danger"
-                                @click="open = false">Cancelar</Button>
-                            <Button severity="success" :loading="loading" class="text-success hover:bg-success"
-                                @click="submit">Guardar</Button>
-                        </div>
-                    </DialogPanel>
-                </TransitionChild>
+                                <Button class="hover:bg-danger text-danger border-danger" severity="danger"
+                                    @click="open = false">Cancelar</Button>
+                                <Button severity="success" :loading="loading" class="text-success hover:bg-success"
+                                    @click="submit">Guardar</Button>
+                            </div>
+                        </DialogPanel>
+                    </TransitionChild>
+                </div>
             </div>
-        </div>
-    </Dialog>
-</TransitionRoot></template>
+        </Dialog>
+    </TransitionRoot>
+</template>

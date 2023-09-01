@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Projects\ContractController;
 use App\Http\Controllers\Projects\CustomerController;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
@@ -7,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
+    return Inertia::render('Auth/Login', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
@@ -47,6 +48,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     //CRUD Customers
     Route::resource('customers', CustomerController::class);
 
+    //CRUD Contracts
+    Route::resource('contracts', ContractController::class);
 });
 
 /*

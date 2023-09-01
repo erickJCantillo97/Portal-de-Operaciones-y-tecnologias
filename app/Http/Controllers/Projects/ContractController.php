@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Projects\Contract;
 use Exception;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ContractController extends Controller
 {
@@ -14,7 +15,9 @@ class ContractController extends Controller
      */
     public function index()
     {
-        //
+        $contracts = Contract::orderBy('name')->get();
+
+        return Inertia::render('Project/Contracts', ['contracts' => $contracts], ['gerencias' => gerencias()]);
     }
 
     /**
@@ -30,15 +33,25 @@ class ContractController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request);
         $validateData = $request->validate([
-            //
+            'customer_id' => 'nullable',
+            'name' => 'required',
+            'gerencia' => 'required',
+            'cost' => 'required|numeric',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
         ]);
 
-        try{
+        try {
             Contract::create($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+
+            return back()->with(['message' => 'Contrato creado correctamente'], 200);
+        } catch (Exception $e) {
+            return back()->withErrors(['message' => 'Ocurrió un error al crear el contrato: '.$e->getMessage()], 500);
         }
+
+        return redirect('contracts.index');
     }
 
     /**
@@ -63,12 +76,16 @@ class ContractController extends Controller
     public function update(Request $request, Contract $contract)
     {
         $validateData = $request->validate([
-            //
+            'name' => 'required',
+            'gerencia' => 'required',
+            'cost' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'required',
         ]);
 
-        try{
+        try {
             $contract->update($validateData);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
@@ -78,9 +95,9 @@ class ContractController extends Controller
      */
     public function destroy(Contract $contract)
     {
-        try{
+        try {
             $contract->delete();
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }

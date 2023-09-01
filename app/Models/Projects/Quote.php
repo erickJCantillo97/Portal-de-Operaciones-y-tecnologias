@@ -11,9 +11,9 @@ class Quote extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $guarded = ['ship_id', 'gerencia', 'cost', 'start_date', 'end_date'];
+    protected $guarded = [];
 
-    public function ships()
+    public function ship()
     {
         return $this->belongsTo(Ship::class);
     }

@@ -5,6 +5,8 @@ import { router, useForm } from '@inertiajs/vue3';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import Calendar from 'primevue/calendar';
+import Tag from 'primevue/tag';
 import Dropdown from 'primevue/dropdown';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
@@ -27,84 +29,37 @@ const filters = ref({
 })
 const open = ref(false)
 
-// const form = useForm({
-//     object: {
-// id: props.customers?.id ?? '0',
-// NIT: props.customers?.NIT ?? '',
-// name: props.customers?.name ?? '',
-// type: props.customers?.type ?? '',
-// email: props.customers?.email ?? '',
-//}
-// })
-
-// const elementos = ref([])
 
 const props = defineProps({
-    customers: Array,
-
-    add: {
-        type: Boolean,
-        default: false
-    },
-
-    tittle: String,
-
-    url: { // Hace referecia al nombre del modelo que su usa en las url resorces para formas la rutas (index, create, store, update, Etc..)
-        type: String,
-        required: true
-    },
-
-    headers: {
-        type: Array,
-        required: true
-    },
-    loading: {
-        type: Boolean,
-        default: false
-    },
-
-    height: {
-        default: '500px',
-        type: String
-    },
-    editItem: {
-        type: Boolean,
-        default: false
-    },
-    delete: {
-        type: Boolean,
-        default: false
-    },
-    globalSearch: {
-        default: true,
-        type: Boolean
-    }
+    contracts: Array,
+    gerencias: Array
 })
 
 //#region UseForm
 const formData = useForm({
-    id: props.customers?.id ?? '0',
-    NIT: props.customers?.NIT ?? '',
-    name: props.customers?.name ?? '',
-    type: props.customers?.type ?? '',
-    email: props.customers?.email ?? '',
+    id: props.contracts?.id ?? '0',
+    customer_id: props.contracts?.customer_id ?? '0',
+    name: props.contracts?.name ?? '',
+    gerencia: props.contracts?.gerencia ?? '',
+    cost: props.contracts?.cost ?? '0',
+    start_date: props.contracts?.start_date ?? '',
+    end_date: props.contracts?.end_date ?? '',
 });
 //#endregion
 
 onMounted(() => {
     initFilters();
-    getElements();
 })
 
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
     if (formData.id == 0) {
-        router.post(route('customers.store'), formData, {
+        router.post(route('contracts.store'), formData, {
             preserveScroll: true,
             onSuccess: (res) => {
                 open.value = false;
-                toast(' Cliente creado exitosamente', 'success');
+                toast(' Contrato creado exitosamente', 'success');
             },
             onError: (errors) => {
                 toast('¡Ups! Ha surgido un error', 'error');
@@ -115,11 +70,11 @@ const submit = () => {
         })
         return 'creado';
     }
-    router.put(route('customers.update', formData.id), formData, {
+    router.put(route('contracts.update', formData.id), formData, {
         preserveScroll: true,
         onSuccess: (res) => {
             open.value = false;
-            toast('¡Cliente actualizado exitosamente!', 'success');
+            toast('Contrato actualizado exitosamente!', 'success');
         },
         onError: (errors) => {
             toast('¡Ups! Ha surgido un error', 'error');
@@ -136,12 +91,13 @@ const addItem = () => {
     open.value = true;
 }
 
-const editItem = (customer) => {
-    formData.id = customer.id;
-    formData.NIT = customer.NIT;
-    formData.name = customer.name;
-    formData.type = customer.type;
-    formData.email = customer.email;
+const editItem = (contract) => {
+    formData.id = contract.id;
+    formData.name = contract.name;
+    formData.gerencia = contract.gerencia;
+    formData.cost = contract.cost;
+    formData.start_date = contract.start_date;
+    formData.end_date = contract.end_date;
     open.value = true;
 };
 
@@ -153,15 +109,7 @@ const initFilters = () => {
     }
 };
 
-const getElements = () => {
-    loading.value = true
-    if (props.url) {
-        axios.get(route(props.url + '.index')).then((res) => {
-            elementos.value = res.data[0];
-            loading.value = false;
-        })
-    }
-}
+
 
 const clearFilter = () => {
     initFilters();
@@ -173,6 +121,33 @@ const formatDate = (value) => {
         month: '2-digit',
         year: 'numeric'
     });
+};
+
+// Formatear el número en moneda (USD)
+const formatCurrency = (value) => {
+    return parseFloat(value).toLocaleString('es-CO', {
+        style: 'currency',
+        currency: 'COP'
+    });
+};
+
+const getContractStatusSeverity = (contract) => {
+    switch (contract.status) {
+        case 'INICIADO':
+            return 'info';
+
+        case 'PROCESO':
+            return 'warning';
+
+        case 'PENDIENTE':
+            return 'danger';
+
+        case 'FINALIZADO':
+            return 'success';
+
+        default:
+            return null;
+    }
 };
 
 const exportarExcel = () => {
@@ -188,7 +163,7 @@ const exportarExcel = () => {
     ], { origin: -1 });
 
     // Package and Release Data (`writeFile` tries to write and save an XLSB file)
-    XLSX.writeFile(workbook, 'Lista de Clientes_' + customers.nit + '_' + customers.name + ".xlsb");
+    XLSX.writeFile(workbook, 'Lista de Contratos_' + contract.nit + '_' + contract.name + ".xlsb");
 };
 
 
@@ -199,7 +174,7 @@ const exportarExcel = () => {
         <div class="px-auto  w-full p-4">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
-                    <h1 class="text-xl capitalize font-semibold leading-6 text-primary">Clientes</h1>
+                    <h1 class="text-xl capitalize font-semibold leading-6 text-primary">Contratos</h1>
                 </div>
 
                 <div class="">
@@ -208,9 +183,9 @@ const exportarExcel = () => {
                     </Button>
                 </div>
             </div>
-            <DataTable id="tabla" stripedRows class="p-datatable-sm" :scrollHeight="height" :value="customers"
-                v-model:filters="filters" dataKey="id" filterDisplay="menu" :loading="props.loading"
-                :globalFilterFields="['NIT', 'name', 'type', 'email']"
+            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="contracts" v-model:filters="filters"
+                dataKey="id" filterDisplay="menu" :loading="loading"
+                :globalFilterFields="['name', 'gerencia', 'cost', 'start_date', 'end_date']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -237,10 +212,20 @@ const exportarExcel = () => {
                 </template>
 
                 <!--COLUMNAS-->
-                <Column field="NIT" header="NIT"></Column>
                 <Column field="name" header="Nombre"></Column>
-                <Column field="type" header="Tipo"></Column>
-                <Column field="email" header="Correo"></Column>
+                <Column field="gerencia" header="Gerencia"></Column>
+                <Column field="cost" header="Costo">
+                    <template #body="slotProps">
+                        {{ formatCurrency(slotProps.data.cost) }}
+                    </template>
+                </Column>
+                <Column field="start_date" header="Fecha Inicio"></Column>
+                <Column field="end_date" header="Fecha Finalización"></Column>
+                <Column field="status" header="Estado" sortable>
+                    <template #body="slotProps">
+                        <Tag :value="slotProps.data.status" :severity="getContractStatusSeverity(slotProps.data)" />
+                    </template>
+                </Column>
 
                 <!--ACCIONES-->
                 <Column header="Acciones" class="space-x-3">
@@ -254,7 +239,7 @@ const exportarExcel = () => {
                                 </Button>
                             </div>
                             <div>
-                                <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Cliente?', 'customers')"
+                                <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Contrato', 'contracts')"
                                     class="hover:bg-danger">
                                     <TrashIcon class="h-4 w-4 " aria-hidden="true" />
                                 </Button>
@@ -285,14 +270,19 @@ const exportarExcel = () => {
                                 <div>
                                     <div class="text-center mt-2 px-2">
                                         <DialogTitle as="h3" class="text-xl font-semibold text-primary ">{{ formData.id !=
-                                            0 ? 'Editar ' : 'Crear' }} Cliente
+                                            0 ? 'Editar ' : 'Crear' }} Contrato
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="mt-2 space-y-4 border border-gray-200 p-2 rounded-lg">
-                                            <TextInput class="mt-2 text-left" label="NIT" placeholder="e.g. 9234232988-0"
-                                                v-model="formData.NIT" :error="router.page.props.errors.nit"></TextInput>
-                                            <TextInput class="mt-2 text-left" label="Nombre Completo"
-                                                placeholder="Escriba su nombre completo" v-model="formData.name"
+                                            <TextInput class="mt-2 text-left" label="Nombre del Contrato"
+                                                placeholder="Escriba Nombre del Contrato" v-model="formData.name"
                                                 :error="router.page.props.errors.name"></TextInput>
+                                            <Dropdown v-model="formData.gerencia" optionLabel="name" optionValue="id"
+                                                :options="gerencias" placeholder="Seleccione Gerencia"
+                                                :class="error != null ? 'p-invalid' : ''" />
+                                            <small id="gerencia-help" class="p-error">
+                                                {{ formData.errors.gerencia }}
+                                            </small>
+
                                             <!-- <div class="mt-2">
                                                 <label for="type"
                                                     class="block capitalize text-left text-sm text-gray-900">Tipo de
@@ -301,12 +291,41 @@ const exportarExcel = () => {
                                                     placeholder="Selecccionar" class="w-full md:w-14rem">
                                                 </Dropdown>
                                             </div> -->
-                                            <TextInput class="mt-2 text-left" label="Tipo de Cliente"
-                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.type"
-                                                :error="router.page.props.errors.type"></TextInput>
-                                            <TextInput class="mt-2 text-left" label="Correo"
-                                                placeholder="Escriba su correo electronico" v-model="formData.email"
-                                                :error="router.page.props.errors.email"></TextInput>
+                                            <TextInput class="mt-2 text-left" label="Costo"
+                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.cost"
+                                                :error="router.page.props.errors.cost"></TextInput>
+
+                                            <!--CAMPO FECHA INICIO-->
+                                            <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
+                                                <label for="icon" class="mt-2 text-left text-sm font-semibold">
+                                                    Fecha Inicio
+                                                </label>
+                                                <Calendar id="calendar-24h" v-model="formData.start_date" touchUI showTime
+                                                    showIcon manualInput="true" hideOnDateTimeSelect="true" hourFormat="24"
+                                                    :showOnFocus="false" :showButtonBar="false"
+                                                    placeholder="Fecha Inicio del Contrato"
+                                                    :class="error != null ? 'p-invalid' : ''"
+                                                    @input="$emit('update:start_date', $event.target.value)" />
+                                                <small id="start_date-help" class="p-error">
+                                                    {{ formData.errors.start_date }}
+                                                </small>
+                                            </div>
+
+                                            <!--CAMPO FECHA FINALIZACIÓN-->
+                                            <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
+                                                <label for="icon" class="mt-2 text-left text-sm font-semibold">
+                                                    Fecha Finalización
+                                                </label>
+                                                <Calendar id="calendar-24h" v-model="formData.end_date" touchUI showTime
+                                                    showIcon manualInput="true" hideOnDateTimeSelect="true" hourFormat="24"
+                                                    :showOnFocus="false" :showButtonBar="false"
+                                                    placeholder="Fecha Finalización del Contrato"
+                                                    :class="error != null ? 'p-invalid' : ''"
+                                                    @input="$emit('update:end_date', $event.target.value)" />
+                                                <small id="fechaInicio-help" class="p-error">
+                                                    {{ formData.errors.end_date }}
+                                                </small>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

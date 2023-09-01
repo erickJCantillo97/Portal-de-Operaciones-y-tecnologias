@@ -1,16 +1,15 @@
 <?php
 
-use App\Http\Controllers\SubSystemController;
 use App\Http\Controllers\SWBS\BaseActivityController;
 use App\Http\Controllers\SWBS\SpecificActivityController;
+use App\Http\Controllers\SWBS\SubSystemController;
 use App\Http\Controllers\SWBS\SystemController;
-use App\Models\SWBS\SubSystem;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified'])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
-    Route::get('', function (){
+    Route::get('', function () {
         return Inertia::render('Settings/Basic/Index');
     })->name('settings.basic');
 
@@ -19,15 +18,12 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified'])
     Route::resource('system', SystemController::class);
     Route::resource('subSystem', SubSystemController::class);
 
-
-    Route::get('gerencias/get', function (){
+    Route::get('gerencias/get', function () {
         return response()->json([gerencias()], 200);
     })->name('gerencias.index');
 
-    Route::get('gruposConstructivos/get', function (){
+    Route::get('gruposConstructivos/get', function () {
         return response()->json([gruposConstructivos()], 200);
     })->name('gruposConstructivos.index');
-
-
 
 });

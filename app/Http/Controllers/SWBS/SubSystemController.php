@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\SWBS;
 
+use App\Http\Controllers\Controller;
 use App\Models\SWBS\SubSystem;
 use Exception;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class SubSystemController extends Controller
         $subsystems = SubSystem::get();
 
         return response()->json([
-            $subsystems
+            $subsystems,
         ]);
     }
 
@@ -37,9 +38,9 @@ class SubSystemController extends Controller
             //
         ]);
 
-        try{
+        try {
             SubSystem::create($validateData);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
     }
@@ -69,9 +70,9 @@ class SubSystemController extends Controller
             //
         ]);
 
-        try{
+        try {
             $subSystem->update($validateData);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
@@ -81,9 +82,9 @@ class SubSystemController extends Controller
      */
     public function destroy(SubSystem $subSystem)
     {
-        try{
+        try {
             $subSystem->delete();
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }

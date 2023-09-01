@@ -13,14 +13,14 @@ class QuotAuthorization extends Model
 
     protected $table = 'quot_authorizations';
 
-    protected $guarded = ['authorization_id', 'quote_id'];
+    protected $guarded = [];
 
-    public function authorizations()
+    public function authorization()
     {
         return $this->belongsTo(Authorization::class);
     }
 
-    public function quotes()
+    public function quot()
     {
         return $this->belongsTo(Quote::class);
     }

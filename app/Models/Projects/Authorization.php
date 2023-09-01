@@ -11,14 +11,14 @@ class Authorization extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $guarded = ['project_id', 'contract_id', 'gerencia', 'start_date', 'end_date'];
+    protected $guarded = [];
 
-    public function contracts()
+    public function contract()
     {
         return $this->belongsTo(Contract::class);
     }
 
-    public function projects()
+    public function project()
     {
         return $this->belongsTo(Project::class);
     }

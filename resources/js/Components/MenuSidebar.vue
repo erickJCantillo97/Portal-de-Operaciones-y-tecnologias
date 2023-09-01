@@ -109,7 +109,7 @@ const navigation = [
         icon: FolderIcon,
         current: false,
         children: [
-            // { name: 'Contratos', href: '#' },
+            { name: 'Contratos', href: 'contracts.index' },
             // { name: 'Autorizaciones', href: '#' },
             // { name: 'Estimaciones', href: '#' },
             { name: 'Clientes', href: 'customers.index' },

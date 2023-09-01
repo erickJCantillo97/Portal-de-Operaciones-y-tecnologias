@@ -11,7 +11,7 @@ class Contract extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $guarded = ['customer_id', 'gerencia', 'cost', 'start_date', 'end_date'];
+    protected $guarded = [];
 
     public function customer()
     {
