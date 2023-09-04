@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Projects\Authorization;
 use Exception;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class AuthorizationController extends Controller
 {
@@ -14,7 +15,15 @@ class AuthorizationController extends Controller
      */
     public function index()
     {
-        //
+        $authorizations = Authorization::orderBy('project_id')->get();
+
+        return Inertia::render(
+            'Project/Authorizations',
+            [
+                'authorizations' => $authorizations,
+                'gerencias' => gerencias(),
+            ]
+        );
     }
 
     /**
@@ -30,15 +39,24 @@ class AuthorizationController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request);
         $validateData = $request->validate([
-            //
+            'project_id' => 'nullable',
+            'contract_id' => 'nullable',
+            'gerencia' => 'required',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
         ]);
 
-        try{
+        try {
             Authorization::create($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+
+            return back()->with(['message' => 'Autorización creado correctamente'], 200);
+        } catch (Exception $e) {
+            return back()->withErrors(['message' => 'Ocurrió un error al crear la Autorizacion: '.$e->getMessage()], 500);
         }
+
+        return redirect('authorizations.index');
     }
 
     /**
@@ -63,12 +81,16 @@ class AuthorizationController extends Controller
     public function update(Request $request, Authorization $authorization)
     {
         $validateData = $request->validate([
-            //
+            'project_id' => 'nullable',
+            'contract_id' => 'nullable',
+            'gerencia' => 'required',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
         ]);
 
-        try{
+        try {
             $authorization->update($validateData);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
@@ -78,9 +100,9 @@ class AuthorizationController extends Controller
      */
     public function destroy(Authorization $authorization)
     {
-        try{
+        try {
             $authorization->delete();
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }

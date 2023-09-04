@@ -5,22 +5,29 @@ namespace App\Http\Controllers\Projects;
 use App\Http\Controllers\Controller;
 use App\Models\Projects\Ship;
 use Exception;
-use App\Http\Requests\StoreShipRequest;
-use App\Http\Requests\UpdateShipRequest;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ShipController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index()
     {
-        $ship = Ship::orderBy('name')->get();
+        $ships = Ship::orderBy('name')->get();
 
-        return response()->json([
-            $ship
-        ], 200);
+        return Inertia::render(
+            'Project/Ships',
+            [
+                'ships' => $ships,
+                'gerencias' => gerencias()
+            ]
+        );
+
+        // return response()->json([
+        //     $ship
+        // ], 200);
     }
 
     /**
@@ -34,17 +41,26 @@ class ShipController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreShipRequest $request)
+    public function store(Request $request)
     {
+        // dd($request);
         $validateData = $request->validate([
-            //
+            'customer_id' => 'nullable',
+            'gerencia' => 'required',
+            'name' => 'required',
+            'type' => 'required',
+            'details' => 'required'
         ]);
 
-        try{
+        try {
             Ship::create($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+
+            return back()->with(['message' => 'Buque creado correctamente'], 200);
+        } catch (Exception $e) {
+            return back()->withErrors(['message' => 'Ocurrió un error al crear el Buque: ' . $e->getMessage()], 500);
         }
+
+        return redirect('ships.index');
     }
 
     /**
@@ -66,16 +82,20 @@ class ShipController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateShipRequest $request, Ship $ship)
+    public function update(Request $request, Ship $ship)
     {
         $validateData = $request->validate([
-            //
+            'customer_id' => 'nullable',
+            'gerencia' => 'required',
+            'name' => 'required',
+            'type' => 'required',
+            'details' => 'required'
         ]);
 
-        try{
+        try {
             $ship->update($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -84,10 +104,10 @@ class ShipController extends Controller
      */
     public function destroy(Ship $ship)
     {
-        try{
+        try {
             $ship->delete();
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }

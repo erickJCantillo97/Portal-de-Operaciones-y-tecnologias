@@ -6,20 +6,27 @@ use App\Http\Controllers\Controller;
 use App\Models\Projects\Quote;
 use Illuminate\Http\Request;
 use Exception;
-use Illuminate\Http\JsonResponse;
+use Inertia\Inertia;
 
 class QuoteController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index()
     {
-        $quote = Quote::orderBy('id')->get();
+        $quotes = Quote::orderBy('id')->get();
 
-        return response()->json([
-            $quote
-        ], 200);
+        return Inertia::render(
+            'Project/Quotes',
+            [
+                'quotes' => $quotes,
+                'gerencias' => gerencias()
+            ]
+        );
+        // return response()->json([
+        //     $quote
+        // ], 200);
     }
 
     /**
@@ -35,15 +42,24 @@ class QuoteController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request);
         $validateData = $request->validate([
-            //
+            'ship_id' => 'nullable',
+            'gerencia' => 'required',
+            'cost' => 'required|numeric',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date'
         ]);
 
-        try{
+        try {
             Quote::create($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+
+            return back()->with(['message' => 'Cotizacion creada correctamente'], 200);
+        } catch (Exception $e) {
+            return back()->withErrors(['message' => 'Ocurrió un error al crear la Cotizacion: ' . $e->getMessage()], 500);
         }
+
+        return redirect('ships.index');
     }
 
     /**
@@ -68,13 +84,17 @@ class QuoteController extends Controller
     public function update(Request $request, Quote $quote)
     {
         $validateData = $request->validate([
-            //
+            'ship_id' => 'nullable',
+            'gerencia' => 'required',
+            'cost' => 'required|numeric',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date'
         ]);
 
-        try{
+        try {
             $quote->update($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -83,10 +103,10 @@ class QuoteController extends Controller
      */
     public function destroy(Quote $quote)
     {
-        try{
+        try {
             $quote->delete();
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }

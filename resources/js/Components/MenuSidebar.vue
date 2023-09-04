@@ -1,12 +1,12 @@
 <template>
     <div
         class="sidebar fixed min-h-screen h-full top-0 bottom-0 w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] z-20 transition-all duration-300">
-        <div class="bg-white  h-full">
-            <div class="flex justify-between items-center px-2 py-3">
-                <div class="main-logo flex items-center shrink-0">
+        <div class="h-full bg-white">
+            <div class="flex items-center justify-between px-2 py-3">
+                <div class="flex items-center main-logo shrink-0">
                     <ApplicationLogo :letras="false" :width-logo="50" :height-logo="50"></ApplicationLogo>
                     <span
-                        class="text-2xl ml-2  font-semibold align-middle lg:inline dark:text-white-light text-primary">COTECMAR</span>
+                        class="ml-2 text-2xl font-semibold align-middle lg:inline dark:text-white-light text-primary">COTECMAR</span>
                 </div>
 
             </div>
@@ -18,17 +18,17 @@
                             <li v-for="item in navigation" :key="item.name" class=" nav-item">
                                 <Link v-if="!item.children" v-show="item.show" :href="route(item.href)" class="group">
                                 <div class="flex items-center group-hover:!text-primary">
-                                    <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400" aria-hidden="true" />
+                                    <component :is="item.icon" class="w-6 h-6 text-gray-400 shrink-0" aria-hidden="true" />
                                     <span class="pl-3 text-black dark:text-[#506690] dark:group-hover:text-white">{{
                                         item.name
                                     }}</span>
                                 </div>
                                 </Link>
-                                <button v-else type="button" class="nav-link group w-full"
+                                <button v-else type="button" class="w-full nav-link group"
                                     :class="{ active: activeDropdown === item.name }"
                                     @click="activeDropdown === item.name ? (activeDropdown = null) : (activeDropdown = item.name)">
                                     <div class="flex items-center">
-                                        <component :is="item.icon" class="h-6 w-6 shrink-0 text-gray-400"
+                                        <component :is="item.icon" class="w-6 h-6 text-gray-400 shrink-0"
                                             aria-hidden="true" />
 
                                         <span
@@ -45,7 +45,7 @@
                                     </div>
                                 </button>
                                 <vue-collapsible :isOpen="activeDropdown === item.name">
-                                    <ul class="sub-menu text-gray-500" v-for="children of item.children">
+                                    <ul class="text-gray-500 sub-menu" v-for="children of item.children">
                                         <li>
                                             <Link :href="route(children.href)">{{ children.name }}</Link>
                                         </li>
@@ -81,7 +81,12 @@ import {
 const activeDropdown = ref();
 const { hasRole } = usePermissions();
 const navigation = [
-    { name: 'Dashboard', href: 'dashboard', icon: HomeIcon, current: true, show: true },
+    {
+        name: 'Dashboard',
+        href: 'dashboard',
+        icon: HomeIcon,
+        current: true,
+        show: true },
     {
         name: 'Gestion de Personal',
         icon: UsersIcon,
@@ -98,10 +103,10 @@ const navigation = [
         icon: FolderIcon,
         current: false,
         children: [
-            // { name: 'Proyectos', href: '#' }, //gerencia (auth()->user()gerencia)
+            { name: 'Proyectos', href: 'projects.index' }, //gerencia (auth()->user()gerencia)
             // { name: 'Informes', href: '#' },
             { name: 'Cronograma', href: 'showGantt' },
-            // { name: 'Buques', href: '#' },
+            { name: 'Buques', href: 'ships.index' },
         ],
     },
     {
@@ -111,8 +116,9 @@ const navigation = [
         children: [
             { name: 'Clientes', href: 'customers.index' },
             { name: 'Contratos', href: 'contracts.index' },
-            // { name: 'Autorizaciones', href: '#' },
-            // { name: 'Estimaciones', href: '#' },
+            { name: 'Autorizaciones', href: 'authorizations.index' },
+            { name: 'Estimaciones', href: 'quotes.index' },
+            { name: 'Clientes', href: 'customers.index' },
         ],
     },
     // { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
