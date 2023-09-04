@@ -53,11 +53,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         return Inertia::render('Dashboards/Gerencias', ['personal' => $personal, 'GERENCIA' => $gerencia]);
     })->name('dashboard.gerencias');
 
-    //CRUD Customers
-    Route::resource('customers', CustomerController::class);
-
-    //CRUD Contracts
-    Route::resource('contracts', ContractController::class);
 
 
     Route::get('crearTarea', function (){
@@ -71,17 +66,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             ]);
     });
 
-    //CRUD Projects
-    Route::resource('projects', ProjectController::class);
 
-    //CRUD Authorizations
-    Route::resource('authorizations', AuthorizationController::class);
-
-    //CRUD Quotes
-    Route::resource('quotes', QuoteController::class);
-
-    //CRUD Ships
-    Route::resource('ships', ShipController::class);
 });
 
 

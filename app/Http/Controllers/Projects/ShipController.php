@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
+use App\Models\Projects\Customer;
 use App\Models\Projects\Ship;
 use Exception;
 use Illuminate\Http\Request;
@@ -16,12 +17,12 @@ class ShipController extends Controller
     public function index()
     {
         $ships = Ship::orderBy('name')->get();
+        $customers = Customer::orderBy('name')->get();
 
-        return Inertia::render(
-            'Project/Ships',
+        return Inertia::render('Project/Ships',
             [
                 'ships' => $ships,
-                'gerencias' => gerencias()
+                'customers' => $customers,
             ]
         );
 
@@ -46,10 +47,12 @@ class ShipController extends Controller
         // dd($request);
         $validateData = $request->validate([
             'customer_id' => 'nullable',
-            'gerencia' => 'required',
             'name' => 'required',
             'type' => 'required',
-            'details' => 'required'
+            'quilla' => 'required|numeric|gt:0',
+            'pantoque' => 'required|numeric|gt:0',
+            'eslora' => 'required|numeric|gt:0',
+            'details' => 'required',
         ]);
 
         try {
@@ -57,7 +60,7 @@ class ShipController extends Controller
 
             return back()->with(['message' => 'Buque creado correctamente'], 200);
         } catch (Exception $e) {
-            return back()->withErrors(['message' => 'Ocurrió un error al crear el Buque: ' . $e->getMessage()], 500);
+            return back()->withErrors(['message' => 'Ocurrió un error al crear el Buque: '.$e->getMessage()], 500);
         }
 
         return redirect('ships.index');
@@ -89,13 +92,13 @@ class ShipController extends Controller
             'gerencia' => 'required',
             'name' => 'required',
             'type' => 'required',
-            'details' => 'required'
+            'details' => 'required',
         ]);
 
         try {
             $ship->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
 
@@ -107,7 +110,7 @@ class ShipController extends Controller
         try {
             $ship->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }
 }

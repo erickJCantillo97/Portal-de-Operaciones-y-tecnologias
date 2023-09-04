@@ -21,7 +21,6 @@ class AuthorizationController extends Controller
             'Project/Authorizations',
             [
                 'authorizations' => $authorizations,
-                'gerencias' => gerencias(),
             ]
         );
     }
@@ -41,9 +40,8 @@ class AuthorizationController extends Controller
     {
         // dd($request);
         $validateData = $request->validate([
-            'project_id' => 'nullable',
             'contract_id' => 'nullable',
-            'gerencia' => 'required',
+            'quote_id' => 'nullable',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
         ]);

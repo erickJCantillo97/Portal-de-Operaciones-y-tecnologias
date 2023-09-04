@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('ships', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('customer_id')->index();
-            $table->string('gerencia');
-            $table->string('name');
+            $table->string('name')->nullable();
             $table->string('type');
+            $table->string('quilla');
+            $table->string('pantoque');
+            $table->double('eslora');
             $table->string('details')->nullable();
             $table->timestamps();
             $table->softDeletes();

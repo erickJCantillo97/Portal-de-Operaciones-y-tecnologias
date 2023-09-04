@@ -86,7 +86,8 @@ const navigation = [
         href: 'dashboard',
         icon: HomeIcon,
         current: true,
-        show: true },
+        show: true
+    },
     {
         name: 'Gestion de Personal',
         icon: UsersIcon,
@@ -119,7 +120,6 @@ const navigation = [
             { name: 'Contratos', href: 'contracts.index' },
             { name: 'Autorizaciones', href: 'authorizations.index' },
             { name: 'Estimaciones', href: 'quotes.index' },
-            { name: 'Clientes', href: 'customers.index' },
         ],
     },
     // { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },

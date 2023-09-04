@@ -13,10 +13,15 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('contract_id')->nullable()->index();
+            $table->unsignedBigInteger('authorization_id')->nullable()->index();
+            $table->unsignedBigInteger('quote_id')->nullable()->index();
             $table->unsignedBigInteger('ship_id')->index();
+            $table->string('intern_communications')->nullable();
             $table->string('name'); //Este nombre debe ser calculado (Ship - Contrato )
             $table->string('gerencia');
             $table->date('start_date');
+            $table->date('end_date');
             $table->float('hoursPerDay')->default(floatval(8.5));
             $table->integer('daysPerWeek')->default(5);
             $table->integer('daysPerMonth')->default(20);
