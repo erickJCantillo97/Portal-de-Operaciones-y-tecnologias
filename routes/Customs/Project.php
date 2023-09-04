@@ -15,4 +15,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
 
     Route::post('/syncGantt', [GanttController::class, 'sync'])->name('syncGantt');
 
+    Route::post('/syncGanttImporter', [GanttController::class, 'syncImporter'])->name('syncImporter');
+
+    Route::get('/ganttImporter', function () {
+        return Inertia::render('GanttImporter');
+    })->name('ganttImporter');
+
 });

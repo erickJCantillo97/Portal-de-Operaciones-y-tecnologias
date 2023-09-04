@@ -106,6 +106,7 @@ const navigation = [
             { name: 'Proyectos', href: 'projects.index' }, //gerencia (auth()->user()gerencia)
             // { name: 'Informes', href: '#' },
             { name: 'Cronograma', href: 'showGantt' },
+            { name: 'Subir Cronograma', href: 'ganttImporter' },
             { name: 'Buques', href: 'ships.index' },
         ],
     },

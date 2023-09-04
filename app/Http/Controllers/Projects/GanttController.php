@@ -12,13 +12,13 @@ class GanttController extends Controller
     {
 
         return response()->json([
-            "success"=> true,
-            "proyect"=>['rows' => [
-                "calendar"=> "general",
-                "startDate"=> "2022-05-31",
-                "hoursPerDay"=> 9,
-                "daysPerWeek"=> 5,
-                "daysPerMonth"=> 20
+            "success" => true,
+            "proyect" => ['rows' => [
+                "calendar" => "general",
+                "startDate" => "2022-05-31",
+                "hoursPerDay" => 9,
+                "daysPerWeek" => 5,
+                "daysPerMonth" => 20
             ]],
             "tasks" => ['rows' => Task::whereNull('task_id')->get()],
             "dependencies" => ['rows' => []],
@@ -33,8 +33,8 @@ class GanttController extends Controller
         $rows = [];
         $removed = [];
         // dd($request->requestId);
-        if(isset($request->tasks['added'])){
-            foreach($request->tasks['added'] as $task){
+        if (isset($request->tasks['added'])) {
+            foreach ($request->tasks['added'] as $task) {
                 $taskCreate = Task::create([
                     'name' => $task['name'],
                     'task_id' => $task['parentId'],
@@ -43,15 +43,15 @@ class GanttController extends Controller
                     'startDate' => $task['startDate'],
                     'endDate' => $task['endDate'],
                 ]);
-                array_push($rows , [
+                array_push($rows, [
                     '$PhantomId' => end($task),
                     'id' => $taskCreate['id'],
                     'added_dt' => $taskCreate->created_at,
                 ]);
             }
         }
-        if(isset($request->tasks['updated'])){
-            foreach($request->tasks['updated'] as $task){
+        if (isset($request->tasks['updated'])) {
+            foreach ($request->tasks['updated'] as $task) {
                 $taskUpdate = Task::where('id', $task['id'])->first();
                 $taskUpdate->update([
                     'name' => $task['name'] ?? $taskUpdate->name,
@@ -63,8 +63,8 @@ class GanttController extends Controller
                 ]);
             }
         }
-        if(isset($request->tasks['removed'])){
-            foreach($request->tasks['removed'] as $task){
+        if (isset($request->tasks['removed'])) {
+            foreach ($request->tasks['removed'] as $task) {
                 $taskUpdate = Task::where('id', $task['id'])->delete();
                 array_push($removed, ['id' => $task['id']]);
             }
@@ -74,9 +74,19 @@ class GanttController extends Controller
 
         return response()->json([
             "success"   => true,
-            'requestId' => $request->requestId , 'tasks' => [
-            'rows' => $rows,
-            'removed' => $removed
-        ]]);
+            'requestId' => $request->requestId, 'tasks' => [
+                'rows' => $rows,
+                'removed' => $removed
+            ]
+        ]);
+    }
+
+    public function syncImporter(Request $request)
+    {
+
+        return response()->json([
+            "success"   => true,
+            'requestId' => $request->requestId,
+        ]);
     }
 }

@@ -12,4 +12,8 @@ class SubSystem extends Model
     use SoftDeletes;
 
     protected $guarded = [];
+
+    public function system(){
+        return $this->belongsTo(System::class);
+    }
 }
