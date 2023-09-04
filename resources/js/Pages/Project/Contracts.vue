@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref, onMounted,computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
@@ -241,28 +241,32 @@ const exportarExcel = () => {
                                 class="relative transform overflow-hidden rounded-lg bg-white px-2 pb-4 pt-2 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg ">
                                 <div>
                                     <div class="mt-2 px-2">
-                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary text-center">{{ formData.id !=
+                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary text-center">{{
+                                            formData.id !=
                                             0 ? 'Editar ' : 'Crear' }} Contrato
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="mt-2 space-y-4  p-2 rounded-lg">
-                                            <Combobox label="Cliente" :options="customers" v-model="customerSelect"></Combobox>
-                                            <TextInput label="Nombre del Contrato"
-                                                placeholder="Escriba Nombre del Contrato" v-model="formData.name"
-                                                :error="$page.props.errors.name">
+                                            <Combobox label="Cliente" placeholder="Seleccione Cliente" :options="customers"
+                                                v-model="customerSelect">
+                                            </Combobox>
+
+                                            <TextInput label="Nombre del Contrato" placeholder="Escriba Nombre del Contrato"
+                                                v-model="formData.name" :error="$page.props.errors.name">
                                             </TextInput>
 
-                                            <TextInput  type="number" label="Costo"
-                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.cost"
+                                            <TextInput type="number" label="Costo"
+                                                :placeholder="'Escriba el Costo del Contrato'" v-model="formData.cost"
                                                 :error="$page.props.errors.cost">
                                             </TextInput>
 
-                                            <TextInput  type="date" label="Fecha de inicio"
+                                            <!--CAMPO FECHA INICIO-->
+                                            <TextInput type="date" label="Fecha de inicio"
                                                 :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.start_date"
                                                 :error="$page.props.errors.cost">
                                             </TextInput>
 
-
-                                            <TextInput  type="date" label="Fecha de Fin"
+                                            <!--CAMPO FECHA FINALIZACIÓN-->
+                                            <TextInput type="date" label="Fecha de Finalización"
                                                 :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
                                                 :error="$page.props.errors.end_date">
                                             </TextInput>
@@ -283,6 +287,5 @@ const exportarExcel = () => {
                 </div>
             </Dialog>
         </TransitionRoot>
-
     </AppLayout>
 </template>

@@ -13,9 +13,8 @@ return new class extends Migration
     {
         Schema::create('authorizations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('project_id')->index();
             $table->unsignedBigInteger('contract_id')->index();
-            $table->string('gerencia');
+            $table->unsignedBigInteger('quote_id')->index();
             $table->date('start_date');
             $table->date('end_date');
             $table->timestamps();

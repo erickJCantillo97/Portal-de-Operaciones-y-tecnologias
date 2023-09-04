@@ -7,7 +7,7 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Calendar from 'primevue/calendar';
 import Tag from 'primevue/tag';
-import Dropdown from 'primevue/dropdown';
+import Combobox from '@/Components/Combobox.vue';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
@@ -32,19 +32,24 @@ const open = ref(false)
 
 const props = defineProps({
     projects: Array,
-    gerencias: Array
+    ships: Array,
+    contracts: Array
 })
 
 //#region UseForm
 const formData = useForm({
     id: props.projects?.id ?? '0',
+    contract_id: props.projects?.contract_id ?? '0',
+    authorization_id: props.projects?.authorization_id ?? '0',
+    quote_id: props.projects?.quote_id ?? '0',
     ship_id: props.projects?.ship_id ?? '0',
+    intern_communications: props.projects?.intern_communications ?? '0',
     name: props.projects?.name ?? '',
-    gerencia: props.projects?.gerencia ?? '',
     start_date: props.projects?.start_date ?? '',
-    hoursPerDay: props.projects?.hoursPerDay ?? '0',
-    daysPerWeek: props.projects?.daysPerWeek ?? '',
-    daysPerMonth: props.projects?.daysPerMonth ?? ''
+    end_date: props.projects?.end_date ?? '',
+    hoursPerDay: props.projects?.hoursPerDay ?? '8.5',
+    daysPerWeek: props.projects?.daysPerWeek ?? '5',
+    daysPerMonth: props.projects?.daysPerMonth ?? '20'
 });
 //#endregion
 
@@ -84,12 +89,12 @@ const submit = () => {
             loading.value = false;
         }
     })
-
 }
 
 const addItem = () => {
-    formData.reset();
-    open.value = true;
+    router.get(route('projects.edit'))
+    // formData.reset();
+    // open.value = true;
 }
 
 const editItem = (project) => {
@@ -182,7 +187,7 @@ const exportarExcel = () => {
                 <div class="">
                     <Button @click="addItem()" severity="success">
                         <PlusIcon class="w-6 h-6" aria-hidden="true" />
-                            Agregar
+                        Agregar
                     </Button>
                 </div>
             </div>
@@ -273,15 +278,23 @@ const exportarExcel = () => {
                                             0 ? 'Editar ' : 'Crear' }} Proyecto
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
-                                            <TextInput class="mt-2 text-left" label="Nombre del Contrato"
-                                                placeholder="Escriba Nombre del Proyecto" v-model="formData.name"
-                                                :error="router.page.props.errors.name"></TextInput>
-                                            <Dropdown v-model="formData.gerencia" optionLabel="name" optionValue="id"
-                                                :options="gerencias" placeholder="Seleccione Gerencia"
-                                                :class="error != null ? 'p-invalid' : ''" />
-                                            <small id="gerencia-help" class="p-error">
-                                                {{ formData.errors.gerencia }}
-                                            </small>
+                                            <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
+                                                <Combobox class="mt-2 text-left text-gray-900" label="Contrato"
+                                                    placeholder="Seleccione Contrato" :options="contracts"
+                                                    v-model="customerSelect">
+                                                </Combobox>
+
+                                                <Combobox class="mt-2 text-left" label="Buque"
+                                                    placeholder="Seleccione Buque" :options="ships"
+                                                    v-model="customerSelect">
+                                                </Combobox>
+                                            </div>
+
+                                            <!--CAMPO FECHA INICIO-->
+                                            <TextInput class="mt-2 text-left" type="date" label="Fecha De Inicio"
+                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.start_date"
+                                                :error="$page.props.errors.start_date">
+                                            </TextInput>
 
                                             <!-- <div class="mt-2">
                                                 <label for="type"
@@ -292,20 +305,12 @@ const exportarExcel = () => {
                                                 </Dropdown>
                                             </div> -->
 
-                                            <!--CAMPO FECHA INICIO-->
+                                            <!--CAMPO FECHA FINALIZACIÓN-->
                                             <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
-                                                <label for="icon" class="mt-2 text-sm font-semibold text-left">
-                                                    Fecha Inicio
-                                                </label>
-                                                <Calendar id="calendar-24h" v-model="formData.start_date" touchUI showTime
-                                                    showIcon manualInput="true" hideOnDateTimeSelect="true" hourFormat="24"
-                                                    :showOnFocus="false" :showButtonBar="false"
-                                                    placeholder="Fecha Inicio del Contrato"
-                                                    :class="error != null ? 'p-invalid' : ''"
-                                                    @input="$emit('update:start_date', $event.target.value)" />
-                                                <small id="start_date-help" class="p-error">
-                                                    {{ formData.errors.start_date }}
-                                                </small>
+                                                <TextInput class="mt-2 text-left" type="date" label="Fecha de Finalización"
+                                                    :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
+                                                    :error="$page.props.errors.end_date">
+                                                </TextInput>
                                             </div>
 
                                             <TextInput class="mt-2 text-left" label="Horas por Dia"

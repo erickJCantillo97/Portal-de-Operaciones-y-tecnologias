@@ -21,7 +21,7 @@ class ContractController extends Controller
 
         return Inertia::render('Project/Contracts', [
             'contracts' => $contracts,
-            'customers' => $customers
+            'customers' => $customers,
         ]);
     }
 
@@ -41,8 +41,9 @@ class ContractController extends Controller
         // dd($request);
         $validateData = $request->validate([
             'customer_id' => 'nullable',
+            'ship_id' => 'nullable',
             'name' => 'required',
-            'cost' => 'required|numeric',
+            'cost' => 'required|numeric|gt:0',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
         ]);

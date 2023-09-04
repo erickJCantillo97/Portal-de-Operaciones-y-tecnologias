@@ -7,7 +7,7 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Calendar from 'primevue/calendar';
 import Tag from 'primevue/tag';
-import Dropdown from 'primevue/dropdown';
+import Combobox from '@/Components/Combobox.vue';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
@@ -32,16 +32,18 @@ const open = ref(false)
 
 const props = defineProps({
     ships: Array,
-    gerencias: Array
+    customers: Array
 })
 
 //#region UseForm
 const formData = useForm({
     id: props.contracts?.id ?? '0',
     customer_id: props.contracts?.customer_id ?? '0',
-    gerencia: props.contracts?.gerencia ?? '',
     name: props.contracts?.name ?? '',
     type: props.contracts?.type ?? '',
+    quilla: props.contracts?.quilla ?? '',
+    pantoque: props.contracts?.pantoque ?? '',
+    eslora: props.contracts?.eslora ?? '',
     details: props.contracts?.details ?? '',
 });
 //#endregion
@@ -180,13 +182,12 @@ const exportarExcel = () => {
                 <div class="">
                     <Button @click="addItem()" severity="success">
                         <PlusIcon class="w-6 h-6" aria-hidden="true" />
-                            Agregar
+                        Agregar
                     </Button>
                 </div>
             </div>
-            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="ships" v-model:filters="filters"
-                dataKey="id" filterDisplay="menu" :loading="loading"
-                :globalFilterFields="['name', 'gerencia', 'type', 'details']"
+            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="ships" v-model:filters="filters" dataKey="id"
+                filterDisplay="menu" :loading="loading" :globalFilterFields="['name', 'gerencia', 'type', 'details']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -266,28 +267,27 @@ const exportarExcel = () => {
                                 <div>
                                     <div class="px-2 mt-2 text-center">
                                         <DialogTitle as="h3" class="text-xl font-semibold text-primary ">
-                                            {{ formData.id != 0 ? 'Editar ' : 'Crear' }} 
-                                                Buque
+                                            {{ formData.id != 0 ? 'Editar ' : 'Crear' }}
+                                            Buque
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
-                                            <TextInput class="mt-2 text-left" label="Nombre del Buque"
-                                                placeholder="Escriba Nombre del Buque" v-model="formData.name"
-                                                :error="router.page.props.errors.name"></TextInput>
-                                            <Dropdown v-model="formData.gerencia" optionLabel="name" optionValue="id"
-                                                :options="gerencias" placeholder="Seleccione Gerencia"
-                                                :class="error != null ? 'p-invalid' : ''" />
-                                            <small id="gerencia-help" class="p-error">
-                                                {{ formData.errors.gerencia }}
-                                            </small>
+                                            <Combobox class="mt-2 text-left" label="Cliente"
+                                                placeholder="Seleccione Cliente" :options="customers"
+                                                v-model="customerSelect">
+                                            </Combobox>
 
-                                            <!-- <div class="mt-2">
-                                                <label for="type"
-                                                    class="block text-sm text-left text-gray-900 capitalize">Tipo de
-                                                    Cliente</label>
-                                                <Dropdown v-model="form.type" :options="types" filter optionLabel="name"
-                                                    placeholder="Selecccionar" class="w-full md:w-14rem">
-                                                </Dropdown>
-                                            </div> -->
+                                            <TextInput class="mt-2 text-left" label="Cantidad de Quillas"
+                                                :placeholder="'Números de Quillas necesarios'" v-model="formData.quilla"
+                                                :error="router.page.props.errors.quilla"></TextInput>
+
+                                            <TextInput class="mt-2 text-left" label="Cantidad de Pantoques"
+                                                :placeholder="'Números de Pantoques necesarios'" v-model="formData.pantoque"
+                                                :error="router.page.props.errors.pantoque"></TextInput>
+
+                                            <TextInput class="mt-2 text-left" label="Longitud de Eslora"
+                                                :placeholder="'Longitud de Eslora'" v-model="formData.eslora"
+                                                :error="router.page.props.errors.eslora"></TextInput>
+
                                             <TextInput class="mt-2 text-left" label="Tipo de Buque"
                                                 :placeholder="'Escriba el Tipo de Buque'" v-model="formData.type"
                                                 :error="router.page.props.errors.type"></TextInput>
