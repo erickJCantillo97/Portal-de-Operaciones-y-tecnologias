@@ -1,104 +1,70 @@
 <script setup>
-import { ref, onMounted } from "vue";
 import AppLayout from '@/Layouts/AppLayout.vue';
-import SimpleCRUD from '@/Components/SimpleCRUD.vue';
-import axios from 'axios';
-import DataTableCustom from '@/Components/DataTableCustom.vue'
-
-const gerencias = ref([])
-const gruposConstructivos = ref([]) //
-const baseActivities = ref([]);
-
-const baseActivitiesHeader = ref([
-    {
-        header: 'id',
-        field: 'id',
-        input: false,
-        show: false
-    },
-    {
-        header: 'Nombre',
-        field: 'name',
-        type: 'text',
-    },
-])
-
-const gruposConstructivosHeader = ref([
-    {
-        header: 'id',
-        field: 'id',
-        input: false,
-        show: false
-    },
-    {
-        header: 'Grupo',
-        field: 'name',
-        type: 'text',
-    },
-
-    {
-        header: 'Nombre',
-        field: 'descripcion',
-        type: 'text',
-    },
-
-])
-
-onMounted(() => {
-    axios.get(route('get.gerencias')).then((res) => {
-        gerencias.value = res.data.gerencias
-    })
-    axios.get(route('gruposConstructivos.index')).then((res) => {
-        gruposConstructivos.value = res.data
-    })
-})
-
-const systemsHeaders = ref([
-    {
-        header: 'id',
-        field: 'id',
-        input: false,
-        show: false
-    },
-    {
-        header: 'Grupo Constructivo',
-        field: 'constructive_group_id',
-        type: 'multiple',
-        show: false,
-        options: gruposConstructivos
-    },
-    {
-        field: 'code',
-        header: 'Codigo',
-        type: 'text',
-    },
-    {
-        header: 'Nombre',
-        field: 'name',
-        type: 'text',
-    }
-
-])
-
-
+import { ref } from 'vue'
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
+import { ChevronUpIcon } from '@heroicons/vue/20/solid'
+import ConstructiveGrupo from './../Components/SWBS/ConstructiveGrupo.vue';
+import { CreditCardIcon, KeyIcon, SquaresPlusIcon, UserCircleIcon, UserGroupIcon } from '@heroicons/vue/24/outline'
+import Gerencias from './../Components/Gerencias.vue';
+const menu = ref('VB')
+const navigation = [
+    { name: 'Variables Basicas', value: 'VB', icon: SquaresPlusIcon, current: true },
+    { name: 'SWBS', value: 'SW', icon: KeyIcon, current: false },
+//   { name: 'Plan & Billing', value: '#', icon: CreditCardIcon, current: false },
+//   { name: 'Team', value: '#', icon: UserGroupIcon, current: false },
+//   { name: 'Integrations', value: '#', icon: SquaresPlusIcon, current: false },
+]
 </script>
+
 <template>
     <AppLayout>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 gap-y-9">
-            <SimpleCRUD   :headers="[{header: 'id', field: 'id'}, {header: 'nombre', field:'name'}, { header: 'descripción', field: 'descripcion'}]" url="gerencias" title="Gerencias"></SimpleCRUD>
+        <div class="lg:grid lg:grid-cols-12 lg:gap-x-5 p-2 -mt-4">
+            <aside class="px-2 py-6 sm:px-6 lg:col-span-3 lg:px-0 lg:py-0">
+              <nav class="space-y-1">
+                <a v-for="item in navigation" :key="item.name"  :class="[menu == item.value ? 'bg-gray-50 text-indigo-700 hover:bg-white hover:text-indigo-700' : 'text-gray-900 hover:bg-gray-50 hover:text-gray-900', 'group flex items-center rounded-md px-3 py-2 text-sm font-medium cursor-pointer']" :aria-current="menu == item.value ? 'page' : undefined" @click="menu = item.value">
+                  <component :is="item.icon" :class="[menu == item.value ? 'text-indigo-500 group-hover:text-indigo-500' : 'text-gray-400 group-hover:text-gray-500', '-ml-1 mr-3 h-6 w-6 flex-shrink-0']" aria-hidden="true" />
+                  <span class="truncate">{{ item.name }}</span>
+                </a>
+              </nav>
+            </aside>
 
-            <SimpleCRUD url="gruposConstructivos" :headers="gruposConstructivosHeader"   title="Grupo Constructivos"></SimpleCRUD>
-
-            <DataTableCustom url="system" :headers="systemsHeaders" :delete="true"  :add="true"  title="Sistema"></DataTableCustom>
-
-            <DataTableCustom url="subSystem" :headers="systemsHeaders"   :add="true" :delete="true"  title="Sub Sistema"></DataTableCustom>
-
-            <SimpleCRUD url="baseActivities" :headers="baseActivitiesHeader" :delete="true" :edit="true" :add="true"  title="Actividad Base"></SimpleCRUD>
-
-            <SimpleCRUD url="specificActivities" :headers="baseActivitiesHeader" :delete="true"  :add="true"  title="Actividad Especifica"></SimpleCRUD>
-
-
-
+            <div class="space-y-6 sm:px-6 lg:col-span-9 lg:px-0 overflow-y-auto max-h-screen custom-scroll">
+                <div class="w-full">
+                    <div class="mx-auto w-full  rounded-2xl bg-white p-2" v-if="menu == 'VB'">
+                        <div>
+                            <h3 class="text-base font-semibold leading-6 text-gray-900">Variables de Sistema</h3>
+                            <p class="mt-1 text-sm text-gray-500 text-justify">Aqui podras encontrar las variables donde se sustenta la aplicación, <strong class="text-red-800">
+                                procede con precausión
+                            </strong> ó ponte en contacto con los administradores del sistema.</p>
+                        </div>
+                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
+                            <DisclosureButton class="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75 uppercase">
+                                <span>Gerencias</span>
+                                <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''" class="h-5 w-5 text-purple-500" />
+                            </DisclosureButton>
+                            <DisclosurePanel class="pt-4 pb-2 text-sm text-gray-500">
+                                    <Gerencias></Gerencias>
+                            </DisclosurePanel>
+                        </Disclosure>
+                    </div>
+                    <div class="mx-auto w-full  rounded-2xl bg-white p-2" v-if="menu == 'SW'">
+                        <div>
+                            <h3 class="text-base font-semibold leading-6 text-gray-900">SWBS</h3>
+                            <p class="mt-1 text-sm text-gray-500 text-justify">Aqui podras encontrar la base de datos que soporta el SWBS en el sistema, añade nuevas actividades, sistemas, subsistemas y grupos constructivos.</p>
+                        </div>
+                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
+                            <DisclosureButton class="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                <span>Grupos Constructivos</span>
+                                <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''" class="h-5 w-5 text-purple-500" />
+                            </DisclosureButton>
+                            <DisclosurePanel class="pb-2 text-sm text-gray-500">
+                                    <ConstructiveGrupo></ConstructiveGrupo>
+                            </DisclosurePanel>
+                        </Disclosure>
+                    </div>
+                </div>
+            </div>
         </div>
+        <!--  -->
     </AppLayout>
 </template>

@@ -11,15 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contracts', function (Blueprint $table) {
+        Schema::create('assignments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('customer_id')->index();
-            $table->string('name');
-            $table->string('gerencia');
-            $table->double('cost');
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->foreign('customer_id')->references('id')->on('customers');
+            $table->integer('event');
+            $table->integer('resource');
+            $table->integer('units');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -30,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('contracts');
+        Schema::dropIfExists('assignments');
     }
 };

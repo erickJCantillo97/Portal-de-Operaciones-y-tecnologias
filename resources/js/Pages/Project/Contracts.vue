@@ -1,39 +1,43 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted,computed } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import Calendar from 'primevue/calendar';
-import Tag from 'primevue/tag';
-import Dropdown from 'primevue/dropdown';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
 import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline';
 import { useSweetalert } from '@/composable/sweetAlert';
-import { useConfirm } from "primevue/useconfirm";
-import axios from 'axios';
-// import plural from 'pluralize-es'
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
-// import Button from 'primevue/button';
-
-const confirm = useConfirm();
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid'
+import Combobox from '@/Components/Combobox.vue';
 const { toast } = useSweetalert();
 const loading = ref(false);
 const { confirmDelete } = useSweetalert();
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
+
+const customerSelect = ref({});
 const open = ref(false)
+const query = ref('')
 
 
 const props = defineProps({
     contracts: Array,
-    gerencias: Array
+    customers: Array,
 })
+
+const filterCustomer = computed(() =>
+  query.value === ''
+    ? props.customers
+    : props.customers.filter((customer) => {
+        return customer.name.toLowerCase().includes(query.value.toLowerCase())
+      })
+)
 
 //#region UseForm
 const formData = useForm({
@@ -54,6 +58,7 @@ onMounted(() => {
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
+    formData.customer_id = customerSelect.value.id
     if (formData.id == 0) {
         router.post(route('contracts.store'), formData, {
             preserveScroll: true,
@@ -98,9 +103,9 @@ const editItem = (contract) => {
     formData.cost = contract.cost;
     formData.start_date = contract.start_date;
     formData.end_date = contract.end_date;
+    customerSelect.value = contract.customer;
     open.value = true;
 };
-
 
 const initFilters = () => {
     filters.value = {
@@ -108,8 +113,6 @@ const initFilters = () => {
         name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
     }
 };
-
-
 
 const clearFilter = () => {
     initFilters();
@@ -127,27 +130,8 @@ const formatDate = (value) => {
 const formatCurrency = (value) => {
     return parseFloat(value).toLocaleString('es-CO', {
         style: 'currency',
-        currency: 'COP'
+        currency: 'COP',
     });
-};
-
-const getContractStatusSeverity = (contract) => {
-    switch (contract.status) {
-        case 'INICIADO':
-            return 'info';
-
-        case 'PROCESO':
-            return 'warning';
-
-        case 'PENDIENTE':
-            return 'danger';
-
-        case 'FINALIZADO':
-            return 'success';
-
-        default:
-            return null;
-    }
 };
 
 const exportarExcel = () => {
@@ -165,8 +149,6 @@ const exportarExcel = () => {
     // Package and Release Data (`writeFile` tries to write and save an XLSB file)
     XLSX.writeFile(workbook, 'Lista de Contratos_' + contract.nit + '_' + contract.name + ".xlsb");
 };
-
-
 </script>
 
 <template>
@@ -213,7 +195,7 @@ const exportarExcel = () => {
 
                 <!--COLUMNAS-->
                 <Column field="name" header="Nombre"></Column>
-                <Column field="gerencia" header="Gerencia"></Column>
+                <Column field="customer.name" header="Cliente"></Column>
                 <Column field="cost" header="Costo">
                     <template #body="slotProps">
                         {{ formatCurrency(slotProps.data.cost) }}
@@ -221,11 +203,11 @@ const exportarExcel = () => {
                 </Column>
                 <Column field="start_date" header="Fecha Inicio"></Column>
                 <Column field="end_date" header="Fecha Finalización"></Column>
-                <Column field="status" header="Estado" sortable>
+                <!-- <Column field="status" header="Estado" sortable>
                     <template #body="slotProps">
                         <Tag :value="slotProps.data.status" :severity="getContractStatusSeverity(slotProps.data)" />
                     </template>
-                </Column>
+                </Column> -->
 
                 <!--ACCIONES-->
                 <Column header="Acciones" class="space-x-3">
@@ -257,7 +239,6 @@ const exportarExcel = () => {
                     leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
                     <div class="fixed h-screen w-screen inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-30" />
                 </TransitionChild>
-
                 <div class="fixed inset-0 z-50 overflow-y-auto h-screen">
                     <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                         <TransitionChild as="template" enter="ease-out duration-300"
@@ -265,67 +246,35 @@ const exportarExcel = () => {
                             enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
                             leave-from="opacity-100 translate-y-0 sm:scale-100"
                             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                            <DialogPanel :class="props.heigthDialog"
+                            <DialogPanel
                                 class="relative transform overflow-hidden rounded-lg bg-white px-2 pb-4 pt-2 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg ">
                                 <div>
-                                    <div class="text-center mt-2 px-2">
-                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">{{ formData.id !=
+                                    <div class="mt-2 px-2">
+                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary text-center">{{ formData.id !=
                                             0 ? 'Editar ' : 'Crear' }} Contrato
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
-                                        <div class="mt-2 space-y-4 border border-gray-200 p-2 rounded-lg">
-                                            <TextInput class="mt-2 text-left" label="Nombre del Contrato"
+                                        <div class="mt-2 space-y-4  p-2 rounded-lg">
+                                            <Combobox label="Cliente" :options="customers" v-model="customerSelect"></Combobox>
+                                            <TextInput label="Nombre del Contrato"
                                                 placeholder="Escriba Nombre del Contrato" v-model="formData.name"
-                                                :error="router.page.props.errors.name"></TextInput>
-                                            <Dropdown v-model="formData.gerencia" optionLabel="name" optionValue="id"
-                                                :options="gerencias" placeholder="Seleccione Gerencia"
-                                                :class="error != null ? 'p-invalid' : ''" />
-                                            <small id="gerencia-help" class="p-error">
-                                                {{ formData.errors.gerencia }}
-                                            </small>
+                                                :error="$page.props.errors.name">
+                                            </TextInput>
 
-                                            <!-- <div class="mt-2">
-                                                <label for="type"
-                                                    class="block capitalize text-left text-sm text-gray-900">Tipo de
-                                                    Cliente</label>
-                                                <Dropdown v-model="form.type" :options="types" filter optionLabel="name"
-                                                    placeholder="Selecccionar" class="w-full md:w-14rem">
-                                                </Dropdown>
-                                            </div> -->
-                                            <TextInput class="mt-2 text-left" label="Costo"
+                                            <TextInput  type="number" label="Costo"
                                                 :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.cost"
-                                                :error="router.page.props.errors.cost"></TextInput>
+                                                :error="$page.props.errors.cost">
+                                            </TextInput>
 
-                                            <!--CAMPO FECHA INICIO-->
-                                            <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
-                                                <label for="icon" class="mt-2 text-left text-sm font-semibold">
-                                                    Fecha Inicio
-                                                </label>
-                                                <Calendar id="calendar-24h" v-model="formData.start_date" touchUI showTime
-                                                    showIcon manualInput="true" hideOnDateTimeSelect="true" hourFormat="24"
-                                                    :showOnFocus="false" :showButtonBar="false"
-                                                    placeholder="Fecha Inicio del Contrato"
-                                                    :class="error != null ? 'p-invalid' : ''"
-                                                    @input="$emit('update:start_date', $event.target.value)" />
-                                                <small id="start_date-help" class="p-error">
-                                                    {{ formData.errors.start_date }}
-                                                </small>
-                                            </div>
+                                            <TextInput  type="date" label="Fecha de inicio"
+                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.start_date"
+                                                :error="$page.props.errors.cost">
+                                            </TextInput>
 
-                                            <!--CAMPO FECHA FINALIZACIÓN-->
-                                            <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
-                                                <label for="icon" class="mt-2 text-left text-sm font-semibold">
-                                                    Fecha Finalización
-                                                </label>
-                                                <Calendar id="calendar-24h" v-model="formData.end_date" touchUI showTime
-                                                    showIcon manualInput="true" hideOnDateTimeSelect="true" hourFormat="24"
-                                                    :showOnFocus="false" :showButtonBar="false"
-                                                    placeholder="Fecha Finalización del Contrato"
-                                                    :class="error != null ? 'p-invalid' : ''"
-                                                    @input="$emit('update:end_date', $event.target.value)" />
-                                                <small id="fechaInicio-help" class="p-error">
-                                                    {{ formData.errors.end_date }}
-                                                </small>
-                                            </div>
+
+                                            <TextInput  type="date" label="Fecha de Fin"
+                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
+                                                :error="$page.props.errors.end_date">
+                                            </TextInput>
                                         </div>
                                     </div>
                                 </div>

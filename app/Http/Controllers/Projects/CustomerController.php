@@ -49,10 +49,8 @@ class CustomerController extends Controller
 
             return back()->with(['message' => 'Cliente creado correctamente'], 200);
         } catch (Exception $e) {
-            return back()->with(['message' => 'Ocurrió un error al crear el cliente: '.$e->getMessage()], 500);
+            return back()->withErrors(['message' => 'Ocurrió un error al crear el cliente: '.$e->getMessage()], 500);
         }
-
-        return redirect('customers.index');
     }
 
     /**

@@ -11,6 +11,10 @@ defineProps({
     error: {
         type: String,
         default: null
+    },
+    type: {
+        type: String,
+        default: 'text'
     }
 });
 
@@ -24,7 +28,7 @@ const input = ref(null);
     <div>
         <label for="password" class="block capitalize text-sm font-mediumtext-gray-900">{{ label }}</label>
         <div class="relative mt-2 rounded-md shadow-sm">
-            <input type="text" autocomplete="current-password"
+            <input :type="type" autocomplete="current-password"
                 :class="[error != null ? 'text-red-900 ring-1 ring-inset ring-red-300 focus:ring-2 focus:ring-inset focus:ring-red-500' : '']"
                 required="" :placeholder="placeholder"
                 class="block w-full rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 -mt-1"

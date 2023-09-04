@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contracts', function (Blueprint $table) {
+        Schema::create('tasks', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('customer_id')->index();
+            $table->unsignedBigInteger('authorization_id')->index()->nullable();
+            $table->unsignedBigInteger('task_id')->index()->nullable();
             $table->string('name');
-            $table->string('gerencia');
-            $table->double('cost');
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->foreign('customer_id')->references('id')->on('customers');
+            $table->double('percentDone');
+            $table->double('duration');
+            $table->date('startDate');
+            $table->date('endDate');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('contracts');
+        Schema::dropIfExists('tasks');
     }
 };

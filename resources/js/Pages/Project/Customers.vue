@@ -13,10 +13,8 @@ import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons
 import { useSweetalert } from '@/composable/sweetAlert';
 import { useConfirm } from "primevue/useconfirm";
 import axios from 'axios';
-// import plural from 'pluralize-es'
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
-// import Button from 'primevue/button';
 
 const confirm = useConfirm();
 const { toast } = useSweetalert();
@@ -27,67 +25,19 @@ const filters = ref({
 })
 const open = ref(false)
 
-// const form = useForm({
-//     object: {
-// id: props.customers?.id ?? '0',
-// NIT: props.customers?.NIT ?? '',
-// name: props.customers?.name ?? '',
-// type: props.customers?.type ?? '',
-// email: props.customers?.email ?? '',
-//}
-// })
-
-// const elementos = ref([])
 
 const props = defineProps({
     customers: Array,
-
-    add: {
-        type: Boolean,
-        default: false
-    },
-
-    tittle: String,
-
-    url: { // Hace referecia al nombre del modelo que su usa en las url resorces para formas la rutas (index, create, store, update, Etc..)
-        type: String,
-        required: true
-    },
-
-    headers: {
-        type: Array,
-        required: true
-    },
-    loading: {
-        type: Boolean,
-        default: false
-    },
-
-    height: {
-        default: '500px',
-        type: String
-    },
-    editItem: {
-        type: Boolean,
-        default: false
-    },
-    delete: {
-        type: Boolean,
-        default: false
-    },
-    globalSearch: {
-        default: true,
-        type: Boolean
-    }
 })
 
 //#region UseForm
 const formData = useForm({
-    id: props.customers?.id ?? '0',
-    NIT: props.customers?.NIT ?? '',
-    name: props.customers?.name ?? '',
-    type: props.customers?.type ?? '',
-    email: props.customers?.email ?? '',
+    customer: {},
+    // id: props.customers?.id ?? '0',
+    // NIT: props.customers?.NIT ?? '',
+    // name: props.customers?.name ?? '',
+    // type: props.customers?.type ?? '',
+    // email: props.customers?.email ?? '',
 });
 //#endregion
 
@@ -99,8 +49,8 @@ onMounted(() => {
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
-    if (formData.id == 0) {
-        router.post(route('customers.store'), formData, {
+    if (formData.customer.id == null) {
+        router.post(route('customers.store'), formData.customer, {
             preserveScroll: true,
             onSuccess: (res) => {
                 open.value = false;
@@ -115,7 +65,7 @@ const submit = () => {
         })
         return 'creado';
     }
-    router.put(route('customers.update', formData.id), formData, {
+    router.put(route('customers.update', formData.customer.id), formData.customer, {
         preserveScroll: true,
         onSuccess: (res) => {
             open.value = false;
@@ -137,11 +87,12 @@ const addItem = () => {
 }
 
 const editItem = (customer) => {
-    formData.id = customer.id;
-    formData.NIT = customer.NIT;
-    formData.name = customer.name;
-    formData.type = customer.type;
-    formData.email = customer.email;
+    formData.customer = customer;
+    // formData.id = customer.id;
+    // formData.NIT = customer.NIT;
+    // formData.name = customer.name;
+    // formData.type = customer.type;
+    // formData.email = customer.email;
     open.value = true;
 };
 
@@ -284,14 +235,14 @@ const exportarExcel = () => {
                                 class="relative transform overflow-hidden rounded-lg bg-white px-2 pb-4 pt-2 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg ">
                                 <div>
                                     <div class="text-center mt-2 px-2">
-                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">{{ formData.id !=
-                                            0 ? 'Editar ' : 'Crear' }} Cliente
+                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">{{ formData.customer.id !=
+                                            null ? 'Editar ' : 'Crear' }} Cliente
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="mt-2 space-y-4 border border-gray-200 p-2 rounded-lg">
                                             <TextInput class="mt-2 text-left" label="NIT" placeholder="e.g. 9234232988-0"
-                                                v-model="formData.NIT" :error="router.page.props.errors.nit"></TextInput>
+                                                v-model="formData.customer.NIT" :error="router.page.props.errors.nit"></TextInput>
                                             <TextInput class="mt-2 text-left" label="Nombre Completo"
-                                                placeholder="Escriba su nombre completo" v-model="formData.name"
+                                                placeholder="Escriba su nombre completo" v-model="formData.customer.name"
                                                 :error="router.page.props.errors.name"></TextInput>
                                             <!-- <div class="mt-2">
                                                 <label for="type"
@@ -302,10 +253,10 @@ const exportarExcel = () => {
                                                 </Dropdown>
                                             </div> -->
                                             <TextInput class="mt-2 text-left" label="Tipo de Cliente"
-                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.type"
+                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.customer.type"
                                                 :error="router.page.props.errors.type"></TextInput>
                                             <TextInput class="mt-2 text-left" label="Correo"
-                                                placeholder="Escriba su correo electronico" v-model="formData.email"
+                                                placeholder="Escriba su correo electronico" v-model="formData.customer.email"
                                                 :error="router.page.props.errors.email"></TextInput>
                                         </div>
                                     </div>
@@ -315,7 +266,7 @@ const exportarExcel = () => {
                                         @click="open = false">Cancelar</Button>
                                     <Button severity="success" :loading="false"
                                         class="text-success hover:bg-success border-success" @click="submit()">
-                                        {{ formData.id != 0 ? 'Actualizar ' : 'Guardar' }}
+                                        {{ formData.customer.id != null ? 'Actualizar ' : 'Guardar' }}
                                     </Button>
                                 </div>
                             </DialogPanel>

@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Projects\ContractController;
 use App\Http\Controllers\Projects\CustomerController;
+use App\Models\Gantt\Task;
+use Carbon\Carbon;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -50,6 +52,19 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     //CRUD Contracts
     Route::resource('contracts', ContractController::class);
+
+
+    Route::get('crearTarea', function (){
+        Task::truncate();
+        Task::create([
+            'name' => 'ARC PUNTA ESPADA',
+            'percentDone' => 50,
+            'duration' => 260,
+            'startDate' => Carbon::now(),
+            'endDate' => Carbon::now()->addDays(260),
+            ]);
+    });
+
 });
 
 /*

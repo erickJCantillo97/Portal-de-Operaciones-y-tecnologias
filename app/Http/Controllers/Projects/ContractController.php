@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
 use App\Models\Projects\Contract;
+use App\Models\Projects\Customer;
 use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -15,9 +16,13 @@ class ContractController extends Controller
      */
     public function index()
     {
-        $contracts = Contract::orderBy('name')->get();
+        $contracts = Contract::with('customer')->orderBy('name')->get();
+        $customers = Customer::orderBy('name')->get();
 
-        return Inertia::render('Project/Contracts', ['contracts' => $contracts], ['gerencias' => gerencias()]);
+        return Inertia::render('Project/Contracts', [
+            'contracts' => $contracts,
+            'customers' => $customers
+        ]);
     }
 
     /**
@@ -37,13 +42,13 @@ class ContractController extends Controller
         $validateData = $request->validate([
             'customer_id' => 'nullable',
             'name' => 'required',
-            'gerencia' => 'required',
             'cost' => 'required|numeric',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
         ]);
 
         try {
+            $validateData['gerencia'] = auth()->user()->gerencia;
             Contract::create($validateData);
 
             return back()->with(['message' => 'Contrato creado correctamente'], 200);

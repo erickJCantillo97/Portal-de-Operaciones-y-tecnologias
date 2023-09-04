@@ -1,17 +1,6 @@
 <template>
     <div class="w-full">
-        <!-- <div class="flex items-center  px-10">
-            <div class="flex-auto mt-4">
-                <h1 class="text-xl capitalize font-semibold leading-6 text-primary">{{getPlurar(title)}}</h1>
-            </div>
 
-            <div class="ml-16 " v-show="add">
-                <Button type="button" @click="addItem()" severity="success">
-                    <PlusIcon class="h-6 w-6 mr-2" aria-hidden="true" />
-                    Nuevo
-                </Button>
-            </div>
-        </div> -->
         <div class="flow-root">
             <div class="">
                   <dataTableCustomized :add="props.add" :edit-item="props.edit" :delete="props.delete" :url="props.url" height="300px" :headers="headers" :title="title" :loading="loading"></dataTableCustomized>
@@ -86,7 +75,6 @@ import TextInput from './TextInput.vue';
 import Multiselect from '@suadelabs/vue3-multiselect'
 import {useSweetalert} from '@/composable/sweetAlert'
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
-import plural from 'pluralize-es'
 import axios from 'axios';
 import dataTableCustomized from '@/Components/DataTableCustom.vue'
 const {toast} = useSweetalert();
@@ -187,9 +175,5 @@ const getElements = () => {
     }
 }
 
-/* Poner en Plurar un srt*/
-const getPlurar = (str) =>{
-    return plural(str);
-}
 
 </script>

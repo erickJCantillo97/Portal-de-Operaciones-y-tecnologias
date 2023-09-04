@@ -1,6 +1,6 @@
 import { StringHelper } from '@bryntum/gantt';
 import { DateHelper } from '@bryntum/gantt';
-
+import '@/GanttToolbar.js'
 /**
  * Application configuration
  */
@@ -11,7 +11,7 @@ const useGanttConfig = function () {
             autoLoad: true,
             transport: {
                 load: {
-                    url: './datos/launch-saas.json'
+                    url: route('dataGantt')
                 },
                 sync: {
                     url : route('syncGantt'),
@@ -46,10 +46,6 @@ const useGanttConfig = function () {
             {
                 type: 'name',
                 width: 250,
-                editor: {
-                    type: 'combo',
-                    items: ['100', '200', '300']
-                }
             },
             {
                 text: 'Programacion',
@@ -85,8 +81,20 @@ const useGanttConfig = function () {
                 editor: false,
                 region: 'right',
             },
-            { field: 'code', text: 'Codigo SAP', width: 50 },
+            { field: 'code', text: 'Codigo SAP', autoWidth: true, hidden: true},
         ],
+
+        keyMap : {
+            // This is a function from the existing Gantt API
+            'Ctrl+Shift+Q': 'addSubTask',
+            'Ctrl+i' : 'indent',
+            'Ctrl+o' : 'outdent',
+
+        },
+        tbar : {
+            type : 'gantttoolbar',
+            height : '4em'
+        },
 
         // Custom task content, display task name on child tasks
         taskRenderer({ taskRecord }) {
