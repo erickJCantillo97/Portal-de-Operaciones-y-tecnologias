@@ -3,14 +3,11 @@
 use App\Http\Controllers\Projects\AuthorizationController;
 use App\Http\Controllers\Projects\ContractController;
 use App\Http\Controllers\Projects\CustomerController;
-<<<<<<< HEAD
 use App\Models\Gantt\Task;
 use Carbon\Carbon;
-=======
 use App\Http\Controllers\Projects\ProjectController;
 use App\Http\Controllers\Projects\QuoteController;
 use App\Http\Controllers\Projects\ShipController;
->>>>>>> 6f7e29761b10b8ab1d01eec5b593b65826028a9c
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -60,7 +57,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     //CRUD Contracts
     Route::resource('contracts', ContractController::class);
 
-<<<<<<< HEAD
 
     Route::get('crearTarea', function (){
         Task::truncate();
@@ -73,7 +69,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             ]);
     });
 
-=======
     //CRUD Projects
     Route::resource('projects', ProjectController::class);
 
@@ -85,7 +80,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     //CRUD Ships
     Route::resource('ships', ShipController::class);
->>>>>>> 6f7e29761b10b8ab1d01eec5b593b65826028a9c
 });
 
 /*
