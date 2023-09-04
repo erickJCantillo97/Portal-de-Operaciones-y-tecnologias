@@ -12,7 +12,6 @@ import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons
 import { useSweetalert } from '@/composable/sweetAlert';
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid'
 import Combobox from '@/Components/Combobox.vue';
 const { toast } = useSweetalert();
 const loading = ref(false);
@@ -30,14 +29,6 @@ const props = defineProps({
     contracts: Array,
     customers: Array,
 })
-
-const filterCustomer = computed(() =>
-  query.value === ''
-    ? props.customers
-    : props.customers.filter((customer) => {
-        return customer.name.toLowerCase().includes(query.value.toLowerCase())
-      })
-)
 
 //#region UseForm
 const formData = useForm({
