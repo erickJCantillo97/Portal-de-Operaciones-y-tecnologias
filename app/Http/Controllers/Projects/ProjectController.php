@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Projects\Project;
 use Exception;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
@@ -14,11 +15,19 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $project = Project::orderBy('name')->get();
+        $projects = Project::orderBy('name')->get();
 
-        return response()->json([
-            $project
-        ], 200);
+        return Inertia::render(
+            'Project/Projects',
+            [
+                'projects' => $projects,
+                'gerencias' => gerencias(),
+            ]
+        );
+
+        // return response()->json([
+        //     $project
+        // ], 200);
     }
 
     /**
@@ -34,15 +43,26 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request);
         $validateData = $request->validate([
-            //
+            'ship_id' => 'nullable',
+            'name' => 'required',
+            'gerencia' => 'required',
+            'start_date' => 'required|date',
+            'hoursPerDay' => 'required',
+            'daysPerWeek' => 'required',
+            'daysPerMonth' => 'required',
         ]);
 
-        try{
+        try {
             Project::create($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+
+            return back()->with(['message' => 'Proyecto creado correctamente'], 200);
+        } catch (Exception $e) {
+            return back()->withErrors(['message' => 'Ocurrió un error al crear el proyecto: '.$e->getMessage()], 500);
         }
+
+        return redirect('projects.index');
     }
 
     /**
@@ -67,12 +87,16 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project)
     {
         $validateData = $request->validate([
-            //
+            'name' => 'required',
+            'gerencia' => 'required',
+            'cost' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'required',
         ]);
 
-        try{
+        try {
             $project->update($validateData);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
@@ -82,9 +106,9 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        try{
+        try {
             $project->delete();
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }

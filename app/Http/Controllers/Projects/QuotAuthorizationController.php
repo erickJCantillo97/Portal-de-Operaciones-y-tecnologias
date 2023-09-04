@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
-use Exception;
 use App\Models\Projects\QuotAuthorization;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Request;
 
@@ -18,7 +18,7 @@ class QuotAuthorizationController extends Controller
         $quotauth = QuotAuthorization::orderBy('name')->get();
 
         return response()->json([
-            $quotauth
+            $quotauth,
         ], 200);
     }
 
@@ -39,9 +39,9 @@ class QuotAuthorizationController extends Controller
             //
         ]);
 
-        try{
+        try {
             QuotAuthorization::create($validateData);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
     }
@@ -71,9 +71,9 @@ class QuotAuthorizationController extends Controller
             //
         ]);
 
-        try{
+        try {
             $quotAuth->update($validateData);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
@@ -83,9 +83,9 @@ class QuotAuthorizationController extends Controller
      */
     public function destroy(QuotAuthorization $quotAuth)
     {
-        try{
+        try {
             $quotAuth->delete();
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }

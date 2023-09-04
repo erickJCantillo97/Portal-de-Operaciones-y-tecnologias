@@ -1,7 +1,11 @@
 <?php
 
+use App\Http\Controllers\Projects\AuthorizationController;
 use App\Http\Controllers\Projects\ContractController;
 use App\Http\Controllers\Projects\CustomerController;
+use App\Http\Controllers\Projects\ProjectController;
+use App\Http\Controllers\Projects\QuoteController;
+use App\Http\Controllers\Projects\ShipController;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -50,6 +54,18 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     //CRUD Contracts
     Route::resource('contracts', ContractController::class);
+
+    //CRUD Projects
+    Route::resource('projects', ProjectController::class);
+
+    //CRUD Authorizations
+    Route::resource('authorizations', AuthorizationController::class);
+
+    //CRUD Quotes
+    Route::resource('quotes', QuoteController::class);
+
+    //CRUD Ships
+    Route::resource('ships', ShipController::class);
 });
 
 /*

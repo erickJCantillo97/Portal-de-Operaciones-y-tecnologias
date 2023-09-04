@@ -17,7 +17,11 @@ class ContractController extends Controller
     {
         $contracts = Contract::orderBy('name')->get();
 
-        return Inertia::render('Project/Contracts', ['contracts' => $contracts], ['gerencias' => gerencias()]);
+        return Inertia::render('Project/Contracts',
+            [
+                'contracts' => $contracts,
+                'gerencias' => gerencias(),
+            ]);
     }
 
     /**
