@@ -45,7 +45,13 @@ const useGanttConfig = function () {
         columns: [
             {
                 type: 'name',
-                width: 250,
+                width: 500,
+            },
+            {
+                type: 'percentdone',
+                text:'Avance',
+                showCircle: true,
+                width: 80,
             },
             {
                 text: 'Programacion',
@@ -53,7 +59,7 @@ const useGanttConfig = function () {
                 collapseMode: 'toggleAll',
                 collapsed: false,
                 children: [
-                    { type: 'startdate' }, { type: 'duration' }, { type: 'enddate' }, // Column that is shown when the header is collapsed
+                    { type: 'duration' },{ type: 'startdate' }, { type: 'enddate' }, // Column that is shown when the header is collapsed
                     {
                         field: 'startDate',
                         hidden: true,
@@ -73,14 +79,7 @@ const useGanttConfig = function () {
                     }
                 ]
             },
-            {
-                type: 'percentdone',
-                text:'Avance',
-                showCircle: true,
-                width: 80,
-                editor: false,
-                region: 'right',
-            },
+
             { field: 'code', text: 'Codigo SAP', autoWidth: true, hidden: true},
         ],
 
@@ -109,7 +108,7 @@ const sliderConfig = {
     text: 'Set Bar Margin',
     min: 0,
     max: 15,
-    width: '14em',
+    width: '50em',
     showTooltip: false
 };
 

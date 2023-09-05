@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('authorization_id')->index()->nullable();
             $table->unsignedBigInteger('task_id')->index()->nullable();
             $table->string('name');
+            $table->string('durationUnit');
             $table->double('percentDone');
             $table->double('duration');
             $table->date('startDate');
