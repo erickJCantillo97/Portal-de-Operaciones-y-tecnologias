@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use App\Http\Controllers\Projects\ProjectController;
 use App\Http\Controllers\Projects\QuoteController;
 use App\Http\Controllers\Projects\ShipController;
+use App\Models\SWBS\SubSystem;
 use App\Models\SWBS\System;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
@@ -72,11 +73,15 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
 Route::get('recuperarDatos',function (){
 
-    $datos = DB::connection('sqlsrv_anterior')->table('swbs_systems')->select(['code', 'validity', 'status','name'])->get();
+    $datos = DB::connection('sqlsrv_anterior')->table('swbs_systems')->select(['code', 'validity', 'status','name','constructive_group_id'])->get();
 
     foreach ($datos as $dato) {
-
         System::create((array) $dato);
+    }
+
+    $datos = DB::connection('sqlsrv_anterior')->table('swbs_subsystems')->select(['system_id', 'code', 'validity', 'status','name'])->get();
+    foreach ($datos as $dato) {
+        SubSystem::create((array) $dato);
     }
 
     return System::get();

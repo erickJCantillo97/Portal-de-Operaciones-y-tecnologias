@@ -16,6 +16,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         return Inertia::render('GanttBryntum');
     })->name('showGantt');
 
+    Route::get('/createSchedule',);
+
     Route::get('/dataGantt', [GanttController::class, 'get'])->name('dataGantt');
 
     Route::post('/syncGantt', [GanttController::class, 'sync'])->name('syncGantt');
