@@ -34,8 +34,8 @@ const props = defineProps({
 const formData = useForm({
     id: props.contracts?.id ?? '0',
     customer_id: props.contracts?.customer_id ?? '0',
+    ship_id: props.contracts?.ship_id ?? '0',
     name: props.contracts?.name ?? '',
-    gerencia: props.contracts?.gerencia ?? '',
     cost: props.contracts?.cost ?? '0',
     start_date: props.contracts?.start_date ?? '',
     end_date: props.contracts?.end_date ?? '',
@@ -90,7 +90,6 @@ const addItem = () => {
 const editItem = (contract) => {
     formData.id = contract.id;
     formData.name = contract.name;
-    formData.gerencia = contract.gerencia;
     formData.cost = contract.cost;
     formData.start_date = contract.start_date;
     formData.end_date = contract.end_date;

@@ -16,11 +16,12 @@ class AuthorizationController extends Controller
     public function index()
     {
         $authorizations = Authorization::orderBy('project_id')->get();
+        $ships = Ship::orderBy('name')->get();
 
-        return Inertia::render(
-            'Project/Authorizations',
+        return Inertia::render('Project/Authorizations',
             [
                 'authorizations' => $authorizations,
+                'ships' => $ships,
             ]
         );
     }

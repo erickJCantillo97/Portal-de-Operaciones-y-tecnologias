@@ -64,7 +64,7 @@
                     </div>
                 </div>
             </div>
-            <div class=" sm:ml-20 sm:mr-2 mt-6 bg-white shadow-2xl rounded-lg">
+            <div class=" sm:ml-20 sm:mr-2 mt-3 bg-white shadow-2xl rounded-lg h-">
                 <slot />
             </div>
         </main>
