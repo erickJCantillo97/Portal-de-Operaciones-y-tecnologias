@@ -4,6 +4,10 @@ import { ref } from 'vue'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
 import { ChevronUpIcon } from '@heroicons/vue/20/solid'
 import ConstructiveGrupo from './../Components/SWBS/ConstructiveGrupo.vue';
+import Systems from './../Components/SWBS/Systems.vue';
+import SubSystems from './../Components/SWBS/SubSystems.vue';
+import Processes from './../Components/SWBS/Processes.vue';
+import BaseActivities from './../Components/SWBS/BaseActivities.vue';
 import { CreditCardIcon, KeyIcon, SquaresPlusIcon, UserCircleIcon, UserGroupIcon } from '@heroicons/vue/24/outline'
 import Gerencias from './../Components/Gerencias.vue';
 const menu = ref('VB')
@@ -59,6 +63,42 @@ const navigation = [
                             </DisclosureButton>
                             <DisclosurePanel class="pb-2 text-sm text-gray-500">
                                     <ConstructiveGrupo></ConstructiveGrupo>
+                            </DisclosurePanel>
+                        </Disclosure>
+                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
+                            <DisclosureButton class="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                <span>Sistemas</span>
+                                <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''" class="h-5 w-5 text-purple-500" />
+                            </DisclosureButton>
+                            <DisclosurePanel class="pb-2 text-sm text-gray-500">
+                                    <Systems></Systems>
+                            </DisclosurePanel>
+                        </Disclosure>
+                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
+                            <DisclosureButton class="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                <span>Sub-Sistemas</span>
+                                <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''" class="h-5 w-5 text-purple-500" />
+                            </DisclosureButton>
+                            <DisclosurePanel class="pb-2 text-sm text-gray-500">
+                                    <SubSystems></SubSystems>
+                            </DisclosurePanel>
+                        </Disclosure>
+                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
+                            <DisclosureButton class="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                <span>Proceso</span>
+                                <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''" class="h-5 w-5 text-purple-500" />
+                            </DisclosureButton>
+                            <DisclosurePanel class="pb-2 text-sm text-gray-500">
+                                    <Processes></Processes>
+                            </DisclosurePanel>
+                        </Disclosure>
+                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
+                            <DisclosureButton class="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                <span>Actividades basicas</span>
+                                <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''" class="h-5 w-5 text-purple-500" />
+                            </DisclosureButton>
+                            <DisclosurePanel class="pb-2 text-sm text-gray-500">
+                                    <BaseActivities></BaseActivities>
                             </DisclosurePanel>
                         </Disclosure>
                     </div>

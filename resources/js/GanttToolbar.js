@@ -181,7 +181,7 @@ export default class GanttToolbar extends Toolbar {
                     triggers: {
                         filter: {
                             align: "end",
-                            
+
                         }
                     },
                     onChange: "up.onFilterChange"

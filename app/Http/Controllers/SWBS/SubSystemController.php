@@ -14,7 +14,7 @@ class SubSystemController extends Controller
      */
     public function index()
     {
-        $subsystems = SubSystem::get();
+        $subsystems = SubSystem::with('system')->get();
 
         return response()->json([
             $subsystems,
