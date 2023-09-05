@@ -223,6 +223,7 @@ const exportarExcel = () => {
                 <Column field="name" header="Nombre"></Column>
                 <Column field="gerencia" header="Gerencia"></Column>
                 <Column field="start_date" header="Fecha Inicio"></Column>
+                <Column field="end_date" header="Fecha Finalización"></Column>
                 <Column field="hoursPerDay" header="Horas por Dia"></Column>
                 <Column field="daysPerWeek" header="Dias por Semana"></Column>
                 <Column field="daysPerMonth" header="Dias por Mes"></Column>
@@ -281,12 +282,11 @@ const exportarExcel = () => {
                                             <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
                                                 <Combobox class="mt-2 text-left text-gray-900" label="Contrato"
                                                     placeholder="Seleccione Contrato" :options="contracts"
-                                                    v-model="customerSelect">
+                                                    v-model="contractSelect">
                                                 </Combobox>
 
                                                 <Combobox class="mt-2 text-left" label="Buque"
-                                                    placeholder="Seleccione Buque" :options="ships"
-                                                    v-model="customerSelect">
+                                                    placeholder="Seleccione Buque" :options="ships" v-model="shipSelect">
                                                 </Combobox>
                                             </div>
 

@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('contract_id')->index();
             $table->unsignedBigInteger('quote_id')->index();
+            $table->string('name');
             $table->date('start_date');
             $table->date('end_date');
+            $table->string('file')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

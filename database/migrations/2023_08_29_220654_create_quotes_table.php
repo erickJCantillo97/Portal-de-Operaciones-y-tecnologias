@@ -14,10 +14,12 @@ return new class extends Migration
         Schema::create('quotes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('ship_id')->index();
+            $table->string('name');
             $table->string('gerencia');
             $table->double('cost');
             $table->date('start_date');
             $table->date('end_date');
+            $table->string('file')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -37,14 +37,14 @@ const props = defineProps({
 
 //#region UseForm
 const formData = useForm({
-    id: props.contracts?.id ?? '0',
-    customer_id: props.contracts?.customer_id ?? '0',
-    name: props.contracts?.name ?? '',
-    type: props.contracts?.type ?? '',
-    quilla: props.contracts?.quilla ?? '',
-    pantoque: props.contracts?.pantoque ?? '',
-    eslora: props.contracts?.eslora ?? '',
-    details: props.contracts?.details ?? '',
+    id: '0',
+    customer_id: '0',
+    name: '',
+    type: '',
+    quilla: '',
+    pantoque: '',
+    eslora: '',
+    details: '',
 });
 //#endregion
 
@@ -94,9 +94,11 @@ const addItem = () => {
 
 const editItem = (ship) => {
     formData.id = ship.id;
-    formData.gerencia = ship.gerencia;
     formData.name = ship.name;
     formData.type = ship.type;
+    formData.quilla = ship.quilla;
+    formData.pantoque = ship.pantoque;
+    formData.eslora = ship.eslora;
     formData.details = ship.details;
     open.value = true;
 };
@@ -215,8 +217,10 @@ const exportarExcel = () => {
 
                 <!--COLUMNAS-->
                 <Column field="name" header="Nombre"></Column>
-                <Column field="gerencia" header="Gerencia"></Column>
                 <Column field="type" header="Tipo de Buque"></Column>
+                <Column field="quilla" header="Quillas"></Column>
+                <Column field="pantoque" header="Pantoque"></Column>
+                <Column field="eslora" header="Eslora"></Column>
                 <Column field="status" header="Estado" sortable>
                     <template #body="slotProps">
                         <Tag :value="slotProps.data.status" :severity="getContractStatusSeverity(slotProps.data)" />
@@ -276,6 +280,14 @@ const exportarExcel = () => {
                                                 v-model="customerSelect">
                                             </Combobox>
 
+                                            <TextInput class="mt-2 text-left" label="Nombre del Buque"
+                                                :placeholder="'Nombre del Buque'" v-model="formData.name"
+                                                :error="router.page.props.errors.name"></TextInput>
+
+                                            <TextInput class="mt-2 text-left" label="Tipo de Buque"
+                                                :placeholder="'Escriba el Tipo de Buque'" v-model="formData.type"
+                                                :error="router.page.props.errors.type"></TextInput>
+
                                             <TextInput class="mt-2 text-left" label="Cantidad de Quillas"
                                                 :placeholder="'Números de Quillas necesarios'" v-model="formData.quilla"
                                                 :error="router.page.props.errors.quilla"></TextInput>
@@ -287,10 +299,6 @@ const exportarExcel = () => {
                                             <TextInput class="mt-2 text-left" label="Longitud de Eslora"
                                                 :placeholder="'Longitud de Eslora'" v-model="formData.eslora"
                                                 :error="router.page.props.errors.eslora"></TextInput>
-
-                                            <TextInput class="mt-2 text-left" label="Tipo de Buque"
-                                                :placeholder="'Escriba el Tipo de Buque'" v-model="formData.type"
-                                                :error="router.page.props.errors.type"></TextInput>
 
                                             <TextInput class="mt-2 text-left" label="Detalles"
                                                 :placeholder="'Escriba los detalles del Buque'" v-model="formData.details"

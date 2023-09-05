@@ -48,11 +48,11 @@ class ShipController extends Controller
         $validateData = $request->validate([
             'customer_id' => 'nullable',
             'name' => 'required',
-            'type' => 'required',
-            'quilla' => 'required|numeric|gt:0',
-            'pantoque' => 'required|numeric|gt:0',
-            'eslora' => 'required|numeric|gt:0',
-            'details' => 'required',
+            'type' => 'nullable',
+            'quilla' => 'nullable|numeric|gt:0',
+            'pantoque' => 'nullable|numeric|gt:0',
+            'eslora' => 'nullable|numeric|gt:0',
+            'details' => 'nullable',
         ]);
 
         try {

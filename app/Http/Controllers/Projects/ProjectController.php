@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
+use App\Models\Projects\Authorization;
 use App\Models\Projects\Contract;
 use App\Models\Projects\Project;
+use App\Models\Projects\Quote;
 use App\Models\Projects\Ship;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
@@ -54,7 +57,6 @@ class ProjectController extends Controller
             'quote_id' => 'nullable',
             'ship_id' => 'nullable',
             'intern_communications' => 'nullable',
-            'gerencia' => 'required',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'hoursPerDay' => 'required',
@@ -87,11 +89,19 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        $project = Project::orderBy('name');
+        $projects = Project::orderBy('name')->get();
+        $contracts = Contract::orderBy('name')->get();
+        $authorizations = Authorization::orderBy('contract_id')->get();
+        $quotes = Quote::orderBy('ship_id')->get();
+        $ships = Ship::orderBy('id')->get();
 
         return Inertia::render('Project/CreateProjects',
             [
-                'project' => $project,
+                'projects' => $projects,
+                'contracts' => $contracts,
+                'authorizations' => $authorizations,
+                'quotes' => $quotes,
+                'ships' => $ships,
             ]
         );
     }
@@ -126,5 +136,27 @@ class ProjectController extends Controller
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
+    }
+
+    public function uploadFiles(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|max:2048',
+        ]);
+
+        if ($request->hasFile('file')) {
+            // Obtener el archivo del formulario
+            $file = $request->file('file');
+
+            // Almacena el archivo utilizando el disco "public" (con la configuración en filesystems.php)
+            $path = Storage::disk('public')->putFile('uploads', $file);
+
+            // Puedes guardar la ruta en la base de datos si es necesario
+            File::create(['file_path' => $path]);
+
+            return redirect()->back()->with('success', 'Archivo cargado correctamente.');
+        }
+
+        return redirect()->back()->with('error', 'No se ha seleccionado ningún archivo.');
     }
 }
