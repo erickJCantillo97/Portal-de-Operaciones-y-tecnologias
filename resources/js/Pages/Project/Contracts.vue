@@ -98,6 +98,7 @@ const editItem = (contract) => {
     formData.cost = contract.cost;
     formData.start_date = contract.start_date;
     formData.end_date = contract.end_date;
+    formData.pdf = contract.pdf;
     customerSelect.value = contract.customer;
     open.value = true;
 };
@@ -257,15 +258,10 @@ const exportarExcel = () => {
                                                 v-model="customerSelect">
                                             </Combobox>
 
-<<<<<<< HEAD
                                             <Combobox label="Buque" placeholder="Seleccione Buque" :options="ships"
                                                 v-model="shipSelect">
                                             </Combobox>
-
-                                            <TextInput label="Nombre del Contrato" placeholder="Escriba Nombre del Contrato"
-=======
                                             <TextInput class="mt-2 text-left" label="Nombre del Contrato" placeholder="Escriba Nombre del Contrato"
->>>>>>> 769dca3aa444d79f45c885ac2e9cd2018dd98240
                                                 v-model="formData.name" :error="$page.props.errors.name">
                                             </TextInput>
 

@@ -18,6 +18,7 @@ import axios from 'axios';
 // import plural from 'pluralize-es'
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
+import FileUpload from 'primevue/fileupload';
 // import Button from 'primevue/button';
 
 const confirm = useConfirm();
@@ -45,6 +46,7 @@ const formData = useForm({
     pantoque: '',
     eslora: '',
     details: '',
+    image:null
 });
 //#endregion
 
@@ -100,6 +102,7 @@ const editItem = (ship) => {
     formData.pantoque = ship.pantoque;
     formData.eslora = ship.eslora;
     formData.details = ship.details;
+    formData.image = ship.image;
     open.value = true;
 };
 
@@ -303,6 +306,13 @@ const exportarExcel = () => {
                                             <TextInput class="mt-2 text-left" label="Detalles"
                                                 :placeholder="'Escriba los detalles del Buque'" v-model="formData.details"
                                                 :error="router.page.props.errors.details"></TextInput>
+                                            <FileUpload chooseLabel="Adjuntar foto" cancelLabel="Cancelar" :show-upload-button=false name="demo[]"
+                                                :multiple="false" fileLimit="1" accept="image/*" :maxFileSize="1000000"
+                                                @input="formData.image = $event.target.files[0]">
+                                                <template #empty>
+                                                    <p>Adjunta una imagen del buque</p>
+                                                </template>
+                                            </FileUpload>
                                         </div>
                                     </div>
                                 </div>
