@@ -39,7 +39,7 @@ const props = defineProps({
 const formData = useForm({
     id: props.contracts?.id ?? '0',
     ship_id: props.contracts?.ship_id ?? '0',
-    gerencia: props.contracts?.gerencia ?? '',
+    // gerencia: props.contracts?.gerencia ?? '',
     cost: props.contracts?.cost ?? '0',
     start_date: props.contracts?.start_date ?? '',
     end_date: props.contracts?.end_date ?? '',
@@ -212,7 +212,7 @@ const exportarExcel = () => {
                 </template>
 
                 <!--COLUMNAS-->
-                <Column field="gerencia" header="Gerencia"></Column>
+                <!-- <Column field="gerencia" header="Gerencia"></Column> -->
                 <Column field="cost" header="Costo">
                     <template #body="slotProps">
                         {{ formatCurrency(slotProps.data.cost) }}

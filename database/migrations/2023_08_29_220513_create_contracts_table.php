@@ -21,6 +21,7 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->foreign('customer_id')->references('id')->on('customers');
+            $table->foreign('ship_id')->references('id')->on('ships');
             $table->string('file')->nullable();
             $table->timestamps();
             $table->softDeletes();

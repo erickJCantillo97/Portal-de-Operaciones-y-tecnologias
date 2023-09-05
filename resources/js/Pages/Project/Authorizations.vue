@@ -32,7 +32,8 @@ const open = ref(false)
 
 const props = defineProps({
     authorizations: Array,
-    gerencias: Array
+    contracts: Array,
+    quotes: Array,
 })
 
 //#region UseForm

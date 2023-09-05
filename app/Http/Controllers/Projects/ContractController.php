@@ -17,11 +17,13 @@ class ContractController extends Controller
     public function index()
     {
         $contracts = Contract::with('customer')->orderBy('name')->get();
+        $ships = Contract::with('ship')->orderBy('name')->get();
         $customers = Customer::orderBy('name')->get();
 
         return Inertia::render('Project/Contracts', [
             'contracts' => $contracts,
             'customers' => $customers,
+            'ships' => $ships,
         ]);
     }
 

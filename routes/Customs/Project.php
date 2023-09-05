@@ -8,10 +8,9 @@ use App\Http\Controllers\Projects\ProjectController;
 use App\Http\Controllers\Projects\QuoteController;
 use App\Http\Controllers\Projects\ShipController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
     Route::get('/cronograma', function () {
         return Inertia::render('GanttBryntum');
@@ -38,7 +37,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
 
     //CRUD Ships
     Route::resource('ships', ShipController::class);
-
 
     //CRUD Customers
     Route::resource('customers', CustomerController::class);

@@ -21,6 +21,7 @@ const filters = ref({
 })
 
 const customerSelect = ref({});
+const shipSelect = ref({});
 const open = ref(false)
 const query = ref('')
 
@@ -28,6 +29,7 @@ const query = ref('')
 const props = defineProps({
     contracts: Array,
     customers: Array,
+    ships: Array,
 })
 
 //#region UseForm
@@ -50,6 +52,7 @@ onMounted(() => {
 const submit = () => {
     loading.value = true;
     formData.customer_id = customerSelect.value.id
+    formData.ship_id = shipSelect.value.id
     if (formData.id == 0) {
         router.post(route('contracts.store'), formData, {
             preserveScroll: true,
@@ -186,6 +189,9 @@ const exportarExcel = () => {
                 <!--COLUMNAS-->
                 <Column field="name" header="Nombre"></Column>
                 <Column field="customer.name" header="Cliente"></Column>
+                <Column field="ship.name" header="Buque">
+
+                </Column>
                 <Column field="cost" header="Costo">
                     <template #body="slotProps">
                         {{ formatCurrency(slotProps.data.cost) }}
@@ -247,6 +253,10 @@ const exportarExcel = () => {
                                         <div class="mt-2 space-y-4  p-2 rounded-lg">
                                             <Combobox label="Cliente" placeholder="Seleccione Cliente" :options="customers"
                                                 v-model="customerSelect">
+                                            </Combobox>
+
+                                            <Combobox label="Buque" placeholder="Seleccione Buque" :options="ships"
+                                                v-model="shipSelect">
                                             </Combobox>
 
                                             <TextInput label="Nombre del Contrato" placeholder="Escriba Nombre del Contrato"

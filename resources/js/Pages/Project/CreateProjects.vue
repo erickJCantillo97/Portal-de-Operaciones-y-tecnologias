@@ -30,6 +30,9 @@ const filters = ref({
 
 const open = ref(false)
 const selectedForm = ref('form1')
+const contractSelect = ref();
+const authorizationSelect = ref();
+const quoteSelect = ref();
 
 const props = defineProps({
     'projects': Array,
@@ -92,12 +95,6 @@ const submit = () => {
         }
     })
 }
-
-const addItem = () => {
-    formData.reset();
-    open.value = true;
-}
-
 const editItem = (project) => {
     formData.id = project.id;
     formData.name = project.name;
@@ -109,6 +106,28 @@ const editItem = (project) => {
     open.value = true;
 };
 
+const loadContractDates = () => {
+
+    const contract = contractSelect.value
+    const authorization = authorizationSelect.value
+    const quote = quoteSelect.value
+
+    if (contract) {
+        formData.start_date = contract.start_date
+        formData.end_date = contract.end_date
+    }
+
+    if (authorization) {
+        formData.start_date = authorization.start_date
+        formData.end_date = authorization.end_date
+    }
+
+    if (quote) {
+        formData.start_date = quote.start_date
+        formData.end_date = quote.end_date
+    }
+
+}
 
 const initFilters = () => {
     filters.value = {
@@ -116,7 +135,6 @@ const initFilters = () => {
         name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
     }
 };
-
 
 
 const clearFilter = () => {
@@ -241,20 +259,22 @@ const exportarExcel = () => {
                 <!-- Aquí va el contenido del Formulario 1 -->
                 <div>
                     <div class="space-y-2 border border-gray-200 rounded-lg p-4">
+                        <!--CONFIGURACIÓN DE PROYECTO-->
                         <div class="" v-if="selectedForm == 'form1'">
                             <Combobox class="text-left text-gray-900" label="Contrato" placeholder="Seleccione Contrato"
-                                :options="contracts" v-model="contractSelect">
+                                :options="contracts" v-model="contractSelect" @update:modelValue="loadContractDates()">
                             </Combobox>
                         </div>
                         <div class=" " v-if="selectedForm == 'form2'">
                             <Combobox class="text-left text-gray-900" label="Autorizaciones"
                                 placeholder="Seleccione Autorización" :options="authorizations"
-                                v-model="authorization_idSelect">
+                                v-model="authorizationSelect" @update:modelValue="loadContractDates()">
                             </Combobox>
                         </div>
                         <div class="" v-if="selectedForm == 'form3'">
                             <Combobox class="text-left text-gray-900" label="Estimaciones"
-                                placeholder="Seleccione Estimación" :options="quotes" v-model="quoteSelect">
+                                placeholder="Seleccione Estimación" :options="quotes" v-model="quoteSelect"
+                                @update:modelValue="loadContractDates()">
                             </Combobox>
                         </div>
                         <TextInput class=" text-left" type="text" v-if="selectedForm == 'form4'" label=" Codigo de
@@ -269,22 +289,18 @@ const exportarExcel = () => {
 
                         <!--CAMPO FECHA INICIO-->
                         <TextInput class="p-1 pb-1 text-left" type="date" label="Fecha De Inicio"
-                            :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.start_date"
-                            :error="$page.props.errors.start_date">
+                            v-model="formData.start_date" :error="$page.props.errors.start_date"
+                            :disabled="!contractSelect">
                         </TextInput>
 
                         <!--CAMPO FECHA FINALIZACIÓN-->
                         <TextInput class="p-1 pb-1 text-left" type="date" label="Fecha de Finalización"
-                            :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
-                            :error="$page.props.errors.end_date">
+                            v-model="formData.end_date" :error="$page.props.errors.end_date" :disabled="!contractSelect">
                         </TextInput>
                     </div>
                 </div>
 
-
-
-
-
+                <!--CONFIGURACIÓN DE CRONOGRAMA-->
                 <div class="space-y-4 border border-gray-200 rounded-lg p-4">
                     <TextInput class="mt-2 text-left" label="Horas por Dia" :placeholder="'Escriba Numero de Horas por Dia'"
                         v-model="formData.hoursPerDay" :error="router.page.props.errors.hoursPerDay"></TextInput>

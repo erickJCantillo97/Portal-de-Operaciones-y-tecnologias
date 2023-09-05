@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('name');
             $table->date('start_date');
             $table->date('end_date');
+            $table->foreign('contract_id')->references('id')->on('contracts');
+            $table->foreign('quote_id')->references('id')->on('quotes');
             $table->string('file')->nullable();
             $table->timestamps();
             $table->softDeletes();

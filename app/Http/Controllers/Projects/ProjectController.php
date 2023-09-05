@@ -57,6 +57,7 @@ class ProjectController extends Controller
             'quote_id' => 'nullable',
             'ship_id' => 'nullable',
             'intern_communications' => 'nullable',
+            'name' => 'nullable',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'hoursPerDay' => 'required',
@@ -136,27 +137,5 @@ class ProjectController extends Controller
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
-    }
-
-    public function uploadFiles(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|file|max:2048',
-        ]);
-
-        if ($request->hasFile('file')) {
-            // Obtener el archivo del formulario
-            $file = $request->file('file');
-
-            // Almacena el archivo utilizando el disco "public" (con la configuración en filesystems.php)
-            $path = Storage::disk('public')->putFile('uploads', $file);
-
-            // Puedes guardar la ruta en la base de datos si es necesario
-            File::create(['file_path' => $path]);
-
-            return redirect()->back()->with('success', 'Archivo cargado correctamente.');
-        }
-
-        return redirect()->back()->with('error', 'No se ha seleccionado ningún archivo.');
     }
 }
