@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('authorizations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('project_id')->index();
             $table->unsignedBigInteger('contract_id')->index();
-            $table->string('gerencia');
+            $table->unsignedBigInteger('quote_id')->index();
+            $table->string('name');
             $table->date('start_date');
             $table->date('end_date');
+            $table->foreign('contract_id')->references('id')->on('contracts');
+            $table->foreign('quote_id')->references('id')->on('quotes');
+            $table->string('file')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

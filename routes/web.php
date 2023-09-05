@@ -70,12 +70,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
 });
 
+
 Route::get('recuperarDatos',function (){
 
-    // System::truncate();
-
-
-    $datos = DB::connection('sqlsrv_anterior')->table('swbs_systems')->select(['constructive_group_id', 'code', 'validity', 'status','name'])->get();
+    $datos = DB::connection('sqlsrv_anterior')->table('swbs_systems')->select(['code', 'validity', 'status','name','constructive_group_id'])->get();
 
     foreach ($datos as $dato) {
         System::create((array) $dato);
@@ -86,5 +84,5 @@ Route::get('recuperarDatos',function (){
         SubSystem::create((array) $dato);
     }
 
-    return SubSystem::get();
+    return System::get();
 });

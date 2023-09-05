@@ -67,7 +67,8 @@ class SystemController extends Controller
     public function update(Request $request, System $system)
     {
         $validateData = $request->validate([
-            //
+            'name' => 'required',
+            'code' => 'required',
         ]);
 
         try{

@@ -8,10 +8,9 @@ use App\Http\Controllers\Projects\ProjectController;
 use App\Http\Controllers\Projects\QuoteController;
 use App\Http\Controllers\Projects\ShipController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
     Route::get('/cronograma', function () {
         return Inertia::render('GanttBryntum');
@@ -23,8 +22,14 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
 
     Route::post('/syncGantt', [GanttController::class, 'sync'])->name('syncGantt');
 
+    Route::post('/syncGanttImporter', [GanttController::class, 'syncImporter'])->name('syncImporter');
+
+    Route::get('/ganttImporter', function () {
+        return Inertia::render('GanttImporter');
+    })->name('ganttImporter');
     //CRUD Projects
     Route::resource('projects', ProjectController::class);
+    Route::get('create-projects', [ProjectController::class, 'edit'])->name('projects.edit');
 
     //CRUD Authorizations
     Route::resource('authorizations', AuthorizationController::class);
@@ -34,7 +39,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
 
     //CRUD Ships
     Route::resource('ships', ShipController::class);
-
 
     //CRUD Customers
     Route::resource('customers', CustomerController::class);

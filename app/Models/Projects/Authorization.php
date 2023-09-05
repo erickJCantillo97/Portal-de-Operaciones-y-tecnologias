@@ -18,6 +18,11 @@ class Authorization extends Model
         return $this->belongsTo(Contract::class);
     }
 
+    public function quote()
+    {
+        return $this->belongsTo(Quote::class);
+    }
+
     public function project()
     {
         return $this->belongsTo(Project::class);

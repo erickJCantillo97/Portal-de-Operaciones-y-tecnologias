@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref, onMounted,computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
@@ -13,6 +13,7 @@ import { useSweetalert } from '@/composable/sweetAlert';
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
 import Combobox from '@/Components/Combobox.vue';
+import FileUpload from 'primevue/fileupload';
 const { toast } = useSweetalert();
 const loading = ref(false);
 const { confirmDelete } = useSweetalert();
@@ -21,6 +22,7 @@ const filters = ref({
 })
 
 const customerSelect = ref({});
+const shipSelect = ref({});
 const open = ref(false)
 const query = ref('')
 
@@ -28,17 +30,19 @@ const query = ref('')
 const props = defineProps({
     contracts: Array,
     customers: Array,
+    ships: Array,
 })
 
 //#region UseForm
 const formData = useForm({
     id: props.contracts?.id ?? '0',
     customer_id: props.contracts?.customer_id ?? '0',
+    ship_id: props.contracts?.ship_id ?? '0',
     name: props.contracts?.name ?? '',
-    gerencia: props.contracts?.gerencia ?? '',
     cost: props.contracts?.cost ?? '0',
     start_date: props.contracts?.start_date ?? '',
     end_date: props.contracts?.end_date ?? '',
+    pdf: null
 });
 //#endregion
 
@@ -50,6 +54,7 @@ onMounted(() => {
 const submit = () => {
     loading.value = true;
     formData.customer_id = customerSelect.value.id
+    formData.ship_id = shipSelect.value.id
     if (formData.id == 0) {
         router.post(route('contracts.store'), formData, {
             preserveScroll: true,
@@ -90,7 +95,6 @@ const addItem = () => {
 const editItem = (contract) => {
     formData.id = contract.id;
     formData.name = contract.name;
-    formData.gerencia = contract.gerencia;
     formData.cost = contract.cost;
     formData.start_date = contract.start_date;
     formData.end_date = contract.end_date;
@@ -187,6 +191,9 @@ const exportarExcel = () => {
                 <!--COLUMNAS-->
                 <Column field="name" header="Nombre"></Column>
                 <Column field="customer.name" header="Cliente"></Column>
+                <Column field="ship.name" header="Buque">
+
+                </Column>
                 <Column field="cost" header="Costo">
                     <template #body="slotProps">
                         {{ formatCurrency(slotProps.data.cost) }}
@@ -240,32 +247,50 @@ const exportarExcel = () => {
                             <DialogPanel
                                 class="relative transform overflow-hidden rounded-lg bg-white px-2 pb-4 pt-2 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg ">
                                 <div>
-                                    <div class="mt-2 px-2">
-                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary text-center">{{ formData.id !=
+                                    <div class="px-2 mt-2 text-center">
+                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary text-center">{{
+                                            formData.id !=
                                             0 ? 'Editar ' : 'Crear' }} Contrato
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
-                                        <div class="mt-2 space-y-4  p-2 rounded-lg">
-                                            <Combobox label="Cliente" :options="customers" v-model="customerSelect"></Combobox>
-                                            <TextInput label="Nombre del Contrato"
-                                                placeholder="Escriba Nombre del Contrato" v-model="formData.name"
-                                                :error="$page.props.errors.name">
+                                        <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
+                                            <Combobox class="mt-2 text-left" label="Cliente" placeholder="Seleccione Cliente" :options="customers"
+                                                v-model="customerSelect">
+                                            </Combobox>
+
+<<<<<<< HEAD
+                                            <Combobox label="Buque" placeholder="Seleccione Buque" :options="ships"
+                                                v-model="shipSelect">
+                                            </Combobox>
+
+                                            <TextInput label="Nombre del Contrato" placeholder="Escriba Nombre del Contrato"
+=======
+                                            <TextInput class="mt-2 text-left" label="Nombre del Contrato" placeholder="Escriba Nombre del Contrato"
+>>>>>>> 769dca3aa444d79f45c885ac2e9cd2018dd98240
+                                                v-model="formData.name" :error="$page.props.errors.name">
                                             </TextInput>
 
-                                            <TextInput  type="number" label="Costo"
-                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.cost"
+                                            <TextInput class="mt-2 text-left" type="number" label="Costo"
+                                                :placeholder="'Escriba el Costo del Contrato'" v-model="formData.cost"
                                                 :error="$page.props.errors.cost">
                                             </TextInput>
 
-                                            <TextInput  type="date" label="Fecha de inicio"
+                                            <!--CAMPO FECHA INICIO-->
+                                            <TextInput class="mt-2 text-left" type="date" label="Fecha de inicio"
                                                 :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.start_date"
                                                 :error="$page.props.errors.cost">
                                             </TextInput>
 
-
-                                            <TextInput  type="date" label="Fecha de Fin"
+                                            <!--CAMPO FECHA FINALIZACIÓN-->
+                                            <TextInput class="mt-2 text-left" type="date" label="Fecha de Finalización"
                                                 :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
                                                 :error="$page.props.errors.end_date">
                                             </TextInput>
+
+                                            <FileUpload chooseLabel="Adjuntar PDF" mode="basic" name="demo[]"
+                                                :multiple="false" accept=".pdf" :maxFileSize="1000000"
+                                                @input="formData.pdf = $event.target.files[0]">
+                                            </FileUpload>
+
                                         </div>
                                     </div>
                                 </div>
@@ -283,6 +308,5 @@ const exportarExcel = () => {
                 </div>
             </Dialog>
         </TransitionRoot>
-
     </AppLayout>
 </template>

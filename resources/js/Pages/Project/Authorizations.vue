@@ -32,12 +32,13 @@ const open = ref(false)
 
 const props = defineProps({
     authorizations: Array,
-    gerencias: Array
+    contracts: Array,
+    quotes: Array,
 })
 
 //#region UseForm
 const formData = useForm({
-    id: props.contracts?.id ?? '0',
+    id: props.authorizations?.id ?? '0',
     project_id: props.contracts?.project_id ?? '0',
     contract_id: props.contracts?.contract_id ?? '',
     start_date: props.contracts?.start_date ?? '',
@@ -179,8 +180,7 @@ const exportarExcel = () => {
                 </div>
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="authorizations" v-model:filters="filters"
-                dataKey="id" filterDisplay="menu" :loading="loading"
-                :globalFilterFields="['start_date', 'end_date']"
+                dataKey="id" filterDisplay="menu" :loading="loading" :globalFilterFields="['start_date', 'end_date']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -227,7 +227,8 @@ const exportarExcel = () => {
                                 </Button>
                             </div>
                             <div>
-                                <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Autorización', 'authorizations')"
+                                <Button severity="danger"
+                                    @click="confirmDelete(slotProps.data.id, 'Autorización', 'authorizations')"
                                     class="hover:bg-danger">
                                     <TrashIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
@@ -261,37 +262,19 @@ const exportarExcel = () => {
                                             0 ? 'Editar ' : 'Crear' }} Contrato
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
-                                        
+
                                             <!--CAMPO FECHA INICIO-->
                                             <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
-                                                <label for="icon" class="mt-2 text-sm font-semibold text-left">
-                                                    Fecha Inicio
-                                                </label>
-                                                <Calendar id="calendar-24h" v-model="formData.start_date" touchUI showTime
-                                                    showIcon manualInput="true" hideOnDateTimeSelect="true" hourFormat="24"
-                                                    :showOnFocus="false" :showButtonBar="false"
-                                                    placeholder="Fecha Inicio del Contrato"
-                                                    :class="error != null ? 'p-invalid' : ''"
-                                                    @input="$emit('update:start_date', $event.target.value)" />
-                                                <small id="start_date-help" class="p-error">
-                                                    {{ formData.errors.start_date }}
-                                                </small>
-                                            </div>
+                                                <TextInput class="mt-2 text-left" type="date" label="Fecha de inicio"
+                                                    :placeholder="'Escriba el Tipo de Cliente'"
+                                                    v-model="formData.start_date" :error="$page.props.errors.cost">
+                                                </TextInput>
 
-                                            <!--CAMPO FECHA FINALIZACIÓN-->
-                                            <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
-                                                <label for="icon" class="mt-2 text-sm font-semibold text-left">
-                                                    Fecha Finalización
-                                                </label>
-                                                <Calendar id="calendar-24h" v-model="formData.end_date" touchUI showTime
-                                                    showIcon manualInput="true" hideOnDateTimeSelect="true" hourFormat="24"
-                                                    :showOnFocus="false" :showButtonBar="false"
-                                                    placeholder="Fecha Finalización del Contrato"
-                                                    :class="error != null ? 'p-invalid' : ''"
-                                                    @input="$emit('update:end_date', $event.target.value)" />
-                                                <small id="end_date-help" class="p-error">
-                                                    {{ formData.errors.end_date }}
-                                                </small>
+                                                <!--CAMPO FECHA FINALIZACIÓN-->
+                                                <TextInput class="mt-2 text-left" type="date" label="Fecha de Finalización"
+                                                    :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
+                                                    :error="$page.props.errors.end_date">
+                                                </TextInput>
                                             </div>
                                         </div>
                                     </div>

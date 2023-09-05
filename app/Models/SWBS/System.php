@@ -17,7 +17,9 @@ class System extends Model
     public function constructiveGroupId(): Attribute
     {
         return Attribute::make(
+            get: fn($value)=>$value.'00',
             set: fn ($value) => $value - 1,
         );
     }
+
 }

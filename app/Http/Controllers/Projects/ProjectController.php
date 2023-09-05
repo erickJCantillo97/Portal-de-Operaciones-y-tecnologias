@@ -3,9 +3,14 @@
 namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
+use App\Models\Projects\Authorization;
+use App\Models\Projects\Contract;
 use App\Models\Projects\Project;
+use App\Models\Projects\Quote;
+use App\Models\Projects\Ship;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
@@ -16,12 +21,14 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::orderBy('name')->get();
+        $ships = Ship::orderBy('name')->get();
+        $contracts = Contract::orderBy('name')->get();
 
-        return Inertia::render(
-            'Project/Projects',
+        return Inertia::render('Project/Projects',
             [
                 'projects' => $projects,
-                'gerencias' => gerencias(),
+                'ships' => $ships,
+                'contracts' => $contracts,
             ]
         );
 
@@ -45,16 +52,21 @@ class ProjectController extends Controller
     {
         // dd($request);
         $validateData = $request->validate([
+            'contract_id' => 'nullable',
+            'authorization_id' => 'nullable',
+            'quote_id' => 'nullable',
             'ship_id' => 'nullable',
-            'name' => 'required',
-            'gerencia' => 'required',
+            'intern_communications' => 'nullable',
+            'name' => 'nullable',
             'start_date' => 'required|date',
+            'end_date' => 'required|date',
             'hoursPerDay' => 'required',
             'daysPerWeek' => 'required',
             'daysPerMonth' => 'required',
         ]);
 
         try {
+            $validateData['gerencia'] = auth()->user()->gerencia;
             Project::create($validateData);
 
             return back()->with(['message' => 'Proyecto creado correctamente'], 200);
@@ -78,7 +90,21 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        //
+        $projects = Project::orderBy('name')->get();
+        $contracts = Contract::orderBy('name')->get();
+        $authorizations = Authorization::orderBy('contract_id')->get();
+        $quotes = Quote::orderBy('ship_id')->get();
+        $ships = Ship::orderBy('id')->get();
+
+        return Inertia::render('Project/CreateProjects',
+            [
+                'projects' => $projects,
+                'contracts' => $contracts,
+                'authorizations' => $authorizations,
+                'quotes' => $quotes,
+                'ships' => $ships,
+            ]
+        );
     }
 
     /**

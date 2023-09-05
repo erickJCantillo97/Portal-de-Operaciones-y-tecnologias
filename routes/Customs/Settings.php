@@ -1,6 +1,8 @@
 <?php
 
+
 use App\Http\Controllers\SWBS\BaseActivityController;
+use App\Http\Controllers\SWBS\ProcessController;
 use App\Http\Controllers\SWBS\SpecificActivityController;
 use App\Http\Controllers\SWBS\SubSystemController;
 use App\Http\Controllers\SWBS\SystemController;
@@ -16,7 +18,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::resource('baseActivities', BaseActivityController::class);
     Route::resource('specificActivities', SpecificActivityController::class);
     Route::resource('system', SystemController::class);
-    Route::resource('subSystem', SubSystemController::class);
+    Route::resource('subsystem', SubSystemController::class);
+    Route::resource('process', ProcessController::class);
 
     Route::get('gerencias/get', function () {
         return response()->json([gerencias()], 200);

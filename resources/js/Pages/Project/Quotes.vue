@@ -18,6 +18,7 @@ import axios from 'axios';
 // import plural from 'pluralize-es'
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
+import FileUpload from 'primevue/fileupload';
 // import Button from 'primevue/button';
 
 const confirm = useConfirm();
@@ -39,10 +40,12 @@ const props = defineProps({
 const formData = useForm({
     id: props.contracts?.id ?? '0',
     ship_id: props.contracts?.ship_id ?? '0',
-    gerencia: props.contracts?.gerencia ?? '',
+    //gerencia: props.contracts?.gerencia ?? '',
+    cost: props.contracts?.code ?? '0',
     cost: props.contracts?.cost ?? '0',
     start_date: props.contracts?.start_date ?? '',
     end_date: props.contracts?.end_date ?? '',
+    pdf: null
 });
 //#endregion
 
@@ -93,6 +96,7 @@ const addItem = () => {
 const editItem = (quote) => {
     formData.id = quote.id;
     formData.gerencia = quote.gerencia;
+    formData.cost = quote.code;
     formData.cost = quote.cost;
     formData.start_date = quote.start_date;
     formData.end_date = quote.end_date;
@@ -212,7 +216,7 @@ const exportarExcel = () => {
                 </template>
 
                 <!--COLUMNAS-->
-                <Column field="gerencia" header="Gerencia"></Column>
+                <!-- <Column field="gerencia" header="Gerencia"></Column> -->
                 <Column field="cost" header="Costo">
                     <template #body="slotProps">
                         {{ formatCurrency(slotProps.data.cost) }}
@@ -269,15 +273,9 @@ const exportarExcel = () => {
                                 <div>
                                     <div class="px-2 mt-2 text-center">
                                         <DialogTitle as="h3" class="text-xl font-semibold text-primary ">{{ formData.id !=
-                                            0 ? 'Editar ' : 'Crear' }} Contrato
+                                            0 ? 'Editar ' : 'Crear' }} Estimación
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
-                                            <Dropdown v-model="formData.gerencia" optionLabel="name" optionValue="id"
-                                                :options="gerencias" placeholder="Seleccione Gerencia"
-                                                :class="error != null ? 'p-invalid' : ''" />
-                                            <small id="gerencia-help" class="p-error">
-                                                {{ formData.errors.gerencia }}
-                                            </small>
 
                                             <!-- <div class="mt-2">
                                                 <label for="type"
@@ -287,41 +285,30 @@ const exportarExcel = () => {
                                                     placeholder="Selecccionar" class="w-full md:w-14rem">
                                                 </Dropdown>
                                             </div> -->
+                                            <TextInput class="mt-2 text-left" label="Consecutivo"
+                                                :placeholder="'Escriba el consecutivo de la estimacion'" v-model="formData.code"
+                                                :error="router.page.props.errors.cost"></TextInput>
                                             <TextInput class="mt-2 text-left" label="Costo"
-                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.cost"
+                                                :placeholder="'Escriba el valor total estimado'" v-model="formData.cost"
                                                 :error="router.page.props.errors.cost"></TextInput>
 
                                             <!--CAMPO FECHA INICIO-->
                                             <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
-                                                <label for="icon" class="mt-2 text-sm font-semibold text-left">
-                                                    Fecha Inicio
-                                                </label>
-                                                <Calendar id="calendar-24h" v-model="formData.start_date" touchUI showTime
-                                                    showIcon manualInput="true" hideOnDateTimeSelect="true" hourFormat="24"
-                                                    :showOnFocus="false" :showButtonBar="false"
-                                                    placeholder="Fecha Inicio del Contrato"
-                                                    :class="error != null ? 'p-invalid' : ''"
-                                                    @input="$emit('update:start_date', $event.target.value)" />
-                                                <small id="start_date-help" class="p-error">
-                                                    {{ formData.errors.start_date }}
-                                                </small>
-                                            </div>
+                                                <TextInput class="mt-2 text-left" type="date" label="Fecha de inicio"
+                                                    :placeholder="'Escriba el Tipo de Cliente'"
+                                                    v-model="formData.start_date" :error="$page.props.errors.cost">
+                                                </TextInput>
 
-                                            <!--CAMPO FECHA FINALIZACIÓN-->
-                                            <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
-                                                <label for="icon" class="mt-2 text-sm font-semibold text-left">
-                                                    Fecha Finalización
-                                                </label>
-                                                <Calendar id="calendar-24h" v-model="formData.end_date" touchUI showTime
-                                                    showIcon manualInput="true" hideOnDateTimeSelect="true" hourFormat="24"
-                                                    :showOnFocus="false" :showButtonBar="false"
-                                                    placeholder="Fecha Finalización del Contrato"
-                                                    :class="error != null ? 'p-invalid' : ''"
-                                                    @input="$emit('update:end_date', $event.target.value)" />
-                                                <small id="fechaInicio-help" class="p-error">
-                                                    {{ formData.errors.end_date }}
-                                                </small>
+                                                <!--CAMPO FECHA FINALIZACIÓN-->
+                                                <TextInput class="mt-2 text-left" type="date" label="Fecha de Finalización"
+                                                    :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
+                                                    :error="$page.props.errors.end_date">
+                                                </TextInput>
                                             </div>
+                                            <FileUpload chooseLabel="Adjuntar PDF" mode="basic" name="demo[]"
+                                                :multiple="false" accept=".pdf" :maxFileSize="1000000"
+                                                @input="formData.pdf = $event.target.files[0]">
+                                            </FileUpload>
                                         </div>
                                     </div>
                                 </div>

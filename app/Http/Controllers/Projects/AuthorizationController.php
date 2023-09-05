@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
 use App\Models\Projects\Authorization;
+use App\Models\Projects\Contract;
+use App\Models\Projects\Quote;
 use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,12 +18,16 @@ class AuthorizationController extends Controller
     public function index()
     {
         $authorizations = Authorization::orderBy('project_id')->get();
+        $ships = Ship::orderBy('name')->get();
+        $contracts = Contract::orderBy('name')->get();
+        $quotes = Quote::orderBy('name')->get();
 
-        return Inertia::render(
-            'Project/Authorizations',
+        return Inertia::render('Project/Authorizations',
             [
                 'authorizations' => $authorizations,
-                'gerencias' => gerencias(),
+                'ships' => $ships,
+                'contracts' => $contracts,
+                'quotes' => $quotes,
             ]
         );
     }
@@ -41,9 +47,8 @@ class AuthorizationController extends Controller
     {
         // dd($request);
         $validateData = $request->validate([
-            'project_id' => 'nullable',
             'contract_id' => 'nullable',
-            'gerencia' => 'required',
+            'quote_id' => 'nullable',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
         ]);
