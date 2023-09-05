@@ -8,6 +8,7 @@ use App\Models\Projects\Customer;
 use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class ContractController extends Controller
 {
@@ -50,11 +51,17 @@ class ContractController extends Controller
 
         try {
             $validateData['gerencia'] = auth()->user()->gerencia;
+            if ($request->pdf != null) {
+                $validateData['file'] = Storage::putFileAs(
+                    'public/contract/',
+                    $request->pdf,
+                    $validateData['name'] . "." . $request->pdf->getClientOriginalExtension()
+                );
+            };
             Contract::create($validateData);
-
             return back()->with(['message' => 'Contrato creado correctamente'], 200);
         } catch (Exception $e) {
-            return back()->withErrors(['message' => 'Ocurrió un error al crear el contrato: '.$e->getMessage()], 500);
+            return back()->withErrors(['message' => 'Ocurrió un error al crear el contrato: ' . $e->getMessage()], 500);
         }
 
         return redirect('contracts.index');
@@ -90,9 +97,16 @@ class ContractController extends Controller
         ]);
 
         try {
+            if ($request->pdf != null) {
+                $validateData['file'] = Storage::putFileAs(
+                    'public/contract/',
+                    $request->pdf,
+                    $validateData['name'] . "." . $request->pdf->getClientOriginalExtension()
+                );
+            };
             $contract->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -104,7 +118,7 @@ class ContractController extends Controller
         try {
             $contract->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }

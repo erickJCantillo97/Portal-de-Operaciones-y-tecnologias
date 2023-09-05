@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Projects\Quote;
 use Illuminate\Http\Request;
 use Exception;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class QuoteController extends Controller
@@ -45,14 +46,21 @@ class QuoteController extends Controller
         $validateData = $request->validate([
             'ship_id' => 'nullable',
             'gerencia' => 'required',
+            'code' => 'required',
             'cost' => 'required|numeric|gt:0',
             'start_date' => 'required|date',
             'end_date' => 'required|date'
         ]);
 
         try {
+            if ($request->pdf != null) {
+                $validateData['file'] = Storage::putFileAs(
+                    'public/Quote/',
+                    $request->pdf,
+                    $validateData['code'] . "." . $request->pdf->getClientOriginalExtension()
+                );
+            };
             Quote::create($validateData);
-
             return back()->with(['message' => 'Cotizacion creada correctamente'], 200);
         } catch (Exception $e) {
             return back()->withErrors(['message' => 'Ocurrió un error al crear la Cotizacion: ' . $e->getMessage()], 500);
@@ -91,6 +99,13 @@ class QuoteController extends Controller
         ]);
 
         try {
+            if ($request->pdf != null) {
+                $validateData['file'] = Storage::putFileAs(
+                    'public/Quote/',
+                    $request->pdf,
+                    $validateData['code'] . "." . $request->pdf->getClientOriginalExtension()
+                );
+            };
             $quote->update($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);

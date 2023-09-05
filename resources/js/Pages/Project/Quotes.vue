@@ -18,6 +18,7 @@ import axios from 'axios';
 // import plural from 'pluralize-es'
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
+import FileUpload from 'primevue/fileupload';
 // import Button from 'primevue/button';
 
 const confirm = useConfirm();
@@ -40,9 +41,11 @@ const formData = useForm({
     id: props.contracts?.id ?? '0',
     ship_id: props.contracts?.ship_id ?? '0',
     gerencia: props.contracts?.gerencia ?? '',
+    cost: props.contracts?.code ?? '0',
     cost: props.contracts?.cost ?? '0',
     start_date: props.contracts?.start_date ?? '',
     end_date: props.contracts?.end_date ?? '',
+    pdf: null
 });
 //#endregion
 
@@ -93,6 +96,7 @@ const addItem = () => {
 const editItem = (quote) => {
     formData.id = quote.id;
     formData.gerencia = quote.gerencia;
+    formData.cost = quote.code;
     formData.cost = quote.cost;
     formData.start_date = quote.start_date;
     formData.end_date = quote.end_date;
@@ -281,8 +285,11 @@ const exportarExcel = () => {
                                                     placeholder="Selecccionar" class="w-full md:w-14rem">
                                                 </Dropdown>
                                             </div> -->
+                                            <TextInput class="mt-2 text-left" label="Consecutivo"
+                                                :placeholder="'Escriba el consecutivo de la estimacion'" v-model="formData.code"
+                                                :error="router.page.props.errors.cost"></TextInput>
                                             <TextInput class="mt-2 text-left" label="Costo"
-                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.cost"
+                                                :placeholder="'Escriba el valor total estimado'" v-model="formData.cost"
                                                 :error="router.page.props.errors.cost"></TextInput>
 
                                             <!--CAMPO FECHA INICIO-->
@@ -298,6 +305,10 @@ const exportarExcel = () => {
                                                     :error="$page.props.errors.end_date">
                                                 </TextInput>
                                             </div>
+                                            <FileUpload chooseLabel="Adjuntar PDF" mode="basic" name="demo[]"
+                                                :multiple="false" accept=".pdf" :maxFileSize="1000000"
+                                                @input="formData.pdf = $event.target.files[0]">
+                                            </FileUpload>
                                         </div>
                                     </div>
                                 </div>

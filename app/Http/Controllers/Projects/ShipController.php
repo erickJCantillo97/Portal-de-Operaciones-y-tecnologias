@@ -7,6 +7,7 @@ use App\Models\Projects\Customer;
 use App\Models\Projects\Ship;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ShipController extends Controller
@@ -56,6 +57,13 @@ class ShipController extends Controller
         ]);
 
         try {
+            if ($request->image != null) {
+                $validateData['file'] = Storage::putFileAs(
+                    'public/Ship/',
+                    $request->pdf,
+                    $validateData['name'] . "." . $request->pdf->getClientOriginalExtension()
+                );
+            };
             Ship::create($validateData);
 
             return back()->with(['message' => 'Buque creado correctamente'], 200);
