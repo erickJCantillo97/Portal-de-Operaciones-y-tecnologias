@@ -13,6 +13,7 @@ import { useSweetalert } from '@/composable/sweetAlert';
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
 import Combobox from '@/Components/Combobox.vue';
+import FileUpload from 'primevue/fileupload';
 const { toast } = useSweetalert();
 const loading = ref(false);
 const { confirmDelete } = useSweetalert();
@@ -41,6 +42,7 @@ const formData = useForm({
     cost: props.contracts?.cost ?? '0',
     start_date: props.contracts?.start_date ?? '',
     end_date: props.contracts?.end_date ?? '',
+    pdf: null
 });
 //#endregion
 
@@ -245,40 +247,50 @@ const exportarExcel = () => {
                             <DialogPanel
                                 class="relative transform overflow-hidden rounded-lg bg-white px-2 pb-4 pt-2 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg ">
                                 <div>
-                                    <div class="mt-2 px-2">
+                                    <div class="px-2 mt-2 text-center">
                                         <DialogTitle as="h3" class="text-xl font-semibold text-primary text-center">{{
                                             formData.id !=
                                             0 ? 'Editar ' : 'Crear' }} Contrato
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
-                                        <div class="mt-2 space-y-4  p-2 rounded-lg">
-                                            <Combobox label="Cliente" placeholder="Seleccione Cliente" :options="customers"
+                                        <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
+                                            <Combobox class="mt-2 text-left" label="Cliente" placeholder="Seleccione Cliente" :options="customers"
                                                 v-model="customerSelect">
                                             </Combobox>
 
+<<<<<<< HEAD
                                             <Combobox label="Buque" placeholder="Seleccione Buque" :options="ships"
                                                 v-model="shipSelect">
                                             </Combobox>
 
                                             <TextInput label="Nombre del Contrato" placeholder="Escriba Nombre del Contrato"
+=======
+                                            <TextInput class="mt-2 text-left" label="Nombre del Contrato" placeholder="Escriba Nombre del Contrato"
+>>>>>>> 769dca3aa444d79f45c885ac2e9cd2018dd98240
                                                 v-model="formData.name" :error="$page.props.errors.name">
                                             </TextInput>
 
-                                            <TextInput type="number" label="Costo"
+                                            <TextInput class="mt-2 text-left" type="number" label="Costo"
                                                 :placeholder="'Escriba el Costo del Contrato'" v-model="formData.cost"
                                                 :error="$page.props.errors.cost">
                                             </TextInput>
 
                                             <!--CAMPO FECHA INICIO-->
-                                            <TextInput type="date" label="Fecha de inicio"
+                                            <TextInput class="mt-2 text-left" type="date" label="Fecha de inicio"
                                                 :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.start_date"
                                                 :error="$page.props.errors.cost">
                                             </TextInput>
 
                                             <!--CAMPO FECHA FINALIZACIÓN-->
-                                            <TextInput type="date" label="Fecha de Finalización"
+                                            <TextInput class="mt-2 text-left" type="date" label="Fecha de Finalización"
                                                 :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
                                                 :error="$page.props.errors.end_date">
                                             </TextInput>
+
+                                            <FileUpload chooseLabel="Adjuntar PDF" mode="basic" name="demo[]"
+                                                :multiple="false" accept=".pdf" :maxFileSize="1000000"
+                                                @input="formData.pdf = $event.target.files[0]">
+                                            </FileUpload>
+
                                         </div>
                                     </div>
                                 </div>

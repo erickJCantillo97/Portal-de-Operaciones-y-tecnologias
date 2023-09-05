@@ -9,223 +9,223 @@ import { AjaxHelper, Gantt, LocaleManager, Toast } from '@bryntum/gantt/gantt.mo
 
 class Importer {
 
-constructor(config) {
-    this.gantt = config.gantt;
-    this.defaultColumns = config.defaultColumns;
-}
+    constructor(config) {
+        this.gantt = config.gantt;
+        this.defaultColumns = config.defaultColumns;
+    }
 
-async importData(data) {
-    const
-        me = this,
+    async importData(data) {
+        const
+            me = this,
 
-        project = new me.gantt.projectModelClass({
-            silenceInitialCommit: false,
-            // To save imported data provide `sync` url and set `autoSync` true, or call `gantt.project.sync()` manually after data is imported.
-            autoSync             : true,
-            transport            : {
-                sync: {
-                    url : route('syncImporter'),
-                    headers     : {
-                        'Content-Type' : 'application/json',
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    credentials : 'include'
+            project = new me.gantt.projectModelClass({
+                silenceInitialCommit: false,
+                // To save imported data provide `sync` url and set `autoSync` true, or call `gantt.project.sync()` manually after data is imported.
+                autoSync: true,
+                transport: {
+                    sync: {
+                        url: route('syncImporter'),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        credentials: 'include'
+                    }
                 }
-            }
+            });
+
+        me.project = project;
+        me.calendarManager = project.calendarManagerStore;
+        me.taskStore = project.taskStore;
+        me.assignmentStore = project.assignmentStore;
+        me.resourceStore = project.resourceStore;
+        me.dependencyStore = project.dependencyStore;
+
+        Object.assign(me, {
+            calendarMap: {},
+            resourceMap: {},
+            taskMap: {}
         });
 
-    me.project = project;
-    me.calendarManager = project.calendarManagerStore;
-    me.taskStore = project.taskStore;
-    me.assignmentStore = project.assignmentStore;
-    me.resourceStore = project.resourceStore;
-    me.dependencyStore = project.dependencyStore;
+        me.importCalendars(data);
 
-    Object.assign(me, {
-        calendarMap: {},
-        resourceMap: {},
-        taskMap: {}
-    });
+        const tasks = me.getTaskTree(Array.isArray(data.tasks) ? data.tasks : [data.tasks]);
 
-    me.importCalendars(data);
+        me.importResources(data);
+        me.importAssignments(data);
 
-    const tasks = me.getTaskTree(Array.isArray(data.tasks) ? data.tasks : [data.tasks]);
+        me.taskStore.rootNode.appendChild(tasks[0].children);
 
-    me.importResources(data);
-    me.importAssignments(data);
+        me.importDependencies(data);
 
-    me.taskStore.rootNode.appendChild(tasks[0].children);
+        me.importProject(data);
 
-    me.importDependencies(data);
+        // Assign the new project to the gantt before launching commitAsync()
+        // to let Gantt resolve possible scheduling conflicts
+        me.gantt.project = project;
 
-    me.importProject(data);
+        await me.project.commitAsync();
 
-    // Assign the new project to the gantt before launching commitAsync()
-    // to let Gantt resolve possible scheduling conflicts
-    me.gantt.project = project;
+        me.importColumns(data);
 
-    await me.project.commitAsync();
-
-    me.importColumns(data);
-
-    return project;
-}
-
-// region RESOURCES
-importResources(data) {
-    this.resourceStore.add(data.resources.map(this.processResource, this));
-}
-
-processResource(data) {
-    const { id } = data;
-
-    delete data.id;
-
-    data.calendar = this.calendarMap[data.calendar];
-
-    const resource = new this.resourceStore.modelClass(data);
-
-    this.resourceMap[id] = resource;
-
-    return resource;
-}
-// endregion
-
-// region DEPENDENCIES
-importDependencies(data) {
-    this.dependencyStore.add(data.dependencies.map(this.processDependency, this));
-}
-
-processDependency(data) {
-    const
-        me = this,
-        { fromEvent, toEvent } = data;
-
-    delete data.id;
-
-    const dep = new me.dependencyStore.modelClass(data);
-
-    dep.fromEvent = me.taskMap[fromEvent].id;
-    dep.toEvent = me.taskMap[toEvent].id;
-
-    return dep;
-}
-// endregion
-
-// region ASSIGNMENTS
-importAssignments(data) {
-    this.assignmentStore.add(data.assignments.map(this.processAssignment, this));
-}
-
-processAssignment(data) {
-    const me = this;
-
-    delete data.id;
-
-    return new me.assignmentStore.modelClass({
-        units: data.units,
-        event: me.taskMap[data.event],
-        resource: me.resourceMap[data.resource]
-    });
-}
-// endregion
-
-// region TASKS
-getTaskTree(tasks) {
-    return tasks.map(this.processTask, this);
-}
-
-processTask(data) {
-    const
-        me = this,
-        { id, children } = data;
-
-    delete data.children;
-    delete data.id;
-    delete data.milestone;
-
-    data.calendar = me.calendarMap[data.calendar];
-
-    const t = new me.taskStore.modelClass(data);
-
-    if (children) {
-        t.appendChild(me.getTaskTree(children));
+        return project;
     }
 
-    t._id = id;
-    me.taskMap[t._id] = t;
-
-    return t;
-}
-// endregion
-
-// region CALENDARS
-processCalendarChildren(children) {
-    return children.map(this.processCalendar, this);
-}
-
-processCalendar(data) {
-    const
-        me = this,
-        { id, children } = data,
-        intervals = data.intervals;
-
-    delete data.children;
-    delete data.id;
-
-    const t = new me.calendarManager.modelClass(Object.assign(data, { intervals }));
-
-    if (children) {
-        t.appendChild(me.processCalendarChildren(children));
+    // region RESOURCES
+    importResources(data) {
+        this.resourceStore.add(data.resources.map(this.processResource, this));
     }
 
-    t._id = id;
-    me.calendarMap[t._id] = t;
+    processResource(data) {
+        const { id } = data;
 
-    return t;
-}
+        delete data.id;
 
-// Entry point of calendars loading
-importCalendars(data) {
-    this.calendarManager.add(this.processCalendarChildren(data.calendars.children));
-}
-// endregion
+        data.calendar = this.calendarMap[data.calendar];
 
-// region Columns
+        const resource = new this.resourceStore.modelClass(data);
 
-importColumns(data) {
-    let columns = data.columns.map(this.processColumn, this).filter(column => column);
+        this.resourceMap[id] = resource;
 
-    const columnStore = this.gantt.subGrids.locked.columns;
+        return resource;
+    }
+    // endregion
 
-    // if no columns extracted apply default set (if configured)
-    if (!columns.length && this.defaultColumns) {
-        columns = this.defaultColumns;
+    // region DEPENDENCIES
+    importDependencies(data) {
+        this.dependencyStore.add(data.dependencies.map(this.processDependency, this));
     }
 
-    if (columns.length) {
-        columnStore.removeAll(true);
-        columnStore.add(columns);
+    processDependency(data) {
+        const
+            me = this,
+            { fromEvent, toEvent } = data;
+
+        delete data.id;
+
+        const dep = new me.dependencyStore.modelClass(data);
+
+        dep.fromEvent = me.taskMap[fromEvent].id;
+        dep.toEvent = me.taskMap[toEvent].id;
+
+        return dep;
     }
-}
+    // endregion
 
-processColumn(data) {
-    const columnClass = this.gantt.columns.constructor.getColumnClass(data.type);
-
-    // ignore unknown columns (or columns that classes are not loaded)
-    if (columnClass) {
-        return Object.assign({ region: 'locked' }, data);
+    // region ASSIGNMENTS
+    importAssignments(data) {
+        this.assignmentStore.add(data.assignments.map(this.processAssignment, this));
     }
-}
 
-// endregion
+    processAssignment(data) {
+        const me = this;
 
-importProject(data) {
-    if ('calendar' in data.project) {
-        data.project.calendar = this.calendarMap[data.project.calendar];
+        delete data.id;
+
+        return new me.assignmentStore.modelClass({
+            units: data.units,
+            event: me.taskMap[data.event],
+            resource: me.resourceMap[data.resource]
+        });
     }
-    Object.assign(this.project, data.project);
-}
+    // endregion
+
+    // region TASKS
+    getTaskTree(tasks) {
+        return tasks.map(this.processTask, this);
+    }
+
+    processTask(data) {
+        const
+            me = this,
+            { id, children } = data;
+
+        delete data.children;
+        delete data.id;
+        delete data.milestone;
+
+        data.calendar = me.calendarMap[data.calendar];
+
+        const t = new me.taskStore.modelClass(data);
+
+        if (children) {
+            t.appendChild(me.getTaskTree(children));
+        }
+
+        t._id = id;
+        me.taskMap[t._id] = t;
+
+        return t;
+    }
+    // endregion
+
+    // region CALENDARS
+    processCalendarChildren(children) {
+        return children.map(this.processCalendar, this);
+    }
+
+    processCalendar(data) {
+        const
+            me = this,
+            { id, children } = data,
+            intervals = data.intervals;
+
+        delete data.children;
+        delete data.id;
+
+        const t = new me.calendarManager.modelClass(Object.assign(data, { intervals }));
+
+        if (children) {
+            t.appendChild(me.processCalendarChildren(children));
+        }
+
+        t._id = id;
+        me.calendarMap[t._id] = t;
+
+        return t;
+    }
+
+    // Entry point of calendars loading
+    importCalendars(data) {
+        this.calendarManager.add(this.processCalendarChildren(data.calendars.children));
+    }
+    // endregion
+
+    // region Columns
+
+    importColumns(data) {
+        let columns = data.columns.map(this.processColumn, this).filter(column => column);
+
+        const columnStore = this.gantt.subGrids.locked.columns;
+
+        // if no columns extracted apply default set (if configured)
+        if (!columns.length && this.defaultColumns) {
+            columns = this.defaultColumns;
+        }
+
+        if (columns.length) {
+            columnStore.removeAll(true);
+            columnStore.add(columns);
+        }
+    }
+
+    processColumn(data) {
+        const columnClass = this.gantt.columns.constructor.getColumnClass(data.type);
+
+        // ignore unknown columns (or columns that classes are not loaded)
+        if (columnClass) {
+            return Object.assign({ region: 'locked' }, data);
+        }
+    }
+
+    // endregion
+
+    importProject(data) {
+        if ('calendar' in data.project) {
+            data.project.calendar = this.calendarMap[data.project.calendar];
+        }
+        Object.assign(this.project, data.project);
+    }
 }
 onMounted(() => {
     const
@@ -249,7 +249,8 @@ onMounted(() => {
             features: {
                 baselines: true,
                 // A demo feature allowing dropping the file onto the Gantt element to trigger import
-                fileDrop: true
+                fileDrop: true,
+                mspExport: true
             },
 
             dependencyIdField: 'sequenceNumber',
@@ -273,7 +274,7 @@ onMounted(() => {
                     },
                     fileFieldConfig: {
                         // Uncomment to only allow picking certain files
-                        accept : '.mpp'
+                        accept: '.mpp'
                     },
                     listeners: {
                         change: ({ files }) => {
@@ -293,13 +294,22 @@ onMounted(() => {
                     disabled: true,
                     onClick: 'up.onImportButtonClick'
                 },
-                // {
-                //     type: 'button',
-                //     href: 'sampleproject.mpp',
-                //     target: '_blank',
-                //     text: 'Download a sample MPP file',
-                //     icon: 'b-fa-file-download'
-                // }
+                {
+                    type: 'button',
+                    text: 'Exportar MSP',
+                    ref: 'mspExportBtn',
+                    icon: 'b-fa-file-export',
+                    onAction() {
+                        const { gantt } = this;
+                        // give a filename based on task name
+                        const filename = gantt.project.taskStore.first && `${gantt.project.taskStore.first.name}.mpp`;
+
+                        // call the export to download the XML file
+                        gantt.features.mspExport.export({
+                            filename
+                        });
+                    }
+                }
             ],
 
             onFileDrop({ file }) {

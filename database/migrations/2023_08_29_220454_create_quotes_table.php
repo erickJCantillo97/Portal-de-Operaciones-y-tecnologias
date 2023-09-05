@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('ship_id')->index();
             $table->string('name')->nullable();
+            $table->string('code')->unique();
+            $table->string('name');
             $table->string('gerencia');
             $table->double('cost');
             $table->date('start_date');

@@ -61,8 +61,8 @@ export default class GanttToolbar extends Toolbar {
                         {
                             ref: "editTaskButton",
                             icon: "b-fa b-fa-pen",
-                            text: "Edit",
-                            tooltip: "Edit selected task",
+                            text: "Editar",
+                            tooltip: "Editar celda seleccionada",
                             onAction: "up.onEditTaskClick"
                         },
                         {
@@ -80,13 +80,13 @@ export default class GanttToolbar extends Toolbar {
                         {
                             ref: "expandAllButton",
                             icon: "b-fa b-fa-angle-double-down",
-                            tooltip: "Expand all",
+                            tooltip: "Expandir todo",
                             onAction: "up.onExpandAllClick"
                         },
                         {
                             ref: "collapseAllButton",
                             icon: "b-fa b-fa-angle-double-up",
-                            tooltip: "Collapse all",
+                            tooltip: "Colapsar todo",
                             onAction: "up.onCollapseAllClick"
                         }
                     ]
@@ -95,13 +95,12 @@ export default class GanttToolbar extends Toolbar {
                 {
                     type: "buttonGroup",
                     items: [
-
                         {
                             type: "button",
                             ref: "settingsButton",
-                            text: "Ajustes",
-                            tooltip: "Adjust settings",
+                            tooltip: "Ajustes",
                             toggleable: true,
+                            icon: 'b-fa-gear',
                             menu: {
                                 type: "popup",
                                 anchor: true,
@@ -115,7 +114,7 @@ export default class GanttToolbar extends Toolbar {
                                     {
                                         type: "slider",
                                         ref: "rowHeight",
-                                        text: "Row height",
+                                        text: "Altura de celdas",
                                         width: "12em",
                                         showValue: true,
                                         min: 30,
@@ -125,7 +124,7 @@ export default class GanttToolbar extends Toolbar {
                                     {
                                         type: "slider",
                                         ref: "barMargin",
-                                        text: "Bar margin",
+                                        text: "Altura barras",
                                         width: "12em",
                                         showValue: true,
                                         min: 0,
@@ -135,7 +134,7 @@ export default class GanttToolbar extends Toolbar {
                                     {
                                         type: "slider",
                                         ref: "duration",
-                                        text: "Animation duration ",
+                                        text: "Duracion animaciones ",
                                         width: "12em",
                                         min: 0,
                                         max: 2000,
@@ -185,9 +184,25 @@ export default class GanttToolbar extends Toolbar {
                         }
                     },
                     onChange: "up.onFilterChange"
+                },
+                {
+                    type : 'button',
+                    text : 'Exportar',
+                    ref  : 'mspExportBtn',
+                    icon : 'b-fa-file-export',
+                    onAction: "up.onExport"
                 }
             ]
         };
+    }
+    onExport() {
+        // give a filename based on task name
+        const filename = this.gantt.project.taskStore.first && `${this.gantt.project.taskStore.first.name}.xml`;
+
+        // call the export to download the XML file
+        this.gantt.features.mspExport.export({
+            filename
+        });
     }
 
     setAnimationDuration(value) {

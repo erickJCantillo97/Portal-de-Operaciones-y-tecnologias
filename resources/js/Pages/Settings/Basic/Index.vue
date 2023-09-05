@@ -38,7 +38,7 @@ const navigation = [
                         <div>
                             <h3 class="text-base font-semibold leading-6 text-gray-900">Variables de Sistema</h3>
                             <p class="mt-1 text-sm text-gray-500 text-justify">Aqui podras encontrar las variables donde se sustenta la aplicación, <strong class="text-red-800">
-                                procede con precausión
+                                procede con precaución
                             </strong> ó ponte en contacto con los administradores del sistema.</p>
                         </div>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">

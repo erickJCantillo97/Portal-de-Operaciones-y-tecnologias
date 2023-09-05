@@ -9,8 +9,8 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
 import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline'
-const { confirmDelete } = useSweetalert();
 import { useSweetalert } from '@/composable/sweetAlert'
+const { confirmDelete } = useSweetalert();
 import axios from 'axios';
 import plural from 'pluralize-es'
 import TextInput from './TextInput.vue';
