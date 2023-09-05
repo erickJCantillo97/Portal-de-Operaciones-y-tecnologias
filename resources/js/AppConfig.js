@@ -11,7 +11,8 @@ const useGanttConfig = function () {
             autoLoad: true,
             transport: {
                 load: {
-                    url: route('dataGantt')
+                    // url: route('dataGantt')
+                    url: 'data/launch-saas.json'
                 },
                 sync: {
                     url : route('syncGantt'),
@@ -23,7 +24,9 @@ const useGanttConfig = function () {
                 }
             }
         },
-
+        features : {
+            mspExport : true // enable the feature Microsoft Project export
+        },
         // agrega opcion a menu contextual
         // features : {
         //     taskMenu : {
@@ -58,7 +61,7 @@ const useGanttConfig = function () {
                         field: 'startDate',
                         hidden: true,
                         text: 'Fechas',
-                        width: 150,
+                        width: 30,
                         editor: false,
                         htmlEncode: false,
                         renderer({ record }) {

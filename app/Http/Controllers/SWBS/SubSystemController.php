@@ -67,11 +67,12 @@ class SubSystemController extends Controller
     public function update(Request $request, SubSystem $subSystem)
     {
         $validateData = $request->validate([
-            //
+            'name' => 'required',
+            'code' => 'required',
         ]);
 
         try {
-            $subSystem->update($validateData);
+            SubSystem::find($request->id)->update($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
