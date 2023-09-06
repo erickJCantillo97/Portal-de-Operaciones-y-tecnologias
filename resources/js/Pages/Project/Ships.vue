@@ -22,6 +22,7 @@ import FileUpload from 'primevue/fileupload';
 // import Button from 'primevue/button';
 
 const confirm = useConfirm();
+const customerSelect=ref();
 const { toast } = useSweetalert();
 const loading = ref(false);
 const { confirmDelete } = useSweetalert();
@@ -33,7 +34,8 @@ const open = ref(false)
 
 const props = defineProps({
     ships: Array,
-    customers: Array
+    customers: Array,
+    customer: Object
 })
 
 //#region UseForm
@@ -57,6 +59,7 @@ onMounted(() => {
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
+    formData.customer_id=customerSelect.value.id;
     if (formData.id == 0) {
         router.post(route('ships.store'), formData, {
             preserveScroll: true,
@@ -96,6 +99,7 @@ const addItem = () => {
 
 const editItem = (ship) => {
     formData.id = ship.id;
+    formData.customer_id = ship.customer_id;
     formData.name = ship.name;
     formData.type = ship.type;
     formData.quilla = ship.quilla;
@@ -179,8 +183,9 @@ const exportarExcel = () => {
         <div class="w-full p-4 px-auto">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
-                    <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
-                        Unidades
+                    <h1 class="text-xl font-semibold leading-6 text-primary">
+                        <p v-if="customer">Unidades del ciente: {{ customer.name }}</p>
+                        <p v-else>Todas las unidades</p>
                     </h1>
                 </div>
 
@@ -224,6 +229,12 @@ const exportarExcel = () => {
                 <Column field="quilla" header="Quillas"></Column>
                 <Column field="pantoque" header="Pantoque"></Column>
                 <Column field="eslora" header="Eslora"></Column>
+                <Column header="Cliente">
+                    <template #body="slotProps">
+                        <p v-if=slotProps.data.customer>{{ slotProps.data.customer.name }}</p>
+                        <p v-else> Sin asignar cliente</p>
+                    </template>
+                </Column>
                 <!-- <Column field="status" header="Estado" sortable>
                     <template #body="slotProps">
                         <Tag :value="slotProps.data.status" :severity="getContractStatusSeverity(slotProps.data)" />

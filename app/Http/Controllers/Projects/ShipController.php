@@ -15,22 +15,30 @@ class ShipController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $ships = Ship::orderBy('name')->get();
+    public function index(Request $request)
+    { if (isset($request->id)){
+        $ships = Ship::where('customer_id', $request->id)->get();
+        return Inertia::render('Project/Ships',
+            [
+                'ships' => $ships,
+                'customer'=> Customer::find($request->id)
+            ]
+        );
+    }else{
+        $ships = Ship::with('customer')->orderBy('name')->get();
         $customers = Customer::orderBy('name')->get();
-
         return Inertia::render('Project/Ships',
             [
                 'ships' => $ships,
                 'customers' => $customers,
             ]
         );
-
+    }
         // return response()->json([
         //     $ship
         // ], 200);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -104,6 +112,7 @@ class ShipController extends Controller
             'eslora' => 'nullable|numeric|gt:0',
             'details' => 'nullable',
         ]);
+        // dd($validateData);
         if ($request->image != null) {
             $validateData['file'] = Storage::putFileAs(
                 'public/Ship/',
