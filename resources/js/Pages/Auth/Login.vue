@@ -40,8 +40,7 @@ const submit = () => {
     -->
     <div class="fondo min-w-full min-h-screen flex sm:justify-center justify-center items-center">
         <div class="sm:max-w-sm min-w-max">
-            <!-- <div class="card bg-blue-400 opacity-70 shadow-lg  w-full h-full rounded-3xl absolute  transform -rotate-6" style="backdrop-filter: blur(2px)"></div>
-            <div class="card bg-blue-800 opacity-70 shadow-lg  w-full h-full rounded-3xl absolute  transform rotate-6" style="backdrop-filter: blur(2px)"></div> -->
+
             <div class="rounded-3xl backdrop-blur-xl px-6 py-4  shadow-2xl shadow-black">
                 <div class="items-center justify-center">
                     <ApplicationLogo class="mx-[45%]"></ApplicationLogo>
@@ -52,7 +51,7 @@ const submit = () => {
                     </p>
                 </div>
 
-                <div class="mt-10 text-white">
+                <div class="mt-10">
                     <div>
                         <form action="#" method="POST" @submit.prevent="submit" class="space-y-6">
                             <div>
@@ -83,7 +82,7 @@ const submit = () => {
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
                                     <input id="remember-me" v-model="form.remember" name="remember-me" type="checkbox"
-                                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" />
+                                        class="h-4 w-4 rounded border-gray-300 text-[#2c3494] focus:ring-indigo-600" />
                                     <label for="remember-me"
                                         class="ml-3 mt-2 block text-sm leading-6 text-white">Recuérdame</label>
                                 </div>
@@ -96,7 +95,7 @@ const submit = () => {
 
                             <div>
                                 <Button
-                                    class="bg-blue-900 w-full py-3 rounded-xl text-white shadow-xl hover:shadow-inner focus:outline-none transition duration-500 ease-in-out  transform hover:-translate-x hover:scale-105"
+                                    class="bg-[#2c3494] w-full py-3 rounded-xl text-white shadow-xl hover:shadow-inner focus:outline-none transition duration-500 ease-in-out  transform hover:-translate-x hover:scale-105"
                                     severity="primary" :loading="form.processing">Iniciar Sesión</Button>
                             </div>
                         </form>
