@@ -5,10 +5,15 @@ import { CheckIcon } from '@heroicons/vue/24/solid'
 import Button from '@/Components/Button.vue';
 import { EllipsisVerticalIcon } from '@heroicons/vue/20/solid'
 
-const systems = ref([])
 const grupo = ref();
 const system = ref();
+const systems = ref([])
+
+const subsystem = ref();
 const subSystems = ref([])
+
+const processes = ref([])
+
 const props = defineProps({
     groups: Array,
 })
@@ -16,6 +21,7 @@ const props = defineProps({
 const getSystems = (g) => {
     grupo.value = g.name
     systems.value = []
+    processes.value = [];
     subSystems.value = [];
     axios.get(route('system.index', {grupo: g.name})).then((res) => {
         systems.value = res.data[0];
@@ -25,8 +31,17 @@ const getSystems = (g) => {
 const getSubSystems = (s) => {
     system.value = s;
     subSystems.value = [];
+    processes.value = [];
     axios.get(route('subsystem.index', {system: s.id})).then((res) => {
         subSystems.value = res.data[0];
+    });
+}
+
+const getProcess = (s) => {
+    subsystem.value = s;
+    processes.value = [];
+    axios.get(route('process.index', {subSystem: s.id})).then((res) => {
+        processes.value = res.data[0];
     });
 }
 
@@ -34,7 +49,7 @@ const getSubSystems = (s) => {
 
 <template>
     <AppLayout>
-        <div class="w-full flex justify-between p-4">
+        <div class="w-full flex justify-between px-4 py-1">
             <div></div>
             <h2 class="text-xl font-bold  text-center text-primary">Crear un Cronograma</h2>
             <div class="justify-end">
@@ -66,7 +81,7 @@ const getSubSystems = (s) => {
                 </div>
             </div>
             <div class="mt-3  grid grid-cols-2 gap-5 sm:grid-cols-4 sm:gap-4 lg:grid-cols-4">
-            <div  v-for="s of systems" class=" p-2 flex flex-1 items-center justify-between shadow-md hover:scale-105 hover:bg-sky-100 cursor-pointer rounded-md text-xs bg-white" :class="s.name == grupo ? 'bg-sky-100':''" @click="getSubSystems(s)">
+            <div  v-for="s of systems" class=" p-2 flex flex-1 items-center justify-between shadow-md hover:scale-105 hover:bg-sky-100 cursor-pointer rounded-md text-xs " :class="(system != null && s.name == system.name) ? 'bg-sky-100':'bg-white'" @click="getSubSystems(s)">
                     <div>{{ s.code }}. {{s.name}}</div>
                 </div>
             </div>
@@ -81,8 +96,23 @@ const getSubSystems = (s) => {
                 </div>
             </div>
             <div class="mt-3  grid grid-cols-2 gap-5 sm:grid-cols-4 sm:gap-4 lg:grid-cols-4">
-            <div  v-for="s of subSystems" class="text-xs p-2 flex flex-1 items-center justify-between shadow-md hover:scale-105 hover:bg-sky-100 cursor-pointer rounded-md  bg-white" :class="s.name == grupo ? 'bg-sky-100':''">
+            <div  v-for="s of subSystems" class="text-xs p-2 flex flex-1 items-center justify-between shadow-md hover:scale-105 hover:bg-sky-100 cursor-pointer rounded-md  bg-white" :class="s.name == grupo ? 'bg-sky-100':''" @click="getProcess(s)">
                     <div>{{ s.code }}. {{s.name}}</div>
+                </div>
+            </div>
+        </div>
+        <div class="p-2" v-if="processes.length > 0">
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div class="w-full border-t border-gray-300" />
+                </div>
+                <div class="relative flex justify-center">
+                    <span class="bg-white px-3 text-base font-semibold leading-6 text-gray-900">Proceso</span>
+                </div>
+            </div>
+            <div class="mt-3  grid grid-cols-2 gap-5 sm:grid-cols-4 sm:gap-4 lg:grid-cols-4">
+            <div  v-for="s of processes" class="text-xs p-2 flex flex-1 items-center justify-between shadow-md hover:scale-105 hover:bg-sky-100 cursor-pointer rounded-md  bg-white" :class="s.name == grupo ? 'bg-sky-100':''">
+                    <div>{{s.name}}</div>
                 </div>
             </div>
         </div>

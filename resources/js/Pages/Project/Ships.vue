@@ -220,6 +220,7 @@ const exportarExcel = () => {
 
                 <!--COLUMNAS-->
                 <Column field="name" header="Nombre"></Column>
+                <Column field="customer.name" header="Cliente"></Column>
                 <Column field="type" header="Tipo de Buque"></Column>
                 <Column field="quilla" header="Quillas"></Column>
                 <Column field="pantoque" header="Pantoque"></Column>

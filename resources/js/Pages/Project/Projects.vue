@@ -18,8 +18,16 @@ import axios from 'axios';
 // import plural from 'pluralize-es'
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
-// import Button from 'primevue/button';
+import OverlayPanel from 'primevue/overlaypanel';
 
+// import Button from 'primevue/button';
+import { CheckIcon } from '@heroicons/vue/24/solid'
+
+const steps = [
+  { id: '01', name: 'Nuevo en Blanco', description: 'Vitae sed mi luctus laoreet.', href: '#', status: 'complete' },
+  { id: '02', name: 'Nuevo con Seguimiento', description: 'Cursus semper viverra.', href: '#', status: 'current' },
+  { id: '03', name: 'Preview', description: 'Penatibus eu quis ante.', href: '#', status: 'upcoming' },
+]
 const confirm = useConfirm();
 const { toast } = useSweetalert();
 const loading = ref(false);
@@ -28,7 +36,11 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 const open = ref(false)
-
+const project = ref()
+const op = ref();
+const toggle = (event, project) => {
+    op.value.toggle(event);
+}
 
 const props = defineProps({
     projects: Array,
@@ -117,8 +129,6 @@ const initFilters = () => {
         name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
     }
 };
-
-
 
 const clearFilter = () => {
     initFilters();
@@ -242,6 +252,17 @@ const exportarExcel = () => {
                         <div
                             class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
                             <div>
+                                <Button severity="primary" @click="toggle($event, slotProps.data)" class="hover:bg-primary">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M18 16L16 16M16 16L14 16M16 16L16 14M16 16L16 18" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M7 4V2.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M17 4V2.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M21.5 9H16.625H10.75M2 9H5.875" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V12C2 8.22876 2 6.34315 3.17157 5.17157C4.34315 4 6.22876 4 10 4H14C17.7712 4 19.6569 4 20.8284 5.17157C22 6.34315 22 8.22876 22 12V14C22 17.7712 22 19.6569 20.8284 20.8284C20.1752 21.4816 19.3001 21.7706 18 21.8985" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
+                                        </svg>
+                                </Button>
+                            </div>
+                            <div>
                                 <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
                                     <PencilIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
@@ -346,5 +367,32 @@ const exportarExcel = () => {
                 </div>
             </Dialog>
         </TransitionRoot>
+
+        <OverlayPanel ref="op">
+            <div class="text-sm font-bold">
+                Opciones de Creacion de Cronograma
+                <div class="p-2 border-t border-gray-400 mt-2">
+                    <div class="lg:border-b lg:border-t lg:border-gray-200">
+                        <nav class="" aria-label="Progress">
+                          <ol role="list" class="overflow-hidden rounded-md lg:flex lg:rounded-none lg:border-l lg:border-r lg:border-gray-200">
+                            <li v-for="(step, stepIdx) in steps" :key="step.id" class="relative overflow-hidden lg:flex-1">
+                              <div :class="[stepIdx === 0 ? 'rounded-t-md border-b-0' : '', stepIdx === steps.length - 1 ? 'rounded-b-md border-t-0' : '', 'overflow-hidden border border-gray-200 lg:border-0']">
+                                <a :href="step.href" class="group">
+                                  <span class="absolute left-0 top-0 h-full w-1 bg-transparent group-hover:bg-gray-200 lg:bottom-0 lg:top-auto lg:h-1 lg:w-full" aria-hidden="true" />
+                                  <span class="flex items-start px-6 py-5 text-sm font-medium">
+                                    <span class="mt-0.5 flex min-w-0 flex-col">
+                                      <span class="text-sm font-medium text-gray-500">{{ step.name }}</span>
+                                      <span class="text-sm font-medium text-gray-500">{{ step.description }}</span>
+                                    </span>
+                                  </span>
+                                </a>
+                              </div>
+                            </li>
+                          </ol>
+                        </nav>
+                      </div>
+                </div>
+            </div>
+        </OverlayPanel>
     </AppLayout>
 </template>

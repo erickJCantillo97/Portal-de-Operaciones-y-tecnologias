@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('contracts', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('customer_id')->index();
-            $table->unsignedBigInteger('ship_id')->index();
+            $table->unsignedBigInteger('ship_id')->index()->nullable();
             $table->string('name')->unique();
             $table->string('gerencia');
             $table->double('cost');

@@ -18,7 +18,7 @@ class ContractController extends Controller
      */
     public function index()
     {
-        $contracts = Contract::with('customer')->orderBy('name')->get();
+        $contracts = Contract::with('customer', 'ship')->orderBy('name')->get();
         $ships = Ship::orderBy('name')->get();
         $customers = Customer::orderBy('name')->get();
 

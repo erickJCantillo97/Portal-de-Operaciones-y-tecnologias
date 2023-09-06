@@ -17,7 +17,7 @@ class ShipController extends Controller
      */
     public function index()
     {
-        $ships = Ship::orderBy('name')->get();
+        $ships = Ship::with('customer')->orderBy('name')->get();
         $customers = Customer::orderBy('name')->get();
 
         return Inertia::render('Project/Ships',

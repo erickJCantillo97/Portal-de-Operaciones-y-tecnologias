@@ -17,7 +17,7 @@ class SystemController extends Controller
 
         $systems = System::get();
         if($request->grupo){
-            $systems = System::where('constructive_group_id', 'LIKE', ($request->grupo/100))->get();
+            $systems = System::where('constructive_group_id', 'LIKE', ($request->grupo/100))->orderBy('code')->get();
         }
 
         return response()->json([

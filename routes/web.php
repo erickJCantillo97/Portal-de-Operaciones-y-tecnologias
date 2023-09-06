@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use App\Http\Controllers\Projects\ProjectController;
 use App\Http\Controllers\Projects\QuoteController;
 use App\Http\Controllers\Projects\ShipController;
+use App\Models\Process;
 use App\Models\SWBS\SubSystem;
 use App\Models\SWBS\System;
 use Illuminate\Foundation\Application;
@@ -82,6 +83,10 @@ Route::get('recuperarDatos',function (){
     $datos = DB::connection('sqlsrv_anterior')->table('swbs_subsystems')->select(['system_id', 'code', 'validity', 'status','name'])->get();
     foreach ($datos as $dato) {
         SubSystem::create((array) $dato);
+    }
+    $datos = DB::connection('sqlsrv_anterior')->table('swbs_process')->select(['subsystem_id', 'validity', 'status','name', 'maintenance_type'])->get();
+    foreach ($datos as $dato) {
+        Process::create((array) $dato);
     }
 
     return System::get();

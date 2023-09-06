@@ -7,16 +7,19 @@ use App\Models\Process;
 use Exception;
 use App\Http\Requests\StoreprocessRequest;
 use App\Http\Requests\UpdateprocessRequest;
+use Illuminate\Http\Request as HttpRequest;
 
 class ProcessController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(HttpRequest $request)
     {
         $process = Process::orderBy('id')->get();
-
+        if($request->subSystem){
+            $process = Process::where('subsystem_id', $request->subSystem)->get();
+        }
         return response()->json([
                 $process
             ], 200);
