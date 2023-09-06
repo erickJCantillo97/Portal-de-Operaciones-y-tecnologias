@@ -15,17 +15,19 @@ class ShipController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
-        if (isset($request->id)){
-        $ships = Ship::where('customer_id', $request->id)->get();
-                return Inertia::render('Project/Ships',
-                    [
-                        'ships' => $ships,
-                        'customer'=> Customer::find($request->id)
-                    ]
-                );
-            }else{
+    public function index(Request $request){
+
+     if (isset($request->id)){
+
+        $ships = Ship::with('customer')->where('customer_id', $request->id)->get();
+        // dd($ships);
+        return Inertia::render('Project/Ships',
+            [
+                'ships' => $ships,
+                'customer'=> Customer::find($request->id)
+            ]
+        );
+    }else{
         $ships = Ship::with('customer')->orderBy('name')->get();
         $customers = Customer::orderBy('name')->get();
         return Inertia::render('Project/Ships',
