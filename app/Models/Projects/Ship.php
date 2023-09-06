@@ -18,6 +18,11 @@ class Ship extends Model
         return $this->belongsTo(Customer::class);
     }
 
+    public function ship()
+    {
+        return $this->belongsTo(Ship::class);
+    }
+
     public function project()
     {
         return $this->belongsTo(Project::class);

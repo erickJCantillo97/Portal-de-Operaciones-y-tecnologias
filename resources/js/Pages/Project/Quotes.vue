@@ -220,6 +220,7 @@ const exportarExcel = () => {
                 <!-- <Column field="gerencia" header="Gerencia"></Column> -->
                 <Column field="name" header="Consecutivo">
                 </Column>
+                <Column field="ship.name" header="Buque"></Column>
                 <Column field="cost" header="Costo">
                     <template #body="slotProps">
                         {{ formatCurrency(slotProps.data.cost) }}

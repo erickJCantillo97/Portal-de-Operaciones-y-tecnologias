@@ -19,13 +19,13 @@ class ShipController extends Controller
     {
         if (isset($request->id)){
         $ships = Ship::where('customer_id', $request->id)->get();
-        return Inertia::render('Project/Ships',
-            [
-                'ships' => $ships,
-                'customer'=> Customer::find($request->id)
-            ]
-        );
-    }else{
+                return Inertia::render('Project/Ships',
+                    [
+                        'ships' => $ships,
+                        'customer'=> Customer::find($request->id)
+                    ]
+                );
+            }else{
         $ships = Ship::with('customer')->orderBy('name')->get();
         $customers = Customer::orderBy('name')->get();
         return Inertia::render('Project/Ships',

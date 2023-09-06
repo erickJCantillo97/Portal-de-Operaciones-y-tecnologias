@@ -219,6 +219,7 @@ const exportarExcel = () => {
                 </template>
 
                 <!--COLUMNAS-->
+                <Column field="name" header="name"></Column>
                 <Column field="start_date" header="Fecha Inicio"></Column>
                 <Column field="end_date" header="Fecha Finalización"></Column>
                 <Column field="status" header="Estado" sortable>
