@@ -11,10 +11,10 @@ import Combobox from '@/Components/Combobox.vue';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline';
+import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, Bars4Icon, CalendarIcon, ClockIcon, PhotoIcon, TableCellsIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline';
 import { useSweetalert } from '@/composable/sweetAlert';
 import { useConfirm } from "primevue/useconfirm";
-import axios from 'axios';
+
 // import plural from 'pluralize-es'
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
@@ -24,9 +24,9 @@ import OverlayPanel from 'primevue/overlaypanel';
 import { CheckIcon } from '@heroicons/vue/24/solid'
 
 const steps = [
-  { id: '01', name: 'Nuevo en Blanco', description: 'Vitae sed mi luctus laoreet.', href: '#', status: 'complete' },
-  { id: '02', name: 'Nuevo con Seguimiento', description: 'Cursus semper viverra.', href: '#', status: 'current' },
-  { id: '03', name: 'Preview', description: 'Penatibus eu quis ante.', href: '#', status: 'upcoming' },
+    { id: '01', name: 'Nuevo en Blanco', description: 'Vitae sed mi luctus laoreet.', href: '#', status: 'complete' },
+    { id: '02', name: 'Nuevo con Seguimiento', description: 'Cursus semper viverra.', href: '#', status: 'current' },
+    { id: '03', name: 'Preview', description: 'Penatibus eu quis ante.', href: '#', status: 'upcoming' },
 ]
 const confirm = useConfirm();
 const { toast } = useSweetalert();
@@ -70,7 +70,7 @@ onMounted(() => {
     initFilters();
 })
 
-/* SUBMIT*/
+//#region SUBMIT
 const submit = () => {
     loading.value = true;
     if (formData.id == 0) {
@@ -103,6 +103,7 @@ const submit = () => {
         }
     })
 }
+//#endregion
 
 const addItem = () => {
     router.get(route('projects.create'))
@@ -188,6 +189,36 @@ const exportarExcel = () => {
     // Package and Release Data (`writeFile` tries to write and save an XLSB file)
     XLSX.writeFile(workbook, 'Lista de Contratos_' + project.nit + '_' + project.name + ".xlsb");
 };
+
+const items = [
+    {
+        title: 'Crear proyecto nuevo',
+        description: 'Aqui podra crear un proyecto desde 0',
+        icon: Bars4Icon,
+        background: 'bg-pink-500',
+        command: () => router.get(route('showGantt'), {id: selectCustomer.id})
+    },
+    {
+        title: 'Crear proyecto con asistente',
+        description: 'Podra crear el proyecto con un asistente amigable',
+        icon: CalendarIcon,
+        background: 'bg-yellow-500',
+    },
+    {
+        title: 'Crear proyecto desde proyecto anterior',
+        description: 'Actualmente en construccion',
+        icon: PhotoIcon,
+        background: 'bg-green-500',
+    },
+    {
+        title: 'Crear proyecto desde plantilla prediseñada',
+        description: 'Actualmente en construccion',
+        icon: ViewColumnsIcon,
+        background: 'bg-blue-500',
+    },
+]
+
+
 </script>
 
 <template>
@@ -258,12 +289,16 @@ const exportarExcel = () => {
                             <div>
                                 <Button severity="primary" @click="toggle($event, slotProps.data)" class="hover:bg-primary">
                                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M18 16L16 16M16 16L14 16M16 16L16 14M16 16L16 18" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
-                                        <path d="M7 4V2.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
-                                        <path d="M17 4V2.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
-                                        <path d="M21.5 9H16.625H10.75M2 9H5.875" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
-                                        <path d="M14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V12C2 8.22876 2 6.34315 3.17157 5.17157C4.34315 4 6.22876 4 10 4H14C17.7712 4 19.6569 4 20.8284 5.17157C22 6.34315 22 8.22876 22 12V14C22 17.7712 22 19.6569 20.8284 20.8284C20.1752 21.4816 19.3001 21.7706 18 21.8985" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
-                                        </svg>
+                                        <path d="M18 16L16 16M16 16L14 16M16 16L16 14M16 16L16 18" stroke="#1C274C"
+                                            stroke-width="1.5" stroke-linecap="round" />
+                                        <path d="M7 4V2.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
+                                        <path d="M17 4V2.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
+                                        <path d="M21.5 9H16.625H10.75M2 9H5.875" stroke="#1C274C" stroke-width="1.5"
+                                            stroke-linecap="round" />
+                                        <path
+                                            d="M14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V12C2 8.22876 2 6.34315 3.17157 5.17157C4.34315 4 6.22876 4 10 4H14C17.7712 4 19.6569 4 20.8284 5.17157C22 6.34315 22 8.22876 22 12V14C22 17.7712 22 19.6569 20.8284 20.8284C20.1752 21.4816 19.3001 21.7706 18 21.8985"
+                                            stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
+                                    </svg>
                                 </Button>
                             </div>
                             <div>
@@ -381,29 +416,36 @@ const exportarExcel = () => {
         </TransitionRoot>
 
         <OverlayPanel ref="op">
-            <div class="text-sm font-bold">
-                Opciones de Creacion de Cronograma
-                <div class="p-2 border-t border-gray-400 mt-2">
-                    <div class="lg:border-b lg:border-t lg:border-gray-200">
-                        <nav class="" aria-label="Progress">
-                          <ol role="list" class="overflow-hidden rounded-md lg:flex lg:rounded-none lg:border-l lg:border-r lg:border-gray-200">
-                            <li v-for="(step, stepIdx) in steps" :key="step.id" class="relative overflow-hidden lg:flex-1">
-                              <div :class="[stepIdx === 0 ? 'rounded-t-md border-b-0' : '', stepIdx === steps.length - 1 ? 'rounded-b-md border-t-0' : '', 'overflow-hidden border border-gray-200 lg:border-0']">
-                                <a :href="step.href" class="group">
-                                  <span class="absolute left-0 top-0 h-full w-1 bg-transparent group-hover:bg-gray-200 lg:bottom-0 lg:top-auto lg:h-1 lg:w-full" aria-hidden="true" />
-                                  <span class="flex items-start px-6 py-5 text-sm font-medium">
-                                    <span class="mt-0.5 flex min-w-0 flex-col">
-                                      <span class="text-sm font-medium text-gray-500">{{ step.name }}</span>
-                                      <span class="text-sm font-medium text-gray-500">{{ step.description }}</span>
-                                    </span>
-                                  </span>
-                                </a>
-                              </div>
-                            </li>
-                          </ol>
-                        </nav>
-                      </div>
-                </div>
+            <div>
+                <h2 class="text-base font-semibold leading-6 text-gray-900">Creacion de cronograma</h2>
+                <p class="mt-1 text-sm text-gray-500">Aqui podra escoger como desea crear el cronograma del proyecto.</p>
+                <ul role="list" class="mt-6 grid grid-cols-1 gap-6 border-b border-t border-gray-200 py-6 sm:grid-cols-2">
+                    <li v-for="(item, itemIdx) in items" :key="itemIdx" class="flow-root">
+                        <div
+                            class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 focus-within:ring-2 focus-within:ring-indigo-500 hover:bg-gray-50">
+                            <div
+                                :class="[item.background, 'flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg']">
+                                <component :is="item.icon" class="h-6 w-6 text-white" aria-hidden="true" />
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-900">
+                                    <a href="#" class="focus:outline-none">
+                                        <span class="absolute inset-0" aria-hidden="true" />
+                                        <span>{{ item.title }}</span>
+                                        <span aria-hidden="true"> &rarr;</span>
+                                    </a>
+                                </h3>
+                                <p class="mt-1 text-sm text-gray-500">{{ item.description }}</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <!-- <div class="mt-4 flex">
+                    <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        Or start from an empty project
+                        <span aria-hidden="true"> &rarr;</span>
+                    </a>
+                </div> -->
             </div>
         </OverlayPanel>
     </AppLayout>
