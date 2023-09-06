@@ -39,11 +39,12 @@ const props = defineProps({
 
 //#region UseForm
 const formData = useForm({
-    id: props.authorizations?.id ?? '0',
-    project_id: props.contracts?.project_id ?? '0',
-    contract_id: props.contracts?.contract_id ?? '',
-    start_date: props.contracts?.start_date ?? '',
-    end_date: props.contracts?.end_date ?? '',
+    id: '0',
+    project_id: '0',
+    contract_id: '',
+    start_date: '',
+    end_date: '',
+    name: '',
     pdf: null
 });
 //#endregion
@@ -96,6 +97,7 @@ const editItem = (contract) => {
     formData.id = contract.id;
     formData.start_date = contract.start_date;
     formData.end_date = contract.end_date;
+    formData.name = contract.name
     formData.pdf = contract.pdf
     open.value = true;
 };
@@ -262,12 +264,17 @@ const exportarExcel = () => {
                                 <div>
                                     <div class="px-2 mt-2 text-center">
                                         <DialogTitle as="h3" class="text-xl font-semibold text-primary ">{{ formData.id !=
-                                            0 ? 'Editar ' : 'Crear' }} Contrato
+                                            0 ? 'Editar ' : 'Crear' }} Autorización
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
 
                                             <!--CAMPO FECHA INICIO-->
                                             <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
+                                                <TextInput class="mt-2 text-left" type="text" label="Codigo de autorizacion"
+                                                    :placeholder="'Escriba el codigo de autorizacion'"
+                                                    v-model="formData.name" :error="$page.props.errors.cost">
+                                                </TextInput>
+
                                                 <TextInput class="mt-2 text-left" type="date" label="Fecha de inicio"
                                                     :placeholder="'Escriba el Tipo de Cliente'"
                                                     v-model="formData.start_date" :error="$page.props.errors.cost">
