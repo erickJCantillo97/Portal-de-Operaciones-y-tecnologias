@@ -22,7 +22,7 @@ import FileUpload from 'primevue/fileupload';
 // import Button from 'primevue/button';
 
 const confirm = useConfirm();
-const customerSelect=ref();
+const customerSelect = ref();
 const { toast } = useSweetalert();
 const loading = ref(false);
 const { confirmDelete } = useSweetalert();
@@ -48,7 +48,7 @@ const formData = useForm({
     pantoque: '',
     eslora: '',
     details: '',
-    image:null
+    image: null
 });
 //#endregion
 
@@ -59,7 +59,11 @@ onMounted(() => {
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
-    formData.customer_id=customerSelect.value.id;
+    if (customers==null){
+        formData.customer_id = customer.value.id;
+    }else{
+        formData.customer_id = customerSelect.value.id;
+    }
     if (formData.id == 0) {
         router.post(route('ships.store'), formData, {
             preserveScroll: true,
@@ -286,10 +290,10 @@ const exportarExcel = () => {
                                     <div class="px-2 mt-2 text-center">
                                         <DialogTitle as="h3" class="text-xl font-semibold text-primary ">
                                             {{ formData.id != 0 ? 'Editar ' : 'Crear' }}
-                                            Unidad
+                                            Unidad {{ customer != null ? ' para ' + customer.name : '' }}
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
-                                            <Combobox class="mt-2 text-left" label="Cliente"
+                                            <Combobox v-if="customers" class="mt-2 text-left" label="Cliente"
                                                 placeholder="Seleccione Cliente" :options="customers"
                                                 v-model="customerSelect">
                                             </Combobox>
@@ -302,26 +306,26 @@ const exportarExcel = () => {
                                                 :placeholder="'Escriba el Tipo de Buque'" v-model="formData.type"
                                                 :error="router.page.props.errors.type"></TextInput>
 
-                                            <TextInput class="mt-2 text-left" label="Carros Quillas"
-                                            type="number"
-                                                :placeholder="'Números de carros de Quillas necesarios'" v-model="formData.quilla"
-                                                :error="router.page.props.errors.quilla"></TextInput>
+                                            <TextInput class="mt-2 text-left" label="Carros Quillas" type="number"
+                                                :placeholder="'Números de carros de Quillas necesarios'"
+                                                v-model="formData.quilla" :error="router.page.props.errors.quilla">
+                                            </TextInput>
 
-                                            <TextInput class="mt-2 text-left" label="Carros de Pantoques"
-                                            type="number"
-                                                :placeholder="'Números carros de Pantoques necesarios'" v-model="formData.pantoque"
-                                                :error="router.page.props.errors.pantoque"></TextInput>
+                                            <TextInput class="mt-2 text-left" label="Carros de Pantoques" type="number"
+                                                :placeholder="'Números carros de Pantoques necesarios'"
+                                                v-model="formData.pantoque" :error="router.page.props.errors.pantoque">
+                                            </TextInput>
 
-                                            <TextInput class="mt-2 text-left" label="Longitud de Eslora"
-                                            type="number"
+                                            <TextInput class="mt-2 text-left" label="Longitud de Eslora" type="number"
                                                 :placeholder="'Longitud de Eslora'" v-model="formData.eslora"
                                                 :error="router.page.props.errors.eslora"></TextInput>
 
                                             <TextInput class="mt-2 text-left" label="Detalles"
                                                 :placeholder="'Escriba los detalles del Buque'" v-model="formData.details"
                                                 :error="router.page.props.errors.details"></TextInput>
-                                            <FileUpload chooseLabel="Adjuntar foto" cancelLabel="Cancelar" :show-upload-button=false name="demo[]"
-                                                :multiple="false" fileLimit="1" accept="image/*" :maxFileSize="1000000"
+                                            <FileUpload chooseLabel="Adjuntar foto" cancelLabel="Cancelar"
+                                                :show-upload-button=false name="demo[]" :multiple="false" fileLimit="1"
+                                                accept="image/*" :maxFileSize="1000000"
                                                 @input="formData.image = $event.target.files[0]">
                                                 <template #empty>
                                                     <p>Adjunta una imagen del buque</p>

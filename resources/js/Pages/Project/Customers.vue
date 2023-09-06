@@ -204,7 +204,7 @@ const showShips=(selectCustomer)=>{
                         <div
                             class="whitespace-normal pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8 flex space-x-2 ">
                             <div title="Unidades">
-                                <Button icon="fa fa-ship" severity="primary" @click="showShips(slotProps.data)" class="hover:bg-primary">
+                                <Button severity="primary" @click="showShips(slotProps.data)" class="hover:bg-primary">
                                     <i class="fa fa-ship w-4 h-4"></i>
                                 </Button>
                             </div>
