@@ -7,6 +7,7 @@ use App\Http\Controllers\Projects\GanttController;
 use App\Http\Controllers\Projects\ProjectController;
 use App\Http\Controllers\Projects\QuoteController;
 use App\Http\Controllers\Projects\ShipController;
+use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -16,7 +17,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         return Inertia::render('GanttBryntum');
     })->name('showGantt');
 
-    Route::get('/createSchedule',);
+    Route::get('/createSchedule', [ScheduleController::class, 'create']);
 
     Route::get('/dataGantt', [GanttController::class, 'get'])->name('dataGantt');
 
