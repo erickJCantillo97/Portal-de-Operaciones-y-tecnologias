@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Projects\Authorization;
 use App\Models\Projects\Contract;
 use App\Models\Projects\Quote;
+use App\Models\Projects\Ship;
 use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,7 +18,7 @@ class AuthorizationController extends Controller
      */
     public function index()
     {
-        $authorizations = Authorization::orderBy('project_id')->get();
+        $authorizations = Authorization::orderBy('contract_id')->get();
         $ships = Ship::orderBy('name')->get();
         $contracts = Contract::orderBy('name')->get();
         $quotes = Quote::orderBy('name')->get();

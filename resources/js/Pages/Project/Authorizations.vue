@@ -8,6 +8,7 @@ import Column from 'primevue/column';
 import Calendar from 'primevue/calendar';
 import Tag from 'primevue/tag';
 import Dropdown from 'primevue/dropdown';
+import Combobox from '@/Components/Combobox.vue';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
@@ -28,12 +29,15 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 const open = ref(false)
-
+const contractSelect = ref()
+const shipSelect = ref()
+const quoteSelect = ref()
 
 const props = defineProps({
     authorizations: Array,
     contracts: Array,
     quotes: Array,
+    ships: Array
 })
 
 //#region UseForm
@@ -53,6 +57,7 @@ onMounted(() => {
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
+    formData.contract_id = contractSelect.value.id
     if (formData.id == 0) {
         router.post(route('authorizations.store'), formData, {
             preserveScroll: true,
@@ -259,9 +264,24 @@ const exportarExcel = () => {
                                 <div>
                                     <div class="px-2 mt-2 text-center">
                                         <DialogTitle as="h3" class="text-xl font-semibold text-primary ">{{ formData.id !=
-                                            0 ? 'Editar ' : 'Crear' }} Contrato
+                                            0 ? 'Editar ' : 'Crear' }} Autorización
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
+                                            <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
+                                                <Combobox class="mt-2 text-left text-gray-900" label="Contrato"
+                                                    placeholder="Seleccione Contrato" :options="contracts"
+                                                    v-model="contractSelect">
+                                                </Combobox>
+
+                                                <Combobox class="mt-2 text-left" label="Buque"
+                                                    placeholder="Seleccione Buque" :options="ships" v-model="shipSelect">
+                                                </Combobox>
+
+                                                <Combobox class="mt-2 text-left" label="Estimación"
+                                                    placeholder="Seleccione Estimación" :options="quotes"
+                                                    v-model="quoteSelect">
+                                                </Combobox>
+                                            </div>
 
                                             <!--CAMPO FECHA INICIO-->
                                             <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">

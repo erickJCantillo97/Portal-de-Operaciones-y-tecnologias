@@ -30,7 +30,7 @@ const query = ref('')
 const props = defineProps({
     contracts: Array,
     customers: Array,
-    ships: Array,
+    ships: Array
 })
 
 //#region UseForm
@@ -253,20 +253,18 @@ const exportarExcel = () => {
                                             0 ? 'Editar ' : 'Crear' }} Contrato
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
-                                            <Combobox class="mt-2 text-left" label="Cliente" placeholder="Seleccione Cliente" :options="customers"
+                                            <Combobox class="mt-2 text-left" label="Cliente"
+                                                placeholder="Seleccione Cliente" :options="customers"
                                                 v-model="customerSelect">
                                             </Combobox>
 
-<<<<<<< HEAD
-                                            <Combobox label="Buque" placeholder="Seleccione Buque" :options="ships"
-                                                v-model="shipSelect">
+                                            <Combobox class="mt-2 text-left" label="Buque" placeholder="Seleccione Buque"
+                                                :options="ships" v-model="shipSelect">
                                             </Combobox>
 
                                             <TextInput label="Nombre del Contrato" placeholder="Escriba Nombre del Contrato"
-=======
-                                            <TextInput class="mt-2 text-left" label="Nombre del Contrato" placeholder="Escriba Nombre del Contrato"
->>>>>>> 769dca3aa444d79f45c885ac2e9cd2018dd98240
-                                                v-model="formData.name" :error="$page.props.errors.name">
+                                                class="mt-2 text-left" v-model="formData.name"
+                                                :error="$page.props.errors.name">
                                             </TextInput>
 
                                             <TextInput class="mt-2 text-left" type="number" label="Costo"

@@ -8,6 +8,7 @@ import Column from 'primevue/column';
 import Calendar from 'primevue/calendar';
 import Tag from 'primevue/tag';
 import Dropdown from 'primevue/dropdown';
+import Combobox from '@/Components/Combobox.vue';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
@@ -29,11 +30,12 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 const open = ref(false)
-
+const shipSelect = ref()
 
 const props = defineProps({
     quotes: Array,
-    gerencias: Array
+    gerencias: Array,
+    ships: Array
 })
 
 //#region UseForm
@@ -56,6 +58,7 @@ onMounted(() => {
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
+    formData.ship_id = shipSelect.value.id
     if (formData.id == 0) {
         router.post(route('quotes.store'), formData, {
             preserveScroll: true,
@@ -110,8 +113,6 @@ const initFilters = () => {
         name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
     }
 };
-
-
 
 const clearFilter = () => {
     initFilters();
@@ -286,8 +287,15 @@ const exportarExcel = () => {
                                                 </Dropdown>
                                             </div> -->
                                             <TextInput class="mt-2 text-left" label="Consecutivo"
-                                                :placeholder="'Escriba el consecutivo de la estimacion'" v-model="formData.code"
-                                                :error="router.page.props.errors.cost"></TextInput>
+                                                :placeholder="'Escriba el consecutivo de la estimacion'"
+                                                v-model="formData.code" :error="router.page.props.errors.cost"></TextInput>
+
+                                            <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
+                                                <Combobox class="mt-2 text-left text-gray-900" label="Buque"
+                                                    placeholder="Seleccione Buque" :options="ships" v-model="shipSelect">
+                                                </Combobox>
+                                            </div>
+
                                             <TextInput class="mt-2 text-left" label="Costo"
                                                 :placeholder="'Escriba el valor total estimado'" v-model="formData.cost"
                                                 :error="router.page.props.errors.cost"></TextInput>

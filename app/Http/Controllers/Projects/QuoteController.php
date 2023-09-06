@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
 use App\Models\Projects\Quote;
+use App\Models\Projects\Ship;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -17,11 +18,12 @@ class QuoteController extends Controller
     public function index()
     {
         $quotes = Quote::orderBy('id')->get();
+        $ships = Ship::orderBy('name')->get();
 
-        return Inertia::render(
-            'Project/Quotes',
+        return Inertia::render('Project/Quotes',
             [
                 'quotes' => $quotes,
+                'ships' => $ships,
             ]
         );
         // return response()->json([
@@ -52,6 +54,8 @@ class QuoteController extends Controller
         ]);
 
         try {
+            $validateData['gerencia'] = auth()->user()->gerencia;
+            $validateData['name'] = $validateData['code'];
             if ($request->pdf != null) {
                 $validateData['file'] = Storage::putFileAs(
                     'public/Quote/',
