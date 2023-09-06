@@ -138,7 +138,7 @@ const formatCurrency = (value) => {
 };
 
 const getContractStatusSeverity = (authorization) => {
-    switch (authorizations.status) {
+    switch (authorization.status) {
         case 'INICIADO':
             return 'info';
 
@@ -277,11 +277,6 @@ const exportarExcel = () => {
                                                     placeholder="Seleccione Contrato" :options="contracts"
                                                     v-model="contractSelect">
                                                 </Combobox>
-
-                                                <Combobox class="mt-2 text-left" label="Buque"
-                                                    placeholder="Seleccione Buque" :options="ships" v-model="shipSelect">
-                                                </Combobox>
-
                                                 <Combobox class="mt-2 text-left" label="Estimación"
                                                     placeholder="Seleccione Estimación" :options="quotes"
                                                     v-model="quoteSelect">
