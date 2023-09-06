@@ -19,6 +19,7 @@ import axios from 'axios';
 // import plural from 'pluralize-es'
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
+import FileUpload from 'primevue/fileupload';
 // import Button from 'primevue/button';
 
 const confirm = useConfirm();
@@ -42,11 +43,13 @@ const props = defineProps({
 
 //#region UseForm
 const formData = useForm({
-    id: props.authorizations?.id ?? '0',
-    project_id: props.contracts?.project_id ?? '0',
-    contract_id: props.contracts?.contract_id ?? '',
-    start_date: props.contracts?.start_date ?? '',
-    end_date: props.contracts?.end_date ?? '',
+    id: '0',
+    project_id: '0',
+    contract_id: '',
+    start_date: '',
+    end_date: '',
+    name: '',
+    pdf: null
 });
 //#endregion
 
@@ -99,6 +102,8 @@ const editItem = (contract) => {
     formData.id = contract.id;
     formData.start_date = contract.start_date;
     formData.end_date = contract.end_date;
+    formData.name = contract.name
+    formData.pdf = contract.pdf
     open.value = true;
 };
 
@@ -285,6 +290,11 @@ const exportarExcel = () => {
 
                                             <!--CAMPO FECHA INICIO-->
                                             <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
+                                                <TextInput class="mt-2 text-left" type="text" label="Codigo de autorizacion"
+                                                    :placeholder="'Escriba el codigo de autorizacion'"
+                                                    v-model="formData.name" :error="$page.props.errors.cost">
+                                                </TextInput>
+
                                                 <TextInput class="mt-2 text-left" type="date" label="Fecha de inicio"
                                                     :placeholder="'Escriba el Tipo de Cliente'"
                                                     v-model="formData.start_date" :error="$page.props.errors.cost">
@@ -295,6 +305,12 @@ const exportarExcel = () => {
                                                     :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
                                                     :error="$page.props.errors.end_date">
                                                 </TextInput>
+
+                                                <FileUpload chooseLabel="Adjuntar PDF" mode="basic" name="demo[]"
+                                                    :multiple="false" accept=".pdf" :maxFileSize="1000000"
+                                                    @input="formData.pdf = $event.target.files[0]">
+                                                </FileUpload>
+
                                             </div>
                                         </div>
                                     </div>

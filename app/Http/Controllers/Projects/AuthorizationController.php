@@ -9,6 +9,7 @@ use App\Models\Projects\Quote;
 use App\Models\Projects\Ship;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class AuthorizationController extends Controller
@@ -18,7 +19,7 @@ class AuthorizationController extends Controller
      */
     public function index()
     {
-        $authorizations = Authorization::orderBy('contract_id')->get();
+        $authorizations = Authorization::get();
         $ships = Ship::orderBy('name')->get();
         $contracts = Contract::orderBy('name')->get();
         $quotes = Quote::orderBy('name')->get();
@@ -52,9 +53,17 @@ class AuthorizationController extends Controller
             'quote_id' => 'nullable',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
+            'name'=>'required'
         ]);
 
         try {
+            if ($request->pdf != null) {
+                $validateData['file'] = Storage::putFileAs(
+                    'public/Autorization/',
+                    $request->pdf,
+                    $validateData['name'] . "." . $request->pdf->getClientOriginalExtension()
+                );
+            };
             Authorization::create($validateData);
 
             return back()->with(['message' => 'Autorización creado correctamente'], 200);
@@ -92,9 +101,17 @@ class AuthorizationController extends Controller
             'gerencia' => 'required',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
+            'name'=>'required'
         ]);
 
         try {
+            if ($request->pdf != null) {
+                $validateData['file'] = Storage::putFileAs(
+                    'public/Autorization/',
+                    $request->pdf,
+                    $validateData['name'] . "." . $request->pdf->getClientOriginalExtension()
+                );
+            };
             $authorization->update($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);

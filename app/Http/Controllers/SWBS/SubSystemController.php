@@ -12,10 +12,13 @@ class SubSystemController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $subsystems = SubSystem::with('system')->get();
 
+        $subsystems = SubSystem::with('system')->get();
+        if($request->system){
+            $subsystems = SubSystem::where('system_id', $request->system)->get();
+        }
         return response()->json([
             $subsystems,
         ]);

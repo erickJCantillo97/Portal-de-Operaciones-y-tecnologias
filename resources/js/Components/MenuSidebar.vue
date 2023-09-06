@@ -108,7 +108,7 @@ const navigation = [
             // { name: 'Informes', href: '#' },
             { name: 'Cronograma', href: 'showGantt' },
             { name: 'Subir Cronograma', href: 'ganttImporter' },
-            { name: 'Buques', href: 'ships.index' },
+            { name: 'Unidades', href: 'ships.index' },
         ],
     },
     {

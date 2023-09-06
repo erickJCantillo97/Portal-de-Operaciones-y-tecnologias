@@ -7,6 +7,14 @@
     display: none;
 }
 
+.fondo{
+    background-image: url(/fondo-login.jpg);
+    background-size: 100% 100%;
+    background-repeat: space;
+    background-origin: content-box;
+    background-attachment: fixed;
+    background-clip: padding-box;
+}
 
 .custom-scroll::-webkit-scrollbar-track {background-color: #e9edf000;border-left: 2px solid #ededed00;  border-radius: 4px;}
 
