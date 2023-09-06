@@ -12,9 +12,13 @@ class SystemController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+
         $systems = System::get();
+        if($request->grupo){
+            $systems = System::where('constructive_group_id', 'LIKE', ($request->grupo/100))->get();
+        }
 
         return response()->json([
             $systems
