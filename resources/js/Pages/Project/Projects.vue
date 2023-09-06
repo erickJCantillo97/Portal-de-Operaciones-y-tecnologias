@@ -49,7 +49,8 @@ const formData = useForm({
     end_date: props.projects?.end_date ?? '',
     hoursPerDay: props.projects?.hoursPerDay ?? '8.5',
     daysPerWeek: props.projects?.daysPerWeek ?? '5',
-    daysPerMonth: props.projects?.daysPerMonth ?? '20'
+    daysPerMonth: props.projects?.daysPerMonth ?? '20',
+    pdf:null
 });
 //#endregion
 
@@ -105,6 +106,7 @@ const editItem = (project) => {
     formData.hoursPerDay = project.hoursPerDay;
     formData.daysPerWeek = project.daysPerWeek;
     formData.daysPerMonth = project.daysPerMonth;
+    formData.pdf=project.pdf
     open.value = true;
 };
 
