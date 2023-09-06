@@ -17,7 +17,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         return Inertia::render('GanttBryntum');
     })->name('showGantt');
 
-    Route::get('/createSchedule', [ScheduleController::class, 'create']);
+    Route::get('/createSchedule', [ScheduleController::class, 'create'])->name('createSchedule.create');
 
     Route::get('/dataGantt', [GanttController::class, 'get'])->name('dataGantt');
 
@@ -28,9 +28,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/ganttImporter', function () {
         return Inertia::render('GanttImporter');
     })->name('ganttImporter');
+
     //CRUD Projects
     Route::resource('projects', ProjectController::class);
-    // Route::get('create-projects', [ProjectController::class, 'edit'])->name('projects.edit');
 
     //CRUD Authorizations
     Route::resource('authorizations', AuthorizationController::class);

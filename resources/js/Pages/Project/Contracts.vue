@@ -259,11 +259,12 @@ const exportarExcel = () => {
                                                 v-model="customerSelect">
                                             </Combobox>
 
-                                            <Combobox label="Buque" placeholder="Seleccione Buque" :options="ships"
-                                                v-model="shipSelect">
+                                            <Combobox class="mt-2 text-left" label="Buque" placeholder="Seleccione Buque"
+                                                :options="ships" v-model="shipSelect">
                                             </Combobox>
-                                            <TextInput class="mt-2 text-left" label="Nombre del Contrato" placeholder="Escriba Nombre del Contrato"
-                                                v-model="formData.name" :error="$page.props.errors.name">
+                                            <TextInput class="mt-2 text-left" label="Nombre del Contrato"
+                                                placeholder="Escriba Nombre del Contrato" v-model="formData.name"
+                                                :error="$page.props.errors.name">
                                             </TextInput>
 
                                             <TextInput class="mt-2 text-left" type="number" label="Costo"
