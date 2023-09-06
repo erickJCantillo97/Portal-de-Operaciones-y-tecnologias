@@ -8,6 +8,7 @@ use App\Models\Projects\Contract;
 use App\Models\Projects\Project;
 use App\Models\Projects\Quote;
 use App\Models\Projects\Ship;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -42,7 +43,19 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        //
+        $contracts = Contract::has('ship')->orderBy('name')->get();
+        $authorizations = Authorization::orderBy('contract_id')->get();
+        $quotes = Quote::orderBy('ship_id')->get();
+        $ships = Ship::orderBy('id')->get();
+
+        return Inertia::render('Project/CreateProjects',
+            [
+                'contracts' => $contracts,
+                'authorizations' => $authorizations,
+                'quotes' => $quotes,
+                'ships' => $ships,
+            ]
+        );
     }
 
     /**
@@ -57,7 +70,6 @@ class ProjectController extends Controller
             'quote_id' => 'nullable',
             'ship_id' => 'nullable',
             'intern_communications' => 'nullable',
-            'name' => 'nullable',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'hoursPerDay' => 'required',
@@ -66,6 +78,30 @@ class ProjectController extends Controller
         ]);
 
         try {
+            if ($validateData['quote_id'] != 0) {
+                $buque = Quote::find($validateData['quote_id'])->ship;
+            }
+
+            if ($validateData['authorization_id'] != 0) {
+                $buque = Authorization::find($validateData['authorization_id'])->qoute->ship;
+            }
+
+            if (($validateData['contract_id']) != 0) {
+                $buque = Contract::find($validateData['contract_id'])->ship;
+            }
+
+            if (isset($buque) && $validateData['ship_id'] != 0) {
+                $buque = Ship::find($validateData['ship_id']);
+            }
+
+            if (! isset($buque)) {
+                return back()->withErrors(['message' => 'Ocurrió un error al crear el proyecto: No se seleccione un Buque'], 500);
+            }
+
+            $countProject = count(Project::where('ship_id', $buque->id)->get()) + 1;
+
+            $validateData['ship_id'] = $buque->id;
+            $validateData['name'] = $buque->name.'-'.Carbon::now()->format('Y').'-'.str_pad($countProject, 3, '0', STR_PAD_LEFT);
             $validateData['gerencia'] = auth()->user()->gerencia;
             Project::create($validateData);
 
