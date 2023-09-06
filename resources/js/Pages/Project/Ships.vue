@@ -180,7 +180,7 @@ const exportarExcel = () => {
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
-                        Buques
+                        Unidades
                     </h1>
                 </div>
 
@@ -224,12 +224,12 @@ const exportarExcel = () => {
                 <Column field="quilla" header="Quillas"></Column>
                 <Column field="pantoque" header="Pantoque"></Column>
                 <Column field="eslora" header="Eslora"></Column>
-                <Column field="status" header="Estado" sortable>
+                <!-- <Column field="status" header="Estado" sortable>
                     <template #body="slotProps">
                         <Tag :value="slotProps.data.status" :severity="getContractStatusSeverity(slotProps.data)" />
                     </template>
-                </Column>
-                <Column field="details" header="Detalles"></Column>
+                </Column> -->
+                <!-- <Column field="details" header="Detalles"></Column> -->
 
                 <!--ACCIONES-->
                 <Column header="Acciones" class="space-x-3">
@@ -275,7 +275,7 @@ const exportarExcel = () => {
                                     <div class="px-2 mt-2 text-center">
                                         <DialogTitle as="h3" class="text-xl font-semibold text-primary ">
                                             {{ formData.id != 0 ? 'Editar ' : 'Crear' }}
-                                            Buque
+                                            Unidad
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
                                             <Combobox class="mt-2 text-left" label="Cliente"
@@ -291,15 +291,18 @@ const exportarExcel = () => {
                                                 :placeholder="'Escriba el Tipo de Buque'" v-model="formData.type"
                                                 :error="router.page.props.errors.type"></TextInput>
 
-                                            <TextInput class="mt-2 text-left" label="Cantidad de Quillas"
-                                                :placeholder="'Números de Quillas necesarios'" v-model="formData.quilla"
+                                            <TextInput class="mt-2 text-left" label="Carros Quillas"
+                                            type="number"
+                                                :placeholder="'Números de carros de Quillas necesarios'" v-model="formData.quilla"
                                                 :error="router.page.props.errors.quilla"></TextInput>
 
-                                            <TextInput class="mt-2 text-left" label="Cantidad de Pantoques"
-                                                :placeholder="'Números de Pantoques necesarios'" v-model="formData.pantoque"
+                                            <TextInput class="mt-2 text-left" label="Carros de Pantoques"
+                                            type="number"
+                                                :placeholder="'Números carros de Pantoques necesarios'" v-model="formData.pantoque"
                                                 :error="router.page.props.errors.pantoque"></TextInput>
 
                                             <TextInput class="mt-2 text-left" label="Longitud de Eslora"
+                                            type="number"
                                                 :placeholder="'Longitud de Eslora'" v-model="formData.eslora"
                                                 :error="router.page.props.errors.eslora"></TextInput>
 
