@@ -30,9 +30,10 @@ const filters = ref({
 
 const open = ref(false)
 const selectedForm = ref('form1')
-const contractSelect = ref();
-const authorizationSelect = ref();
-const quoteSelect = ref();
+const contractSelect = ref()
+const authorizationSelect = ref()
+const quoteSelect = ref()
+const ship = ref()
 
 const props = defineProps({
     'projects': Array,
@@ -50,7 +51,7 @@ const formData = useForm({
     quote_id: props.projects?.quote_id ?? '0',
     ship_id: props.projects?.ship_id ?? '0',
     intern_communications: props.projects?.intern_communications ?? '0',
-    // name: props.projects?.name ?? '',
+    name: props.projects?.name ?? '',
     start_date: props.projects?.start_date ?? '',
     end_date: props.projects?.end_date ?? '',
     hoursPerDay: props.projects?.hoursPerDay ?? '8.5',
@@ -66,35 +67,43 @@ onMounted(() => {
 /* SUBMIT*/
 const submit = () => {
     if (formData.id == 0) {
-        router.post(route('projects.store'), formData, {
-            preserveScroll: true,
-            onSuccess: (res) => {
-                open.value = false;
-                toast('Proyecto creado exitosamente', 'success');
-            },
+        if (selectedForm.value == 'form1') {
+            formData['contract_id'] = contractSelect.value.id
+        }
+        try {
+            router.post(route('projects.store'), formData, {
+                preserveScroll: true,
+                onSuccess: (res) => {
+                    open.value = false;
+                    toast('Proyecto creado exitosamente', 'success');
+                }
+            });
+        } catch (error) {
             onError: (errors) => {
-                toast('¡Ups! Ha surgido un error', 'error');
-            },
+                toast('¡Ups! Ha surgido un error', 'error' + errors);
+            };
+        } finally {
             onFinish: visit => {
                 loading.value = false;
             }
-        })
+        }
         return 'creado';
     }
-    router.put(route('projects.update', formData.id), formData, {
-        preserveScroll: true,
-        onSuccess: (res) => {
-            open.value = false;
-            toast('¡Proyecto actualizado exitosamente!', 'success');
-        },
-        onError: (errors) => {
-            toast('¡Ups! Ha surgido un error', 'error');
-        },
-        onFinish: visit => {
-            loading.value = false;
-        }
-    })
 }
+// router.put(route('projects.update', formData.id), formData, {
+//     preserveScroll: true,
+//     onSuccess: (res) => {
+//         open.value = false;
+//         toast('¡Proyecto actualizado exitosamente!', 'success');
+//     },
+//     onError: (errors) => {
+//         toast('¡Ups! Ha surgido un error', 'error');
+//     },
+//     onFinish: visit => {
+//         loading.value = false;
+//     }
+// })
+
 const editItem = (project) => {
     formData.id = project.id;
     formData.name = project.name;

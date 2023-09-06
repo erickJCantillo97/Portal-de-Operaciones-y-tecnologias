@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('quote_id')->nullable()->index();
             $table->unsignedBigInteger('ship_id')->index();
             $table->string('intern_communications')->nullable();
-            $table->string('name'); //Este nombre debe ser calculado (Ship_Contrato_YYYY)
+            $table->string('name'); //Este nombre debe ser calculado (Ship_YYYY_consecutivo)
             $table->string('gerencia');
             $table->date('start_date');
             $table->date('end_date');

@@ -62,7 +62,7 @@ const formData = useForm({
     hoursPerDay: props.projects?.hoursPerDay ?? '8.5',
     daysPerWeek: props.projects?.daysPerWeek ?? '5',
     daysPerMonth: props.projects?.daysPerMonth ?? '20',
-    pdf:null
+    pdf: null
 });
 //#endregion
 
@@ -105,7 +105,7 @@ const submit = () => {
 }
 
 const addItem = () => {
-    router.get(route('projects.edit'))
+    router.get(route('projects.create'))
     // formData.reset();
     // open.value = true;
 }
@@ -118,9 +118,13 @@ const editItem = (project) => {
     formData.hoursPerDay = project.hoursPerDay;
     formData.daysPerWeek = project.daysPerWeek;
     formData.daysPerMonth = project.daysPerMonth;
-    formData.pdf=project.pdf
+    formData.pdf = project.pdf
     open.value = true;
 };
+
+const addTask = () => {
+    router.get(route('createSchedule.create'))
+}
 
 
 const initFilters = () => {
@@ -267,10 +271,18 @@ const exportarExcel = () => {
                                     <PencilIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
                             </div>
+                            <!--BOTÓN ELIMINAR-->
                             <div>
                                 <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Proyecto', 'projects')"
                                     class="hover:bg-danger">
                                     <TrashIcon class="w-4 h-4 " aria-hidden="true" />
+                                </Button>
+                            </div>
+                            <!--BOTÓN AGREGAR TAREAS-->
+                            <div>
+                                <Button severity="success" @click="addTask(slotProps.data.id, 'Proyecto', 'projects')"
+                                    class="hover:bg-success">
+                                    <PlusIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
                             </div>
                         </div>
