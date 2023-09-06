@@ -100,9 +100,6 @@ const submit = () => {
                             </div>
                         </form>
                     </div>
-
-                    <div class="mt-10">
-                    </div>
                 </div>
             </div>
         </div>

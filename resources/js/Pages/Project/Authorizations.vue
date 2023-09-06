@@ -46,6 +46,7 @@ const formData = useForm({
     id: '0',
     project_id: '0',
     contract_id: '',
+    quote_id:'',
     start_date: '',
     end_date: '',
     name: '',
@@ -61,6 +62,7 @@ onMounted(() => {
 const submit = () => {
     loading.value = true;
     formData.contract_id = contractSelect.value.id
+    formData.quote_id = quoteSelect.value.id
     if (formData.id == 0) {
         router.post(route('authorizations.store'), formData, {
             preserveScroll: true,
@@ -138,7 +140,7 @@ const formatCurrency = (value) => {
 };
 
 const getContractStatusSeverity = (authorization) => {
-    switch (authorizations.status) {
+    switch (authorization.status) {
         case 'INICIADO':
             return 'info';
 
@@ -277,11 +279,6 @@ const exportarExcel = () => {
                                                     placeholder="Seleccione Contrato" :options="contracts"
                                                     v-model="contractSelect">
                                                 </Combobox>
-
-                                                <Combobox class="mt-2 text-left" label="Buque"
-                                                    placeholder="Seleccione Buque" :options="ships" v-model="shipSelect">
-                                                </Combobox>
-
                                                 <Combobox class="mt-2 text-left" label="Estimación"
                                                     placeholder="Seleccione Estimación" :options="quotes"
                                                     v-model="quoteSelect">

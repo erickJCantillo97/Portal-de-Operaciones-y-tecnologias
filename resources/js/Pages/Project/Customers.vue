@@ -199,6 +199,11 @@ const exportarExcel = () => {
                         <!--BOTÓN EDITAR-->
                         <div
                             class="whitespace-normal pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8 flex space-x-2 ">
+                            <div title="Unidades">
+                                <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
+                                    <i class="fa fa-ship w-4 h-4"></i>
+                                </Button>
+                            </div>
                             <div>
                                 <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
                                     <PencilIcon class="h-4 w-4 " aria-hidden="true" />
