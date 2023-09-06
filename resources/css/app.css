@@ -7,7 +7,7 @@
     display: none;
 }
 
-.fondo{
+.fondo {
     background-image: url(/fondo-login.jpg);
     background-size: 100% 100%;
     background-repeat: space;
@@ -16,10 +16,31 @@
     background-clip: padding-box;
 }
 
-.custom-scroll::-webkit-scrollbar-track {background-color: #e9edf000;border-left: 2px solid #ededed00;  border-radius: 4px;}
+.video {
+    position: fixed;
+    right: 0;
+    top:0;
+    min-width: 300%;
+    height: auto;
+    z-index: -1;
+}
 
-.custom-scroll::-webkit-scrollbar {width: 6px;background-color: #ffffff00; height: 1px;}
-.custom-scroll::-webkit-scrollbar-thumb {background:#043575b8;  border-radius: 4px;}
+.custom-scroll::-webkit-scrollbar-track {
+    background-color: #e9edf000;
+    border-left: 2px solid #ededed00;
+    border-radius: 4px;
+}
+
+.custom-scroll::-webkit-scrollbar {
+    width: 6px;
+    background-color: #ffffff00;
+    height: 1px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+    background: #043575b8;
+    border-radius: 4px;
+}
 
 .calendar {
     display: flex;
@@ -33,8 +54,9 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1254901961);
     border-radius: 4px;
     overflow: hidden;
-  }
-  .calendar::before {
+}
+
+.calendar::before {
     content: "";
     position: absolute;
     top: 0;
@@ -42,18 +64,18 @@
     right: 0;
     height: 9px;
     background: #d93737;
-  }
-  .calendar .date {
+}
+
+.calendar .date {
     position: absolute;
     font-size: 12px;
     bottom: 3px;
     color: #333;
-  }
-  .calendar .month {
+}
+
+.calendar .month {
     position: absolute;
     font-size: 8px;
     top: -1px;
     color: #fff;
-  }
-
-
+}
