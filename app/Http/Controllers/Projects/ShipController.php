@@ -60,8 +60,8 @@ class ShipController extends Controller
             if ($request->image != null) {
                 $validateData['file'] = Storage::putFileAs(
                     'public/Ship/',
-                    $request->pdf,
-                    $validateData['name'] . "." . $request->pdf->getClientOriginalExtension()
+                    $request->image,
+                    $validateData['name'] . "." . $request->image->getClientOriginalExtension()
                 );
             };
             Ship::create($validateData);
@@ -97,12 +97,20 @@ class ShipController extends Controller
     {
         $validateData = $request->validate([
             'customer_id' => 'nullable',
-            'gerencia' => 'required',
             'name' => 'required',
-            'type' => 'required',
-            'details' => 'required',
+            'type' => 'nullable',
+            'quilla' => 'nullable|numeric|gt:0',
+            'pantoque' => 'nullable|numeric|gt:0',
+            'eslora' => 'nullable|numeric|gt:0',
+            'details' => 'nullable',
         ]);
-
+        if ($request->image != null) {
+            $validateData['file'] = Storage::putFileAs(
+                'public/Ship/',
+                $request->image,
+                $validateData['name'] . "." . $request->image->getClientOriginalExtension()
+            );
+        };
         try {
             $ship->update($validateData);
         } catch (Exception $e) {

@@ -29,7 +29,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     })->name('ganttImporter');
     //CRUD Projects
     Route::resource('projects', ProjectController::class);
-    Route::get('create-projects', [ProjectController::class, 'edit'])->name('projects.edit');
+    // Route::get('create-projects', [ProjectController::class, 'edit'])->name('projects.edit');
 
     //CRUD Authorizations
     Route::resource('authorizations', AuthorizationController::class);
