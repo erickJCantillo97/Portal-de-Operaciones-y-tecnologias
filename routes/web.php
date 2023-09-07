@@ -91,3 +91,16 @@ Route::get('recuperarDatos',function (){
 
     return System::get();
 });
+
+Route::get('actividadesDeultimonivel', function () {
+        $date = Carbon::now();
+        $tareas =  Task::whereNotNull('task_id')->select('task_id')->get()->toArray();
+
+        $ids = array_map(function ($objeto) {
+            return $objeto['task_id'];
+        }, $tareas);
+
+        return response()->json(
+            Task::where('startDate', '<=', $date)->where('endDate', '>=', $date)->whereNotIn('id', array_unique($ids))->get()
+        );
+});
