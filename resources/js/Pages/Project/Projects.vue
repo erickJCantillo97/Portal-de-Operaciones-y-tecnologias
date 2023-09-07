@@ -205,7 +205,7 @@ const items = [
         description: 'Podra crear el proyecto con un asistente amigable',
         icon: CalendarIcon,
         background: 'bg-yellow-500',
-        page: 'createSchedule.create'
+        page: 'wizard'
     },
     {
         title: 'Crear proyecto desde proyecto anterior',
@@ -317,12 +317,12 @@ const items = [
                                 </Button>
                             </div>
                             <!--BOTÓN AGREGAR TAREAS-->
-                            <div>
+                            <!-- <div>
                                 <Button severity="success" @click="addTask(slotProps.data.id)"
                                     class="hover:bg-success">
                                     <PlusIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
-                            </div>
+                            </div> -->
                         </div>
                     </template>
                 </Column>

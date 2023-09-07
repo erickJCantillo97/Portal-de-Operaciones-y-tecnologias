@@ -44,6 +44,7 @@ class ScheduleController extends Controller
             'project' => Project::find($request->id)
         ]);
     }
+
     public function get(Project $project)
     {
 
@@ -126,6 +127,14 @@ class ScheduleController extends Controller
         return response()->json([
             "success"   => true,
             'requestId' => $request->requestId,
+        ]);
+    }
+
+    public function wizard(Project $project){
+
+        return Inertia::render('Project/Schedule/CreateSchedule', [
+            'project' => $project,
+            'groups'=> gruposConstructivos()
         ]);
     }
 }
