@@ -13,20 +13,16 @@ use Inertia\Inertia;
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
-    Route::get('/ScheduleNew', [GanttController::class, 'index'])->name('showGantt');
-    Route::get('/ScheduleNewImport', [GanttController::class, 'import'])->name('ganttImporter');
+    Route::get('/ScheduleNew/{project}', [ScheduleController::class, 'index'])->name('showGantt');
+    Route::get('/ScheduleNewImport/{project}', [ScheduleController::class, 'import'])->name('ganttImporter');
 
-<<<<<<< HEAD
-    Route::get('/ScheduleCreate', [ScheduleController::class, 'create'])->name('createSchedule.create');
-=======
-    Route::get('/createSchedule/{project}', [ScheduleController::class, 'create'])->name('createSchedule.create');
->>>>>>> 35106b40e89ef0836949407e9ec275b6e27c7c1b
+    Route::get('/ScheduleCreate/{project}', [ScheduleController::class, 'create'])->name('createSchedule.create');
 
-    Route::get('/dataGantt/{project}', [GanttController::class, 'get'])->name('dataGantt');
+    Route::get('/dataGantt/{project}', [ScheduleController::class, 'get'])->name('dataGantt');
 
-    Route::post('/syncGantt/{project}', [GanttController::class, 'sync'])->name('syncGantt');
+    Route::post('/syncGantt/{project}', [ScheduleController::class, 'sync'])->name('syncGantt');
 
-    Route::post('/syncGanttImporter', [GanttController::class, 'syncImporter'])->name('syncImporter');
+    Route::post('/syncGanttImporter', [ScheduleController::class, 'syncImporter'])->name('syncImporter');
 
     //CRUD Projects
     Route::resource('projects', ProjectController::class);

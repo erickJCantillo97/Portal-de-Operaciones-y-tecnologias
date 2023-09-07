@@ -198,7 +198,7 @@ const items = [
         description: 'Aqui podra crear un proyecto desde 0',
         icon: Bars4Icon,
         background: 'bg-pink-500',
-        page: 'showGantt'
+        page: 'createSchedule.create'
     },
     {
         title: 'Crear proyecto con asistente',
@@ -209,13 +209,13 @@ const items = [
     },
     {
         title: 'Crear proyecto desde proyecto anterior',
-        description: 'Actualmente en construccion',
+        description: 'Actualmente en desarollo',
         icon: PhotoIcon,
         background: 'bg-green-500',
     },
     {
         title: 'Crear proyecto desde plantilla prediseñada',
-        description: 'Actualmente en construccion',
+        description: 'Actualmente en desarrollo',
         icon: ViewColumnsIcon,
         background: 'bg-blue-500',
     },
@@ -424,7 +424,7 @@ const items = [
                 <p class="mt-1 text-sm text-gray-500">Aqui podra escoger como desea crear el cronograma del proyecto.</p>
                 <ul role="list" class="mt-6 grid grid-cols-1 gap-6 border-b border-t border-gray-200 py-6 sm:grid-cols-2">
                     <li v-for="(item, itemIdx) in items" :key="itemIdx" class="flow-root">
-                        <div @click="router.get(route(item.page), { id: projectSelect.id })"
+                        <div @click="router.get(route(item.page, projectSelect.id))"
                             class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 focus-within:ring-2 focus-within:ring-indigo-500 hover:bg-gray-50">
                         <div
                             :class="[item.background, 'flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg']">

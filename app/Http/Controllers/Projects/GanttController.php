@@ -10,11 +10,10 @@ use Inertia\Inertia;
 
 class GanttController extends Controller
 {
-<<<<<<< HEAD
-    public function index(Request $request)
+    public function index(Project $project)
     {
         return Inertia::render('GanttBryntum', [
-            'project' => Project::find($request->id)
+            'project' => $project
         ]);
     }
 
@@ -24,11 +23,7 @@ class GanttController extends Controller
             'project' => Project::find($request->id)
         ]);
     }
-
-    public function get()
-=======
     public function get(Project $project)
->>>>>>> 35106b40e89ef0836949407e9ec275b6e27c7c1b
     {
 
         return response()->json([

@@ -106,8 +106,8 @@ const navigation = [
         children: [
             { name: 'Proyectos', href: 'projects.index' }, //gerencia (auth()->user()gerencia)
             // { name: 'Informes', href: '#' },
-            { name: 'Cronograma', href: 'showGantt' },
-            { name: 'Subir Cronograma', href: 'ganttImporter' },
+            // { name: 'Cronograma', href: 'showGantt' },
+            // { name: 'Subir Cronograma', href: 'ganttImporter' },
             { name: 'Unidades', href: 'ships.index' },
         ],
     },

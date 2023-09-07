@@ -7,7 +7,6 @@ import "@bryntum/gantt/gantt.material.css";
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
 import { LocaleManager } from '@bryntum/gantt/gantt.module.js';
 
-<<<<<<< HEAD
 
 const props = defineProps({
     project: Object,
@@ -15,12 +14,6 @@ const props = defineProps({
 
 
 LocaleManager.applyLocale('Es');
-=======
-LocaleManager.applyLocale('Es');
-const props = defineProps({
-    project: Number
-});
->>>>>>> 35106b40e89ef0836949407e9ec275b6e27c7c1b
 const barMargin = ref(4);
 const ganttConfig = reactive(useGanttConfig(props.project));
 

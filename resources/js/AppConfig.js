@@ -12,11 +12,7 @@ useGanttConfig = function (p) {
             autoLoad: true,
             transport: {
                 load: {
-<<<<<<< HEAD
-                    url: route('dataGantt')
-=======
                     url: route('dataGantt', p)
->>>>>>> 35106b40e89ef0836949407e9ec275b6e27c7c1b
                     // url: 'data/launch-saas.json'
                 },
                 sync: {
