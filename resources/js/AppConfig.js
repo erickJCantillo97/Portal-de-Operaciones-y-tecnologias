@@ -68,7 +68,7 @@ useGanttConfig = function (p) {
                 with: 50
             },
             {
-                type: 'startdate',
+                type: 'enddate',
                 text:'Fecha fin',
                 with: 50
             },

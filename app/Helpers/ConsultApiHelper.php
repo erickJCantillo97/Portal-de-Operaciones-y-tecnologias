@@ -4,12 +4,13 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 
+define('ROUTE_API' , "https://servicioapi.cotecmar.com");
 function getEmpleadosAPI(): mixed
 {
     try {
         if (getToken()){
             $json =  Http::acceptJson()->withToken(session()->get('token'))
-                    ->get(env('ROUTE_API').'/listado_personal_sap_activos_busqueda'
+                    ->get(ROUTE_API.'/listado_personal_sap_activos_busqueda'
                     )->json();
             return  collect($json);
         }
@@ -26,7 +27,7 @@ function getToken(): bool{
     {
         return login();
     }
-    $user = Http::acceptJson()->withToken(session()->get('token'))->get(env('ROUTE_API').'/user');
+    $user = Http::acceptJson()->withToken(session()->get('token'))->get(ROUTE_API.'/user');
 
     if(!isset($user['id'])){
         return login();
@@ -37,7 +38,7 @@ function getToken(): bool{
 
 function login(): bool{
     try{
-        $login = Http::acceptJson()->post(env('ROUTE_API').'/auth/login',
+        $login = Http::acceptJson()->post(ROUTE_API.'/auth/login',
             [
                 'username' => 'portalreuniones',
                 'password' => 'cG9ydGFscmV1bmlvbmVz',
