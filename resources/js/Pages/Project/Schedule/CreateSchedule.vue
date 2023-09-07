@@ -23,7 +23,7 @@ const getSystems = (g) => {
     systems.value = []
     processes.value = [];
     subSystems.value = [];
-    axios.get(route('system.index', {grupo: g.name})).then((res) => {
+    axios.get(route('system.index', { grupo: g.name })).then((res) => {
         systems.value = res.data[0];
     });
 }
@@ -62,9 +62,10 @@ const getProcess = (s) => {
             <h2 class="text-sm font-medium text-gray-500">Seleccione un Grupo Constructivo</h2>
             <ul role="list" class="mt-3 grid grid-cols-2 gap-5 sm:grid-cols-4 sm:gap-4 lg:grid-cols-10">
                 <li v-for="g in groups" :key="g.name" class="col-span-1 flex rounded-md shadow-sm">
-                    <div class="flex flex-1 items-center justify-between shadow-md hover:scale-110 hover:bg-sky-100 cursor-pointer rounded-md  " :class="g.name == grupo ? 'bg-sky-100':'bg-white'" @click="getSystems(g)">
+                    <div class="flex flex-1 items-center justify-between shadow-md hover:scale-110 hover:bg-sky-100 cursor-pointer rounded-md  "
+                        :class="g.name == grupo ? 'bg-sky-100' : 'bg-white'" @click="getSystems(g)">
                         <div class="flex-1 truncate p-2 text-sm">
-                        <a  class="font-medium  hover:text-gray-600 text-primary">{{ g.name }}</a>
+                            <a class="font-medium  hover:text-gray-600 text-primary">{{ g.name }}</a>
                         </div>
                     </div>
                 </li>

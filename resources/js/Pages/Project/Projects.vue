@@ -237,7 +237,7 @@ const items = [
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
                 dataKey="id" filterDisplay="menu" :loading="loading"
-                :globalFilterFields="['name', 'gerencia', 'start_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
+                :globalFilterFields="['name', 'gerencia', 'start_date', 'end_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">

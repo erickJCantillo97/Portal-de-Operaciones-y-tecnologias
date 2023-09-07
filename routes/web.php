@@ -1,16 +1,10 @@
 <?php
 
-use App\Http\Controllers\Projects\AuthorizationController;
-use App\Http\Controllers\Projects\ContractController;
-use App\Http\Controllers\Projects\CustomerController;
 use App\Models\Gantt\Task;
-use Carbon\Carbon;
-use App\Http\Controllers\Projects\ProjectController;
-use App\Http\Controllers\Projects\QuoteController;
-use App\Http\Controllers\Projects\ShipController;
 use App\Models\Process;
 use App\Models\SWBS\SubSystem;
 use App\Models\SWBS\System;
+use Carbon\Carbon;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -55,7 +49,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         return Inertia::render('Dashboards/Gerencias', ['personal' => $personal, 'GERENCIA' => $gerencia]);
     })->name('dashboard.gerencias');
 
-    Route::get('crearTarea', function (){
+    Route::get('crearTarea', function () {
         Task::truncate();
         Task::create([
             'name' => 'ARC PUNTA ESPADA',
@@ -63,26 +57,20 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             'duration' => 260,
             'startDate' => Carbon::now(),
             'endDate' => Carbon::now()->addDays(260),
-            ]);
+        ]);
     });
-
-    Route::get('/Programming', function () {
-        //return ModelToolsAterior::get();
-        return Inertia::render('Programming');
-    })->name('programming');
 
 });
 
+Route::get('recuperarDatos', function () {
 
-Route::get('recuperarDatos',function (){
-
-    $datos = DB::connection('sqlsrv_anterior')->table('swbs_systems')->select(['code', 'validity', 'status','name','constructive_group_id'])->get();
+    $datos = DB::connection('sqlsrv_anterior')->table('swbs_systems')->select(['code', 'validity', 'status', 'name', 'constructive_group_id'])->get();
 
     foreach ($datos as $dato) {
         System::create((array) $dato);
     }
 
-    $datos = DB::connection('sqlsrv_anterior')->table('swbs_subsystems')->select(['system_id', 'code', 'validity', 'status','name'])->get();
+    $datos = DB::connection('sqlsrv_anterior')->table('swbs_subsystems')->select(['system_id', 'code', 'validity', 'status', 'name'])->get();
     foreach ($datos as $dato) {
         SubSystem::create((array) $dato);
     }
@@ -92,4 +80,17 @@ Route::get('recuperarDatos',function (){
     }
 
     return System::get();
+});
+
+Route::get('actividadesDeultimonivel', function () {
+        $date = Carbon::now();
+        $tareas =  Task::whereNotNull('task_id')->select('task_id')->get()->toArray();
+
+        $ids = array_map(function ($objeto) {
+            return $objeto['task_id'];
+        }, $tareas);
+
+        return response()->json(
+            Task::where('startDate', '<=', $date)->where('endDate', '>=', $date)->whereNotIn('id', array_unique($ids))->get()
+        );
 });
