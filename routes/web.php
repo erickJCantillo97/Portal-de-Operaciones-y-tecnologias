@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\Gantt\Task;
+use App\Models\Process;
 use App\Models\SWBS\SubSystem;
 use App\Models\SWBS\System;
-use Carbon\Carbon;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -73,6 +73,23 @@ Route::get('recuperarDatos', function () {
     foreach ($datos as $dato) {
         SubSystem::create((array) $dato);
     }
+    $datos = DB::connection('sqlsrv_anterior')->table('swbs_process')->select(['subsystem_id', 'validity', 'status','name', 'maintenance_type'])->get();
+    foreach ($datos as $dato) {
+        Process::create((array) $dato);
+    }
 
     return System::get();
+});
+
+Route::get('actividadesDeultimonivel', function () {
+        $date = Carbon::now();
+        $tareas =  Task::whereNotNull('task_id')->select('task_id')->get()->toArray();
+
+        $ids = array_map(function ($objeto) {
+            return $objeto['task_id'];
+        }, $tareas);
+
+        return response()->json(
+            Task::where('startDate', '<=', $date)->where('endDate', '>=', $date)->whereNotIn('id', array_unique($ids))->get()
+        );
 });

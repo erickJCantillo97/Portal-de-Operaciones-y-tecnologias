@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('subsystem_id')->unsigned();
             $table->foreign('subsystem_id')->references('id')->on('sub_systems');
             $table->enum("maintenance_type",['PREDICTIVO O DIAGNOSTICO', 'PREVENTIVO', 'CORRECTIVO', 'CAMBIO, REEMPLAZO O MONTAJE']);
+            $table->string('name');
             $table->boolean('validity')->default(0);
             $table->boolean('status')->default(1);
             $table->timestamps();

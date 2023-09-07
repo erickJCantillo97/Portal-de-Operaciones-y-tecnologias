@@ -17,7 +17,7 @@ class SubSystemController extends Controller
 
         $subsystems = SubSystem::with('system')->get();
         if($request->system){
-            $subsystems = SubSystem::where('system_id', $request->system)->get();
+            $subsystems = SubSystem::where('system_id', $request->system)->orderBy('code')->get();
         }
         return response()->json([
             $subsystems,

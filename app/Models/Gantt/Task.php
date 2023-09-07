@@ -16,5 +16,5 @@ class Task extends Model
 
     public function getChildrenAttribute(){
         return Task::where('task_id', '=', $this->id)->get();
-    }
+    }   
 }

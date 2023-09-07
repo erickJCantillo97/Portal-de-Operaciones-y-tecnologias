@@ -38,9 +38,11 @@ const submit = () => {
       <body class="h-full">
       ```
     -->
-    <div class="fondo min-w-full min-h-screen flex sm:justify-center justify-center items-center">
+    <div class="min-w-full min-h-screen flex sm:justify-center justify-center items-center">
         <div class="sm:max-w-sm min-w-max">
-
+            <video autoplay="autoplay" class="video" loop="loop" muted="muted" preload="">
+                <source src="/video/video_margen_completa_home.mp4" type="video/mp4">
+            </video>
             <div class="rounded-3xl backdrop-blur-xl px-6 py-4  shadow-2xl shadow-black">
                 <div class="items-center justify-center">
                     <ApplicationLogo class="mx-[45%]"></ApplicationLogo>

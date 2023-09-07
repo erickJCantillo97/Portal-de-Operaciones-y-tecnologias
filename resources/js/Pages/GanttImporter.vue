@@ -7,6 +7,10 @@ import { AjaxHelper, Gantt, LocaleManager, Toast } from '@bryntum/gantt/gantt.mo
 
 //#region importar gantt
 
+const props = defineProps({
+    project: Object,
+})
+
 class Importer {
 
     constructor(config) {
@@ -405,6 +409,7 @@ LocaleManager.applyLocale('Es');
     <AppLayout title="">
         <div class="">
             <div class="h-screen">
+                {{ project.name }}
                 <div id="contenedorGantt" class="h-full"></div>
             </div>
         </div>

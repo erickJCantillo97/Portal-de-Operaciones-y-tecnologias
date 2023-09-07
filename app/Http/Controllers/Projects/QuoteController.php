@@ -17,7 +17,7 @@ class QuoteController extends Controller
      */
     public function index()
     {
-        $quotes = Quote::orderBy('id')->get();
+        $quotes = Quote::with('ship')->orderBy('id')->get();
         $ships = Ship::orderBy('name')->get();
 
         return Inertia::render('Project/Quotes',

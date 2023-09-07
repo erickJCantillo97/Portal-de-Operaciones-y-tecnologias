@@ -22,6 +22,7 @@ import FileUpload from 'primevue/fileupload';
 // import Button from 'primevue/button';
 
 const confirm = useConfirm();
+const customerSelect = ref();
 const { toast } = useSweetalert();
 const loading = ref(false);
 const { confirmDelete } = useSweetalert();
@@ -33,7 +34,8 @@ const open = ref(false)
 
 const props = defineProps({
     ships: Array,
-    customers: Array
+    customers: Array,
+    customer: Object
 })
 
 //#region UseForm
@@ -46,7 +48,7 @@ const formData = useForm({
     pantoque: '',
     eslora: '',
     details: '',
-    image:null
+    image: null
 });
 //#endregion
 
@@ -57,6 +59,11 @@ onMounted(() => {
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
+    if (props.customers==null){
+        formData.customer_id = customer.value.id;
+    }else{
+        formData.customer_id = customerSelect.value.id;
+    }
     if (formData.id == 0) {
         router.post(route('ships.store'), formData, {
             preserveScroll: true,
@@ -96,6 +103,7 @@ const addItem = () => {
 
 const editItem = (ship) => {
     formData.id = ship.id;
+    formData.customer_id = ship.customer_id;
     formData.name = ship.name;
     formData.type = ship.type;
     formData.quilla = ship.quilla;
@@ -179,8 +187,9 @@ const exportarExcel = () => {
         <div class="w-full p-4 px-auto">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
-                    <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
-                        Unidades
+                    <h1 class="text-xl font-semibold leading-6 text-primary">
+                        <p v-if="customer">Unidades del ciente: {{ customer.name }}</p>
+                        <p v-else>Todas las unidades</p>
                     </h1>
                 </div>
 
@@ -220,10 +229,17 @@ const exportarExcel = () => {
 
                 <!--COLUMNAS-->
                 <Column field="name" header="Nombre"></Column>
+                <Column field="customer.name" header="Cliente"></Column>
                 <Column field="type" header="Tipo de Buque"></Column>
                 <Column field="quilla" header="Quillas"></Column>
                 <Column field="pantoque" header="Pantoque"></Column>
                 <Column field="eslora" header="Eslora"></Column>
+                <Column header="Cliente">
+                    <template #body="slotProps">
+                        <p v-if=slotProps.data.customer>{{ slotProps.data.customer.name }}</p>
+                        <p v-else> Sin asignar cliente</p>
+                    </template>
+                </Column>
                 <!-- <Column field="status" header="Estado" sortable>
                     <template #body="slotProps">
                         <Tag :value="slotProps.data.status" :severity="getContractStatusSeverity(slotProps.data)" />
@@ -275,10 +291,10 @@ const exportarExcel = () => {
                                     <div class="px-2 mt-2 text-center">
                                         <DialogTitle as="h3" class="text-xl font-semibold text-primary ">
                                             {{ formData.id != 0 ? 'Editar ' : 'Crear' }}
-                                            Unidad
+                                            Unidad {{ customer != null ? ' para ' + customer.name : '' }}
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
-                                        <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
-                                            <Combobox class="mt-2 text-left" label="Cliente"
+                                        <div class="p-2 mt-2 space-y-2  rounded-lg">
+                                            <Combobox v-if="customers" class="mt-2 text-left" label="Cliente"
                                                 placeholder="Seleccione Cliente" :options="customers"
                                                 v-model="customerSelect">
                                             </Combobox>
@@ -291,26 +307,26 @@ const exportarExcel = () => {
                                                 :placeholder="'Escriba el Tipo de Buque'" v-model="formData.type"
                                                 :error="router.page.props.errors.type"></TextInput>
 
-                                            <TextInput class="mt-2 text-left" label="Carros Quillas"
-                                            type="number"
-                                                :placeholder="'Números de carros de Quillas necesarios'" v-model="formData.quilla"
-                                                :error="router.page.props.errors.quilla"></TextInput>
+                                            <TextInput class="mt-2 text-left" label="Carros Quillas" type="number"
+                                                :placeholder="'Números de carros de Quillas necesarios'"
+                                                v-model="formData.quilla" :error="router.page.props.errors.quilla">
+                                            </TextInput>
 
-                                            <TextInput class="mt-2 text-left" label="Carros de Pantoques"
-                                            type="number"
-                                                :placeholder="'Números carros de Pantoques necesarios'" v-model="formData.pantoque"
-                                                :error="router.page.props.errors.pantoque"></TextInput>
+                                            <TextInput class="mt-2 text-left" label="Carros de Pantoques" type="number"
+                                                :placeholder="'Números carros de Pantoques necesarios'"
+                                                v-model="formData.pantoque" :error="router.page.props.errors.pantoque">
+                                            </TextInput>
 
-                                            <TextInput class="mt-2 text-left" label="Longitud de Eslora"
-                                            type="number"
+                                            <TextInput class="mt-2 text-left" label="Longitud de Eslora" type="number"
                                                 :placeholder="'Longitud de Eslora'" v-model="formData.eslora"
                                                 :error="router.page.props.errors.eslora"></TextInput>
 
                                             <TextInput class="mt-2 text-left" label="Detalles"
                                                 :placeholder="'Escriba los detalles del Buque'" v-model="formData.details"
                                                 :error="router.page.props.errors.details"></TextInput>
-                                            <FileUpload chooseLabel="Adjuntar foto" cancelLabel="Cancelar" :show-upload-button=false name="demo[]"
-                                                :multiple="false" fileLimit="1" accept="image/*" :maxFileSize="1000000"
+                                            <FileUpload chooseLabel="Adjuntar foto" cancelLabel="Cancelar"
+                                                :show-upload-button=false name="demo[]" :multiple="false" fileLimit="1"
+                                                accept="image/*" :maxFileSize="1000000"
                                                 @input="formData.image = $event.target.files[0]">
                                                 <template #empty>
                                                     <p>Adjunta una imagen del buque</p>

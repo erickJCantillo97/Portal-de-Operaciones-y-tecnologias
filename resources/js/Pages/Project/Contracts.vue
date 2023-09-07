@@ -253,7 +253,7 @@ const exportarExcel = () => {
                                             formData.id !=
                                             0 ? 'Editar ' : 'Crear' }} Contrato
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
-                                        <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
+                                        <div class="p-2 mt-2 space-y-2 border border-gray-200 rounded-lg">
                                             <Combobox class="mt-2 text-left" label="Cliente"
                                                 placeholder="Seleccione Cliente" :options="customers"
                                                 v-model="customerSelect">
