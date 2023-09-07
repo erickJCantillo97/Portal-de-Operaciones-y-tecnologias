@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, onMounted } from 'vue';
-import { router, useForm } from '@inertiajs/vue3';
+import { Link, router, useForm } from '@inertiajs/vue3';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -35,10 +35,12 @@ const { confirmDelete } = useSweetalert();
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
-const open = ref(false)
-const project = ref()
+const open = ref(false);
+const project = ref();
+const projectSelect=ref();
 const op = ref();
-const toggle = (event, project) => {
+const toggle = (event, p) => {
+    projectSelect.value=p;
     op.value.toggle(event);
 }
 
@@ -196,13 +198,14 @@ const items = [
         description: 'Aqui podra crear un proyecto desde 0',
         icon: Bars4Icon,
         background: 'bg-pink-500',
-        command: () => router.get(route('showGantt'), {id: selectCustomer.id})
+        page: 'showGantt'
     },
     {
         title: 'Crear proyecto con asistente',
         description: 'Podra crear el proyecto con un asistente amigable',
         icon: CalendarIcon,
         background: 'bg-yellow-500',
+        page: 'createSchedule.create'
     },
     {
         title: 'Crear proyecto desde proyecto anterior',
@@ -421,23 +424,23 @@ const items = [
                 <p class="mt-1 text-sm text-gray-500">Aqui podra escoger como desea crear el cronograma del proyecto.</p>
                 <ul role="list" class="mt-6 grid grid-cols-1 gap-6 border-b border-t border-gray-200 py-6 sm:grid-cols-2">
                     <li v-for="(item, itemIdx) in items" :key="itemIdx" class="flow-root">
-                        <div
+                        <div @click="router.get(route(item.page), { id: projectSelect.id })"
                             class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 focus-within:ring-2 focus-within:ring-indigo-500 hover:bg-gray-50">
-                            <div
-                                :class="[item.background, 'flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg']">
-                                <component :is="item.icon" class="h-6 w-6 text-white" aria-hidden="true" />
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-medium text-gray-900">
-                                    <a href="#" class="focus:outline-none">
-                                        <span class="absolute inset-0" aria-hidden="true" />
-                                        <span>{{ item.title }}</span>
-                                        <span aria-hidden="true"> &rarr;</span>
-                                    </a>
-                                </h3>
-                                <p class="mt-1 text-sm text-gray-500">{{ item.description }}</p>
-                            </div>
+                        <div
+                            :class="[item.background, 'flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg']">
+                            <component :is="item.icon" class="h-6 w-6 text-white" aria-hidden="true" />
                         </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-900">
+                                <a href="#" class="focus:outline-none">
+                                    <span class="absolute inset-0" aria-hidden="true" />
+                                    <span>{{ item.title }}</span>
+                                    <span aria-hidden="true"> &rarr;</span>
+                                </a>
+                            </h3>
+                            <p class="mt-1 text-sm text-gray-500">{{ item.description }}</p>
+                        </div>
+                    </div>
                     </li>
                 </ul>
                 <!-- <div class="mt-4 flex">

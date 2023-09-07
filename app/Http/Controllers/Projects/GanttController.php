@@ -4,10 +4,26 @@ namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
 use App\Models\Gantt\Task;
+use App\Models\Projects\Project;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class GanttController extends Controller
 {
+    public function index(Request $request)
+    {
+        return Inertia::render('GanttBryntum', [
+            'project' => Project::find($request->id)
+        ]);
+    }
+
+    public function import(Request $request)
+    {
+        return Inertia::render('GanttImporter', [
+            'project' => Project::find($request->id)
+        ]);
+    }
+
     public function get()
     {
 

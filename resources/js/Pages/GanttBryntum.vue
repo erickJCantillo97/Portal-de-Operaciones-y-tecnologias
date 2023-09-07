@@ -7,8 +7,13 @@ import "@bryntum/gantt/gantt.material.css";
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
 import { LocaleManager } from '@bryntum/gantt/gantt.module.js';
 
-LocaleManager.applyLocale('Es');
 
+const props = defineProps({
+    project: Object,
+})
+
+
+LocaleManager.applyLocale('Es');
 const barMargin = ref(4);
 const ganttConfig = reactive(useGanttConfig());
 
@@ -18,6 +23,7 @@ const ganttConfig = reactive(useGanttConfig());
         <div class="">
             <div class="h-screen">
                 <div class="overflow-hidden shadow-xl sm:rounded-lg h-full">
+                    {{ project.name }}
                     <bryntum-gantt v-bind="ganttConfig" :barMargin="barMargin"/>
                 </div>
             </div>

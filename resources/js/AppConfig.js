@@ -11,8 +11,8 @@ const useGanttConfig = function () {
             autoLoad: true,
             transport: {
                 load: {
-                    // url: route('dataGantt')
-                    url: 'data/launch-saas.json'
+                    url: route('dataGantt')
+                    // url: 'data/launch-saas.json'
                 },
                 sync: {
                     url : route('syncGantt'),
