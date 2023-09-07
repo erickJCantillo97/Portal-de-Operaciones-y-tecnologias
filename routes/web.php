@@ -55,8 +55,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         return Inertia::render('Dashboards/Gerencias', ['personal' => $personal, 'GERENCIA' => $gerencia]);
     })->name('dashboard.gerencias');
 
-
-
     Route::get('crearTarea', function (){
         Task::truncate();
         Task::create([
@@ -68,6 +66,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             ]);
     });
 
+    Route::get('/Programming', function () {
+        //return ModelToolsAterior::get();
+        return Inertia::render('Programming');
+    })->name('programming');
 
 });
 
