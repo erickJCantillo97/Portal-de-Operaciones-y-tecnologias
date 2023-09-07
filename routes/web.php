@@ -93,4 +93,8 @@ Route::get('actividadesDeultimonivel', function () {
         return response()->json(
             Task::where('startDate', '<=', $date)->where('endDate', '>=', $date)->whereNotIn('id', array_unique($ids))->get()
         );
-});
+})->name('actividadesDeultimonivel');
+
+Route::get('/programming', function () {
+    return Inertia::render('Programming');
+})->name('programming');

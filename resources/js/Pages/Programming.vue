@@ -1,5 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { router, useForm } from '@inertiajs/vue3';
 import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid';
 import { FilterMatchMode } from 'primevue/api';
 import Button from 'primevue/button';
@@ -10,13 +11,21 @@ import Tag from 'primevue/tag';
 import { ref, onMounted } from 'vue';
 
 
-
-const props = defineProps({
-    task: Object,
-})
+const dates = ref()
+const task = ref()
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
+
+const getTask = () => {
+    router.get(route('actividadesDeultimonivel'), { fecha: dates }, {
+        preserveScroll: true,
+        onSuccess: (response) => {
+            task = response.data
+        },
+    });
+}
+
 
 </script>
 
@@ -39,14 +48,12 @@ const filters = ref({
 
                 <template #header>
                     <div class="w-full mb-2">
-                        <div class="flex h-8 mb-2 space-x-4">
+                        <div class="flex justify-end h-8 mb-2 space-x-4">
                             <Button icon="pi pi-sun" label="Hoy" @click="clearFilter()" type="button" text="Hoy"
                                 severity="primary" class="hover:bg-primary ">
                             </Button>
-                            <label class="text-primary space-x-5" for="date">
-                                Intervalo
-                                <Calendar class="h-8" style="border-color: #2c3494" v-model="dates" showIcon selectionMode="range" :manualInput="false" />
-                            </label>
+                                <Calendar class="h-8 " v-on:update:model-value="getTask()" v-model="dates"
+                                    selectionMode="range" :manualInput="false" />
                         </div>
                         <div class="flex h-8 space-x-4">
                             <Button icon="pi pi-filter-slash" @click="clearFilter()" type="button" text=""
