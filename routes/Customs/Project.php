@@ -17,11 +17,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         return Inertia::render('GanttBryntum');
     })->name('showGantt');
 
-    Route::get('/createSchedule', [ScheduleController::class, 'create'])->name('createSchedule.create');
+    Route::get('/createSchedule/{project}', [ScheduleController::class, 'create'])->name('createSchedule.create');
 
-    Route::get('/dataGantt', [GanttController::class, 'get'])->name('dataGantt');
+    Route::get('/dataGantt/{project}', [GanttController::class, 'get'])->name('dataGantt');
 
-    Route::post('/syncGantt', [GanttController::class, 'sync'])->name('syncGantt');
+    Route::post('/syncGantt/{project}', [GanttController::class, 'sync'])->name('syncGantt');
 
     Route::post('/syncGanttImporter', [GanttController::class, 'syncImporter'])->name('syncImporter');
 

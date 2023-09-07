@@ -8,9 +8,11 @@ import '@bryntum/gantt/locales/gantt.locale.Es.js';
 import { LocaleManager } from '@bryntum/gantt/gantt.module.js';
 
 LocaleManager.applyLocale('Es');
-
+const props = defineProps({
+    project: Number
+});
 const barMargin = ref(4);
-const ganttConfig = reactive(useGanttConfig());
+const ganttConfig = reactive(useGanttConfig(props.project));
 
 </script>
 <template>

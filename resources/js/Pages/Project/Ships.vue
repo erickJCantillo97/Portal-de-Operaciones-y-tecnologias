@@ -59,7 +59,7 @@ onMounted(() => {
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
-    if (customers==null){
+    if (props.customers==null){
         formData.customer_id = customer.value.id;
     }else{
         formData.customer_id = customerSelect.value.id;
@@ -293,7 +293,7 @@ const exportarExcel = () => {
                                             {{ formData.id != 0 ? 'Editar ' : 'Crear' }}
                                             Unidad {{ customer != null ? ' para ' + customer.name : '' }}
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
-                                        <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
+                                        <div class="p-2 mt-2 space-y-2  rounded-lg">
                                             <Combobox v-if="customers" class="mt-2 text-left" label="Cliente"
                                                 placeholder="Seleccione Cliente" :options="customers"
                                                 v-model="customerSelect">

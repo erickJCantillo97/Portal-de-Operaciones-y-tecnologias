@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('authorization_id')->index()->nullable();
             $table->unsignedBigInteger('task_id')->index()->nullable();
+            $table->unsignedBigInteger('project_id')->index()->nullable();
             $table->string('name');
             $table->string('durationUnit');
             $table->double('percentDone');

@@ -2,11 +2,11 @@
     <div
         class="sidebar fixed min-h-screen h-full top-0 bottom-0 w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] z-20 transition-all duration-300">
         <div class="h-full bg-white">
-            <div class="flex items-center justify-between px-2 py-3">
+            <div class="flex items-center justify-center px-2 py-3">
                 <div class="flex items-center main-logo shrink-0">
-                    <ApplicationLogo :letras="false" :width-logo="50" :height-logo="50"></ApplicationLogo>
-                    <span
-                        class="ml-2 text-2xl font-semibold align-middle lg:inline dark:text-white-light text-primary">COTECMAR</span>
+                    <ApplicationLogo class="justify-center" :letras="true" :width-logo="50" :height-logo="50"></ApplicationLogo>
+                    <!-- <span
+                        class="ml-2 text-2xl font-semibold align-middle lg:inline dark:text-white-light text-primary">COTECMAR</span> -->
                 </div>
 
             </div>
