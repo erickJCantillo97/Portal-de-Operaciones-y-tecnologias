@@ -4,18 +4,23 @@ import '@/GanttToolbar.js'
 /**
  * Application configuration
  */
-const useGanttConfig = function () {
+const
+useGanttConfig = function (p) {
     return {
         project: {
             autoSync : true,
             autoLoad: true,
             transport: {
                 load: {
+<<<<<<< HEAD
                     url: route('dataGantt')
+=======
+                    url: route('dataGantt', p)
+>>>>>>> 35106b40e89ef0836949407e9ec275b6e27c7c1b
                     // url: 'data/launch-saas.json'
                 },
                 sync: {
-                    url : route('syncGantt'),
+                    url : route('syncGantt', p),
                     headers     : {
                         'Content-Type' : 'application/json',
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -48,7 +53,7 @@ const useGanttConfig = function () {
         columns: [
             {
                 type: 'name',
-                width: 500,
+                width: 200,
             },
             {
                 type: 'percentdone',
@@ -57,31 +62,45 @@ const useGanttConfig = function () {
                 width: 80,
             },
             {
-                text: 'Programacion',
-                collapsible: true,
-                collapseMode: 'toggleAll',
-                collapsed: false,
-                children: [
-                    { type: 'duration' },{ type: 'startdate' }, { type: 'enddate' }, // Column that is shown when the header is collapsed
-                    {
-                        field: 'startDate',
-                        hidden: true,
-                        text: 'Fechas',
-                        width: 30,
-                        editor: false,
-                        htmlEncode: false,
-                        renderer({ record }) {
-                            return `
-                                <div class="calendar">
-                                    <div class="date">${DateHelper.format(record.startDate, 'D')}</div>
-                                    <div class="month">${DateHelper.format(record.startDate, 'MMM')}</div>
-                                </div>
-                                ${record.duration ?? 0} ${DateHelper.getLocalizedNameOfUnit(record.durationUnit, record.duration !== 1)}
-                            `;
-                        }
-                    }
-                ]
+                type: 'duration',
+                text:'Duración',
+                with: 50
             },
+            {
+                type: 'startdate',
+                text:'Fecha Inicio',
+                with: 50
+            },
+            {
+                type: 'startdate',
+                text:'Fecha fin',
+                with: 50
+            },
+            // {
+            //     text: 'Programacion',
+            //     collapsible: true,
+            //     collapseMode: 'toggleAll',
+            //     collapsed: false,
+            //     children: [{ type: 'startdate' }, { type: 'enddate' }, // Column that is shown when the header is collapsed
+            //         {
+            //             field: 'startDate',
+            //             hidden: true,
+            //             text: 'Fechas',
+            //             width: 30,
+            //             editor: false,
+            //             htmlEncode: false,
+            //             renderer({ record }) {
+            //                 return `
+            //                     <div class="calendar">
+            //                         <div class="date">${DateHelper.format(record.startDate, 'D')}</div>
+            //                         <div class="month">${DateHelper.format(record.startDate, 'MMM')}</div>
+            //                     </div>
+            //                     ${record.duration ?? 0} ${DateHelper.getLocalizedNameOfUnit(record.durationUnit, record.duration !== 1)}
+            //                 `;
+            //             }
+            //         }
+            //     ]
+            // },
 
             { field: 'code', text: 'Codigo SAP', autoWidth: true, hidden: true},
         ],

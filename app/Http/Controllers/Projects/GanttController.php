@@ -10,6 +10,7 @@ use Inertia\Inertia;
 
 class GanttController extends Controller
 {
+<<<<<<< HEAD
     public function index(Request $request)
     {
         return Inertia::render('GanttBryntum', [
@@ -25,6 +26,9 @@ class GanttController extends Controller
     }
 
     public function get()
+=======
+    public function get(Project $project)
+>>>>>>> 35106b40e89ef0836949407e9ec275b6e27c7c1b
     {
 
         return response()->json([
@@ -36,7 +40,7 @@ class GanttController extends Controller
                 "daysPerWeek" => 5,
                 "daysPerMonth" => 20
             ]],
-            "tasks" => ['rows' => Task::whereNull('task_id')->get()],
+            "tasks" => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
             "dependencies" => ['rows' => []],
             "resources" => ['rows' => []],
             "assignments" => ['rows' => []],
@@ -44,7 +48,7 @@ class GanttController extends Controller
         ]);
     }
 
-    public function sync(Request $request)
+    public function sync(Project $project,Request $request)
     {
         $rows = [];
         $removed = [];
@@ -52,10 +56,12 @@ class GanttController extends Controller
         if (isset($request->tasks['added'])) {
             foreach ($request->tasks['added'] as $task) {
                 $taskCreate = Task::create([
+                    'project_id' => $project->id,
                     'name' => $task['name'],
                     'task_id' => $task['parentId'],
                     'percentDone' => $task['percentDone'],
                     'duration' => $task['duration'],
+                    'durationUnit' => $task['durationUnit'],
                     'startDate' => $task['startDate'],
                     'endDate' => $task['endDate'],
                 ]);
@@ -73,6 +79,7 @@ class GanttController extends Controller
                     'name' => $task['name'] ?? $taskUpdate->name,
                     'task_id' => $task['parentId'] ?? $taskUpdate->task_id,
                     'percentDone' => $task['percentDone'] ?? $taskUpdate->percentDone,
+                    'durationUnit' => $task['durationUnit'] ?? $taskUpdate->durationUnit,
                     'duration' => $task['duration'] ?? $taskUpdate->duration,
                     'startDate' => $task['startDate'] ?? $taskUpdate->startDate,
                     'endDate' => $task['endDate'] ?? $taskUpdate->endDate,

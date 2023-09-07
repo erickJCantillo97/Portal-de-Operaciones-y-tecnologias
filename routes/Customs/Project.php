@@ -16,11 +16,15 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/ScheduleNew', [GanttController::class, 'index'])->name('showGantt');
     Route::get('/ScheduleNewImport', [GanttController::class, 'import'])->name('ganttImporter');
 
+<<<<<<< HEAD
     Route::get('/ScheduleCreate', [ScheduleController::class, 'create'])->name('createSchedule.create');
+=======
+    Route::get('/createSchedule/{project}', [ScheduleController::class, 'create'])->name('createSchedule.create');
+>>>>>>> 35106b40e89ef0836949407e9ec275b6e27c7c1b
 
-    Route::get('/dataGantt', [GanttController::class, 'get'])->name('dataGantt');
+    Route::get('/dataGantt/{project}', [GanttController::class, 'get'])->name('dataGantt');
 
-    Route::post('/syncGantt', [GanttController::class, 'sync'])->name('syncGantt');
+    Route::post('/syncGantt/{project}', [GanttController::class, 'sync'])->name('syncGantt');
 
     Route::post('/syncGanttImporter', [GanttController::class, 'syncImporter'])->name('syncImporter');
 

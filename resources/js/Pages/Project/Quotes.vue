@@ -279,7 +279,7 @@ const exportarExcel = () => {
                                         <DialogTitle as="h3" class="text-xl font-semibold text-primary ">{{ formData.id !=
                                             0 ? 'Editar ' : 'Crear' }} Estimación
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
-                                        <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
+                                        <div class="p-2 mt-2 space-y-2 border border-gray-200 rounded-lg">
 
                                             <!-- <div class="mt-2">
                                                 <label for="type"
@@ -293,29 +293,27 @@ const exportarExcel = () => {
                                                 :placeholder="'Escriba el consecutivo de la estimacion'"
                                                 v-model="formData.code" :error="router.page.props.errors.cost"></TextInput>
 
-                                            <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
-                                                <Combobox class="mt-2 text-left text-gray-900" label="Buque"
-                                                    placeholder="Seleccione Buque" :options="ships" v-model="shipSelect">
-                                                </Combobox>
-                                            </div>
 
-                                            <TextInput class="mt-2 text-left" label="Costo"
+                                            <Combobox class="text-left text-gray-900" label="Buque"
+                                                placeholder="Seleccione Buque" :options="ships" v-model="shipSelect">
+                                            </Combobox>
+
+                                            <TextInput class="text-left" label="Costo"
                                                 :placeholder="'Escriba el valor total estimado'" v-model="formData.cost"
                                                 :error="router.page.props.errors.cost"></TextInput>
 
                                             <!--CAMPO FECHA INICIO-->
-                                            <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
-                                                <TextInput class="mt-2 text-left" type="date" label="Fecha de inicio"
-                                                    :placeholder="'Escriba el Tipo de Cliente'"
-                                                    v-model="formData.start_date" :error="$page.props.errors.cost">
-                                                </TextInput>
 
-                                                <!--CAMPO FECHA FINALIZACIÓN-->
-                                                <TextInput class="mt-2 text-left" type="date" label="Fecha de Finalización"
-                                                    :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
-                                                    :error="$page.props.errors.end_date">
-                                                </TextInput>
-                                            </div>
+                                            <TextInput class="text-left" type="date" label="Fecha de inicio"
+                                                :placeholder="'Escriba el Tipo de Cliente'"
+                                                v-model="formData.start_date" :error="$page.props.errors.cost">
+                                            </TextInput>
+
+                                            <!--CAMPO FECHA FINALIZACIÓN-->
+                                            <TextInput class="mt-2 text-left" type="date" label="Fecha de Finalización"
+                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
+                                                :error="$page.props.errors.end_date">
+                                            </TextInput>
                                             <FileUpload chooseLabel="Adjuntar PDF" mode="basic" name="demo[]"
                                                 :multiple="false" accept=".pdf" :maxFileSize="1000000"
                                                 @input="formData.pdf = $event.target.files[0]">

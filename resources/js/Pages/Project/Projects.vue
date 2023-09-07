@@ -125,8 +125,8 @@ const editItem = (project) => {
     open.value = true;
 };
 
-const addTask = () => {
-    router.get(route('createSchedule.create'))
+const addTask = (id) => {
+    router.get(route('createSchedule.create',id));
 }
 
 
@@ -318,7 +318,7 @@ const items = [
                             </div>
                             <!--BOTÓN AGREGAR TAREAS-->
                             <div>
-                                <Button severity="success" @click="addTask(slotProps.data.id, 'Proyecto', 'projects')"
+                                <Button severity="success" @click="addTask(slotProps.data.id)"
                                     class="hover:bg-success">
                                     <PlusIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
