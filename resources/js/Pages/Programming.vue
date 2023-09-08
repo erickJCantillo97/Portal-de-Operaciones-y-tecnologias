@@ -9,23 +9,26 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Tag from 'primevue/tag';
 import { ref, onMounted } from 'vue';
+import { EyeIcon, PencilIcon, TrashIcon } from '@vue-hero-icons/outline';
 
 
-const dates = ref()
-const task = ref()
+const dates = ref([]);
+const task = ref();
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-})
+});
 
 const getTask = () => {
-    router.get(route('actividadesDeultimonivel'), { fecha: dates }, {
-        preserveScroll: true,
-        onSuccess: (response) => {
-            task = response.data
-        },
-    });
-}
+    if (dates.value[1] != null) {
+        router.get(route('actividadesDeultimonivel'), { dates: dates.value }, {
+            preserveScroll: true,
+            onSuccess: (response) => {
+                task = response.data
+            },
+        });
+    }
 
+}
 
 </script>
 
@@ -35,12 +38,12 @@ const getTask = () => {
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
-                        Actividades del dia
+                        Actividades del dia {{ dates }}
                     </h1>
                 </div>
             </div>
-            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
-                dataKey="id" filterDisplay="menu" :loading="loading"
+            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="task" v-model:filters="filters" dataKey="id"
+                filterDisplay="menu" :loading="loading"
                 :globalFilterFields="['name', 'gerencia', 'start_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
@@ -49,11 +52,11 @@ const getTask = () => {
                 <template #header>
                     <div class="w-full mb-2">
                         <div class="flex justify-end h-8 mb-2 space-x-4">
-                            <Button icon="pi pi-sun" label="Hoy" @click="clearFilter()" type="button" text="Hoy"
+                            <Button icon="pi pi-sun" label="Hoy" @click="clearFilter()" type="button" :text=true
                                 severity="primary" class="hover:bg-primary ">
                             </Button>
-                                <Calendar class="h-8 " v-on:update:model-value="getTask()" v-model="dates"
-                                    selectionMode="range" :manualInput="false" />
+                            <Calendar class="h-8 text-center" v-on:date-select="getTask()" v-model="dates"
+                                selectionMode="range" :manualInput="false" placeholder="Rango de fechas" />
                         </div>
                         <div class="flex h-8 space-x-4">
                             <Button icon="pi pi-filter-slash" @click="clearFilter()" type="button" text=""
