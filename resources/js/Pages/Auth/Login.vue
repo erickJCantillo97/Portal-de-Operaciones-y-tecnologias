@@ -96,9 +96,8 @@ const submit = () => {
                             </div>
 
                             <div>
-                                <Button
-                                    class="bg-[#2c3494] w-full py-3 rounded-xl text-white shadow-xl hover:shadow-inner focus:outline-none transition duration-500 ease-in-out  transform hover:-translate-x hover:scale-105"
-                                    severity="primary" :loading="form.processing">Iniciar Sesión</Button>
+                                <button
+                                    class="bg-[#2c3494] w-full py-3 rounded-xl text-white shadow-xl hover:shadow-inner focus:outline-none transition duration-500 ease-in-out  transform hover:-translate-x hover:scale-105" :loading="form.processing">Iniciar Sesión</button>
                             </div>
                         </form>
                     </div>
