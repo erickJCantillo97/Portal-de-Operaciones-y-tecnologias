@@ -19,21 +19,15 @@ const filters = ref({
 });
 
 const getTask = () => {
-    const rango =[];
-    if (dates.value[1]==null){
-        rango[0]=dates.value[0]
-        rango[1]=dates.value[0]
-    }else{
-        rango[0]=dates.value[0]
-        rango[1]=dates.value[1]
+    if (dates.value[1] != null) {
+        router.get(route('actividadesDeultimonivel'), { dates: dates.value }, {
+            preserveScroll: true,
+            onSuccess: (response) => {
+                task = response.data
+            },
+        });
     }
-    console.log(rango);
-    router.get(route('actividadesDeultimonivel'), { fecha: rango }, {
-        preserveScroll: true,
-        onSuccess: (response) => {
-            task = response.data
-        },
-    });
+
 }
 
 </script>
