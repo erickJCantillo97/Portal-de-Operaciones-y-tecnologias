@@ -82,27 +82,49 @@ Route::get('recuperarDatos', function () {
     return System::get();
 });
 
-Route::get('actividadesDeultimonivel', function () {
+Route::get('actividadesDeultimonivel', function (Request $request) {
 
-        $date_start = Carbon::yesterday();
-        $date_end = Carbon::tomorrow();
+
+        $date_start = Carbon::parse($request->dates[0])->format('Y-m-d');
+        $date_end = Carbon::parse($request->dates[1])->format('Y-m-d');
+
         $tareas =  Task::whereNotNull('task_id')->select('task_id')->get()->toArray();
 
         $ids = array_map(function ($objeto) {
             return $objeto['task_id'];
         }, $tareas);
-
-        return
+        return response()->json(
             Task::where(function ($query) use ($date_start, $date_end) {
                 $query->whereBetween('startdate', [$date_start, $date_end])
                     ->orWhereBetween('enddate', [$date_start, $date_end])
                     ->orWhere(function ($query) use ($date_start, $date_end) {
-                        $query->where('startdate', '<=', $date_start)
-                            ->where('enddate', '>=', $date_end);
+                        $query->where('enddate', '>', $date_end)
+                                ->where('startdate', '<', $date_start);
                     });
-            })->whereNotIn('id', array_unique($ids))->get();
+            })->whereNotIn('id', array_unique($ids))->get(),
+        );
+
 })->name('actividadesDeultimonivel');
 
 Route::get('/programming', function () {
-    return Inertia::render('Programming');
+    $date_start = Carbon::now();
+    $date_end = Carbon::now();
+
+    $tareas =  Task::whereNotNull('task_id')->select('task_id')->get()->toArray();
+
+    $ids = array_map(function ($objeto) {
+        return $objeto['task_id'];
+    }, $tareas);
+
+    $tasks = Task::where(function ($query) use ($date_start, $date_end) {
+        $query->whereBetween('startdate', [$date_start, $date_end])
+            ->orWhereBetween('enddate', [$date_start, $date_end])
+            ->orWhere(function ($query) use ($date_start, $date_end) {
+                $query->where('startdate', '<', $date_start)
+                    ->where('enddate', '>', $date_end);
+            });
+    })->whereNotIn('id', array_unique($ids))->get();
+    return Inertia::render('Programming', [
+        'taskNow' => $tasks
+    ]);
 })->name('programming');

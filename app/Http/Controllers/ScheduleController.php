@@ -41,7 +41,7 @@ class ScheduleController extends Controller
     public function import(Request $request)
     {
         return Inertia::render('GanttImporter', [
-            'project' => Project::find($request->id)
+         
         ]);
     }
 

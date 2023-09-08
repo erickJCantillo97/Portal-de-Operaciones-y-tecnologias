@@ -409,7 +409,7 @@ LocaleManager.applyLocale('Es');
     <AppLayout title="">
         <div class="">
             <div class="h-screen">
-                {{ project.name }}
+             
                 <div id="contenedorGantt" class="h-full"></div>
             </div>
         </div>

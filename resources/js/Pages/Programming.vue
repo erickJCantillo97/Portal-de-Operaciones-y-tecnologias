@@ -9,23 +9,27 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Tag from 'primevue/tag';
 import { ref, onMounted } from 'vue';
-import { EyeIcon, PencilIcon, TrashIcon } from '@vue-hero-icons/outline';
+import axios from 'axios';
 
+const props = defineProps({
+    taskNow: Array,
+})
 
+onMounted(() => {
+    tasks.value = props.taskNow;
+})
 const dates = ref([]);
-const task = ref();
+const tasks = ref([]);
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
 
 const getTask = () => {
     if (dates.value[1] != null) {
-        router.get(route('actividadesDeultimonivel'), { dates: dates.value }, {
-            preserveScroll: true,
-            onSuccess: (response) => {
-                task = response.data
-            },
-        });
+        tasks.value = [];
+        axios.get(route('actividadesDeultimonivel', { dates: dates.value })).then( (res) => {
+            tasks.value = res.data
+        })
     }
 
 }
@@ -38,11 +42,11 @@ const getTask = () => {
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
-                        Actividades del dia {{ dates }}
+                        Actividades
                     </h1>
                 </div>
             </div>
-            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="task" v-model:filters="filters" dataKey="id"
+            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="tasks" v-model:filters="filters" dataKey="id"
                 filterDisplay="menu" :loading="loading"
                 :globalFilterFields="['name', 'gerencia', 'start_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
@@ -83,9 +87,13 @@ const getTask = () => {
 
                 <!--COLUMNAS-->
                 <Column field="name" header="Tarea"></Column>
-                <Column field="hoursPerDay" header="Duracion"></Column>
-                <Column field="daysPerWeek" header="Fecha inicio"></Column>
-                <Column field="daysPerMonth" header="Fecha fin"></Column>
+                <Column field="duration" header="Duracion">
+                <template #body="slotProps">
+                    {{ slotProps.data.duration }} {{ slotProps.data.durationUnit }}
+                </template>
+                </Column>
+                <Column field="startDate" header="Fecha inicio"></Column>
+                <Column field="endDate" header="Fecha fin"></Column>
 
                 <!--ACCIONES-->
                 <Column header="Acciones" class="space-x-3">
@@ -93,39 +101,9 @@ const getTask = () => {
                         <!--BOTÓN EDITAR-->
                         <div
                             class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
-                            <div>
-                                <Button severity="primary" @click="toggle($event, slotProps.data)" class="hover:bg-primary">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M18 16L16 16M16 16L14 16M16 16L16 14M16 16L16 18" stroke="#1C274C"
-                                            stroke-width="1.5" stroke-linecap="round" />
-                                        <path d="M7 4V2.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
-                                        <path d="M17 4V2.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
-                                        <path d="M21.5 9H16.625H10.75M2 9H5.875" stroke="#1C274C" stroke-width="1.5"
-                                            stroke-linecap="round" />
-                                        <path
-                                            d="M14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V12C2 8.22876 2 6.34315 3.17157 5.17157C4.34315 4 6.22876 4 10 4H14C17.7712 4 19.6569 4 20.8284 5.17157C22 6.34315 22 8.22876 22 12V14C22 17.7712 22 19.6569 20.8284 20.8284C20.1752 21.4816 19.3001 21.7706 18 21.8985"
-                                            stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
-                                    </svg>
-                                </Button>
-                            </div>
-                            <div>
-                                <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
-                                    <PencilIcon class="w-4 h-4 " aria-hidden="true" />
-                                </Button>
-                            </div>
-                            <!--BOTÓN ELIMINAR-->
-                            <div>
-                                <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Proyecto', 'projects')"
-                                    class="hover:bg-danger">
-                                    <TrashIcon class="w-4 h-4 " aria-hidden="true" />
-                                </Button>
-                            </div>
-                            <!--BOTÓN AGREGAR TAREAS-->
-                            <div>
-                                <Button severity="success" @click="" class="hover:bg-success">
-                                    <EyeIcon class="w-4 h-4 " aria-hidden="true" />
-                                </Button>
-                            </div>
+
+
+
                         </div>
                     </template>
                 </Column>
