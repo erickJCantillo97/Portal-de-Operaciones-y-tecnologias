@@ -132,8 +132,8 @@ const openModal = () => {
         </div>
 
         <!--MODAL DE FORMULARIO-->
-        <TransitionRoot as="template" :visible="visibleModal = true">
-            <Dialog as="div" class="relative z-30" @close="open = false">
+        <!-- <TransitionRoot as="template" :show="visibleModal">
+            <Dialog as="div" class="relative z-30" @close="open">
                 <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
                     leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
                     <div class="fixed inset-0 z-30 w-screen h-screen transition-opacity bg-gray-500 bg-opacity-75" />
@@ -173,6 +173,6 @@ const openModal = () => {
                     </div>
                 </div>
             </Dialog>
-        </TransitionRoot>
+        </TransitionRoot> -->
     </AppLayout>
 </template>
