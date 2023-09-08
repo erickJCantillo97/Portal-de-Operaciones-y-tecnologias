@@ -59,9 +59,9 @@ onMounted(() => {
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
-    if (props.customers==null){
-        formData.customer_id = customer.value.id;
-    }else{
+    if (props.customers == null) {
+        formData.customer_id = props.customer.id;
+    } else if (customerSelect.value != null) {
         formData.customer_id = customerSelect.value.id;
     }
     if (formData.id == 0) {
@@ -87,6 +87,7 @@ const submit = () => {
             toast('¡Buque actualizado exitosamente!', 'success');
         },
         onError: (errors) => {
+            console.log(errors);
             toast('¡Ups! Ha surgido un error', 'error');
         },
         onFinish: visit => {
@@ -277,7 +278,6 @@ const exportarExcel = () => {
                     leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
                     <div class="fixed inset-0 z-30 w-screen h-screen transition-opacity bg-gray-500 bg-opacity-75" />
                 </TransitionChild>
-
                 <div class="fixed inset-0 z-50 h-screen overflow-y-auto">
                     <div class="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
                         <TransitionChild as="template" enter="ease-out duration-300"
@@ -325,7 +325,7 @@ const exportarExcel = () => {
                                                 :placeholder="'Escriba los detalles del Buque'" v-model="formData.details"
                                                 :error="router.page.props.errors.details"></TextInput>
                                             <FileUpload chooseLabel="Adjuntar foto" cancelLabel="Cancelar"
-                                                :show-upload-button=false name="demo[]" :multiple="false" fileLimit="1"
+                                                :show-upload-button=false name="demo[]" :multiple="false" :fileLimit=1
                                                 accept="image/*" :maxFileSize="1000000"
                                                 @input="formData.image = $event.target.files[0]">
                                                 <template #empty>
