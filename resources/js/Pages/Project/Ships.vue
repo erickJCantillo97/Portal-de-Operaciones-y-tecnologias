@@ -60,7 +60,7 @@ onMounted(() => {
 const submit = () => {
     loading.value = true;
     if (props.customers == null) {
-        formData.customer_id = customer.value.id;
+        formData.customer_id = props.customer.id;
     } else if (customerSelect.value != null) {
         formData.customer_id = customerSelect.value.id;
     }
