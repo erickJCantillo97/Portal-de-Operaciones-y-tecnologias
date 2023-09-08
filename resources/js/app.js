@@ -1,7 +1,7 @@
 import "./bootstrap";
 import "../css/app.css";
 import "../css/tailwind.css";
-
+import { i18nVue } from 'laravel-vue-i18n'
 import { createApp, h } from "vue";
 import { createInertiaApp } from "@inertiajs/vue3";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
@@ -27,7 +27,7 @@ createInertiaApp({
             .use(ZiggyVue)
             .use(ConfirmationService)
             .use(ToastService)
-            .use(PrimeVue, "es")
+            .use(PrimeVue)
             .mount(el);
     },
     progress: {

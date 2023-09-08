@@ -10,10 +10,12 @@ import DataTable from 'primevue/datatable';
 import Tag from 'primevue/tag';
 import { ref, onMounted } from 'vue';
 import { EyeIcon, PencilIcon, TrashIcon } from '@vue-hero-icons/outline';
+import InputText from 'primevue/inputtext';
 
 
 const dates = ref([]);
 const task = ref();
+const loading = ref(false);
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
@@ -38,7 +40,7 @@ const getTask = () => {
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
-                        Actividades del dia {{ dates }}
+                        Actividades del dia
                     </h1>
                 </div>
             </div>
@@ -48,6 +50,9 @@ const getTask = () => {
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
+                <template #empty>
+                    <p class="text-center pt-5 pb-5">Seleccione una fecha o rango de fechas para mostrar</p>
+                </template>
 
                 <template #header>
                     <div class="w-full mb-2">
@@ -55,20 +60,21 @@ const getTask = () => {
                             <Button icon="pi pi-sun" label="Hoy" @click="clearFilter()" type="button" :text=true
                                 severity="primary" class="hover:bg-primary ">
                             </Button>
-                            <Calendar class="h-8 text-center" v-on:date-select="getTask()" v-model="dates"
-                                selectionMode="range" :manualInput="false" placeholder="Rango de fechas" />
+                            <span class="p-float-label">
+                                <Calendar id="calendar" class="block text-gray-900 border-0 rounded-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                :unstyled="false" v-on:date-select="getTask()" v-model="dates"
+                                selectionMode="range" :manualInput="false"/>
+                                <label for="calendar">Rango de fechas</label>
+                            </span>
                         </div>
-                        <div class="flex h-8 space-x-4">
+                        <div class="alturah8 flex h-8 space-x-4">
                             <Button icon="pi pi-filter-slash" @click="clearFilter()" type="button" text=""
                                 severity="primary" class="hover:bg-primary ">
                             </Button>
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <MagnifyingGlassIcon class="w-5 h-4 text-gray-400" aria-hidden="true" />
-                            </div>
-                            <input type="search"
-                                class="block w-50 py-4 pl-10 text-gray-900 border-0 rounded-md ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                v-model="filters.global.value" placeholder="Buscar..." />
-
+                            <span class="p-float-label">
+                                <InputText id="buscar" v-model="filters.global.value" :unstyled="true" type="search" class="block text-gray-900 border-0 rounded-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
+                                <label for="buscar">Buscar...</label>
+                            </span>
                             <!-- <div class="relative flex rounded-md shadow-sm">
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <MagnifyingGlassIcon class="w-5 h-4 text-gray-400" aria-hidden="true" />
