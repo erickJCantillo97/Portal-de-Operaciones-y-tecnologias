@@ -33,6 +33,7 @@ const selectedForm = ref('form1')
 const contractSelect = ref()
 const authorizationSelect = ref()
 const quoteSelect = ref()
+const intern_communicationsSelect = ref()
 const ship = ref()
 
 const props = defineProps({
@@ -64,28 +65,80 @@ onMounted(() => {
     initFilters();
 })
 
+//Cancelar Creación de Proyectos
+const cancelCreateProject = () => {
+    router.get(route('projects.index'))
+}
+
 /* SUBMIT*/
 const submit = () => {
     if (formData.id == 0) {
-        if (selectedForm.value == 'form1') {
-            formData['contract_id'] = contractSelect.value.id
+        //Validaciones de Formulario de Contratos
+        if (selectedForm.value == 'form1' && !contractSelect.value) {
+            toast('Por favor, seleccione un contrato', 'error');
+            return;
         }
+
+        if (selectedForm.value == 'form1') {
+            formData['contract_id'] = contractSelect.value.id;
+        }
+
+        //Validaciones de Formulario de Autorizaciones
+        if (selectedForm.value == 'form2' && !authorizationSelect.value) {
+            toast('Por favor, seleccione una autorización', 'error');
+            return;
+        }
+
+        if (selectedForm.value == 'form2') {
+            formData['authorization_id'] = authorizationSelect.value.id;
+        }
+
+        //Validaciones de Formulario de Estimaciones
+        if (selectedForm.value == 'form3' && !quoteSelect.value) {
+            toast('Por favor, seleccione una estimación', 'error');
+            return;
+        }
+
+        if (selectedForm.value == 'form3') {
+            formData['quote_id'] = quoteSelect.value.id;
+        }
+
+        //Validaciones de Formulario de Comunicaciones Internas
+        if (selectedForm.value == 'form4' && !intern_communicationsSelect.value) {
+            toast('Por favor, seleccione un Buque', 'error');
+            return;
+        }
+
+        if (selectedForm.value == 'form4') {
+            formData['intern_communications'] = intern_communicationsSelect.value.id;
+        }
+
         try {
-            router.post(route('projects.store'), formData, {
+            const routeName = 'projects.store'
+            if (selectedForm.value == 'form1') {
+                routeName;
+            } else if (selectedForm.value == 'form2') {
+                routeName;
+            } else if (selectedForm.value == 'form3') {
+                routeName;
+            } else if (selectedForm.value == 'form4') {
+                routeName;
+            }
+            router.post(route(routeName), formData, {
                 preserveScroll: true,
                 onSuccess: (res) => {
                     open.value = false;
                     toast('Proyecto creado exitosamente', 'success');
+                },
+                onError: (errors) => {
+                    toast('Ya existe un proyecto con este contrato.', 'error');
+                },
+                onFinish: () => {
+                    loading.value = false;
                 }
             });
         } catch (error) {
-            onError: (errors) => {
-                toast('¡Ups! Ha surgido un error', 'error' + errors);
-            };
-        } finally {
-            onFinish: visit => {
-                loading.value = false;
-            }
+            toast(error.message)
         }
         return 'creado';
     }
@@ -274,18 +327,21 @@ const exportarExcel = () => {
                                 :options="contracts" v-model="contractSelect" @update:modelValue="loadContractDates()">
                             </Combobox>
                         </div>
+
                         <div class=" " v-if="selectedForm == 'form2'">
                             <Combobox class="text-left text-gray-900" label="Autorizaciones"
                                 placeholder="Seleccione Autorización" :options="authorizations"
                                 v-model="authorizationSelect" @update:modelValue="loadContractDates()">
                             </Combobox>
                         </div>
+
                         <div class="" v-if="selectedForm == 'form3'">
                             <Combobox class="text-left text-gray-900" label="Estimaciones"
                                 placeholder="Seleccione Estimación" :options="quotes" v-model="quoteSelect"
                                 @update:modelValue="loadContractDates()">
                             </Combobox>
                         </div>
+
                         <TextInput class=" text-left" type="text" v-if="selectedForm == 'form4'" label=" Codigo de
                         comunicación Interna" :placeholder="'Escriba el Tipo de Cliente'"
                             v-model="formData.intern_communications" :error="$page.props.errors.intern_communications">
@@ -322,7 +378,7 @@ const exportarExcel = () => {
                         v-model="formData.daysPerMonth" :error="router.page.props.errors.daysPerMonth"></TextInput>
                     <div class="flex px-2 mt-2 space-x-4">
                         <Button class="hover:bg-danger text-danger border-danger" severity="danger"
-                            @click="open = false">Cancelar</Button>
+                            @click="cancelCreateProject()">Cancelar</Button>
                         <Button severity="success" :loading="false" class="text-success hover:bg-success border-success"
                             @click="submit()">
                             {{ formData.id != 0 ? 'Actualizar ' : 'Guardar' }}

@@ -11,7 +11,7 @@ import Combobox from '@/Components/Combobox.vue';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, Bars4Icon, CalendarIcon, ClockIcon, PhotoIcon, TableCellsIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline';
+import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, Bars4Icon, CalendarIcon, EyeIcon, PhotoIcon, TableCellsIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline';
 import { useSweetalert } from '@/composable/sweetAlert';
 import { useConfirm } from "primevue/useconfirm";
 
@@ -21,13 +21,7 @@ import Button from '../../Components/Button.vue';
 import OverlayPanel from 'primevue/overlaypanel';
 
 // import Button from 'primevue/button';
-import { CheckIcon } from '@heroicons/vue/24/solid'
 
-const steps = [
-    { id: '01', name: 'Nuevo en Blanco', description: 'Vitae sed mi luctus laoreet.', href: '#', status: 'complete' },
-    { id: '02', name: 'Nuevo con Seguimiento', description: 'Cursus semper viverra.', href: '#', status: 'current' },
-    { id: '03', name: 'Preview', description: 'Penatibus eu quis ante.', href: '#', status: 'upcoming' },
-]
 const confirm = useConfirm();
 const { toast } = useSweetalert();
 const loading = ref(false);
@@ -194,15 +188,15 @@ const exportarExcel = () => {
 
 const items = [
     {
-        title: 'Crear proyecto nuevo',
-        description: 'Aqui podra crear un proyecto desde 0',
+        title: 'Crear cronograma nuevo',
+        description: 'Aqui podra crear un cronograma vacio',
         icon: Bars4Icon,
         background: 'bg-pink-500',
         page: 'createSchedule.create'
     },
     {
-        title: 'Crear proyecto con asistente',
-        description: 'Podra crear el proyecto con un asistente amigable',
+        title: 'Crear cronograma con asistente',
+        description: 'Podra crear el proyecto con un asistente inteligente',
         icon: CalendarIcon,
         background: 'bg-yellow-500',
         page: 'wizard'
@@ -243,7 +237,7 @@ const items = [
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
                 dataKey="id" filterDisplay="menu" :loading="loading"
-                :globalFilterFields="['name', 'gerencia', 'start_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
+                :globalFilterFields="['name', 'gerencia', 'start_date', 'end_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -317,12 +311,12 @@ const items = [
                                 </Button>
                             </div>
                             <!--BOTÓN AGREGAR TAREAS-->
-                            <!-- <div>
-                                <Button severity="success" @click="addTask(slotProps.data.id)"
+                            <div>
+                                <Button severity="success" @click=""
                                     class="hover:bg-success">
-                                    <PlusIcon class="w-4 h-4 " aria-hidden="true" />
+                                    <EyeIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
-                            </div> -->
+                            </div>
                         </div>
                     </template>
                 </Column>
@@ -420,8 +414,9 @@ const items = [
 
         <OverlayPanel ref="op">
             <div>
-                <h2 class="text-base font-semibold leading-6 text-gray-900">Creacion de cronograma</h2>
+                <h2 class="text-base font-semibold leading-6 text-gray-900">Creacion o edicion de cronograma</h2>
                 <p class="mt-1 text-sm text-gray-500">Aqui podra escoger como desea crear el cronograma del proyecto.</p>
+
                 <ul role="list" class="mt-6 grid grid-cols-1 gap-6 border-b border-t border-gray-200 py-6 sm:grid-cols-2">
                     <li v-for="(item, itemIdx) in items" :key="itemIdx" class="flow-root">
                         <div @click="router.get(route(item.page, projectSelect.id))"

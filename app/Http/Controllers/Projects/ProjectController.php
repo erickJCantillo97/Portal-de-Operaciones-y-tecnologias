@@ -83,7 +83,7 @@ class ProjectController extends Controller
             }
 
             if ($validateData['authorization_id'] != 0) {
-                $buque = Authorization::find($validateData['authorization_id'])->qoute->ship;
+                $buque = Authorization::find($validateData['authorization_id'])->first()->quote->ship;
             }
 
             if (($validateData['contract_id']) != 0) {
@@ -95,7 +95,25 @@ class ProjectController extends Controller
             }
 
             if (! isset($buque)) {
-                return back()->withErrors(['message' => 'Ocurrió un error al crear el proyecto: No se seleccione un Buque'], 500);
+                return back()->withErrors(['message' => 'Ocurrió un error al crear el proyecto: No se seleccionó un Buque'], 500);
+            }
+
+            // Verificar si ya existe un proyecto con el mismo contract_id y ship_id
+            $existingProjectwithContract = Project::where('contract_id', $validateData['contract_id'])
+                ->where('ship_id', $buque->id)
+                ->first();
+
+            if ($existingProjectwithContract) {
+                return back()->withErrors(['message' => 'Ya existe un proyecto con el mismo contrato y buque'], 500);
+            }
+
+            // Verificar si ya existe un proyecto con el mismo authorization_id y ship_id
+            $existingProjectwithAuthorization = Project::where('authorization_id', $validateData['authorization_id'])
+                ->where('quote_id', $buque->id)
+                ->first();
+
+            if ($existingProjectwithAuthorization) {
+                return back()->withErrors(['message' => 'Ya existe un proyecto con la misma autorización y buque'], 500);
             }
 
             $countProject = count(Project::where('ship_id', $buque->id)->get()) + 1;
