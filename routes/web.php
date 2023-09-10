@@ -94,7 +94,7 @@ Route::get('actividadesDeultimonivel', function (Request $request) {
             return $objeto['task_id'];
         }, $tareas);
         return response()->json(
-            Task::where(function ($query) use ($date_start, $date_end) {
+            Task::with('project')->where(function ($query) use ($date_start, $date_end) {
                 $query->whereBetween('startdate', [$date_start, $date_end])
                     ->orWhereBetween('enddate', [$date_start, $date_end])
                     ->orWhere(function ($query) use ($date_start, $date_end) {
@@ -116,7 +116,7 @@ Route::get('/programming', function () {
         return $objeto['task_id'];
     }, $tareas);
 
-    $tasks = Task::where(function ($query) use ($date_start, $date_end) {
+    $tasks = Task::with('project')->where(function ($query) use ($date_start, $date_end) {
         $query->whereBetween('startdate', [$date_start, $date_end])
             ->orWhereBetween('enddate', [$date_start, $date_end])
             ->orWhere(function ($query) use ($date_start, $date_end) {
