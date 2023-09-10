@@ -15,7 +15,10 @@ const props = defineProps({
     taskNow: Array,
 })
 
-
+const unidad = {
+    day: 'Dias',
+    hour: 'Horas'
+};
 
 onMounted(() => {
     tasks.value = props.taskNow;
@@ -27,8 +30,28 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
 const optionValue = ref('today')
-const getTask = (option) => {
 
+function obtenerLunesYViernesSemanaActual() {
+    const hoy = new Date();
+    const diaSemana = hoy.getDay(); // 0 para domingo, 1 para lunes, ..., 6 para sábado
+
+    // Calcula la fecha del lunes de la semana actual
+    const lunes = new Date(hoy);
+    lunes.setDate(hoy.getDate() - diaSemana + (diaSemana === 0 ? -6 : 1));
+
+    // Calcula la fecha del viernes de la semana actual
+    const viernes = new Date(lunes);
+    viernes.setDate(lunes.getDate() + 4);
+  
+
+    return {
+        lunes: lunes,
+        viernes: viernes
+    };
+}
+
+const getTask = (option) => {
+ 
     const today = new Date();
     optionValue.value = option
     switch (option) {
@@ -45,9 +68,10 @@ const getTask = (option) => {
 
         case 'week':
             const week = new Date();
+            const fechasSemanaActual = obtenerLunesYViernesSemanaActual();
             week.setDate(week.getDate() + 7);
-            dates.value[0] = today;
-            dates.value[1] = week;
+            dates.value[0] = fechasSemanaActual.lunes;
+            dates.value[1] = fechasSemanaActual.viernes;
             break;
         default:
             break;
@@ -64,6 +88,10 @@ const getTask = (option) => {
 
 }
 
+
+const redondear = (value )=> {
+    return new Intl.NumberFormat().format(Number(value).toFixed(2) )
+}
 </script>
 
 <template>
@@ -72,7 +100,7 @@ const getTask = (option) => {
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
-                        Actividades
+                        Programación de Actividades
                     </h1>
                 </div>
             </div>
@@ -137,7 +165,7 @@ const getTask = (option) => {
                 <Column field="project.name" header="Proyecto"></Column>
                 <Column field="duration" header="Duracion">
                     <template #body="slotProps">
-                        {{ slotProps.data.duration }} {{ slotProps.data.durationUnit }}
+                        {{ redondear(slotProps.data.duration) }} {{ unidad[slotProps.data.durationUnit] }}
                     </template>
                 </Column>
                 <Column field="startDate" header="Fecha inicio"></Column>
