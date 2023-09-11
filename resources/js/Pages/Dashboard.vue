@@ -6,6 +6,7 @@ import { usePermissions } from '@/composable/permission';
 import { Link } from '@inertiajs/vue3';
 const { hasRole } = usePermissions();
 import Image from 'primevue/image';
+import UserHeader from '@/Components/sections/UserHeader.vue';
 
 const props = defineProps({
     projects: Array
@@ -45,6 +46,7 @@ const getTask = () => {
 
 <template>
     <AppLayout>
+        <UserHeader></UserHeader>
         <div class="mt-4 px-4 sm:px-6 py-2">
             <div>
                 <h3 class="font-medium text-primary text-xl">Proyectos</h3>
