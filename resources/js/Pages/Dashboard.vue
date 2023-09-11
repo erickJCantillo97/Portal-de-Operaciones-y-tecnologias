@@ -56,13 +56,13 @@ const getTask = () => {
                             <div class="absolute rounded-md">
                             <Image  alt="Image"  preview >
                                 <template #image>
-                                    <img class="h-16 w-20 rounded-full" :src="item.file" />
+                                    <img class="h-20 w-20 rounded-full" :src="item.file" />
                                 </template>
                             </Image>
                             </div>
-                            <p class="ml-20 text-sm font-medium text-gray-500">{{ item.name }}</p>
+                            <p class="ml-24 text-sm font-medium text-gray-500">{{ item.name }}</p>
                         </dt>
-                        <dd class="ml-20 flex items-baseline pb-6 sm:pb-7">
+                        <dd class="ml-24 flex items-baseline pb-6 sm:pb-7">
                             <p class="text-2xl font-semibold text-gray-900">{{ item.avance }} %</p>
 
                             <div class="absolute inset-x-0 bottom-0 bg-gray-50 px-4 py-4">
@@ -75,10 +75,10 @@ const getTask = () => {
                 </dl>
             </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2">
+        <div class="grid grid-cols-1 md:grid-cols-2 mb-8">
             <div class="mt-4 px-4 sm:px-6">
                 <div class="flex justify-between">
-                    <h2 class="font-medium text-primary text-xl">Personal Corporativo </h2>
+                    <h2 class="font-medium text-primary text-xl">Personal</h2>
                     <h2 class="font-medium text-primary text-xl">Total: {{totalMembers}}</h2>
                 </div>
 
@@ -112,5 +112,5 @@ const getTask = () => {
                 
             </div>
         </div>
-        </AppLayout>
+    </AppLayout>
 </template>
