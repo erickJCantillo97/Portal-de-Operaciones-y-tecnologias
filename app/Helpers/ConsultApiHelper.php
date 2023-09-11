@@ -61,7 +61,10 @@ function searchEmpleados(String $clave, String $valor)
     });
 }
 
-
+function pokeapi () {
+    HTTP::acceptJson()->get('https://pokeapi.co/api/v2/pokemon/');
+    
+}
 
 
 
