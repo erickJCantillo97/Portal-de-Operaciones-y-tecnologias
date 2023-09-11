@@ -273,7 +273,7 @@ const items = [
                 <Column field="daysPerMonth" header="Dias por Mes"></Column>
                 <Column field="status" header="Estado" sortable>
                     <template #body="slotProps">
-                        <Tag :value="slotProps.data.status" :severity="getContractStatusSeverity(slotProps.data)" />
+                        <Tag :value="'EJECUCIÓN'" :severity="getContractStatusSeverity('EJECUCIÓN')" />
                     </template>
                 </Column>
 
