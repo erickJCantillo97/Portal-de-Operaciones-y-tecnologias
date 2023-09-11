@@ -65,7 +65,6 @@ class ShipController extends Controller
             'pantoque' => 'nullable|numeric|gt:0',
             'eslora' => 'nullable|numeric|gt:0',
             'details' => 'nullable',
-            'image' => 'nullable'
         ]);
 
         try {

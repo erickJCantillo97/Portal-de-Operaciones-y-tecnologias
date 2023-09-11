@@ -32,7 +32,7 @@ class Ship extends Model
     protected function file(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => str_replace('public', 'storage', $value),
+            get: fn ($value) => str_replace('//', '/', str_replace('public', 'storage', $value)),
             set: fn ($value) => $value,
         );
     }
