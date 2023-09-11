@@ -34,8 +34,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     //CRUD Quotes
     Route::resource('quotes', QuoteController::class);
 
+    Route::post('ships/update/{ship}', [ShipController::class, 'update'])->name('ships.update');
     //CRUD Ships
-    Route::resource('ships', ShipController::class);
+    Route::resource('ships', ShipController::class)->except('update');
 
     //CRUD Customers
     Route::resource('customers', CustomerController::class);

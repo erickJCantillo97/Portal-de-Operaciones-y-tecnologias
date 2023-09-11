@@ -65,6 +65,7 @@ class ShipController extends Controller
             'pantoque' => 'nullable|numeric|gt:0',
             'eslora' => 'nullable|numeric|gt:0',
             'details' => 'nullable',
+            'image' => 'nullable'
         ]);
 
         try {
@@ -116,14 +117,15 @@ class ShipController extends Controller
             'details' => 'nullable',
         ]);
         // dd($validateData);
-        if ($request->image != null) {
-            $validateData['file'] = Storage::putFileAs(
-                'public/Ship/',
-                $request->image,
-                $validateData['name'] . "." . $request->image->getClientOriginalExtension()
-            );
-        };
+        
         try {
+            if ($request->image != null) {
+                $validateData['file'] = Storage::putFileAs(
+                    'public/Ship/',
+                    $request->image,
+                    $validateData['name'] . "." . $request->image->getClientOriginalExtension()
+                );
+            };
             $ship->update($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);

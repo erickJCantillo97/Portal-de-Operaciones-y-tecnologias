@@ -79,7 +79,8 @@ const submit = () => {
         })
         return 'creado';
     }
-    router.put(route('ships.update', formData.id), formData, {
+    console.log(formData)
+    router.post(route('ships.update', formData.id), formData, {
         preserveScroll: true,
         onSuccess: (res) => {
             open.value = false;
