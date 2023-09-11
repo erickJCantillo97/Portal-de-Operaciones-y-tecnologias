@@ -159,7 +159,7 @@ const openModal = (processes) => {
                                 <div>
                                     <div class="px-2 mt-2 text-center">
                                         <DialogTitle as="h3" class="text-xl font-semibold text-primary ">
-                                            {{ formData.id != 0 ? 'Editar ' : 'Crear' }} Actividad Base
+                                            Cargar Actividades
                                         </DialogTitle>
 
 
