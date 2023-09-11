@@ -24,7 +24,7 @@ Route::get('/', function () {
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
     Route::get('/dashboard', function () {
-     
+
 
         $taskProject = Task::whereNull('task_id')->get()->map(function (Task $item) {
             return [
@@ -40,13 +40,13 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         ]);
     })->name('dashboard');
 
-    Route::get('pruebaApi', function () {
+    Route::get('getEmpleadosGerencias', function () {
         if (auth()->user()->hasRole('Super Admin')) {
             return getEmpleadosAPI()->groupBy('GERENCIA');
         }
 
         return searchEmpleados('GERENCIA', auth()->user()->gerencia)->groupBy('OFICINA');
-    })->name('pruebaApi');
+    })->name('get.empleados.gerencia');
 
     Route::get('simple/crud', function (Request $request) {
         $request = $request->all();
