@@ -1,9 +1,9 @@
 <template>
-    <div class="min-h-full collapsible-vertical" :class="menu ? 'toggle-sidebar' : ''">
+    <div class="collapsible-vertical" :class="menu ? 'toggle-sidebar' : ''">
         <div class="bg-GECON hiden"></div>
 
 
-        <main class="flex-1 ">
+        <main class="flex-1">
             <div class="fixed inset-0 bg-[black]/60 z-10" :class="{ hidden: !menu }" @click="menu = !menu"></div>
 
             <MenuSidebar class="lg:block " :class="{ hidden: !menu }"></MenuSidebar>
@@ -64,7 +64,7 @@
                     </div>
                 </div>
             </div>
-            <div class=" sm:ml-20 sm:mr-2 mt-3 bg-white shadow-2xl rounded-lg h-">
+            <div class=" sm:ml-20 sm:mr-2 mt-3 bg-white shadow-2xl rounded-lg">
                 <slot />
             </div>
         </main>

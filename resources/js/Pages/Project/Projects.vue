@@ -11,7 +11,7 @@ import Combobox from '@/Components/Combobox.vue';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, Bars4Icon, CalendarIcon, EyeIcon, PhotoIcon, TableCellsIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline';
+import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassPlusIcon, SparklesIcon, EyeIcon, PhotoIcon, TableCellsIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline';
 import { useSweetalert } from '@/composable/sweetAlert';
 import { useConfirm } from "primevue/useconfirm";
 
@@ -190,14 +190,14 @@ const items = [
     {
         title: 'Crear cronograma nuevo',
         description: 'Aqui podra crear un cronograma vacio',
-        icon: Bars4Icon,
+        icon: MagnifyingGlassPlusIcon,
         background: 'bg-pink-500',
         page: 'createSchedule.create'
     },
     {
         title: 'Crear cronograma con asistente',
         description: 'Podra crear el proyecto con un asistente inteligente',
-        icon: CalendarIcon,
+        icon: SparklesIcon,
         background: 'bg-yellow-500',
         page: 'wizard'
     },

@@ -14,7 +14,7 @@ const props = defineProps({
 
 
 LocaleManager.applyLocale('Es');
-const barMargin = ref(4);
+const barMargin = ref(5);
 const ganttConfig = reactive(useGanttConfig(props.project));
 
 </script>

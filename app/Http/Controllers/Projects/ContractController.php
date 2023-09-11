@@ -95,7 +95,6 @@ class ContractController extends Controller
     {
         $validateData = $request->validate([
             'name' => 'required',
-            'gerencia' => 'required',
             'cost' => 'required',
             'start_date' => 'required',
             'end_date' => 'required',

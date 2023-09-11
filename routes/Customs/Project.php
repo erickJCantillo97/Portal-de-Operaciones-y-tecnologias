@@ -14,7 +14,7 @@ use Inertia\Inertia;
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
     Route::get('/ScheduleNew/{project}', [ScheduleController::class, 'index'])->name('showGantt');
-    Route::get('/ScheduleNewImport/{project}', [ScheduleController::class, 'import'])->name('ganttImporter');
+    Route::get('GanttImporterGanttImporter', [ScheduleController::class, 'import'])->name('ganttImporter');
     Route::get('/ScheduleWizard/{project}', [ScheduleController::class, 'wizard'])->name('wizard');
 
     Route::get('/ScheduleCreate/{project}', [ScheduleController::class, 'create'])->name('createSchedule.create');
@@ -34,8 +34,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     //CRUD Quotes
     Route::resource('quotes', QuoteController::class);
 
+    Route::post('ships/update/{ship}', [ShipController::class, 'update'])->name('ships.update');
     //CRUD Ships
-    Route::resource('ships', ShipController::class);
+    Route::resource('ships', ShipController::class)->except('update');
 
     //CRUD Customers
     Route::resource('customers', CustomerController::class);

@@ -47,6 +47,7 @@ useGanttConfig = function (p) {
         dependencyIdField: 'sequenceNumber',
 
         columns: [
+            { type : 'wbs' , text:'Nivel', width: 20},
             {
                 type: 'name',
                 width: 200,
@@ -126,8 +127,8 @@ const sliderConfig = {
     text: 'Set Bar Margin',
     min: 0,
     max: 15,
-    width: '50em',
-    showTooltip: false
+    width: '8em',
+    showTooltip: true
 };
 
 export { useGanttConfig, sliderConfig };

@@ -5,8 +5,7 @@ import { router, useForm } from '@inertiajs/vue3';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import Calendar from 'primevue/calendar';
-import Tag from 'primevue/tag';
+import Image from 'primevue/image';
 import Combobox from '@/Components/Combobox.vue';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
@@ -59,9 +58,9 @@ onMounted(() => {
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
-    if (props.customers==null){
-        formData.customer_id = customer.value.id;
-    }else{
+    if (props.customers == null) {
+        formData.customer_id = props.customer.id;
+    } else if (customerSelect.value != null) {
         formData.customer_id = customerSelect.value.id;
     }
     if (formData.id == 0) {
@@ -80,13 +79,15 @@ const submit = () => {
         })
         return 'creado';
     }
-    router.put(route('ships.update', formData.id), formData, {
+    console.log(formData)
+    router.post(route('ships.update', formData.id), formData, {
         preserveScroll: true,
         onSuccess: (res) => {
             open.value = false;
             toast('¡Buque actualizado exitosamente!', 'success');
         },
         onError: (errors) => {
+            console.log(errors);
             toast('¡Ups! Ha surgido un error', 'error');
         },
         onFinish: visit => {
@@ -228,7 +229,14 @@ const exportarExcel = () => {
                 </template>
 
                 <!--COLUMNAS-->
-                <Column field="name" header="Nombre"></Column>
+                <Column field="name" header="Nombre">
+                    <template #body="slotProps">
+                        <div class="flex space-x-2 items-center">
+                            <Image :src="slotProps.data.file" alt="Image" class="h-8 w-8 rounded-full" preview />
+                            <p>{{ slotProps.data.name }} </p>
+                        </div>
+                    </template>
+                </Column>
                 <Column field="customer.name" header="Cliente"></Column>
                 <Column field="type" header="Tipo de Buque"></Column>
                 <Column field="quilla" header="Quillas"></Column>
@@ -277,7 +285,6 @@ const exportarExcel = () => {
                     leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
                     <div class="fixed inset-0 z-30 w-screen h-screen transition-opacity bg-gray-500 bg-opacity-75" />
                 </TransitionChild>
-
                 <div class="fixed inset-0 z-50 h-screen overflow-y-auto">
                     <div class="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
                         <TransitionChild as="template" enter="ease-out duration-300"
@@ -325,7 +332,7 @@ const exportarExcel = () => {
                                                 :placeholder="'Escriba los detalles del Buque'" v-model="formData.details"
                                                 :error="router.page.props.errors.details"></TextInput>
                                             <FileUpload chooseLabel="Adjuntar foto" cancelLabel="Cancelar"
-                                                :show-upload-button=false name="demo[]" :multiple="false" fileLimit="1"
+                                                :show-upload-button=false name="demo[]" :multiple="false" :fileLimit=1
                                                 accept="image/*" :maxFileSize="1000000"
                                                 @input="formData.image = $event.target.files[0]">
                                                 <template #empty>
