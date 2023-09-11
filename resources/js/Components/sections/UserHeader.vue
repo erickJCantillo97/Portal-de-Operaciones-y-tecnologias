@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white mx-2">
+    <div class="bg-white">
     
         <div class="px-4 sm:px-6 lg:mx-auto lg:max-w-6xl lg:px-8">
     
@@ -29,7 +29,7 @@
     
                                 <dd class="flex items-center text-sm font-medium capitalize text-gray-500 sm:mr-6">
     
-                                    <BuildingOfficeIcon class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" /> {{$page.props.auth.user.gerencia}}
+                                    <BuildingOfficeIcon class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" /> {{$page.props.auth.user.gerencia}} - {{$page.props.auth.user.oficina}}
     
                                 </dd>
     

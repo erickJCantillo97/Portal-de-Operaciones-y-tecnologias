@@ -54,7 +54,11 @@ const getTask = () => {
                     <div v-for="item in projects" :key="item.id" class="relative overflow-hidden rounded-lg bg-white px-2 pb-8 pt-1 shadow">
                         <dt>
                             <div class="absolute rounded-md">
-                            <Image :src="item.file" alt="Image" class="h-16 w-20 rounded-full" preview />
+                            <Image  alt="Image"  preview >
+                                <template #image>
+                                    <img class="h-16 w-20 rounded-full" :src="item.file" />
+                                </template>
+                            </Image>
                             </div>
                             <p class="ml-20 text-sm font-medium text-gray-500">{{ item.name }}</p>
                         </dt>
