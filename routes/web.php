@@ -24,9 +24,9 @@ Route::get('/', function () {
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
     Route::get('/dashboard', function () {
-        $proyecto = Project::first();
+     
 
-        $taskProject = Task::where('project_id', $proyecto->id)->whereNull('task_id')->get()->map(function (Task $item) {
+        $taskProject = Task::whereNull('task_id')->get()->map(function (Task $item) {
             return [
                 'id' => $item->id,
                 'project_id' => $item->project->id,
