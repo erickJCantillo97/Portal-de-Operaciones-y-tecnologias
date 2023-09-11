@@ -19,7 +19,7 @@ const totalMembers = ref(0)
 const tasks = ref([]);
 
 onMounted(() => {
-    axios.get(route('pruebaApi')).then((res) => {
+    axios.get(route('get.empleados.gerencia')).then((res) => {
         for (var gerencia of Object.values(res.data)) {
             personal.value.push({
                 title: hasRole('Super Admin') ? gerencia[0].GERENCIA : gerencia[0].OFICINA,
@@ -38,10 +38,6 @@ const getTask = () => {
         tasks.value = res.data
     })
 }
-
-
-
-
 </script>
 
 <template>
@@ -54,7 +50,7 @@ const getTask = () => {
                     <div v-for="item in projects" :key="item.id" class="relative overflow-hidden rounded-lg bg-white px-2 pb-8 pt-1 shadow">
                         <dt>
                             <div class="absolute rounded-md">
-                            <Image  alt="Image"  preview >
+                            <Image  alt="Image">
                                 <template #image>
                                     <img class="h-20 w-20 rounded-full" :src="item.file" />
                                 </template>
@@ -99,7 +95,7 @@ const getTask = () => {
                     <h2 class="font-medium text-primary text-xl">Actividades De Hoy </h2>
                     <h2 class="font-medium text-primary text-xl">Total: {{tasks.length}}</h2>
                 </div>
-                
+
                 <ul class="block space-y-2 mt-2">
                     <li v-for="task in tasks" :key="task.id" class="shadow-lg p-2 flex justify-between rounded-md">
                         <div class="block">
@@ -109,7 +105,7 @@ const getTask = () => {
                         <p>{{ task.percentDone }} %</p>
                     </li>
                 </ul>
-                
+
             </div>
         </div>
     </AppLayout>
