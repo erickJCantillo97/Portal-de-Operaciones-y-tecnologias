@@ -182,6 +182,6 @@ const openModal = (processes) => {
                     </div>
                 </div>
             </Dialog>
-        </TransitionRoot> -->
+        </TransitionRoot>
     </AppLayout>
 </template>
