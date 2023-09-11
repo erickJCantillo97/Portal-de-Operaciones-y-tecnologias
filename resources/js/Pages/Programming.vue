@@ -42,7 +42,7 @@ function obtenerLunesYViernesSemanaActual() {
     // Calcula la fecha del viernes de la semana actual
     const viernes = new Date(lunes);
     viernes.setDate(lunes.getDate() + 4);
-  
+
 
     return {
         lunes: lunes,
@@ -51,7 +51,7 @@ function obtenerLunesYViernesSemanaActual() {
 }
 
 const getTask = (option) => {
- 
+
     const today = new Date();
     optionValue.value = option
     switch (option) {
@@ -111,7 +111,10 @@ const redondear = (value )=> {
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
                 <template #empty>
-                    <p class="text-center pt-5 pb-5">No hay actividades programadas</p>
+                    <p class="text-center pt-5 pb-5">No hay tareas para mostrar</p>
+                </template>
+                <template #loading>
+                    <p class="text-center pt-5 pb-5">Cargando tareas...</p>
                 </template>
 
                 <template #header>

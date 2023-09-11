@@ -43,15 +43,15 @@ const submit = () => {
     -->
     <div class="min-w-full min-h-screen flex sm:justify-center justify-center items-center">
         <div class="sm:max-w-sm min-w-max">
-            <video autoplay="autoplay" class="video" loop="loop" muted="muted" preload="">
+            <video autoplay="autoplay" class="video hidden md:block" loop="loop" muted="muted" preload="">
                 <source src="/video/video_margen_completa_home.mp4" type="video/mp4">
             </video>
-            <div class="rounded-3xl backdrop-blur-xl px-6 py-4  shadow-2xl shadow-black">
-                <div class="items-center justify-center">
+            <div class="rounded-3xl w-96 md:w-full bg-whitw md:bg-transparent md:backdrop-blur-xl px-2 md:px-6 py-4  shadow-2xl shadow-black">
+                <div class="items-center justify-center text-primary md:text-white">
                     <ApplicationLogo class="mx-[45%]"></ApplicationLogo>
-                    <h2 class="mt-8 text-center text-2xl font-bold leading-9 tracking-tight text-white">
+                    <h2 class="mt-8 text-center text-2xl font-bold leading-9 tracking-tight">
                         Bienvenido al Portal Operaciones Tecnologicas</h2>
-                    <p class="mt-2 text-center text-sm leading-6 text-gray-200">
+                    <p class="mt-2 text-center text-sm leading-6 ">
                         <i>Inicia sesión con tu usuario de dominio</i>
                     </p>
                 </div>
@@ -60,7 +60,7 @@ const submit = () => {
                     <div>
                         <form action="#" method="POST" @submit.prevent="submit" class="space-y-6">
                             <div>
-                                <label for="price" class="block text-sm font-medium leading-6 text-white">
+                                <label for="price" class="block text-sm font-medium leading-6 text-primary md:text-white">
                                     Nombre de usuario</label>
                                 <div class="relative mt-2 rounded-md shadow-sm">
 
@@ -75,7 +75,7 @@ const submit = () => {
                             </div>
 
                             <div>
-                                <label for="password" class="block text-sm font-medium leading-6 text-white">
+                                <label for="password" class="block text-sm font-medium leading-6 text-primary md:text-white">
                                     Password</label>
                                 <div class="mt-2">
                                     <input id="password" v-model="form.password" name="password" type="password"
@@ -89,7 +89,7 @@ const submit = () => {
                                     <input id="remember-me" v-model="form.remember" name="remember-me" type="checkbox"
                                         class="h-4 w-4 rounded border-gray-300 text-[#2c3494] focus:ring-indigo-600" />
                                     <label for="remember-me"
-                                        class="ml-3 mt-2 block text-sm leading-6 text-white">Recuérdame</label>
+                                        class="ml-3 mt-2 block text-sm leading-6 text-primary md:text-white">Recuérdame</label>
                                 </div>
 
                                 <!-- <div class="text-sm leading-6">

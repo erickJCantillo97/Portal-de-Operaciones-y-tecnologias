@@ -71,14 +71,17 @@ const getTask = () => {
                 </dl>
             </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 mb-8">
-            <div class="mt-4 px-4 sm:px-6">
-                <div class="flex justify-between">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-8">
+            <div class="m-4">
+                <div class="bg-gradient-to-b from-gray-400 to-slate-50 text-black font-extrabold  w-full p-4 text-center">
+                    <h2 class="text-xl font-extrabold">Personal</h2>
+                </div>
+                <!-- <div class="flex justify-between">
                     <h2 class="font-medium text-primary text-xl">Personal</h2>
                     <h2 class="font-medium text-primary text-xl">Total: {{totalMembers}}</h2>
-                </div>
+                </div> -->
 
-                <div role="list" class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2 lg:grid-cols-2 h-32 sm:h-64 overflow-y-auto custom-scroll snap-y snap-proximity px-2">
+                <div role="list" class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2 lg:grid-cols-2 h-64 overflow-y-auto custom-scroll snap-y snap-proximity px-2 my-6">
                     <div  v-for="project in personal" :key="project.title" class="relative col-span-1 flex rounded-md snap-center shadow-sm">
                         <div :class="[project.bgColorClass, 'flex w-16 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium text-white']">{{ project.initials }}</div>
                         <div class="flex flex-1 items-center justify-between truncate rounded-r-md border-b border-r border-t border-gray-200 bg-white">
@@ -90,11 +93,12 @@ const getTask = () => {
                     </div>
                 </div>
             </div>
-            <div class="mt-4 px-4 sm:px-6 border-l border-gray-300 h-32 sm:h-64 overflow-y-auto custom-scroll snap-y snap-proximity">
-                <div class="flex justify-between">
-                    <h2 class="font-medium text-primary text-xl">Actividades De Hoy </h2>
-                    <h2 class="font-medium text-primary text-xl">Total: {{tasks.length}}</h2>
+            <div class="m-4">
+                <div class="bg-gradient-to-b from-blue-400 to-slate-50 text-black font-extrabold w-full p-4 text-center">
+                    <h2 class="text-xl font-extrabold ">Actividades de Hoy</h2>
                 </div>
+                <div class="mt-4 px-4 sm:px-6  h-64 overflow-y-auto custom-scroll snap-y snap-proximity">
+
 
                 <ul class="block space-y-2 mt-2">
                     <li v-for="task in tasks" :key="task.id" class="shadow-lg p-2 flex justify-between rounded-md">
@@ -107,6 +111,8 @@ const getTask = () => {
                 </ul>
 
             </div>
+            </div>
+
         </div>
     </AppLayout>
 </template>

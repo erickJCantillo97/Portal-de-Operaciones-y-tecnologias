@@ -41,7 +41,7 @@ class ScheduleController extends Controller
     public function import(Request $request)
     {
         return Inertia::render('GanttImporter', [
-         
+
         ]);
     }
 
@@ -59,7 +59,16 @@ class ScheduleController extends Controller
             ]],
             "tasks" => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
             "dependencies" => ['rows' => []],
-            "resources" => ['rows' => []],
+            "resources" => ['rows' => [
+                [
+                    'id' => 1,
+                    'name' => 'Auxiliar de Investigación y Desarrollo'
+                ],
+                [
+                    'id' => 2,
+                    'name' => 'Jefe de Departamento'
+                ],
+            ]],
             "assignments" => ['rows' => []],
             "timeRanges" => ['rows' => []]
         ]);
