@@ -285,7 +285,8 @@ const items = [
                 <Column field="daysPerMonth" header="Dias por Mes"></Column>
                 <Column field="status" header="Estado" sortable>
                     <template #body="slotProps">
-                        <Tag :value="'EJECUCIÓN'" :severity="getContractStatusSeverity('EJECUCIÓN')" />
+                        <Tag :value="'EJECUCIÓN'" :severity="getContractStatusSeverity('EJECUCIÓN')"
+                            class="animate-pulse" />
                     </template>
                 </Column>
 
