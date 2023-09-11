@@ -94,6 +94,8 @@ class ContractController extends Controller
     public function update(Request $request, Contract $contract)
     {
         $validateData = $request->validate([
+            'customer_id' => 'nullable',
+            'ship_id' => 'nullable',
             'name' => 'required',
             'cost' => 'required',
             'start_date' => 'required',

@@ -19,7 +19,7 @@ class AuthorizationController extends Controller
      */
     public function index()
     {
-        $authorizations = Authorization::get();
+        $authorizations = Authorization::with('contract', 'quote')->orderBy('id')->get();
         $ships = Ship::orderBy('name')->get();
         $contracts = Contract::orderBy('name')->get();
         $quotes = Quote::orderBy('name')->get();
@@ -53,7 +53,8 @@ class AuthorizationController extends Controller
             'quote_id' => 'nullable',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'name'=>'required'
+            'name' => 'required',
+            'file' => 'nullable',
         ]);
 
         try {
@@ -61,9 +62,9 @@ class AuthorizationController extends Controller
                 $validateData['file'] = Storage::putFileAs(
                     'public/Autorization/',
                     $request->pdf,
-                    $validateData['name'] . "." . $request->pdf->getClientOriginalExtension()
+                    $validateData['name'].'.'.$request->pdf->getClientOriginalExtension()
                 );
-            };
+            }
             Authorization::create($validateData);
 
             return back()->with(['message' => 'Autorización creado correctamente'], 200);
@@ -96,12 +97,13 @@ class AuthorizationController extends Controller
     public function update(Request $request, Authorization $authorization)
     {
         $validateData = $request->validate([
-            'project_id' => 'nullable',
+            // 'project_id' => 'nullable',
             'contract_id' => 'nullable',
-            'gerencia' => 'required',
+            'quote_id' => 'nullable',
+            'gerencia' => 'nullable',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'name'=>'required'
+            'name' => 'required',
         ]);
 
         try {
@@ -109,9 +111,9 @@ class AuthorizationController extends Controller
                 $validateData['file'] = Storage::putFileAs(
                     'public/Autorization/',
                     $request->pdf,
-                    $validateData['name'] . "." . $request->pdf->getClientOriginalExtension()
+                    $validateData['name'].'.'.$request->pdf->getClientOriginalExtension()
                 );
-            };
+            }
             $authorization->update($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);

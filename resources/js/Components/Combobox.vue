@@ -14,7 +14,16 @@ import {
 const emit = defineEmits(['update:select']);
 
 const query = ref('')
-const props = defineProps({ modelValue: Object, options: Array, label: String, placeholder: String })
+const props = defineProps({
+    modelValue: Object,
+    options: Array,
+    label: String,
+    placeholder: String,
+    enabled: {
+        type: Boolean,
+        default: true
+    }
+})
 const filtered = computed(() =>
     query.value === ''
         ? props.options
@@ -26,13 +35,17 @@ const filtered = computed(() =>
 
 <template>
     <Combobox as="div" :modelValue="modelValue" @update:modelValue="value => emit('update:modelValue', value)">
-        <ComboboxLabel class="block text-sm font-medium leading-6 text-gray-900">{{ label }}</ComboboxLabel>
+        <ComboboxLabel class="block text-sm font-medium leading-6 text-gray-900">
+            {{ label }}
+            <sup class="text-danger">*</sup>
+        </ComboboxLabel>
         <div class="relative">
             <ComboboxInput
                 class="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 @change="query = $event.target.value" :display-value="(customer) => customer?.name"
-                :placeholder="placeholder" />
-            <ComboboxButton class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+                :placeholder="placeholder" :disabled="!enabled" />
+            <ComboboxButton :disabled="!enabled"
+                class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                 <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
             </ComboboxButton>
 

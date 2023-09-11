@@ -15,33 +15,34 @@ class ShipController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request){
+    public function index(Request $request)
+    {
 
-     if (isset($request->id)){
+        if (isset($request->id)) {
 
-        $ships = Ship::with('customer')->where('customer_id', $request->id)->get();
-        // dd($ships);
-        return Inertia::render('Project/Ships',
-            [
-                'ships' => $ships,
-                'customer'=> Customer::find($request->id)
-            ]
-        );
-    }else{
-        $ships = Ship::with('customer')->orderBy('name')->get();
-        $customers = Customer::orderBy('name')->get();
-        return Inertia::render('Project/Ships',
-            [
-                'ships' => $ships,
-                'customers' => $customers,
-            ]
-        );
-    }
+            $ships = Ship::with('customer')->where('customer_id', $request->id)->get();
+            // dd($ships);
+            return Inertia::render('Project/Ships',
+                [
+                    'ships' => $ships,
+                    'customer' => Customer::find($request->id),
+                ]
+            );
+        } else {
+            $ships = Ship::with('customer')->orderBy('name')->get();
+            $customers = Customer::orderBy('name')->get();
+
+            return Inertia::render('Project/Ships',
+                [
+                    'ships' => $ships,
+                    'customers' => $customers,
+                ]
+            );
+        }
         // return response()->json([
         //     $ship
         // ], 200);
     }
-
 
     /**
      * Show the form for creating a new resource.
@@ -72,12 +73,12 @@ class ShipController extends Controller
                 $validateData['file'] = Storage::putFileAs(
                     'public/Ship/',
                     $request->image,
-                    $validateData['name'] . "." . $request->image->getClientOriginalExtension()
+                    $validateData['name'].'.'.$request->image->getClientOriginalExtension()
                 );
-            };
+            }
             Ship::create($validateData);
 
-            return back()->with(['message' => 'Buque creado correctamente'], 200);
+            return back()->with(['message' => 'Unidad creada correctamente'], 200);
         } catch (Exception $e) {
             return back()->withErrors(['message' => 'Ocurrió un error al crear el Buque: '.$e->getMessage()], 500);
         }
@@ -116,15 +117,15 @@ class ShipController extends Controller
             'details' => 'nullable',
         ]);
         // dd($validateData);
-        
+
         try {
             if ($request->image != null) {
                 $validateData['file'] = Storage::putFileAs(
                     'public/Ship/',
                     $request->image,
-                    $validateData['name'] . "." . $request->image->getClientOriginalExtension()
+                    $validateData['name'].'.'.$request->image->getClientOriginalExtension()
                 );
-            };
+            }
             $ship->update($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);

@@ -31,10 +31,12 @@ const filters = ref({
 })
 const open = ref(false);
 const project = ref();
-const projectSelect=ref();
+const projectSelect = ref();
+const contractSelect = ref();
+const shipSelect = ref();
 const op = ref();
 const toggle = (event, p) => {
-    projectSelect.value=p;
+    projectSelect.value = p;
     op.value.toggle(event);
 }
 
@@ -103,15 +105,21 @@ const submit = () => {
 
 const addItem = () => {
     router.get(route('projects.create'))
+    clearError();
     // formData.reset();
     // open.value = true;
 }
 
 const editItem = (project) => {
+    clearError();
+
     formData.id = project.id;
+    contractSelect.value = project.contract;
+    shipSelect.value = project.ship;
     formData.name = project.name;
     formData.gerencia = project.gerencia;
     formData.start_date = project.start_date;
+    formData.end_date = project.end_date;
     formData.hoursPerDay = project.hoursPerDay;
     formData.daysPerWeek = project.daysPerWeek;
     formData.daysPerMonth = project.daysPerMonth;
@@ -120,7 +128,7 @@ const editItem = (project) => {
 };
 
 const addTask = (id) => {
-    router.get(route('createSchedule.create',id));
+    router.get(route('createSchedule.create', id));
 }
 
 
@@ -134,6 +142,10 @@ const initFilters = () => {
 const clearFilter = () => {
     initFilters();
 };
+
+const clearError = () => {
+    router.page.props.errors = {};
+}
 
 const formatDate = (value) => {
     return value.toLocaleDateString('es-ES', {
@@ -228,7 +240,7 @@ const items = [
                     </h1>
                 </div>
 
-                <div class="">
+                <div class="" title="Agregar Proyecto">
                     <Button @click="addItem()" severity="success">
                         <PlusIcon class="w-6 h-6" aria-hidden="true" />
                         Agregar
@@ -245,7 +257,7 @@ const items = [
                 <template #header>
                     <div class="flex justify-between w-full h-8 mb-2">
                         <div class="flex space-x-4">
-                            <div class="w-8">
+                            <div class="w-8" title="Filtrar Proyectos">
                                 <Button @click="clearFilter()" type="button" severity="primary" class="hover:bg-primary ">
                                     <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
                                 </Button>
@@ -255,7 +267,7 @@ const items = [
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <MagnifyingGlassIcon class="w-5 h-4 text-gray-400" aria-hidden="true" />
                                 </div>
-                                <input type="search"
+                                <input type="search" title="Buscar Proyectos"
                                     class="block w-10/12 py-4 pl-10 text-gray-900 border-0 rounded-md ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                     v-model="filters.global.value" placeholder="Buscar..." />
                             </div>
@@ -273,17 +285,18 @@ const items = [
                 <Column field="daysPerMonth" header="Dias por Mes"></Column>
                 <Column field="status" header="Estado" sortable>
                     <template #body="slotProps">
-                        <Tag :value="slotProps.data.status" :severity="getContractStatusSeverity(slotProps.data)" />
+                        <Tag :value="'EJECUCIÓN'" :severity="getContractStatusSeverity('EJECUCIÓN')"
+                            class="animate-pulse" />
                     </template>
                 </Column>
 
                 <!--ACCIONES-->
                 <Column header="Acciones" class="space-x-3">
                     <template #body="slotProps">
-                        <!--BOTÓN EDITAR-->
+                        <!--BOTÓN CREAR ACTIVIDADES-->
                         <div
                             class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
-                            <div>
+                            <div title="Crear Actividades">
                                 <Button severity="primary" @click="toggle($event, slotProps.data)" class="hover:bg-primary">
                                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M18 16L16 16M16 16L14 16M16 16L16 14M16 16L16 18" stroke="#1C274C"
@@ -298,23 +311,17 @@ const items = [
                                     </svg>
                                 </Button>
                             </div>
-                            <div>
+                            <!--BOTÓN EDITAR-->
+                            <div title="Editar Proyecto">
                                 <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
                                     <PencilIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
                             </div>
                             <!--BOTÓN ELIMINAR-->
-                            <div>
+                            <div title="Eliminar Proyecto">
                                 <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Proyecto', 'projects')"
                                     class="hover:bg-danger">
                                     <TrashIcon class="w-4 h-4 " aria-hidden="true" />
-                                </Button>
-                            </div>
-                            <!--BOTÓN AGREGAR TAREAS-->
-                            <div>
-                                <Button severity="success" @click=""
-                                    class="hover:bg-success">
-                                    <EyeIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
                             </div>
                         </div>
@@ -349,11 +356,12 @@ const items = [
                                             <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
                                                 <Combobox class="mt-2 text-left text-gray-900" label="Contrato"
                                                     placeholder="Seleccione Contrato" :options="contracts"
-                                                    v-model="contractSelect">
+                                                    :enabled="formData.id == 0" v-model="contractSelect">
                                                 </Combobox>
 
                                                 <Combobox class="mt-2 text-left" label="Buque"
-                                                    placeholder="Seleccione Buque" :options="ships" v-model="shipSelect">
+                                                    placeholder="Seleccione Buque" :options="ships"
+                                                    :enabled="formData.id == 0" v-model="shipSelect">
                                                 </Combobox>
                                             </div>
 
@@ -421,21 +429,21 @@ const items = [
                     <li v-for="(item, itemIdx) in items" :key="itemIdx" class="flow-root">
                         <div @click="router.get(route(item.page, projectSelect.id))"
                             class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 focus-within:ring-2 focus-within:ring-indigo-500 hover:bg-gray-50">
-                        <div
-                            :class="[item.background, 'flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg']">
-                            <component :is="item.icon" class="h-6 w-6 text-white" aria-hidden="true" />
+                            <div
+                                :class="[item.background, 'flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg']">
+                                <component :is="item.icon" class="h-6 w-6 text-white" aria-hidden="true" />
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-900">
+                                    <a href="#" class="focus:outline-none">
+                                        <span class="absolute inset-0" aria-hidden="true" />
+                                        <span>{{ item.title }}</span>
+                                        <span aria-hidden="true"> &rarr;</span>
+                                    </a>
+                                </h3>
+                                <p class="mt-1 text-sm text-gray-500">{{ item.description }}</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="text-sm font-medium text-gray-900">
-                                <a href="#" class="focus:outline-none">
-                                    <span class="absolute inset-0" aria-hidden="true" />
-                                    <span>{{ item.title }}</span>
-                                    <span aria-hidden="true"> &rarr;</span>
-                                </a>
-                            </h3>
-                            <p class="mt-1 text-sm text-gray-500">{{ item.description }}</p>
-                        </div>
-                    </div>
                     </li>
                 </ul>
                 <!-- <div class="mt-4 flex">

@@ -47,7 +47,7 @@ class QuoteController extends Controller
         // dd($request);
         $validateData = $request->validate([
             'ship_id' => 'nullable',
-            'code' => 'required',
+            'code' => 'required|unique:quotes,code',
             'cost' => 'required|numeric|gt:0',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
@@ -56,6 +56,7 @@ class QuoteController extends Controller
         try {
             $validateData['gerencia'] = auth()->user()->gerencia;
             $validateData['name'] = $validateData['code'];
+
             if ($request->pdf != null) {
                 $validateData['file'] = Storage::putFileAs(
                     'public/Quote/',
@@ -96,7 +97,6 @@ class QuoteController extends Controller
     {
         $validateData = $request->validate([
             'ship_id' => 'nullable',
-            'gerencia' => 'required',
             'cost' => 'required|numeric',
             'start_date' => 'required|date',
             'end_date' => 'required|date',

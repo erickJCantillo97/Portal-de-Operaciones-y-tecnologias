@@ -53,8 +53,20 @@ onMounted(() => {
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
+
+    if (!customerSelect.value) {
+        toast('Por favor seleccione un cliente.', 'error')
+        return;
+    }
+
+    if (!shipSelect.value) {
+        toast('Por favor seleccione un buque.', 'error')
+        return;
+    }
+
     formData.customer_id = customerSelect.value.id
     formData.ship_id = shipSelect.value.id
+
     if (formData.id == 0) {
         router.post(route('contracts.store'), formData, {
             preserveScroll: true,
@@ -63,7 +75,7 @@ const submit = () => {
                 toast(' Contrato creado exitosamente', 'success');
             },
             onError: (errors) => {
-                toast('¡Ups! Ha surgido un error', 'error');
+                toast('Por favor diligencie todos los campos', 'error');
             },
             onFinish: visit => {
                 loading.value = false;
@@ -89,17 +101,23 @@ const submit = () => {
 
 const addItem = () => {
     formData.reset();
+    clearErrors();
+    customerSelect.value = {}; //Resetear los datos 
+    shipSelect.value = {}; //Resetear los datos 
     open.value = true;
 }
 
 const editItem = (contract) => {
+    clearErrors();
+
     formData.id = contract.id;
+    customerSelect.value = contract.customer; //Este dato viene del Contract::with('customer')
+    shipSelect.value = contract.ship; //Este dato viene del Contract::with('ship')
     formData.name = contract.name;
     formData.cost = contract.cost;
     formData.start_date = contract.start_date;
     formData.end_date = contract.end_date;
     formData.pdf = contract.pdf;
-    customerSelect.value = contract.customer;
     open.value = true;
 };
 
@@ -112,6 +130,10 @@ const initFilters = () => {
 
 const clearFilter = () => {
     initFilters();
+};
+
+const clearErrors = () => {
+    router.page.props.errors = {};
 };
 
 const formatDate = (value) => {
@@ -152,18 +174,21 @@ const exportarExcel = () => {
         <div class="px-auto  w-full p-4">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
-                    <h1 class="text-xl capitalize font-semibold leading-6 text-primary">Contratos</h1>
+                    <h1 class="text-xl capitalize font-semibold leading-6 text-primary">
+                        Contratos
+                    </h1>
                 </div>
 
-                <div class="">
+                <div class="" title="Agregar Contrato">
                     <Button @click="addItem()" severity="success">
-                        <PlusIcon class="h-6 w-6" aria-hidden="true" /> Agregar
+                        <PlusIcon class="h-6 w-6" aria-hidden="true" />
+                        Agregar
                     </Button>
                 </div>
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="contracts" v-model:filters="filters"
                 dataKey="id" filterDisplay="menu" :loading="loading"
-                :globalFilterFields="['name', 'gerencia', 'cost', 'start_date', 'end_date']"
+                :globalFilterFields="['name', 'customer.name', 'ship.name', 'gerencia', 'cost', 'start_date', 'end_date']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -171,7 +196,7 @@ const exportarExcel = () => {
                 <template #header>
                     <div class="flex justify-between w-full h-8 mb-2">
                         <div class="flex space-x-4">
-                            <div class="w-8">
+                            <div class="w-8" title="Filtrar Contratos">
                                 <Button @click="clearFilter()" type="button" severity="primary" class="hover:bg-primary ">
                                     <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
                                 </Button>
@@ -181,7 +206,7 @@ const exportarExcel = () => {
                                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                     <MagnifyingGlassIcon class="h-4 w-5  text-gray-400" aria-hidden="true" />
                                 </div>
-                                <input type="search"
+                                <input type="search" title="Buscar Contrato"
                                     class="block w-10/12 rounded-md border-0 py-4 pl-10 text-gray-900 ring-1  ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                     v-model="filters.global.value" placeholder="Buscar..." />
                             </div>
@@ -214,12 +239,13 @@ const exportarExcel = () => {
                         <!--BOTÓN EDITAR-->
                         <div
                             class="whitespace-normal pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8 flex space-x-2 ">
-                            <div>
+                            <div title="Editar Contrato">
                                 <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
                                     <PencilIcon class="h-4 w-4 " aria-hidden="true" />
                                 </Button>
                             </div>
-                            <div>
+                            <!--BOTÓN ELIMINAR-->
+                            <div title="Eliminar Contrato">
                                 <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Contrato', 'contracts')"
                                     class="hover:bg-danger">
                                     <TrashIcon class="h-4 w-4 " aria-hidden="true" />
@@ -249,9 +275,9 @@ const exportarExcel = () => {
                                 class="relative transform overflow-hidden rounded-lg bg-white px-2 pb-4 pt-2 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg ">
                                 <div>
                                     <div class="px-2 mt-2 text-center">
-                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary text-center">{{
-                                            formData.id !=
-                                            0 ? 'Editar ' : 'Crear' }} Contrato
+                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary text-center">
+                                            {{ formData.id != 0 ? 'Editar ' : 'Crear' }}
+                                            Contrato
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-2 border border-gray-200 rounded-lg">
                                             <Combobox class="mt-2 text-left" label="Cliente"
