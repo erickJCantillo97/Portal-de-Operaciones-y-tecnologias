@@ -30,7 +30,6 @@ const filters = ref({
 })
 const open = ref(false)
 
-
 const props = defineProps({
     ships: Array,
     customers: Array,
@@ -58,11 +57,13 @@ onMounted(() => {
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
+
     if (props.customers == null) {
         formData.customer_id = props.customer.id;
     } else if (customerSelect.value != null) {
         formData.customer_id = customerSelect.value.id;
     }
+
     if (formData.id == 0) {
         router.post(route('ships.store'), formData, {
             preserveScroll: true,
@@ -71,7 +72,7 @@ const submit = () => {
                 toast(' Buque creado exitosamente', 'success');
             },
             onError: (errors) => {
-                toast('¡Ups! Ha surgido un error', 'error');
+                toast('Por favor diligencie todos los campos.', 'error');
             },
             onFinish: visit => {
                 loading.value = false;
@@ -99,10 +100,13 @@ const submit = () => {
 
 const addItem = () => {
     formData.reset();
+    clearErrors();
     open.value = true;
 }
 
 const editItem = (ship) => {
+    clearErrors();
+
     formData.id = ship.id;
     formData.customer_id = ship.customer_id;
     formData.name = ship.name;
@@ -129,6 +133,10 @@ const clearFilter = () => {
     initFilters();
 };
 
+const clearErrors = () => {
+    router.page.props.errors = {};
+};
+
 const formatDate = (value) => {
     return value.toLocaleDateString('es-ES', {
         day: '2-digit',
@@ -138,11 +146,17 @@ const formatDate = (value) => {
 };
 
 // Formatear el número en moneda (USD)
-const formatCurrency = (value) => {
-    return parseFloat(value).toLocaleString('es-CO', {
-        style: 'currency',
-        currency: 'COP'
-    });
+const formatMeters = (value) => {
+    // Eliminar caracteres no numéricos, excepto el punto decimal
+    const unformattedLength = value.replace(/[^0-9.]/g, "");
+
+    // Convertir la cadena a un número
+    length = parseFloat(unformattedLength);
+
+    // Formatear el número con la unidad "m"
+    value = `${length} metros`;
+
+    return value;
 };
 
 const getContractStatusSeverity = (ship) => {
@@ -189,12 +203,12 @@ const exportarExcel = () => {
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 text-primary">
-                        <p v-if="customer">Unidades del ciente: {{ customer.name }}</p>
+                        <p v-if="customer" icon="pi pi-eye">Unidades del cliente: {{ customer.name }}</p>
                         <p v-else>Todas las unidades</p>
                     </h1>
                 </div>
 
-                <div class="">
+                <div class="" title="Agregar Unidad">
                     <Button @click="addItem()" severity="success">
                         <PlusIcon class="w-6 h-6" aria-hidden="true" />
                         Agregar
@@ -210,7 +224,7 @@ const exportarExcel = () => {
                 <template #header>
                     <div class="flex justify-between w-full h-8 mb-2">
                         <div class="flex space-x-4">
-                            <div class="w-8">
+                            <div class="w-8" title="Filtrar Buques">
                                 <Button @click="clearFilter()" type="button" severity="primary" class="hover:bg-primary ">
                                     <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
                                 </Button>
@@ -220,7 +234,7 @@ const exportarExcel = () => {
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <MagnifyingGlassIcon class="w-5 h-4 text-gray-400" aria-hidden="true" />
                                 </div>
-                                <input type="search"
+                                <input type="search" title="Buscar Buque"
                                     class="block w-10/12 py-4 pl-10 text-gray-900 border-0 rounded-md ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                     v-model="filters.global.value" placeholder="Buscar..." />
                             </div>
@@ -241,13 +255,18 @@ const exportarExcel = () => {
                 <Column field="type" header="Tipo de Buque"></Column>
                 <Column field="quilla" header="Quillas"></Column>
                 <Column field="pantoque" header="Pantoque"></Column>
-                <Column field="eslora" header="Eslora"></Column>
+                <Column field="eslora" header="Eslora">
+                    <template #body="slotProps">
+                        {{ formatMeters(slotProps.data.eslora) }}
+                    </template>
+                </Column>
                 <Column header="Cliente">
                     <template #body="slotProps">
                         <p v-if=slotProps.data.customer>{{ slotProps.data.customer.name }}</p>
                         <p v-else> Sin asignar cliente</p>
                     </template>
                 </Column>
+                <Column field="details" header="Detalles"></Column>
                 <!-- <Column field="status" header="Estado" sortable>
                     <template #body="slotProps">
                         <Tag :value="slotProps.data.status" :severity="getContractStatusSeverity(slotProps.data)" />
@@ -261,12 +280,13 @@ const exportarExcel = () => {
                         <!--BOTÓN EDITAR-->
                         <div
                             class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
-                            <div>
+                            <div title="Editar Unidad">
                                 <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
                                     <PencilIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
                             </div>
-                            <div>
+                            <!--BOTÓN ELIMINAR-->
+                            <div title="Eliminar Unidad">
                                 <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Buque', 'ships')"
                                     class="hover:bg-danger">
                                     <TrashIcon class="w-4 h-4 " aria-hidden="true" />
@@ -326,17 +346,22 @@ const exportarExcel = () => {
 
                                             <TextInput class="mt-2 text-left" label="Longitud de Eslora" type="number"
                                                 :placeholder="'Longitud de Eslora'" v-model="formData.eslora"
-                                                :error="router.page.props.errors.eslora"></TextInput>
+                                                :error="router.page.props.errors.eslora">
+                                            </TextInput>
 
                                             <TextInput class="mt-2 text-left" label="Detalles"
                                                 :placeholder="'Escriba los detalles del Buque'" v-model="formData.details"
                                                 :error="router.page.props.errors.details"></TextInput>
+
+                                            <!--maxFileSize = 10MB, la expresión viene dada en Bytes-->
                                             <FileUpload chooseLabel="Adjuntar foto" cancelLabel="Cancelar"
                                                 :show-upload-button=false name="demo[]" :multiple="false" :fileLimit=1
-                                                accept="image/*" :maxFileSize="1000000"
+                                                :show-cancel-button=false accept="image/*" :maxFileSize="10000000"
+                                                invalidFileTypeMessage="Archivo Inválido: solo se permite imagen."
+                                                invalidFileSizeMessage="Este archivo supera el tamaño permitido: "
                                                 @input="formData.image = $event.target.files[0]">
                                                 <template #empty>
-                                                    <p>Adjunta una imagen del buque</p>
+                                                    <p>Arrastre aquí una imagen del buque</p>
                                                 </template>
                                             </FileUpload>
                                         </div>

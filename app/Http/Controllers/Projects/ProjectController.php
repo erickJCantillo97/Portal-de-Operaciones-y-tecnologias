@@ -21,7 +21,7 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::orderBy('name')->get();
+        $projects = Project::with('contract', 'ship')->orderBy('name')->get();
         $ships = Ship::orderBy('name')->get();
         $contracts = Contract::orderBy('name')->get();
 
@@ -169,7 +169,7 @@ class ProjectController extends Controller
         $validateData = $request->validate([
             'name' => 'required',
             'gerencia' => 'required',
-            'cost' => 'required',
+            'cost' => 'nullable',
             'start_date' => 'required',
             'end_date' => 'required',
         ]);
