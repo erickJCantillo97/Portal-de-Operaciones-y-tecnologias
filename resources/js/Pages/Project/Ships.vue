@@ -5,8 +5,7 @@ import { router, useForm } from '@inertiajs/vue3';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import Calendar from 'primevue/calendar';
-import Tag from 'primevue/tag';
+import Image from 'primevue/image';
 import Combobox from '@/Components/Combobox.vue';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
@@ -229,7 +228,14 @@ const exportarExcel = () => {
                 </template>
 
                 <!--COLUMNAS-->
-                <Column field="name" header="Nombre"></Column>
+                <Column field="name" header="Nombre">
+                    <template #body="slotProps">
+                        <div class="flex space-x-2 items-center">
+                            <Image :src="slotProps.data.file" alt="Image" class="h-8 w-8 rounded-full" preview />
+                            <p>{{ slotProps.data.name }} </p>
+                        </div>
+                    </template>
+                </Column>
                 <Column field="customer.name" header="Cliente"></Column>
                 <Column field="type" header="Tipo de Buque"></Column>
                 <Column field="quilla" header="Quillas"></Column>

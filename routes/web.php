@@ -2,6 +2,7 @@
 
 use App\Models\Gantt\Task;
 use App\Models\Process;
+use App\Models\Projects\Project;
 use App\Models\SWBS\SubSystem;
 use App\Models\SWBS\System;
 use Carbon\Carbon;
@@ -23,8 +24,20 @@ Route::get('/', function () {
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
     Route::get('/dashboard', function () {
-        //return ModelToolsAterior::get();
-        return Inertia::render('Dashboard');
+        $proyecto = Project::first();
+
+        $taskProject = Task::where('project_id', $proyecto->id)->whereNull('task_id')->get()->map(function (Task $item) {
+            return [
+                'id' => $item->id,
+                'project_id' => $item->project->id,
+                'avance'=>number_format($item['percentDone'], 2,),
+                'name' => $item['name'],
+                'file' => $item->project->contract->ship->file
+            ];
+        });
+        return Inertia::render('Dashboard', [
+            'projects' => $taskProject,
+        ]);
     })->name('dashboard');
 
     Route::get('pruebaApi', function () {
@@ -84,9 +97,13 @@ Route::get('recuperarDatos', function () {
 
 Route::get('actividadesDeultimonivel', function (Request $request) {
 
-
-        $date_start = Carbon::parse($request->dates[0])->format('Y-m-d');
-        $date_end = Carbon::parse($request->dates[1])->format('Y-m-d');
+        if(isset($request->dates[0])){
+            $date_start = Carbon::parse($request->dates[0])->format('Y-m-d');
+            $date_end = Carbon::parse($request->dates[1])->format('Y-m-d');
+        }else{
+            $date_start = Carbon::now()->format('Y-m-d');
+            $date_end = Carbon::now()->format('Y-m-d');
+        }
 
         $tareas =  Task::whereNotNull('task_id')->select('task_id')->get()->toArray();
 
@@ -128,3 +145,15 @@ Route::get('/programming', function () {
         'taskNow' => $tasks
     ]);
 })->name('programming');
+
+Route::get('projectAvance', function (){
+    $proyecto = Project::first();
+
+    $taskProject = Task::where('project_id', $proyecto->id)->whereNull('task_id')->get()->map(function (Task $item) {
+        return [
+            number_format($item['percentDone'], 2,),
+            $item['name']
+        ];
+    });
+    return $taskProject;
+});

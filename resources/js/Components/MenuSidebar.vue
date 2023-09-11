@@ -72,7 +72,7 @@ import { usePermissions } from '@/composable/permission';
 import VueCollapsible from 'vue-height-collapsible/vue3';
 import {
     CalendarIcon,
-    ChartPieIcon,
+    CreditCardIcon,
     DocumentDuplicateIcon,
     FolderIcon,
     HomeIcon,
@@ -113,7 +113,7 @@ const navigation = [
     },
     {
         name: 'Gestión Comercial',
-        icon: FolderIcon,
+        icon: CreditCardIcon,
         current: false,
         children: [
             { name: 'Clientes', href: 'customers.index' },
