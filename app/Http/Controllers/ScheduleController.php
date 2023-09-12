@@ -62,11 +62,13 @@ class ScheduleController extends Controller
             "resources" => ['rows' => [
                 [
                     'id' => 1,
-                    'name' => 'Auxiliar de Investigación y Desarrollo'
+                    'name' => 'Auxiliar de Investigación y Desarrollo',
+                    'quantity'=>0
                 ],
                 [
                     'id' => 2,
-                    'name' => 'Jefe de Departamento'
+                    'name' => 'Jefe de Departamento',
+                    'quantity'=>0
                 ],
             ]],
             "assignments" => ['rows' => []],
@@ -78,6 +80,7 @@ class ScheduleController extends Controller
     {
         $rows = [];
         $removed = [];
+        // dd($request);
         // dd($request->requestId);
         if (isset($request->tasks['added'])) {
             foreach ($request->tasks['added'] as $task) {
