@@ -21,7 +21,7 @@ onMounted(() => {
     axios.get(route('baseActivities.index')).then(
         (res) => {
             groups.value = res.data[0]
-            loading.value =false;
+            loading.value = false;
         }
     );
 })
@@ -41,10 +41,9 @@ const clearFilter = () => {
 
 <template>
     <div class="px-auto  w-full">
-        <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="groups" scroll-height="300px" v-model:filters="filters"
-            dataKey="id" filterDisplay="menu" :loading="loading"
-            :globalFilterFields="['name','descripcion']"
-            currentPageReportTemplate=" {first} al {last} de {totalRecords}"
+        <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="groups" scroll-height="300px"
+            v-model:filters="filters" dataKey="id" filterDisplay="menu" :loading="loading"
+            :globalFilterFields="['name', 'descripcion']" currentPageReportTemplate=" {first} al {last} de {totalRecords}"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
             :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
 

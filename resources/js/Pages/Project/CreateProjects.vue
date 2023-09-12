@@ -113,18 +113,9 @@ const submit = () => {
             formData['intern_communications'] = intern_communicationsSelect.value.id;
         }
 
+        //Validación de Fechas de Finalización de Documentos Contractuales
         try {
-            const routeName = 'projects.store'
-            if (selectedForm.value == 'form1') {
-                routeName;
-            } else if (selectedForm.value == 'form2') {
-                routeName;
-            } else if (selectedForm.value == 'form3') {
-                routeName;
-            } else if (selectedForm.value == 'form4') {
-                routeName;
-            }
-            router.post(route(routeName), formData, {
+            router.post(route('projects.store'), formData, {
                 preserveScroll: true,
                 onSuccess: (res) => {
                     open.value = false;
@@ -162,6 +153,7 @@ const editItem = (project) => {
     formData.name = project.name;
     formData.gerencia = project.gerencia;
     formData.start_date = project.start_date;
+    formData.end_date = project.end_date;
     formData.hoursPerDay = project.hoursPerDay;
     formData.daysPerWeek = project.daysPerWeek;
     formData.daysPerMonth = project.daysPerMonth;
@@ -171,24 +163,31 @@ const editItem = (project) => {
 const loadContractDates = () => {
 
     const contract = contractSelect.value
-    const authorization = authorizationSelect.value
-    const quote = quoteSelect.value
 
     if (contract) {
         formData.start_date = contract.start_date
         formData.end_date = contract.end_date
     }
+}
+
+const loadAuthorizationDates = () => {
+
+    const authorization = authorizationSelect.value
 
     if (authorization) {
         formData.start_date = authorization.start_date
         formData.end_date = authorization.end_date
     }
+}
+
+const loadQuoteDates = () => {
+
+    const quote = quoteSelect.value
 
     if (quote) {
         formData.start_date = quote.start_date
         formData.end_date = quote.end_date
     }
-
 }
 
 const initFilters = () => {
@@ -211,6 +210,7 @@ const formatDate = (value) => {
     });
 };
 
+//#region COMPOSABLES
 // Formatear el número en moneda (USD)
 const formatCurrency = (value) => {
     return parseFloat(value).toLocaleString('es-CO', {
@@ -253,6 +253,7 @@ const exportarExcel = () => {
     // Package and Release Data (`writeFile` tries to write and save an XLSB file)
     XLSX.writeFile(workbook, 'Lista de Contratos_' + project.nit + '_' + project.name + ".xlsb");
 };
+//#endregion
 </script>
 
 <template>
@@ -267,59 +268,61 @@ const exportarExcel = () => {
                 Documento Contractual
             </label>
 
-            <!--RADIO BUTTON CONTRATO-->
-            <div class="space-y-2 flex w-full justify-between px-12 space-x-6">
-                <label class="flex items-center space-x-2 cursor-pointer rounded-lg p-3 w-full"
+            <!-- RADIO BUTTON CONTRATO -->
+            <div
+                class="space-y-2 flex flex-col sm:flex-row sm:space-x-6 sm:items-center px-4 sm:px-12 md:flex-row md:space-x-6 md:items-center md:px-16 lg:flex-row lg:space-x-6 lg:items-center lg:px-20 xl:px-24 2xl:px-32">
+                <label class="flex items-center space-x-2 cursor-pointer rounded-lg p-3 w-full sm:w-auto"
                     :class="[selectedForm == 'form1' ? 'bg-blue-100' : '']">
                     <input type="radio" v-model="selectedForm" value="form1" class="form-radio mr-4">
                     <div>
                         <span>Contrato</span>
-                        <p class="text-xs italic text-gray-600 ">
+                        <p class="text-xs italic text-gray-600">
                             Seleccione esta opción si solo cuenta con el Contrato.</p>
                     </div>
                 </label>
 
-                <!--RADIO BUTTON AUTORIZACIÓN-->
-                <label class="flex items-center space-x-2 cursor-pointer rounded-lg p-3 w-full"
+                <!-- RADIO BUTTON AUTORIZACIÓN -->
+                <label class="flex items-center space-x-2 cursor-pointer rounded-lg p-3 w-full sm:w-auto"
                     :class="[selectedForm == 'form2' ? 'bg-blue-100' : '']">
                     <input type="radio" v-model="selectedForm" value="form2" class="form-radio mr-4">
                     <div>
                         <span>Autorización</span>
-                        <p class="text-xs italic text-gray-600 ">
+                        <p class="text-xs italic text-gray-600">
                             Seleccione esta opción si solo cuenta con la Autorización.
                         </p>
                     </div>
                 </label>
 
-                <!--RADIO BUTTON ESTIMACIÓN-->
-                <label class="flex items-center space-x-2 cursor-pointer rounded-lg p-3 w-full"
+                <!-- RADIO BUTTON ESTIMACIÓN -->
+                <label class="flex items-center space-x-2 cursor-pointer rounded-lg p-3 w-full sm:w-auto"
                     :class="[selectedForm == 'form3' ? 'bg-blue-100' : '']">
                     <input type="radio" v-model="selectedForm" value="form3" class="form-radio mr-4">
                     <div>
                         <span>Estimación</span>
-                        <p class="text-xs italic text-gray-600 ">
+                        <p class="text-xs italic text-gray-600">
                             Seleccione esta opción si es una <br> Estimación.
                         </p>
                     </div>
                 </label>
 
-                <!--RADIO BUTTON COMUNICACIONES INTERNAS-->
-                <label class="flex items-center space-x-2 cursor-pointer rounded-lg p-3 w-full"
+                <!-- RADIO BUTTON COMUNICACIONES INTERNAS -->
+                <label class="flex items-center space-x-2 cursor-pointer rounded-lg p-3 w-full sm:w-auto"
                     :class="[selectedForm == 'form4' ? 'bg-blue-100' : '']">
                     <input type="radio" v-model="selectedForm" value="form4" class="form-radio mr-4">
                     <div>
                         <span>Comunicación Interna</span>
-                        <p class="text-xs italic text-gray-600 ">
+                        <p class="text-xs italic text-gray-600">
                             Seleccione esta opción si es una <br> Comunicación Interna.
                         </p>
                     </div>
                 </label>
             </div>
 
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Columna izquierda del formulario -->
                 <!-- Aquí va el contenido del Formulario 1 -->
-                <div>
+                <div class="md:col-span-1">
                     <div class="space-y-2 border border-gray-200 rounded-lg p-4">
                         <!--CONFIGURACIÓN DE PROYECTO-->
                         <div class="" v-if="selectedForm == 'form1'">
@@ -331,25 +334,26 @@ const exportarExcel = () => {
                         <div class=" " v-if="selectedForm == 'form2'">
                             <Combobox class="text-left text-gray-900" label="Autorizaciones"
                                 placeholder="Seleccione Autorización" :options="authorizations"
-                                v-model="authorizationSelect" @update:modelValue="loadContractDates()">
+                                v-model="authorizationSelect" @update:modelValue="loadAuthorizationDates()">
                             </Combobox>
                         </div>
 
                         <div class="" v-if="selectedForm == 'form3'">
                             <Combobox class="text-left text-gray-900" label="Estimaciones"
                                 placeholder="Seleccione Estimación" :options="quotes" v-model="quoteSelect"
-                                @update:modelValue="loadContractDates()">
+                                @update:modelValue="loadQuoteDates()">
                             </Combobox>
                         </div>
 
-                        <TextInput class=" text-left" type="text" v-if="selectedForm == 'form4'" label=" Codigo de
-                        comunicación Interna" :placeholder="'Escriba el Tipo de Cliente'"
+                        <TextInput class=" text-left" type="text" v-if="selectedForm == 'form4'" label=" Código de
+                        Comunicación Interna" :placeholder="'Escriba el Tipo de Cliente'"
                             v-model="formData.intern_communications" :error="$page.props.errors.intern_communications">
                         </TextInput>
 
                         <div class="p-1 " v-if="selectedForm == 'form4'">
                             <Combobox class="text-left" label="Buque" placeholder="Seleccione Buque" :options="ships"
-                                v-model="shipSelect"></Combobox>
+                                v-model="shipSelect">
+                            </Combobox>
                         </div>
 
                         <!--CAMPO FECHA INICIO-->
@@ -366,15 +370,15 @@ const exportarExcel = () => {
                 </div>
 
                 <!--CONFIGURACIÓN DE CRONOGRAMA-->
-                <div class="space-y-4 border border-gray-200 rounded-lg p-4">
-                    <TextInput class="mt-2 text-left" label="Horas por Dia" :placeholder="'Escriba Numero de Horas por Dia'"
+                <div class="md:col-span-1 space-y-4 border border-gray-200 rounded-lg p-4">
+                    <TextInput class="mt-2 text-left" label="Horas por Dia" :placeholder="'Escriba Número de Horas por Dia'"
                         v-model="formData.hoursPerDay" :error="router.page.props.errors.hoursPerDay"></TextInput>
 
                     <TextInput class="mt-2 text-left" label="Dias por Semana"
                         :placeholder="'Escriba Numero de Horas por Dia'" v-model="formData.daysPerWeek"
                         :error="router.page.props.errors.daysPerWeek"></TextInput>
 
-                    <TextInput class="mt-2 text-left" label="Dias por Mes" :placeholder="'Escriba Numero de Horas por Dia'"
+                    <TextInput class="mt-2 text-left" label="Dias por Mes" :placeholder="'Escriba Número de Horas por Dia'"
                         v-model="formData.daysPerMonth" :error="router.page.props.errors.daysPerMonth"></TextInput>
                     <div class="flex px-2 mt-2 space-x-4">
                         <Button class="hover:bg-danger text-danger border-danger" severity="danger"

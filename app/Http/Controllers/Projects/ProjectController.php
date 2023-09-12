@@ -78,16 +78,16 @@ class ProjectController extends Controller
         ]);
 
         try {
-            if ($validateData['quote_id'] != 0) {
-                $buque = Quote::find($validateData['quote_id'])->ship;
+            if (($validateData['contract_id']) != 0) {
+                $buque = Contract::find($validateData['contract_id'])->ship;
             }
 
             if ($validateData['authorization_id'] != 0) {
                 $buque = Authorization::find($validateData['authorization_id'])->first()->quote->ship;
             }
 
-            if (($validateData['contract_id']) != 0) {
-                $buque = Contract::find($validateData['contract_id'])->ship;
+            if ($validateData['quote_id'] != 0) {
+                $buque = Quote::find($validateData['quote_id'])->ship;
             }
 
             if (isset($buque) && $validateData['ship_id'] != 0) {
