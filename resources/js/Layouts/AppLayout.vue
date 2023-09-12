@@ -20,7 +20,7 @@
                     <div class="flex items-center ">
                         <button type="button" class="text-gray-400 hover:text-gray-500">
                             <span class="sr-only">View notifications</span>
-                            <div class="relative w-6 h-6">
+                            <div class="relative w-6 h-6" title="Notificaciones">
                                 <BellIcon aria-hidden="true" />
                                 <span class="flex h-3 w-3">
                                     <span
@@ -28,9 +28,9 @@
                                 </span>
                             </div>
                         </button>
-                        <DropdownSetting></DropdownSetting>
+                        <DropdownSetting title="Utilidades"></DropdownSetting>
                         <Menu as="div" class="relative inline-block text-left">
-                            <div>
+                            <div title="Perfil">
                                 <MenuButton
                                     class="inline-flex w-full items-center justify-center rounded-md  px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
                                     <span class="sr-only">Open user menu</span>

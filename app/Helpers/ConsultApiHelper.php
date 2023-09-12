@@ -1,18 +1,17 @@
 <?php
 
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 
-define('ROUTE_API' , "https://servicioapi.cotecmar.com");
+define('ROUTE_API', 'https://servicioapi.cotecmar.com');
 function getEmpleadosAPI(): mixed
 {
     try {
-        if (getToken()){
-            $json =  Http::acceptJson()->withToken(session()->get('token'))
-                    ->get(ROUTE_API.'/listado_personal_sap_activos_busqueda'
-                    )->json();
-            return  collect($json);
+        if (getToken()) {
+            $json = Http::acceptJson()->withToken(session()->get('token'))
+                ->get(ROUTE_API.'/listado_personal_sap_activos_busqueda'
+                )->json();
+
+            return collect($json);
         }
         dd('Sin token');
 
@@ -21,51 +20,51 @@ function getEmpleadosAPI(): mixed
     }
 }
 
-function getToken(): bool{
+function getToken(): bool
+{
 
-    if(session()->get('token') == null)
-    {
+    if (session()->get('token') == null) {
         return login();
     }
     $user = Http::acceptJson()->withToken(session()->get('token'))->get(ROUTE_API.'/user');
 
-    if(!isset($user['id'])){
+    if (! isset($user['id'])) {
         return login();
     }
 
     return true;
 }
 
-function login(): bool{
-    try{
+function login(): bool
+{
+    try {
         $login = Http::acceptJson()->post(ROUTE_API.'/auth/login',
             [
                 'username' => 'portalreuniones',
                 'password' => 'cG9ydGFscmV1bmlvbmVz',
             ]
         )->json();
-        if($login['status'] == 'true'){
+        if ($login['status'] == 'true') {
             session()->put('token', $login['token']);
+
             return true;
         }
+
         return false;
-    }catch(Exception $e){
+    } catch (Exception $e) {
         return false;
     }
 }
 
-function searchEmpleados(String $clave, String $valor)
+function searchEmpleados(string $clave, string $valor)
 {
-    return getEmpleadosAPI()->filter(function ($employee) use ($clave, $valor){
-            return $employee[$clave] == $valor;
+    return getEmpleadosAPI()->filter(function ($employee) use ($clave, $valor) {
+        return $employee[$clave] == $valor;
     });
 }
 
-function pokeapi () {
+function pokeapi()
+{
     HTTP::acceptJson()->get('https://pokeapi.co/api/v2/pokemon/');
-    
+
 }
-
-
-
-

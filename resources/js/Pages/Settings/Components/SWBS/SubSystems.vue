@@ -27,7 +27,7 @@ onMounted(() => {
     axios.get(route('subsystem.index')).then(
         (res) => {
             groups.value = res.data[0]
-            loading.value =false;
+            loading.value = false;
         }
     );
 })
@@ -86,10 +86,9 @@ const submit = () => {
 
 <template>
     <div class="px-auto  w-full">
-        <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="groups" scroll-height="300px" v-model:filters="filters"
-            dataKey="id" filterDisplay="menu" :loading="loading"
-            :globalFilterFields="['name','descripcion']"
-            currentPageReportTemplate=" {first} al {last} de {totalRecords}"
+        <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="groups" scroll-height="300px"
+            v-model:filters="filters" dataKey="id" filterDisplay="menu" :loading="loading"
+            :globalFilterFields="['name', 'descripcion']" currentPageReportTemplate=" {first} al {last} de {totalRecords}"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
             :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
 
@@ -121,14 +120,15 @@ const submit = () => {
             <Column header="Acciones" class="space-x-3">
                 <template #body="slotProps">
                     <!--BOTÓN EDITAR-->
-                    <div
+                    <div title="Editar Sistema"
                         class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
                         <div>
                             <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
                                 <PencilIcon class="w-4 h-4 " aria-hidden="true" />
                             </Button>
                         </div>
-                        <div>
+                        <!--BOTÓN ELIMINAR-->
+                        <div title="Eliminar Sistema">
                             <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'SubSistema', 'subsystem')"
                                 class="hover:bg-danger">
                                 <TrashIcon class="w-4 h-4 " aria-hidden="true" />

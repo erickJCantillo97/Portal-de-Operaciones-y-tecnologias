@@ -422,8 +422,8 @@ const items = [
 
         <OverlayPanel ref="op">
             <div>
-                <h2 class="text-base font-semibold leading-6 text-gray-900">Creacion o edicion de cronograma</h2>
-                <p class="mt-1 text-sm text-gray-500">Aqui podra escoger como desea crear el cronograma del proyecto.</p>
+                <h2 class="text-base font-semibold leading-6 text-gray-900">Creación o edición de cronograma</h2>
+                <p class="mt-1 text-sm text-gray-500">Aquí podrá escoger como desea crear el cronograma del proyecto.</p>
 
                 <ul role="list" class="mt-6 grid grid-cols-1 gap-6 border-b border-t border-gray-200 py-6 sm:grid-cols-2">
                     <li v-for="(item, itemIdx) in items" :key="itemIdx" class="flow-root">
