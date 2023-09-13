@@ -97,7 +97,7 @@ if (!Widget.factoryable.registry.resourcelist) {
                             ${resource.unit}
                         </div>
                         <div class="b-resource-city">
-                            ${resource.costo_hora}
+                            Costo hora: ${resource.costo_hora}
                             <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
                         </div>
                     </div>`;
@@ -204,6 +204,7 @@ const gantt = new Gantt(({
         },
     ],
     features: {
+        projectLines : false,
         taskEdit: {
             items: {
                 resourcesTab: {
@@ -234,30 +235,6 @@ onMounted(() => {
 </script>
 <template>
     <AppLayout title="">
-        <div class="w-1/2">
-            <div class="b-inline-list">
-                <div class="b-list-item">
-                    <div class="b-resource-detail">
-                        <div class="b-resource-name">ingenieria de producion y mantenimiento
-                        </div>
-                        <div class="b-resource-city">
-                            <p>$100.000</p>
-                            <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="b-list-item">
-                    <div class="b-resource-detail">
-                        <div class="b-resource-name">Ingeniero de producion
-                            <div class="b-resource-city">
-                                <p>$100.000</p>
-                                <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="">
             <div class="h-full">
                 <div class="overflow-hidden shadow-xl sm:rounded-lg h-screen">
