@@ -209,10 +209,10 @@ const gantt = new Gantt(({
                 var task = taskRecord._data;
                 console.log(taskRecord._data)
                 for(var element of overflowAssignments){
-                    overflowAssignments2 += ('<div>' + element.units / 100 + ' ' + element.name + ' $' + Math.round(task.durationUnit == 'day' ? (task.duration * (element.units/100) * element.costo_hora)*8.5:(task.duration * (element.units/100) * element.costo_hora)) + '</div>')
+                    overflowAssignments2 += ('<div>' + element.units / 100 + ' ' + element.name + ' $' + Math.round(task.durationUnit == 'day' ? (task.duration * (element.units/100) * element.costo_hora)*8.5:(task.duration * (element.units/100) * element.costo_hora)).toLocaleString('es') + '</div>')
                 }
                 return `
-                    <div>${assignmentRecord.units / 100} ${assignmentRecord.name} $${Math.round(task.durationUnit == 'day' ? (task.duration * (assignmentRecord.units/100) * assignmentRecord.costo_hora)*8.5:(task.duration * (assignmentRecord.units/100) * assignmentRecord.costo_hora))} </div>
+                    <div>${assignmentRecord.units / 100} ${assignmentRecord.name} $${Math.round(task.durationUnit == 'day' ? (task.duration * (assignmentRecord.units/100) * assignmentRecord.costo_hora)*8.5:(task.duration * (assignmentRecord.units/100) * assignmentRecord.costo_hora)).toLocaleString('es')} </div>
                      ${overflowCount > 0 ? `${overflowAssignments2}` : ''}
                 `;
             }
