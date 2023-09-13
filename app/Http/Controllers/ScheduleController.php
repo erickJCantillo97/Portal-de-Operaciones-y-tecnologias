@@ -63,12 +63,12 @@ class ScheduleController extends Controller
                 [
                     'id' => 1,
                     'name' => 'Auxiliar de Investigación y Desarrollo',
-                    'quantity'=>0
+                    'unit'=>0
                 ],
                 [
                     'id' => 2,
                     'name' => 'Jefe de Departamento',
-                    'quantity'=>0
+                    'unit'=>0
                 ],
             ]],
             "assignments" => ['rows' => []],
