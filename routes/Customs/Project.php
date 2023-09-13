@@ -19,6 +19,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('/ScheduleCreate/{project}', [ScheduleController::class, 'create'])->name('createSchedule.create');
 
+    Route::get('getAssignmentsTask', [ScheduleController::class, 'getAssignmentsTask'])->name('get.assignments.task');
+
     Route::get('/dataGantt/{project}', [ScheduleController::class, 'get'])->name('dataGantt');
 
     Route::post('/syncGantt/{project}', [ScheduleController::class, 'sync'])->name('syncGantt');

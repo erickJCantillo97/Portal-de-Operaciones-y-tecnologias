@@ -171,4 +171,10 @@ class ScheduleController extends Controller
             'groups'=> gruposConstructivos()
         ]);
     }
+
+    public function getAssignmentsTask(Task $task) {
+        return response()->json([
+            'assigments' => Assignment::where('even', $task->id)->get(),
+        ]);
+    }
 }
