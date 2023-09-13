@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gantt\Task;
+use App\Models\Labor;
 use App\Models\Projects\Project;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -59,18 +60,7 @@ class ScheduleController extends Controller
             ]],
             "tasks" => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
             "dependencies" => ['rows' => []],
-            "resources" => ['rows' => [
-                [
-                    'id' => 1,
-                    'name' => 'Auxiliar de Investigación y Desarrollo',
-                    'unit'=>0
-                ],
-                [
-                    'id' => 2,
-                    'name' => 'Jefe de Departamento',
-                    'unit'=>0
-                ],
-            ]],
+            "resources" => ['rows' => Labor::get()],
             "assignments" => ['rows' => []],
             "timeRanges" => ['rows' => []]
         ]);
