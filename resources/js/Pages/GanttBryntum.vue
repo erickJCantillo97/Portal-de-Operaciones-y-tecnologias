@@ -97,8 +97,8 @@ if (!Widget.factoryable.registry.resourcelist) {
                             ${resource.unit}
                         </div>
                         <div class="b-resource-city">
-                            ${resource.costo_hora}
-                            <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
+                            Costo hora: ${resource.costo_hora}
+                            <i data-btip="Quitar recurso" class="b-icon b-icon-trash"></i>
                         </div>
                     </div>`;
                 }
@@ -152,7 +152,7 @@ const project = new ProjectModel({
 
 const gantt = new Gantt(({
     project,
-    resourceImageFolderPath: '../images/users/',
+    // resourceImageFolderPath: '../images/users/',
     dependencyIdField: 'sequenceNumber',
     columns: [
         { type: 'wbs', text: 'Nivel', width: 20 },
@@ -164,7 +164,7 @@ const gantt = new Gantt(({
         {
             type: 'resourceassignment',
             text: 'Recursos',
-            width: 100,
+            width: 150,
             showAvatars: true,
             align: 'center',
             editor: {
@@ -181,6 +181,9 @@ const gantt = new Gantt(({
                         max: 1000,
                         step: 100,
                         width: 100,
+                        finalizeCellEdit: ({ value }) => {
+                            return value % 100 != 0 ? 'El valor debe ser en multiplos de 100' : true;
+                        }
                     },
                     features: {
                         // group: 'resource.city',
@@ -200,10 +203,23 @@ const gantt = new Gantt(({
                         width: 100
                     }]
                 }
+            },
+            avatarTooltipTemplate({ taskRecord, assignmentRecord, overflowCount, overflowAssignments }) {
+                let overflowAssignments2 = '';
+                var task = taskRecord._data;
+                console.log(taskRecord._data)
+                for(var element of overflowAssignments){
+                    overflowAssignments2 += ('<div>' + element.units / 100 + ' ' + element.name + ' $' + Math.round(task.durationUnit == 'day' ? (task.duration * (element.units/100) * element.costo_hora)*8.5:(task.duration * (element.units/100) * element.costo_hora)).toLocaleString('es') + '</div>')
+                }
+                return `
+                    <div>${assignmentRecord.units / 100} ${assignmentRecord.name} $${Math.round(task.durationUnit == 'day' ? (task.duration * (assignmentRecord.units/100) * assignmentRecord.costo_hora)*8.5:(task.duration * (assignmentRecord.units/100) * assignmentRecord.costo_hora)).toLocaleString('es')} </div>
+                     ${overflowCount > 0 ? `${overflowAssignments2}` : ''}
+                `;
             }
         },
     ],
     features: {
+        projectLines: false,
         taskEdit: {
             items: {
                 resourcesTab: {
@@ -234,30 +250,6 @@ onMounted(() => {
 </script>
 <template>
     <AppLayout title="">
-        <div class="w-1/2">
-            <div class="b-inline-list">
-                <div class="b-list-item">
-                    <div class="b-resource-detail">
-                        <div class="b-resource-name">ingenieria de producion y mantenimiento
-                        </div>
-                        <div class="b-resource-city">
-                            <p>$100.000</p>
-                            <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="b-list-item">
-                    <div class="b-resource-detail">
-                        <div class="b-resource-name">Ingeniero de producion
-                            <div class="b-resource-city">
-                                <p>$100.000</p>
-                                <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="">
             <div class="h-full">
                 <div class="overflow-hidden shadow-xl sm:rounded-lg h-screen">
