@@ -60,7 +60,13 @@ class ScheduleController extends Controller
             ]],
             "tasks" => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
             "dependencies" => ['rows' => []],
-            "resources" => ['rows' => Labor::get()],
+            "resources" => ['rows' => Labor::where('gerencia', auth()->user()->gerencia)->get()->map(function($cargo){
+                return [
+                    'id' => $cargo->id,
+                    'name' => $cargo->name,
+                    'costo_hora' => '$ '. number_format($cargo->costo_hora, 0),
+                ];
+            })],
             "assignments" => ['rows' => []],
             "timeRanges" => ['rows' => []]
         ]);
