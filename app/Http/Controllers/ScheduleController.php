@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Gantt\Assignment;
 use App\Models\Gantt\Task;
 use App\Models\Labor;
 use App\Models\Projects\Project;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use PhpParser\Node\Expr\Assign;
 
 class ScheduleController extends Controller
 {
@@ -67,7 +69,7 @@ class ScheduleController extends Controller
                     'costo_hora' => '$ '. number_format($cargo->costo_hora, 0),
                 ];
             })],
-            "assignments" => ['rows' => []],
+            "assignments" => ['rows' => Assignment::get()],
             "timeRanges" => ['rows' => []]
         ]);
     }
@@ -76,6 +78,7 @@ class ScheduleController extends Controller
     {
         $rows = [];
         $removed = [];
+        $assgimentRows = [];
         // dd($request);
         // dd($request->requestId);
         if (isset($request->tasks['added'])) {
@@ -117,14 +120,37 @@ class ScheduleController extends Controller
                 array_push($removed, ['id' => $task['id']]);
             }
         }
+        if(isset($request->assignments['added'])){
+            foreach($request->assignments['added'] as $assignment){
+                $labor = Labor::find($assignment['resource']);
+                $assigmmentCreate = Assignment::create([
+                    'event' => $assignment['event'],
+                    'resource' => $assignment['resource'],
+                    'units' => $assignment['units'],
+                    'name' => $labor->name,
+                    'costo_hora' => $labor->costo_hora,
+                ]);
+                array_push($assgimentRows, [
+                    '$PhantomId' => end($assignment),
+                    'id' => $assigmmentCreate['id'],
+                    'added_dt' => $assigmmentCreate->created_at,
+                ]);
+            }
+        }
+
+
 
 
 
         return response()->json([
             "success"   => true,
-            'requestId' => $request->requestId, 'tasks' => [
+            'requestId' => $request->requestId,
+            'tasks' => [
                 'rows' => $rows,
                 'removed' => $removed
+            ],
+            'assignments' => [
+                'rows' => $assgimentRows
             ]
         ]);
     }
