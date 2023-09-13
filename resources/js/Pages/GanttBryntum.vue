@@ -5,6 +5,7 @@ import "@bryntum/gantt/gantt.material.css";
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
 import { Gantt, List, LocaleManager, ProjectModel, StringHelper, Widget } from '@bryntum/gantt/gantt.module.js';
 import '@/GanttToolbar.js'
+import '../../css/app.scss'
 
 const props = defineProps({
     project: Number,
@@ -91,13 +92,12 @@ if (!Widget.factoryable.registry.resourcelist) {
                 itemTpl: resource => {
                     return StringHelper.xss`
                     <div class="b-resource-detail">
-                    <div class="b-resource-name">${resource.name}</div>
-                    <div class="b-resource-city">
-                        ${resource.units}
-                        <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
-                    </div>
-                </div>
-            `;
+                        <div class="b-resource-name">${resource.name}</div>
+                        <div class="b-resource-city">
+                            ${resource.unit}
+                            <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
+                        </div>
+                    </div>`;
                 }
             };
         }
@@ -198,7 +198,7 @@ const gantt = new Gantt(({
                 resourcesTab: {
                     type: 'resourcelist',
                     weight: 120,
-                    title: 'Resources'
+                    title: 'Recursos',
                 },
             }
         }
@@ -223,10 +223,22 @@ onMounted(() => {
 </script>
 <template>
     <AppLayout title="">
-        <div class="b-resource-detail border border-blue-400 rounded-lg">
-            <div class="b-resource-name">${resource.name}</div>
-            <div class="b-resource-city">${resource.units}
-                <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
+        <div class="b-inline-list">
+            <div class="b-list-item">
+                <div class="b-resource-detail">
+                    <div class="b-resource-name">${resource.name}</div>
+                    <div class="b-resource-city">
+                        ${resource.unit}
+                        <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
+                    </div>
+                </div>
+                <div class="b-resource-detail">
+                    <div class="b-resource-name">${resource.name}</div>
+                    <div class="b-resource-city">
+                        ${resource.unit}
+                        <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="">
