@@ -99,21 +99,30 @@ class ProjectController extends Controller
             }
 
             // Verificar si ya existe un proyecto con el mismo contract_id y ship_id
-            $existingProjectwithContract = Project::where('contract_id', $validateData['contract_id'])
+            $existingProjectWithContract = Project::where('contract_id', $validateData['contract_id'])
                 ->where('ship_id', $buque->id)
                 ->first();
 
-            if ($existingProjectwithContract) {
+            if ($existingProjectWithContract) {
                 return back()->withErrors(['message' => 'Ya existe un proyecto con el mismo contrato y buque'], 500);
             }
 
             // Verificar si ya existe un proyecto con el mismo authorization_id y ship_id
-            $existingProjectwithAuthorization = Project::where('authorization_id', $validateData['authorization_id'])
+            $existingProjectWithAuthorization = Project::where('authorization_id', $validateData['authorization_id'])
                 ->where('quote_id', $buque->id)
                 ->first();
 
-            if ($existingProjectwithAuthorization) {
+            if ($existingProjectWithAuthorization) {
                 return back()->withErrors(['message' => 'Ya existe un proyecto con la misma autorización y buque'], 500);
+            }
+
+            // Verificar si ya existe un proyecto con la misma Estimación
+            $existingProjectWithQuote = Project::where('quote_id', $validateData['quote_id'])
+                ->where('quote_id', $buque->id)
+                ->first();
+
+            if ($existingProjectWithQuote) {
+                return back()->withErrors(['message' => 'Ya existe un proyecto con la misma estimación y buque'], 500);
             }
 
             $countProject = count(Project::where('ship_id', $buque->id)->get()) + 1;
