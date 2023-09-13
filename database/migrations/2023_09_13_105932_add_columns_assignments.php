@@ -11,15 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('assignments', function (Blueprint $table) {
-            $table->id();
-            $table->integer('event');
-            $table->integer('resource');
-            $table->integer('units');
+        Schema::table('assignments', function (Blueprint $table) {
             $table->string('name');
             $table->double('costo_hora');
-            $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -28,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('assignments');
+        Schema::table('assignments', function (Blueprint $table) {
+            //
+        });
     }
 };
