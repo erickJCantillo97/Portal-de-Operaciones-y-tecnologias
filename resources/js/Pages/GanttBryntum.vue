@@ -95,6 +95,9 @@ if (!Widget.factoryable.registry.resourcelist) {
                         <div class="b-resource-name">${resource.name}</div>
                         <div class="b-resource-city">
                             ${resource.unit}
+                        </div>
+                        <div class="b-resource-city">
+                            ${resource.costo_hora}
                             <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
                         </div>
                     </div>`;
@@ -188,6 +191,14 @@ const gantt = new Gantt(({
                         cellMenu: false,
                     },
                     // The extra columns are concatenated onto the base column set.
+                    columns: [{
+                        text: 'Valor Hora',
+                        // Read a nested property (name) from the resource calendar
+                        field: 'resource.costo_hora',
+                        filterable: false,
+                        editor: false,
+                        width: 100
+                    }]
                 }
             }
         },
@@ -223,20 +234,26 @@ onMounted(() => {
 </script>
 <template>
     <AppLayout title="">
-        <div class="b-inline-list">
-            <div class="b-list-item">
-                <div class="b-resource-detail">
-                    <div class="b-resource-name">${resource.name}</div>
-                    <div class="b-resource-city">
-                        ${resource.unit}
-                        <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
+        <div class="w-1/2">
+            <div class="b-inline-list">
+                <div class="b-list-item">
+                    <div class="b-resource-detail">
+                        <div class="b-resource-name">ingenieria de producion y mantenimiento
+                        </div>
+                        <div class="b-resource-city">
+                            <p>$100.000</p>
+                            <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
+                        </div>
                     </div>
                 </div>
-                <div class="b-resource-detail">
-                    <div class="b-resource-name">${resource.name}</div>
-                    <div class="b-resource-city">
-                        ${resource.unit}
-                        <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
+                <div class="b-list-item">
+                    <div class="b-resource-detail">
+                        <div class="b-resource-name">Ingeniero de producion
+                            <div class="b-resource-city">
+                                <p>$100.000</p>
+                                <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

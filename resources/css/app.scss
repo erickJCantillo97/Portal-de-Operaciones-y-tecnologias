@@ -40,20 +40,20 @@
         // Widths are 1/3 minus their 1/3 share of the cumulative 1em column gap on the parent flexbox
         flex: 0 0 calc(33.333% - 0.333em);
         box-shadow: lightgrey 0px 0px 4px 0px;
-        display: flex;
         column-gap: 1em;
 
         .b-resource-detail {
-            flex: 1;
+            flex-wrap: wrap;
+            flex-direction: column;
+            align-content: space-between;
         }
         .b-resource-name {
-            word-wrap: break-word;
+            white-space: pre-wrap;
+            text-align: center;
         }
         .b-resource-city {
-            display: flex;
             justify-content: space-between;
         }
-
         img {
             height: 2em;
             width: 2em;
