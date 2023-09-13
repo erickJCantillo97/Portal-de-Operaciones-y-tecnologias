@@ -16,4 +16,5 @@ return [
     'failed' => 'Usuario o Contraseña Incorrectas.',
     'throttle' => 'Demasiados intentos de acceso. Por favor inténtelo de nuevo en :seconds segundos.',
 
+
 ];

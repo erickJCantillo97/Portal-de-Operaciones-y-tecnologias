@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Gantt\Task;
+use App\Models\Labor;
 use App\Models\Process;
 use App\Models\Projects\Project;
 use App\Models\SWBS\SubSystem;
@@ -43,13 +44,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         if (auth()->user()->hasRole('Super Admin')) {
             return getEmpleadosAPI()->groupBy('GERENCIA');
         }
-
-        return searchEmpleados('GERENCIA', auth()->user()->gerencia)->groupBy('OFICINA');
+        return searchEmpleados('Gerencia', auth()->user()->gerencia)->groupBy('Oficina');
     })->name('get.empleados.gerencia');
-
-    Route::get('simple/crud', function (Request $request) {
-        $request = $request->all();
-    })->name('simple.crud');
 
     Route::get('get/gerencias', function () {
         return response()->json(['gerencias' => gerencias()]);
@@ -156,3 +152,16 @@ Route::get('projectAvance', function (){
     });
     return $taskProject;
 });
+
+
+Route::get('costoPersonal', function(){
+
+    $personal = getPersonalGerenciaOficina(auth()->user()->gerencia);
+    $sum = $personal->sum(function ($objeto) {
+        return $objeto['Ingresos_Mes'];
+    });
+
+    return  $sum;
+});
+
+

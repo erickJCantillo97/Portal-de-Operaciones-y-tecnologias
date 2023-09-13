@@ -7,6 +7,19 @@
     display: none;
 }
 
+.b-resource-detail {
+    flex: 1;
+    border-width: 1px;
+    --tw-border-opacity: 1;
+    border-color: rgb(96 165 250 / var(--tw-border-opacity));
+    border-radius: 0.5rem;
+}
+
+.b-resource-city {
+    display: flex;
+    justify-content: space-between;
+}
+
 .fondo {
     background-image: url(/fondo-login.jpg);
     background-size: 100% 100%;
@@ -19,7 +32,7 @@
 .video {
     position: fixed;
     right: 0;
-    top:0;
+    top: 0;
     min-width: 300%;
     height: auto;
     z-index: -1;

@@ -43,13 +43,13 @@ const props = defineProps({
 
 //#region UseForm
 const formData = useForm({
-    id: '0',
-    project_id: '0',
-    contract_id: '',
-    quote_id:'',
-    start_date: '',
-    end_date: '',
-    name: '',
+    id: props.authorizations?.id ?? '0',
+    project_id: props.authorizations?.project_id ?? '0',
+    contract_id: props.authorizations?.contract_id ?? '0',
+    quote_id: props.authorizations?.quote_id ?? '0',
+    start_date: props.authorizations?.start_date ?? '',
+    end_date: props.authorizations?.end_date ?? '',
+    name: props.authorizations?.name ?? '',
     pdf: null
 });
 //#endregion
@@ -61,8 +61,20 @@ onMounted(() => {
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
+
+    if (!contractSelect.value) {
+        toast('Por favor seleccione un contrato.', 'error')
+        return;
+    }
+
+    if (!quoteSelect.value) {
+        toast('Por favor seleccione una estimación.', 'error')
+        return;
+    }
+
     formData.contract_id = contractSelect.value.id
     formData.quote_id = quoteSelect.value.id
+
     if (formData.id == 0) {
         router.post(route('authorizations.store'), formData, {
             preserveScroll: true,
@@ -71,7 +83,7 @@ const submit = () => {
                 toast(' Autorización creado exitosamente', 'success');
             },
             onError: (errors) => {
-                toast('¡Ups! Ha surgido un error', 'error');
+                toast('Por favor diligencie todos los campos.', 'error');
             },
             onFinish: visit => {
                 loading.value = false;
@@ -82,30 +94,36 @@ const submit = () => {
     router.put(route('authorizations.update', formData.id), formData, {
         preserveScroll: true,
         onSuccess: (res) => {
-            open.value = false;
+            open.value = false
             toast('¡Autorización actualizada exitosamente!', 'success');
         },
         onError: (errors) => {
-            toast('¡Ups! Ha surgido un error', 'error');
+            toast('Por favor diligencie todos los campos.', 'error');
         },
         onFinish: visit => {
-            loading.value = false;
+            loading.value = false
         }
     })
-
 }
 
 const addItem = () => {
-    formData.reset();
-    open.value = true;
+    formData.reset()
+    clearErrors()
+    contractSelect.value = {}
+    quoteSelect.value = {}
+    open.value = true
 }
 
-const editItem = (contract) => {
-    formData.id = contract.id;
-    formData.start_date = contract.start_date;
-    formData.end_date = contract.end_date;
-    formData.name = contract.name
-    formData.pdf = contract.pdf
+const editItem = (authorization) => {
+    clearErrors()
+
+    formData.id = authorization.id
+    contractSelect.value = authorization.contract
+    quoteSelect.value = authorization.quote
+    formData.start_date = authorization.end_date
+    formData.end_date = authorization.end_date
+    formData.name = authorization.name
+    formData.pdf = authorization.pdf
     open.value = true;
 };
 
@@ -117,10 +135,12 @@ const initFilters = () => {
     }
 };
 
-
-
 const clearFilter = () => {
     initFilters();
+};
+
+const clearErrors = () => {
+    router.page.props.errors = {};
 };
 
 const formatDate = (value) => {
@@ -185,14 +205,16 @@ const exportarExcel = () => {
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">Autorizaciones</h1>
                 </div>
 
-                <div class="">
+                <div class="" title="Agrega Autorización">
                     <Button @click="addItem()" severity="success">
-                        <PlusIcon class="w-6 h-6" aria-hidden="true" /> Agregar
+                        <PlusIcon class="w-6 h-6" aria-hidden="true" />
+                        Agregar
                     </Button>
                 </div>
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="authorizations" v-model:filters="filters"
-                dataKey="id" filterDisplay="menu" :loading="loading" :globalFilterFields="['start_date', 'end_date']"
+                dataKey="id" filterDisplay="menu" :loading="loading"
+                :globalFilterFields="['name', 'start_date', 'end_date']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -200,7 +222,7 @@ const exportarExcel = () => {
                 <template #header>
                     <div class="flex justify-between w-full h-8 mb-2">
                         <div class="flex space-x-4">
-                            <div class="w-8">
+                            <div class="w-8" title="Filtrar Autorizaciones">
                                 <Button @click="clearFilter()" type="button" severity="primary" class="hover:bg-primary ">
                                     <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
                                 </Button>
@@ -210,7 +232,7 @@ const exportarExcel = () => {
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <MagnifyingGlassIcon class="w-5 h-4 text-gray-400" aria-hidden="true" />
                                 </div>
-                                <input type="search"
+                                <input type="search" title="Buscar Autorizaciones"
                                     class="block w-10/12 py-4 pl-10 text-gray-900 border-0 rounded-md ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                     v-model="filters.global.value" placeholder="Buscar..." />
                             </div>
@@ -219,7 +241,7 @@ const exportarExcel = () => {
                 </template>
 
                 <!--COLUMNAS-->
-                <Column field="name" header="name"></Column>
+                <Column field="name" header="Código Autorización"></Column>
                 <Column field="start_date" header="Fecha Inicio"></Column>
                 <Column field="end_date" header="Fecha Finalización"></Column>
                 <Column field="status" header="Estado" sortable>
@@ -234,12 +256,13 @@ const exportarExcel = () => {
                         <!--BOTÓN EDITAR-->
                         <div
                             class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
-                            <div>
+                            <div title="Editar Autorizaciones">
                                 <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
                                     <PencilIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
                             </div>
-                            <div>
+                            <!--BOTÓN ELIMINAR-->
+                            <div title="Eliminar Autorizaciones">
                                 <Button severity="danger"
                                     @click="confirmDelete(slotProps.data.id, 'Autorización', 'authorizations')"
                                     class="hover:bg-danger">
@@ -278,11 +301,11 @@ const exportarExcel = () => {
                                             <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
                                                 <Combobox class="mt-2 text-left text-gray-900" label="Contrato"
                                                     placeholder="Seleccione Contrato" :options="contracts"
-                                                    v-model="contractSelect">
+                                                    v-model="contractSelect" :error="$page.props.errors.contract">
                                                 </Combobox>
                                                 <Combobox class="mt-2 text-left" label="Estimación"
                                                     placeholder="Seleccione Estimación" :options="quotes"
-                                                    v-model="quoteSelect">
+                                                    v-model="quoteSelect" :error="$page.props.errors.quote">
                                                 </Combobox>
                                             </div>
 

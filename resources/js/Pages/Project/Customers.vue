@@ -49,6 +49,7 @@ onMounted(() => {
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
+
     if (formData.customer.id == null) {
         router.post(route('customers.store'), formData.customer, {
             preserveScroll: true,
@@ -57,7 +58,7 @@ const submit = () => {
                 toast(' Cliente creado exitosamente', 'success');
             },
             onError: (errors) => {
-                toast('¡Ups! Ha surgido un error', 'error');
+                toast('Por favor diligencie todos los campos', 'error');
             },
             onFinish: visit => {
                 loading.value = false;
@@ -65,6 +66,7 @@ const submit = () => {
         })
         return 'creado';
     }
+
     router.put(route('customers.update', formData.customer.id), formData.customer, {
         preserveScroll: true,
         onSuccess: (res) => {
@@ -83,10 +85,13 @@ const submit = () => {
 
 const addItem = () => {
     formData.reset();
+    clearErrors();
     open.value = true;
 }
 
 const editItem = (customer) => {
+    clearErrors();
+
     formData.customer = customer;
     // formData.id = customer.id;
     // formData.NIT = customer.NIT;
@@ -107,15 +112,20 @@ const initFilters = () => {
 const getElements = () => {
     loading.value = true
     if (props.url) {
-        axios.get(route(props.url + '.index')).then((res) => {
-            elementos.value = res.data[0];
-            loading.value = false;
-        })
+        axios.get(route(props.url + '.index'))
+            .then((res) => {
+                elementos.value = res.data[0];
+                loading.value = false;
+            })
     }
 }
 
 const clearFilter = () => {
     initFilters();
+};
+
+const clearErrors = () => {
+    router.page.props.errors = {};
 };
 
 const formatDate = (value) => {
@@ -142,9 +152,9 @@ const exportarExcel = () => {
     XLSX.writeFile(workbook, 'Lista de Clientes_' + customers.nit + '_' + customers.name + ".xlsb");
 };
 
-const showShips=(selectCustomer)=>{
+const showShips = (selectCustomer) => {
 
-    router.get(route('ships.index'), {id: selectCustomer.id})
+    router.get(route('ships.index'), { id: selectCustomer.id })
 }
 
 </script>
@@ -154,15 +164,19 @@ const showShips=(selectCustomer)=>{
         <div class="px-auto  w-full p-4">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
-                    <h1 class="text-xl capitalize font-semibold leading-6 text-primary">Clientes</h1>
+                    <h1 class="text-xl capitalize font-semibold leading-6 text-primary">
+                        Clientes
+                    </h1>
                 </div>
 
-                <div class="">
+                <div title="Agregar Cliente" class="">
                     <Button @click="addItem()" severity="success">
-                        <PlusIcon class="h-6 w-6" aria-hidden="true" /> Agregar
+                        <PlusIcon class="h-6 w-6" aria-hidden="true" />
+                        Agregar
                     </Button>
                 </div>
             </div>
+            <!--DATATABLE-->
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :scrollHeight="height" :value="customers"
                 v-model:filters="filters" dataKey="id" filterDisplay="menu" :loading="props.loading"
                 :globalFilterFields="['NIT', 'name', 'type', 'email']"
@@ -173,7 +187,7 @@ const showShips=(selectCustomer)=>{
                 <template #header>
                     <div class="flex justify-between w-full h-8 mb-2">
                         <div class="flex space-x-4">
-                            <div class="w-8">
+                            <div class="w-8" title="Filtrar Clientes">
                                 <Button @click="clearFilter()" type="button" severity="primary" class="hover:bg-primary ">
                                     <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
                                 </Button>
@@ -183,7 +197,7 @@ const showShips=(selectCustomer)=>{
                                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                     <MagnifyingGlassIcon class="h-4 w-5  text-gray-400" aria-hidden="true" />
                                 </div>
-                                <input type="search"
+                                <input type="search" title="Buscar Clientes"
                                     class="block w-10/12 rounded-md border-0 py-4 pl-10 text-gray-900 ring-1  ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                     v-model="filters.global.value" placeholder="Buscar..." />
                             </div>
@@ -200,20 +214,22 @@ const showShips=(selectCustomer)=>{
                 <!--ACCIONES-->
                 <Column header="Acciones" class="space-x-3">
                     <template #body="slotProps">
-                        <!--BOTÓN EDITAR-->
+                        <!--BOTÓN UNIDADES-->
                         <div
                             class="whitespace-normal pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8 flex space-x-2 ">
-                            <div title="Unidades">
+                            <div title="Unidades del Cliente">
                                 <Button severity="primary" @click="showShips(slotProps.data)" class="hover:bg-primary">
                                     <i class="fa fa-ship w-4 h-4"></i>
                                 </Button>
                             </div>
-                            <div>
+                            <!--BOTÓN EDITAR-->
+                            <div title="Editar Cliente">
                                 <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
                                     <PencilIcon class="h-4 w-4 " aria-hidden="true" />
                                 </Button>
                             </div>
-                            <div>
+                            <!--BOTÓN ELIMINAR-->
+                            <div title="Eliminar Cliente">
                                 <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Cliente?', 'customers')"
                                     class="hover:bg-danger">
                                     <TrashIcon class="h-4 w-4 " aria-hidden="true" />
@@ -244,12 +260,14 @@ const showShips=(selectCustomer)=>{
                                 class="relative transform overflow-hidden rounded-lg bg-white px-2 pb-4 pt-2 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg ">
                                 <div>
                                     <div class="text-center mt-2 px-2">
-                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">{{ formData.customer.id !=
+                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">{{
+                                            formData.customer.id !=
                                             null ? 'Editar ' : 'Crear' }} Cliente
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="mt-2 space-y-4 border border-gray-200 p-2 rounded-lg">
                                             <TextInput class="mt-2 text-left" label="NIT" placeholder="e.g. 9234232988-0"
-                                                v-model="formData.customer.NIT" :error="router.page.props.errors.nit"></TextInput>
+                                                v-model="formData.customer.NIT" :error="router.page.props.errors.nit">
+                                            </TextInput>
                                             <TextInput class="mt-2 text-left" label="Nombre Completo"
                                                 placeholder="Escriba su nombre completo" v-model="formData.customer.name"
                                                 :error="router.page.props.errors.name"></TextInput>
@@ -265,8 +283,9 @@ const showShips=(selectCustomer)=>{
                                                 :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.customer.type"
                                                 :error="router.page.props.errors.type"></TextInput>
                                             <TextInput class="mt-2 text-left" label="Correo"
-                                                placeholder="Escriba su correo electronico" v-model="formData.customer.email"
-                                                :error="router.page.props.errors.email"></TextInput>
+                                                placeholder="Escriba su correo electronico"
+                                                v-model="formData.customer.email" :error="router.page.props.errors.email">
+                                            </TextInput>
                                         </div>
                                     </div>
                                 </div>

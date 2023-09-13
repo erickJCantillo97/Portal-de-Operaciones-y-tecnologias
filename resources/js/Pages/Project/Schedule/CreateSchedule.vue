@@ -38,6 +38,55 @@ const formData = useForm({
 });
 //#endregion
 
+//#region SUBMIT
+// const submit = () => {
+//     loading.value = true;
+
+//     if (!customerSelect.value) {
+//         toast('Por favor seleccione un cliente.', 'error')
+//         return;
+//     }
+
+//     if (!shipSelect.value) {
+//         toast('Por favor seleccione un buque.', 'error')
+//         return;
+//     }
+
+//     formData.customer_id = customerSelect.value.id
+//     formData.ship_id = shipSelect.value.id
+
+//     if (formData.id == 0) {
+//         router.post(route('contracts.store'), formData, {
+//             preserveScroll: true,
+//             onSuccess: (res) => {
+//                 open.value = false;
+//                 toast(' Contrato creado exitosamente', 'success');
+//             },
+//             onError: (errors) => {
+//                 toast('¡Ups! Ha surgido un error', 'error');
+//             },
+//             onFinish: visit => {
+//                 loading.value = false;
+//             }
+//         })
+//         return 'creado';
+//     }
+//     router.put(route('contracts.update', formData.id), formData, {
+//         preserveScroll: true,
+//         onSuccess: (res) => {
+//             open.value = false;
+//             toast('Contrato actualizado exitosamente!', 'success');
+//         },
+//         onError: (errors) => {
+//             toast('¡Ups! Ha surgido un error', 'error');
+//         },
+//         onFinish: visit => {
+//             loading.value = false;
+//         }
+//     })
+// }
+//#endregion
+
 const getSubSystems = (s) => {
     system.value = s;
     subSystems.value = [];
@@ -59,6 +108,10 @@ const openModal = (processes) => {
     open.value = true;
     grupo.value = processes.value;
 }
+
+const clearErrors = () => {
+    router.page.props.errors = {};
+};
 
 </script>
 

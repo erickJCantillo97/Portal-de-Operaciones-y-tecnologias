@@ -40,13 +40,13 @@ const props = defineProps({
 
 //#region UseForm
 const formData = useForm({
-    id: props.contracts?.id ?? '0',
-    ship_id: props.contracts?.ship_id ?? '0',
+    id: props.quotes?.id ?? '0',
+    ship_id: props.quotes?.ship_id ?? '0',
+    code: props.quotes?.code ?? '0',
     //gerencia: props.contracts?.gerencia ?? '',
-    cost: props.contracts?.code ?? '0',
-    cost: props.contracts?.cost ?? '0',
-    start_date: props.contracts?.start_date ?? '',
-    end_date: props.contracts?.end_date ?? '',
+    cost: props.quotes?.cost ?? '0',
+    start_date: props.quotes?.start_date ?? '',
+    end_date: props.quotes?.end_date ?? '',
     pdf: null
 });
 //#endregion
@@ -58,7 +58,14 @@ onMounted(() => {
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
+
+    if (!shipSelect.value) {
+        toast('Por favor seleccione un buque.', 'error')
+        return
+    }
+
     formData.ship_id = shipSelect.value.id
+
     if (formData.id == 0) {
         router.post(route('quotes.store'), formData, {
             preserveScroll: true,
@@ -67,7 +74,7 @@ const submit = () => {
                 toast(' Cotizacion creado exitosamente', 'success');
             },
             onError: (errors) => {
-                toast('¡Ups! Ha surgido un error', 'error');
+                toast('Por favor diligencie todos los campos.', 'error');
             },
             onFinish: visit => {
                 loading.value = false;
@@ -93,13 +100,18 @@ const submit = () => {
 
 const addItem = () => {
     formData.reset();
+    clearErrors();
+    shipSelect.value = {};
     open.value = true;
 }
 
 const editItem = (quote) => {
+    clearErrors();
+
     formData.id = quote.id;
-    formData.gerencia = quote.gerencia;
-    formData.cost = quote.code;
+    // formData.gerencia = quote.gerencia;
+    shipSelect.value = quote.ship;
+    formData.code = quote.code;
     formData.cost = quote.cost;
     formData.start_date = quote.start_date;
     formData.end_date = quote.end_date;
@@ -116,6 +128,10 @@ const initFilters = () => {
 
 const clearFilter = () => {
     initFilters();
+};
+
+const clearErrors = () => {
+    router.page.props.errors = {};
 };
 
 const formatDate = (value) => {
@@ -182,7 +198,7 @@ const exportarExcel = () => {
                     </h1>
                 </div>
 
-                <div class="">
+                <div class="" title="Agregar Estimación">
                     <Button @click="addItem()" severity="success">
                         <PlusIcon class="w-6 h-6" aria-hidden="true" />
                         Agregar
@@ -190,7 +206,8 @@ const exportarExcel = () => {
                 </div>
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="quotes" v-model:filters="filters" dataKey="id"
-                filterDisplay="menu" :loading="loading" :globalFilterFields="['gerencia', 'cost', 'start_date', 'end_date']"
+                filterDisplay="menu" :loading="loading"
+                :globalFilterFields="['name', 'ship.name', 'cost', 'start_date', 'end_date']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -198,7 +215,7 @@ const exportarExcel = () => {
                 <template #header>
                     <div class="flex justify-between w-full h-8 mb-2">
                         <div class="flex space-x-4">
-                            <div class="w-8">
+                            <div class="w-8" title="Filtrar Estimaciones">
                                 <Button @click="clearFilter()" type="button" severity="primary" class="hover:bg-primary ">
                                     <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
                                 </Button>
@@ -208,7 +225,7 @@ const exportarExcel = () => {
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <MagnifyingGlassIcon class="w-5 h-4 text-gray-400" aria-hidden="true" />
                                 </div>
-                                <input type="search"
+                                <input type="search" title="Buscar Estimaciones"
                                     class="block w-10/12 py-4 pl-10 text-gray-900 border-0 rounded-md ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                     v-model="filters.global.value" placeholder="Buscar..." />
                             </div>
@@ -240,12 +257,13 @@ const exportarExcel = () => {
                         <!--BOTÓN EDITAR-->
                         <div
                             class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
-                            <div>
+                            <div title="Editar Estimación">
                                 <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
                                     <PencilIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
                             </div>
-                            <div>
+                            <!--BOTÓN ELIMINAR-->
+                            <div title="Eliminar Estimación">
                                 <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Cotización', 'quotes')"
                                     class="hover:bg-danger">
                                     <TrashIcon class="w-4 h-4 " aria-hidden="true" />
@@ -276,37 +294,32 @@ const exportarExcel = () => {
                                 class="relative px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg ">
                                 <div>
                                     <div class="px-2 mt-2 text-center">
-                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">{{ formData.id !=
-                                            0 ? 'Editar ' : 'Crear' }} Estimación
+                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">
+                                            {{ formData.id != 0 ? 'Editar ' : 'Crear' }}
+                                            Estimación
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-2 border border-gray-200 rounded-lg">
 
-                                            <!-- <div class="mt-2">
-                                                <label for="type"
-                                                    class="block text-sm text-left text-gray-900 capitalize">Tipo de
-                                                    Cliente</label>
-                                                <Dropdown v-model="form.type" :options="types" filter optionLabel="name"
-                                                    placeholder="Selecccionar" class="w-full md:w-14rem">
-                                                </Dropdown>
-                                            </div> -->
+                                            <!--formData.id hace referencia si está activo el modal o no (0=activo; 1=inactivo)-->
                                             <TextInput class="mt-2 text-left" label="Consecutivo"
+                                                :enabled="formData.id == 0"
                                                 :placeholder="'Escriba el consecutivo de la estimacion'"
-                                                v-model="formData.code" :error="router.page.props.errors.cost"></TextInput>
-
+                                                v-model="formData.code" :error="router.page.props.errors.code">
+                                            </TextInput>
 
                                             <Combobox class="text-left text-gray-900" label="Buque"
-                                                placeholder="Seleccione Buque" :options="ships" v-model="shipSelect">
+                                                placeholder="Seleccione Buque" :options="ships" v-model="shipSelect"
+                                                :error="router.page.props.errors.ship">
                                             </Combobox>
 
-                                            <TextInput class="text-left" label="Costo"
+                                            <TextInput class="text-left" label="Costo" type="number"
                                                 :placeholder="'Escriba el valor total estimado'" v-model="formData.cost"
                                                 :error="router.page.props.errors.cost"></TextInput>
 
                                             <!--CAMPO FECHA INICIO-->
-
                                             <TextInput class="text-left" type="date" label="Fecha de inicio"
-                                                :placeholder="'Escriba el Tipo de Cliente'"
-                                                v-model="formData.start_date" :error="$page.props.errors.cost">
+                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.start_date"
+                                                :error="$page.props.errors.start_date">
                                             </TextInput>
 
                                             <!--CAMPO FECHA FINALIZACIÓN-->

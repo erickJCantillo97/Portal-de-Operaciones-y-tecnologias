@@ -9,7 +9,8 @@ import Image from 'primevue/image';
 import UserHeader from '@/Components/sections/UserHeader.vue';
 
 const props = defineProps({
-    projects: Array
+    projects: Array,
+    costoMes: Number,
 })
 const colors = { GEDIN: 'bg-blue-500', VPEXE: 'bg-gray-500', GEMAM: 'bg-teal-500', 'VPT&O': 'bg-yellow-500', GEBOC: 'bg-cyan-500', GECTI: 'bg-indigo-500', GETHU: 'bg-red-500', PCTMAR: 'bg-purple-500', GEFAD: 'bg-sky-500', GECON: 'bg-pink-500' }
 
@@ -22,10 +23,10 @@ onMounted(() => {
     axios.get(route('get.empleados.gerencia')).then((res) => {
         for (var gerencia of Object.values(res.data)) {
             personal.value.push({
-                title: hasRole('Super Admin') ? gerencia[0].GERENCIA : gerencia[0].OFICINA,
+                title: hasRole('Super Admin') ? gerencia[0].Gerencia : gerencia[0].Oficina,
                 initials: gerencia.length,
                 totalMembers: gerencia.length,
-                bgColorClass: gerencia[0].GERENCIA != 'GECON' ? colors[gerencia[0].GERENCIA] : 'bg-' + gerencia[0].GERENCIA,
+                bgColorClass: gerencia[0].Gerencia != 'GECON' ? colors[gerencia[0].Gerencia] : 'bg-' + gerencia[0].Gerencia,
             }, )
             totalMembers.value += gerencia.length
         }

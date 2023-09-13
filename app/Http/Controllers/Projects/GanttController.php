@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
 use App\Models\Gantt\Task;
+use App\Models\Labor;
 use App\Models\Projects\Project;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -37,7 +38,7 @@ class GanttController extends Controller
             ]],
             "tasks" => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
             "dependencies" => ['rows' => []],
-            "resources" => ['rows' => []],
+            "resources" => ['rows' => Labor::get()],
             "assignments" => ['rows' => []],
             "timeRanges" => ['rows' => []]
         ]);

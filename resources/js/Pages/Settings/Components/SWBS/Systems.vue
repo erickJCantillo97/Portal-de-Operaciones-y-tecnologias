@@ -119,14 +119,15 @@ const submit = () => {
             <Column header="Acciones" class="space-x-3">
                 <template #body="slotProps">
                     <!--BOTÓN EDITAR-->
-                    <div
+                    <div title="Editar Sistema"
                         class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
                         <div>
                             <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
                                 <PencilIcon class="w-4 h-4 " aria-hidden="true" />
                             </Button>
                         </div>
-                        <div>
+                        <!--BOTÓN ELIMINAR-->
+                        <div title="Eliminar Sistema">
                             <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Sistema', 'system')"
                                 class="hover:bg-danger">
                                 <TrashIcon class="w-4 h-4 " aria-hidden="true" />
