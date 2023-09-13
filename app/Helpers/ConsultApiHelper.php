@@ -79,9 +79,9 @@ function UpdateCargos() {
                         Labor::firstOrCreate([
                             'name' => $cargo['Cargo'],
                             'gerencia' => $cargo['Gerencia'],
-                            'costo_mes' => $cargo['Ingresos_Mes'],
-                            'costo_dia' => $cargo['Ingresos_Dia'],
-                            'costo_hora' => $cargo['Ingresos_Hora'],
+                            'costo_mes' => $cargo['Costos_Mes'],
+                            'costo_dia' => $cargo['Costos_Dia'],
+                            'costo_hora' => $cargo['Costos_Hora'],
                         ]);
                     }
             return  collect($json);
