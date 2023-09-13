@@ -2,17 +2,26 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { router, useForm } from '@inertiajs/vue3';
 import { FilterMatchMode } from 'primevue/api';
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassPlusIcon, SparklesIcon, EyeIcon, PhotoIcon, TableCellsIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline';
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
+import Combobox from '@/Components/Combobox.vue';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import InputText from 'primevue/inputtext';
+import OverlayPanel from 'primevue/overlaypanel';
 import '../../sass/dataTableCustomized.scss';
+
+const open = ref(false)
+const assigment = ref()
+const assignmentSelect = ref()
 
 const props = defineProps({
     taskNow: Array,
+    assignments: Array,
 })
 
 const unidad = {
@@ -89,8 +98,12 @@ const getTask = (option) => {
 }
 
 
-const redondear = (value )=> {
-    return new Intl.NumberFormat().format(Number(value).toFixed(2) )
+const redondear = (value) => {
+    return new Intl.NumberFormat().format(Number(value).toFixed(2))
+}
+
+const viewAssignments = (assigment) => {
+    open.value = true
 }
 </script>
 
@@ -106,7 +119,7 @@ const redondear = (value )=> {
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="tasks" v-model:filters="filters" dataKey="id"
                 filterDisplay="menu" :loading="loading"
-                :globalFilterFields="['name', 'gerencia', 'start_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
+                :globalFilterFields="['name', 'project.name', 'duration', 'startDate', 'endDate']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -121,11 +134,17 @@ const redondear = (value )=> {
                     <div class="w-full mb-2">
                         <div class="flex justify-end h-8 mb-2 space-x-4">
                             <span class="shadow-xl">
-                                <button type="button" :class="optionValue == 'today' ? 'bg-sky-500 text-white':'bg-white hover:bg-sky-200 text-gray-90'" @click="getTask('today')"
+                                <button type="button"
+                                    :class="optionValue == 'today' ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+                                    @click="getTask('today')"
                                     class="relative inline-flex items-center rounded-l-md  px-3 py-2 text-sm font-semibold 0 ring-1 ring-inset ring-gray-300 focus:z-10">Hoy</button>
-                                <button type="button" :class="optionValue == 'tomorrow' ? 'bg-sky-500 text-white':'bg-white hover:bg-sky-200 text-gray-90'"  @click="getTask('tomorrow')"
+                                <button type="button"
+                                    :class="optionValue == 'tomorrow' ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+                                    @click="getTask('tomorrow')"
                                     class="relative -ml-px inline-flex items-center  px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 focus:z-10">Mañana</button>
-                                <button type="button" :class="optionValue == 'week' ? 'bg-sky-500 text-white':'bg-white hover:bg-sky-200 text-gray-90'" @click="getTask('week')"
+                                <button type="button"
+                                    :class="optionValue == 'week' ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+                                    @click="getTask('week')"
                                     class="relative -ml-px inline-flex items-center rounded-r-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300  focus:z-10">Semana</button>
                             </span>
                             <span class="p-float-label">
@@ -147,7 +166,7 @@ const redondear = (value )=> {
                                 severity="primary" class="hover:bg-primary ">
                             </Button>
                             <span class="p-float-label">
-                                <InputText id="buscar" v-model="filters.global.value"  type="search"
+                                <InputText id="buscar" v-model="filters.global.value" type="search"
                                     class="block text-gray-900 border-0 rounded-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                                 <label for="buscar">Buscar...</label>
                             </span>
@@ -173,8 +192,119 @@ const redondear = (value )=> {
                 </Column>
                 <Column field="startDate" header="Fecha inicio"></Column>
                 <Column field="endDate" header="Fecha fin"></Column>
-                <Column field="" header="Recursos"></Column>
+                <Column field="" header="Recursos">
+                    <template #body="slotProps">
+                        <!--BOTÓN VER RECURSOS-->
+                        <div
+                            class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
+
+                            <!--BOTÓN VER RECURSOS-->
+                            <div title="Ver Recursos">
+                                <Button severity="success" @click="viewAssignments(slotProps.data)"
+                                    class="hover:bg-primary">
+                                    <EyeIcon class="w-4 h-4 " aria-hidden="true" />
+                                </Button>
+                            </div>
+
+                            <!--BOTÓN EDITAR-->
+                            <!-- <div title="Editar Proyecto">
+                                <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
+                                    <PencilIcon class="w-4 h-4 " aria-hidden="true" />
+                                </Button>
+                            </div> -->
+                            <!--BOTÓN ELIMINAR-->
+                            <!-- <div title="Eliminar Proyecto">
+                                <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Proyecto', 'projects')"
+                                    class="hover:bg-danger">
+                                    <TrashIcon class="w-4 h-4 " aria-hidden="true" />
+                                </Button>
+                            </div> -->
+                        </div>
+                    </template>
+                </Column>
             </DataTable>
         </div>
+
+        <!--MODAL DE VER RECURSOS-->
+        <TransitionRoot as="template" :show="open">
+            <Dialog as="div" class="relative z-30" @close="open = false">
+                <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
+                    leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+                    <div class="fixed inset-0 z-30 w-screen h-screen transition-opacity bg-gray-500 bg-opacity-75" />
+                </TransitionChild>
+
+                <div class="fixed inset-0 z-50 h-screen overflow-y-auto">
+                    <div class="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
+                        <TransitionChild as="template" enter="ease-out duration-300"
+                            enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
+                            leave-from="opacity-100 translate-y-0 sm:scale-100"
+                            leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                            <DialogPanel :class="props.heigthDialog"
+                                class="relative px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg ">
+                                <div>
+                                    <div class="px-2 mt-2 text-center">
+                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">Ver Recursos
+                                        </DialogTitle> <!--Se puede usar {{ tittle }}-->
+                                        <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
+                                            <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
+                                                <Combobox class="mt-2 text-left" label="Buque"
+                                                    placeholder="Seleccione Recursos" :options="assignments"
+                                                    v-model="assignmentSelect">
+                                                </Combobox>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- <div class="flex px-2 mt-2 space-x-4">
+                                    <Button class="hover:bg-danger text-danger border-danger" severity="danger"
+                                        @click="open = false">Cancelar</Button>
+                                    <Button severity="success" :loading="false"
+                                        class="text-success hover:bg-success border-success" @click="submit()">
+                                        {{ formData.id != 0 ? 'Actualizar ' : 'Guardar' }}
+                                    </Button>
+                                </div> -->
+                            </DialogPanel>
+                        </TransitionChild>
+                    </div>
+                </div>
+            </Dialog>
+        </TransitionRoot>
+
+        <OverlayPanel ref="op">
+            <div>
+                <h2 class="text-base font-semibold leading-6 text-gray-900">Creación o edición de cronograma</h2>
+                <p class="mt-1 text-sm text-gray-500">Aquí podrá escoger como desea crear el cronograma del proyecto.</p>
+
+                <ul role="list" class="mt-6 grid grid-cols-1 gap-6 border-b border-t border-gray-200 py-6 sm:grid-cols-2">
+                    <li v-for="(item, itemIdx) in items" :key="itemIdx" class="flow-root">
+                        <div @click="router.get(route(item.page, projectSelect.id))"
+                            class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 focus-within:ring-2 focus-within:ring-indigo-500 hover:bg-gray-50">
+                            <div
+                                :class="[item.background, 'flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg']">
+                                <component :is="item.icon" class="h-6 w-6 text-white" aria-hidden="true" />
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-900">
+                                    <a href="#" class="focus:outline-none">
+                                        <span class="absolute inset-0" aria-hidden="true" />
+                                        <span>{{ item.title }}</span>
+                                        <span aria-hidden="true"> &rarr;</span>
+                                    </a>
+                                </h3>
+                                <p class="mt-1 text-sm text-gray-500">{{ item.description }}</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <!-- <div class="mt-4 flex">
+                    <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        Or start from an empty project
+                        <span aria-hidden="true"> &rarr;</span>
+                    </a>
+                </div> -->
+            </div>
+        </OverlayPanel>
     </AppLayout>
 </template>

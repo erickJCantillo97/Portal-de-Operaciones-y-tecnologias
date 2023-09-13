@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('authorization_id')->nullable()->index();
             $table->unsignedBigInteger('quote_id')->nullable()->index();
             $table->unsignedBigInteger('ship_id')->index();
+            $table->unsignedBigInteger('customer_id')->nullable()->index();
             $table->string('intern_communications')->nullable();
             $table->string('name'); //Este nombre debe ser calculado (Ship_YYYY_consecutivo)
             $table->string('gerencia');

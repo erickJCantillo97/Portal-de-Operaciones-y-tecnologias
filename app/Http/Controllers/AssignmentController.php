@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Gantt\Assignment;
 use Exception;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class AssignmentController extends Controller
 {
@@ -13,7 +14,12 @@ class AssignmentController extends Controller
      */
     public function index()
     {
-        //
+        $assignments = Assignment::orderBy('name')->get();
+
+        return Inertia::render('Programming',
+            [
+                'assignments' => $assignments,
+            ]);
     }
 
     /**
@@ -33,9 +39,9 @@ class AssignmentController extends Controller
             //
         ]);
 
-        try{
+        try {
             Assignment::create($validateData);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
     }
@@ -65,9 +71,9 @@ class AssignmentController extends Controller
             //
         ]);
 
-        try{
+        try {
             $assignment->update($validateData);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
@@ -77,9 +83,9 @@ class AssignmentController extends Controller
      */
     public function destroy(Assignment $assignment)
     {
-        try{
+        try {
             $assignment->delete();
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }

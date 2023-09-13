@@ -3,13 +3,11 @@
 use App\Http\Controllers\Projects\AuthorizationController;
 use App\Http\Controllers\Projects\ContractController;
 use App\Http\Controllers\Projects\CustomerController;
-use App\Http\Controllers\Projects\GanttController;
 use App\Http\Controllers\Projects\ProjectController;
 use App\Http\Controllers\Projects\QuoteController;
 use App\Http\Controllers\Projects\ShipController;
 use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
