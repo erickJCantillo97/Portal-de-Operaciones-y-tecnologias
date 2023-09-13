@@ -97,11 +97,9 @@ const getTask = () => {
                 <div class="bg-gradient-to-b from-blue-400 to-slate-50 text-black font-extrabold w-full p-4 text-center">
                     <h2 class="text-xl font-extrabold ">Actividades de Hoy</h2>
                 </div>
-                <div class="mt-4 px-4 sm:px-6  h-64 overflow-y-auto custom-scroll snap-y snap-proximity">
-
-
-                <ul class="block space-y-2 mt-2">
-                    <li v-for="task in tasks" :key="task.id" class="shadow-lg p-2 flex justify-between rounded-md">
+                <div class="mt-4 h-64 overflow-y-auto custom-scroll snap-y snap-proximity">
+                <ul class="space-y-2 mt-2">
+                    <li v-for="task in tasks" :key="task.id" class="shadow-lg p-2 flex justify-between rounded-md w-full">
                         <div class="block">
                             <p>{{ task.name }}</p>
                             <p class="text-xs italic">{{task.project.name}}</p>
@@ -109,10 +107,8 @@ const getTask = () => {
                         <p>{{ task.percentDone }} %</p>
                     </li>
                 </ul>
-
             </div>
             </div>
-
         </div>
     </AppLayout>
 </template>

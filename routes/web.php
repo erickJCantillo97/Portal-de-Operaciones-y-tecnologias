@@ -25,7 +25,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('/dashboard', function () {
 
-
         $taskProject = Task::whereNull('task_id')->get()->map(function (Task $item) {
             return [
                 'id' => $item->id,

@@ -10,7 +10,7 @@ function getEmpleadosAPI(): mixed
     try {
         if (getToken()){
             $json =  Http::acceptJson()->withToken(session()->get('token'))
-                    ->get(ROUTE_API.'/listado_personal_sap_activos_busqueda'
+                    ->get(ROUTE_API.'/listado_personal_cargo_costo_da_view'
                     )->json();
             return  collect($json);
         }
@@ -40,8 +40,8 @@ function login(): bool{
     try{
         $login = Http::acceptJson()->post(ROUTE_API.'/auth/login',
             [
-                'username' => 'portalreuniones',
-                'password' => 'cG9ydGFscmV1bmlvbmVz',
+                'username' => 'portalOperTecnologia',
+                'password' => 'cG9ydGFsT3BlclRlY25vbG9naWE=',
             ]
         )->json();
         if($login['status'] == 'true'){
@@ -63,7 +63,22 @@ function searchEmpleados(String $clave, String $valor)
 
 function pokeapi () {
     HTTP::acceptJson()->get('https://pokeapi.co/api/v2/pokemon/');
-    
+}
+
+function getCargos() {
+    try {
+        if (getToken()){
+            $json =  Http::acceptJson()->withToken(session()->get('token'))
+                    ->get(ROUTE_API.'/listado_cargo_promedio_salarial_da_view'
+                    )->json();
+            return  collect($json);
+        }
+        dd('Sin token');
+
+    } catch (\Throwable $th) {
+        dd($th);
+    }
+
 }
 
 

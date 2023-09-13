@@ -147,7 +147,7 @@ const redondear = (value )=> {
                                 severity="primary" class="hover:bg-primary ">
                             </Button>
                             <span class="p-float-label">
-                                <InputText id="buscar" v-model="filters.global.value" :unstyled="true" type="search"
+                                <InputText id="buscar" v-model="filters.global.value"  type="search"
                                     class="block text-gray-900 border-0 rounded-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                                 <label for="buscar">Buscar...</label>
                             </span>
