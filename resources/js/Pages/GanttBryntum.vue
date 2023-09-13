@@ -5,6 +5,7 @@ import "@bryntum/gantt/gantt.material.css";
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
 import { Gantt, List, LocaleManager, ProjectModel, StringHelper, Widget } from '@bryntum/gantt/gantt.module.js';
 import '@/GanttToolbar.js'
+import '../../css/app.scss'
 
 const props = defineProps({
     project: Number,
@@ -91,13 +92,15 @@ if (!Widget.factoryable.registry.resourcelist) {
                 itemTpl: resource => {
                     return StringHelper.xss`
                     <div class="b-resource-detail">
-                    <div class="b-resource-name">${resource.name}</div>
-                    <div class="b-resource-city">
-                        ${resource.units}
-                        <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
-                    </div>
-                </div>
-            `;
+                        <div class="b-resource-name">${resource.name}</div>
+                        <div class="b-resource-city">
+                            ${resource.unit}
+                        </div>
+                        <div class="b-resource-city">
+                            Costo hora: ${resource.costo_hora}
+                            <i data-btip="Quitar recurso" class="b-icon b-icon-trash"></i>
+                        </div>
+                    </div>`;
                 }
             };
         }
@@ -149,7 +152,7 @@ const project = new ProjectModel({
 
 const gantt = new Gantt(({
     project,
-    resourceImageFolderPath: '../images/users/',
+    // resourceImageFolderPath: '../images/users/',
     dependencyIdField: 'sequenceNumber',
     columns: [
         { type: 'wbs', text: 'Nivel', width: 20 },
@@ -161,7 +164,7 @@ const gantt = new Gantt(({
         {
             type: 'resourceassignment',
             text: 'Recursos',
-            width: 100,
+            width: 150,
             showAvatars: true,
             align: 'center',
             editor: {
@@ -178,6 +181,9 @@ const gantt = new Gantt(({
                         max: 1000,
                         step: 100,
                         width: 100,
+                        finalizeCellEdit: ({ value }) => {
+                            return value % 100 != 0 ? 'El valor debe ser en multiplos de 100' : true;
+                        }
                     },
                     features: {
                         // group: 'resource.city',
@@ -188,17 +194,38 @@ const gantt = new Gantt(({
                         cellMenu: false,
                     },
                     // The extra columns are concatenated onto the base column set.
+                    columns: [{
+                        text: 'Valor Hora',
+                        // Read a nested property (name) from the resource calendar
+                        field: 'resource.costo_hora',
+                        filterable: false,
+                        editor: false,
+                        width: 100
+                    }]
                 }
+            },
+            avatarTooltipTemplate({ taskRecord, assignmentRecord, overflowCount, overflowAssignments }) {
+                let overflowAssignments2 = '';
+                var task = taskRecord._data;
+                console.log(taskRecord._data)
+                for(var element of overflowAssignments){
+                    overflowAssignments2 += ('<div>' + element.units / 100 + ' ' + element.name + ' $' + Math.round(task.durationUnit == 'day' ? (task.duration * (element.units/100) * element.costo_hora)*8.5:(task.duration * (element.units/100) * element.costo_hora)).toLocaleString('es') + '</div>')
+                }
+                return `
+                    <div>${assignmentRecord.units / 100} ${assignmentRecord.name} $${Math.round(task.durationUnit == 'day' ? (task.duration * (assignmentRecord.units/100) * assignmentRecord.costo_hora)*8.5:(task.duration * (assignmentRecord.units/100) * assignmentRecord.costo_hora)).toLocaleString('es')} </div>
+                     ${overflowCount > 0 ? `${overflowAssignments2}` : ''}
+                `;
             }
         },
     ],
     features: {
+        projectLines: false,
         taskEdit: {
             items: {
                 resourcesTab: {
                     type: 'resourcelist',
                     weight: 120,
-                    title: 'Resources'
+                    title: 'Recursos',
                 },
             }
         }
@@ -223,12 +250,6 @@ onMounted(() => {
 </script>
 <template>
     <AppLayout title="">
-        <div class="b-resource-detail border border-blue-400 rounded-lg">
-            <div class="b-resource-name">${resource.name}</div>
-            <div class="b-resource-city">${resource.units}
-                <i data-btip="Deassign resource" class="b-icon b-icon-trash"></i>
-            </div>
-        </div>
         <div class="">
             <div class="h-full">
                 <div class="overflow-hidden shadow-xl sm:rounded-lg h-screen">

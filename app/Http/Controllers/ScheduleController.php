@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Gantt\Assignment;
 use App\Models\Gantt\Task;
+use App\Models\Labor;
 use App\Models\Projects\Project;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use PhpParser\Node\Expr\Assign;
 
 class ScheduleController extends Controller
 {
@@ -59,19 +62,14 @@ class ScheduleController extends Controller
             ]],
             "tasks" => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
             "dependencies" => ['rows' => []],
-            "resources" => ['rows' => [
-                [
-                    'id' => 1,
-                    'name' => 'Auxiliar de Investigación y Desarrollo',
-                    'quantity'=>0
-                ],
-                [
-                    'id' => 2,
-                    'name' => 'Jefe de Departamento',
-                    'quantity'=>0
-                ],
-            ]],
-            "assignments" => ['rows' => []],
+            "resources" => ['rows' => Labor::where('gerencia', auth()->user()->gerencia)->get()->map(function($cargo){
+                return [
+                    'id' => $cargo->id,
+                    'name' => $cargo->name,
+                    'costo_hora' => '$ '. number_format($cargo->costo_hora, 0),
+                ];
+            })],
+            "assignments" => ['rows' => Assignment::get()],
             "timeRanges" => ['rows' => []]
         ]);
     }
@@ -80,6 +78,7 @@ class ScheduleController extends Controller
     {
         $rows = [];
         $removed = [];
+        $assgimentRows = [];
         // dd($request);
         // dd($request->requestId);
         if (isset($request->tasks['added'])) {
@@ -121,14 +120,37 @@ class ScheduleController extends Controller
                 array_push($removed, ['id' => $task['id']]);
             }
         }
+        if(isset($request->assignments['added'])){
+            foreach($request->assignments['added'] as $assignment){
+                $labor = Labor::find($assignment['resource']);
+                $assigmmentCreate = Assignment::create([
+                    'event' => $assignment['event'],
+                    'resource' => $assignment['resource'],
+                    'units' => $assignment['units'],
+                    'name' => $labor->name,
+                    'costo_hora' => $labor->costo_hora,
+                ]);
+                array_push($assgimentRows, [
+                    '$PhantomId' => end($assignment),
+                    'id' => $assigmmentCreate['id'],
+                    'added_dt' => $assigmmentCreate->created_at,
+                ]);
+            }
+        }
+
+
 
 
 
         return response()->json([
             "success"   => true,
-            'requestId' => $request->requestId, 'tasks' => [
+            'requestId' => $request->requestId,
+            'tasks' => [
                 'rows' => $rows,
                 'removed' => $removed
+            ],
+            'assignments' => [
+                'rows' => $assgimentRows
             ]
         ]);
     }
@@ -147,6 +169,12 @@ class ScheduleController extends Controller
         return Inertia::render('Project/Schedule/CreateSchedule', [
             'project' => $project,
             'groups'=> gruposConstructivos()
+        ]);
+    }
+
+    public function getAssignmentsTask(Task $task) {
+        return response()->json([
+            'assigments' => Assignment::where('even', $task->id)->get(),
         ]);
     }
 }
