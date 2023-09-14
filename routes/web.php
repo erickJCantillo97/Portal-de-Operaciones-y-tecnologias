@@ -6,6 +6,7 @@ use App\Models\Process;
 use App\Models\Projects\Project;
 use App\Models\SWBS\SubSystem;
 use App\Models\SWBS\System;
+use App\Models\VirtualTask;
 use Carbon\Carbon;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
@@ -100,13 +101,13 @@ Route::get('actividadesDeultimonivel', function (Request $request) {
             $date_end = Carbon::now()->format('Y-m-d');
         }
 
-        $tareas =  Task::whereNotNull('task_id')->select('task_id')->get()->toArray();
+        $tareas =  VirtualTask::whereNotNull('task_id')->select('task_id')->get()->toArray();
 
         $ids = array_map(function ($objeto) {
             return $objeto['task_id'];
         }, $tareas);
         return response()->json(
-            Task::with('project')->where(function ($query) use ($date_start, $date_end) {
+            VirtualTask::with('project')->where(function ($query) use ($date_start, $date_end) {
                 $query->whereBetween('startdate', [$date_start, $date_end])
                     ->orWhereBetween('enddate', [$date_start, $date_end])
                     ->orWhere(function ($query) use ($date_start, $date_end) {
@@ -119,26 +120,7 @@ Route::get('actividadesDeultimonivel', function (Request $request) {
 })->name('actividadesDeultimonivel');
 
 Route::get('/programming', function () {
-    $date_start = Carbon::now();
-    $date_end = Carbon::now();
-
-    $tareas =  Task::whereNotNull('task_id')->select('task_id')->get()->toArray();
-
-    $ids = array_map(function ($objeto) {
-        return $objeto['task_id'];
-    }, $tareas);
-
-    $tasks = Task::with('project')->where(function ($query) use ($date_start, $date_end) {
-        $query->whereBetween('startdate', [$date_start, $date_end])
-            ->orWhereBetween('enddate', [$date_start, $date_end])
-            ->orWhere(function ($query) use ($date_start, $date_end) {
-                $query->where('startdate', '<', $date_start)
-                    ->where('enddate', '>', $date_end);
-            });
-    })->whereNotIn('id', array_unique($ids))->get();
-    return Inertia::render('Programming', [
-        'taskNow' => $tasks
-    ]);
+    return Inertia::render('Programming');
 })->name('programming');
 
 Route::get('projectAvance', function (){

@@ -174,7 +174,7 @@ class ScheduleController extends Controller
 
     public function getAssignmentsTask(Task $task) {
         return response()->json([
-            'assigments' => Assignment::where('even', $task->id)->get(),
+            'assigments' => Assignment::where('event', $task->id)->get(),
         ]);
     }
 }
