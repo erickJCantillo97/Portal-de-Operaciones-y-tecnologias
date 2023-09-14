@@ -11,6 +11,7 @@ import ToastService from "primevue/toastservice";
 import "primevue/resources/themes/mdc-light-indigo/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
+import Tooltip from 'primevue/tooltip';
 const appName = import.meta.env.VITE_APP_NAME || "Portal de Operaciones Tecnológicas";
 
 createInertiaApp({
@@ -27,6 +28,7 @@ createInertiaApp({
             .use(ConfirmationService)
             .use(ToastService)
             .use(PrimeVue)
+            .directive('tooltip', Tooltip)
             .mount(el);
     },
     progress: {
