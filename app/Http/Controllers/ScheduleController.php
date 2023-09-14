@@ -6,6 +6,7 @@ use App\Models\Gantt\Assignment;
 use App\Models\Gantt\Task;
 use App\Models\Labor;
 use App\Models\Projects\Project;
+use App\Models\VirtualTask;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -169,7 +170,7 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function getAssignmentsTask(Task $task)
+    public function getAssignmentsTask(VirtualTask $task)
     {
         return response()->json([
             'assignments' => Assignment::where('event', $task->id)->get(),

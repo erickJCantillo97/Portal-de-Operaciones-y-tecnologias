@@ -120,7 +120,7 @@ Route::get('actividadesDeultimonivel', function (Request $request) {
 })->name('actividadesDeultimonivel');
 
 Route::get('/programming', function () {
-    return Inertia::render('Programming');
+    return Inertia::render('Programming/Index');
 })->name('programming');
 
 Route::get('projectAvance', function (){

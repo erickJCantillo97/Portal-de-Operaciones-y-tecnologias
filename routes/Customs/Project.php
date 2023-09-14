@@ -12,7 +12,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
     Route::get('/ScheduleNew/{project}', [ScheduleController::class, 'index'])->name('showGantt');
+
     Route::get('GanttImporterGanttImporter', [ScheduleController::class, 'import'])->name('ganttImporter');
+    
     Route::get('/ScheduleWizard/{project}', [ScheduleController::class, 'wizard'])->name('wizard');
 
     Route::get('/ScheduleCreate/{project}', [ScheduleController::class, 'create'])->name('createSchedule.create');
