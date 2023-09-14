@@ -9,7 +9,6 @@ use App\Models\Projects\Project;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use PhpParser\Node\Expr\Assign;
 
 class ScheduleController extends Controller
 {
@@ -17,16 +16,16 @@ class ScheduleController extends Controller
     {
         $groups = gruposConstructivos();
         $taskProject = Task::where('project_id', $project->id)->first();
-        if(!$taskProject){
+        if (! $taskProject) {
             $taskCreate = Task::firstOrcreate([
-            'project_id' => $project->id,
-            'name' => $project->name,
-            'percentDone' => 0,
-            'duration' => Carbon::parse($project->start_date)->diffInDays($project->end_date),
-            'durationUnit' => 'Days',
-            'startDate' => $project->start_date,
-            'endDate' => $project->end_date,
-        ]);
+                'project_id' => $project->id,
+                'name' => $project->name,
+                'percentDone' => 0,
+                'duration' => Carbon::parse($project->start_date)->diffInDays($project->end_date),
+                'durationUnit' => 'Days',
+                'startDate' => $project->start_date,
+                'endDate' => $project->end_date,
+            ]);
         }
 
         return Inertia::render('GanttBryntum', [
@@ -38,9 +37,10 @@ class ScheduleController extends Controller
     public function index(Project $project)
     {
         return Inertia::render('GanttBryntum', [
-            'project' => $project
+            'project' => $project,
         ]);
     }
+
     public function import(Request $request)
     {
         return Inertia::render('GanttImporter', [
@@ -52,29 +52,29 @@ class ScheduleController extends Controller
     {
 
         return response()->json([
-            "success" => true,
-            "proyect" => ['rows' => [
-                "calendar" => "general",
-                "startDate" => "2022-05-31",
-                "hoursPerDay" => 9,
-                "daysPerWeek" => 5,
-                "daysPerMonth" => 20
+            'success' => true,
+            'proyect' => ['rows' => [
+                'calendar' => 'general',
+                'startDate' => '2022-05-31',
+                'hoursPerDay' => 9,
+                'daysPerWeek' => 5,
+                'daysPerMonth' => 20,
             ]],
-            "tasks" => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
-            "dependencies" => ['rows' => []],
-            "resources" => ['rows' => Labor::where('gerencia', auth()->user()->gerencia)->get()->map(function($cargo){
+            'tasks' => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
+            'dependencies' => ['rows' => []],
+            'resources' => ['rows' => Labor::where('gerencia', auth()->user()->gerencia)->get()->map(function ($cargo) {
                 return [
                     'id' => $cargo->id,
                     'name' => $cargo->name,
-                    'costo_hora' => '$ '. number_format($cargo->costo_hora, 0),
+                    'costo_hora' => '$ '.number_format($cargo->costo_hora, 0),
                 ];
             })],
-            "assignments" => ['rows' => Assignment::get()],
-            "timeRanges" => ['rows' => []]
+            'assignments' => ['rows' => Assignment::get()],
+            'timeRanges' => ['rows' => []],
         ]);
     }
 
-    public function sync(Project $project,Request $request)
+    public function sync(Project $project, Request $request)
     {
         $rows = [];
         $removed = [];
@@ -120,8 +120,8 @@ class ScheduleController extends Controller
                 array_push($removed, ['id' => $task['id']]);
             }
         }
-        if(isset($request->assignments['added'])){
-            foreach($request->assignments['added'] as $assignment){
+        if (isset($request->assignments['added'])) {
+            foreach ($request->assignments['added'] as $assignment) {
                 $labor = Labor::find($assignment['resource']);
                 $assigmmentCreate = Assignment::create([
                     'event' => $assignment['event'],
@@ -138,20 +138,16 @@ class ScheduleController extends Controller
             }
         }
 
-
-
-
-
         return response()->json([
-            "success"   => true,
+            'success' => true,
             'requestId' => $request->requestId,
             'tasks' => [
                 'rows' => $rows,
-                'removed' => $removed
+                'removed' => $removed,
             ],
             'assignments' => [
-                'rows' => $assgimentRows
-            ]
+                'rows' => $assgimentRows,
+            ],
         ]);
     }
 
@@ -159,22 +155,24 @@ class ScheduleController extends Controller
     {
 
         return response()->json([
-            "success"   => true,
+            'success' => true,
             'requestId' => $request->requestId,
         ]);
     }
 
-    public function wizard(Project $project){
+    public function wizard(Project $project)
+    {
 
         return Inertia::render('Project/Schedule/CreateSchedule', [
             'project' => $project,
-            'groups'=> gruposConstructivos()
+            'groups' => gruposConstructivos(),
         ]);
     }
 
-    public function getAssignmentsTask(Task $task) {
+    public function getAssignmentsTask(Task $task)
+    {
         return response()->json([
-            'assigments' => Assignment::where('event', $task->id)->get(),
+            'assignments' => Assignment::where('event', $task->id)->get(),
         ]);
     }
 }

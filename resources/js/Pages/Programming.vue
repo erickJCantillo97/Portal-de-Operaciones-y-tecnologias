@@ -4,7 +4,7 @@ import { router, useForm } from '@inertiajs/vue3';
 import { FilterMatchMode } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassPlusIcon, SparklesIcon, EyeIcon, PhotoIcon, TableCellsIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline';
-import Button from 'primevue/button';
+import Button from '../Components/Button.vue';
 import Calendar from 'primevue/calendar';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
@@ -16,12 +16,10 @@ import OverlayPanel from 'primevue/overlaypanel';
 import '../../sass/dataTableCustomized.scss';
 
 const open = ref(false)
-const assigment = ref()
-const assignmentSelect = ref()
+const assignments = ref()
 
 const props = defineProps({
     taskNow: Array,
-    assignments: Array,
 })
 
 const unidad = {
@@ -102,9 +100,16 @@ const redondear = (value) => {
     return new Intl.NumberFormat().format(Number(value).toFixed(2))
 }
 
-const viewAssignments = (assigment) => {
-    open.value = true
+//#region Obtener API de Recursos
+const getAssignmentsTask = (id) => {
+    axios.get(route('get.assignments.task', id))
+        .then((res) => {
+            assignments.value = res.data.assignments
+            open.value = true
+        })
 }
+//#endregion
+
 </script>
 
 <template>
@@ -124,10 +129,10 @@ const viewAssignments = (assigment) => {
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
                 <template #empty>
-                    <p class="text-center pt-5 pb-5">No hay tareas para mostrar</p>
+                    <p class="pt-5 pb-5 text-center">No hay tareas para mostrar</p>
                 </template>
                 <template #loading>
-                    <p class="text-center pt-5 pb-5">Cargando tareas...</p>
+                    <p class="pt-5 pb-5 text-center">Cargando tareas...</p>
                 </template>
 
                 <template #header>
@@ -137,20 +142,20 @@ const viewAssignments = (assigment) => {
                                 <button type="button"
                                     :class="optionValue == 'today' ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
                                     @click="getTask('today')"
-                                    class="relative inline-flex items-center rounded-l-md  px-3 py-2 text-sm font-semibold 0 ring-1 ring-inset ring-gray-300 focus:z-10">Hoy</button>
+                                    class="relative inline-flex items-center px-3 py-2 text-sm font-semibold rounded-l-md 0 ring-1 ring-inset ring-gray-300 focus:z-10">Hoy</button>
                                 <button type="button"
                                     :class="optionValue == 'tomorrow' ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
                                     @click="getTask('tomorrow')"
-                                    class="relative -ml-px inline-flex items-center  px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 focus:z-10">Mañana</button>
+                                    class="relative inline-flex items-center px-3 py-2 -ml-px text-sm font-semibold ring-1 ring-inset ring-gray-300 focus:z-10">Mañana</button>
                                 <button type="button"
                                     :class="optionValue == 'week' ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
                                     @click="getTask('week')"
-                                    class="relative -ml-px inline-flex items-center rounded-r-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300  focus:z-10">Semana</button>
+                                    class="relative inline-flex items-center px-3 py-2 -ml-px text-sm font-semibold rounded-r-md ring-1 ring-inset ring-gray-300 focus:z-10">Semana</button>
                             </span>
                             <span class="p-float-label">
                                 <calendar id="calendar" selectionMode="range" v-model="dates"
                                     v-on:date-select="getTask('range')"
-                                    class="focus:ring-2 focus:ring-indigo-600 focus:ring-inset shadow-xl h-9"></calendar>
+                                    class="shadow-xl focus:ring-2 focus:ring-indigo-600 focus:ring-inset h-9"></calendar>
                                 <label for="calendar">Rango de fechas</label>
                             </span>
                             <!-- <span class="p-float-label">
@@ -161,7 +166,7 @@ const viewAssignments = (assigment) => {
                                 <label for="calendar">Rango de fechas</label>
                             </span> -->
                         </div>
-                        <div class="alturah8 flex h-8 space-x-4">
+                        <div class="flex h-8 space-x-4 alturah8">
                             <Button icon="pi pi-filter-slash" @click="clearFilter()" type="button" text=""
                                 severity="primary" class="hover:bg-primary ">
                             </Button>
@@ -200,7 +205,7 @@ const viewAssignments = (assigment) => {
 
                             <!--BOTÓN VER RECURSOS-->
                             <div title="Ver Recursos">
-                                <Button severity="success" @click="viewAssignments(slotProps.data)"
+                                <Button severity="success" @click="getAssignmentsTask(slotProps.data.id)"
                                     class="hover:bg-primary">
                                     <EyeIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
@@ -244,14 +249,21 @@ const viewAssignments = (assigment) => {
                                 class="relative px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg ">
                                 <div>
                                     <div class="px-2 mt-2 text-center">
-                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">Ver Recursos
+                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">
+                                            Ver Recursos
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
                                             <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
-                                                <Combobox class="mt-2 text-left" label="Buque"
-                                                    placeholder="Seleccione Recursos" :options="assignments"
-                                                    v-model="assignmentSelect">
-                                                </Combobox>
+                                                <!-- Contenedor de datos -->
+                                                <div class="p-4 mt-4 border border-gray-300 rounded-lg">
+                                                    <h2 class="text-xl font-semibold">
+                                                        Recursos Obtenidos
+                                                    </h2>
+                                                    <ul>
+                                                        <li v-for="assignment in assignments" :key="assignment.id">
+                                                            {{ assignment.name }}</li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -277,13 +289,13 @@ const viewAssignments = (assigment) => {
                 <h2 class="text-base font-semibold leading-6 text-gray-900">Creación o edición de cronograma</h2>
                 <p class="mt-1 text-sm text-gray-500">Aquí podrá escoger como desea crear el cronograma del proyecto.</p>
 
-                <ul role="list" class="mt-6 grid grid-cols-1 gap-6 border-b border-t border-gray-200 py-6 sm:grid-cols-2">
+                <ul role="list" class="grid grid-cols-1 gap-6 py-6 mt-6 border-t border-b border-gray-200 sm:grid-cols-2">
                     <li v-for="(item, itemIdx) in items" :key="itemIdx" class="flow-root">
                         <div @click="router.get(route(item.page, projectSelect.id))"
-                            class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 focus-within:ring-2 focus-within:ring-indigo-500 hover:bg-gray-50">
+                            class="relative flex items-center p-2 -m-2 space-x-4 rounded-xl focus-within:ring-2 focus-within:ring-indigo-500 hover:bg-gray-50">
                             <div
                                 :class="[item.background, 'flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg']">
-                                <component :is="item.icon" class="h-6 w-6 text-white" aria-hidden="true" />
+                                <component :is="item.icon" class="w-6 h-6 text-white" aria-hidden="true" />
                             </div>
                             <div>
                                 <h3 class="text-sm font-medium text-gray-900">
@@ -298,7 +310,7 @@ const viewAssignments = (assigment) => {
                         </div>
                     </li>
                 </ul>
-                <!-- <div class="mt-4 flex">
+                <!-- <div class="flex mt-4">
                     <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         Or start from an empty project
                         <span aria-hidden="true"> &rarr;</span>
