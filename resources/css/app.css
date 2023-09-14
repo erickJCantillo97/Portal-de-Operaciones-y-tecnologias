@@ -6,6 +6,9 @@
 [x-cloak] {
     display: none;
 }
+.alturah8{
+    height: 2rem !important;
+}
 
 .b-color-picker-container {
     width: 18em !important;
