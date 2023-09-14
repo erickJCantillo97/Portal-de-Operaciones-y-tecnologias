@@ -57,10 +57,11 @@ class AuthorizationController extends Controller
             'file' => 'nullable',
         ]);
 
+        //Guardar arvhivo pdf de las Autorizaciones
         try {
             if ($request->pdf != null) {
                 $validateData['file'] = Storage::putFileAs(
-                    'public/Autorization/',
+                    'public/Authorization/',
                     $request->pdf,
                     $validateData['name'].'.'.$request->pdf->getClientOriginalExtension()
                 );

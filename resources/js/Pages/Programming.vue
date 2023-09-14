@@ -2,14 +2,21 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { router, useForm } from '@inertiajs/vue3';
 import { FilterMatchMode } from 'primevue/api';
-import Button from 'primevue/button';
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassPlusIcon, SparklesIcon, EyeIcon, PhotoIcon, TableCellsIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline';
+import Button from '../Components/Button.vue';
 import Calendar from 'primevue/calendar';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
+import Combobox from '@/Components/Combobox.vue';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import InputText from 'primevue/inputtext';
+import OverlayPanel from 'primevue/overlaypanel';
 import '../../sass/dataTableCustomized.scss';
+
+const open = ref(false)
+const assignments = ref()
 
 const props = defineProps({
     taskNow: Array,
@@ -21,7 +28,7 @@ const unidad = {
 };
 
 onMounted(() => {
-    tasks.value = props.taskNow;
+    getTask('today')
 })
 const dates = ref([]);
 const tasks = ref([]);
@@ -89,9 +96,20 @@ const getTask = (option) => {
 }
 
 
-const redondear = (value )=> {
-    return new Intl.NumberFormat().format(Number(value).toFixed(2) )
+const redondear = (value) => {
+    return new Intl.NumberFormat().format(Number(value).toFixed(2))
 }
+
+//#region Obtener API de Recursos
+const getAssignmentsTask = (id) => {
+    axios.get(route('get.assignments.task', id))
+        .then((res) => {
+            assignments.value = res.data.assignments
+            open.value = true
+        })
+}
+//#endregion
+
 </script>
 
 <template>
@@ -106,15 +124,15 @@ const redondear = (value )=> {
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="tasks" v-model:filters="filters" dataKey="id"
                 filterDisplay="menu" :loading="loading"
-                :globalFilterFields="['name', 'gerencia', 'start_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
+                :globalFilterFields="['name', 'project.name', 'duration', 'startDate', 'endDate']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
                 <template #empty>
-                    <p class="text-center pt-5 pb-5">No hay tareas para mostrar</p>
+                    <p class="pt-5 pb-5 text-center">No hay tareas para mostrar</p>
                 </template>
                 <template #loading>
-                    <p class="text-center pt-5 pb-5">Cargando tareas...</p>
+                    <p class="pt-5 pb-5 text-center">Cargando tareas...</p>
                 </template>
 
                 <template #header>
@@ -173,8 +191,126 @@ const redondear = (value )=> {
                 </Column>
                 <Column field="startDate" header="Fecha inicio"></Column>
                 <Column field="endDate" header="Fecha fin"></Column>
-                <Column field="" header="Recursos"></Column>
+                <Column field="" header="Recursos">
+                    <template #body="slotProps">
+                        <!--BOTÓN VER RECURSOS-->
+                        <div
+                            class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
+
+                            <!--BOTÓN VER RECURSOS-->
+                            <div title="Ver Recursos">
+                                <Button severity="success" @click="getAssignmentsTask(slotProps.data.id)"
+                                    class="hover:bg-primary">
+                                    <EyeIcon class="w-4 h-4 " aria-hidden="true" />
+                                </Button>
+                            </div>
+
+                            <!--BOTÓN EDITAR-->
+                            <!-- <div title="Editar Proyecto">
+                                <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
+                                    <PencilIcon class="w-4 h-4 " aria-hidden="true" />
+                                </Button>
+                            </div> -->
+                            <!--BOTÓN ELIMINAR-->
+                            <!-- <div title="Eliminar Proyecto">
+                                <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Proyecto', 'projects')"
+                                    class="hover:bg-danger">
+                                    <TrashIcon class="w-4 h-4 " aria-hidden="true" />
+                                </Button>
+                            </div> -->
+                        </div>
+                    </template>
+                </Column>
             </DataTable>
         </div>
+
+        <!--MODAL DE VER RECURSOS-->
+        <TransitionRoot as="template" :show="open">
+            <Dialog as="div" class="relative z-30" @close="open = false">
+                <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
+                    leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+                    <div class="fixed inset-0 z-30 w-screen h-screen transition-opacity bg-gray-500 bg-opacity-75" />
+                </TransitionChild>
+
+                <div class="fixed inset-0 z-50 h-screen overflow-y-auto">
+                    <div class="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
+                        <TransitionChild as="template" enter="ease-out duration-300"
+                            enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
+                            leave-from="opacity-100 translate-y-0 sm:scale-100"
+                            leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                            <DialogPanel :class="props.heigthDialog"
+                                class="relative px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg ">
+                                <div>
+                                    <div class="px-2 mt-2 text-center">
+                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">
+                                            Ver Recursos
+                                        </DialogTitle> <!--Se puede usar {{ tittle }}-->
+                                        <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
+                                            <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
+                                                <!-- Contenedor de datos -->
+                                                <div class="p-4 mt-4 border border-gray-300 rounded-lg">
+                                                    <h2 class="text-xl font-semibold">
+                                                        Recursos Obtenidos
+                                                    </h2>
+                                                    <ul>
+                                                        <li v-for="assignment in assignments" :key="assignment.id">
+                                                            {{ assignment.name }}</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- <div class="flex px-2 mt-2 space-x-4">
+                                    <Button class="hover:bg-danger text-danger border-danger" severity="danger"
+                                        @click="open = false">Cancelar</Button>
+                                    <Button severity="success" :loading="false"
+                                        class="text-success hover:bg-success border-success" @click="submit()">
+                                        {{ formData.id != 0 ? 'Actualizar ' : 'Guardar' }}
+                                    </Button>
+                                </div> -->
+                            </DialogPanel>
+                        </TransitionChild>
+                    </div>
+                </div>
+            </Dialog>
+        </TransitionRoot>
+
+        <OverlayPanel ref="op">
+            <div>
+                <h2 class="text-base font-semibold leading-6 text-gray-900">Creación o edición de cronograma</h2>
+                <p class="mt-1 text-sm text-gray-500">Aquí podrá escoger como desea crear el cronograma del proyecto.</p>
+
+                <ul role="list" class="grid grid-cols-1 gap-6 py-6 mt-6 border-t border-b border-gray-200 sm:grid-cols-2">
+                    <li v-for="(item, itemIdx) in items" :key="itemIdx" class="flow-root">
+                        <div @click="router.get(route(item.page, projectSelect.id))"
+                            class="relative flex items-center p-2 -m-2 space-x-4 rounded-xl focus-within:ring-2 focus-within:ring-indigo-500 hover:bg-gray-50">
+                            <div
+                                :class="[item.background, 'flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg']">
+                                <component :is="item.icon" class="w-6 h-6 text-white" aria-hidden="true" />
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-900">
+                                    <a href="#" class="focus:outline-none">
+                                        <span class="absolute inset-0" aria-hidden="true" />
+                                        <span>{{ item.title }}</span>
+                                        <span aria-hidden="true"> &rarr;</span>
+                                    </a>
+                                </h3>
+                                <p class="mt-1 text-sm text-gray-500">{{ item.description }}</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <!-- <div class="flex mt-4">
+                    <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        Or start from an empty project
+                        <span aria-hidden="true"> &rarr;</span>
+                    </a>
+                </div> -->
+            </div>
+        </OverlayPanel>
     </AppLayout>
 </template>

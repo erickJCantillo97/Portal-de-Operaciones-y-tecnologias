@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Projects;
 use App\Http\Controllers\Controller;
 use App\Models\Projects\Authorization;
 use App\Models\Projects\Contract;
+use App\Models\Projects\Customer;
 use App\Models\Projects\Project;
 use App\Models\Projects\Quote;
 use App\Models\Projects\Ship;
@@ -21,7 +22,7 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::with('contract', 'ship')->orderBy('name')->get();
+        $projects = Project::with('contract', 'ship', 'customers')->orderBy('name')->get();
         $ships = Ship::orderBy('name')->get();
         $contracts = Contract::orderBy('name')->get();
 
@@ -47,6 +48,7 @@ class ProjectController extends Controller
         $authorizations = Authorization::orderBy('contract_id')->get();
         $quotes = Quote::orderBy('ship_id')->get();
         $ships = Ship::orderBy('id')->get();
+        $customers = Customer::orderBy('name')->get();
 
         return Inertia::render('Project/CreateProjects',
             [
@@ -54,6 +56,7 @@ class ProjectController extends Controller
                 'authorizations' => $authorizations,
                 'quotes' => $quotes,
                 'ships' => $ships,
+                'customers' => $customers,
             ]
         );
     }
@@ -69,12 +72,14 @@ class ProjectController extends Controller
             'authorization_id' => 'nullable',
             'quote_id' => 'nullable',
             'ship_id' => 'nullable',
+            'customer_id' => 'nullable',
             'intern_communications' => 'nullable',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'hoursPerDay' => 'required',
             'daysPerWeek' => 'required',
             'daysPerMonth' => 'required',
+            'file' => 'nullable',
         ]);
 
         try {
@@ -91,6 +96,10 @@ class ProjectController extends Controller
             }
 
             if (isset($buque) && $validateData['ship_id'] != 0) {
+                $buque = Ship::find($validateData['ship_id']);
+            }
+
+            if (isset($buque) && $validateData['intern_communications'] != 0) {
                 $buque = Ship::find($validateData['ship_id']);
             }
 
@@ -125,11 +134,30 @@ class ProjectController extends Controller
                 return back()->withErrors(['message' => 'Ya existe un proyecto con la misma estimación y buque'], 500);
             }
 
+            // Verificar si ya existe un proyecto con la misma Estimación
+            $existingProjectWithInternCommunications = Project::where('intern_communications', $validateData['intern_communications'])
+                ->where('intern_communications', $buque->id)
+                ->first();
+
+            if ($existingProjectWithInternCommunications) {
+                return back()->withErrors(['message' => 'Ya existe un proyecto asociado con este consecutivo.'], 500);
+            }
+
             $countProject = count(Project::where('ship_id', $buque->id)->get()) + 1;
 
             $validateData['ship_id'] = $buque->id;
             $validateData['name'] = $buque->name.'-'.Carbon::now()->format('Y').'-'.str_pad($countProject, 3, '0', STR_PAD_LEFT);
             $validateData['gerencia'] = auth()->user()->gerencia;
+
+            //Guardar archivo pdf de Comunicación Interna
+            if ($request->pdf != null) {
+                $validateData['file'] = Storage::putFileAs(
+                    'public/Interns_Communications/',
+                    $request->pdf,
+                    $validateData['name'].'.'.$request->pdf->getClientOriginalExtension()
+                );
+            }
+
             Project::create($validateData);
 
             return back()->with(['message' => 'Proyecto creado correctamente'], 200);
