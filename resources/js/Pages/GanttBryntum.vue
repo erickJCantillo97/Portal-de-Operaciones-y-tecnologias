@@ -207,12 +207,15 @@ const gantt = new Gantt(({
             avatarTooltipTemplate({ taskRecord, assignmentRecord, overflowCount, overflowAssignments }) {
                 let overflowAssignments2 = '';
                 var task = taskRecord._data;
-                console.log(taskRecord._data)
-                for(var element of overflowAssignments){
-                    overflowAssignments2 += ('<div>' + element.units / 100 + ' ' + element.name + ' $' + Math.round(task.durationUnit == 'day' ? (task.duration * (element.units/100) * element.costo_hora)*8.5:(task.duration * (element.units/100) * element.costo_hora)).toLocaleString('es') + '</div>')
+                for (var element of overflowAssignments) {
+                    overflowAssignments2 += ('<div class="text-xs flex justify-between space-x-2 mt-2">'
+                        + '<div>' + element.units / 100 + '</div>'
+                        + '<div class="italic">' + element.name + '</div>' +
+                        '<div class="font-bold"> $' + Math.round(task.durationUnit == 'day' ? (task.duration * (element.units / 100) * element.costo_hora) * 8.5 : (task.duration * (element.units / 100) * element.costo_hora)).toLocaleString('es')
+                        + '</div></div>')
                 }
                 return `
-                    <div>${assignmentRecord.units / 100} ${assignmentRecord.name} $${Math.round(task.durationUnit == 'day' ? (task.duration * (assignmentRecord.units/100) * assignmentRecord.costo_hora)*8.5:(task.duration * (assignmentRecord.units/100) * assignmentRecord.costo_hora)).toLocaleString('es')} </div>
+                    <div class="text-xs flex justify-between space-x-2"><div>${assignmentRecord.units / 100}</div><div class="italic">${assignmentRecord.name}</div><div class="font-bold">$${Math.round(task.durationUnit == 'day' ? (task.duration * (assignmentRecord.units / 100) * assignmentRecord.costo_hora) * 8.5 : (task.duration * (assignmentRecord.units / 100) * assignmentRecord.costo_hora)).toLocaleString('es')} </div></div>
                      ${overflowCount > 0 ? `${overflowAssignments2}` : ''}
                 `;
             }
