@@ -166,23 +166,24 @@ const getAssignmentsTask = (id) => {
                                 <label for="calendar">Rango de fechas</label>
                             </span> -->
                         </div>
-                        <div class="flex h-8 space-x-4 alturah8">
-                            <Button icon="pi pi-filter-slash" @click="clearFilter()" type="button" text=""
-                                severity="primary" class="hover:bg-primary ">
-                            </Button>
-                            <span class="p-float-label">
-                                <InputText id="buscar" v-model="filters.global.value" type="search"
-                                    class="block text-gray-900 border-0 rounded-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
-                                <label for="buscar">Buscar...</label>
-                            </span>
-                            <!-- <div class="relative flex rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <MagnifyingGlassIcon class="w-5 h-4 text-gray-400" aria-hidden="true" />
+                        <div class="flex justify-between w-full h-8 mb-2">
+                            <div class="flex space-x-4">
+                                <div class="w-8" title="Filtrar Proyectos">
+                                    <Button @click="clearFilter()" type="button" severity="primary"
+                                        class="hover:bg-primary ">
+                                        <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
+                                    </Button>
                                 </div>
-                                <input type="search"
-                                    class="block w-10/12 py-4 pl-10 text-gray-900 border-0 rounded-md ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                    v-model="filters.global.value" placeholder="Buscar..." />
-                            </div> -->
+
+                                <div class="relative flex rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <MagnifyingGlassIcon class="w-5 h-4 text-gray-400" aria-hidden="true" />
+                                    </div>
+                                    <input type="search" title="Buscar Proyectos"
+                                        class="block w-10/12 py-4 pl-10 text-gray-900 border-0 rounded-md ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        v-model="filters.global.value" placeholder="Buscar..." />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -197,7 +198,8 @@ const getAssignmentsTask = (id) => {
                 </Column>
                 <Column field="startDate" header="Fecha inicio"></Column>
                 <Column field="endDate" header="Fecha fin"></Column>
-                <Column field="" header="Recursos">
+                <Column field="" header="Recursos"></Column>
+                <Column field="" header="Acciones">
                     <template #body="slotProps">
                         <!--BOTÓN VER RECURSOS-->
                         <div
