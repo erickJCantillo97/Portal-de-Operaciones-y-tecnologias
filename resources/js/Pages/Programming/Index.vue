@@ -12,7 +12,7 @@ import axios from 'axios';
 import InputText from 'primevue/inputtext';
 import OverlayPanel from 'primevue/overlaypanel';
 import '../../../sass/dataTableCustomized.scss';
-
+import Avatars from '@/Components/Avatars.vue';
 
 const props = defineProps({
     taskNow: Array,
@@ -167,7 +167,10 @@ const redondear = (value) => {
                 </Column>
                 <Column field="startDate" header="Fecha inicio"></Column>
                 <Column field="endDate" header="Fecha fin"></Column>
-                <Column field="" header="Recursos"></Column>
+                <Column field="" header="Recursos">
+                    <template #body="slotProps">
+                        <Avatars :taskId=slotProps.data.id />
+                    </template></Column>
                 <Column field="" header="Acciones">
                     <template #body="slotProps">
                         <!--BOTÓN VER RECURSOS-->
