@@ -28,7 +28,7 @@ const unidad = {
 };
 
 onMounted(() => {
-    tasks.value = props.taskNow;
+    getTask('today')
 })
 const dates = ref([]);
 const tasks = ref([]);
