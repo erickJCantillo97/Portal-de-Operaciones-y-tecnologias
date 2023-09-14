@@ -207,7 +207,7 @@ const getAssignmentsTask = (id) => {
 
                             <!--BOTÓN VER RECURSOS-->
                             <div title="Ver Recursos">
-                                <Button severity="success" @click="getAssignmentsTask(slotProps.data.id)"
+                                <Button severity="primary" @click="getAssignmentsTask(slotProps.data.id)"
                                     class="hover:bg-primary">
                                     <EyeIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
