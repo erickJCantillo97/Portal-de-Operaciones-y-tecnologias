@@ -33,10 +33,6 @@ class ProjectController extends Controller
                 'contracts' => $contracts,
             ]
         );
-
-        // return response()->json([
-        //     $project
-        // ], 200);
     }
 
     /**
