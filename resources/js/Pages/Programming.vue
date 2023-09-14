@@ -138,8 +138,10 @@ const getAssignmentsTask = (id) => {
                 <template #header>
                     <div class="w-full mb-2 flex justify-between">
                         <div class="alturah8 flex space-x-4">
-                            <Button icon="pi pi-filter-slash shadow-xl" @click="clearFilter()" type="button" text=""
+                            <Button icon="pi pi-filter-slash shadow-xl" @click="clearFilter()" type="button"
+                            text=""
                                 severity="primary" class="hover:bg-primary ">
+                                <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
                             </Button>
                             <span class="p-float-label">
                                 <InputText id="buscar" v-model="filters.global.value"  type="search"
@@ -176,7 +178,8 @@ const getAssignmentsTask = (id) => {
                 </Column>
                 <Column field="startDate" header="Fecha inicio"></Column>
                 <Column field="endDate" header="Fecha fin"></Column>
-                <Column field="" header="Recursos">
+                <Column field="" header="Recursos"></Column>
+                <Column field="" header="Acciones">
                     <template #body="slotProps">
                         <!--BOTÓN VER RECURSOS-->
                         <div
