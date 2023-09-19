@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gantt\Assignment;
+use App\Models\Gantt\Dependecy;
 use App\Models\Gantt\Task;
 use App\Models\Labor;
 use App\Models\Projects\Project;
@@ -10,6 +11,7 @@ use App\Models\VirtualTask;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use PHPUnit\Metadata\Api\Dependencies;
 
 class ScheduleController extends Controller
 {
@@ -18,7 +20,7 @@ class ScheduleController extends Controller
         $groups = gruposConstructivos();
         $taskProject = Task::where('project_id', $project->id)->first();
         if (! $taskProject) {
-            $taskCreate = Task::firstOrcreate([
+            Task::firstOrcreate([
                 'project_id' => $project->id,
                 'name' => $project->name,
                 'percentDone' => 0,
@@ -42,10 +44,10 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function import(Request $request)
+    public function import(Project $project, Request $request)
     {
         return Inertia::render('GanttImporter', [
-
+            'project' => $project
         ]);
     }
 
@@ -62,7 +64,7 @@ class ScheduleController extends Controller
                 'daysPerMonth' => 20,
             ]],
             'tasks' => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
-            'dependencies' => ['rows' => []],
+            'dependencies' => ['rows' => Dependecy::get()],
             'resources' => ['rows' => Labor::where('gerencia', auth()->user()->gerencia)->get()->map(function ($cargo) {
                 return [
                     'id' => $cargo->id,
@@ -80,14 +82,14 @@ class ScheduleController extends Controller
         $rows = [];
         $removed = [];
         $assgimentRows = [];
-        // dd($request);
-        // dd($request->requestId);
+        task::truncate();
         if (isset($request->tasks['added'])) {
             foreach ($request->tasks['added'] as $task) {
                 $taskCreate = Task::create([
                     'project_id' => $project->id,
                     'name' => $task['name'],
-                    'task_id' => $task['parentId'],
+                    'task_id' => $task['parentId'] != null ? Task::where('PhantomId', $task['parentId'])->first()->id : null,
+                    'PhantomId' => $task['$PhantomId'],
                     'percentDone' => $task['percentDone'],
                     'duration' => $task['duration'],
                     'durationUnit' => $task['durationUnit'],
@@ -121,6 +123,17 @@ class ScheduleController extends Controller
                 array_push($removed, ['id' => $task['id']]);
             }
         }
+        if (isset($request->dependencies['added'])) {
+            foreach ($request->dependencies['added'] as $dependency) {
+                Dependecy::create([
+                    'from' => Task::where('PhantomId',$dependency['from'])->first()->id,
+                    'to' => Task::where('PhantomId',$dependency['to'])->first()->id,
+                    'type' => $dependency['type'],
+                    'lag' => $dependency['lag'],
+                    'lagUnit' => $dependency['lagUnit'],
+                ]);
+            }
+        }
         if (isset($request->assignments['added'])) {
             foreach ($request->assignments['added'] as $assignment) {
                 $labor = Labor::find($assignment['resource']);
@@ -152,8 +165,9 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function syncImporter(Request $request)
+    public function syncImporter(Project $project, Request $request)
     {
+
 
         return response()->json([
             'success' => true,

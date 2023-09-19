@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('gerencia');
-            $table->double('w');
+            $table->double('costo_mes');
             $table->double('costo_dia');
             $table->double('costo_hora');
             $table->timestamps();
