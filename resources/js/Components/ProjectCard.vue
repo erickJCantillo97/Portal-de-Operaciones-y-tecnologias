@@ -36,9 +36,6 @@ axios.get(route('projects.show', props.projectId)).then(response => {
                 <h2 class="text-sm font-bold text-gray-900">{{ project.name }}</h2>
                 <h3 class="mt-2 text-sm font-bold text-left text-indigo-500">{{project.avance}}</h3>
                 <p class="text-sm font-semibold text-gray-400">Last Transaction</p>
-                <!-- <button
-                    class="px-4 py-2 mt-6 text-sm tracking-wider text-white bg-indigo-400 rounded-lg outline-none hover:bg-indigo-500">Add
-                    to cart</button> -->
             </div>
         </div>
 
