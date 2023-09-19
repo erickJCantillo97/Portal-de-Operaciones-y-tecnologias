@@ -165,6 +165,8 @@ const redondear = (value) => {
                         <ProjectCard :projectId=slotProps.data.project.id />
                     </template>
                 </Column>
+                <Column field="executor" header="Ejecutor"></Column>
+                <Column field="manager" header="Responsable"></Column>
                 <Column field="duration" header="Duracion">
                     <template #body="slotProps">
                         {{ redondear(slotProps.data.duration) }} {{ unidad[slotProps.data.durationUnit] }}

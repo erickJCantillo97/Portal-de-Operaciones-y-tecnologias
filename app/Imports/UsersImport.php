@@ -27,7 +27,7 @@ class UsersImport implements ToCollection, WithHeadingRow, WithChunkReading, Sho
     public function collection(Collection $rows)
     {
         foreach($rows as $row){
-            $tasks = Task::where('project_id', $this->project)->where('name', $row['name'])->get();
+            $tasks = Task::where('project_id', $this->project)->where('id', trim($row['name']))->get();
             foreach($tasks as $task){
                 $task->update([
                     'manager' => $row['manager'],
