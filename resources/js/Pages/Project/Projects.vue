@@ -251,7 +251,7 @@ const items = [
                 </div>
 
 
-                <div class="flex content-between w-full mr-10 pl-96" title="Importar Archivos">
+                <!-- <div class="flex content-between w-full mr-10 pl-96" title="Importar Archivos">
                     <div class="mr-10 w-96">
 
                         <Combobox class="mt-2 text-left text-gray-900" label="Proyecto" placeholder="Seleccione Contrato"
@@ -271,7 +271,7 @@ const items = [
                             </progress>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <div class="" title="Agregar Proyecto">
                     <Button @click="addItem()" severity="success">

@@ -51,16 +51,16 @@ const getTask = () => {
                     <div v-for="item in projects" :key="item.id" class="relative overflow-hidden rounded-lg bg-white px-2 pb-8 pt-1 shadow">
                         <dt>
                             <div class="absolute rounded-md">
-                            <Image  alt="Image">
+                            <!-- <Image  alt="Image">
                                 <template #image>
                                     <img class="h-20 w-20 rounded-full" :src="item.file" />
                                 </template>
-                            </Image>
+                            </Image> -->
                             </div>
-                            <p class="ml-24 text-sm font-medium text-gray-500">{{ item.name }}</p>
+                            <p class="text-sm text-center font-medium text-gray-500">{{ item.name }}</p>
                         </dt>
-                        <dd class="ml-24 flex items-baseline pb-6 sm:pb-7">
-                            <p class="text-2xl font-semibold text-gray-900">{{ item.avance }} %</p>
+                        <dd class="text-center mt-4 flex items-baseline pb-6 sm:pb-7">
+                            <p class="text-2xl text-center font-semibold text-gray-900">{{ item.avance }} %</p>
 
                             <div class="absolute inset-x-0 bottom-0 bg-gray-50 px-4 py-4">
                                 <div class="text-sm">
@@ -103,7 +103,7 @@ const getTask = () => {
                     <li v-for="task in tasks" :key="task.id" class="shadow-lg p-2 flex justify-between rounded-md w-full">
                         <div class="block">
                             <p>{{ task.name }}</p>
-                            <p class="text-xs italic">{{task.project.name}}</p>
+                            <p class="text-xs italic">{{task.project.name}} - <b>  {{task.executor}}</b></p>
                         </div>
                         <p>{{ task.percentDone }} %</p>
                     </li>

@@ -161,11 +161,11 @@ const redondear = (value) => {
                 <!--COLUMNAS-->
                 <Column field="name" header="Tarea"></Column>
                 <Column field="project.name" header="Proyecto">
-                    <template #body="slotProps">
+                    <!-- <template #body="slotProps">
                         <ProjectCard :projectId=slotProps.data.project.id />
-                    </template>
+                    </template> -->
                 </Column>
-                <Column field="executor" header="Ejecutor"></Column>
+                <Column field="executor" header="Ejecutor" sortable></Column>
                 <Column field="manager" header="Responsable"></Column>
                 <Column field="duration" header="Duracion">
                     <template #body="slotProps">
