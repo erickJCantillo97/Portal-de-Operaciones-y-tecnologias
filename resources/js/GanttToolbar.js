@@ -49,7 +49,7 @@ export default class GanttToolbar extends Toolbar {
                             color: "b-green",
                             ref: "addTaskButton",
                             icon: "b-fa b-fa-plus",
-                            text: "Nueva",
+                            text: "",
                             tooltip: "Crear una nueva tarea",
                             onAction: "up.onAddTaskClick"
                         }
@@ -61,7 +61,7 @@ export default class GanttToolbar extends Toolbar {
                         {
                             ref: "editTaskButton",
                             icon: "b-fa b-fa-pen",
-                            text: "Editar",
+                            text: "",
                             tooltip: "Editar celda seleccionada",
                             onAction: "up.onEditTaskClick"
                         },
@@ -117,7 +117,7 @@ export default class GanttToolbar extends Toolbar {
                                         text: "Altura de celdas",
                                         width: "12em",
                                         showValue: true,
-                                        min: 30,
+                                        min: 10,
                                         max: 70,
                                         onInput: "up.onSettingsRowHeightChange"
                                     },

@@ -13,6 +13,7 @@ import InputText from 'primevue/inputtext';
 import OverlayPanel from 'primevue/overlaypanel';
 import '../../../sass/dataTableCustomized.scss';
 import Avatars from '@/Components/Avatars.vue';
+import ProjectCard from '@/Components/ProjectCard.vue';
 
 const props = defineProps({
     taskNow: Array,
@@ -125,8 +126,8 @@ const redondear = (value) => {
                 </template>
 
                 <template #header>
-                    <div class="w-full mb-2 flex justify-between">
-                        <div class="alturah8 flex space-x-4">
+                    <div class="flex justify-between w-full mb-2">
+                        <div class="flex space-x-4 alturah8">
                             <Button icon="pi pi-filter-slash shadow-xl" @click="clearFilter()" type="button"
                             text=""
                                 severity="primary" class="hover:bg-primary ">
@@ -134,23 +135,23 @@ const redondear = (value) => {
                             </Button>
                             <span class="p-float-label">
                                 <InputText id="buscar" v-model="filters.global.value"  type="search"
-                                    class="alturah8 shadow-xl block text-gray-900 rounded-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                    class="block text-gray-900 rounded-md shadow-xl alturah8 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                                 <label for="buscar">Buscar...</label>
                             </span>
                         </div>
-                        <div class="flex justify-end alturah8 mb-2 space-x-4">
+                        <div class="flex justify-end mb-2 space-x-4 alturah8">
                             <span class="shadow-xl alturah8">
                                 <button type="button" :class="optionValue == 'today' ? 'bg-sky-500 text-white':'bg-white hover:bg-sky-200 text-gray-90'" @click="getTask('today')"
-                                    class="alturah8 relative inline-flex items-center rounded-l-md  px-3 py-2 text-sm font-semibold 0 ring-1 ring-inset ring-gray-300 focus:z-10">Hoy</button>
+                                    class="relative inline-flex items-center px-3 py-2 text-sm font-semibold alturah8 rounded-l-md 0 ring-1 ring-inset ring-gray-300 focus:z-10">Hoy</button>
                                 <button type="button" :class="optionValue == 'tomorrow' ? 'bg-sky-500 text-white':'bg-white hover:bg-sky-200 text-gray-90'"  @click="getTask('tomorrow')"
-                                    class="alturah8 relative -ml-px inline-flex items-center  px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 focus:z-10">Mañana</button>
+                                    class="relative inline-flex items-center px-3 py-2 -ml-px text-sm font-semibold alturah8 ring-1 ring-inset ring-gray-300 focus:z-10">Mañana</button>
                                 <button type="button" :class="optionValue == 'week' ? 'bg-sky-500 text-white':'bg-white hover:bg-sky-200 text-gray-90'" @click="getTask('week')"
-                                    class="alturah8 relative -ml-px inline-flex items-center rounded-r-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300  focus:z-10">Semana</button>
+                                    class="relative inline-flex items-center px-3 py-2 -ml-px text-sm font-semibold alturah8 rounded-r-md ring-1 ring-inset ring-gray-300 focus:z-10">Semana</button>
                             </span>
                             <span class="p-float-label">
                                 <calendar id="calendar" selectionMode="range" v-model="dates"
                                     v-on:date-select="getTask('range')"
-                                    class="alturah8 focus:ring-2 focus:ring-indigo-600 focus:ring-inset shadow-xl h-9"></calendar>
+                                    class="shadow-xl alturah8 focus:ring-2 focus:ring-indigo-600 focus:ring-inset h-9"></calendar>
                                 <label for="calendar">Rango de fechas</label>
                             </span>
                         </div>
@@ -159,7 +160,11 @@ const redondear = (value) => {
 
                 <!--COLUMNAS-->
                 <Column field="name" header="Tarea"></Column>
-                <Column field="project.name" header="Proyecto"></Column>
+                <Column field="project.name" header="Proyecto">
+                    <template #body="slotProps">
+                        <ProjectCard :projectId=slotProps.data.project.id />
+                    </template>
+                </Column>
                 <Column field="duration" header="Duracion">
                     <template #body="slotProps">
                         {{ redondear(slotProps.data.duration) }} {{ unidad[slotProps.data.durationUnit] }}
