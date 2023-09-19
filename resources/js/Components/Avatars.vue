@@ -1,4 +1,6 @@
 <script setup>
+import Avatar from 'primevue/avatar';
+import AvatarGroup from 'primevue/avatargroup';
 import { ref } from 'vue'
 
 const props = defineProps({
@@ -16,7 +18,7 @@ const props = defineProps({
     },
     class: {
         type: String,
-        default: 'inline-block h-8 w-8 rounded-full ring-1 ring-blue-800 hover:z-20 hover:scale-125',
+        default: 'hover:z-20 hover:scale-110 duration-500',
     }
 });
 const assignments = ref([]);
@@ -25,17 +27,34 @@ axios.get(route('get.assignments.task', props.taskId)).then(response => {
     assignments.value = response.data.assignments;
 })
 
+const letraAvatar = (cadena) => {
+    var palabras = cadena.split(" ");
+    var resultado = "";
+    if (palabras.length > 2) {
+        for (var i = 0; i < 2; i++) {
+            resultado += palabras[i].substring(0, 1);
+        }
+    }else{
+    for (var i = 0; i < palabras.length; i++) {
+        resultado += palabras[i].substring(0, 1);
+    }}
+    return resultado.toUpperCase();
+}
+
 </script>
 
 <template>
-    <div class="flex -space-x-2 overflow-hidden p-1 " v-if="assignments.length > 0">
-        <img v-for="assignment in assignments"
-            v-tooltip.top="{ value: `<h4 class='text-blue-800 text-center bg-blue-200'>` + (assignment.name) + ` : `+(assignment.units/100)+ ` UND</h4>`, escape: true, class: 'custom-error' }"
-            :class="class" class=""
-            :src="'https://ui-avatars.com/api/?name=' + assignment.name + '&color=' + props.color + '&background=' + props.background"
-            alt="imagen">
-    </div>
-    <div v-else class="text-red-600 font-bold text-sm text-center uppercase italic animate-pulse">
+    <AvatarGroup v-if="assignments.length > 0">
+        <!-- <Avatar v-for="assignment in assignments"
+            v-tooltip.top="{ value: `<h4 class='text-center text-blue-800 bg-blue-200'>` + (assignment.name) + ` : `+(assignment.units/100)+ ` UND</h4>`, escape: true, class: 'custom-error' }"
+            :class="class" size="large" shape="circle"
+            :image="'https://ui-avatars.com/api/?name=' + assignment.name + '&color=' + props.color + '&background=' + props.background"
+            alt="imagen"></Avatar> -->
+        <Avatar v-for="assignment in assignments"
+            v-tooltip.top="{ value: `<h4 class='text-center text-blue-800 bg-blue-200'>` + (assignment.name) + ` : ` + (assignment.units / 100) + ` UND</h4>`, escape: true, class: 'custom-error' }"
+            :class="class" style="background-color:#2196F3; color: #ffffff" shape="circle" :label="letraAvatar(assignment.name)" alt="imagen"></Avatar>
+    </AvatarGroup>
+    <div v-else class="text-sm italic font-bold text-center text-red-600 uppercase animate-pulse">
         Sin asignaciones
     </div>
 </template>

@@ -154,13 +154,15 @@ const gantt = new Gantt(({
     project,
     // resourceImageFolderPath: '../images/users/',
     dependencyIdField: 'sequenceNumber',
+    rowHeight:30,
     columns: [
         { type: 'wbs', text: 'Nivel', width: 20 },
         { type: 'name', width: 200 },
-        { type: 'percentdone', text: 'Avance', showCircle: true, width: 80 },
+        { type: 'percentdone', text: 'Avance', showCircle: true, width: 80, hidden: true },
         { type: 'duration', text: 'Duración', with: 50 },
         { type: 'startdate', text: 'Fecha Inicio', with: 50 },
         { type: 'enddate', text: 'Fecha fin', with: 50 },
+        // { type: 'newColumns', text: 'Buscar Columna', with: 50 },
         {
             type: 'resourceassignment',
             text: 'Recursos',
@@ -220,8 +222,11 @@ const gantt = new Gantt(({
                 `;
             }
         },
+
     ],
     features: {
+
+        filter      : true,
         projectLines: false,
         taskEdit: {
             items: {
@@ -256,8 +261,7 @@ onMounted(() => {
         <div class="">
             <div class="h-full">
                 <div class="overflow-hidden shadow-xl sm:rounded-lg h-screen">
-                    <!-- <bryntum-gantt v-bind="ganttconf" /> -->
-                    <div id="container" class="overflow-hidden shadow-xl sm:rounded-lg h-full">
+                    <div id="container" class="text-xs overflow-hidden shadow-xl sm:rounded-lg h-full">
 
                     </div>
                 </div>
@@ -265,3 +269,8 @@ onMounted(() => {
         </div>
     </AppLayout>
 </template>
+<style>
+#id {
+    font-size: 12px !important;
+}
+</style>

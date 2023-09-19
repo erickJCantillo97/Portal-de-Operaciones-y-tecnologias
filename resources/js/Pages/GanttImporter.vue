@@ -28,7 +28,7 @@ class Importer {
                 autoSync: true,
                 transport: {
                     sync: {
-                        url: route('syncImporter'),
+                        url: route('syncGantt', props.project.id),
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -261,6 +261,8 @@ onMounted(() => {
 
             columns: [
                 { type: 'name', field: 'name', text: 'Name', width: 250 },
+                { field: 'texto10', text: 'Responsable', width: 150 },
+                { field: 'Ejecuta', text: 'Ejecuta', width: 150 },
                 { type: 'startdate' },
                 { type: 'duration' },
                 { type: 'addnew' }
@@ -409,7 +411,7 @@ LocaleManager.applyLocale('Es');
     <AppLayout title="">
         <div class="">
             <div class="h-screen">
-             
+
                 <div id="contenedorGantt" class="h-full"></div>
             </div>
         </div>

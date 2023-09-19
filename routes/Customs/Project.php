@@ -14,7 +14,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('/ScheduleNew/{project}', [ScheduleController::class, 'index'])->name('showGantt');
 
-    Route::get('GanttImporterGanttImporter', [ScheduleController::class, 'import'])->name('ganttImporter');
+    Route::get('GanttImporter/{project}', [ScheduleController::class, 'import'])->name('ganttImporter');
 
     Route::get('/ScheduleWizard/{project}', [ScheduleController::class, 'wizard'])->name('wizard');
 
@@ -28,7 +28,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::post('/syncGantt/{project}', [ScheduleController::class, 'sync'])->name('syncGantt');
 
-    Route::post('/syncGanttImporter', [ScheduleController::class, 'syncImporter'])->name('syncImporter');
+    Route::post('/syncGanttImporter/{project}', [ScheduleController::class, 'syncImporter'])->name('syncImporter');
 
     //CRUD Projects
     Route::resource('projects', ProjectController::class);
