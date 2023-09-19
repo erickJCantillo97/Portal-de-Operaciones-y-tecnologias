@@ -2,61 +2,43 @@
 
 namespace App\Imports;
 
+use App\Models\Gantt\Task;
 use App\Models\User;
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 
-class UsersImport implements ToModel, WithHeadingRow, WithBatchInserts, WithChunkReading, WithValidation
+class UsersImport implements ToCollection, WithHeadingRow
 {
+
+    protected $project;
+    public function __construct($project)
+    {
+        $this->project = $project;
+    }
     /**
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function model(array $row)
+    public function collection(Collection $rows)
     {
-        return new User([
-            'name' => $row['nombre'],
-            'manager' => $row['responsable'],
-            'executor' => $row['ejecutor'],
-        ]);
+        foreach($rows as $row){
+            $tasks = Task::where('project_id', $this->project->id)->where('name', $row['name'])->get();
+            foreach($tasks as $task){
+                $task->update([
+                    'manager' => $row['manager'],
+                    'executor' => $row['executor'],
+                ]);
+            }
+        }
     }
 
-    public function batchSize(): int
-    {
-        return 4000;
-    }
 
-    public function chunkSize(): int
-    {
-        return 4000;
-    }
 
-    public function rules(): array
-    {
-        return [
-            '*.name' => [
-                'string',
-                'required',
-            ],
-            '*.manager' => [
-                'string',
-                'required',
-            ],
-            '*.executor' => [
-                'string',
-                'required',
-            ],
-        ];
-    }
 
-    public function customValidationMessages()
-    {
-        return [
-            'name' => 'El campo Nombre debe ser de tipo String.',
-            'manager' => 'El campo Responsable debe ser de tipo String.',
-            'executor' => 'El campo Ejecutor debe ser de tipo String.',
-        ];
-    }
+
+
 }
