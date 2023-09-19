@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\UsersImport;
 use App\Jobs\ExcelImport;
 use App\Models\Gantt\Task;
 use Exception;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TaskController extends Controller
 {
@@ -87,9 +89,10 @@ class TaskController extends Controller
 
     public function excelImport(Request $request)
     {
-        ExcelImport::dispatch($request);
+
+        Excel::import(new UsersImport($request->project_id), $request->file);
 
         return back()->with('message', 'Archivo cargado correctamente');
-        
+
     }
 }

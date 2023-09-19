@@ -82,7 +82,6 @@ class ScheduleController extends Controller
         $rows = [];
         $removed = [];
         $assgimentRows = [];
-        task::truncate();
         if (isset($request->tasks['added'])) {
             foreach ($request->tasks['added'] as $task) {
                 $taskCreate = Task::create([

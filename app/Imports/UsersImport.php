@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\Gantt\Task;
 use App\Models\User;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -12,7 +13,7 @@ use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 
-class UsersImport implements ToCollection, WithHeadingRow
+class UsersImport implements ToCollection, WithHeadingRow, WithChunkReading, ShouldQueue
 {
 
     protected $project;
@@ -26,7 +27,7 @@ class UsersImport implements ToCollection, WithHeadingRow
     public function collection(Collection $rows)
     {
         foreach($rows as $row){
-            $tasks = Task::where('project_id', $this->project->id)->where('name', $row['name'])->get();
+            $tasks = Task::where('project_id', $this->project)->where('name', $row['name'])->get();
             foreach($tasks as $task){
                 $task->update([
                     'manager' => $row['manager'],
@@ -34,6 +35,10 @@ class UsersImport implements ToCollection, WithHeadingRow
                 ]);
             }
         }
+    }
+    public function chunkSize(): int
+    {
+        return 1000;
     }
 
 
