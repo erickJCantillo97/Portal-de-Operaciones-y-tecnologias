@@ -113,8 +113,8 @@ const redondear = (value) => {
                 </div>
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="tasks" v-model:filters="filters" dataKey="id"
-                filterDisplay="menu" :loading="loading"
-                :globalFilterFields="['name', 'project.name', 'duration', 'startDate', 'endDate']"
+                filterDisplay="menu" :loading="loading" sortMode="multiple"
+                :globalFilterFields="['name', 'project.name', 'executor', 'manager', 'duration', 'startDate', 'endDate']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -128,30 +128,36 @@ const redondear = (value) => {
                 <template #header>
                     <div class="flex justify-between w-full mb-2">
                         <div class="flex space-x-4 alturah8">
-                            <Button icon="pi pi-filter-slash shadow-xl" @click="clearFilter()" type="button"
-                            text=""
+                            <Button icon="pi pi-filter-slash shadow-xl" @click="clearFilter()" type="button" text=""
                                 severity="primary" class="hover:bg-primary ">
                                 <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
                             </Button>
                             <span class="p-float-label">
-                                <InputText id="buscar" v-model="filters.global.value"  type="search"
+                                <InputText id="buscar" v-model="filters.global.value" type="search"
                                     class="block text-gray-900 rounded-md shadow-xl alturah8 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                                 <label for="buscar">Buscar...</label>
                             </span>
                         </div>
                         <div class="flex justify-end mb-2 space-x-4 alturah8">
                             <span class="shadow-xl alturah8">
-                                <button type="button" :class="optionValue == 'today' ? 'bg-sky-500 text-white':'bg-white hover:bg-sky-200 text-gray-90'" @click="getTask('today')"
+                                <button type="button"
+                                    :class="optionValue == 'today' ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+                                    @click="getTask('today')"
                                     class="relative inline-flex items-center px-3 py-2 text-sm font-semibold alturah8 rounded-l-md 0 ring-1 ring-inset ring-gray-300 focus:z-10">Hoy</button>
-                                <button type="button" :class="optionValue == 'tomorrow' ? 'bg-sky-500 text-white':'bg-white hover:bg-sky-200 text-gray-90'"  @click="getTask('tomorrow')"
+                                <button type="button"
+                                    :class="optionValue == 'tomorrow' ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+                                    @click="getTask('tomorrow')"
                                     class="relative inline-flex items-center px-3 py-2 -ml-px text-sm font-semibold alturah8 ring-1 ring-inset ring-gray-300 focus:z-10">Mañana</button>
-                                <button type="button" :class="optionValue == 'week' ? 'bg-sky-500 text-white':'bg-white hover:bg-sky-200 text-gray-90'" @click="getTask('week')"
+                                <button type="button"
+                                    :class="optionValue == 'week' ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+                                    @click="getTask('week')"
                                     class="relative inline-flex items-center px-3 py-2 -ml-px text-sm font-semibold alturah8 rounded-r-md ring-1 ring-inset ring-gray-300 focus:z-10">Semana</button>
                             </span>
                             <span class="p-float-label">
                                 <calendar id="calendar" selectionMode="range" v-model="dates"
                                     v-on:date-select="getTask('range')"
-                                    class="shadow-xl alturah8 focus:ring-2 focus:ring-indigo-600 focus:ring-inset h-9"></calendar>
+                                    class="shadow-xl alturah8 focus:ring-2 focus:ring-indigo-600 focus:ring-inset h-9">
+                                </calendar>
                                 <label for="calendar">Rango de fechas</label>
                             </span>
                         </div>
@@ -167,7 +173,7 @@ const redondear = (value) => {
                 </Column>
                 <Column field="executor" header="Ejecutor"></Column>
                 <Column field="manager" header="Responsable"></Column>
-                <Column field="duration" header="Duracion">
+                <Column field="duration" header="Duración">
                     <template #body="slotProps">
                         {{ redondear(slotProps.data.duration) }} {{ unidad[slotProps.data.durationUnit] }}
                     </template>
@@ -177,11 +183,13 @@ const redondear = (value) => {
                 <Column field="" header="Recursos">
                     <template #body="slotProps">
                         <Avatars :taskId=slotProps.data.id />
-                    </template></Column>
+                    </template>
+                </Column>
                 <Column field="" header="Acciones">
                     <template #body="slotProps">
                         <!--BOTÓN VER RECURSOS-->
-                        <div class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
+                        <div
+                            class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
                             <!--BOTÓN VER RECURSOS-->
                             <div title="Ver Recursos">
                                 <AssignmentModal :task="slotProps.data"></AssignmentModal>
