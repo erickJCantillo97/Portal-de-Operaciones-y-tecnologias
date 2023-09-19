@@ -11,7 +11,7 @@ import Combobox from '@/Components/Combobox.vue';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassPlusIcon, SparklesIcon, EyeIcon, PhotoIcon, TableCellsIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline';
+import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassPlusIcon, SparklesIcon, EyeIcon, PhotoIcon, TableCellsIcon, ArrowUpCircleIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline';
 import { useSweetalert } from '@/composable/sweetAlert';
 import { useConfirm } from "primevue/useconfirm";
 
@@ -68,6 +68,11 @@ onMounted(() => {
     initFilters();
 })
 
+
+const formFile = useForm({
+    project_id: '',
+    file: ''
+})
 //#region SUBMIT
 const submit = () => {
     loading.value = true;
@@ -102,6 +107,11 @@ const submit = () => {
     })
 }
 //#endregion
+
+const addManager = () => {
+    formFile.project_id = projectSelect.value.id;
+    formFile.post(route('post.excel.import'))
+}
 
 const addItem = () => {
     router.get(route('projects.create'))
@@ -238,6 +248,21 @@ const items = [
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
                         Proyectos
                     </h1>
+                </div>
+
+
+                <div class="flex mr-10 " title="Agregar Responsables">
+                    <Combobox class="mt-2 text-left text-gray-900" label="Proyecto" placeholder="Seleccione Contrato"
+                        :options="projects" :enabled="formData.id == 0" v-model="projectSelect">
+                    </Combobox>
+                    <input type="file" @input="formFile.file = $event.target.files[0]">
+                    <progress v-if="formFile.progress" :value="formFile.progress.percentage" max="100">
+                        {{ formFile.progress.percentage }}%
+                    </progress>
+                    <Button @click="addManager(id)" severity="primary">
+                        <ArrowUpCircleIcon class="w-6 h-6" aria-hidden="true" />
+                        Importar Excel
+                    </Button>
                 </div>
 
                 <div class="" title="Agregar Proyecto">
@@ -425,13 +450,13 @@ const items = [
                 <h2 class="text-base font-semibold leading-6 text-gray-900">Creación o edición de cronograma</h2>
                 <p class="mt-1 text-sm text-gray-500">Aquí podrá escoger como desea crear el cronograma del proyecto.</p>
 
-                <ul role="list" class="mt-6 grid grid-cols-1 gap-6 border-b border-t border-gray-200 py-6 sm:grid-cols-2">
+                <ul role="list" class="grid grid-cols-1 gap-6 py-6 mt-6 border-t border-b border-gray-200 sm:grid-cols-2">
                     <li v-for="(item, itemIdx) in items" :key="itemIdx" class="flow-root">
                         <div @click="router.get(route(item.page, projectSelect.id))"
-                            class="relative -m-2 flex items-center space-x-4 rounded-xl p-2 focus-within:ring-2 focus-within:ring-indigo-500 hover:bg-gray-50">
+                            class="relative flex items-center p-2 -m-2 space-x-4 rounded-xl focus-within:ring-2 focus-within:ring-indigo-500 hover:bg-gray-50">
                             <div
                                 :class="[item.background, 'flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg']">
-                                <component :is="item.icon" class="h-6 w-6 text-white" aria-hidden="true" />
+                                <component :is="item.icon" class="w-6 h-6 text-white" aria-hidden="true" />
                             </div>
                             <div>
                                 <h3 class="text-sm font-medium text-gray-900">
@@ -446,7 +471,7 @@ const items = [
                         </div>
                     </li>
                 </ul>
-                <!-- <div class="mt-4 flex">
+                <!-- <div class="flex mt-4">
                     <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         Or start from an empty project
                         <span aria-hidden="true"> &rarr;</span>
