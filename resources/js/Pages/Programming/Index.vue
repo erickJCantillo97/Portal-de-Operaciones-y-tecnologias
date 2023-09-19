@@ -114,8 +114,8 @@ const redondear = (value) => {
                 </div>
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="tasks" v-model:filters="filters" dataKey="id"
-                filterDisplay="menu" :loading="loading"
-                :globalFilterFields="['name', 'project', 'duration', 'startDate', 'endDate',]"
+                filterDisplay="menu" :loading="loading" sortMode="multiple"
+                :globalFilterFields="['name', 'project', 'executor', 'manager', 'duration', 'startDate', 'endDate',]"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -181,7 +181,7 @@ const redondear = (value) => {
                 </Column>
                 <Column field="executor" header="Ejecutor" sortable></Column>
                 <Column field="manager" header="Responsable"></Column>
-                <Column field="duration" header="Duracion">
+                <Column field="duration" header="Duración">
                     <template #body="slotProps">
                         {{ redondear(slotProps.data.duration) }} {{ unidad[slotProps.data.durationUnit] }}
                     </template>
