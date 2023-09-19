@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ExcelImport;
 use App\Models\Gantt\Task;
 use Exception;
 use Illuminate\Http\Request;
@@ -33,9 +34,9 @@ class TaskController extends Controller
             //
         ]);
 
-        try{
+        try {
             Task::create($validateData);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
     }
@@ -65,9 +66,9 @@ class TaskController extends Controller
             //
         ]);
 
-        try{
+        try {
             $task->update($validateData);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
@@ -77,10 +78,18 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        try{
+        try {
             $task->delete();
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
+    }
+
+    public function excelImport(Request $request)
+    {
+        ExcelImport::dispatch($request);
+
+        return back()->with('message', 'Archivo cargado correctamente');
+        // return redirect()->route('route.name')->with('success', 'Archivo cargado correctamente');
     }
 }
