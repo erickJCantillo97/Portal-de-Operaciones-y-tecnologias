@@ -161,7 +161,7 @@ export default class GanttToolbar extends Toolbar {
                     type: "datefield",
                     ref: "startDateField",
                     placeholder: "Fecha de Inicio",
-                    show: false,
+                    maxWidth: "7em",
                     required  : 'done',
                     flex: "0 0 17em",
                     listeners: {
@@ -187,7 +187,6 @@ export default class GanttToolbar extends Toolbar {
                 },
                 {
                     type : 'button',
-                    text : 'Exportar',
                     ref  : 'mspExportBtn',
                     icon : 'b-fa-file-export',
                     onAction: "up.onExport"

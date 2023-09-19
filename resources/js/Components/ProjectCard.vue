@@ -30,15 +30,12 @@ axios.get(route('projects.show', props.projectId)).then(response => {
 <template>
     <div class="duration-500 w-max hover:scale-105">
         <div class="flex items-center space-x-3 bg-white rounded-lg shadow-md shadow-indigo-50">
-            <img :src=project.file
-                class=" w-16 h-16  rounded-full shadow-2xl shadow-[#304FFE] border-white  border-dashed border-2  flex justify-center items-center ">
+            <!-- <img :src=project.file
+                class=" w-16 h-16  rounded-full shadow-2xl shadow-[#304FFE] border-white  border-dashed border-2  flex justify-center items-center "> -->
             <div>
                 <h2 class="text-sm font-bold text-gray-900">{{ project.name }}</h2>
-                <h3 class="mt-2 text-sm font-bold text-left text-indigo-500">{{project.avance}}</h3>
-                <p class="text-sm font-semibold text-gray-400">Last Transaction</p>
-                <!-- <button
-                    class="px-4 py-2 mt-6 text-sm tracking-wider text-white bg-indigo-400 rounded-lg outline-none hover:bg-indigo-500">Add
-                    to cart</button> -->
+                <!-- <h3 class="mt-2 text-sm font-bold text-left text-indigo-500">{{project.avance}}</h3>
+                <p class="text-sm font-semibold text-gray-400">Last Transaction</p> -->
             </div>
         </div>
 
