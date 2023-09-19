@@ -10,11 +10,13 @@ WORKDIR /var/www/html
 RUN yes | pecl install ${XDEBUG_VERSION} \
     && docker-php-ext-enable xdebug
 
+RUN apt update && apt install -y openjdk-11-jdk
+
 RUN apt update; \
     apt install -y libmagickwand-dev; \
     pecl install imagick; \
     docker-php-ext-enable imagick
-	
+
 RUN apt update &&  apt install -y -f \
         git \
         gnupg2 curl \

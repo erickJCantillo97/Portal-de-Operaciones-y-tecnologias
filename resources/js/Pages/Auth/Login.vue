@@ -53,7 +53,6 @@ const submit = () => {
                 <template #logo>
                     <ApplicationLogo height-logo="100" width-logo="100" />
                 </template>
-n
                 <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
                     {{ status }}
                 </div>

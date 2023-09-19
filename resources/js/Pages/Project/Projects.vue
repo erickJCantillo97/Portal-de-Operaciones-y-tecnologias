@@ -251,18 +251,26 @@ const items = [
                 </div>
 
 
-                <div class="flex mr-10 " title="Agregar Responsables">
-                    <Combobox class="mt-2 text-left text-gray-900" label="Proyecto" placeholder="Seleccione Contrato"
-                        :options="projects" :enabled="formData.id == 0" v-model="projectSelect">
-                    </Combobox>
-                    <input type="file" @input="formFile.file = $event.target.files[0]">
-                    <progress v-if="formFile.progress" :value="formFile.progress.percentage" max="100">
-                        {{ formFile.progress.percentage }}%
-                    </progress>
-                    <Button @click="addManager(id)" severity="primary">
-                        <ArrowUpCircleIcon class="w-6 h-6" aria-hidden="true" />
-                        Importar Excel
-                    </Button>
+                <div class="flex content-between w-full mr-10 pl-96" title="Importar Archivos">
+                    <div class="mr-10 w-96">
+
+                        <Combobox class="mt-2 text-left text-gray-900" label="Proyecto" placeholder="Seleccione Contrato"
+                            :options="projects" :enabled="formData.id == 0" v-model="projectSelect">
+                        </Combobox>
+                    </div>
+                    <div class="w-96">
+
+                        <Button @click="addManager()" severity="primary">
+                            <ArrowUpCircleIcon class="w-6 h-6" aria-hidden="true" />
+                            Importar Excel
+                        </Button>
+                        <div class="mt-4">
+                            <input type="file" @input="formFile.file = $event.target.files[0]" class="pb-4">
+                            <progress v-if="formFile.progress" :value="formFile.progress.percentage" max="100">
+                                {{ formFile.progress.percentage }}%
+                            </progress>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="" title="Agregar Proyecto">
