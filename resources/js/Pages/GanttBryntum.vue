@@ -157,11 +157,12 @@ const gantt = new Gantt(({
     rowHeight:30,
     columns: [
         { type: 'wbs', text: 'Nivel', width: 20 },
-        { type: 'name', width: 280 },
-        { type: 'percentdone', text: 'Avance', showCircle: true, width: 80 },
+        { type: 'name', width: 200 },
+        { type: 'percentdone', text: 'Avance', showCircle: true, width: 80, hidden: true },
         { type: 'duration', text: 'Duración', with: 50 },
         { type: 'startdate', text: 'Fecha Inicio', with: 50 },
         { type: 'enddate', text: 'Fecha fin', with: 50 },
+        // { type: 'newColumns', text: 'Buscar Columna', with: 50 },
         {
             type: 'resourceassignment',
             text: 'Recursos',
@@ -268,3 +269,8 @@ onMounted(() => {
         </div>
     </AppLayout>
 </template>
+<style>
+#id {
+    font-size: 12px !important;
+}
+</style>

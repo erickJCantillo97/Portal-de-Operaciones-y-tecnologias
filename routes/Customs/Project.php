@@ -7,25 +7,28 @@ use App\Http\Controllers\Projects\ProjectController;
 use App\Http\Controllers\Projects\QuoteController;
 use App\Http\Controllers\Projects\ShipController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
     Route::get('/ScheduleNew/{project}', [ScheduleController::class, 'index'])->name('showGantt');
 
-    Route::get('GanttImporterGanttImporter', [ScheduleController::class, 'import'])->name('ganttImporter');
-    
+    Route::get('GanttImporter/{project}', [ScheduleController::class, 'import'])->name('ganttImporter');
+
     Route::get('/ScheduleWizard/{project}', [ScheduleController::class, 'wizard'])->name('wizard');
 
     Route::get('/ScheduleCreate/{project}', [ScheduleController::class, 'create'])->name('createSchedule.create');
 
     Route::get('getAssignmentsTask/{task}', [ScheduleController::class, 'getAssignmentsTask'])->name('get.assignments.task');
 
+    Route::get('getExcelImport/{request}', [TaskController::class, 'excelImport'])->name('get.excel.import');
+
     Route::get('/dataGantt/{project}', [ScheduleController::class, 'get'])->name('dataGantt');
 
     Route::post('/syncGantt/{project}', [ScheduleController::class, 'sync'])->name('syncGantt');
 
-    Route::post('/syncGanttImporter', [ScheduleController::class, 'syncImporter'])->name('syncImporter');
+    Route::post('/syncGanttImporter/{project}', [ScheduleController::class, 'syncImporter'])->name('syncImporter');
 
     //CRUD Projects
     Route::resource('projects', ProjectController::class);

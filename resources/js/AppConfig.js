@@ -56,6 +56,7 @@ useGanttConfig = function (p) {
                 type: 'percentdone',
                 text:'Avance',
                 showCircle: true,
+                visible: false,
                 width: 80,
             },
             {
