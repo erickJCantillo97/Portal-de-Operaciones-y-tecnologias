@@ -18,15 +18,13 @@ class ExcelImport implements ShouldQueue
 
     protected $request;
 
-    protected $project;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(Request $request, Project $project)
+    public function __construct(Request $request)
     {
         $this->request = $request;
-        $this->project = $project;
     }
 
     /**
@@ -34,7 +32,7 @@ class ExcelImport implements ShouldQueue
      */
     public function handle(): void
     {
-        $file = $this->request->file('import_file');
-        Excel::import(new UsersImport, $file);
+        $file = $this->request->file('file');
+        Excel::import(new UsersImport($this->request->project_id), $file);
     }
 }
