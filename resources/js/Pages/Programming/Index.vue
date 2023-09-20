@@ -33,6 +33,7 @@ const loading = ref(false);
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     'project.name': { value: null, matchMode: FilterMatchMode.CONTAINS },
+    'manager': { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const optionValue = ref('today')
 
@@ -114,8 +115,8 @@ const redondear = (value) => {
                 </div>
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="tasks" v-model:filters="filters" dataKey="id"
-                filterDisplay="menu" :loading="loading"
-                :globalFilterFields="['name', 'project', 'duration', 'startDate', 'endDate',]"
+                filterDisplay="menu" :loading="loading" sortMode="multiple"
+                :globalFilterFields="['name', 'project', 'executor', 'manager', 'duration', 'startDate', 'endDate',]"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -168,9 +169,15 @@ const redondear = (value) => {
                 <!--COLUMNAS-->
                 <Column field="name" header="Tarea"></Column>
                 <Column field="project.name" header="Proyecto" :show-filter-match-modes="false">
+<<<<<<< HEAD
                     <!-- <template #body="{ data }">
                     {{ data.project.name }}
                 </template> -->
+=======
+                    <template #body="{ data }">
+                        {{ data.project.name }}
+                    </template>
+>>>>>>> 0847138b8abb7e35346cd1107c08e5adc6fa2b2c
                     <template #filter="{ filterModel, filterCallback }">
                         <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
                             placeholder="Busca por proyecto" />
@@ -179,9 +186,14 @@ const redondear = (value) => {
                         <ProjectCard :projectId=slotProps.data.project.id />
                     </template>
                 </Column>
+                <Column field="manager" header="Responsable" :show-filter-match-modes="false">
+                    <template #filter="{ filterModel, filterCallback }">
+                        <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
+                            placeholder="Busca por Responsable" />
+                    </template>
+                </Column>
                 <Column field="executor" header="Ejecutor"></Column>
-                <Column field="manager" header="Responsable"></Column>
-                <Column field="duration" header="Duracion">
+                <Column field="duration" header="Duración">
                     <template #body="slotProps">
                         {{ redondear(slotProps.data.duration) }} {{ unidad[slotProps.data.durationUnit] }}
                     </template>
@@ -203,9 +215,10 @@ const redondear = (value) => {
                                 <AssignmentModal :task="slotProps.data"></AssignmentModal>
 
                             </div>
-                    </div>
-                </template>
-            </Column>
-        </DataTable>
-    </div>
-</AppLayout></template>
+                        </div>
+                    </template>
+                </Column>
+            </DataTable>
+        </div>
+    </AppLayout>
+</template>
