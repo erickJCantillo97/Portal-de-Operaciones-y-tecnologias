@@ -168,16 +168,16 @@ const redondear = (value) => {
                 <!--COLUMNAS-->
                 <Column field="name" header="Tarea"></Column>
                 <Column field="project.name" header="Proyecto" :show-filter-match-modes="false">
-                    <template #body="{ data }">
+                    <!-- <template #body="{ data }">
                     {{ data.project.name }}
-                </template>
+                </template> -->
                     <template #filter="{ filterModel, filterCallback }">
                         <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
                             placeholder="Busca por proyecto" />
                     </template>
-                    <!-- <template #body="slotProps">
+                    <template #body="slotProps">
                         <ProjectCard :projectId=slotProps.data.project.id />
-                    </template> -->
+                    </template>
                 </Column>
                 <Column field="executor" header="Ejecutor"></Column>
                 <Column field="manager" header="Responsable"></Column>
