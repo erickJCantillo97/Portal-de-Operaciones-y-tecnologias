@@ -169,15 +169,9 @@ const redondear = (value) => {
                 <!--COLUMNAS-->
                 <Column field="name" header="Tarea"></Column>
                 <Column field="project.name" header="Proyecto" :show-filter-match-modes="false">
-<<<<<<< HEAD
                     <!-- <template #body="{ data }">
                     {{ data.project.name }}
                 </template> -->
-=======
-                    <template #body="{ data }">
-                        {{ data.project.name }}
-                    </template>
->>>>>>> 0847138b8abb7e35346cd1107c08e5adc6fa2b2c
                     <template #filter="{ filterModel, filterCallback }">
                         <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
                             placeholder="Busca por proyecto" />
