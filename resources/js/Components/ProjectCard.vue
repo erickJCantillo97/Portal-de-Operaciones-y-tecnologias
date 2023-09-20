@@ -8,13 +8,17 @@ const props = defineProps({
     projectId: {
         type: Number
     },
-    class: {
+    clases: {
         type: String,
         default: '',
     },
     avance: {
         type: Boolean,
         default: true,
+    },
+    activo: {
+        type: Boolean,
+        default: false,
     }
 
 
@@ -29,20 +33,22 @@ axios.get(route('projects.show', props.projectId)).then(response => {
 </script>
 
 <template>
-    <div v-if="cagando" :class="class" class="flex w-40 hover:z-20 hover:scale-125">
+    <div v-if="cagando" :class="activo ? 'bg-sky-500 text-white':'bg-white hover:bg-sky-200 text-gray-90' + clases"
+    class="flex w-40 rounded-md hover:z-20 hover:scale-110">
         <Skeleton shape="circle" size="2rem" class="mr-2"></Skeleton>
         <div class="align-self-center" style="flex: 1">
             <Skeleton width="100%" class="mb-1"></Skeleton>
             <Skeleton width="100%"></Skeleton>
         </div>
     </div>
-    <div v-else :class="class" class="flex w-40 h-10 space-x-3 duration-500 cursor-pointer hover:z-20 hover:scale-125">
+    <div v-else :class="activo ? 'bg-sky-500 text-white':'bg-white hover:bg-sky-200 text-gray-90' + clases"
+    class="flex items-center h-12 p-1 space-x-3 duration-500 border rounded-md cursor-pointer w-52 hover:z-20 hover:scale-110"
+    v-tooltip.top="{ value: `<h4 class='text-center text-blue-800 bg-blue-200'> Avance: ` + (parseInt(project.avance)) + `%</h4>`, escape: true, class: 'custom-error' }">
         <img :src=project.file
-            class="w-8 h-8 rounded-full ">
-        <div class="items-center w-full text-center align-middle">
-            <h2 class="text-xs font-bold text-gray-900">{{ project.name }}</h2>
-            <ProgressBar v-if="avance"
-                v-tooltip.top="{ value: `<h4 class='text-center text-blue-800 bg-blue-200'> Avance: ` + (parseInt(project.avance)) + `%</h4>`, escape: true, class: 'custom-error' }"
+            class="w-10 h-10 rounded-full ">
+        <div class="flex-col w-full text-center">
+            <h2 class="text-xs font-bold">{{ project.name }}</h2>
+            <ProgressBar v-if="avance" class="items-end"
                 :value="parseInt(project.avance)"></ProgressBar>
         </div>
     </div>
