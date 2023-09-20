@@ -217,6 +217,11 @@ const filterProject = (id) => {
                 </Column>
                 <Column field="startDate" header="Fecha inicio"></Column>
                 <Column field="endDate" header="Fecha fin"></Column>
+                <Column field="" header="Recursos">
+                    <template #body="slotProps">
+                        <Avatars :assignments=slotProps.data.assignments />
+                    </template>
+                </Column>
                 <Column field="" header="Acciones">
                     <template #body="slotProps">
                         <!--BOTÓN VER RECURSOS-->

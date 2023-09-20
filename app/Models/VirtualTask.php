@@ -20,5 +20,7 @@ class VirtualTask extends Model
     public function project(){
         return $this->belongsTo(Project::class);
     }
-
+    public function assignments(){
+        return $this->hasMany(Assignment::class, 'event');
+    }
 }
