@@ -180,16 +180,13 @@ const redondear = (value) => {
                         <ProjectCard :projectId=slotProps.data.project.id />
                     </template> -->
                 </Column>
-                <Column field="executor" header="Ejecutor"></Column>
                 <Column field="manager" header="Responsable" :show-filter-match-modes="false">
-                    <template #body="{ data }">
-                        {{ data.project.manager }}
-                    </template>
                     <template #filter="{ filterModel, filterCallback }">
                         <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
                             placeholder="Busca por Responsable" />
                     </template>
                 </Column>
+                <Column field="executor" header="Ejecutor"></Column>
                 <Column field="duration" header="Duración">
                     <template #body="slotProps">
                         {{ redondear(slotProps.data.duration) }} {{ unidad[slotProps.data.durationUnit] }}
