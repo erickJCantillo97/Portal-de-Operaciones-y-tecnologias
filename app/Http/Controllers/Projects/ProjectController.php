@@ -9,6 +9,7 @@ use App\Models\Projects\Customer;
 use App\Models\Projects\Project;
 use App\Models\Projects\Quote;
 use App\Models\Projects\Ship;
+use App\Models\VirtualTask;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -169,7 +170,17 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        return response()->json($project);
+        $taskProject = VirtualTask::where('project_id', $project->id)->whereNull('task_id')->get()->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'project_id' => $item->project->id,
+                'avance'=>number_format($item['percentDone'], 2,),
+                'name' => $item['name'],
+                'file' => $item->project->contract->ship->file
+            ];
+        });
+
+        return response()->json($taskProject);
     }
 
     /**

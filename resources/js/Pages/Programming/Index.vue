@@ -33,6 +33,7 @@ const loading = ref(false);
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     'project.name': { value: null, matchMode: FilterMatchMode.CONTAINS },
+    'manager': { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const optionValue = ref('today')
 
@@ -169,19 +170,24 @@ const redondear = (value) => {
                 <!--COLUMNAS-->
                 <Column field="name" header="Tarea"></Column>
                 <Column field="project.name" header="Proyecto" :show-filter-match-modes="false">
-                    <template #body="{ data }">
+                    <!-- <template #body="{ data }">
                     {{ data.project.name }}
-                </template>
+                </template> -->
                     <template #filter="{ filterModel, filterCallback }">
                         <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
                             placeholder="Busca por proyecto" />
                     </template>
-                    <!-- <template #body="slotProps">
+                    <template #body="slotProps">
                         <ProjectCard :projectId=slotProps.data.project.id />
-                    </template> -->
+                    </template>
                 </Column>
-                <Column field="executor" header="Ejecutor" sortable></Column>
-                <Column field="manager" header="Responsable"></Column>
+                <Column field="manager" header="Responsable" :show-filter-match-modes="false">
+                    <template #filter="{ filterModel, filterCallback }">
+                        <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
+                            placeholder="Busca por Responsable" />
+                    </template>
+                </Column>
+                <Column field="executor" header="Ejecutor"></Column>
                 <Column field="duration" header="Duración">
                     <template #body="slotProps">
                         {{ redondear(slotProps.data.duration) }} {{ unidad[slotProps.data.durationUnit] }}
@@ -204,9 +210,10 @@ const redondear = (value) => {
                                 <AssignmentModal :task="slotProps.data"></AssignmentModal>
 
                             </div>
-                    </div>
-                </template>
-            </Column>
-        </DataTable>
-    </div>
-</AppLayout></template>
+                        </div>
+                    </template>
+                </Column>
+            </DataTable>
+        </div>
+    </AppLayout>
+</template>
