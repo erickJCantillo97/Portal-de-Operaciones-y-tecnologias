@@ -125,14 +125,14 @@ const filterProject = (id) => {
             </div>
             <div>
                 <div class="flex space-x-2 my-4 ">
-                    <div class="px-2 w-1/12">
+                    <div class="p-1 w-1/12">
                         <Button icon="pi pi-filter-slash shadow-xl" @click="filterProject()" type="button" text=""
                         severity="primary" class="hover:bg-primary ">
                         Ver Todos
                     </Button>
                     </div>
-                    <div class="flex w-11/12 space-x-8 shadow-sm shadow-primary rounded-xl p-1">
-                        <ProjectCard v-for="project in projects" :projectId=project class="cursor-pointer" @click="filterProject(project)" />
+                    <div class="flex w-11/12 space-x-2 shadow-sm shadow-primary rounded-xl p-1">
+                        <ProjectCard v-for="project in projects" :projectId=project class="cursor-pointer" @click="filterProject(project)" :activo="filters['project.id'].value == project"/>
                 </div>
                 </div>
 
@@ -191,7 +191,7 @@ const filterProject = (id) => {
 
                 <!--COLUMNAS-->
                 <Column field="name" header="Tarea"></Column>
-                <Column field="project.ship.name" header="Proyecto" :show-filter-match-modes="false">
+                <Column field="project.ship.name" header="Proyecto" :show-filter-match-modes="false" v-if="filters['project.id'].value == null">
                     <!-- <template #body="{ data }">
                     {{ data.project.name }}
                 </template> -->
@@ -217,11 +217,6 @@ const filterProject = (id) => {
                 </Column>
                 <Column field="startDate" header="Fecha inicio"></Column>
                 <Column field="endDate" header="Fecha fin"></Column>
-                <Column field="" header="Recursos">
-                    <template #body="slotProps">
-                        <Avatars :taskId=slotProps.data.id />
-                    </template>
-                </Column>
                 <Column field="" header="Acciones">
                     <template #body="slotProps">
                         <!--BOTÓN VER RECURSOS-->

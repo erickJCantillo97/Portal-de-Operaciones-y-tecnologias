@@ -4,8 +4,8 @@ import AvatarGroup from 'primevue/avatargroup';
 import { ref } from 'vue'
 
 const props = defineProps({
-    taskId: {
-        type: Number,
+    assignments: {
+        type: Array,
         default: 0,
     },
     color: {
@@ -21,11 +21,11 @@ const props = defineProps({
         default: 'hover:z-20 hover:scale-110 duration-500',
     }
 });
-const assignments = ref([]);
+// const assignments = ref([]);
 
-axios.get(route('get.assignments.task', props.taskId)).then(response => {
-    assignments.value = response.data.assignments;
-})
+// axios.get(route('get.assignments.task', props.taskId)).then(response => {
+//     assignments.value = response.data.assignments;
+// })
 
 const letraAvatar = (cadena) => {
     var palabras = cadena.split(" ");
