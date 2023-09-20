@@ -7,7 +7,7 @@ import { Link } from '@inertiajs/vue3';
 const { hasRole } = usePermissions();
 import Image from 'primevue/image';
 import UserHeader from '@/Components/sections/UserHeader.vue';
-
+import ProjectCard from '@/Components/ProjectCard.vue';
 const props = defineProps({
     projects: Array,
     costoMes: Number,
@@ -48,27 +48,9 @@ const getTask = () => {
             <div>
                 <h3 class="text-xl font-medium text-primary">Proyectos</h3>
                 <dl class="grid grid-cols-1 gap-5 mt-5 sm:grid-cols-2 lg:grid-cols-4">
-                    <div v-for="item in projects" :key="item.id" class="relative px-2 pt-1 pb-8 overflow-hidden bg-white rounded-lg shadow">
-                        <dt>
-                            <div class="absolute rounded-md">
-                            <!-- <Image  alt="Image">
-                                <template #image>
-                                    <img class="w-20 h-20 rounded-full" :src="item.file" />
-                                </template>
-                            </Image> -->
-                            </div>
-                            <p class="text-sm font-medium text-center text-gray-500">{{ item.name }}</p>
-                        </dt>
-                        <dd class="flex items-baseline pb-6 mt-4 text-center sm:pb-7">
-                            <p class="text-2xl font-semibold text-center text-gray-900">{{ item.avance }} %</p>
-
-                            <div class="absolute inset-x-0 bottom-0 px-4 py-4 bg-gray-50">
-                                <div class="text-sm">
-                                    <Link :href="route('createSchedule.create', item.project_id)" class="font-medium text-indigo-600 hover:text-indigo-500">Cronograma</Link>
-                                </div>
-                            </div>
-                        </dd>
-                    </div>
+                    <Link v-for="project of projects" :href="route('createSchedule.create', project.project_id)">
+                    <ProjectCard :projectId="project.project_id" class="cursor-pointer"  :activo="false"/>
+                  </Link>
                 </dl>
             </div>
         </div>
