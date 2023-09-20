@@ -31,12 +31,13 @@ axios.get(route('projects.show', props.projectId)).then(response => {
         </div>
     </div>
     <div v-else class="w-40 duration-500 hover:scale-105">
-        <div class="flex space-x-3 bg-white rounded-lg shadow-md shadow-indigo-50">
+        <div class="flex space-x-3 bg-white rounded-lg shadow-md shadow-indigo-50 cursor-pointer">
             <img :src=project.file
                 class="flex items-center justify-center w-8 h-8 border-2 border-white border-dashed rounded-full ">
             <div class="items-center w-full text-center">
                 <h2 class="text-xs font-bold text-gray-900">{{ project.name }}</h2>
                 <ProgressBar
+
                     v-tooltip.top="{ value: `<h4 class='text-center text-blue-800 bg-blue-200'> Avance: ` + (parseInt(project.avance)) + `%</h4>`, escape: true, class: 'custom-error' }"
                     :value="parseInt(project.avance)"></ProgressBar>
             </div>

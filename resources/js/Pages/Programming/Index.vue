@@ -16,16 +16,19 @@ import Avatars from '@/Components/Avatars.vue';
 import ProjectCard from '@/Components/ProjectCard.vue';
 
 const props = defineProps({
-    taskNow: Array,
+    projects: Array,
 })
+
 
 const unidad = {
     day: 'Dias',
     hour: 'Horas'
 };
 
+const projects = ref()
 onMounted(() => {
     getTask('today')
+
 })
 const dates = ref([]);
 const tasks = ref([]);
@@ -86,10 +89,11 @@ const getTask = (option) => {
     if (dates.value[1] != null) {
         tasks.value = [];
         loading.value = true;
-        
+
         axios.get(route('actividadesDeultimonivel', { dates: dates.value })).then((res) => {
             loading.value = false;
             tasks.value = res.data
+            projects.value = [...new Set(res.data.map(obj => obj.project.id))]
         })
     }
 
@@ -114,6 +118,23 @@ const redondear = (value) => {
                         Programación de Actividades
                     </h1>
                 </div>
+            </div>
+            <div>
+                <div class="flex space-x-8 ">
+                    <div class="my-4 p-2">
+                        <Button icon="pi pi-filter-slash shadow-xl" @click="clearFilter()" type="button" text=""
+                        severity="primary" class="hover:bg-primary ">
+                        Ver Todos
+                    </Button>
+                    </div>
+                     <div class="flex w-11/12 space-x-8 my-4 shadow-md rounded-xl p-2">
+
+                    <div v-for="project in projects">
+                        <ProjectCard :projectId=project class="cursor-pointer" />
+                    </div>
+                </div>
+                </div>
+
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="tasks" v-model:filters="filters" dataKey="id"
                 filterDisplay="menu" :loading="loading" sortMode="multiple"
@@ -173,13 +194,13 @@ const redondear = (value) => {
                     <!-- <template #body="{ data }">
                     {{ data.project.name }}
                 </template> -->
-                    <template #filter="{ filterModel, filterCallback }">
+                    <!-- <template #filter="{ filterModel, filterCallback }">
                         <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
                             placeholder="Busca por proyecto" />
                     </template>
                     <template #body="slotProps">
-                        <ProjectCard :projectId=slotProps.data.project.id />
-                    </template>
+
+                    </template> -->
                 </Column>
                 <Column field="manager" header="Responsable" :show-filter-match-modes="false">
                     <template #filter="{ filterModel, filterCallback }">

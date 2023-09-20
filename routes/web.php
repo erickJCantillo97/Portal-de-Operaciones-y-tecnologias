@@ -120,9 +120,7 @@ Route::get('recuperarDatos', function () {
 });
 
 
-Route::get('/programming', function () {
-    return Inertia::render('Programming/Index');
-})->name('programming');
+
 
 Route::get('projectAvance', function (){
     $proyecto = Project::first();
