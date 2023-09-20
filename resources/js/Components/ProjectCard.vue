@@ -36,7 +36,7 @@ axios.get(route('projects.show', props.projectId)).then(response => {
             <Skeleton width="100%"></Skeleton>
         </div>
     </div>
-    <div v-else :class="class" class="flex w-40 h-10 space-x-3 duration-500 hover:z-20 hover:scale-125">
+    <div v-else :class="class" class="flex w-40 h-10 space-x-3 duration-500 cursor-pointer hover:z-20 hover:scale-125">
         <img :src=project.file
             class="w-8 h-8 rounded-full ">
         <div class="items-center w-full text-center align-middle">
