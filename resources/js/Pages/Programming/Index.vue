@@ -28,7 +28,6 @@ const unidad = {
 const projects = ref()
 onMounted(() => {
     getTask('today')
-
 })
 const dates = ref([]);
 const tasks = ref([]);
@@ -36,6 +35,7 @@ const loading = ref(false);
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     'project.name': { value: null, matchMode: FilterMatchMode.CONTAINS },
+    'project.id': { value: null, matchMode: FilterMatchMode.EQUALS },
     'manager': { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const optionValue = ref('today')
@@ -103,6 +103,10 @@ const redondear = (value) => {
     return new Intl.NumberFormat().format(Number(value).toFixed(2))
 }
 
+const filterProject = (id) => {
+    filters.value['project.id'].value = id;
+}
+
 //#region Obtener API de Recursos
 
 //#endregion
@@ -120,18 +124,15 @@ const redondear = (value) => {
                 </div>
             </div>
             <div>
-                <div class="flex space-x-8 ">
-                    <div class="my-4 p-2">
-                        <Button icon="pi pi-filter-slash shadow-xl" @click="clearFilter()" type="button" text=""
+                <div class="flex space-x-2 my-4 ">
+                    <div class="px-2 w-1/12">
+                        <Button icon="pi pi-filter-slash shadow-xl" @click="filterProject()" type="button" text=""
                         severity="primary" class="hover:bg-primary ">
                         Ver Todos
                     </Button>
                     </div>
-                     <div class="flex w-11/12 space-x-8 my-4 shadow-md rounded-xl p-2">
-
-                    <div v-for="project in projects">
-                        <ProjectCard :projectId=project class="cursor-pointer" />
-                    </div>
+                    <div class="flex w-11/12 space-x-8 shadow-sm shadow-primary rounded-xl p-1">
+                        <ProjectCard v-for="project in projects" :projectId=project class="cursor-pointer" @click="filterProject(project)" />
                 </div>
                 </div>
 
