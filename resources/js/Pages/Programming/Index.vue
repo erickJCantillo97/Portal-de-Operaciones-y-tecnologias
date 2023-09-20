@@ -85,6 +85,7 @@ const getTask = (option) => {
     if (dates.value[1] != null) {
         tasks.value = [];
         loading.value = true;
+        
         axios.get(route('actividadesDeultimonivel', { dates: dates.value })).then((res) => {
             loading.value = false;
             tasks.value = res.data
