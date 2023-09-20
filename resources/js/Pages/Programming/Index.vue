@@ -191,7 +191,7 @@ const filterProject = (id) => {
 
                 <!--COLUMNAS-->
                 <Column field="name" header="Tarea"></Column>
-                <Column field="project.name" header="Proyecto" :show-filter-match-modes="false">
+                <Column field="project.ship.name" header="Proyecto" :show-filter-match-modes="false">
                     <!-- <template #body="{ data }">
                     {{ data.project.name }}
                 </template> -->
