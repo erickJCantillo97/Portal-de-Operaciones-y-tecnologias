@@ -33,6 +33,7 @@ const loading = ref(false);
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     'project.name': { value: null, matchMode: FilterMatchMode.CONTAINS },
+    'manager': { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const optionValue = ref('today')
 
@@ -169,8 +170,8 @@ const redondear = (value) => {
                 <Column field="name" header="Tarea"></Column>
                 <Column field="project.name" header="Proyecto" :show-filter-match-modes="false">
                     <template #body="{ data }">
-                    {{ data.project.name }}
-                </template>
+                        {{ data.project.name }}
+                    </template>
                     <template #filter="{ filterModel, filterCallback }">
                         <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
                             placeholder="Busca por proyecto" />
@@ -180,7 +181,15 @@ const redondear = (value) => {
                     </template> -->
                 </Column>
                 <Column field="executor" header="Ejecutor"></Column>
-                <Column field="manager" header="Responsable"></Column>
+                <Column field="manager" header="Responsable" :show-filter-match-modes="false">
+                    <template #body="{ data }">
+                        {{ data.project.manager }}
+                    </template>
+                    <template #filter="{ filterModel, filterCallback }">
+                        <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
+                            placeholder="Busca por Responsable" />
+                    </template>
+                </Column>
                 <Column field="duration" header="Duración">
                     <template #body="slotProps">
                         {{ redondear(slotProps.data.duration) }} {{ unidad[slotProps.data.durationUnit] }}
@@ -203,9 +212,10 @@ const redondear = (value) => {
                                 <AssignmentModal :task="slotProps.data"></AssignmentModal>
 
                             </div>
-                    </div>
-                </template>
-            </Column>
-        </DataTable>
-    </div>
-</AppLayout></template>
+                        </div>
+                    </template>
+                </Column>
+            </DataTable>
+        </div>
+    </AppLayout>
+</template>
