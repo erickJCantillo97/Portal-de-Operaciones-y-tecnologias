@@ -10,7 +10,6 @@ import DataTable from 'primevue/datatable';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import InputText from 'primevue/inputtext';
-import OverlayPanel from 'primevue/overlaypanel';
 import '../../../sass/dataTableCustomized.scss';
 import Avatars from '@/Components/Avatars.vue';
 import ProjectCard from '@/Components/ProjectCard.vue';
@@ -107,7 +106,24 @@ const filterProject = (id) => {
     filters.value['project.id'].value = id;
 }
 
-//#region Obtener API de Recursos
+//#region
+const items = ref([
+    {
+        label: 'Add',
+        icon: 'pi pi-pencil',
+
+    },
+    {
+        label: 'Update',
+        icon: 'pi pi-refresh',
+
+    },
+    {
+        label: 'Delete',
+        icon: 'pi pi-trash',
+
+    }
+])
 
 //#endregion
 
@@ -229,7 +245,7 @@ const filterProject = (id) => {
                             class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
                             <!--BOTÓN VER RECURSOS-->
                             <div title="Ver Recursos">
-                                <AssignmentModal :task="slotProps.data"></AssignmentModal>
+                                <!-- <AssignmentModal :task="slotProps.data"></AssignmentModal> -->
 
                             </div>
                         </div>
