@@ -13,6 +13,7 @@ import InputText from 'primevue/inputtext';
 import '../../../sass/dataTableCustomized.scss';
 import Avatars from '@/Components/Avatars.vue';
 import ProjectCard from '@/Components/ProjectCard.vue';
+import MinimalMenu from '@/Components/MinimalMenu.vue';
 
 const props = defineProps({
     projects: Array,
@@ -109,21 +110,22 @@ const filterProject = (id) => {
 //#region
 const items = ref([
     {
-        label: 'Add',
-        icon: 'pi pi-pencil',
-
+        label: 'Editar recursos',
+        icon: 'fa-solid fa-chart-gantt',
+        url: {
+            name: 'createSchedule.create',
+            parametter: ''
+        }
     },
     {
-        label: 'Update',
-        icon: 'pi pi-refresh',
-
+        label: 'Ver programacion',
+        icon: 'fa-solid fa-list-check',
+        url: {
+            name: 'programming',
+            parametter: ''
+        }
     },
-    {
-        label: 'Delete',
-        icon: 'pi pi-trash',
-
-    }
-])
+]);
 
 //#endregion
 
@@ -143,13 +145,14 @@ const items = ref([
                 <div class="flex space-x-2 my-4 ">
                     <div class="p-1 w-1/12">
                         <Button icon="pi pi-filter-slash shadow-xl" @click="filterProject()" type="button" text=""
-                        severity="primary" class="hover:bg-primary ">
-                        Ver Todos
-                    </Button>
+                            severity="primary" class="hover:bg-primary ">
+                            Ver Todos
+                        </Button>
                     </div>
                     <div class="flex w-11/12 space-x-2 shadow-sm shadow-primary rounded-xl p-1">
-                        <ProjectCard v-for="project in projects" :projectId=project class="cursor-pointer" @click="filterProject(project)" :activo="filters['project.id'].value == project"/>
-                </div>
+                        <ProjectCard v-for="project in projects" :projectId=project class="cursor-pointer"
+                            @click="filterProject(project)" :activo="filters['project.id'].value == project" />
+                    </div>
                 </div>
 
             </div>
@@ -207,7 +210,8 @@ const items = ref([
 
                 <!--COLUMNAS-->
                 <Column field="name" header="Tarea"></Column>
-                <Column field="project.ship.name" header="Proyecto" :show-filter-match-modes="false" v-if="filters['project.id'].value == null">
+                <Column field="project.ship.name" header="Proyecto" :show-filter-match-modes="false"
+                    v-if="filters['project.id'].value == null">
                     <!-- <template #body="{ data }">
                     {{ data.project.name }}
                 </template> -->
@@ -238,17 +242,13 @@ const items = ref([
                         <Avatars :assignments=slotProps.data.assignments />
                     </template>
                 </Column>
-                <Column field="" header="Acciones">
+                <Column field="" header="Acciones" bodyStyle="text-align:center">
                     <template #body="slotProps">
-                        <!--BOTÓN VER RECURSOS-->
-                        <div
-                            class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
-                            <!--BOTÓN VER RECURSOS-->
-                            <div title="Ver Recursos">
-                                <!-- <AssignmentModal :task="slotProps.data"></AssignmentModal> -->
-
-                            </div>
-                        </div>
+                        <MinimalMenu :items="items" :header="true">
+                            <template #header>
+                                <p class="text-black text-center">{{slotProps.data.name}}</p>
+                            </template>
+                        </MinimalMenu>
                     </template>
                 </Column>
             </DataTable>

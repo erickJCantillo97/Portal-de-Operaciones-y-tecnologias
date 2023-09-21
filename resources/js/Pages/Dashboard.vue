@@ -5,7 +5,6 @@ import axios from 'axios';
 import { usePermissions } from '@/composable/permission';
 import { Link } from '@inertiajs/vue3';
 const { hasRole } = usePermissions();
-import Image from 'primevue/image';
 import UserHeader from '@/Components/sections/UserHeader.vue';
 import ProjectCard from '@/Components/ProjectCard.vue';
 const props = defineProps({
@@ -48,15 +47,13 @@ const getTask = () => {
             <div>
                 <h3 class="text-xl font-medium text-primary">Proyectos</h3>
                 <dl class="grid grid-cols-1 gap-5 mt-5 sm:grid-cols-2 lg:grid-cols-4">
-                    <Link v-for="project of projects" :href="route('createSchedule.create', project.project_id)">
-                    <ProjectCard :projectId="project.project_id" class="cursor-pointer"  :activo="false"/>
-                  </Link>
+                    <ProjectCard v-for="project of projects" :projectId="project.project_id" :activo="false"/>
                 </dl>
             </div>
         </div>
         <div class="grid grid-cols-1 gap-2 mb-8 md:grid-cols-2">
             <div class="m-4">
-                <div class="w-full p-4 font-extrabold text-center text-black bg-gradient-to-b from-gray-400 to-slate-50">
+                <div class="rounded-xl w-full p-4 font-extrabold text-center text-black bg-gradient-to-b from-gray-400 to-slate-50">
                     <h2 class="text-xl font-extrabold">Personal</h2>
                 </div>
                 <!-- <div class="flex justify-between">
@@ -71,7 +68,6 @@ const getTask = () => {
                             <div class="flex-1 px-4 py-2 text-sm truncate">
                                 <Link :href="route('dashboard.gerencias', project.title)" class="font-medium text-gray-900 hover:text-gray-600" v-if="project.title != null">{{ project.title }}</Link><p>Personas</p>
                             </div>
-
                         </div>
                     </div>
                 </div>

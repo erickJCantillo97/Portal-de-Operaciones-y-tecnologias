@@ -6,7 +6,6 @@ import { ref } from 'vue'
 const props = defineProps({
     assignments: {
         type: Array,
-        default: 0,
     },
     color: {
         type: String,
@@ -34,10 +33,11 @@ const letraAvatar = (cadena) => {
         for (var i = 0; i < 2; i++) {
             resultado += palabras[i].substring(0, 1);
         }
-    }else{
-    for (var i = 0; i < palabras.length; i++) {
-        resultado += palabras[i].substring(0, 1);
-    }}
+    } else {
+        for (var i = 0; i < palabras.length; i++) {
+            resultado += palabras[i].substring(0, 1);
+        }
+    }
     return resultado.toUpperCase();
 }
 
@@ -52,7 +52,8 @@ const letraAvatar = (cadena) => {
             alt="imagen"></Avatar> -->
         <Avatar v-for="assignment in assignments"
             v-tooltip.top="{ value: `<h4 class='text-center text-blue-800 bg-blue-200'>` + (assignment.name) + ` : ` + (assignment.units / 100) + ` UND</h4>`, escape: true, class: 'custom-error' }"
-            :class="class" style="background-color:#2196F3; color: #ffffff" shape="circle" :label="letraAvatar(assignment.name)" alt="imagen"></Avatar>
+            :class="class" style="background-color:#2196F3; color: #ffffff" shape="circle"
+            :label="letraAvatar(assignment.name)" alt="imagen"></Avatar>
     </AvatarGroup>
     <div v-else class="text-sm italic font-bold text-center text-red-600 uppercase animate-pulse">
         Sin asignaciones
