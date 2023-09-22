@@ -10,10 +10,10 @@ import DataTable from 'primevue/datatable';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import InputText from 'primevue/inputtext';
-import OverlayPanel from 'primevue/overlaypanel';
 import '../../../sass/dataTableCustomized.scss';
 import Avatars from '@/Components/Avatars.vue';
 import ProjectCard from '@/Components/ProjectCard.vue';
+import MinimalMenu from '@/Components/MinimalMenu.vue';
 
 const props = defineProps({
     projects: Array,
@@ -107,7 +107,25 @@ const filterProject = (id) => {
     filters.value['project.id'].value = id;
 }
 
-//#region Obtener API de Recursos
+//#region
+const items = ref([
+    {
+        label: 'Editar recursos',
+        icon: 'fa-solid fa-chart-gantt',
+        url: {
+            name: 'createSchedule.create',
+            parametter: ''
+        }
+    },
+    {
+        label: 'Ver programacion',
+        icon: 'fa-solid fa-list-check',
+        url: {
+            name: 'programming',
+            parametter: ''
+        }
+    },
+]);
 
 //#endregion
 
@@ -127,12 +145,18 @@ const filterProject = (id) => {
                 <div class="flex space-x-2 my-4 ">
                     <div class=" w-1/12 hidden md:block">
                         <Button icon="pi pi-filter-slash shadow-xl" @click="filterProject()" type="button" text=""
-                        severity="primary" class="hover:bg-primary ">
-                        Ver Todos
-                    </Button>
+                            severity="primary" class="hover:bg-primary ">
+                            Ver Todos
+                        </Button>
                     </div>
+<<<<<<< HEAD
                     <div class="flex max-w-full md:w-11/12 space-x-2 shadow-sm shadow-primary rounded-xl p-1 overflow-x-auto">
                         <ProjectCard v-for="project in projects" :projectId=project class="cursor-pointer" @click="filterProject(project)" :activo="filters['project.id'].value == project"/>
+=======
+                    <div class="flex w-11/12 space-x-2 shadow-sm shadow-primary rounded-xl p-1">
+                        <ProjectCard v-for="project in projects" :projectId=project class="cursor-pointer"
+                            @click="filterProject(project)" :activo="filters['project.id'].value == project" />
+>>>>>>> e76bdba24fc85d31b578ce83a308a9aa7483a4c0
                     </div>
                 </div>
 
@@ -191,7 +215,8 @@ const filterProject = (id) => {
 
                 <!--COLUMNAS-->
                 <Column field="name" header="Tarea"></Column>
-                <Column field="project.ship.name" header="Proyecto" :show-filter-match-modes="false" v-if="filters['project.id'].value == null">
+                <Column field="project.ship.name" header="Proyecto" :show-filter-match-modes="false"
+                    v-if="filters['project.id'].value == null">
                     <!-- <template #body="{ data }">
                     {{ data.project.name }}
                 </template> -->
@@ -222,17 +247,13 @@ const filterProject = (id) => {
                         <Avatars :assignments=slotProps.data.assignments />
                     </template>
                 </Column>
-                <Column field="" header="Acciones">
+                <Column field="" header="Acciones" bodyStyle="text-align:center">
                     <template #body="slotProps">
-                        <!--BOTÓN VER RECURSOS-->
-                        <div
-                            class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
-                            <!--BOTÓN VER RECURSOS-->
-                            <div title="Ver Recursos">
-                                <AssignmentModal :task="slotProps.data"></AssignmentModal>
-
-                            </div>
-                        </div>
+                        <MinimalMenu :items="items" :header="true">
+                            <template #header>
+                                <p class="text-black text-center">{{slotProps.data.name}}</p>
+                            </template>
+                        </MinimalMenu>
                     </template>
                 </Column>
             </DataTable>
