@@ -115,7 +115,7 @@ const filterProject = (id) => {
 
 <template>
     <AppLayout>
-        <div class="w-full p-4 px-auto">
+        <div class="w-full md:p-4 px-auto">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
@@ -125,15 +125,15 @@ const filterProject = (id) => {
             </div>
             <div>
                 <div class="flex space-x-2 my-4 ">
-                    <div class="p-1 w-1/12">
+                    <div class=" w-1/12 hidden md:block">
                         <Button icon="pi pi-filter-slash shadow-xl" @click="filterProject()" type="button" text=""
                         severity="primary" class="hover:bg-primary ">
                         Ver Todos
                     </Button>
                     </div>
-                    <div class="flex w-11/12 space-x-2 shadow-sm shadow-primary rounded-xl p-1">
+                    <div class="flex max-w-full md:w-11/12 space-x-2 shadow-sm shadow-primary rounded-xl p-1 overflow-x-auto">
                         <ProjectCard v-for="project in projects" :projectId=project class="cursor-pointer" @click="filterProject(project)" :activo="filters['project.id'].value == project"/>
-                </div>
+                    </div>
                 </div>
 
             </div>
@@ -159,12 +159,12 @@ const filterProject = (id) => {
                             </Button>
                             <span class="p-float-label">
                                 <InputText id="buscar" v-model="filters.global.value" type="search"
-                                    class="block text-gray-900 rounded-md shadow-xl alturah8 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                    class="block text-gray-900 rounded-md shadow-xl placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                                 <label for="buscar">Buscar...</label>
                             </span>
                         </div>
                         <div class="flex justify-end mb-2 space-x-4 alturah8">
-                            <span class="shadow-xl alturah8">
+                            <span class="shadow-xl hidden md:block">
                                 <button type="button"
                                     :class="optionValue == 'today' ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
                                     @click="getTask('today')"
