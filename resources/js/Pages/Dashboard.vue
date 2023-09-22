@@ -52,6 +52,10 @@ const getTask = () => {
                 </dl>
             </div>
         </div>
+        <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
+            <TimeLine :projects="props.projects"></TimeLine>
+        </div>
+
         <div class="grid grid-cols-1 gap-2 mb-8 md:grid-cols-2">
             <div class="m-4">
                 <div
@@ -98,8 +102,9 @@ const getTask = () => {
                     </li>
                 </ul>
                 </div> -->
-                <TimeLine :projects="props.projects"></TimeLine>
+                <!-- <TimeLine :projects="props.projects"></TimeLine> -->
             </div>
         </div>
+
     </AppLayout>
 </template>

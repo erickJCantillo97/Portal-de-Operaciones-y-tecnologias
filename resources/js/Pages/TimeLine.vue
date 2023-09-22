@@ -1,54 +1,99 @@
 <script setup>
-import { ref } from 'vue';
+
 const props = defineProps({
     projects: Array,
 })
-const project = ref();
-// import 'https://www.gstatic.com/charts/loader.js'
-// Load the Visualization API and the corechart package.
-google.charts.load('current', { 'packages': ['gantt'] });
 
-// Set a callback to run when the Google Visualization API is loaded.
-google.charts.setOnLoadCallback(drawChart);
-
-
-// Callback that creates and populates a data table,
-// instantiates the pie chart, passes in the data and
-// draws it.
-function drawChart() {
-
-    var data = new google.visualization.DataTable();
-    data.addColumn('string', 'Task ID');
-    data.addColumn('string', 'Task Name');
-    data.addColumn('string', 'Resource');
-    data.addColumn('date', 'Start Date');
-    data.addColumn('date', 'End Date');
-    data.addColumn('number', 'Duration');
-    data.addColumn('number', 'Percent Complete');
-    data.addColumn('string', 'Dependencies');
-    props.projects.forEach(element => {
-        data.addRows([
-            [String(element.id), String(element.name), null,
-            new Date(element.fechaI), new Date(element.fechaF), null, parseInt(element.avance), null],
-        ])
-    });
-
-    var options = {
-        height: 400,
-        gantt: {
-            trackHeight: 30
-        }
+var datos = [];
+const getRandomColor = () => {
+    const getRandomNumber = (maxNum) => {
+        return Math.floor(Math.random() * maxNum);
     };
 
-    var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
+    const h = getRandomNumber(360);
+    const s = getRandomNumber(100);
+    const l = getRandomNumber(100);
 
-    chart.draw(data, options);
+    return `hsl(${h}deg, ${s}%, ${l}%)`;
+};
+
+props.projects.forEach(project => {
+    const randomColor = getRandomColor();
+    let a = {
+        x: project.name,
+        y: [
+            new Date(project.fechaI).getTime(),
+            new Date(project.fechaF).getTime()
+        ],
+        fillColor: randomColor
+    }
+    datos.push(a)
+});
+const series = [{
+    data: datos
 }
+]
+
+const chartOptions = {
+    chart: {
+        height: 350,
+        type: 'rangeBar',
+        defaultLocale: 'es',
+        locales: [{
+            name: 'es',
+            options: {
+                months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octuber', 'Noviembre', 'Dicembre'],
+                shortMonths: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                days: ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'],
+                shortDays: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+                toolbar: {
+                    download: 'Descargar SVG',
+                    selection: 'Seleccion',
+                    selectionZoom: 'Selecionar Zoom',
+                    zoomIn: 'Acercarse',
+                    zoomOut: 'Alejarse',
+                    pan: 'Arrastrar',
+                    reset: 'Reiniciar Zoom',
+                }
+            }
+        }]
+    },
+    plotOptions: {
+        bar: {
+            horizontal: true
+        }
+    },
+    xaxis: {
+        axisBorder: {
+            show: true,
+            color: "#008FFB"
+        },
+        type: 'datetime',
+    },
+    yaxis: {
+        show: false
+    },
+    dataLabels: {
+        enabled: true,
+        formatter: function (val, opts) {
+            var label = opts.w.globals.labels[opts.dataPointIndex]
+            // var a = moment(val[0])
+            // var b = moment(val[1])
+            // var diff = b.diff(a, 'days')
+            console.log(label)
+            return label
+        },
+        style: {
+            colors: ['#f3f4f5', '#fff']
+        }
+    },
+
+}
+
 </script>
 
 <template>
-    <div class="w-full p-4 font-extrabold text-center text-black bg-gradient-to-b from-blue-400 to-slate-50">
-        <h2 class="text-xl font-extrabold ">Linea de tiempo proyectos activos</h2>
+    <div class="relative">
+        <apexchart type="rangeBar" height="350" :options="chartOptions" :series="series"></apexchart>
     </div>
-    <div id="chart_div"></div>
 </template>

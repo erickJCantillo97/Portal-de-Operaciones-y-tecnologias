@@ -29,7 +29,9 @@
         "@sweetalert2/themes": "^5.0.15",
         "@vue-hero-icons/outline": "^1.7.2",
         "@vue-hero-icons/solid": "^1.7.2",
+        "apexcharts": "^3.42.0",
         "inflected": "^2.1.0",
+        "moment": "^2.29.4",
         "pluralize": "^8.0.0",
         "pluralize-es": "^1.0.0",
         "primeicons": "^6.0.1",
@@ -37,6 +39,7 @@
         "sass": "^1.66.1",
         "sweetalert2": "^11.7.28",
         "vue-google-charts": "^1.1.0",
-        "vue-height-collapsible": "^0.1.1"
+        "vue-height-collapsible": "^0.1.1",
+        "vue3-apexcharts": "^1.4.4"
     }
 }
