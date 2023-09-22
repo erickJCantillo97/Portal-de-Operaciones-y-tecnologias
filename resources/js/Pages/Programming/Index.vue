@@ -1,8 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { router, useForm } from '@inertiajs/vue3';
 import { FilterMatchMode } from 'primevue/api';
-import AssignmentModal from './AssignmentModal.vue';
 import Button from '@/Components/Button.vue';
 import Calendar from 'primevue/calendar';
 import Column from 'primevue/column';
@@ -142,21 +140,16 @@ const items = ref([
                 </div>
             </div>
             <div>
-                <div class="flex space-x-2 my-4 ">
-                    <div class=" w-1/12 hidden md:block">
+                <div class="flex my-4 space-x-2 ">
+                    <div class="hidden w-1/12  md:block">
                         <Button icon="pi pi-filter-slash shadow-xl" @click="filterProject()" type="button" text=""
                             severity="primary" class="hover:bg-primary ">
                             Ver Todos
                         </Button>
                     </div>
-<<<<<<< HEAD
-                    <div class="flex max-w-full md:w-11/12 space-x-2 shadow-sm shadow-primary rounded-xl p-1 overflow-x-auto">
-                        <ProjectCard v-for="project in projects" :projectId=project class="cursor-pointer" @click="filterProject(project)" :activo="filters['project.id'].value == project"/>
-=======
-                    <div class="flex w-11/12 space-x-2 shadow-sm shadow-primary rounded-xl p-1">
+                    <div class="flex w-11/12 p-1 space-x-2 shadow-sm shadow-primary rounded-xl">
                         <ProjectCard v-for="project in projects" :projectId=project class="cursor-pointer"
                             @click="filterProject(project)" :activo="filters['project.id'].value == project" />
->>>>>>> e76bdba24fc85d31b578ce83a308a9aa7483a4c0
                     </div>
                 </div>
 
@@ -188,7 +181,7 @@ const items = ref([
                             </span>
                         </div>
                         <div class="flex justify-end mb-2 space-x-4 alturah8">
-                            <span class="shadow-xl hidden md:block">
+                            <span class="hidden shadow-xl md:block">
                                 <button type="button"
                                     :class="optionValue == 'today' ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
                                     @click="getTask('today')"
@@ -251,7 +244,7 @@ const items = ref([
                     <template #body="slotProps">
                         <MinimalMenu :items="items" :header="true">
                             <template #header>
-                                <p class="text-black text-center">{{slotProps.data.name}}</p>
+                                <p class="text-center text-black">{{slotProps.data.name}}</p>
                             </template>
                         </MinimalMenu>
                     </template>

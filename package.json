@@ -22,7 +22,6 @@
     "dependencies": {
         "@bryntum/gantt": "npm:@bryntum/gantt-trial@^5.5.1",
         "@bryntum/gantt-vue-3": "^5.5.1",
-        "@google-web-components/google-chart": "^5.0.5",
         "@headlessui/vue": "^1.7.16",
         "@heroicons/vue": "^2.0.18",
         "@suadelabs/vue3-multiselect": "^1.0.2",
@@ -36,7 +35,8 @@
         "primeicons": "^6.0.1",
         "primevue": "^3.32.2",
         "sass": "^1.66.1",
-        "sweetalert2": "^11.6.13",
+        "sweetalert2": "^11.7.28",
+        "vue-google-charts": "^1.1.0",
         "vue-height-collapsible": "^0.1.1"
     }
 }

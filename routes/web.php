@@ -28,12 +28,17 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/dashboard', function () {
 
         $taskProject = VirtualTask::whereNull('task_id')->get()->map(function ($item) {
+
             return [
                 'id' => $item->id,
                 'project_id' => $item->project->id,
                 'avance'=>number_format($item['percentDone'], 2,),
                 'name' => $item['name'],
-                'file' => $item->project->contract->ship->file
+                'file' => $item->project->contract->ship->file,
+                'duracion' => $item->duration,
+                'fechaI'=>$item->startDate,
+                'fechaF'=>$item->endDate,
+                'unidadDuracion'=>$item->durationUnit
             ];
         });
         return Inertia::render('Dashboard', [
