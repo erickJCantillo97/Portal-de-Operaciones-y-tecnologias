@@ -34,6 +34,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     //CRUD Projects
     Route::resource('projects', ProjectController::class);
+    Route::resource('tasks', TaskController::class);
 
     //CRUD Authorizations
     Route::resource('authorizations', AuthorizationController::class);
