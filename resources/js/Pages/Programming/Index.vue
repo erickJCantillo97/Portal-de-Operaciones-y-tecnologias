@@ -246,7 +246,7 @@ const items = ref([
                     <template #body="slotProps">
                         <MinimalMenu :items="items" :header="true">
                             <template #header>
-                                <p class="text-black text-center">{{slotProps.data.name}}</p>
+                                <p class="text-black text-center">{{ slotProps.data.name }}</p>
                             </template>
                         </MinimalMenu>
                     </template>

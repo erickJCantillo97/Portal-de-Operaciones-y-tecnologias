@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Projects;
 
+use App\Events\TestWebsocket;
 use App\Http\Controllers\Controller;
 use App\Models\Projects\Contract;
 use App\Models\Projects\Customer;
@@ -62,7 +63,8 @@ class ContractController extends Controller
                     $validateData['name'].'.'.$request->pdf->getClientOriginalExtension()
                 );
             }
-            Contract::create($validateData);
+            $contract = Contract::create($validateData);
+            event(new TestWebsocket($contract));
 
             return back()->with(['message' => 'Contrato creado correctamente'], 200);
         } catch (Exception $e) {

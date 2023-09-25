@@ -5,6 +5,7 @@ import { router, useForm } from '@inertiajs/vue3';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import "@/push.min.js"
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
@@ -47,6 +48,10 @@ const formData = useForm({
 //#endregion
 
 onMounted(() => {
+    window.Echo.private('contracts')
+        .listen('.TestWebsocket', (e) => {
+            Push.create(e.data)
+        })
     initFilters();
 })
 

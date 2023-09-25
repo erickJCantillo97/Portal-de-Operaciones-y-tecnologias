@@ -30,10 +30,13 @@
         "@vue-hero-icons/outline": "^1.7.2",
         "@vue-hero-icons/solid": "^1.7.2",
         "inflected": "^2.1.0",
+        "laravel-echo": "^1.15.3",
         "pluralize": "^8.0.0",
         "pluralize-es": "^1.0.0",
         "primeicons": "^6.0.1",
         "primevue": "^3.32.2",
+        "push.js": "^1.0.12",
+        "pusher-js": "^8.3.0",
         "sass": "^1.66.1",
         "sweetalert2": "^11.7.27",
         "vue-height-collapsible": "^0.1.1"

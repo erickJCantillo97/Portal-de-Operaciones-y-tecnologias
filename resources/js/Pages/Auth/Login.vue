@@ -7,10 +7,6 @@ import InputLabel from '@/Components/InputLabel.vue';
 import Button from '@/Components/Button.vue';
 import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
 import AuthenticationCard from '@/Components/AuthenticationCard.vue';
-
-
-
-
 defineProps({
     canResetPassword: Boolean,
     status: String,
@@ -21,8 +17,6 @@ const form = useForm({
     password: '',
     remember: false,
 });
-
-
 
 const submit = () => {
     form.transform(data => ({

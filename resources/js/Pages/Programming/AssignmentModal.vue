@@ -1,6 +1,6 @@
 <script setup>
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { EyeIcon} from '@heroicons/vue/24/outline';
+import { EyeIcon } from '@heroicons/vue/24/outline';
 import { ref, onMounted } from 'vue';
 import Button from '@/Components/Button.vue';
 import MultiSelect from 'primevue/multiselect';
@@ -27,16 +27,16 @@ onMounted(() => {
 
 });
 
-const getAssignmentsTask = async() => {
+const getAssignmentsTask = async () => {
     await axios.get(route('get.assignments.task', props.task.id))
         .then((res) => {
             assignments.value = res.data.assignments
-            if(assignments.value.length > 0){
-                for(var assignment of assignments.value){
+            if (assignments.value.length > 0) {
+                for (var assignment of assignments.value) {
                     console.log(assignment.name);
                     axios.get(route('get.personal.cargo')).then((res) => {
-                            personal.value[assignment.name] = res.data.personal[assignment.name];
-                        })
+                        personal.value[assignment.name] = res.data.personal[assignment.name];
+                    })
                 }
             }
             open.value = true
@@ -47,8 +47,7 @@ const getAssignmentsTask = async() => {
 </script>
 
 <template>
-    <Button severity="primary" @click="getAssignmentsTask()"
-        class="hover:bg-primary">
+    <Button severity="primary" @click="getAssignmentsTask()" class="hover:bg-primary">
         <EyeIcon class="w-4 h-4 " aria-hidden="true" />
     </Button>
 
@@ -60,7 +59,8 @@ const getAssignmentsTask = async() => {
             </TransitionChild>
 
             <div class="fixed inset-0 z-50 h-screen overflow-y-auto ">
-                <div class="flex items-center justify-center max-h-full overflow-y-auto custom-scroll  p-4 text-center  sm:p-0">
+                <div
+                    class="flex items-center justify-center max-h-full overflow-y-auto custom-scroll  p-4 text-center  sm:p-0">
                     <TransitionChild as="template" enter="ease-out duration-300"
                         enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                         enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
@@ -76,17 +76,20 @@ const getAssignmentsTask = async() => {
                                     <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
                                         <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
                                             <!-- Contenedor de datos -->
-                                                <ul>
-                                                    <li v-for="assignment in assignments" :key="assignment.id" class="text-center">
-                                                        <label for="password" class="block capitalize text-sm font-mediumtext-gray-900">
-                                                            {{assignment.name}}
-                                                        </label>
-                                                    <MultiSelect v-model="personalSelect" :options="personal[assignment.name]" filter optionLabel="Nombres_Apellidos"
-                                                    display="chip"
-                                                     :placeholder="'Selecionar ' + assignment.name"
+                                            <ul>
+                                                <li v-for="assignment in assignments" :key="assignment.id"
+                                                    class="text-center">
+                                                    <label for="password"
+                                                        class="block capitalize text-sm font-mediumtext-gray-900">
+                                                        {{ assignment.name }}
+                                                    </label>
+                                                    <MultiSelect v-model="personalSelect"
+                                                        :options="personal[assignment.name]" filter
+                                                        optionLabel="Nombres_Apellidos" display="chip"
+                                                        :placeholder="'Selecionar ' + assignment.name"
                                                         :maxSelectedLabels="4" class="w-full md:w-20rem" />
-                                                    </li>
-                                                </ul>
+                                                </li>
+                                            </ul>
 
                                         </div>
                                     </div>
@@ -107,6 +110,5 @@ const getAssignmentsTask = async() => {
             </div>
         </Dialog>
     </TransitionRoot>
-
 </template>
 
