@@ -12,6 +12,7 @@ import "primevue/resources/themes/mdc-light-indigo/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 import Tooltip from 'primevue/tooltip';
+import VueApexCharts from "vue3-apexcharts";
 const appName = import.meta.env.VITE_APP_NAME || "Portal de Operaciones Tecnológicas";
 
 createInertiaApp({
@@ -31,6 +32,7 @@ createInertiaApp({
                 ripple: true,
                 locale: optionsPrimeVUE
             })
+            .use(VueApexCharts)
             .directive('tooltip', Tooltip)
             .mount(el);
     },
