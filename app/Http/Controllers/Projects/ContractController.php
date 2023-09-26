@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Projects;
 
-use App\Events\TestWebsocket;
+use App\Events\ContractEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Projects\Contract;
 use App\Models\Projects\Customer;
@@ -64,7 +64,7 @@ class ContractController extends Controller
                 );
             }
             $contract = Contract::create($validateData);
-            event(new TestWebsocket($contract));
+            event(new ContractEvent($contract, 'created'));
 
             return back()->with(['message' => 'Contrato creado correctamente'], 200);
         } catch (Exception $e) {
@@ -113,6 +113,7 @@ class ContractController extends Controller
                 );
             }
             $contract->update($validateData);
+            event(new ContractEvent($contract, 'updated'));
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
@@ -125,6 +126,7 @@ class ContractController extends Controller
     {
         try {
             $contract->delete();
+            event(new ContractEvent($contract, 'deleted'));
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }

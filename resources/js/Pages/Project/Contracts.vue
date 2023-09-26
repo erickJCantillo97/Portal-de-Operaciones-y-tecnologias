@@ -5,12 +5,13 @@ import { router, useForm } from '@inertiajs/vue3';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import "@/push.min.js"
+import "@/Composable/push.min.js";
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
 import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline';
 import { useSweetalert } from '@/composable/sweetAlert';
+import { webNotifications } from '@/composable/webNotifications';
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
 import Combobox from '@/Components/Combobox.vue';
@@ -21,6 +22,7 @@ const { confirmDelete } = useSweetalert();
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
+const { contractNotification } = webNotifications();
 
 const customerSelect = ref({});
 const shipSelect = ref({});
@@ -48,17 +50,34 @@ const formData = useForm({
 //#endregion
 
 onMounted(() => {
-    window.Echo.private('contracts')
-        .listen('.TestWebsocket', (e) => {
-            Push.create(e.data)
-        })
+    // window.Echo.private("contracts").listen(".ContractsEvent", (e) => {
+    //     // Push.Permission.get();
+    //     const customerName = customerSelect.value
+    //         ? customerSelect.value.name
+    //         : "Cliente no seleccionado";
+    //     const shipName = shipSelect.value
+    //         ? shipSelect.value.name
+    //         : "Buque no seleccionado";
+    //     Push.create(e.message, {
+    //         body: `Cliente: ${customerName},
+    //                 \nBuque: ${shipName},
+    //                 \nCosto: ${formatCurrency(formData.cost)}`,
+    //         icon: "/images/cotecmar-logo-bg-white.png",
+    //         requireInteraction: true,
+    //         // timeout: 5000,
+    //         onClick: function () {
+    //             window.open("https://www.cotecmar.com/", "_blank");
+    //             this.close();
+    //         },
+    //     });
+    // });
+    contractNotification(customerSelect, shipSelect, formData.cost);
     initFilters();
 })
 
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
-
     if (!customerSelect.value) {
         toast('Por favor seleccione un cliente.', 'error')
         return;
