@@ -1,4 +1,6 @@
 <?php
+
+use App\Events\TestWebsocket;
 use App\Models\Gantt\Task;
 use App\Models\Process;
 use App\Models\Projects\Project;
@@ -37,16 +39,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
                 'file' => $item->project->contract->ship->file,
                 'contrato'=>$item->project->contract->name,
                 'duracion' => $item->duration,
-<<<<<<< HEAD
                 'fechaI'=>$item->startDate,
                 'fechaF'=>$item->endDate,
                 'unidadDuracion'=>$item->durationUnit,
                 'costo'=>$item->project->contract->cost
-=======
-                'fechaI' => $item->startDate,
-                'fechaF' => $item->endDate,
-                'unidadDuracion' => $item->durationUnit,
->>>>>>> f0849b38f043b01e9d8a2aba327c4b10a83a1998
             ];
         });
 
@@ -157,7 +153,6 @@ Route::get('costoPersonal', function () {
 
     return $sum;
 });
-<<<<<<< HEAD
 
 Route::get('/timeline', function () {
 
@@ -180,5 +175,3 @@ Route::get('/timeline', function () {
     ]);
 })->name('timeline');
 
-=======
->>>>>>> 61235512b4e4d9975b2dd251e1b70c33c5eefe34
