@@ -62,7 +62,7 @@ const broadcastChannel = () => {
             </div>
         </div>
         <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
-            <PieChart></PieChart>
+            <PieChart :title="props.projects.name"></PieChart>
         </div>
         <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
             <TimeLine :projects="props.projects"></TimeLine>

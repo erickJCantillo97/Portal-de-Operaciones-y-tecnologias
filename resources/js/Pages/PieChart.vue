@@ -38,8 +38,8 @@ use([
 
 const option = {
     title: {
-        text: 'Referer of a Website',
-        subtext: 'Fake Data',
+        text: 'Proyectos',
+        subtext: 'Cotecmar 2023',
         left: 'center'
     },
     tooltip: {
@@ -51,8 +51,8 @@ const option = {
             type: 'pie',
             data: [
                 {
-                    value: 335,
-                    name: 'Apple',
+                    value: 27,
+                    name: 'MN ORINOCO II',
                     label: {
                         show: true,
                         position: 'middle',
@@ -60,8 +60,8 @@ const option = {
                     }
                 },
                 {
-                    value: 310,
-                    name: 'Grapes',
+                    value: 2,
+                    name: 'ARC 20 DE JULIO',
                     label: {
                         show: true,
                         position: 'middle',
@@ -69,32 +69,14 @@ const option = {
                     }
                 },
                 {
-                    value: 234,
-                    name: 'Pineapples',
+                    value: 83,
+                    name: 'RM PUNTA BORINQUEN',
                     label: {
                         show: true,
                         position: 'middle',
                         formatter: '{b}: ({d}%)'
                     }
                 },
-                {
-                    value: 135,
-                    name: 'Oranges',
-                    label: {
-                        show: true,
-                        position: 'middle',
-                        formatter: '{b}: ({d}%)'
-                    }
-                },
-                {
-                    value: 1548,
-                    name: 'Bananas',
-                    label: {
-                        show: true,
-                        position: 'middle',
-                        formatter: '{b}: ({d}%)'
-                    }
-                }
             ]
         }
     ]
@@ -107,6 +89,6 @@ const option = {
 </style>
 <template>
     <div>
-        <v-chart class="chart" :option="option" autoresize />
+        <v-chart class="chart" :option="option" :title="title" :tooltip="tooltip" :series="series" autoresize />
     </div>
 </template>
