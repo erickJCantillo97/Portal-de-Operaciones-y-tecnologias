@@ -14,7 +14,8 @@
                         <span class="sr-only">Open sidebar</span>
                         <Bars3CenterLeftIcon class="h-6 w-6" aria-hidden="true" />
                     </button>
-                    <h1 class="hidden lg:block text-primary font-extrabold text-xl">Portal de Operaciones Tecnológicas</h1>
+                    <h1 class="hidden lg:block text-primary font-extrabold text-xl">Portal de Operaciones Tecnológicas e
+                        Inteligencia Artificial</h1>
                 </div>
                 <div class="flex ">
                     <div class="flex items-center ">

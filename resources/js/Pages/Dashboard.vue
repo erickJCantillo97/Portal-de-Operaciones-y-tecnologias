@@ -7,6 +7,7 @@ import { Link } from '@inertiajs/vue3';
 const { hasRole } = usePermissions();
 import UserHeader from '@/Components/sections/UserHeader.vue';
 import ProjectCard from '@/Components/ProjectCard.vue';
+<<<<<<< HEAD
 import DataTable from 'primevue/datatable';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import Column from 'primevue/column';
@@ -16,12 +17,14 @@ import Button from '@/Components/Button.vue';
 import ProgressBar from 'primevue/progressbar';
 import '../../sass/dataTableCustomized.scss';
 // import TimeLine from './TimeLine.vue';
+=======
+
+>>>>>>> 61235512b4e4d9975b2dd251e1b70c33c5eefe34
 const props = defineProps({
     projects: Array,
     costoMes: Number,
 })
 const colors = { GEDIN: 'bg-blue-500', VPEXE: 'bg-gray-500', GEMAM: 'bg-teal-500', 'VPT&O': 'bg-yellow-500', GEBOC: 'bg-cyan-500', GECTI: 'bg-indigo-500', GETHU: 'bg-red-500', PCTMAR: 'bg-purple-500', GEFAD: 'bg-sky-500', GECON: 'bg-pink-500' }
-
 
 const personal = ref([])
 const totalMembers = ref(0)
@@ -62,6 +65,7 @@ const getTask = () => {
     })
 }
 
+<<<<<<< HEAD
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -71,6 +75,16 @@ const initFilters = () => {
 const clearFilter = () => {
     initFilters();
 };
+=======
+const broadcastChannel = () => {
+    setTimeout(() => {
+        window.Echo.private('testing')
+            .listen('.MyWebSocket', (e) => {
+                alert(e.data);
+            })
+    }, 200);
+}
+>>>>>>> 61235512b4e4d9975b2dd251e1b70c33c5eefe34
 </script>
 
 <template>
@@ -135,14 +149,17 @@ const clearFilter = () => {
                 </div>
             </div>
         </div>
+<<<<<<< HEAD
         <!-- <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
             <TimeLine :projects="props.projects"></TimeLine>
         </div> -->
 
+=======
+>>>>>>> 61235512b4e4d9975b2dd251e1b70c33c5eefe34
         <div class="grid grid-cols-1 gap-2 mb-8 md:grid-cols-2">
             <div class="m-4">
                 <div
-                    class="w-full p-4 font-extrabold text-center text-black rounded-xl bg-gradient-to-b from-gray-400 to-slate-50">
+                    class="rounded-xl w-full p-4 font-extrabold text-center text-black bg-gradient-to-b from-gray-400 to-slate-50">
                     <h2 class="text-xl font-extrabold">Personal</h2>
                 </div>
                 <!-- <div class="flex justify-between">
@@ -187,6 +204,5 @@ const clearFilter = () => {
                 </div>
             </div>
         </div>
-
     </AppLayout>
 </template>

@@ -1,7 +1,7 @@
 <?php
 
+use App\Events\TestWebsocket;
 use App\Models\Gantt\Task;
-use App\Models\Labor;
 use App\Models\Process;
 use App\Models\Projects\Project;
 use App\Models\SWBS\SubSystem;
@@ -15,24 +15,26 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+
     return Inertia::render('Auth/Login', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
+
 });
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
     Route::get('/dashboard', function () {
-
+        // event(new TestWebsocket());
         $taskProject = VirtualTask::whereNull('task_id')->get()->map(function ($item) {
 
             return [
                 'id' => $item->id,
                 'project_id' => $item->project->id,
-                'avance'=>number_format($item['percentDone'], 2,),
+                'avance' => number_format($item['percentDone'], 2),
                 'name' => $item['name'],
                 'file' => $item->project->contract->ship->file,
                 'contrato'=>$item->project->contract->name,
@@ -43,6 +45,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
                 'costo'=>$item->project->contract->cost
             ];
         });
+
         return Inertia::render('Dashboard', [
             'projects' => $taskProject,
         ]);
@@ -52,6 +55,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         if (auth()->user()->hasRole('Super Admin')) {
             return getEmpleadosAPI()->groupBy('GERENCIA');
         }
+
         return searchEmpleados('Gerencia', auth()->user()->gerencia)->groupBy('Oficina');
     })->name('get.empleados.gerencia');
 
@@ -78,29 +82,30 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('actividadesDeultimonivel', function (Request $request) {
 
-            if(isset($request->dates[0])){
-                $date_start = Carbon::parse($request->dates[0])->format('Y-m-d');
-                $date_end = Carbon::parse($request->dates[1])->format('Y-m-d');
-            }else{
-                $date_start = Carbon::now()->format('Y-m-d');
-                $date_end = Carbon::now()->format('Y-m-d');
-            }
+        if (isset($request->dates[0])) {
+            $date_start = Carbon::parse($request->dates[0])->format('Y-m-d');
+            $date_end = Carbon::parse($request->dates[1])->format('Y-m-d');
+        } else {
+            $date_start = Carbon::now()->format('Y-m-d');
+            $date_end = Carbon::now()->format('Y-m-d');
+        }
 
-            $tareas =  VirtualTask::whereNotNull('task_id')->select('task_id')->get()->toArray();
+        $tareas = VirtualTask::whereNotNull('task_id')->select('task_id')->get()->toArray();
 
-            $ids = array_map(function ($objeto) {
-                return $objeto['task_id'];
-            }, $tareas);
-            return response()->json(
-                VirtualTask::with('project', 'project.ship', 'assignments')->where(function ($query) use ($date_start, $date_end) {
-                    $query->whereBetween('startdate', [$date_start, $date_end])
-                        ->orWhereBetween('enddate', [$date_start, $date_end])
-                        ->orWhere(function ($query) use ($date_start, $date_end) {
-                            $query->where('enddate', '>', $date_end)
-                                    ->where('startdate', '<', $date_start);
-                        });
-                })->whereNotIn('id', array_unique($ids))->get(),
-            );
+        $ids = array_map(function ($objeto) {
+            return $objeto['task_id'];
+        }, $tareas);
+
+        return response()->json(
+            VirtualTask::with('project', 'project.ship', 'assignments')->where(function ($query) use ($date_start, $date_end) {
+                $query->whereBetween('startdate', [$date_start, $date_end])
+                    ->orWhereBetween('enddate', [$date_start, $date_end])
+                    ->orWhere(function ($query) use ($date_start, $date_end) {
+                        $query->where('enddate', '>', $date_end)
+                            ->where('startdate', '<', $date_start);
+                    });
+            })->whereNotIn('id', array_unique($ids))->get(),
+        );
 
     })->name('actividadesDeultimonivel');
 
@@ -118,7 +123,7 @@ Route::get('recuperarDatos', function () {
     foreach ($datos as $dato) {
         SubSystem::create((array) $dato);
     }
-    $datos = DB::connection('sqlsrv_anterior')->table('swbs_process')->select(['subsystem_id', 'validity', 'status','name', 'maintenance_type'])->get();
+    $datos = DB::connection('sqlsrv_anterior')->table('swbs_process')->select(['subsystem_id', 'validity', 'status', 'name', 'maintenance_type'])->get();
     foreach ($datos as $dato) {
         Process::create((array) $dato);
     }
@@ -126,31 +131,29 @@ Route::get('recuperarDatos', function () {
     return System::get();
 });
 
-
-
-
-Route::get('projectAvance', function (){
+Route::get('projectAvance', function () {
     $proyecto = Project::first();
 
     $taskProject = Task::where('project_id', $proyecto->id)->whereNull('task_id')->get()->map(function (Task $item) {
         return [
-            number_format($item['percentDone'], 2,),
-            $item['name']
+            number_format($item['percentDone'], 2),
+            $item['name'],
         ];
     });
+
     return $taskProject;
 });
 
-
-Route::get('costoPersonal', function(){
+Route::get('costoPersonal', function () {
 
     $personal = getPersonalGerenciaOficina(auth()->user()->gerencia);
     $sum = $personal->sum(function ($objeto) {
         return $objeto['Ingresos_Mes'];
     });
 
-    return  $sum;
+    return $sum;
 });
+<<<<<<< HEAD
 
 Route::get('/timeline', function () {
 
@@ -173,3 +176,5 @@ Route::get('/timeline', function () {
     ]);
 })->name('timeline');
 
+=======
+>>>>>>> 61235512b4e4d9975b2dd251e1b70c33c5eefe34

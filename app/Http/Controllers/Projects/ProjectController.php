@@ -174,9 +174,9 @@ class ProjectController extends Controller
             return [
                 'id' => $item->id,
                 'project_id' => $item->project->id,
-                'avance'=>number_format($item['percentDone'], 2,),
+                'avance' => number_format($item['percentDone'], 2),
                 'name' => $item['name'],
-                'file' => $item->project->contract->ship->file
+                'file' => $item->project->contract->ship->file,
             ];
         });
 
