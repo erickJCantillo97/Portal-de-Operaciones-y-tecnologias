@@ -1,5 +1,8 @@
 <script setup>
-
+import ProjectCard from '@/Components/ProjectCard.vue';
+import { ref } from 'vue';
+import PickList from 'primevue/picklist';
+import MultiSelect from 'primevue/multiselect';
 const props = defineProps({
     projects: Array,
 })
@@ -20,7 +23,7 @@ const getRandomColor = () => {
 props.projects.forEach(project => {
     const randomColor = getRandomColor();
     let a = {
-        x: project.name,
+        x: project.name.split(' '),
         y: [
             new Date(project.fechaI).getTime(),
             new Date(project.fechaF).getTime()
@@ -31,8 +34,7 @@ props.projects.forEach(project => {
 });
 const series = [{
     data: datos
-}
-]
+}]
 
 const chartOptions = {
     chart: {
@@ -60,40 +62,80 @@ const chartOptions = {
     },
     plotOptions: {
         bar: {
-            horizontal: true
+            horizontal: true,
         }
     },
     xaxis: {
-        axisBorder: {
-            show: true,
-            color: "#008FFB"
-        },
         type: 'datetime',
-    },
-    yaxis: {
-        show: false
-    },
-    dataLabels: {
-        enabled: true,
-        formatter: function (val, opts) {
-            var label = opts.w.globals.labels[opts.dataPointIndex]
-            // var a = moment(val[0])
-            // var b = moment(val[1])
-            // var diff = b.diff(a, 'days')
-            console.log(label)
-            return label
-        },
         style: {
-            colors: ['#f3f4f5', '#fff']
+            colors: [],
+            fontSize: '12px',
+            fontWeight: 400,
+            fontFamily: undefined,
+            cssClass: ''
+        },
+        labels: {
+            formatter: function (value) {
+                const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octuber', 'Noviembre', 'Dicembre'];
+                return months[new Date(value).getMonth()];
+            }
         }
     },
+    yaxis: {
+        show: true,
+    },
+
 
 }
+// const id = ref(null)
+const tasks = ref();
+const loading = ref(true)
+const tasksSelect=ref()
 
+const getTasks = (project) => {
+    console.log(project)
+    axios.get(route('tasks.index', { id: project.project_id })).then((res) => {
+        loading.value = false;
+        tasks.value = res.data.tasks
+        console.log(tasks.value)
+        // projects.value = [...new Set(res.data.map(obj => obj.project.id))]
+    })
+}
 </script>
 
 <template>
-    <div class="relative">
-        <apexchart type="rangeBar" height="350" :options="chartOptions" :series="series"></apexchart>
+    <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
+        <h3 class="text-xl font-medium text-primary">Seleciona un proyecto</h3>
+        <dl class="grid grid-cols-1 gap-5 mt-5 sm:grid-cols-2 lg:grid-cols-4">
+            <ProjectCard v-for="project in projects" :project=project class="cursor-pointer" @click="getTasks(project)"
+                :activo="false" />
+        </dl>
     </div>
-</template>
+    <div class="w-2/3 p-3 m-3 border-2 border-blue-100 rounded-xl">
+        <h3 class="text-xl font-medium text-primary">Seleciona una actividad</h3>
+        <dl class="grid grid-cols-1 gap-5 mt-5 sm:grid-cols-2 lg:grid-cols-4">
+            <MultiSelect v-model="tasksSelect" :options="tasks" optionLabel="name" placeholder="Select Countries"
+                display="chip" class="w-full md:w-20rem">
+                <template #option="slotProps">
+                    <div class="flex align-items-center">
+                        <!-- <img :alt="slotProps.option.name"
+                            src="https://primefaces.org/cdn/primevue/images/flag/flag_placeholder.png"
+                            :class="`flag flag-${slotProps.option.code.toLowerCase()} mr-2`" style="width: 18px" /> -->
+                        <div>{{ slotProps.option.name }}</div>
+                    </div>
+                </template>
+                <template #footer>
+                    <div class="py-2 px-3">
+                        <b>{{ tasksSelect ? tasksSelect.length : 0 }}</b> item{{ (tasksSelect ?
+                            tasksSelect.length : 0) > 1 ? 's' : '' }} selected.
+                    </div>
+                </template>
+            </MultiSelect>
+        </dl>
+        <!-- <ProjectCard :project="slotProps.item" :activo="false" :menu="false" /> -->
+    </div>
+    <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
+        <div class="relative">
+            <apexchart type="rangeBar" height="350" :options="chartOptions" :series="series"></apexchart>
+        </div>
+</div></template>

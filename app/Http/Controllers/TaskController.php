@@ -18,7 +18,7 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
-        $tasks = VirtualTask::where('project_id', $request->project)->get();
+        $tasks = VirtualTask::where('project_id', $request->id)->get();
 
         return response()->json([
             'tasks' => $tasks,
