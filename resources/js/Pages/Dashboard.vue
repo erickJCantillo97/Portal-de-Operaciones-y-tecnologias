@@ -7,8 +7,6 @@ import { Link } from '@inertiajs/vue3';
 const { hasRole } = usePermissions();
 import UserHeader from '@/Components/sections/UserHeader.vue';
 import ProjectCard from '@/Components/ProjectCard.vue';
-<<<<<<< HEAD
-<<<<<<< HEAD
 import DataTable from 'primevue/datatable';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import Column from 'primevue/column';
@@ -16,15 +14,10 @@ import Tag from 'primevue/tag';
 import { MagnifyingGlassIcon, PencilIcon, TrashIcon } from '@heroicons/vue/20/solid';
 import Button from '@/Components/Button.vue';
 import ProgressBar from 'primevue/progressbar';
+import PieChart from './PieChart.vue';
 import '../../sass/dataTableCustomized.scss';
 // import TimeLine from './TimeLine.vue';
-=======
 
->>>>>>> 61235512b4e4d9975b2dd251e1b70c33c5eefe34
-=======
-import TimeLine from './TimeLine.vue';
-import PieChart from './PieChart.vue';
->>>>>>> f0849b38f043b01e9d8a2aba327c4b10a83a1998
 const props = defineProps({
     projects: Array,
     costoMes: Number,
@@ -70,7 +63,6 @@ const getTask = () => {
     })
 }
 
-<<<<<<< HEAD
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -80,7 +72,6 @@ const initFilters = () => {
 const clearFilter = () => {
     initFilters();
 };
-=======
 const broadcastChannel = () => {
     setTimeout(() => {
         window.Echo.private('testing')
@@ -89,7 +80,6 @@ const broadcastChannel = () => {
             })
     }, 200);
 }
->>>>>>> 61235512b4e4d9975b2dd251e1b70c33c5eefe34
 </script>
 
 <template>
@@ -154,23 +144,13 @@ const broadcastChannel = () => {
                 </div>
             </div>
         </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
+        <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
+            <PieChart :title="props.projects.name"></PieChart>
+        </div>
         <!-- <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
             <TimeLine :projects="props.projects"></TimeLine>
-        </div> -->
+        </div>  -->
 
-=======
->>>>>>> 61235512b4e4d9975b2dd251e1b70c33c5eefe34
-=======
-        <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
-            <PieChart></PieChart>
-        </div>
-        <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
-            <TimeLine :projects="props.projects"></TimeLine>
-        </div>
-
->>>>>>> f0849b38f043b01e9d8a2aba327c4b10a83a1998
         <div class="grid grid-cols-1 gap-2 mb-8 md:grid-cols-2">
             <div class="m-4">
                 <div
