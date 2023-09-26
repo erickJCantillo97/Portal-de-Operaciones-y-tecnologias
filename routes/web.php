@@ -1,6 +1,4 @@
 <?php
-
-use App\Events\TestWebsocket;
 use App\Models\Gantt\Task;
 use App\Models\Process;
 use App\Models\Projects\Project;
@@ -38,9 +36,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
                 'name' => $item['name'],
                 'file' => $item->project->contract->ship->file,
                 'duracion' => $item->duration,
-                'fechaI'=>$item->startDate,
-                'fechaF'=>$item->endDate,
-                'unidadDuracion'=>$item->durationUnit
+                'fechaI' => $item->startDate,
+                'fechaF' => $item->endDate,
+                'unidadDuracion' => $item->durationUnit,
             ];
         });
 

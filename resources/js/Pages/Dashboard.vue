@@ -7,7 +7,8 @@ import { Link } from '@inertiajs/vue3';
 const { hasRole } = usePermissions();
 import UserHeader from '@/Components/sections/UserHeader.vue';
 import ProjectCard from '@/Components/ProjectCard.vue';
-
+import TimeLine from './TimeLine.vue';
+import PieChart from './PieChart.vue';
 const props = defineProps({
     projects: Array,
     costoMes: Number,
@@ -60,10 +61,17 @@ const broadcastChannel = () => {
                 </dl>
             </div>
         </div>
+        <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
+            <PieChart></PieChart>
+        </div>
+        <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
+            <TimeLine :projects="props.projects"></TimeLine>
+        </div>
+
         <div class="grid grid-cols-1 gap-2 mb-8 md:grid-cols-2">
             <div class="m-4">
                 <div
-                    class="rounded-xl w-full p-4 font-extrabold text-center text-black bg-gradient-to-b from-gray-400 to-slate-50">
+                    class="w-full p-4 font-extrabold text-center text-black rounded-xl bg-gradient-to-b from-gray-400 to-slate-50">
                     <h2 class="text-xl font-extrabold">Personal</h2>
                 </div>
                 <!-- <div class="flex justify-between">

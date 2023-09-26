@@ -17,9 +17,9 @@ use Illuminate\Support\Facades\Broadcast;
 //     return (int) $user->id === (int) $id;
 // });
 
-Broadcast::channel('testing', function () {
-    return true;
-});
+// Broadcast::channel('testing', function () {
+//     return true;
+// });
 
 Broadcast::channel('contracts', function () {
     return true;
