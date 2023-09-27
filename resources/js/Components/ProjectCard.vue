@@ -85,11 +85,11 @@ const items = ref([
         </div>
     </div> -->
     <div :class="activo ? 'bg-sky-500 text-white' : 'bg-white text-gray-90' + clases"
-        class="flex items-center h-14 p-1 space-x-3 rounded-md">
-        <Avatar style="border-radius: 10%;" :image=project.file size="large" />
+        class="flex items-center h-14 min-w-max p-1 space-x-3 rounded-md">
+        <img :src=project.file class="rounded-lg h-0 sm:h-12" />
         <div class="flex-col">
             <p class="text-xs font-bold">{{ project.name }}</p>
-            <p class="text-xs italic">Inicio: {{ project.fechaI }}</p>
+            <p class="text-xs italic">Inicio:</p><p> {{ project.fechaI }}</p>
             <!-- <ProgressBar v-if="avance" class="items-end" :value="parseInt(project.avance)"></ProgressBar> -->
         </div>
         <!-- <div v-if="menu" class="flex w-1/8 justify-center align-middle">

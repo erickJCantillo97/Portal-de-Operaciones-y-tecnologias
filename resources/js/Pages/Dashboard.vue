@@ -85,67 +85,64 @@ const broadcastChannel = () => {
 <template>
     <AppLayout>
         <UserHeader></UserHeader>
-        <div class="px-4 py-2 mt-4 sm:px-6">
-            <div>
-
-                <!-- <div class="max-w-full p-3 border-2 border-blue-100 rounded-xl">
+        <div class="px-4 py-2 sm:px-6">
+            <!-- <div class="max-w-full p-3 border-2 border-blue-100 rounded-xl">
                     <dl class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                         <ProjectCard v-for="project of projects" :project="project" :activo="false" />
                     </dl>
                 </div> -->
-                <div class="max-w-full p-3 mt-1 border-2 border-blue-100 rounded-xl">
-                    <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
-                        dataKey="id" filterDisplay="menu" :loading="loading"
-                        :globalFilterFields="['name', 'gerencia', 'start_date', 'end_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
-                        currentPageReportTemplate=" {first} al {last} de {totalRecords}"
-                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-                        :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
+            <div class="max-w-full p-3 m-1 border-2 border-blue-100 rounded-xl">
+                <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
+                    dataKey="id" filterDisplay="menu" :loading="loading"
+                    :globalFilterFields="['name', 'gerencia', 'start_date', 'end_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
+                    currentPageReportTemplate=" {first} al {last} de {totalRecords}"
+                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                    :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
 
-                        <!--COLUMNAS-->
-                        <Column field="name" header="Proyecto">
-                            <template #body="slotProps">
-                                <ProjectCard :project="slotProps.data" :activo="false" :menu="false" :avance="false" />
-                            </template>
-                        </Column>
-                        <Column field="avance" header="Ejecucion">
-                            <template #body="slotProps">
-                                <ProgressBar class="m-1" :value="parseInt(slotProps.data.avance)"></ProgressBar>
-                                <p class="text-center">Avance actual: {{ parseInt(slotProps.data.avance) }}%</p>
-                            </template>
-                        </Column>
-                        <Column field="contrato" header="Contrato"></Column>
-                        <Column field="costo" header="Valor venta">
-                            <template #body="slotProps">
-                                {{ formatCurrency(slotProps.data.costo) }}
-                            </template>
-                        </Column>
-                        <Column field="fechaF" header="Fin producción">
-                        </Column>
+                    <!--COLUMNAS-->
+                    <Column field="name" header="Proyecto">
+                        <template #body="slotProps">
+                            <ProjectCard :project="slotProps.data" :activo="false" :menu="false" :avance="false" />
+                        </template>
+                    </Column>
+                    <Column field="avance" header="Ejecucion">
+                        <template #body="slotProps">
+                            <ProgressBar class="m-1" :value="parseInt(slotProps.data.avance)"></ProgressBar>
+                            <p class="text-center">Avance actual: {{ parseInt(slotProps.data.avance) }}%</p>
+                        </template>
+                    </Column>
+                    <Column field="contrato" header="Contrato"></Column>
+                    <Column field="costo" header="Valor venta">
+                        <template #body="slotProps">
+                            {{ formatCurrency(slotProps.data.costo) }}
+                        </template>
+                    </Column>
+                    <Column field="fechaF" header="Fin producción">
+                    </Column>
 
-                        <!--ACCIONES-->
-                        <Column header="Acciones" class="space-x-3">
-                            <template #body="slotProps">
-                                <div
-                                    class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
-                                    <div title="Ver programacion">
-                                        <Button severity="primary" @click="" class="hover:bg-primary">
-                                            <i class="fa-solid fa-list-check " />
-                                        </Button>
-                                    </div>
-                                    <div title="Ver cronograma">
-                                        <Button severity="success" @click="" class="hover:bg-danger">
-                                            <i class="fa-solid fa-chart-gantt" />
-                                        </Button>
-                                    </div>
+                    <!--ACCIONES-->
+                    <Column header="Acciones" class="space-x-3">
+                        <template #body="slotProps">
+                            <div
+                                class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
+                                <div title="Ver programacion">
+                                    <Button severity="primary" @click="" class="hover:bg-primary">
+                                        <i class="fa-solid fa-list-check " />
+                                    </Button>
                                 </div>
-                            </template>
-                        </Column>
-                    </DataTable>
-                </div>
+                                <div title="Ver cronograma">
+                                    <Button severity="success" @click="" class="hover:bg-danger">
+                                        <i class="fa-solid fa-chart-gantt" />
+                                    </Button>
+                                </div>
+                            </div>
+                        </template>
+                    </Column>
+                </DataTable>
             </div>
-        </div>
-        <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
-            <PieChart :title="props.projects.name"></PieChart>
+            <div class="max-w-full p-3 m-1 border-2 border-blue-100 rounded-xl">
+                <PieChart :title="props.projects.name"></PieChart>
+            </div>
         </div>
         <!-- <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
             <TimeLine :projects="props.projects"></TimeLine>
