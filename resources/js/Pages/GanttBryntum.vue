@@ -1,12 +1,13 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { reactive, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import "@bryntum/gantt/gantt.material.css";
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
 import { Gantt, List, LocaleManager, ProjectModel, StringHelper, Widget } from '@bryntum/gantt/gantt.module.js';
 import '@/GanttToolbar.js'
 import '../../css/app.scss'
-
+import { useSweetalert } from '@/composable/sweetAlert';
+const { toast } = useSweetalert();
 const props = defineProps({
     project: Number,
 })
@@ -125,7 +126,6 @@ if (!Widget.factoryable.registry.resourcelist) {
     ResourceList.initClass();
 }
 
-
 //#endregion
 const project = new ProjectModel({
     autoSync: true,
@@ -146,7 +146,15 @@ const project = new ProjectModel({
     },
     // This config enables response validation and dumping of found errors to the browser console.
     // It's meant to be used as a development stage helper only so please set it to false for production systems.
-    validateResponse: true
+    // validateResponse: true,
+    listeners: {
+        syncFail: (e) => {
+            gantt.unmaskBody();
+            toast('Ha ocurrido un error, reiniciando...', 'error');
+            location.reload()
+        }
+    }
+
 });
 
 
@@ -154,7 +162,7 @@ const gantt = new Gantt(({
     project,
     // resourceImageFolderPath: '../images/users/',
     dependencyIdField: 'sequenceNumber',
-    rowHeight:30,
+    rowHeight: 30,
     columns: [
         { type: 'wbs', text: 'Nivel', width: 20 },
         { type: 'name', width: 280 },
@@ -226,7 +234,7 @@ const gantt = new Gantt(({
     ],
     features: {
 
-        filter      : true,
+        filter: true,
         projectLines: false,
         taskEdit: {
             items: {
