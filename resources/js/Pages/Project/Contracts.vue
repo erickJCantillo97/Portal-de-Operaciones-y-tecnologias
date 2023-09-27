@@ -5,7 +5,6 @@ import { router, useForm } from '@inertiajs/vue3';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import "@/Composable/push.min.js";
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
@@ -126,8 +125,8 @@ const submit = () => {
 const addItem = () => {
     formData.reset();
     clearErrors();
-    customerSelect.value = {}; //Resetear los datos 
-    shipSelect.value = {}; //Resetear los datos 
+    customerSelect.value = {}; //Resetear los datos
+    shipSelect.value = {}; //Resetear los datos
     open.value = true;
 }
 
