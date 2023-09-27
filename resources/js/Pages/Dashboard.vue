@@ -80,6 +80,42 @@ const broadcastChannel = () => {
             })
     }, 200);
 }
+
+//#region carga el PieChart
+
+//Carga titulo
+const title = {
+    text: 'Proyectos',
+    subtext: 'Valor venta',
+    left: 'center'
+}
+//Carga legends
+var legends = []
+//Carga datos
+var datos = []
+props.projects.forEach(project => {
+    let a = {
+        value: project.costo,
+        name: project.name,
+        label: {
+            show: true,
+            position: 'middle',
+            formatter: '{b}: ({d}%)'
+        },
+    }
+    datos.push(a)
+    legends.push(project.name)
+});
+const series = [{
+    type: 'pie',
+    radius: '65%',
+    center: ['50%', '50%'],
+    selectedMode: 'single',
+    data: datos
+}]
+
+//#endregion
+
 </script>
 
 <template>
@@ -140,8 +176,17 @@ const broadcastChannel = () => {
                     </Column>
                 </DataTable>
             </div>
-            <div class="max-w-full p-3 m-1 border-2 border-blue-100 rounded-xl">
-                <PieChart :title="props.projects.name"></PieChart>
+            <div class="flex">
+                <div class="w-1/2">
+                    <div class="max-w-full p-3 m-1 border-2 border-blue-100 rounded-xl">
+                        <PieChart :title="title" :series="series" :legend="legends"></PieChart>
+                    </div>
+                </div>
+                <div class="w-1/2">
+                    <div class="max-w-full p-3 m-1 border-2 border-blue-100 rounded-xl">
+                        <PieChart :title="title" :series="series" :legend="legends"></PieChart>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">

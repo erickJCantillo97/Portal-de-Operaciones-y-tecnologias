@@ -6,26 +6,22 @@ import {
     TitleComponent,
     TooltipComponent,
     LegendComponent,
+    ToolboxComponent
 } from 'echarts/components';
 import VChart from 'vue-echarts';
-import { ref, provide } from 'vue';
 
-defineProps({
+const props = defineProps({
     title: {
-        type: String,
+        type: Object,
         default: null
     },
-    value: {
-        type: String,
-        default: 'text'
+    series: {
+        type: Array,
+        default: null
     },
-    label: {
-        type: String,
-        default: 'text'
-    },
-    enabled: {
-        type: Boolean,
-        default: true
+    legend: {
+        type: Array,
+        default: null
     }
 });
 
@@ -34,61 +30,42 @@ use([
     TooltipComponent,
     PieChart,
     CanvasRenderer,
+    LegendComponent,
+    ToolboxComponent
 ]);
 
 const option = {
-    title: {
-        text: 'Proyectos',
-        subtext: 'Cotecmar 2023',
-        left: 'center'
-    },
+    title: props.title,
     tooltip: {
         trigger: 'item',
         formatter: '{b}: ({d}%)'
     },
-    series: [
-        {
-            type: 'pie',
-            data: [
-                {
-                    value: 27,
-                    name: 'MN ORINOCO II',
-                    label: {
-                        show: true,
-                        position: 'middle',
-                        formatter: '{b}: ({d}%)'
-                    }
-                },
-                {
-                    value: 2,
-                    name: 'ARC 20 DE JULIO',
-                    label: {
-                        show: true,
-                        position: 'middle',
-                        formatter: '{b}: ({d}%)'
-                    }
-                },
-                {
-                    value: 83,
-                    name: 'RM PUNTA BORINQUEN',
-                    label: {
-                        show: true,
-                        position: 'middle',
-                        formatter: '{b}: ({d}%)'
-                    }
-                },
-            ]
-        }
-    ]
+    series: props.series,
+    legend: {
+        bottom: 10,
+        left: 'center',
+        data: props.legend
+    },
+    toolbox: {
+    show: true,
+    feature: {
+      mark: { show: true },
+      dataView: { show: true, readOnly: false },
+      restore: { show: true },
+      saveAsImage: { show: true }
+    }
+  },
 };
+
+
 </script>
 <style scoped>
 .chart {
-    height: 100vh;
+    height: 50vh;
 }
 </style>
 <template>
     <div>
-        <v-chart class="chart" :option="option" :title="title" :tooltip="tooltip" :series="series" autoresize />
+        <v-chart class="chart" :option="option" />
     </div>
 </template>

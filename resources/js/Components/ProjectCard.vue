@@ -36,7 +36,7 @@ const props = defineProps({
 const project = ref({});
 const cagando = ref(true)
 if (props.project) {
-    project.value=props.project
+    project.value = props.project
     cagando.value = false;
 } else {
     axios.get(route('projects.show', props.projectId)).then(response => {
@@ -52,7 +52,7 @@ const items = ref([
         icon: 'fa-solid fa-chart-gantt',
         url: {
             name: 'createSchedule.create',
-            parametter: (props.project.id ? props.project.id : props.projectId )
+            parametter: (props.project.id ? props.project.id : props.projectId)
         }
     },
     {
@@ -60,7 +60,7 @@ const items = ref([
         icon: 'fa-solid fa-list-check',
         url: {
             name: 'programming',
-            parametter: (props.project.id ? props.project.id : props.projectId )
+            parametter: (props.project.id ? props.project.id : props.projectId)
         }
     },
     {
@@ -68,7 +68,7 @@ const items = ref([
         icon: 'fa-solid fa-diagram-project',
         url: {
             name: 'createSchedule.create',
-            parametter: (props.project.id ? props.project.id : props.projectId )
+            parametter: (props.project.id ? props.project.id : props.projectId)
         }
     },
 ]);
@@ -85,11 +85,14 @@ const items = ref([
         </div>
     </div> -->
     <div :class="activo ? 'bg-sky-500 text-white' : 'bg-white text-gray-90' + clases"
-        class="flex items-center h-14 min-w-max p-1 space-x-3 rounded-md">
-        <img :src=project.file class="rounded-lg h-0 sm:h-12" />
+        class="flex items-center h-14 min-w-max rounded-md">
+        <img :src=project.file class="rounded-lg h-0 sm:h-12 sm:w-16 mr-1" />
         <div class="flex-col">
             <p class="text-xs font-bold">{{ project.name }}</p>
-            <p class="text-xs italic">Inicio:</p><p> {{ project.fechaI }}</p>
+            <div class="flex space-x-1">
+                <p class="text-xs italic">Inicio:</p>
+                <p class="text-xs italic"> {{ project.fechaI }}</p>
+            </div>
             <!-- <ProgressBar v-if="avance" class="items-end" :value="parseInt(project.avance)"></ProgressBar> -->
         </div>
         <!-- <div v-if="menu" class="flex w-1/8 justify-center align-middle">
