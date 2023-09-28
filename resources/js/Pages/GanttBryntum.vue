@@ -3,8 +3,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { onMounted } from 'vue';
 import "@bryntum/gantt/gantt.material.css";
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
-import { Gantt, List, LocaleManager, ProjectModel, StringHelper, Widget } from '@bryntum/gantt/gantt.module.js';
-import '@/GanttToolbar.js'
+import { DateHelper, Gantt, List, LocaleManager, ProjectModel, StringHelper, Widget } from '@bryntum/gantt/gantt.module.js';
 import '../../css/app.scss'
 import { useSweetalert } from '@/composable/sweetAlert';
 const { toast } = useSweetalert();
@@ -14,68 +13,6 @@ const props = defineProps({
 LocaleManager.applyLocale('Es');
 
 //#region colocar tab personalizado en el editor de tareas
-// if (!Widget.factoryable.registry.custom_filestab) {
-//     // Custom FilesTab class (the last item of tabsConfig)
-//     class FilesTab extends Grid {
-
-//         // Factoryable type name
-//         static get type() {
-//             return 'custom_filestab';
-//         }
-
-//         static get defaultConfig() {
-//             return {
-//                 title    : 'Archivos',
-//                 defaults : {
-//                     labelWidth : 200
-//                 },
-//                 columns : [{
-//                     text     : 'Archivos asociados a la actividad',
-//                     field    : 'name',
-//                     type     : 'template',
-//                     template : data => `<i class="b-fa b-fa-fw b-fa-${data.record.data.icon}"></i>${data.record.data.name}`
-//                 }]
-//             };
-//         } // eo getter defaultConfig
-
-//         loadEvent(eventRecord) {
-//             let files = [];
-
-//             // prepare dummy files data
-//             switch (eventRecord.data.id) {
-//                 case 1:
-//                     files = [
-//                         { name : 'Image1.png', icon : 'image' },
-//                         { name : 'Chart2.pdf', icon : 'chart-pie' },
-//                         { name : 'Spreadsheet3.pdf', icon : 'file-excel' },
-//                         { name : 'Document4.pdf', icon : 'file-word' },
-//                         { name : 'Report5.pdf', icon : 'user-chart' }
-//                     ];
-//                     break;
-//                 case 2:
-//                     files = [
-//                         { name : 'Chart11.pdf', icon : 'chart-pie' },
-//                         { name : 'Spreadsheet13.pdf', icon : 'file-excel' },
-//                         { name : 'Document14.pdf', icon : 'file-word' }
-//                     ];
-//                     break;
-//                 case 3:
-//                     files = [
-//                         { name : 'Image21.png', icon : 'image' },
-//                         { name : 'Spreadsheet23.pdf', icon : 'file-excel' },
-//                         { name : 'Document24.pdf', icon : 'file-word' },
-//                         { name : 'Report25.pdf', icon : 'user-chart' }
-//                     ];
-//                     break;
-//             } // eo switch
-
-//             this.store.data = files;
-//         } // eo function loadEvent
-//     } // eo class FilesTab
-
-//     // register 'filestab' type with its Factory
-//     FilesTab.initClass();
-// }
 
 if (!Widget.factoryable.registry.resourcelist) {
     class ResourceList extends List {
@@ -127,6 +64,7 @@ if (!Widget.factoryable.registry.resourcelist) {
 }
 
 //#endregion
+
 const project = new ProjectModel({
     autoSync: true,
     autoLoad: true,
@@ -152,13 +90,12 @@ const project = new ProjectModel({
             gantt.unmaskBody();
             // console.log(e);
             toast('Ha ocurrido un error, reiniciando...', 'error');
-            setTimeout(() => {location.reload()},3000);
+            setTimeout(() => { location.reload() }, 3000);
 
         }
     }
 
 });
-
 
 const gantt = new Gantt(({
     project,
@@ -172,7 +109,6 @@ const gantt = new Gantt(({
         { type: 'duration', text: 'Duración', with: 20 },
         { type: 'startdate', text: 'Fecha Inicio', with: 20 },
         { type: 'enddate', text: 'Fecha fin', with: 20 },
-        // { type: 'newColumns', text: 'Buscar Columna', with: 50 },
         {
             type: 'resourceassignment',
             text: 'Recursos',
@@ -233,11 +169,61 @@ const gantt = new Gantt(({
             }
         },
         { type: 'addnew', text: 'Añadir Columna', with: 50 },
+        {
+            text: 'Linea Base 1',
+            collapsible: true,
+            children: [
+                { type: 'baselinestartdate', text: 'Start', field: 'baselines[0].startDate' },
+                { type: 'baselineenddate', text: 'Finish', field: 'baselines[0].endDate' },
+                { type: 'baselineduration', text: 'Duration', field: 'baselines[0].fullDuration' },
+                { type: 'baselinestartvariance', field: 'baselines[0].startVariance' },
+                { type: 'baselineendvariance', field: 'baselines[0].endVariance' },
+                { type: 'baselinedurationvariance', field: 'baselines[0].durationVariance' }
+            ]
+        },
+        {
+            text: 'Linea Base 2',
+            collapsible: true,
+            collapsed: true,
+            children: [
+                { type: 'baselinestartdate', text: 'Start', field: 'baselines[1].startDate' },
+                { type: 'baselineenddate', text: 'Finish', field: 'baselines[1].endDate' },
+                { type: 'baselineduration', text: 'Duration', field: 'baselines[1].fullDuration' },
+                { type: 'baselinestartvariance', field: 'baselines[1].startVariance' },
+                { type: 'baselineendvariance', field: 'baselines[1].endVariance' },
+                { type: 'baselinedurationvariance', field: 'baselines[1].durationVariance' }
+            ]
+        },
+        {
+            text: 'Linea Base 3',
+            collapsible: true,
+            collapsed: true,
+            children: [
+                { type: 'baselinestartdate', text: 'Start', field: 'baselines[2].startDate' },
+                { type: 'baselineenddate', text: 'Finish', field: 'baselines[2].endDate' },
+                { type: 'baselineduration', text: 'Duration', field: 'baselines[2].fullDuration' },
+                { type: 'baselinestartvariance', field: 'baselines[2].startVariance' },
+                { type: 'baselineendvariance', field: 'baselines[2].endVariance' },
+                { type: 'baselinedurationvariance', field: 'baselines[2].durationVariance' }
+            ]
+        }
     ],
+    // Allow extra space for baseline(s)
+    rowHeight: 60,
+    subGridConfigs: {
+        locked: {
+            flex: 1
+        },
+        normal: {
+            flex: 1
+        }
+    },
     features: {
-
         filter: true,
         projectLines: false,
+        mspExport: {
+            filename: 'Proyecto'
+        },
         taskEdit: {
             items: {
                 resourcesTab: {
@@ -246,7 +232,47 @@ const gantt = new Gantt(({
                     title: 'Recursos',
                 },
             }
-        }
+        },
+        baselines: {
+            // Custom tooltip template for baselines
+            template(data) {
+                const
+                    me = this,
+                    { baseline } = data,
+                    { task } = baseline,
+                    delayed = task.startDate > baseline.startDate,
+                    overrun = task.durationMS > baseline.durationMS;
+
+                let { decimalPrecision } = me;
+
+                if (decimalPrecision == null) {
+                    decimalPrecision = me.client.durationDisplayPrecision;
+                }
+
+                const
+                    multiplier = Math.pow(10, decimalPrecision),
+                    displayDuration = Math.round(baseline.duration * multiplier) / multiplier;
+
+                return `
+                    <div class="b-gantt-task-title">${StringHelper.encodeHtml(task.name)} (${me.L('Linea Base ')} ${baseline.parentIndex + 1})</div>
+                    <table>
+                    <tr><td>${me.L('Inicio')}:</td><td>${data.startClockHtml}</td></tr>
+                    ${baseline.milestone ? '' : `
+                        <tr><td>${me.L('Fin')}:</td><td>${data.endClockHtml}</td></tr>
+                        <tr><td>${me.L('Duracion')}:</td><td class="b-right">${displayDuration + ' ' + DateHelper.getLocalizedNameOfUnit(baseline.durationUnit, baseline.duration !== 1)}</td></tr>
+                    `}
+                    </table>
+                    ${delayed ? `
+                        <h4 class="statusmessage b-baseline-delay"><i class="statusicon b-fa b-fa-exclamation-triangle"></i>${me.L('Inicio retrasado por')} ${DateHelper.formatDelta(task.startDate - baseline.startDate)}</h4>
+                    ` : ''}
+                    ${overrun ? `
+                        <h4 class="statusmessage b-baseline-overrun"><i class="statusicon b-fa b-fa-exclamation-triangle"></i>${me.L('Atrasado por')} ${DateHelper.formatDelta(task.durationMS - baseline.durationMS)}</h4>
+                    ` : ''}
+                    `;
+            },
+
+            renderer: baselineRenderer
+        },
     },
     keyMap: {
         // This is a function from the existing Gantt API
@@ -256,14 +282,364 @@ const gantt = new Gantt(({
 
     },
     tbar: {
-        type: 'gantttoolbar',
-        height: '4em'
-    },
+        items: [
+            {
+                type: "buttonGroup",
+                height: '4em',
+                items: [
+                    {
+                        color: "b-green",
+                        ref: "addTaskButton",
+                        icon: "b-fa b-fa-plus",
+                        text: "",
+                        tooltip: "Crear una nueva tarea",
+                        onAction() {
+                            onAddTaskClick()
+                        }
+                    }
+                ]
+            },
+            {
+                type: "buttonGroup",
+                height: '4em',
+                items: [
+                    {
+                        ref: "editTaskButton",
+                        icon: "b-fa b-fa-pen",
+                        text: "",
+                        tooltip: "Editar celda seleccionada",
+                        onAction() {
+                            onEditTaskClick()
+                        }
+                    },
+                    {
+                        ref: "undoRedo",
+                        type: "undoredo",
+                        items: {
+                            transactionsCombo: null
+                        }
+                    }
+                ]
+            },
+            {
+                type: "buttonGroup",
+                height: '4em',
+                items: [
+                    {
+                        ref: "expandAllButton",
+                        icon: "b-fa b-fa-angle-double-down",
+                        tooltip: "Expandir todo",
+                        onAction() {
+                            onExpandAllClick()
+                        }
+                    },
+                    {
+                        ref: "collapseAllButton",
+                        icon: "b-fa b-fa-angle-double-up",
+                        tooltip: "Colapsar todo",
+                        onAction() {
+                            onCollapseAllClick()
+                        }
+                    }
+                ]
+            },
+            {
+                type: "buttonGroup",
+                height: '4em',
+                items: [
+                    {
+                        type: "button",
+                        ref: "settingsButton",
+                        tooltip: "Ajustes",
+                        toggleable: true,
+                        icon: 'b-fa-gear',
+                        menu: {
+                            type: "popup",
+                            anchor: true,
+                            cls: "settings-menu",
+                            layoutStyle: {
+                                flexDirection: "column"
+                            },
+                            onBeforeShow(e) {
+                                onSettingsShow(e)
+                            },
 
+                            items: [
+                                {
+                                    type: "slider",
+                                    ref: "rowHeight",
+                                    text: "Altura de celdas",
+                                    width: "12em",
+                                    showValue: true,
+                                    min: 10,
+                                    max: 70,
+                                    onInput(e) {
+                                        onSettingsRowHeightChange(e)
+                                    }
+                                },
+                                {
+                                    type: "slider",
+                                    ref: "barMargin",
+                                    text: "Altura barras",
+                                    width: "12em",
+                                    showValue: true,
+                                    min: 0,
+                                    max: 10,
+                                    onInput(e) {
+                                        onSettingsMarginChange(e)
+                                    }
+                                },
+                            ]
+                        }
+                    },
+                    // {
+                    //     type: "button",
+                    //     color: "b-red",
+                    //     ref: "criticalPathsButton",
+                    //     icon: "b-fa b-fa-fire",
+                    //     text: "Critical paths",
+                    //     tooltip: "Highlight critical paths",
+                    //     toggleable: true,
+                    //     onAction: "up.onCriticalPathsClick"
+                    // }
+                ]
+            },
+            {
+                type: "datefield",
+                height: '4em',
+                ref: "startDateField",
+                placeholder: "Busqueda por fecha",
+                maxWidth: "12em",
+                required: 'done',
+                flex: "0 0 17em",
+                listeners: {
+                    change() {
+                        onStartDateChange()
+                    }
+                }
+            },
+            {
+                type: "textfield",
+                ref: "filterByName",
+                cls: "filter-by-name",
+                height: '4em',
+                flex: "0 0 12.5em",
+                // Placeholder for others
+                placeholder: "Buscar Actividad",
+                clearable: true,
+                keyStrokeChangeDelay: 100,
+                triggers: {
+                    filter: {
+                        align: "end",
+                    }
+                },
+                onChange(e) {
+                    onFilterChange(e)
+                }
+            },
+            {
+                type: 'button',
+                ref: 'mspExportBtn',
+                height: '4em',
+                icon: 'b-fa-file-export',
+                onAction() {
+                    onExport()
+                }
+            },
+            {
+                type: 'button',
+                text: 'Lineas base',
+                iconAlign: 'end',
+                height: '4em',
+                menu: [{
+                    text: 'Guardar en 1',
+                    onItem() {
+                        setBaseline(1);
+                    }
+                }, {
+                    text: 'Guardar en 2',
+                    onItem() {
+                        setBaseline(2);
+                    }
+                }, {
+                    text: 'Guardar en 3',
+                    onItem() {
+                        setBaseline(3);
+                    }
+                }]
+            },
+            {
+                type: 'button',
+                icon: "b-fa b-fa-eye",
+                iconAlign: 'end',
+                height: '4em',
+                menu: [{
+                    checked: true,
+                    text: 'Linea Base 1',
+                    onToggle({ checked }) {
+                        toggleBaselineVisible(1, checked);
+                    }
+                }, {
+                    checked: true,
+                    text: 'Linea base 2',
+                    onToggle({ checked }) {
+                        toggleBaselineVisible(2, checked);
+                    }
+                }, {
+                    checked: true,
+                    text: 'Linea base 3',
+                    onToggle({ checked }) {
+                        toggleBaselineVisible(3, checked);
+                    }
+                }]
+            },
+            {
+                type: 'checkbox',
+                text: 'Mostrar todas',
+                height: '4em',
+                checked: true,
+                toggleable: true,
+                onAction({ checked }) {
+                    gantt.features.baselines.disabled = !checked;
+                }
+            },
+            {
+                type: 'checkbox',
+                text: 'Habilitar lineas base',
+                cls: 'b-baseline-toggle',
+                height: '4em',
+                checked: true,
+                toggleable: true,
+                onAction({ checked }) {
+                    gantt.features.baselines.renderer = checked ? baselineRenderer : () => { };
+                }
+            }
+        ]
+    },
 }))
+
+//#region baseline
+
+function baselineRenderer({ baselineRecord, taskRecord, renderData }) {
+    if (baselineRecord.endDate.getTime() + 24 * 3600 * 1000 < taskRecord.endDate.getTime()) {
+        renderData.className['b-baseline-behind'] = 1;
+    }
+    else if (taskRecord.endDate < baselineRecord.endDate) {
+        renderData.className['b-baseline-ahead'] = 1;
+    }
+    else {
+        renderData.className['b-baseline-on-time'] = 1;
+    }
+}
+//#endregion
+
+
+
 onMounted(() => {
     gantt.appendTo = 'container';
 })
+
+//#region
+const onExport = () => {
+    // give a filename based on task name
+    const filename = gantt.project.taskStore.first && `${gantt.project.taskStore.first.name}.xml`;
+
+    // call the export to download the XML file
+    gantt.features.mspExport.export({
+        filename
+    });
+}
+
+
+// region controller methods
+
+const onAddTaskClick = async () => {
+    const added = gantt.taskStore.rootNode.appendChild({
+        name: "Nueva actividad",
+        duration: 1
+    });
+
+    // wait for immediate commit to calculate new task fields
+    await gantt.project.commitAsync();
+
+    // scroll to the added task
+    await gantt.scrollRowIntoView(added);
+
+    gantt.features.cellEdit.startEditing({
+        record: added,
+        field: "name"
+    });
+}
+
+const onEditTaskClick = () => {
+
+    if (gantt.selectedRecord) {
+        gantt.editTask(gantt.selectedRecord);
+    } else {
+        Toast.show("Primero selecciona una tarea a editar");
+    }
+}
+
+const onExpandAllClick = () => {
+    gantt.expandAll();
+}
+
+const onCollapseAllClick = () => {
+    gantt.collapseAll();
+}
+
+function onStartDateChange({ value, oldValue }) {
+    if (!oldValue) {
+        // ignore initial set
+        return;
+    }
+
+    gantt.startDate = DateHelper.add(value, -1, "week");
+
+    gantt.project.setStartDate(value);
+}
+
+const onFilterChange = ({ value }) => {
+    if (value === "") {
+        gantt.taskStore.clearFilters();
+    } else {
+        value = value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+        gantt.taskStore.filter({
+            filters: task =>
+                task.name && task.name.match(new RegExp(value, "i")),
+            replace: true
+        });
+    }
+}
+
+
+const onSettingsShow = ({ source: menu }) => {
+    const { rowHeight, barMargin } = menu.widgetMap;
+    rowHeight.value = gantt.rowHeight;
+    barMargin.value = gantt.barMargin;
+    barMargin.max = gantt.rowHeight / 2 - 5;
+}
+
+const onSettingsRowHeightChange = ({ value }) => {
+    gantt.rowHeight = value;
+    gantt.widgetMap.settingsButton.menu.widgetMap.barMargin.max =
+        value / 2 - 5;
+}
+
+const onSettingsMarginChange = ({ value }) => {
+    gantt.barMargin = value;
+}
+
+const setBaseline = (index) => {
+    gantt.taskStore.setBaseline(index);
+}
+
+const toggleBaselineVisible = (index, visible) => {
+    gantt.element.classList[visible ? 'remove' : 'add'](`b-hide-baseline-${index}`);
+}
+//#endregion
+
 
 </script>
 <template>
