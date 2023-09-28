@@ -150,8 +150,10 @@ const project = new ProjectModel({
     listeners: {
         syncFail: (e) => {
             gantt.unmaskBody();
+            // console.log(e);
             toast('Ha ocurrido un error, reiniciando...', 'error');
-            location.reload()
+            setTimeout(() => {location.reload()},3000);
+
         }
     }
 
@@ -218,14 +220,14 @@ const gantt = new Gantt(({
                 let overflowAssignments2 = '';
                 var task = taskRecord._data;
                 for (var element of overflowAssignments) {
-                    overflowAssignments2 += ('<div class="text-xs flex justify-between space-x-2 mt-2">'
+                    overflowAssignments2 += ('<div class="flex justify-between mt-2 space-x-2 text-xs">'
                         + '<div>' + element.units / 100 + '</div>'
                         + '<div class="italic">' + element.name + '</div>' +
                         '<div class="font-bold"> $' + Math.round(task.durationUnit == 'day' ? (task.duration * (element.units / 100) * element.costo_hora) * 8.5 : (task.duration * (element.units / 100) * element.costo_hora)).toLocaleString('es')
                         + '</div></div>')
                 }
                 return `
-                    <div class="text-xs flex justify-between space-x-2"><div>${assignmentRecord.units / 100}</div><div class="italic">${assignmentRecord.name}</div><div class="font-bold">$${Math.round(task.durationUnit == 'day' ? (task.duration * (assignmentRecord.units / 100) * assignmentRecord.costo_hora) * 8.5 : (task.duration * (assignmentRecord.units / 100) * assignmentRecord.costo_hora)).toLocaleString('es')} </div></div>
+                    <div class="flex justify-between space-x-2 text-xs"><div>${assignmentRecord.units / 100}</div><div class="italic">${assignmentRecord.name}</div><div class="font-bold">$${Math.round(task.durationUnit == 'day' ? (task.duration * (assignmentRecord.units / 100) * assignmentRecord.costo_hora) * 8.5 : (task.duration * (assignmentRecord.units / 100) * assignmentRecord.costo_hora)).toLocaleString('es')} </div></div>
                      ${overflowCount > 0 ? `${overflowAssignments2}` : ''}
                 `;
             }
@@ -268,9 +270,8 @@ onMounted(() => {
     <AppLayout title="">
         <div class="">
             <div class="h-full">
-                <div class="overflow-hidden shadow-xl sm:rounded-lg h-screen">
-                    <div id="container" class="text-xs overflow-hidden shadow-xl sm:rounded-lg h-full">
-
+                <div class="h-screen overflow-hidden shadow-xl sm:rounded-lg">
+                    <div id="container" class="h-full overflow-hidden text-xs shadow-xl sm:rounded-lg">
                     </div>
                 </div>
             </div>
