@@ -88,14 +88,14 @@ const clearFilter = () => {
 <template>
     <AppLayout>
         <UserHeader></UserHeader>
-        <div class="px-4 py-2 sm:px-6">
+        <div class="sm:px-6">
             <!-- <div class="max-w-full p-3 border-2 border-blue-100 rounded-xl">
                     <dl class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                         <ProjectCard v-for="project of projects" :project="project" :activo="false" />
                     </dl>
                 </div> -->
             <!--DATATABLE PROYECTOS-->
-            <div class="max-w-full p-3 m-4 border-2 border-blue-100 rounded-xl">
+            <div class="border-blue-100 p-3 rounded-xl m-1 border-2">
                 <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
                     dataKey="id" filterDisplay="menu" :loading="loading"
                     :globalFilterFields="['name', 'gerencia', 'start_date', 'end_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
@@ -143,6 +143,8 @@ const clearFilter = () => {
                     </Column>
                 </DataTable>
             </div>
+
+
             <DataChart></DataChart>
         </div>
         <!-- <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
