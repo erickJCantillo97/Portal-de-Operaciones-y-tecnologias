@@ -189,7 +189,6 @@ const contractsList = () => {
                     {{ formatCurrency(slotProps.data.cost) }}
                 </template>
             </Column>
-            <Column field="cost" header="Porcentaje"></Column>
             <Column field="end_date" header="Fecha Finalización"></Column>
         </DataTable>
         <div class="ml-1">
