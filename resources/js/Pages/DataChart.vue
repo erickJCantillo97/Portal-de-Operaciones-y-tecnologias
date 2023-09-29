@@ -189,7 +189,6 @@ const contractsList = () => {
             <div class="max-w-full p-3 m-1 border-2 border-blue-100 rounded-xl md:max-w-full md:border-2 md:rounded-xl">
                 <!--:key="showGraph" permite Re renderizar un componente hijo-->
                 <PieChart :title="title" :series="series" :key="showGraph"></PieChart>
-                {{ showGraph }}
             </div>
         </div>
     </div>
