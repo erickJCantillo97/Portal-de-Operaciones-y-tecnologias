@@ -6,12 +6,10 @@ import axios from 'axios';
 import { usePermissions } from '@/composable/permission';
 const { hasRole } = usePermissions();
 import UserHeader from '@/Components/sections/UserHeader.vue';
-import ProjectCard from '@/Components/ProjectCard.vue';
+import ProjectCardMinimal from '@/Components/ProjectCardMinimal.vue';
 import DataTable from 'primevue/datatable';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import Column from 'primevue/column';
-import Tag from 'primevue/tag';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon } from '@heroicons/vue/20/solid';
 import Button from '@/Components/Button.vue';
 import ProgressBar from 'primevue/progressbar';
 import PieChart from './PieChart.vue';
@@ -116,10 +114,6 @@ const series = [{
 
 //#endregion
 
-//#region botones de accion tabla de proyectos
-
-
-//#endregion
 </script>
 
 <template>
@@ -142,7 +136,7 @@ const series = [{
                     <!--COLUMNAS-->
                     <Column field="name" header="Proyecto">
                         <template #body="slotProps">
-                            <ProjectCard :project="slotProps.data" :activo="false" :menu="false" :avance="false" />
+                            <ProjectCardMinimal :project="slotProps.data" :activo="false" :menu="false" :avance="false" />
                         </template>
                     </Column>
                     <Column field="avance" header="Ejecucion">
@@ -171,7 +165,7 @@ const series = [{
                                     </Button>
                                 </div>
                                 <div title="Ver cronograma">
-                                    <Button severity="success" @click="router.get(route('createSchedule.create', slotProps.data.id))" class="hover:bg-danger">
+                                    <Button severity="success" @click="router.get(route('createSchedule.create', slotProps.data.project_id))" class="hover:bg-danger">
                                         <i class="fa-solid fa-chart-gantt" />
                                     </Button>
                                 </div>

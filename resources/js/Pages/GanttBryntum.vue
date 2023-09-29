@@ -84,7 +84,7 @@ const project = new ProjectModel({
     },
     // This config enables response validation and dumping of found errors to the browser console.
     // It's meant to be used as a development stage helper only so please set it to false for production systems.
-    // validateResponse: true,
+    validateResponse: true,
     listeners: {
         syncFail: (e) => {
             gantt.unmaskBody();
@@ -105,7 +105,7 @@ const gantt = new Gantt(({
     columns: [
         { type: 'wbs', text: 'Nivel', width: 20 },
         { type: 'name', width: 280 },
-        { type: 'percentdone', text: 'Avance', showCircle: true, width: 20, hidden: true },
+        { type: 'percentdone', text: 'Avance', showCircle: true, width: 20 },
         { type: 'duration', text: 'Duración', with: 20 },
         { type: 'startdate', text: 'Fecha Inicio', with: 20 },
         { type: 'enddate', text: 'Fecha fin', with: 20 },
@@ -220,9 +220,7 @@ const gantt = new Gantt(({
     features: {
         filter: true,
         projectLines: false,
-        mspExport: {
-            filename: 'Proyecto'
-        },
+        mspExport : true,
         taskEdit: {
             items: {
                 resourcesTab: {
@@ -281,7 +279,7 @@ const gantt = new Gantt(({
 
     },
     tbar: {
-        height:'4em',
+        height: '4em',
         items: [
             {
                 type: "buttonGroup",
@@ -434,6 +432,7 @@ const gantt = new Gantt(({
             {
                 type: 'button',
                 ref: 'mspExportBtn',
+                hidden:true,
                 tooltip: "Exportar a XML",
                 icon: 'b-fa-file-export',
                 onAction() {
@@ -443,7 +442,7 @@ const gantt = new Gantt(({
             {
                 type: 'button',
                 text: 'LB',
-                cls:'',
+                cls: '',
                 // hidden:true,
                 tooltip: "Guardar en linea base",
                 menu: [{
@@ -556,7 +555,7 @@ const onExport = () => {
 
 const onAddTaskClick = async () => {
     const added = gantt.taskStore.rootNode.appendChild({
-        name: "Nueva actividad",
+        name: "Nueva tarea",
         duration: 1
     });
 
