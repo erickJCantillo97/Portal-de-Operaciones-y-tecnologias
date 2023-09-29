@@ -14,14 +14,16 @@ import Tag from 'primevue/tag';
 import { MagnifyingGlassIcon, PencilIcon, TrashIcon } from '@heroicons/vue/20/solid';
 import Button from '@/Components/Button.vue';
 import ProgressBar from 'primevue/progressbar';
-import PieChart from './PieChart.vue';
+import DataChart from './DataChart.vue';
 import '../../sass/dataTableCustomized.scss';
 // import TimeLine from './TimeLine.vue';
 
 const props = defineProps({
     projects: Array,
+    contracts: Array,
     costoMes: Number,
 })
+
 const colors = { GEDIN: 'bg-blue-500', VPEXE: 'bg-gray-500', GEMAM: 'bg-teal-500', 'VPT&O': 'bg-yellow-500', GEBOC: 'bg-cyan-500', GECTI: 'bg-indigo-500', GETHU: 'bg-red-500', PCTMAR: 'bg-purple-500', GEFAD: 'bg-sky-500', GECON: 'bg-pink-500' }
 
 const personal = ref([])
@@ -48,7 +50,6 @@ onMounted(() => {
     getTask();
 })
 
-
 const formatCurrency = (value) => {
     return parseFloat(value).toLocaleString('es-CO', {
         style: 'currency',
@@ -69,53 +70,19 @@ const initFilters = () => {
         name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
     }
 };
+
 const clearFilter = () => {
     initFilters();
 };
-const broadcastChannel = () => {
-    setTimeout(() => {
-        window.Echo.private('testing')
-            .listen('.MyWebSocket', (e) => {
-                alert(e.data);
-            })
-    }, 200);
-}
 
-//#region carga el PieChart
-
-//Carga titulo
-const title = {
-    text: 'Proyectos',
-    subtext: 'Valor venta',
-    left: 'center'
-}
-//Carga legends
-var legends = []
-//Carga datos
-var datos = []
-props.projects.forEach(project => {
-    let a = {
-        value: project.costo,
-        name: project.name,
-        label: {
-            show: true,
-            position: 'middle',
-            formatter: '{b}: ({d}%)'
-        },
-    }
-    datos.push(a)
-    legends.push(project.name)
-});
-const series = [{
-    type: 'pie',
-    radius: '65%',
-    center: ['50%', '50%'],
-    selectedMode: 'single',
-    data: datos
-}]
-
-//#endregion
-
+// const broadcastChannel = () => {
+//     setTimeout(() => {
+//         window.Echo.private('testing')
+//             .listen('.MyWebSocket', (e) => {
+//                 alert(e.data);
+//             })
+//     }, 200);
+// }
 </script>
 
 <template>
@@ -127,7 +94,8 @@ const series = [{
                         <ProjectCard v-for="project of projects" :project="project" :activo="false" />
                     </dl>
                 </div> -->
-            <div class="max-w-full p-3 m-1 border-2 border-blue-100 rounded-xl">
+            <!--DATATABLE PROYECTOS-->
+            <!-- <div class="max-w-full p-3 m-4 border-2 border-blue-100 rounded-xl">
                 <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
                     dataKey="id" filterDisplay="menu" :loading="loading"
                     :globalFilterFields="['name', 'gerencia', 'start_date', 'end_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
@@ -135,13 +103,13 @@ const series = [{
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                     :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
 
-                    <!--COLUMNAS-->
+                    
                     <Column field="name" header="Proyecto">
                         <template #body="slotProps">
                             <ProjectCard :project="slotProps.data" :activo="false" :menu="false" :avance="false" />
                         </template>
                     </Column>
-                    <Column field="avance" header="Ejecucion">
+                    <Column field="avance" header="Ejecución">
                         <template #body="slotProps">
                             <ProgressBar class="m-1" :value="parseInt(slotProps.data.avance)"></ProgressBar>
                             <p class="text-center">Avance actual: {{ parseInt(slotProps.data.avance) }}%</p>
@@ -153,10 +121,9 @@ const series = [{
                             {{ formatCurrency(slotProps.data.costo) }}
                         </template>
                     </Column>
-                    <Column field="fechaF" header="Fin producción">
-                    </Column>
+                    <Column field="fechaF" header="Fin producción"></Column>
 
-                    <!--ACCIONES-->
+                  
                     <Column header="Acciones" class="space-x-3">
                         <template #body="slotProps">
                             <div
@@ -175,34 +142,19 @@ const series = [{
                         </template>
                     </Column>
                 </DataTable>
-            </div>
-            <div class="flex">
-                <div class="w-1/2">
-                    <div class="max-w-full p-3 m-1 border-2 border-blue-100 rounded-xl">
-                        <PieChart :title="title" :series="series" :legend="legends"></PieChart>
-                    </div>
-                </div>
-                <div class="w-1/2">
-                    <div class="max-w-full p-3 m-1 border-2 border-blue-100 rounded-xl">
-                        <PieChart :title="title" :series="series" :legend="legends"></PieChart>
-                    </div>
-                </div>
-            </div>
+            </div> -->
+            <DataChart></DataChart>
         </div>
         <!-- <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
             <TimeLine :projects="props.projects"></TimeLine>
         </div>  -->
 
-        <div class="grid grid-cols-1 gap-2 mb-8 md:grid-cols-2">
+        <!-- <div class="grid grid-cols-1 gap-2 mb-8 md:grid-cols-2">
             <div class="m-4">
                 <div
                     class="w-full p-4 font-extrabold text-center text-black rounded-xl bg-gradient-to-b from-gray-400 to-slate-50">
                     <h2 class="text-xl font-extrabold">Personal</h2>
                 </div>
-                <!-- <div class="flex justify-between">
-                    <h2 class="text-xl font-medium text-primary">Personal</h2>
-                    <h2 class="text-xl font-medium text-primary">Total: {{totalMembers}}</h2>
-                </div> -->
 
                 <div role="list"
                     class="grid h-64 grid-cols-1 gap-2 px-2 my-6 mt-3 overflow-y-auto sm:grid-cols-2 sm:gap-2 lg:grid-cols-2 custom-scroll snap-y snap-proximity">
@@ -240,6 +192,6 @@ const series = [{
                     </ul>
                 </div>
             </div>
-        </div>
+        </div> -->
     </AppLayout>
 </template>

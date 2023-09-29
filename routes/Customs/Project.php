@@ -50,6 +50,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     //CRUD Contracts
     Route::resource('contracts', ContractController::class);
+    //JSON Contracts
+    Route::get('getContracts', [ContractController::class, 'getContracts'])->name('getContracts');
 
     //CRUD Programming
     Route::get('/programming', [ProgrammingController::class, 'index'])->name('programming');

@@ -131,4 +131,11 @@ class ContractController extends Controller
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }
+
+    public function getContracts()
+    {
+        return response()->json([
+            'contracts' => Contract::orderBy('name')->get(),
+        ], 200);
+    }
 }

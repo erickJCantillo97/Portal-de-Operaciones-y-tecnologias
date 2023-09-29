@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { PieChart } from 'echarts/charts';
@@ -24,7 +25,7 @@ const props = defineProps({
         default: null
     }
 });
-
+console.log(props.series)
 use([
     TitleComponent,
     TooltipComponent,
@@ -34,34 +35,45 @@ use([
     ToolboxComponent
 ]);
 
-const option = {
+/** 
+ * @rgutierrez
+ * String template
+
+Valores formatter:
+
+{a}: series name.
+{b}: the name of a data item.
+{c}: the value of a data item.
+{@xxx}: the value of a dimension named 'xxx', for example, {@product} refers the value of 'product' dimension.
+{@[n]}: the value of a dimension at the index of n, for example, {@[3]} refers the value at dimensions[3].
+*/
+const option = ref({
     title: props.title,
-    tooltip: {
-        trigger: 'item',
-        formatter: '{b}: ({d}%)'
-    },
+    // tooltip: {
+    //     trigger: 'item',
+    //     formatter: '{b}: (${c} M)'
+    // },
     series: props.series,
-    legend: {
-        bottom: 10,
-        left: 'center',
-        data: props.legend
-    },
+    // legend: {
+    //     bottom: 10,
+    //     left: 'center',
+    //     data: props.legend
+    // },
     toolbox: {
-    show: true,
-    feature: {
-      mark: { show: true },
-      dataView: { show: true, readOnly: false },
-      restore: { show: true },
-      saveAsImage: { show: true }
-    }
-  },
-};
-
-
+        show: true,
+        feature: {
+            mark: { show: true },
+            dataView: { show: false, readOnly: false },
+            restore: { show: false },
+            saveAsImage: { show: true }
+        }
+    },
+});
 </script>
 <style scoped>
 .chart {
     height: 50vh;
+    /* El gráfico ocupa todo el espacio disponible */
 }
 </style>
 <template>
