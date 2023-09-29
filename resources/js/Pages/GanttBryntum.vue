@@ -209,7 +209,6 @@ const gantt = new Gantt(({
         }
     ],
     // Allow extra space for baseline(s)
-    rowHeight: 60,
     subGridConfigs: {
         locked: {
             flex: 1
@@ -282,10 +281,10 @@ const gantt = new Gantt(({
 
     },
     tbar: {
+        height:'4em',
         items: [
             {
                 type: "buttonGroup",
-                height: '4em',
                 items: [
                     {
                         color: "b-green",
@@ -301,7 +300,6 @@ const gantt = new Gantt(({
             },
             {
                 type: "buttonGroup",
-                height: '4em',
                 items: [
                     {
                         ref: "editTaskButton",
@@ -323,7 +321,6 @@ const gantt = new Gantt(({
             },
             {
                 type: "buttonGroup",
-                height: '4em',
                 items: [
                     {
                         ref: "expandAllButton",
@@ -345,7 +342,6 @@ const gantt = new Gantt(({
             },
             {
                 type: "buttonGroup",
-                height: '4em',
                 items: [
                     {
                         type: "button",
@@ -406,7 +402,6 @@ const gantt = new Gantt(({
             },
             {
                 type: "datefield",
-                height: '4em',
                 ref: "startDateField",
                 placeholder: "Busqueda por fecha",
                 maxWidth: "12em",
@@ -422,7 +417,6 @@ const gantt = new Gantt(({
                 type: "textfield",
                 ref: "filterByName",
                 cls: "filter-by-name",
-                height: '4em',
                 flex: "0 0 12.5em",
                 // Placeholder for others
                 placeholder: "Buscar Actividad",
@@ -440,7 +434,7 @@ const gantt = new Gantt(({
             {
                 type: 'button',
                 ref: 'mspExportBtn',
-                height: '4em',
+                tooltip: "Exportar a XML",
                 icon: 'b-fa-file-export',
                 onAction() {
                     onExport()
@@ -448,21 +442,22 @@ const gantt = new Gantt(({
             },
             {
                 type: 'button',
-                text: 'Lineas base',
-                iconAlign: 'end',
-                height: '4em',
+                text: 'LB',
+                cls:'',
+                // hidden:true,
+                tooltip: "Guardar en linea base",
                 menu: [{
-                    text: 'Guardar en 1',
+                    text: 'Linea base 1',
                     onItem() {
                         setBaseline(1);
                     }
                 }, {
-                    text: 'Guardar en 2',
+                    text: 'Linea base 2',
                     onItem() {
                         setBaseline(2);
                     }
                 }, {
-                    text: 'Guardar en 3',
+                    text: 'Linea base 3',
                     onItem() {
                         setBaseline(3);
                     }
@@ -471,8 +466,7 @@ const gantt = new Gantt(({
             {
                 type: 'button',
                 icon: "b-fa b-fa-eye",
-                iconAlign: 'end',
-                height: '4em',
+                tooltip: "Ver lineas base",
                 menu: [{
                     checked: true,
                     text: 'Linea Base 1',
@@ -493,27 +487,25 @@ const gantt = new Gantt(({
                     }
                 }]
             },
-            {
-                type: 'checkbox',
-                text: 'Mostrar todas',
-                height: '4em',
-                checked: true,
-                toggleable: true,
-                onAction({ checked }) {
-                    gantt.features.baselines.disabled = !checked;
-                }
-            },
-            {
-                type: 'checkbox',
-                text: 'Habilitar lineas base',
-                cls: 'b-baseline-toggle',
-                height: '4em',
-                checked: true,
-                toggleable: true,
-                onAction({ checked }) {
-                    gantt.features.baselines.renderer = checked ? baselineRenderer : () => { };
-                }
-            }
+            // {
+            //     type: 'checkbox',
+            //     text: 'Mostrar todas',
+            //     checked: true,
+            //     toggleable: true,
+            //     onAction({ checked }) {
+            //         gantt.features.baselines.disabled = !checked;
+            //     }
+            // },
+            // {
+            //     type: 'checkbox',
+            //     text: 'Habilitar lineas base',
+            //     cls: 'b-baseline-toggle',
+            //     checked: true,
+            //     toggleable: true,
+            //     onAction({ checked }) {
+            //         gantt.features.baselines.renderer = checked ? baselineRenderer : () => { };
+            //     }
+            // }
         ]
     },
 }))
@@ -531,6 +523,13 @@ function baselineRenderer({ baselineRecord, taskRecord, renderData }) {
         renderData.className['b-baseline-on-time'] = 1;
     }
 }
+const setBaseline = (index) => {
+    gantt.taskStore.setBaseline(index);
+}
+
+const toggleBaselineVisible = (index, visible) => {
+    gantt.element.classList[visible ? 'remove' : 'add'](`b-hide-baseline-${index}`);
+}
 //#endregion
 
 
@@ -539,7 +538,9 @@ onMounted(() => {
     gantt.appendTo = 'container';
 })
 
-//#region
+//#region toolbar
+
+//exportar
 const onExport = () => {
     // give a filename based on task name
     const filename = gantt.project.taskStore.first && `${gantt.project.taskStore.first.name}.xml`;
@@ -551,7 +552,7 @@ const onExport = () => {
 }
 
 
-// region controller methods
+// añadir tarea
 
 const onAddTaskClick = async () => {
     const added = gantt.taskStore.rootNode.appendChild({
@@ -571,6 +572,8 @@ const onAddTaskClick = async () => {
     });
 }
 
+//editar tarea
+
 const onEditTaskClick = () => {
 
     if (gantt.selectedRecord) {
@@ -580,14 +583,17 @@ const onEditTaskClick = () => {
     }
 }
 
+//expandir todas las tareas
 const onExpandAllClick = () => {
     gantt.expandAll();
 }
 
+//recojer todas las tareas
 const onCollapseAllClick = () => {
     gantt.collapseAll();
 }
 
+//buscar por fecha
 function onStartDateChange({ value, oldValue }) {
     if (!oldValue) {
         // ignore initial set
@@ -599,6 +605,7 @@ function onStartDateChange({ value, oldValue }) {
     gantt.project.setStartDate(value);
 }
 
+//buscar por nombre
 const onFilterChange = ({ value }) => {
     if (value === "") {
         gantt.taskStore.clearFilters();
@@ -613,31 +620,24 @@ const onFilterChange = ({ value }) => {
     }
 }
 
-
+//ver ajustes
 const onSettingsShow = ({ source: menu }) => {
     const { rowHeight, barMargin } = menu.widgetMap;
     rowHeight.value = gantt.rowHeight;
     barMargin.value = gantt.barMargin;
     barMargin.max = gantt.rowHeight / 2 - 5;
 }
-
+//ajuste de altura de filas
 const onSettingsRowHeightChange = ({ value }) => {
     gantt.rowHeight = value;
     gantt.widgetMap.settingsButton.menu.widgetMap.barMargin.max =
         value / 2 - 5;
 }
-
+//ajuste de marjen
 const onSettingsMarginChange = ({ value }) => {
     gantt.barMargin = value;
 }
 
-const setBaseline = (index) => {
-    gantt.taskStore.setBaseline(index);
-}
-
-const toggleBaselineVisible = (index, visible) => {
-    gantt.element.classList[visible ? 'remove' : 'add'](`b-hide-baseline-${index}`);
-}
 //#endregion
 
 

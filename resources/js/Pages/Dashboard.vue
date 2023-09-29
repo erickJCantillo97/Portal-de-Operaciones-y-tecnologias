@@ -1,9 +1,9 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, onMounted } from 'vue';
+import { Link, router, } from '@inertiajs/vue3';
 import axios from 'axios';
 import { usePermissions } from '@/composable/permission';
-import { Link } from '@inertiajs/vue3';
 const { hasRole } = usePermissions();
 import UserHeader from '@/Components/sections/UserHeader.vue';
 import ProjectCard from '@/Components/ProjectCard.vue';
@@ -116,6 +116,10 @@ const series = [{
 
 //#endregion
 
+//#region botones de accion tabla de proyectos
+
+
+//#endregion
 </script>
 
 <template>
@@ -162,12 +166,12 @@ const series = [{
                             <div
                                 class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
                                 <div title="Ver programacion">
-                                    <Button severity="primary" @click="" class="hover:bg-primary">
+                                    <Button severity="primary" @click="router.get(route('programming'),{id:slotProps.data.id})" class="hover:bg-primary">
                                         <i class="fa-solid fa-list-check " />
                                     </Button>
                                 </div>
                                 <div title="Ver cronograma">
-                                    <Button severity="success" @click="" class="hover:bg-danger">
+                                    <Button severity="success" @click="router.get(route('createSchedule.create', slotProps.data.id))" class="hover:bg-danger">
                                         <i class="fa-solid fa-chart-gantt" />
                                     </Button>
                                 </div>
