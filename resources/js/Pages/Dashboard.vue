@@ -6,7 +6,7 @@ import { usePermissions } from '@/composable/permission';
 import { Link } from '@inertiajs/vue3';
 const { hasRole } = usePermissions();
 import UserHeader from '@/Components/sections/UserHeader.vue';
-import ProjectCard from '@/Components/ProjectCard.vue';
+import ProjectCardMinimal from '@/Components/ProjectCardMinimal.vue';
 import DataTable from 'primevue/datatable';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import Column from 'primevue/column';
@@ -88,14 +88,14 @@ const clearFilter = () => {
 <template>
     <AppLayout>
         <UserHeader></UserHeader>
-        <div class="px-4 py-2 sm:px-6">
+        <div class="sm:px-6">
             <!-- <div class="max-w-full p-3 border-2 border-blue-100 rounded-xl">
                     <dl class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                         <ProjectCard v-for="project of projects" :project="project" :activo="false" />
                     </dl>
                 </div> -->
             <!--DATATABLE PROYECTOS-->
-            <div class="max-w-full p-3 m-4 border-2 border-blue-100 rounded-xl">
+            <div class=" p-3 rounded-xl m-1 shadow-md ">
                 <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
                     dataKey="id" filterDisplay="menu" :loading="loading"
                     :globalFilterFields="['name', 'gerencia', 'start_date', 'end_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
@@ -106,7 +106,7 @@ const clearFilter = () => {
                     <!--COLUMNAS-->
                     <Column field="name" header="Proyecto">
                         <template #body="slotProps">
-                            <ProjectCard :project="slotProps.data" :activo="false" :menu="false" :avance="false" />
+                            <ProjectCardMinimal :project="slotProps.data" :activo="false" :menu="false" :avance="false" />
                         </template>
                     </Column>
                     <Column field="avance" header="Ejecución">
@@ -143,6 +143,7 @@ const clearFilter = () => {
                     </Column>
                 </DataTable>
             </div>
+
             <DataChart></DataChart>
         </div>
         <!-- <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">

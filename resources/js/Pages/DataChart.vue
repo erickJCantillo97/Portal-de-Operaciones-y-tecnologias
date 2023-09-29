@@ -21,12 +21,18 @@ const loadInitialSelectedContracts = () => {
     contractsList();
 }
 
+const suma = ref(0);
+let loading=true
 //Obtener Contratos por API Routes
 const getContracts = () => {
     try {
         axios.get(route('getContracts')).then((res) => {
             contracts.value = res.data.contracts
             loadInitialSelectedContracts()
+            selectedContracts.value = res.data.contracts
+            suma.value =  res.data.contracts.reduce((total, objeto) => total + parseInt(objeto.cost), 0);
+            contractsList();
+            loading = false;
         })
     } catch (error) {
         console.error('Error al obtener contratos:', error);
@@ -146,7 +152,7 @@ const contractsList = () => {
 </script>
 <template>
     <!--DATATABLE CONTRATOS-->
-    <div class="grid grid-cols-1 p-3 m-1 border-2 border-blue-100 sm:grid-cols-1 md:grid-cols-2 rounded-xl">
+    <div class="grid grid-cols-1 p-3 m-1 sm:grid-cols-1 md:grid-cols-2 rounded-xl">
         <DataTable id="tabla" stripedRows class="p-datatable-sm" @rowUnselect="onRowUnselect" @rowSelect="onRowSelect"
             :value="contracts" v-model:selection="selectedContracts" v-model:filters="filters" dataKey="id"
             filterDisplay="menu" :loading="loading" :selectAll="false"
@@ -179,16 +185,20 @@ const contractsList = () => {
             <!--COLUMNAS-->
             <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
             <Column field="name" header="Contrato"></Column>
+            <Column header="Porcentaje">
+                <template #body="slotProps">
+                    {{ ((slotProps.data.cost/suma)*100).toFixed(2) }} %
+                </template>
+            </Column>
             <Column field="cost" header="Costo">
                 <template #body="slotProps">
                     {{ formatCurrency(slotProps.data.cost) }}
                 </template>
             </Column>
-            <Column field="cost" header="Porcentaje"></Column>
             <Column field="end_date" header="Fecha Finalización"></Column>
         </DataTable>
         <div class="ml-1">
-            <div class="max-w-full p-3 m-1 border-2 border-blue-100 rounded-xl md:max-w-full md:border-2 md:rounded-xl">
+            <div class="max-w-full p-3 m-1 rounded-xl md:max-w-full md:border-2 md:rounded-xl">
                 <!--:key="showGraph" permite Re renderizar un componente hijo-->
                 <PieChart :title="title" :series="series" :key="showGraph"></PieChart>
             </div>
