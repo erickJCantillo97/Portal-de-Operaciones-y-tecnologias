@@ -84,10 +84,15 @@ class ScheduleController extends Controller
         $assgimentRows = [];
         if (isset($request->tasks['added'])) {
             foreach ($request->tasks['added'] as $task) {
+                if(isset($task['parentID'])){
+                    $parentID = null;
+                }else {
+                    $parentID = is_numeric( $task['parentId']) ?$parentID = Task::orWhere('id', $task['parentId'])->first()->id : $parentID = Task::where('PhantomId', $task['parentId'])->first()->id;
+                }
                 $taskCreate = Task::create([
                     'project_id' => $project->id,
                     'name' => $task['name'],
-                    'task_id' => $task['parentId'] != null ? Task::where('PhantomId', $task['parentId'])->first()->id : null,
+                    'task_id' => $parentID,
                     'PhantomId' => $task['$PhantomId'],
                     'percentDone' => $task['percentDone'],
                     'duration' => $task['duration'],
