@@ -15,14 +15,16 @@ onMounted(() => {
     getContracts();
     // contractsList();
 })
-
+const suma = ref(0);
 //Obtener Contratos por API Routes
 const getContracts = () => {
     try {
         axios.get(route('getContracts')).then((res) => {
             contracts.value = res.data.contracts
             selectedContracts.value = res.data.contracts
+            suma.value =  res.data.contracts.reduce((total, objeto) => total + parseInt(objeto.cost), 0);
             contractsList();
+
         })
     } catch (error) {
         console.error('Error al obtener contratos:', error);
@@ -177,6 +179,11 @@ const contractsList = () => {
             <!--COLUMNAS-->
             <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
             <Column field="name" header="Contrato"></Column>
+            <Column header="Porcentaje">
+                <template #body="slotProps">
+                    {{ ((slotProps.data.cost/suma)*100).toFixed(2) }} %
+                </template>
+            </Column>
             <Column field="cost" header="Costo">
                 <template #body="slotProps">
                     {{ formatCurrency(slotProps.data.cost) }}
