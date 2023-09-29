@@ -108,13 +108,22 @@ const filterProject = (id) => {
 //#region
 const items = ref([
     {
-        label: 'Editar recursos',
+        label: 'Añadir recursos',
         icon: 'fa-solid fa-chart-gantt',
         url: {
             name: 'createSchedule.create',
             parametter: ''
         }
     },
+    {
+        label: 'Asignar colaborador',
+        icon: 'fa-solid fa-arrows-down-to-people',
+        url: {
+            name: 'createSchedule.create',
+            parametter: ''
+        }
+    },
+
     {
         label: 'Ver programacion',
         icon: 'fa-solid fa-list-check',
@@ -148,14 +157,14 @@ const items = ref([
                         </Button>
                     </div>
                     <div class="flex w-11/12 p-1 space-x-2 shadow-sm shadow-primary rounded-xl overflow-x-auto snap-x">
-                        <ProjectCard v-for="project in projects" :projectId=project  :menu=false clases="cursor-pointer"
+                        <ProjectCard v-for="project in projects" :projectId=project :menu=false clases="cursor-pointer"
                             @click="filterProject(project)" :activo="filters['project.id'].value == project" />
                     </div>
                 </div>
 
             </div>
-            <DataTable id="tabla" stripedRows class="p-datatable-sm items-center" :value="tasks" v-model:filters="filters" dataKey="id"
-                filterDisplay="menu" :loading="loading" sortMode="multiple"
+            <DataTable id="tabla" stripedRows class="p-datatable-sm items-center" :value="tasks" v-model:filters="filters"
+                dataKey="id" filterDisplay="menu" :loading="loading" sortMode="multiple"
                 :globalFilterFields="['name', 'project', 'executor', 'manager', 'duration', 'startDate', 'endDate',]"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
@@ -244,7 +253,8 @@ const items = ref([
                     <template #body="slotProps">
                         <MinimalMenu :items="items" :header="true">
                             <template #header>
-                                <p class="border-b border-gray-600 font-semibold text-center text-black">{{slotProps.data.name}}</p>
+                                <p class="border-b border-gray-600 font-semibold text-center text-black">
+                                    {{ slotProps.data.name }}</p>
                             </template>
                         </MinimalMenu>
                     </template>
