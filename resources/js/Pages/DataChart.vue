@@ -22,7 +22,7 @@ const loadInitialSelectedContracts = () => {
 }
 
 const suma = ref(0);
-let loading=true
+let loading = true
 //Obtener Contratos por API Routes
 const getContracts = () => {
     try {
@@ -30,8 +30,7 @@ const getContracts = () => {
             contracts.value = res.data.contracts
             loadInitialSelectedContracts()
             selectedContracts.value = res.data.contracts
-            suma.value =  res.data.contracts.reduce((total, objeto) => total + parseInt(objeto.cost), 0);
-            contractsList();
+            suma.value = res.data.contracts.reduce((total, objeto) => total + parseInt(objeto.cost), 0);
             loading = false;
         })
     } catch (error) {
@@ -187,7 +186,7 @@ const contractsList = () => {
             <Column field="name" header="Contrato"></Column>
             <Column header="Porcentaje">
                 <template #body="slotProps">
-                    {{ ((slotProps.data.cost/suma)*100).toFixed(2) }} %
+                    {{ ((slotProps.data.cost / suma) * 100).toFixed(2) }} %
                 </template>
             </Column>
             <Column field="cost" header="Costo">

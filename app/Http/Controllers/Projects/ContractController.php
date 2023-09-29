@@ -135,7 +135,7 @@ class ContractController extends Controller
     public function getContracts()
     {
         return response()->json([
-            'contracts' => Contract::orderBy('name')->take(3)->get(),
+            'contracts' => Contract::orderBy('name')->get(),
         ], 200);
     }
 }
