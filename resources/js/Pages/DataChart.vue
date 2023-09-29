@@ -13,9 +13,9 @@ import '../../sass/dataTableCustomized.scss';
 onMounted(() => {
     initFilters();
     getContracts();
-    // contractsList();
 })
 const suma = ref(0);
+let loading=true
 //Obtener Contratos por API Routes
 const getContracts = () => {
     try {
@@ -24,7 +24,6 @@ const getContracts = () => {
             selectedContracts.value = res.data.contracts
             suma.value =  res.data.contracts.reduce((total, objeto) => total + parseInt(objeto.cost), 0);
             contractsList();
-
         })
     } catch (error) {
         console.error('Error al obtener contratos:', error);
