@@ -1,17 +1,15 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, onMounted } from 'vue';
+import { Link, router, } from '@inertiajs/vue3';
 import axios from 'axios';
 import { usePermissions } from '@/composable/permission';
-import { Link } from '@inertiajs/vue3';
 const { hasRole } = usePermissions();
 import UserHeader from '@/Components/sections/UserHeader.vue';
-import ProjectCard from '@/Components/ProjectCard.vue';
+import ProjectCardMinimal from '@/Components/ProjectCardMinimal.vue';
 import DataTable from 'primevue/datatable';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import Column from 'primevue/column';
-import Tag from 'primevue/tag';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon } from '@heroicons/vue/20/solid';
 import Button from '@/Components/Button.vue';
 import ProgressBar from 'primevue/progressbar';
 import DataChart from './DataChart.vue';
@@ -106,7 +104,7 @@ const clearFilter = () => {
                     
                     <Column field="name" header="Proyecto">
                         <template #body="slotProps">
-                            <ProjectCard :project="slotProps.data" :activo="false" :menu="false" :avance="false" />
+                            <ProjectCardMinimal :project="slotProps.data" :activo="false" :menu="false" :avance="false" />
                         </template>
                     </Column>
                     <Column field="avance" header="Ejecución">
@@ -129,12 +127,12 @@ const clearFilter = () => {
                             <div
                                 class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
                                 <div title="Ver programacion">
-                                    <Button severity="primary" @click="" class="hover:bg-primary">
+                                    <Button severity="primary" @click="router.get(route('programming'),{id:slotProps.data.id})" class="hover:bg-primary">
                                         <i class="fa-solid fa-list-check " />
                                     </Button>
                                 </div>
                                 <div title="Ver cronograma">
-                                    <Button severity="success" @click="" class="hover:bg-danger">
+                                    <Button severity="success" @click="router.get(route('createSchedule.create', slotProps.data.project_id))" class="hover:bg-danger">
                                         <i class="fa-solid fa-chart-gantt" />
                                     </Button>
                                 </div>

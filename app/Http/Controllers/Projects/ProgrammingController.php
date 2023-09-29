@@ -12,9 +12,6 @@ class ProgrammingController extends Controller
 
 
     public function index(){
-        $projects = Project::orderBy('name')->get();
-        return Inertia::render('Programming/Index', [
-            'projects' => $projects
-        ]);
+        return Inertia::render('Programming/Index');
     }
 }

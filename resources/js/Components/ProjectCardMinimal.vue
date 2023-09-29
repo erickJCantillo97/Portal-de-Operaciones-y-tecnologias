@@ -36,7 +36,6 @@ const props = defineProps({
 const project = ref({});
 const cagando = ref(true)
 if (props.project) {
-    console.log(props.project)
     project.value = props.project
     cagando.value = false;
 } else {
@@ -53,7 +52,7 @@ const items = ref([
         icon: 'fa-solid fa-chart-gantt',
         url: {
             name: 'createSchedule.create',
-            parametter: (props.projectId ? props.projectId: props.project.id )
+            parametter: (props.project.id ? props.project.id : props.projectId)
         }
     },
     {
@@ -61,7 +60,7 @@ const items = ref([
         icon: 'fa-solid fa-list-check',
         url: {
             name: 'programming',
-            parametter: (props.projectId ? props.projectId: props.project.id)
+            parametter: (props.project.id ? props.project.id : props.projectId)
         }
     },
     {
@@ -69,7 +68,7 @@ const items = ref([
         icon: 'fa-solid fa-diagram-project',
         url: {
             name: 'createSchedule.create',
-            parametter: (props.projectId ? props.projectId: props.project.id)
+            parametter: (props.project.id ? props.project.id : props.projectId)
         }
     },
 ]);
@@ -77,26 +76,26 @@ const items = ref([
 </script>
 
 <template>
-    <div v-if="cagando" :class="activo ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+    <!-- <div v-if="cagando" :class="activo ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90' + clases"
         class="flex w-60 rounded-md hover:z-20 hover:scale-110">
         <Skeleton shape="circle" size="2rem" class="mr-2"></Skeleton>
         <div class="align-self-center" style="flex: 1">
             <Skeleton width="100%" class="mb-1"></Skeleton>
             <Skeleton width="100%"></Skeleton>
         </div>
-    </div>
-    <div v-else :class="activo ? 'bg-sky-500 text-white' : 'bg-white text-gray-90'"
-        class="flex items-center h-14 w-60 rounded-md border hover:z-20 hover:scale-110">
-        <img :src=project.file class="rounded-lg h-0 sm:h-12 sm:w-16 m-1"/>
-        <div class="w-3/5 h-full m-1 text-center">
-            <p class="text-xs font-bold m-1">{{ project.name }}</p>
-            <!-- <div class="flex space-x-1">
+    </div> -->
+    <div :class="activo ? 'bg-sky-500 text-white' : 'bg-white text-gray-90' + clases"
+        class="flex items-center h-14 min-w-max rounded-md">
+        <img :src=project.file class="rounded-lg h-0 sm:h-12 sm:w-16 mr-1" />
+        <div class="flex-col">
+            <p class="text-xs font-bold">{{ project.name }}</p>
+            <div class="flex space-x-1">
                 <p class="text-xs italic">Inicio:</p>
                 <p class="text-xs italic"> {{ project.fechaI }}</p>
-            </div> -->
-            <ProgressBar v-if="avance" class="h-full justify-end" :value="parseInt(project.avance)"></ProgressBar>
+            </div>
+            <!-- <ProgressBar v-if="avance" class="items-end" :value="parseInt(project.avance)"></ProgressBar> -->
         </div>
-        <div v-if="menu" class="m-1 flex w-1/8 justify-center">
+        <!-- <div v-if="menu" class="flex w-1/8 justify-center align-middle">
             <MinimalMenu :items="items" :header="true">
                 <template #header>
                     <div class="flex relative text-center text-black">
@@ -105,7 +104,7 @@ const items = ref([
                     </div>
                 </template>
             </MinimalMenu>
-        </div>
+        </div> -->
     </div>
 </template>
 

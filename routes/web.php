@@ -97,7 +97,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         }, $tareas);
 
         return response()->json(
-            VirtualTask::with('project', 'project.ship', 'assignments')->where(function ($query) use ($date_start, $date_end) {
+            VirtualTask::with('project',  'assignments')->where(function ($query) use ($date_start, $date_end) {
                 $query->whereBetween('startdate', [$date_start, $date_end])
                     ->orWhereBetween('enddate', [$date_start, $date_end])
                     ->orWhere(function ($query) use ($date_start, $date_end) {
