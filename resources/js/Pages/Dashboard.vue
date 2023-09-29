@@ -95,7 +95,7 @@ const clearFilter = () => {
                     </dl>
                 </div> -->
             <!--DATATABLE PROYECTOS-->
-            <div class="border-blue-100 p-3 rounded-xl m-1 border-2">
+            <div class=" p-3 rounded-xl m-1 shadow-md ">
                 <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
                     dataKey="id" filterDisplay="menu" :loading="loading"
                     :globalFilterFields="['name', 'gerencia', 'start_date', 'end_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
@@ -143,7 +143,6 @@ const clearFilter = () => {
                     </Column>
                 </DataTable>
             </div>
-
 
             <DataChart></DataChart>
         </div>
