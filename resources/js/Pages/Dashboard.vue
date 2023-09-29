@@ -6,7 +6,7 @@ import { usePermissions } from '@/composable/permission';
 import { Link } from '@inertiajs/vue3';
 const { hasRole } = usePermissions();
 import UserHeader from '@/Components/sections/UserHeader.vue';
-import ProjectCard from '@/Components/ProjectCard.vue';
+import ProjectCardMinimal from '@/Components/ProjectCardMinimal.vue';
 import DataTable from 'primevue/datatable';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import Column from 'primevue/column';
@@ -106,7 +106,7 @@ const clearFilter = () => {
                     <!--COLUMNAS-->
                     <Column field="name" header="Proyecto">
                         <template #body="slotProps">
-                            <ProjectCard :project="slotProps.data" :activo="false" :menu="false" :avance="false" />
+                            <ProjectCardMinimal :project="slotProps.data" :activo="false" :menu="false" :avance="false" />
                         </template>
                     </Column>
                     <Column field="avance" header="Ejecución">
