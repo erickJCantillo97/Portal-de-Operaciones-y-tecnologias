@@ -15,7 +15,7 @@ onMounted(() => {
     getContracts();
     // contractsList();
 })
-
+let loading=true
 //Obtener Contratos por API Routes
 const getContracts = () => {
     try {
@@ -23,6 +23,7 @@ const getContracts = () => {
             contracts.value = res.data.contracts
             selectedContracts.value = res.data.contracts
             contractsList();
+            loading=false
         })
     } catch (error) {
         console.error('Error al obtener contratos:', error);
