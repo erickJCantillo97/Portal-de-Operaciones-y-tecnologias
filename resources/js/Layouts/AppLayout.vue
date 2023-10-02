@@ -79,9 +79,10 @@
     </div>
 
     <div class="fixed right-0 bottom-0 -mt-24 w-10 shadow-2xl">
-        <Button severity="primary" @click="sugerenciaVisible = true" v-if="!sugerenciaVisible">
+        <Button v-tooltip="'¿Alguna sugerencia?'" severity="primary" @click="sugerenciaVisible = true"
+        v-if="!sugerenciaVisible" class="animate-bounce">
             <!-- <p>¿Sugerencias?</p> -->
-            <QuestionMarkCircleIcon />
+            <QuestionMarkCircleIcon class="animate-spin"/>
         </Button>
         <transition leave-active-class="transition ease-in duration-300" leave-from-class="opacity-100"
             leave-to-class="opacity-0">
@@ -98,12 +99,12 @@
                         required></textarea>
 
                     <div class="space-x-3 flex">
-                        <div class="w-1/2">
+                        <div class="w-1/2" v-tooltip.top="{ value: 'Enviar', showDelay: 1000, hideDelay: 300 }">
                             <Button type="button" severity="success" @click="enviaSugerencia()">
                                 <CheckIcon class="h-6" />
                             </Button>
                         </div>
-                        <div class="w-1/2">
+                        <div class="w-1/2" v-tooltip.top="{ value: 'Cancelar', showDelay: 1000, hideDelay: 300 }">
                             <Button type="button" severity="danger" @click="sugerenciaVisible = false">
                                 <XCircleIcon class="h-6" />
                             </Button>
@@ -132,6 +133,9 @@ import MenuSidebar from '@/Components/MenuSidebar.vue';
 import DropdownSetting from '@/Components/DropdownSetting.vue';
 import Button from '@/Components/Button.vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
+import html2canvas from 'html2canvas';
+import { useSweetalert } from '@/composable/sweetAlert';
+const { toast } = useSweetalert();
 const menu = ref(false)
 
 const sugerenciaVisible = ref(false)
@@ -140,12 +144,16 @@ const logout = () => {
     router.post(route('logout'));
 };
 
-const sugerencia =ref('')
+const sugerencia = ref('')
+const captura = ref()
 
 const enviaSugerencia = () => {
     console.log(window.location.href)
     console.log(sugerencia.value)
+    html2canvas(document.body).then(canvas => {
+        captura.value = canvas.toDataURL()
+    })
+    toast('¡Se ha enviado con exito!', 'success');
+    sugerenciaVisible.value = false
 }
-
-
 </script>
