@@ -40,7 +40,7 @@ class ScheduleController extends Controller
     public function index(Project $project)
     {
         return Inertia::render('GanttBryntum', [
-            'project' => $project,
+            'project' => $project->id,
         ]);
     }
 
