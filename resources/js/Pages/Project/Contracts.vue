@@ -70,7 +70,7 @@ onMounted(() => {
     //         },
     //     });
     // });
-    contractNotification(customerSelect, shipSelect, formData.cost);
+    // contractNotification(customerSelect, shipSelect, formData.cost);
     initFilters();
 })
 

@@ -14,16 +14,23 @@ onMounted(() => {
     initFilters();
     getContracts();
 })
+
+//Selecciona por defecto 5 contratos para graficar
+const loadInitialSelectedContracts = () => {
+    selectedContracts.value = contracts.value.length > 5 ? contracts.value.slice(0, 5) : contracts.value;
+    contractsList();
+}
+
 const suma = ref(0);
-let loading=true
+let loading = true
 //Obtener Contratos por API Routes
 const getContracts = () => {
     try {
         axios.get(route('getContracts')).then((res) => {
             contracts.value = res.data.contracts
+            loadInitialSelectedContracts()
             selectedContracts.value = res.data.contracts
-            suma.value =  res.data.contracts.reduce((total, objeto) => total + parseInt(objeto.cost), 0);
-            contractsList();
+            suma.value = res.data.contracts.reduce((total, objeto) => total + parseInt(objeto.cost), 0);
             loading = false;
         })
     } catch (error) {
@@ -59,11 +66,8 @@ const onRowSelect = (event) => {
 const onRowUnselect = (event) => {
     datos.value = []
     series.value = []
-    // console.log("Seleccionado " + event.data.id)
     selectedContracts.value = selectedContracts.value.filter((contract) => contract.id !== event.data.id)
-    // console.log(selectedContracts.value)
     contractsList()
-    // console.log(datos.value.length)
 }
 
 const formatCurrency = (value) => {
@@ -91,6 +95,7 @@ const series = ref([])
 
 const contractsList = () => {
     showGraph.value++;
+
     selectedContracts.value.forEach((contract) => {
         let a = {
             value: contract.cost / 1000000,
@@ -153,7 +158,7 @@ const contractsList = () => {
             :globalFilterFields="['name', 'gerencia', 'start_date', 'end_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
             currentPageReportTemplate=" {first} al {last} de {totalRecords}"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-            :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
+            :paginator="true" :rows="7" :rowsPerPageOptions="[5, 10, 15, 50]">
 
             <template #header>
                 <div class="flex justify-between w-full h-8 mb-2 ">
@@ -181,7 +186,7 @@ const contractsList = () => {
             <Column field="name" header="Contrato"></Column>
             <Column header="Porcentaje">
                 <template #body="slotProps">
-                    {{ ((slotProps.data.cost/suma)*100).toFixed(2) }} %
+                    {{ ((slotProps.data.cost / suma) * 100).toFixed(2) }} %
                 </template>
             </Column>
             <Column field="cost" header="Costo">
