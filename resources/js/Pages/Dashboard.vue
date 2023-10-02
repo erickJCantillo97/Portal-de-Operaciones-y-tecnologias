@@ -3,7 +3,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { usePermissions } from '@/composable/permission';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 const { hasRole } = usePermissions();
 import UserHeader from '@/Components/sections/UserHeader.vue';
 import ProjectCardMinimal from '@/Components/ProjectCardMinimal.vue';
@@ -36,18 +36,18 @@ const filters = ref({
 
 onMounted(() => {
     initFilters();
-    axios.get(route('get.empleados.gerencia')).then((res) => {
-        for (var gerencia of Object.values(res.data)) {
-            personal.value.push({
-                title: hasRole('Super Admin') ? gerencia[0].Gerencia : gerencia[0].Oficina,
-                initials: gerencia.length,
-                totalMembers: gerencia.length,
-                bgColorClass: gerencia[0].Gerencia != 'GECON' ? colors[gerencia[0].Gerencia] : 'bg-' + gerencia[0].Gerencia,
-            },)
-            totalMembers.value += gerencia.length
-        }
-    })
-    getTask();
+    // axios.get(route('get.empleados.gerencia')).then((res) => {
+    //     for (var gerencia of Object.values(res.data)) {
+    //         personal.value.push({
+    //             title: hasRole('Super Admin') ? gerencia[0].Gerencia : gerencia[0].Oficina,
+    //             initials: gerencia.length,
+    //             totalMembers: gerencia.length,
+    //             bgColorClass: gerencia[0].Gerencia != 'GECON' ? colors[gerencia[0].Gerencia] : 'bg-' + gerencia[0].Gerencia,
+    //         },)
+    //         totalMembers.value += gerencia.length
+    //     }
+    // })
+    // getTask();
 })
 
 const formatCurrency = (value) => {
@@ -129,12 +129,16 @@ const clearFilter = () => {
                             <div
                                 class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
                                 <div title="Ver programacion">
-                                    <Button severity="primary" @click="" class="hover:bg-primary">
+                                    <Button severity="primary"
+                                        @click="router.get(route('programming'),{ id: slotProps.data.project_id })"
+                                        class="hover:bg-primary">
                                         <i class="fa-solid fa-list-check " />
                                     </Button>
                                 </div>
                                 <div title="Ver cronograma">
-                                    <Button severity="success" @click="" class="hover:bg-danger">
+                                    <Button severity="success"
+                                        @click="router.get(route('createSchedule.create', slotProps.data.project_id))"
+                                        class="hover:bg-danger">
                                         <i class="fa-solid fa-chart-gantt" />
                                     </Button>
                                 </div>
@@ -143,14 +147,16 @@ const clearFilter = () => {
                     </Column>
                 </DataTable>
             </div>
+            <div class=" p-3 rounded-xl m-1 shadow-md ">
 
-            <DataChart></DataChart>
+                <DataChart></DataChart>
+            </div>
         </div>
         <!-- <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
             <TimeLine :projects="props.projects"></TimeLine>
         </div>  -->
 
-        <div class="grid grid-cols-1 gap-2 mb-8 md:grid-cols-2">
+        <!-- <div class="grid grid-cols-1 gap-2 mb-8 md:grid-cols-2">
             <div class="m-4">
                 <div
                     class="w-full p-4 font-extrabold text-center text-black rounded-xl bg-gradient-to-b from-gray-400 to-slate-50">
@@ -193,6 +199,5 @@ const clearFilter = () => {
                     </ul>
                 </div>
             </div>
-        </div>
-    </AppLayout>
-</template>
+        </div> -->
+</AppLayout></template>

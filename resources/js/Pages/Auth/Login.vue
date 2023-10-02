@@ -45,7 +45,7 @@ const submit = () => {
             </video>
             <AuthenticationCard>
                 <template #logo>
-                    <ApplicationLogo height-logo="100" width-logo="100" />
+                    <ApplicationLogo :height-logo=100 :width-logo=100 />
                 </template>
                 <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
                     {{ status }}

@@ -16,41 +16,21 @@ const props = defineProps({
 })
 const personalSelect = ref();
 
-const getPersonalCargo = async (cargo) => {
-    await axios.get(route('get.personal.cargo', cargo)).then((res) => {
+const cargoRecurso = async () => {
+    await axios.get(route('get.cargos')).then((res) => {
         personal.value = res.data.personal;
         return res.data.personal;
     })
 }
 
 onMounted(() => {
-
+    cargoRecurso()
 });
 
-const getAssignmentsTask = async () => {
-    await axios.get(route('get.assignments.task', props.task.id))
-        .then((res) => {
-            assignments.value = res.data.assignments
-            if (assignments.value.length > 0) {
-                for (var assignment of assignments.value) {
-                    console.log(assignment.name);
-                    axios.get(route('get.personal.cargo')).then((res) => {
-                        personal.value[assignment.name] = res.data.personal[assignment.name];
-                    })
-                }
-            }
-            open.value = true
-        })
 
-
-}
 </script>
 
 <template>
-    <Button severity="primary" @click="getAssignmentsTask()" class="hover:bg-primary">
-        <EyeIcon class="w-4 h-4 " aria-hidden="true" />
-    </Button>
-
     <TransitionRoot as="template" :show="open">
         <Dialog as="div" class="relative z-30" @close="open = false">
             <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
