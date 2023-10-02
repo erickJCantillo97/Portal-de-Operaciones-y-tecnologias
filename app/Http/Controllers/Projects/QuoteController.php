@@ -20,12 +20,7 @@ class QuoteController extends Controller
         $quotes = Quote::with('ship')->orderBy('id')->get();
         $ships = Ship::orderBy('name')->get();
 
-        return Inertia::render('Project/Quotes',
-            [
-                'quotes' => $quotes,
-                'ships' => $ships,
-            ]
-        );
+        return Inertia::render('Project/Quotes', compact('quotes', 'ships'));
         // return response()->json([
         //     $quote
         // ], 200);

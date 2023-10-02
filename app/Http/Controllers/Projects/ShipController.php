@@ -21,6 +21,7 @@ class ShipController extends Controller
         if (isset($request->id)) {
 
             $ships = Ship::with('customer')->where('customer_id', $request->id)->get();
+
             // dd($ships);
             return Inertia::render('Project/Ships',
                 [
@@ -32,16 +33,8 @@ class ShipController extends Controller
             $ships = Ship::with('customer')->orderBy('name')->get();
             $customers = Customer::orderBy('name')->get();
 
-            return Inertia::render('Project/Ships',
-                [
-                    'ships' => $ships,
-                    'customers' => $customers,
-                ]
-            );
+            return Inertia::render('Project/Ships', compact('ships', 'customers'));
         }
-        // return response()->json([
-        //     $ship
-        // ], 200);
     }
 
     /**

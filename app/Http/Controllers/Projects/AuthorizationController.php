@@ -24,14 +24,7 @@ class AuthorizationController extends Controller
         $contracts = Contract::orderBy('name')->get();
         $quotes = Quote::orderBy('name')->get();
 
-        return Inertia::render('Project/Authorizations',
-            [
-                'authorizations' => $authorizations,
-                'ships' => $ships,
-                'contracts' => $contracts,
-                'quotes' => $quotes,
-            ]
-        );
+        return Inertia::render('Project/Authorizations', compact('authorizations', 'ships', 'contracts', 'quotes'));
     }
 
     /**
