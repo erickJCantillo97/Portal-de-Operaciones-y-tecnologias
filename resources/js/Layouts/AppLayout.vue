@@ -81,7 +81,6 @@
     <div class="fixed right-0 bottom-0 -mt-24 w-10 shadow-2xl">
         <Button v-tooltip="'¿Alguna sugerencia?'" severity="primary" @click="sugerenciaVisible = true"
         v-if="!sugerenciaVisible" class="animate-bounce">
-            <!-- <p>¿Sugerencias?</p> -->
             <QuestionMarkCircleIcon class="animate-spin"/>
         </Button>
         <transition leave-active-class="transition ease-in duration-300" leave-from-class="opacity-100"
@@ -124,7 +123,7 @@ import {
     Bars3CenterLeftIcon
 } from '@heroicons/vue/24/outline'
 import {
-    BellIcon, ChevronDownIcon, ArrowLeftCircleIcon, FaceSmileIcon,
+    BellIcon, ChevronDownIcon, ArrowLeftCircleIcon,
     QuestionMarkCircleIcon,
     XCircleIcon,
     CheckIcon
@@ -155,5 +154,6 @@ const enviaSugerencia = () => {
     })
     toast('¡Se ha enviado con exito!', 'success');
     sugerenciaVisible.value = false
+    sugerencia.value=null
 }
 </script>
