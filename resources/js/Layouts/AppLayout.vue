@@ -86,20 +86,20 @@
         <transition leave-active-class="transition ease-in duration-300" leave-from-class="opacity-100"
             leave-to-class="opacity-0">
             <div class="chat-popup" v-if="sugerenciaVisible">
-                <form action="" class="form-container shadow-2xl border-blue-200 border">
+                <form class="form-container shadow-2xl border-blue-200 border">
                     <div class="flex space-x-5 items-center text-xl font-semibold">
                         <ApplicationLogo class="justify-center" :letras="true" :width-logo="50" :height-logo="50">
                         </ApplicationLogo>
                         <h1>¡Bienvenido!</h1>
                     </div>
                     <label class="mt-2 text-center" for="msg"><b>¿Tienes algo que comentar?</b></label>
-                    <textarea class="bg-slate-200 rounded-2xl"
+                    <textarea class="bg-slate-200 rounded-2xl" v-model=sugerencia
                         placeholder="Escribe comentarios, sugerencias, fallas que tengas dentro del portal. ¡Tu ayuda es muy importante para nosotros!"
-                        name="msg" required></textarea>
+                        required></textarea>
 
                     <div class="space-x-3 flex">
                         <div class="w-1/2">
-                            <Button type="submit" severity="success">
+                            <Button type="button" severity="success" @click="enviaSugerencia()">
                                 <CheckIcon class="h-6" />
                             </Button>
                         </div>
@@ -120,13 +120,10 @@ import { ref } from 'vue'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 import { router } from '@inertiajs/vue3'
 import {
-    Bars3CenterLeftIcon, XMarkIcon, FaceFrownIcon,
+    Bars3CenterLeftIcon
 } from '@heroicons/vue/24/outline'
 import {
     BellIcon, ChevronDownIcon, ArrowLeftCircleIcon, FaceSmileIcon,
-    FireIcon,
-    HandThumbUpIcon,
-    HeartIcon,
     QuestionMarkCircleIcon,
     XCircleIcon,
     CheckIcon
@@ -143,21 +140,12 @@ const logout = () => {
     router.post(route('logout'));
 };
 
-//controla la apertura del menu
-const op = ref();
-const toggle = (event) => {
-    op.value.toggle(event);
+const sugerencia =ref('')
+
+const enviaSugerencia = () => {
+    console.log(window.location.href)
+    console.log(sugerencia.value)
 }
 
-//controla los emojis
-const moods = [
-    { name: 'Excited', value: 'excited', icon: FireIcon, iconColor: 'text-white', bgColor: 'bg-red-500' },
-    { name: 'Loved', value: 'loved', icon: HeartIcon, iconColor: 'text-white', bgColor: 'bg-pink-400' },
-    { name: 'Happy', value: 'happy', icon: FaceSmileIcon, iconColor: 'text-white', bgColor: 'bg-green-400' },
-    { name: 'Sad', value: 'sad', icon: FaceFrownIcon, iconColor: 'text-white', bgColor: 'bg-yellow-400' },
-    { name: 'Thumbsy', value: 'thumbsy', icon: HandThumbUpIcon, iconColor: 'text-white', bgColor: 'bg-blue-500' },
-    { name: 'I feel nothing', value: null, icon: XMarkIcon, iconColor: 'text-gray-400', bgColor: 'bg-transparent' },
-]
-const selected = ref(moods[5])
 
 </script>
