@@ -23,14 +23,14 @@ const loadInitialSelectedContracts = () => {
 
 const suma = ref(0);
 let loading = true
+
 //Obtener Contratos por API Routes
 const getContracts = () => {
     try {
         axios.get(route('getContracts')).then((res) => {
             contracts.value = res.data.contracts
             loadInitialSelectedContracts()
-            selectedContracts.value = res.data.contracts
-            suma.value = res.data.contracts.reduce((total, objeto) => total + parseInt(objeto.cost), 0);
+            suma.value = res.data.contracts.reduce((total, obj) => total + parseInt(obj.cost), 0); // Cálculo del Porcentaje de Contratos
             loading = false;
         })
     } catch (error) {
@@ -56,6 +56,7 @@ const clearFilter = () => {
 const onRowSelect = (event) => {
     datos.value = []
     series.value = []
+
     // Agregar el contrato seleccionado a selectedContracts si no está presente
     if (!selectedContracts.value.find((contract) => contract.id === event.data.id)) {
         selectedContracts.value.push(event.data)
@@ -89,15 +90,16 @@ const contracts = ref()
 const selectedContracts = ref([]);
 
 //Carga datos
-const showGraph = ref(0)
+const showGraph = ref(0) //Permite Re-renderizar el componente hijo (PieChart) sin necesidad de recargar página 😎
 const datos = ref([])
 const series = ref([])
+// const legends = ref([])
 
 const contractsList = () => {
-    showGraph.value++;
+    showGraph.value++ //Permite Re-renderizar el componente hijo (PieChart) sin necesidad de recargar página 😎
 
     selectedContracts.value.forEach((contract) => {
-        let a = {
+        let chartItemsRender = {
             value: contract.cost / 1000000,
             name: contract.name,
             label: {
@@ -135,15 +137,16 @@ const contractsList = () => {
                         borderRadius: 4
                     }
                 }
-            },
+            }
         }
-        datos.value.push(a)
-        // legends.value.push(contracts.name)
+        datos.value.push(chartItemsRender)
+        // legends.value.push(chartItemsRender.name)
     })
+
     series.value.push({
         type: 'pie',
-        radius: '65%',
-        center: ['50%', '50%'],
+        radius: '70%',
+        center: ['50%', '55%'],
         selectedMode: 'single',
         data: datos.value
     })
@@ -158,7 +161,7 @@ const contractsList = () => {
             :globalFilterFields="['name', 'gerencia', 'start_date', 'end_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
             currentPageReportTemplate=" {first} al {last} de {totalRecords}"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-            :paginator="true" :rows="7" :rowsPerPageOptions="[5, 10, 15, 50]">
+            :paginator="true" :rows="5" :rowsPerPageOptions="[5, 10, 15, 50]">
 
             <template #header>
                 <div class="flex justify-between w-full h-8 mb-2 ">
@@ -198,7 +201,7 @@ const contractsList = () => {
         </DataTable>
         <div class="ml-1">
             <div class="max-w-full p-3 m-1 rounded-xl md:max-w-full md:border-2 md:rounded-xl">
-                <!--:key="showGraph" permite Re renderizar un componente hijo-->
+                <!--:key="showGraph" permite Re-renderizar un componente hijo 👇🏼-->
                 <PieChart :title="title" :series="series" :key="showGraph"></PieChart>
             </div>
         </div>

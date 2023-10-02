@@ -23,12 +23,7 @@ class ContractController extends Controller
         $ships = Ship::orderBy('name')->get();
         $customers = Customer::orderBy('name')->get();
 
-        return Inertia::render('Project/Contracts',
-            [
-                'contracts' => $contracts,
-                'customers' => $customers,
-                'ships' => $ships,
-            ]);
+        return Inertia::render('Project/Contracts', compact('contracts', 'customers', 'ships'));
     }
 
     /**

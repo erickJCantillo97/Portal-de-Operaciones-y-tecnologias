@@ -47,15 +47,7 @@ class ProjectController extends Controller
         $ships = Ship::orderBy('id')->get();
         $customers = Customer::orderBy('name')->get();
 
-        return Inertia::render('Project/CreateProjects',
-            [
-                'contracts' => $contracts,
-                'authorizations' => $authorizations,
-                'quotes' => $quotes,
-                'ships' => $ships,
-                'customers' => $customers,
-            ]
-        );
+        return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes', 'ships', 'customers'));
     }
 
     /**

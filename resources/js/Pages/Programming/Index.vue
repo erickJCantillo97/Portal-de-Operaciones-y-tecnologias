@@ -12,6 +12,7 @@ import '../../../sass/dataTableCustomized.scss';
 import Avatars from '@/Components/Avatars.vue';
 import ProjectCard from '@/Components/ProjectCard.vue';
 import MinimalMenu from '@/Components/MinimalMenu.vue';
+import { MagnifyingGlassIcon, PencilIcon, TrashIcon, CheckIcon, XCircleIcon } from '@heroicons/vue/20/solid';
 
 const props = defineProps({
 
@@ -149,21 +150,21 @@ const items = ref([
                 </div>
             </div>
             <div>
-                <div class="flex my-4 space-x-2 items-center">
-                    <div class="hidden w-1/12  md:block">
+                <div class="flex items-center my-4 space-x-2">
+                    <div class="hidden w-1/12 md:block">
                         <Button icon="pi pi-filter-slash shadow-xl" @click="filterProject()" type="button" text=""
                             severity="primary" class="hover:bg-primary ">
                             Ver Todos
                         </Button>
                     </div>
-                    <div class="flex w-11/12 p-1 space-x-2 shadow-sm shadow-primary rounded-xl overflow-x-auto snap-x">
+                    <div class="flex w-11/12 p-1 space-x-2 overflow-x-auto shadow-sm shadow-primary rounded-xl snap-x">
                         <ProjectCard v-for="project in projects" :projectId=project :menu=false clases="cursor-pointer"
                             @click="filterProject(project)" :activo="filters['project.id'].value == project" />
                     </div>
                 </div>
 
             </div>
-            <DataTable id="tabla" stripedRows class="p-datatable-sm items-center" :value="tasks" v-model:filters="filters"
+            <DataTable id="tabla" stripedRows class="items-center p-datatable-sm" :value="tasks" v-model:filters="filters"
                 dataKey="id" filterDisplay="menu" :loading="loading" sortMode="multiple"
                 :globalFilterFields="['name', 'project', 'executor', 'manager', 'duration', 'startDate', 'endDate',]"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
@@ -185,7 +186,7 @@ const items = ref([
                             </Button>
                             <span class="p-float-label">
                                 <InputText id="buscar" v-model="filters.global.value" type="search"
-                                    class="block alturah8 text-gray-900 rounded-md shadow-xl placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                    class="block text-gray-900 rounded-md shadow-xl alturah8 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                                 <label for="buscar">Buscar...</label>
                             </span>
                         </div>
@@ -253,7 +254,7 @@ const items = ref([
                     <template #body="slotProps">
                         <MinimalMenu :items="items" :header="true">
                             <template #header>
-                                <p class="border-b border-gray-600 font-semibold text-center text-black">
+                                <p class="font-semibold text-center text-black border-b border-gray-600">
                                     {{ slotProps.data.name }}</p>
                             </template>
                         </MinimalMenu>
