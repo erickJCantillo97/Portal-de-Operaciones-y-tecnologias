@@ -78,74 +78,66 @@
 
     </div>
 
-    <div class="fixed right-0 bottom-0 -mt-24 w-10">
-        <Button severity="primary" @click="toggle">
+    <div class="fixed right-0 bottom-0 -mt-24 w-10 shadow-2xl">
+        <Button severity="primary" @click="sugerenciaVisible = true" v-if="!sugerenciaVisible">
             <!-- <p>¿Sugerencias?</p> -->
             <QuestionMarkCircleIcon />
         </Button>
+        <transition leave-active-class="transition ease-in duration-300" leave-from-class="opacity-100"
+            leave-to-class="opacity-0">
+            <div class="chat-popup" v-if="sugerenciaVisible">
+                <form action="" class="form-container shadow-2xl border-blue-200 border">
+                    <div class="flex space-x-5 items-center text-xl font-semibold">
+                        <ApplicationLogo class="justify-center" :letras="true" :width-logo="50" :height-logo="50">
+                        </ApplicationLogo>
+                        <h1>¡Bienvenido!</h1>
+                    </div>
+                    <label class="mt-2 text-center" for="msg"><b>¿Tienes algo que comentar?</b></label>
+                    <textarea class="bg-slate-200 rounded-2xl"
+                        placeholder="Escribe comentarios, sugerencias, fallas que tengas dentro del portal. ¡Tu ayuda es muy importante para nosotros!"
+                        name="msg" required></textarea>
 
-        <OverlayPanel class="relative" ref="op">
-            <div class="flex items-start space-x-4">
-                <div class="min-w-0 flex-1">
-                    <form action="#" class="relative">
-                        <div
-                            class="overflow-hidden rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600">
-                            <label for="comment" class="sr-only">Añadir comentarios</label>
-                            <textarea rows="3" name="comment" id="comment"
-                                class="block w-full resize-none border-0 bg-transparent py-1.5 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                                placeholder="Añade comentarios, sugerencias y reportes de errores" />
-
-                            <!-- Spacer element to match the height of the toolbar -->
-                            <div class="py-2" aria-hidden="true">
-                                <!-- Matches height of button in toolbar (1px border + 36px content height) -->
-                                <div class="py-px">
-                                    <div class="h-9" />
-                                </div>
-                            </div>
+                    <div class="space-x-3 flex">
+                        <div class="w-1/2">
+                            <Button type="submit" severity="success">
+                                <CheckIcon class="h-6" />
+                            </Button>
                         </div>
-
-                        <div class="absolute inset-x-0 bottom-0 flex justify-between py-2 pl-3 pr-2">
-                            <div class="flex items-center space-x-5">
-                                <div class="flex items-center">
-                                    <button type="button"
-                                        class="-m-2.5 flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:text-gray-500">
-                                        <PaperClipIcon class="h-5 w-5" aria-hidden="true" />
-                                        <span class="sr-only">Attach a file</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="flex-shrink-0">
-                                <button type="submit"
-                                    class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Enviar</button>
-                            </div>
+                        <div class="w-1/2">
+                            <Button type="button" severity="danger" @click="sugerenciaVisible = false">
+                                <XCircleIcon class="h-6" />
+                            </Button>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
-        </OverlayPanel>
+        </transition>
     </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { Menu, MenuButton, MenuItems, MenuItem, Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from '@headlessui/vue'
+import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 import { router } from '@inertiajs/vue3'
 import {
     Bars3CenterLeftIcon, XMarkIcon, FaceFrownIcon,
 } from '@heroicons/vue/24/outline'
-import { BellIcon, ChevronDownIcon, ArrowLeftCircleIcon, FaceSmileIcon,
+import {
+    BellIcon, ChevronDownIcon, ArrowLeftCircleIcon, FaceSmileIcon,
     FireIcon,
     HandThumbUpIcon,
     HeartIcon,
-    PaperClipIcon,
-    QuestionMarkCircleIcon
-    } from '@heroicons/vue/20/solid'
+    QuestionMarkCircleIcon,
+    XCircleIcon,
+    CheckIcon
+} from '@heroicons/vue/20/solid'
 import MenuSidebar from '@/Components/MenuSidebar.vue';
 import DropdownSetting from '@/Components/DropdownSetting.vue';
-import OverlayPanel from 'primevue/overlaypanel';
 import Button from '@/Components/Button.vue';
+import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 const menu = ref(false)
 
+const sugerenciaVisible = ref(false)
 
 const logout = () => {
     router.post(route('logout'));
