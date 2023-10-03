@@ -78,41 +78,42 @@
 
     </div>
 
-    <div class="fixed right-0 bottom-0 -mt-24 w-10 shadow-2xl">
-        <Button v-tooltip="'¿Alguna sugerencia?'" severity="primary" @click="sugerenciaVisible = true"
-        v-if="!sugerenciaVisible" class="animate-bounce">
-            <QuestionMarkCircleIcon class="animate-spin"/>
-        </Button>
-        <transition leave-active-class="transition ease-in duration-300" leave-from-class="opacity-100"
-            leave-to-class="opacity-0">
-            <div class="chat-popup" v-if="sugerenciaVisible">
-                <form class="form-container shadow-2xl border-blue-200 border">
-                    <div class="flex space-x-5 items-center text-xl font-semibold">
-                        <ApplicationLogo class="justify-center" :letras="true" :width-logo="50" :height-logo="50">
-                        </ApplicationLogo>
-                        <h1>¡Bienvenido!</h1>
-                    </div>
-                    <label class="mt-2 text-center" for="msg"><b>¿Tienes algo que comentar?</b></label>
-                    <textarea class="bg-slate-200 rounded-2xl" v-model=sugerencia
-                        placeholder="Escribe comentarios, sugerencias, fallas que tengas dentro del portal. ¡Tu ayuda es muy importante para nosotros!"
-                        required></textarea>
-
-                    <div class="space-x-3 flex">
-                        <div class="w-1/2" v-tooltip.top="{ value: 'Enviar', showDelay: 1000, hideDelay: 300 }">
-                            <Button type="button" severity="success" @click="enviaSugerencia()">
-                                <CheckIcon class="h-6" />
-                            </Button>
-                        </div>
-                        <div class="w-1/2" v-tooltip.top="{ value: 'Cancelar', showDelay: 1000, hideDelay: 300 }">
-                            <Button type="button" severity="danger" @click="sugerenciaVisible = false">
-                                <XCircleIcon class="h-6" />
-                            </Button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </transition>
+    <div class="fixed flex right-0 w-12 top-1/2">
+            <button v-tooltip="'¿Alguna sugerencia?'" @click="sugerenciaVisible = true" v-if="!sugerenciaVisible"
+                class="bg-blue-200 opacity-80 flex-col p-2 rounded-tl-3xl rounded-bl-3xl">
+                <QuestionMarkCircleIcon class="animate-spin w-6" />
+                <p class="rotate-180" style="writing-mode: vertical-lr;">¿Alguna sugerencia?</p>
+            </button>
     </div>
+    <transition leave-active-class="transition ease-in duration-300" leave-from-class="opacity-100"
+        leave-to-class="opacity-0">
+        <div class="chat-popup" v-if="sugerenciaVisible">
+            <form class="form-container shadow-2xl border-blue-200 border">
+                <div class="flex space-x-5 items-center text-xl font-semibold">
+                    <ApplicationLogo class="justify-center" :letras="true" :width-logo="50" :height-logo="50">
+                    </ApplicationLogo>
+                    <h1>¡Bienvenido!</h1>
+                </div>
+                <label class="mt-2 text-center" for="msg"><b>¿Tienes algo que comentar?</b></label>
+                <textarea class="bg-slate-200 rounded-2xl" v-model=sugerencia
+                    placeholder="Escribe comentarios, sugerencias, fallas que tengas dentro del portal. ¡Tu ayuda es muy importante para nosotros!"
+                    required></textarea>
+
+                <div class="space-x-3 flex">
+                    <div class="w-1/2" v-tooltip.top="{ value: 'Enviar', showDelay: 1000, hideDelay: 300 }">
+                        <Button type="button" severity="success" @click="enviaSugerencia()">
+                            <CheckIcon class="h-6" />
+                        </Button>
+                    </div>
+                    <div class="w-1/2" v-tooltip.top="{ value: 'Cancelar', showDelay: 1000, hideDelay: 300 }">
+                        <Button type="button" severity="danger" @click="sugerenciaVisible = false">
+                            <XCircleIcon class="h-6" />
+                        </Button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </transition>
 </template>
 
 <script setup>
@@ -154,6 +155,6 @@ const enviaSugerencia = () => {
     })
     toast('¡Se ha enviado con exito!', 'success');
     sugerenciaVisible.value = false
-    sugerencia.value=null
+    sugerencia.value = null
 }
 </script>
