@@ -71,8 +71,11 @@
                     </div>
                 </div>
             </div>
-            <div class=" sm:ml-20 sm:mr-1 mt-1 bg-white shadow-2xl rounded-lg">
-                <div class="rounded-t-lg flex items-center gap-x-6 bg-indigo-600 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
+            <div class=" sm:ml-20 sm:mr-1 mt-1 bg-white shadow-2xl rounded-lg mb-14 ">
+
+                <slot />
+
+                <!-- <div class="pointer-events-none fixed inset-x-0 bottom-0 sm:flex sm:justify-center sm:px-6 sm:pb-5 lg:px-8">
                     <p class="text-sm leading-6 text-white">
                         <button @click="sugerenciaVisible = true">
                             <strong class="font-semibold">¡Bienvenido!</strong><svg viewBox="0 0 2 2"
@@ -83,14 +86,24 @@
                         </button>
                     </p>
                     <div class="flex flex-1 justify-end">
-                        <!-- <button type="button" class="-m-3 p-3 focus-visible:outline-offset-[-4px]">
-                            <span class="sr-only">Ocultar</span>
-                            <XMarkIcon class="h-5 w-5 text-white" aria-hidden="true" />
-                        </button> -->
+
+                    </div>
+                </div> -->
+            </div>
+            <div class="pointer-events-none fixed inset-x-0 bottom-0 sm:flex sm:justify-center sm:px-6 sm:pb-5 lg:px-8">
+                    <div
+                        class="pointer-events-auto flex items-center justify-between gap-x-6 bg-gray-900 px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
+                        <p class="text-sm leading-6 text-white">
+                            <button @click="sugerenciaVisible = true">
+                                <strong class="font-semibold">POT 2023</strong><svg viewBox="0 0 2 2"
+                                    class="mx-2 inline h-0.5 w-0.5 fill-current" aria-hidden="true">
+                                    <circle cx="1" cy="1" r="1" />
+                                </svg>Estas en el portal de pruebas, si tienes sugerencias o fallas reportalas
+                                aqui&nbsp;<span aria-hidden="true">&rarr;</span>
+                            </button>
+                        </p>
                     </div>
                 </div>
-                <slot />
-            </div>
         </main>
 
     </div>
@@ -98,8 +111,8 @@
     <div class="fixed right-0 w-12 top-1/2 z-50">
         <button v-tooltip="'¿Alguna sugerencia?'" @click="sugerenciaVisible = true" v-if="!sugerenciaVisible"
             class="bg-blue-200 opacity-80 flex-col p-2 rounded-tl-3xl rounded-bl-3xl">
-            <QuestionMarkCircleIcon class="animate-spin w-6" />
-            <p class="rotate-180" style="writing-mode: vertical-lr;">¿Alguna sugerencia?</p>
+            <QuestionMarkCircleIcon class="-rotate-90 w-6" />
+            <p class="rotate-180" style="writing-mode: vertical-lr;">Alguna sugerencia</p>
         </button>
     </div>
     <transition leave-active-class="transition ease-in duration-300" leave-from-class="opacity-100"
