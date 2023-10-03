@@ -91,19 +91,19 @@
                 </div> -->
             </div>
             <div class="pointer-events-none fixed inset-x-0 bottom-0 sm:flex sm:justify-center sm:px-6 sm:pb-5 lg:px-8">
-                    <div
-                        class="pointer-events-auto flex items-center justify-between gap-x-6 bg-gray-900 px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
-                        <p class="text-sm leading-6 text-white">
-                            <button @click="sugerenciaVisible = true">
-                                <strong class="font-semibold">POT 2023</strong><svg viewBox="0 0 2 2"
-                                    class="mx-2 inline h-0.5 w-0.5 fill-current" aria-hidden="true">
-                                    <circle cx="1" cy="1" r="1" />
-                                </svg>Estas en el portal de pruebas, si tienes sugerencias o fallas reportalas
-                                aqui&nbsp;<span aria-hidden="true">&rarr;</span>
-                            </button>
-                        </p>
-                    </div>
+                <div
+                    class="pointer-events-auto flex items-center justify-between gap-x-6 bg-gray-900 px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
+                    <p class="text-sm leading-6 text-white">
+                        <button @click="sugerenciaVisible = true">
+                            <strong class="font-semibold">POT 2023</strong><svg viewBox="0 0 2 2"
+                                class="mx-2 inline h-0.5 w-0.5 fill-current" aria-hidden="true">
+                                <circle cx="1" cy="1" r="1" />
+                            </svg>Estas en el portal de pruebas, si tienes sugerencias o fallas reportalas
+                            aqui&nbsp;<span aria-hidden="true">&rarr;</span>
+                        </button>
+                    </p>
                 </div>
+            </div>
         </main>
 
     </div>
@@ -115,7 +115,163 @@
             <p class="rotate-180" style="writing-mode: vertical-lr;">Alguna sugerencia</p>
         </button>
     </div>
-    <transition leave-active-class="transition ease-in duration-300" leave-from-class="opacity-100"
+    <TransitionRoot as="template" :show="sugerenciaVisible">
+        <Dialog as="div" class="relative z-10" @close="sugerenciaVisible = false">
+            <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0" enter-to="opacity-100"
+                leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            </TransitionChild>
+
+            <div class="fixed inset-0 overflow-hidden">
+                <div class="absolute inset-0 overflow-hidden">
+                    <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+                        <TransitionChild as="template" enter="transform transition ease-in-out duration-500 sm:duration-700"
+                            enter-from="translate-x-full" enter-to="translate-x-0"
+                            leave="transform transition ease-in-out duration-500 sm:duration-700" leave-from="translate-x-0"
+                            leave-to="translate-x-full">
+                            <DialogPanel class="pointer-events-auto relative w-screen max-w-md">
+                                <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0"
+                                    enter-to="opacity-100" leave="ease-in-out duration-500" leave-from="opacity-100"
+                                    leave-to="opacity-0">
+                                    <div class="absolute left-0 top-0 -ml-8 flex pr-2 pt-4 sm:-ml-10 sm:pr-4">
+                                        <button type="button"
+                                            class="relative rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                                            @click="sugerenciaVisible = false">
+                                            <span class="absolute -inset-2.5" />
+                                            <span class="sr-only">Cerrar panel de sugerencias</span>
+                                            <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+                                        </button>
+                                    </div>
+                                </TransitionChild>
+                                <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+
+                                    <!-- Your content -->
+                                    <div class="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
+                                        <div class="h-0 flex-1 overflow-y-auto">
+                                            <div class="bg-indigo-700 px-4 py-6 sm:px-6">
+                                                <div class="flex items-center justify-between">
+                                                    <DialogTitle class="text-base font-semibold leading-6 text-white">
+                                                        ¡Bienvenido a POT!</DialogTitle>
+                                                </div>
+                                                <div class="mt-1">
+                                                    <p class="text-sm text-indigo-300">En este espacio podras informarnos
+                                                        tus opiniones, sugerencias y errores que encuentes en el portal</p>
+                                                </div>
+                                            </div>
+                                            <div class="h-[60%] p-2 custom-scroll overflow-y-auto bg-white">
+
+                                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Mollitia ipsam
+                                                    perferendis atque tempora. Nostrum, ea in. Earum illo eligendi quidem in
+                                                    mollitia labore voluptates alias explicabo? Mollitia, id placeat?
+                                                    Perspiciatis?
+                                                    Reprehenderit harum modi velit consequuntur amet dolore excepturi nulla
+                                                    fugiat deleniti, nam saepe natus explicabo soluta, magnam odit quaerat
+                                                    exercitationem ea necessitatibus numquam itaque? Corrupti porro aliquam
+                                                    inventore reiciendis laudantium!
+                                                    Reprehenderit harum modi velit consequuntur amet dolore excepturi nulla
+                                                    fugiat deleniti, nam saepe natus explicabo soluta, magnam odit quaerat
+                                                    exercitationem ea necessitatibus numquam itaque? Corrupti porro aliquam
+                                                    inventore reiciendis laudantium!
+                                                    Reprehenderit harum modi velit consequuntur amet dolore excepturi nulla
+                                                    fugiat deleniti, nam saepe natus explicabo soluta, magnam odit quaerat
+                                                    exercitationem ea necessitatibus numquam itaque? Corrupti porro aliquam
+                                                    inventore reiciendis laudantium!
+                                                    Dolorum neque explicabo delectus sit quidem. Quo error iure animi id
+                                                    voluptates distinctio molestias labore ad ducimus exercitationem ratione
+                                                    iusto excepturi quam accusamus dolores, minima esse dolor quod atque ea.
+                                                    Dolorem veniam saepe eligendi labore? Necessitatibus quidem ipsam quae
+                                                    praesentium beatae molestias aliquid sit ad vel doloremque veniam
+                                                    quibusdam repellendus, quam in! Hic doloremque earum sapiente non
+                                                    consequatur ad temporibus?
+                                                    Ad illo veniam repudiandae excepturi consequuntur voluptas non ipsa
+                                                    voluptatum facilis sequi et veritatis tempore velit vel magni
+                                                    perspiciatis nesciunt atque nulla nostrum vero a, quia accusantium.
+                                                    Magnam, adipisci quos!</p>
+                                            </div>
+                                            <div class="flex flex-1 flex-col justify-between">
+                                                <div class="divide-y divide-gray-200 px-4 sm:px-6">
+                                                    <div class="pt-2">
+                                                        <fieldset>
+                                                            <legend class="text-sm font-medium leading-6 text-gray-900">
+                                                                Tipo de reporte</legend>
+                                                            <div class="mt-2 flex justify-between">
+                                                                <div class="relative flex items-start">
+                                                                    <div class="absolute flex h-6 items-center">
+                                                                        <input id="privacy-public" name="privacy"
+                                                                            aria-describedby="privacy-public-description"
+                                                                            type="radio"
+                                                                            class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                                            checked="" />
+                                                                    </div>
+                                                                    <div class="pl-7 text-sm leading-6">
+                                                                        <label for="privacy-public"
+                                                                            class="font-medium text-gray-900">Errores</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="relative flex items-start">
+                                                                        <div class="absolute flex h-6 items-center">
+                                                                            <input id="privacy-private-to-project"
+                                                                                name="privacy"
+                                                                                aria-describedby="privacy-private-to-project-description"
+                                                                                type="radio"
+                                                                                class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600" />
+                                                                        </div>
+                                                                        <div class="pl-7 text-sm leading-6">
+                                                                            <label for="privacy-private-to-project"
+                                                                                class="font-medium text-gray-900">Opiniones</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="relative flex items-start">
+                                                                        <div class="absolute flex h-6 items-center">
+                                                                            <input id="privacy-private" name="privacy"
+                                                                                aria-describedby="privacy-private-to-project-description"
+                                                                                type="radio"
+                                                                                class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600" />
+                                                                        </div>
+                                                                        <div class="pl-7 text-sm leading-6">
+                                                                            <label for="privacy-private"
+                                                                                class="font-medium text-gray-900">Sugerencias</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </fieldset>
+                                                    </div>
+                                                    <div class="pt-3">
+                                                        <div>
+                                                            <label for="description"
+                                                                class="block text-sm font-medium leading-6 text-gray-900">Description</label>
+                                                            <div class="mt-2">
+                                                                <textarea id="description" name="description" rows="4"
+                                                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-shrink-0 justify-end px-4 py-4">
+                                            <button type="button"
+                                                class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                                @click="open = false">Cancelar</button>
+                                            <button type="submit" @click="enviaSugerencia()"
+                                                class="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Guardar</button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </DialogPanel>
+                        </TransitionChild>
+                    </div>
+                </div>
+            </div>
+        </Dialog>
+    </TransitionRoot>
+
+    <!-- <transition leave-active-class="transition ease-in duration-300" leave-from-class="opacity-100"
         leave-to-class="opacity-0">
         <div class="chat-popup" v-if="sugerenciaVisible">
             <form class="form-container shadow-2xl border-blue-200 border">
@@ -143,12 +299,13 @@
                 </div>
             </form>
         </div>
-    </transition>
+    </transition> -->
+    <!-- <img :src="captura" alt=""> -->
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
+import { Menu, MenuButton, MenuItems, MenuItem, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { router } from '@inertiajs/vue3'
 import {
     Bars3CenterLeftIcon
@@ -183,7 +340,7 @@ const enviaSugerencia = () => {
     html2canvas(document.body).then(canvas => {
         captura.value = canvas.toDataURL()
     })
-    toast('¡Se ha enviado con exito!', 'success');
+    toast('¡Se ha enviado con exito! Gracias por su reporte', 'success');
     sugerenciaVisible.value = false
     sugerencia.value = null
 }
