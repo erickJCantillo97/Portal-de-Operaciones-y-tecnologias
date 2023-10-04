@@ -146,22 +146,52 @@
                                             </div>
                                             <div
                                                 class="h-[60%] p-6 shadow-xl space-y-4 custom-scroll overflow-y-auto bg-white">
+
+                                                <div class="p-2 rounded-md border w-full shadow-lg">
+                                                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
+                                                        odit tempora delectus sint repudiandae sed! Sapiente eaque ab
+                                                        dicta eos cum minima amet cupiditate delectus vero?
+                                                        Reprehenderit rem voluptatibus optio?</p>
+                                                    <p class="text-xs mt-1">DD/MM/AAAA</p>
+                                                </div>
+                                                <div class="p-2 rounded-md border w-full shadow-lg">
+                                                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
+                                                        odit tempora delectus sint repudiandae sed! Sapiente eaque ab
+                                                        dicta eos cum minima amet cupiditate delectus vero?
+                                                        Reprehenderit rem voluptatibus optio?</p>
+                                                    <p class="text-xs mt-1">DD/MM/AAAA</p>
+                                                </div>
+                                                <div class="p-2 rounded-md border w-full shadow-lg">
+                                                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
+                                                        odit tempora delectus sint repudiandae sed! Sapiente eaque ab
+                                                        dicta eos cum minima amet cupiditate delectus vero?
+                                                        Reprehenderit rem voluptatibus optio?</p>
+                                                    <p class="text-xs mt-1">DD/MM/AAAA</p>
+                                                </div>
+                                                <div class="p-2 rounded-md border w-full shadow-lg">
+                                                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
+                                                        odit tempora delectus sint repudiandae sed! Sapiente eaque ab
+                                                        dicta eos cum minima amet cupiditate delectus vero?
+                                                        Reprehenderit rem voluptatibus optio?</p>
+                                                    <p class="text-xs mt-1">DD/MM/AAAA</p>
+                                                </div>
+                                                <!--#region
                                                 <div class="w-full">
                                                     <div class="p-2 rounded-md border w-4/5 shadow-lg">
                                                         <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
                                                             odit tempora delectus sint repudiandae sed! Sapiente eaque ab
                                                             dicta eos cum minima amet cupiditate delectus vero?
                                                             Reprehenderit rem voluptatibus optio?</p>
-                                                        <p class="text-xs text-right">DD/MM/AAAA</p>
+                                                        <p class="text-xs mt-1">DD/MM/AAAA</p>
                                                     </div>
                                                 </div>
-                                                <div class="w-full flex justify-end">
+                                                <div class="w-full flex justify-end text-right">
                                                     <div class="p-2 rounded-md border w-4/5 shadow-lg">
-                                                        <p class="text-right">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
+                                                        <p class="">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
                                                             odit tempora delectus sint repudiandae sed! Sapiente eaque ab
                                                             dicta eos cum minima amet cupiditate delectus vero?
                                                             Reprehenderit rem voluptatibus optio?</p>
-                                                        <p class="text-xs">DD/MM/AAAA</p>
+                                                        <p class="text-xs mt-1">DD/MM/AAAA</p>
                                                     </div>
                                                 </div>
                                                 <div class="w-full">
@@ -170,18 +200,18 @@
                                                             odit tempora delectus sint repudiandae sed! Sapiente eaque ab
                                                             dicta eos cum minima amet cupiditate delectus vero?
                                                             Reprehenderit rem voluptatibus optio?</p>
-                                                        <p class="text-xs text-right">DD/MM/AAAA</p>
+                                                        <p class="text-xs mt-1">DD/MM/AAAA</p>
                                                     </div>
                                                 </div>
-                                                <div class="w-full flex justify-end">
+                                                <div class="w-full flex justify-end text-right">
                                                     <div class="p-2 rounded-md border w-4/5 shadow-lg">
-                                                        <p class="text-right">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
+                                                        <p class="">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
                                                             odit tempora delectus sint repudiandae sed! Sapiente eaque ab
                                                             dicta eos cum minima amet cupiditate delectus vero?
                                                             Reprehenderit rem voluptatibus optio?</p>
-                                                        <p class="text-xs">DD/MM/AAAA</p>
+                                                        <p class="text-xs mt-1">DD/MM/AAAA</p>
                                                     </div>
-                                                </div>
+                                                </div> -->
                                             </div>
                                             <div class="flex flex-1 flex-col justify-between">
                                                 <div class="divide-y divide-gray-200 px-4 sm:px-6">
@@ -241,7 +271,7 @@
             </div>
         </Dialog>
     </TransitionRoot>
-    <!-- <img :src="captura" alt=""> -->
+    <img :src="captura" alt="">
 </template>
 
 <script setup>
@@ -282,22 +312,12 @@ const enviaSugerencia = () => {
     console.log(window.location.href)
     console.log(sugerencia.value)
     console.log(tipoReporte.value)
-    // html2canvas(document.body).then(canvas => {
-    //     captura.value = canvas.toDataURL()
-    // })
+    html2canvas(document.body).then(canvas => {
+        captura.value = canvas.toDataURL()
+    })
     toast('¡Se ha enviado con exito! Gracias por su reporte', 'success');
     sugerenciaVisible.value = false
     sugerencia.value = null
 }
 </script>
-<style>
-.fondodiv {
-    background-image: url(/svg/cotecmar-logo.svg);
-    background-size: 40% 40%;
-    background-repeat: no-repeat;
-    background-position: center;
-    /* background-origin: content-box; */
-    /* background-attachment: fixed; */
-    /* background-clip: padding-box; */
-}
-</style>
+
