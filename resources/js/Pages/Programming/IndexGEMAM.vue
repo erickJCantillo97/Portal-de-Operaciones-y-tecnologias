@@ -22,23 +22,14 @@ const data = ref({
         id: "1" + i,
         data: `Source Draggable - ${i}`
     })),
-    items2: generateItems(15, (i) => ({
-        id: "1" + i,
-        data: `Source Draggable - ${i}`
-    })),
-    items3: generateItems(15, (i) => ({
-        id: "1" + i,
-        data: `Source Draggable - ${i}`
-    })),
+    items2: [],
 })
 
 const onDrop = (collection, dropResult) => {
-    console.log(data.value)
     data.value[collection] = applyDrag(data.value[collection], dropResult);
 }
 
 const getChildPayload1 = (index) => {
-    console.log(data.value)
     return data.value.items1[index];
 }
 
@@ -214,17 +205,26 @@ const items = ref([
 
             </div>
 
-                <div class="copy grid grid-cols-4 space-x-4 w-full">
-                    <div class="item col-span-4">
-                            <Container group-name="1" :get-child-payload="getChildPayload2" @drop="onDrop('items2', $event)">
-                                <Draggable v-for="item in data.items2" :key="item.id">
-                                    <div class="draggable-item">
+                <div class="copy flex  w-full max-h-96 overflow-y-auto">
+                    <div class="item w-2/3 ">
+                            <Container group-name="1"
+                            v-for="task in tasks"
+                            class="bg-gray-100 mb-2 p-2 rounded-md"
+                            :get-child-payload="getChildPayload2" @drop="onDrop('items2', $event)">
+                            <div>
+                            <p>{{task.name}}</p>
+                            <div class="grid grid-cols-3 gap-1">
+                                 <Draggable v-for="item in data.items2" :key="item.id">
+                                    <div class="bg-gray-400 mt-1 rounded-md">
                                         {{ item.data }}
                                     </div>
                                 </Draggable>
+                            </div>
+
+                            </div>
                             </Container>
                     </div>
-                    <div class="item">
+                    <div class="item w-1/3">
                         <Container class="item" behaviour="copy" group-name="1" :get-child-payload="getChildPayload1">
                             <Draggable v-for="item in data.items1" :key="item.id">
                                 <div class="draggable-item bg-gray-400 mt-1">
