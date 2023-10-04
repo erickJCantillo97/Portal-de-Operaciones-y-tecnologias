@@ -71,53 +71,182 @@
                     </div>
                 </div>
             </div>
-            <div class=" sm:ml-20 sm:mr-2 mt-3 bg-white shadow-2xl rounded-lg">
+            <div class=" sm:ml-20 sm:mr-1 mt-1 bg-white shadow-2xl rounded-lg mb-14 ">
+
                 <slot />
+
+            </div>
+            <div class="pointer-events-none fixed inset-x-0 bottom-0 sm:flex sm:justify-center sm:px-6 sm:pb-5 lg:px-8">
+                <div
+                    class="pointer-events-auto flex items-center justify-between gap-x-6 bg-gray-900 px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
+                    <p class="text-sm leading-6 text-white">
+                        <button @click="sugerenciaVisible = true">
+                            <strong class="font-semibold">POT 2023</strong><svg viewBox="0 0 2 2"
+                                class="mx-2 inline h-0.5 w-0.5 fill-current" aria-hidden="true">
+                                <circle cx="1" cy="1" r="1" />
+                            </svg>Estas en el portal de pruebas, si tienes sugerencias o fallas reportalas
+                            aqui&nbsp;<span aria-hidden="true">&rarr;</span>
+                        </button>
+                    </p>
+                </div>
             </div>
         </main>
 
     </div>
 
-    <div class="fixed right-0 bottom-0 -mt-24 w-10 shadow-2xl">
-        <Button v-tooltip="'¿Alguna sugerencia?'" severity="primary" @click="sugerenciaVisible = true"
-        v-if="!sugerenciaVisible" class="animate-bounce">
-            <QuestionMarkCircleIcon class="animate-spin"/>
-        </Button>
-        <transition leave-active-class="transition ease-in duration-300" leave-from-class="opacity-100"
-            leave-to-class="opacity-0">
-            <div class="chat-popup" v-if="sugerenciaVisible">
-                <form class="form-container shadow-2xl border-blue-200 border">
-                    <div class="flex space-x-5 items-center text-xl font-semibold">
-                        <ApplicationLogo class="justify-center" :letras="true" :width-logo="50" :height-logo="50">
-                        </ApplicationLogo>
-                        <h1>¡Bienvenido!</h1>
-                    </div>
-                    <label class="mt-2 text-center" for="msg"><b>¿Tienes algo que comentar?</b></label>
-                    <textarea class="bg-slate-200 rounded-2xl" v-model=sugerencia
-                        placeholder="Escribe comentarios, sugerencias, fallas que tengas dentro del portal. ¡Tu ayuda es muy importante para nosotros!"
-                        required></textarea>
-
-                    <div class="space-x-3 flex">
-                        <div class="w-1/2" v-tooltip.top="{ value: 'Enviar', showDelay: 1000, hideDelay: 300 }">
-                            <Button type="button" severity="success" @click="enviaSugerencia()">
-                                <CheckIcon class="h-6" />
-                            </Button>
-                        </div>
-                        <div class="w-1/2" v-tooltip.top="{ value: 'Cancelar', showDelay: 1000, hideDelay: 300 }">
-                            <Button type="button" severity="danger" @click="sugerenciaVisible = false">
-                                <XCircleIcon class="h-6" />
-                            </Button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </transition>
+    <div class="fixed right-0 w-12 top-1/2 z-50 hover:animate-pulse">
+        <button v-tooltip="'¿Alguna sugerencia?'" @click="sugerenciaVisible = true" v-if="!sugerenciaVisible"
+            class="bg-blue-200 opacity-80 flex-col p-2 rounded-tl-3xl rounded-bl-3xl">
+            <QuestionMarkCircleIcon class="-rotate-90 w-6" />
+            <p class="rotate-180" style="writing-mode: vertical-lr;">Sugerencias</p>
+        </button>
     </div>
+    <TransitionRoot as="template" :show="sugerenciaVisible">
+        <Dialog as="div" class="relative z-10" @close="sugerenciaVisible = false">
+            <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0" enter-to="opacity-100"
+                leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            </TransitionChild>
+
+            <div class="fixed inset-0 overflow-hidden">
+                <div class="absolute inset-0 overflow-hidden">
+                    <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+                        <TransitionChild as="template" enter="transform transition ease-in-out duration-500 sm:duration-700"
+                            enter-from="translate-x-full" enter-to="translate-x-0"
+                            leave="transform transition ease-in-out duration-500 sm:duration-700" leave-from="translate-x-0"
+                            leave-to="translate-x-full">
+                            <DialogPanel class="pointer-events-auto relative w-screen max-w-md">
+                                <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0"
+                                    enter-to="opacity-100" leave="ease-in-out duration-500" leave-from="opacity-100"
+                                    leave-to="opacity-0">
+                                    <div
+                                        class="absolute left-0 -ml-8 flex pr-2 pt-4 sm:-ml-10 sm:pr-4 right-0 w-12 top-1/2 z-50">
+                                        <button type="button"
+                                            class="relative hover:animate-pulse focus:outline-none bg-blue-200 opacity-80 flex-col p-2 rounded-tl-3xl rounded-bl-3xl"
+                                            @click="sugerenciaVisible = false">
+                                            <XCircleIcon class="-rotate-90 w-6" />
+                                            <p class="rotate-180" style="writing-mode: vertical-lr;">Cerrar</p>
+                                        </button>
+                                    </div>
+                                </TransitionChild>
+                                <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+
+                                    <!-- Your content -->
+                                    <div class="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
+                                        <div class="h-0 flex-1 overflow-y-auto">
+                                            <div class="bg-indigo-700 px-4 py-6 sm:px-6">
+                                                <div class="flex items-center justify-between">
+                                                    <DialogTitle class="text-base font-semibold leading-6 text-white">
+                                                        ¡Bienvenido a POT!</DialogTitle>
+                                                </div>
+                                                <div class="mt-1">
+                                                    <p class="text-sm text-indigo-300">En este espacio podras informarnos
+                                                        tus opiniones, sugerencias y errores que encuentes en el portal</p>
+                                                </div>
+                                            </div>
+                                            <div
+                                                class="h-[60%] p-6 shadow-xl space-y-4 custom-scroll overflow-y-auto bg-white">
+                                                <div class="w-full">
+                                                    <div class="p-2 rounded-md border w-4/5 shadow-lg">
+                                                        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
+                                                            odit tempora delectus sint repudiandae sed! Sapiente eaque ab
+                                                            dicta eos cum minima amet cupiditate delectus vero?
+                                                            Reprehenderit rem voluptatibus optio?</p>
+                                                        <p class="text-xs text-right">DD/MM/AAAA</p>
+                                                    </div>
+                                                </div>
+                                                <div class="w-full flex justify-end">
+                                                    <div class="p-2 rounded-md border w-4/5 shadow-lg">
+                                                        <p class="text-right">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
+                                                            odit tempora delectus sint repudiandae sed! Sapiente eaque ab
+                                                            dicta eos cum minima amet cupiditate delectus vero?
+                                                            Reprehenderit rem voluptatibus optio?</p>
+                                                        <p class="text-xs">DD/MM/AAAA</p>
+                                                    </div>
+                                                </div>
+                                                <div class="w-full">
+                                                    <div class="p-2 rounded-md border w-4/5 shadow-lg">
+                                                        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
+                                                            odit tempora delectus sint repudiandae sed! Sapiente eaque ab
+                                                            dicta eos cum minima amet cupiditate delectus vero?
+                                                            Reprehenderit rem voluptatibus optio?</p>
+                                                        <p class="text-xs text-right">DD/MM/AAAA</p>
+                                                    </div>
+                                                </div>
+                                                <div class="w-full flex justify-end">
+                                                    <div class="p-2 rounded-md border w-4/5 shadow-lg">
+                                                        <p class="text-right">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
+                                                            odit tempora delectus sint repudiandae sed! Sapiente eaque ab
+                                                            dicta eos cum minima amet cupiditate delectus vero?
+                                                            Reprehenderit rem voluptatibus optio?</p>
+                                                        <p class="text-xs">DD/MM/AAAA</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-1 flex-col justify-between">
+                                                <div class="divide-y divide-gray-200 px-4 sm:px-6">
+                                                    <div class="pt-2">
+                                                        <fieldset>
+                                                            <legend
+                                                                class="text-base font-bold leading-6 mb-2 text-gray-900">
+                                                                Tipo de reporte</legend>
+                                                            <div
+                                                                class="flex flex-wrap gap-3 text-sm align-middle justify-between">
+                                                                <div class="flex align-items-center">
+                                                                    <RadioButton v-model="tipoReporte" inputId="tipo1"
+                                                                        name="sugerencia" value="Sugerencia" />
+                                                                    <label for="tipo1" class="ml-2">Sugerencia</label>
+                                                                </div>
+                                                                <div class="flex align-items-center">
+                                                                    <RadioButton v-model="tipoReporte" inputId="tipo2"
+                                                                        name="opinion" value="Opinion" />
+                                                                    <label for="tipo2" class="ml-2">Opinión</label>
+                                                                </div>
+                                                                <div class="flex align-items-center">
+                                                                    <RadioButton v-model="tipoReporte" inputId="tipo3"
+                                                                        name="error" value="Error" />
+                                                                    <label for="tipo3" class="ml-2">Error</label>
+                                                                </div>
+                                                            </div>
+                                                        </fieldset>
+                                                    </div>
+                                                    <div class="pt-3">
+                                                        <div>
+                                                            <label for="description"
+                                                                class="block text-base font-bold leading-6 text-gray-900">Descripción</label>
+                                                            <div class="mt-2">
+                                                                <textarea id="description" name="description" rows="4"
+                                                                    v-model="sugerencia"
+                                                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-shrink-0 justify-end px-4 py-4">
+                                            <button type="button"
+                                                class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                                @click="sugerenciaVisible = false">Cancelar</button>
+                                            <button type="submit" @click="enviaSugerencia()"
+                                                class="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Guardar</button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </DialogPanel>
+                        </TransitionChild>
+                    </div>
+                </div>
+            </div>
+        </Dialog>
+    </TransitionRoot>
+    <!-- <img :src="captura" alt=""> -->
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
+import { Menu, MenuButton, MenuItems, MenuItem, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { router } from '@inertiajs/vue3'
 import {
     Bars3CenterLeftIcon
@@ -125,7 +254,7 @@ import {
 import {
     BellIcon, ChevronDownIcon, ArrowLeftCircleIcon,
     QuestionMarkCircleIcon,
-    XCircleIcon,
+    XCircleIcon, XMarkIcon,
     CheckIcon
 } from '@heroicons/vue/20/solid'
 import MenuSidebar from '@/Components/MenuSidebar.vue';
@@ -133,6 +262,8 @@ import DropdownSetting from '@/Components/DropdownSetting.vue';
 import Button from '@/Components/Button.vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 import html2canvas from 'html2canvas';
+import RadioButton from 'primevue/radiobutton';
+
 import { useSweetalert } from '@/composable/sweetAlert';
 const { toast } = useSweetalert();
 const menu = ref(false)
@@ -144,16 +275,29 @@ const logout = () => {
 };
 
 const sugerencia = ref('')
+const tipoReporte = ref('Sugerencia')
 const captura = ref()
 
 const enviaSugerencia = () => {
     console.log(window.location.href)
     console.log(sugerencia.value)
-    html2canvas(document.body).then(canvas => {
-        captura.value = canvas.toDataURL()
-    })
-    toast('¡Se ha enviado con exito!', 'success');
+    console.log(tipoReporte.value)
+    // html2canvas(document.body).then(canvas => {
+    //     captura.value = canvas.toDataURL()
+    // })
+    toast('¡Se ha enviado con exito! Gracias por su reporte', 'success');
     sugerenciaVisible.value = false
-    sugerencia.value=null
+    sugerencia.value = null
 }
 </script>
+<style>
+.fondodiv {
+    background-image: url(/svg/cotecmar-logo.svg);
+    background-size: 40% 40%;
+    background-repeat: no-repeat;
+    background-position: center;
+    /* background-origin: content-box; */
+    /* background-attachment: fixed; */
+    /* background-clip: padding-box; */
+}
+</style>
