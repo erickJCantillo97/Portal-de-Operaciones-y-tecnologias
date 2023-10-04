@@ -46,10 +46,6 @@ const getChildPayload2 = (index) => {
     return data.value.items2[index];
 }
 
-
-
-
-
 //#endregion
 
 const open = ref(true)
@@ -217,10 +213,9 @@ const items = ref([
                 </div>
 
             </div>
-            <div class="grid grid-cols-2 space-x-4">
-                
-                <div class="copy">
-                     <div class="item">
+
+                <div class="copy grid grid-cols-4 space-x-4 w-full">
+                    <div class="item col-span-4">
                             <Container group-name="1" :get-child-payload="getChildPayload2" @drop="onDrop('items2', $event)">
                                 <Draggable v-for="item in data.items2" :key="item.id">
                                     <div class="draggable-item">
@@ -228,19 +223,19 @@ const items = ref([
                                     </div>
                                 </Draggable>
                             </Container>
-                        </div>
+                    </div>
                     <div class="item">
                         <Container class="item" behaviour="copy" group-name="1" :get-child-payload="getChildPayload1">
                             <Draggable v-for="item in data.items1" :key="item.id">
-                                <div class="draggable-item">
+                                <div class="draggable-item bg-gray-400 mt-1">
                                     {{ item.data }}
                                 </div>
                             </Draggable>
                         </Container>
                     </div>
-                   
+
                 </div>
-            </div>
+
 
             <!-- <div>
                 <ul role="list"
