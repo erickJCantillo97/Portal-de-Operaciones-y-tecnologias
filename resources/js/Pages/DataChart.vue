@@ -1,11 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { router, useForm } from '@inertiajs/vue3';
 import axios from 'axios';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon } from '@heroicons/vue/20/solid';
+import { MagnifyingGlassIcon} from '@heroicons/vue/20/solid';
 import Button from '@/Components/Button.vue';
 import PieChart from './PieChart.vue';
 import '../../sass/dataTableCustomized.scss';
@@ -148,6 +147,7 @@ const contractsList = () => {
         radius: '70%',
         center: ['50%', '55%'],
         selectedMode: 'single',
+        is3D:true,
         data: datos.value
     })
 }
@@ -200,7 +200,7 @@ const contractsList = () => {
             <Column field="end_date" header="Fecha Finalización"></Column>
         </DataTable>
         <div class="ml-1">
-            <div class="max-w-full p-3 m-1 rounded-xl md:max-w-full md:border-2 md:rounded-xl">
+            <div class="max-w-full p-3 md:max-w-full">
                 <!--:key="showGraph" permite Re-renderizar un componente hijo 👇🏼-->
                 <PieChart :title="title" :series="series" :key="showGraph"></PieChart>
             </div>
