@@ -35,7 +35,7 @@ use([
     ToolboxComponent
 ]);
 
-/** 
+/**
  * @rgutierrez
  * String template
 
