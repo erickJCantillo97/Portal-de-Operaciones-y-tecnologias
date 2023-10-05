@@ -8,25 +8,14 @@ import { Container, Draggable } from "vue-dndrop";
 import { applyDrag } from "@/composable/helpers.js";
 
 //#region Draggable
-const data = ref({
-    empleados: generateItems(2, (i) => ({
-        id: "1" + i,
-        data: `Persona ${i}`
-    }))
-})
-
-axios.get(route('get.empleados.gerencia')).then((res) => {
-    console.log(res)
-})
-
+const listaDatos = ref({})
 
 const onDrop = (collection, dropResult) => {
-    console.log(dropResult)
-    data.value[collection] = applyDrag(data.value[collection], dropResult);
+    listaDatos.value[collection] = applyDrag(listaDatos.value[collection], dropResult);
 }
 
 const getChildPayload1 = (index) => {
-    return data.value.empleados[index];
+    return personal.value[index];
 }
 
 //#endregion
@@ -117,9 +106,8 @@ const getTask = async (option) => {
             projects.value = [...new Set(res.data.map(obj => obj.project.id))]
         })
         tasks.value.forEach(element => {
-            data.value[element.id] = []
+            listaDatos.value[element.id] = []
         });
-        console.log(data.value)
     }
 
 }
@@ -187,9 +175,8 @@ const items = ref([
                     <div v-for="task in tasks"
                         class="flex flex-col justify-between p-2 m-2 border border-blue-800 rounded-md shadow-lg">
                         <div class="flex">
-                            <p class="w-1/4 mr-1 font-bold">Actividad:</p>
                             <p v-tooltip.top="task.name"
-                                class="block w-full overflow-hidden whitespace-nowrap text-ellipsis">{{ task.name }}</p>
+                                class="block w-full overflow-hidden text-ellipsis">{{ task.name }}</p>
                         </div>
                         <div class="block text-xs">
                             <div class="flex w-1/2">
@@ -207,30 +194,30 @@ const items = ref([
                             class="h-20 p-2 mt-2 mb-2 overflow-auto bg-blue-200 rounded-md custom-scroll"
                             @drop="onDrop(task.id, $event)">
                             <div class="grid grid-cols-2 gap-1">
-                                <div v-for="item in data[task.id]" :key="item.id" class="mt-1 bg-gray-400 rounded-md">
-                                    {{ item.data }}
+                                <div v-for="item in listaDatos[task.id]" class="mt-1 bg-gray-400 rounded-md">
+                                   {{item.Nombres_Apellidos}}
                                 </div>
                             </div>
                         </Container>
                     </div>
                 </div>
                 <div
-                    class="w-2/3 overflow-hidden bg-white divide-y h-screen divide-gray-100 shadow-lg ring-1 ring-gray-900/5 sm:rounded-xl">
+                    class="w-2/3 h-screen overflow-hidden bg-white divide-y divide-gray-100 shadow-lg ring-1 ring-gray-900/5 sm:rounded-xl">
                     <h2 class="font-semibold leading-6 text-center capitalize text-primary">Personal</h2>
                     <Container
                         class="relative flex flex-col h-full px-1 py-1 overflow-y-auto gap custom-scroll gap-x-2 sm:px-1"
                         behaviour="copy" group-name="1" :get-child-payload="getChildPayload1">
-                        <Draggable v-for="item in personal" :key="item.Num_SAP"
-                            class="relative flex justify-between py-2 mt-2 shadow-md cursor-pointer  sm:rounded-xl hover:bg-blue-200 pl-2">
+                        <Draggable v-for="item in personal"
+                            class="relative flex justify-between py-2 pl-2 mt-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200">
                             <div class="flex min-w-0">
                                 <!-- <img class="flex-none w-12 h-12 rounded-full bg-gray-50" :src="item.imageUrl"
                                     alt="profile-photo" /> -->
                                 <div class="flex-auto min-w-0">
                                     <p class="text-sm font-semibold leading-6 text-gray-900">
-                                            {{ item.Nombres_Apellidos }}
+                                        {{ item.Nombres_Apellidos }}
                                     </p>
                                     <p class="flex mt-1 text-xs leading-5 text-gray-500">
-                                            {{ item.Cargo }}
+                                        {{ item.Cargo }}
                                     </p>
                                 </div>
                             </div>
