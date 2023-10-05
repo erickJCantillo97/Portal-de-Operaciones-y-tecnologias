@@ -164,8 +164,8 @@ const items = ref([
                 </div>
 
             </div>
-            <DataTable id="tabla" stripedRows class="items-center p-datatable-sm" :value="tasks" v-model:filters="filters"
-                dataKey="id" filterDisplay="menu" :loading="loading" sortMode="multiple"
+            <DataTable id="tabla" stripedRows class="items-center p-datatable-sm overflow-y-auto h-96" :value="tasks"
+                v-model:filters="filters" dataKey="id" filterDisplay="menu" :loading="loading" sortMode="multiple"
                 :globalFilterFields="['name', 'project', 'executor', 'manager', 'duration', 'startDate', 'endDate',]"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
