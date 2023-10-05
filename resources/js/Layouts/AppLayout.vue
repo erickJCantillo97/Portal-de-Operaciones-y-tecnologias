@@ -241,7 +241,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Menu, MenuButton, MenuItems, MenuItem, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { router } from '@inertiajs/vue3'
 import {
@@ -262,6 +262,11 @@ import RadioButton from 'primevue/radiobutton';
 
 import { useSweetalert } from '@/composable/sweetAlert';
 const { toast } = useSweetalert();
+
+onMounted(() => {
+    document.body.classList.add('overflow-y-hidden');
+});
+
 const menu = ref(false)
 
 const sugerenciaVisible = ref(false)
