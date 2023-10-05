@@ -1,9 +1,7 @@
 <template>
-    <div class="h-screen collapsible-vertical" :class="menu ? 'toggle-sidebar' : ''">
+    <div class="collapsible-vertical" :class="menu ? 'toggle-sidebar' : ''">
         <div class="bg-GECON hiden"></div>
-
-
-        <main class="flex-1">
+        <main class="">
             <div class="fixed inset-0 bg-[black]/60 z-10" :class="{ hidden: !menu }" @click="menu = !menu"></div>
 
             <MenuSidebar class="lg:block " :class="{ hidden: !menu }"></MenuSidebar>
@@ -90,150 +88,161 @@
                     </p>
                 </div>
             </div>
-        </main>
-        <div class="fixed right-0 z-50 w-12 top-1/2 hover:animate-pulse">
-            <button v-tooltip="'¿Alguna sugerencia?'" @click="sugerenciaVisible = true" v-if="!sugerenciaVisible"
-                class="flex-col p-2 bg-blue-200 opacity-80 rounded-tl-3xl rounded-bl-3xl">
-                <QuestionMarkCircleIcon class="w-6 -rotate-90" />
-                <p class="rotate-180" style="writing-mode: vertical-lr;">Sugerencias</p>
-            </button>
-        </div>
-        <TransitionRoot as="template" :show="sugerenciaVisible">
-            <Dialog as="div" class="relative z-10" @close="sugerenciaVisible = false">
-                <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0"
-                    enter-to="opacity-100" leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
-                    <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" />
-                </TransitionChild>
+            <div class="fixed right-0 z-50 w-12 top-1/2 hover:animate-pulse">
+                <button v-tooltip="'¿Alguna sugerencia?'" @click="sugerenciaVisible = true" v-if="!sugerenciaVisible"
+                    class="flex-col p-2 bg-blue-200 opacity-80 rounded-tl-3xl rounded-bl-3xl">
+                    <QuestionMarkCircleIcon class="w-6 -rotate-90" />
+                    <p class="rotate-180" style="writing-mode: vertical-lr;">Sugerencias</p>
+                </button>
+            </div>
+            <TransitionRoot as="template" :show="sugerenciaVisible">
+                <Dialog as="div" class="relative z-10" @close="sugerenciaVisible = false">
+                    <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0"
+                        enter-to="opacity-100" leave="ease-in-out duration-500" leave-from="opacity-100"
+                        leave-to="opacity-0">
+                        <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" />
+                    </TransitionChild>
 
-                <div class="fixed inset-0 overflow-hidden">
-                    <div class="absolute inset-0 overflow-hidden">
-                        <div class="fixed inset-y-0 right-0 flex max-w-full pl-10 pointer-events-none">
-                            <TransitionChild as="template"
-                                enter="transform transition ease-in-out duration-500 sm:duration-700"
-                                enter-from="translate-x-full" enter-to="translate-x-0"
-                                leave="transform transition ease-in-out duration-500 sm:duration-700"
-                                leave-from="translate-x-0" leave-to="translate-x-full">
-                                <DialogPanel class="relative w-screen max-w-md pointer-events-auto">
-                                    <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0"
-                                        enter-to="opacity-100" leave="ease-in-out duration-500" leave-from="opacity-100"
-                                        leave-to="opacity-0">
-                                        <div
-                                            class="absolute left-0 right-0 z-50 flex w-12 pt-4 pr-2 -ml-8 sm:-ml-10 sm:pr-4 top-1/2">
-                                            <button type="button"
-                                                class="relative flex-col p-2 bg-blue-200 hover:animate-pulse focus:outline-none opacity-80 rounded-tl-3xl rounded-bl-3xl"
-                                                @click="sugerenciaVisible = false">
-                                                <XCircleIcon class="w-6 -rotate-90" />
-                                                <p class="rotate-180" style="writing-mode: vertical-lr;">Cerrar</p>
-                                            </button>
-                                        </div>
-                                    </TransitionChild>
-                                    <div class="flex flex-col h-full overflow-y-scroll bg-white shadow-xl">
+                    <div class="fixed inset-0 overflow-hidden">
+                        <div class="absolute inset-0 overflow-hidden">
+                            <div class="fixed inset-y-0 right-0 flex max-w-full pl-10 pointer-events-none">
+                                <TransitionChild as="template"
+                                    enter="transform transition ease-in-out duration-500 sm:duration-700"
+                                    enter-from="translate-x-full" enter-to="translate-x-0"
+                                    leave="transform transition ease-in-out duration-500 sm:duration-700"
+                                    leave-from="translate-x-0" leave-to="translate-x-full">
+                                    <DialogPanel class="relative w-screen max-w-md pointer-events-auto">
+                                        <TransitionChild as="template" enter="ease-in-out duration-500"
+                                            enter-from="opacity-0" enter-to="opacity-100" leave="ease-in-out duration-500"
+                                            leave-from="opacity-100" leave-to="opacity-0">
+                                            <div
+                                                class="absolute left-0 right-0 z-50 flex w-12 pt-4 pr-2 -ml-8 sm:-ml-10 sm:pr-4 top-1/2">
+                                                <button type="button"
+                                                    class="relative flex-col p-2 bg-blue-200 hover:animate-pulse focus:outline-none opacity-80 rounded-tl-3xl rounded-bl-3xl"
+                                                    @click="sugerenciaVisible = false">
+                                                    <XCircleIcon class="w-6 -rotate-90" />
+                                                    <p class="rotate-180" style="writing-mode: vertical-lr;">Cerrar</p>
+                                                </button>
+                                            </div>
+                                        </TransitionChild>
+                                        <div class="flex flex-col h-full overflow-y-scroll bg-white shadow-xl">
 
-                                        <!-- Your content -->
-                                        <div class="flex flex-col h-full bg-white divide-y divide-gray-200 shadow-xl">
-                                            <div class="flex-1 h-0 overflow-y-auto">
-                                                <div class="px-4 py-6 bg-indigo-700 sm:px-6">
-                                                    <div class="flex items-center justify-between">
-                                                        <DialogTitle class="text-base font-semibold leading-6 text-white">
-                                                            ¡Bienvenido a POT!</DialogTitle>
-                                                    </div>
-                                                    <div class="mt-1">
-                                                        <p class="text-sm text-indigo-300">En este espacio podras
-                                                            informarnos
-                                                            tus opiniones, sugerencias y errores que encuentes en el portal
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    class="h-[60%] p-6 shadow-xl space-y-4 custom-scroll overflow-y-auto bg-white">
-
-                                                    <div class="w-full p-2 border rounded-md shadow-lg">
-                                                        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
-                                                            odit tempora delectus sint repudiandae sed! Sapiente eaque ab
-                                                            dicta eos cum minima amet cupiditate delectus vero?
-                                                            Reprehenderit rem voluptatibus optio?</p>
-                                                        <p class="mt-1 text-xs">DD/MM/AAAA</p>
-                                                    </div>
-                                                    <div class="w-full p-2 border rounded-md shadow-lg">
-                                                        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
-                                                            odit tempora delectus sint repudiandae sed! Sapiente eaque ab
-                                                            dicta eos cum minima amet cupiditate delectus vero?
-                                                            Reprehenderit rem voluptatibus optio?</p>
-                                                        <p class="mt-1 text-xs">DD/MM/AAAA</p>
-                                                    </div>
-                                                    <div class="w-full p-2 border rounded-md shadow-lg">
-                                                        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
-                                                            odit tempora delectus sint repudiandae sed! Sapiente eaque ab
-                                                            dicta eos cum minima amet cupiditate delectus vero?
-                                                            Reprehenderit rem voluptatibus optio?</p>
-                                                        <p class="mt-1 text-xs">DD/MM/AAAA</p>
-                                                    </div>
-                                                    <div class="w-full p-2 border rounded-md shadow-lg">
-                                                        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
-                                                            odit tempora delectus sint repudiandae sed! Sapiente eaque ab
-                                                            dicta eos cum minima amet cupiditate delectus vero?
-                                                            Reprehenderit rem voluptatibus optio?</p>
-                                                        <p class="mt-1 text-xs">DD/MM/AAAA</p>
-                                                    </div>
-                                                </div>
-                                                <div class="flex flex-col justify-between flex-1">
-                                                    <div class="px-4 divide-y divide-gray-200 sm:px-6">
-                                                        <div class="pt-2">
-                                                            <fieldset>
-                                                                <legend
-                                                                    class="mb-2 text-base font-bold leading-6 text-gray-900">
-                                                                    Tipo de reporte</legend>
-                                                                <div
-                                                                    class="flex flex-wrap justify-between gap-3 text-sm align-middle">
-                                                                    <div class="flex align-items-center">
-                                                                        <RadioButton v-model="tipoReporte" inputId="tipo1"
-                                                                            name="sugerencia" value="Sugerencia" />
-                                                                        <label for="tipo1" class="ml-2">Sugerencia</label>
-                                                                    </div>
-                                                                    <div class="flex align-items-center">
-                                                                        <RadioButton v-model="tipoReporte" inputId="tipo2"
-                                                                            name="opinion" value="Opinion" />
-                                                                        <label for="tipo2" class="ml-2">Opinión</label>
-                                                                    </div>
-                                                                    <div class="flex align-items-center">
-                                                                        <RadioButton v-model="tipoReporte" inputId="tipo3"
-                                                                            name="error" value="Error" />
-                                                                        <label for="tipo3" class="ml-2">Error</label>
-                                                                    </div>
-                                                                </div>
-                                                            </fieldset>
+                                            <!-- Your content -->
+                                            <div class="flex flex-col h-full bg-white divide-y divide-gray-200 shadow-xl">
+                                                <div class="flex-1 h-0 overflow-y-auto">
+                                                    <div class="px-4 py-6 bg-indigo-700 sm:px-6">
+                                                        <div class="flex items-center justify-between">
+                                                            <DialogTitle
+                                                                class="text-base font-semibold leading-6 text-white">
+                                                                ¡Bienvenido a POT!</DialogTitle>
                                                         </div>
-                                                        <div class="pt-3">
-                                                            <div>
-                                                                <label for="description"
-                                                                    class="block text-base font-bold leading-6 text-gray-900">Descripción</label>
-                                                                <div class="mt-2">
-                                                                    <textarea id="description" name="description" rows="4"
-                                                                        v-model="sugerencia"
-                                                                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                                        <div class="mt-1">
+                                                            <p class="text-sm text-indigo-300">En este espacio podras
+                                                                informarnos
+                                                                tus opiniones, sugerencias y errores que encuentes en el
+                                                                portal
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        class="h-[60%] p-6 shadow-xl space-y-4 custom-scroll overflow-y-auto bg-white">
+
+                                                        <div class="w-full p-2 border rounded-md shadow-lg">
+                                                            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
+                                                                odit tempora delectus sint repudiandae sed! Sapiente eaque
+                                                                ab
+                                                                dicta eos cum minima amet cupiditate delectus vero?
+                                                                Reprehenderit rem voluptatibus optio?</p>
+                                                            <p class="mt-1 text-xs">DD/MM/AAAA</p>
+                                                        </div>
+                                                        <div class="w-full p-2 border rounded-md shadow-lg">
+                                                            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
+                                                                odit tempora delectus sint repudiandae sed! Sapiente eaque
+                                                                ab
+                                                                dicta eos cum minima amet cupiditate delectus vero?
+                                                                Reprehenderit rem voluptatibus optio?</p>
+                                                            <p class="mt-1 text-xs">DD/MM/AAAA</p>
+                                                        </div>
+                                                        <div class="w-full p-2 border rounded-md shadow-lg">
+                                                            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
+                                                                odit tempora delectus sint repudiandae sed! Sapiente eaque
+                                                                ab
+                                                                dicta eos cum minima amet cupiditate delectus vero?
+                                                                Reprehenderit rem voluptatibus optio?</p>
+                                                            <p class="mt-1 text-xs">DD/MM/AAAA</p>
+                                                        </div>
+                                                        <div class="w-full p-2 border rounded-md shadow-lg">
+                                                            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
+                                                                odit tempora delectus sint repudiandae sed! Sapiente eaque
+                                                                ab
+                                                                dicta eos cum minima amet cupiditate delectus vero?
+                                                                Reprehenderit rem voluptatibus optio?</p>
+                                                            <p class="mt-1 text-xs">DD/MM/AAAA</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex flex-col justify-between flex-1">
+                                                        <div class="px-4 divide-y divide-gray-200 sm:px-6">
+                                                            <div class="pt-2">
+                                                                <fieldset>
+                                                                    <legend
+                                                                        class="mb-2 text-base font-bold leading-6 text-gray-900">
+                                                                        Tipo de reporte</legend>
+                                                                    <div
+                                                                        class="flex flex-wrap justify-between gap-3 text-sm align-middle">
+                                                                        <div class="flex align-items-center">
+                                                                            <RadioButton v-model="tipoReporte"
+                                                                                inputId="tipo1" name="sugerencia"
+                                                                                value="Sugerencia" />
+                                                                            <label for="tipo1"
+                                                                                class="ml-2">Sugerencia</label>
+                                                                        </div>
+                                                                        <div class="flex align-items-center">
+                                                                            <RadioButton v-model="tipoReporte"
+                                                                                inputId="tipo2" name="opinion"
+                                                                                value="Opinion" />
+                                                                            <label for="tipo2" class="ml-2">Opinión</label>
+                                                                        </div>
+                                                                        <div class="flex align-items-center">
+                                                                            <RadioButton v-model="tipoReporte"
+                                                                                inputId="tipo3" name="error"
+                                                                                value="Error" />
+                                                                            <label for="tipo3" class="ml-2">Error</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </fieldset>
+                                                            </div>
+                                                            <div class="pt-3">
+                                                                <div>
+                                                                    <label for="description"
+                                                                        class="block text-base font-bold leading-6 text-gray-900">Descripción</label>
+                                                                    <div class="mt-2">
+                                                                        <textarea id="description" name="description"
+                                                                            rows="4" v-model="sugerencia"
+                                                                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <div class="flex justify-end flex-shrink-0 px-4 py-4">
+                                                    <button type="button"
+                                                        class="px-3 py-2 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                                        @click="sugerenciaVisible = false">Cancelar</button>
+                                                    <button type="submit" @click="enviaSugerencia()"
+                                                        class="inline-flex justify-center px-3 py-2 ml-4 text-sm font-semibold text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Guardar</button>
+                                                </div>
                                             </div>
-                                            <div class="flex justify-end flex-shrink-0 px-4 py-4">
-                                                <button type="button"
-                                                    class="px-3 py-2 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                                                    @click="sugerenciaVisible = false">Cancelar</button>
-                                                <button type="submit" @click="enviaSugerencia()"
-                                                    class="inline-flex justify-center px-3 py-2 ml-4 text-sm font-semibold text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Guardar</button>
-                                            </div>
-                                        </div>
 
-                                    </div>
-                                </DialogPanel>
-                            </TransitionChild>
+                                        </div>
+                                    </DialogPanel>
+                                </TransitionChild>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </Dialog>
-        </TransitionRoot>
+                </Dialog>
+            </TransitionRoot>
+        </main>
         <!-- <img :src="captura" alt=""> -->
     </div>
 </template>

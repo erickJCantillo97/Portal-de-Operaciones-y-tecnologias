@@ -18,23 +18,24 @@ import { applyDrag, generateItems } from "@/composable/helpers.js";
 
 //#region Draggable
 const data = ref({
-    items1: generateItems(10, (i) => ({
-        id: "1" + i,
+    items1: generateItems(2, (i) => ({
+        id: "1"+i,
         data: `Personal:\ncargo- ${i}`
     })),
     items2: [],
 })
 
 const onDrop = (collection, dropResult) => {
+    console.log(dropResult)
     data.value[collection] = applyDrag(data.value[collection], dropResult);
 }
 
 const getChildPayload1 = (index) => {
-    return data.value.items1[index];
+    return data.value.items1[index-1];
 }
 
 const getChildPayload2 = (index) => {
-    return data.value.items2[index];
+    return data.value.items2[index-1];
 }
 
 //#endregion
@@ -209,48 +210,38 @@ const items = ref([
 
             </div>
 
-            <div class="h-screen copy">
-                <div class="grid w-5/6 grid-cols-2 overflow-auto border rounded-md shadow-lg custom-scroll item sm:grid-cols-2">
+            <div class="copy">
+                <div class="grid w-5/6 h-screen grid-cols-2 overflow-auto border rounded-md shadow-lg custom-scroll item sm:grid-cols-2">
                     <div v-for="task in tasks"
                         class="flex flex-col justify-between p-2 m-2 border border-blue-800 rounded-md shadow-lg">
                         <div class="flex">
                             <p class="w-1/4 mr-1 font-bold">Actividad:</p>
                             <p v-tooltip.top="task.name" class="block w-full overflow-hidden whitespace-nowrap text-ellipsis">{{ task.name }}</p>
                         </div>
-                        <div class="flex">
+                        <div class="block text-xs">
                             <div class="flex w-1/2">
-                                <p class="w-1/2 font-bold">Inicio:</p>
-                                <p class="w-1/2">{{ task.startDate }}
+                                <p class="font-bold">I:</p>
+                                <p class="ml-3">{{ task.startDate }}
                                 </p>
                             </div>
                             <div class="flex w-1/2">
-                                <p class="w-1/2 font-bold">Fin:</p>
-                                <p class="w-1/2">{{ task.endDate }}
+                                <p class="font-bold">F:</p>
+                                <p class="ml-2">{{ task.endDate }}
                                 </p>
                             </div>
                         </div>
-                        <Container group-name="1" class="h-20 p-2 mt-2 mb-2 bg-blue-200 rounded-md"
-                            :get-child-payload="getChildPayload2" @drop="onDrop('items2', $event)">
+                        <Container group-name="1" class="h-20 p-2 mt-2 mb-2 overflow-auto bg-blue-200 rounded-md custom-scroll"
+                            @drop="onDrop('items2', $event)">
                             <div class="grid grid-cols-2 gap-1">
-                                <Draggable v-for="item in data.items2" :key="item.id">
+                                <div v-for="item in data.items2" :key="item.id">
                                     <div class="mt-1 bg-gray-400 rounded-md">
                                         {{ item.data }}
                                     </div>
-                                </Draggable>
+                                </div>
                             </div>
                         </Container>
                     </div>
                 </div>
-                <!-- <div class="w-1/3 item">
-                    <Container class="item" behaviour="copy" group-name="1" :get-child-payload="getChildPayload1">
-                        <Draggable v-for="item in data.items1" :key="item.id">
-                            <div class="mt-1 bg-gray-400 draggable-item">
-                                {{ item.data }}
-                            </div>
-                        </Draggable>
-                    </Container>
-                </div> -->
-
                 <div
                     class="overflow-hidden bg-white divide-y divide-gray-100 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
                     <Container
