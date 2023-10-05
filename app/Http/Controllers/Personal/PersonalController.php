@@ -30,4 +30,12 @@ class PersonalController extends Controller
             'cargos' => $cargos,
         ]);
     }
+
+    public function getPersonal(){
+        $personal = getPersonalGerenciaOficina(auth()->user()->gerencia, auth()->user()->oficina);
+
+        return response()->json([
+            'personal' => $personal,
+        ]);
+    }
 }

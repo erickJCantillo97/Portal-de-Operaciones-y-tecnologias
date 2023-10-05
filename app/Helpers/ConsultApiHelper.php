@@ -98,12 +98,12 @@ function getPersonalGerenciaOficina(string $gerencia = null, string $oficina = n
     $personal = [];
         if( $gerencia == null){
             $personal = getEmpleadosAPI();
-        }else if( $gerencia != null && $oficina == null){
+        }elseif( $gerencia != null && $oficina == null){
             $personal = searchEmpleados('Gerencia', $gerencia);
-        }else if($gerencia != null && $oficina != null){
+        }elseif($gerencia != null && $oficina != null){
             $personal = searchEmpleados('Gerencia', $gerencia)->filter(function ($employee) use ($gerencia, $oficina) {
                 return $employee['Gerencia'] == $gerencia && $employee['Oficina'] == $oficina;
-            });;
+            });
         }
 
         return $personal;

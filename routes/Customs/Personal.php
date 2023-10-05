@@ -22,4 +22,6 @@ use Illuminate\Support\Facades\Route;
 
 
         Route::get('getCargos', [personalController::class, 'getCargos'])->name('get.cargos');
+
+        Route::get('getPersonal', [personalController::class, 'getPersonal'])->name('get.personal');
 });
