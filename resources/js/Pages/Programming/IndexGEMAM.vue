@@ -14,14 +14,10 @@ import ProjectCard from '@/Components/ProjectCard.vue';
 import MinimalMenu from '@/Components/MinimalMenu.vue';
 import { ChevronRightIcon } from '@heroicons/vue/20/solid'
 import { Container, Draggable } from "vue-dndrop";
-import { applyDrag, generateItems } from "@/composable/helpers.js";
+import { applyDrag } from "@/composable/helpers.js";
 
 //#region Draggable
 const data = ref({
-    items1: generateItems(2, (i) => ({
-        id: "1" + i,
-        data: `Personal:\ncargo- ${i}`
-    })),
     items2: [],
 })
 
@@ -31,11 +27,11 @@ const onDrop = (collection, dropResult) => {
 }
 
 const getChildPayload1 = (index) => {
-    return data.value.items1[index - 1];
+    return data.value.items1[index];
 }
 
 const getChildPayload2 = (index) => {
-    return data.value.items2[index - 1];
+    return data.value.items2[index];
 }
 
 //#endregion
@@ -48,9 +44,13 @@ const unidad = {
 };
 
 const projects = ref()
+const personal = ref([])
 
 onMounted(() => {
     getTask('today')
+    axios.get(route('get.personal')).then((res) => {
+        personal.value = res.data.personal
+    })
 })
 
 const dates = ref([]);
@@ -216,27 +216,22 @@ const items = ref([
                     </div>
                 </div>
                 <div
-                    class="w-96 overflow-hidden bg-white divide-y h-screen divide-gray-100 shadow-lg ring-1 ring-gray-900/5 sm:rounded-xl">
+                    class="w-2/3 overflow-hidden bg-white divide-y h-screen divide-gray-100 shadow-lg ring-1 ring-gray-900/5 sm:rounded-xl">
                     <h2 class="font-semibold leading-6 text-center capitalize text-primary">Personal</h2>
                     <Container
                         class="relative flex flex-col gap px-1 py-1 overflow-y-auto h-full custom-scroll gap-x-2  sm:px-1"
                         behaviour="copy" group-name="1" :get-child-payload="getChildPayload1">
-                        <Draggable v-for="item in data.items1" :key="item.id"
+                        <Draggable v-for="item in personal" :key="item.Num_SAP"
                             class="relative flex justify-between py-2 mt-2 shadow-md cursor-pointer  sm:rounded-xl hover:bg-blue-200 pl-2">
                             <div class="flex min-w-0">
                                 <!-- <img class="flex-none w-12 h-12 rounded-full bg-gray-50" :src="item.imageUrl"
                                     alt="profile-photo" /> -->
                                 <div class="flex-auto min-w-0">
                                     <p class="text-sm font-semibold leading-6 text-gray-900">
-                                        <a>
-                                            <span class="absolute inset-x-0 bottom-0 -top-px" />
-                                            {{ item.data }}
-                                        </a>
+                                            {{ item.Nombres_Apellidos }}
                                     </p>
-                                    <p class="flex mt-1 text-xs leading-5 text-gray-500">Cargo:
-                                        <a :href="`mailto:${item.data}`" class="relative truncate hover:underline">
-                                            {{ item.data }}
-                                        </a>
+                                    <p class="flex mt-1 text-xs leading-5 text-gray-500">
+                                            {{ item.Cargo }}
                                     </p>
                                 </div>
                             </div>
