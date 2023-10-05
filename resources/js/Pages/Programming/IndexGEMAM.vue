@@ -8,14 +8,18 @@ import { Container, Draggable } from "vue-dndrop";
 import { applyDrag } from "@/composable/helpers.js";
 
 //#region Draggable
-const listaDatos = ref({})
+const listaDatos = ref({
+    person: []
+})
 
 const onDrop = (collection, dropResult) => {
+    console.log(collection)
+    console.log(dropResult)
     listaDatos.value[collection] = applyDrag(listaDatos.value[collection], dropResult);
 }
 
-const getChildPayload1 = (index) => {
-    return personal.value[index];
+const getChildPayload = (index) => {
+    return listaDatos.value.person[index];
 }
 
 //#endregion
@@ -28,12 +32,11 @@ const unidad = {
 };
 
 const projects = ref()
-const personal = ref([])
 
 onMounted(() => {
     getTask('today')
     axios.get(route('get.personal')).then((res) => {
-        personal.value = res.data.personal
+        listaDatos.value.person = Object.values(res.data.personal)
     })
 })
 
@@ -170,13 +173,13 @@ const items = ref([
 
             </div>
 
-            <div class="flex max-h-screen gap-8 overflow-y-auto">
+            <div class="flex max-h-screen gap-3 overflow-y-auto">
                 <div class="overflow-auto border rounded-md shadow-lg custom-scroll item">
                     <div v-for="task in tasks"
                         class="flex flex-col justify-between p-2 m-2 border border-blue-800 rounded-md shadow-lg">
                         <div class="flex">
-                            <p v-tooltip.top="task.name"
-                                class="block w-full overflow-hidden text-ellipsis">{{ task.name }}</p>
+                            <p v-tooltip.top="task.name" class="block w-full overflow-hidden text-ellipsis">{{ task.name }}
+                            </p>
                         </div>
                         <div class="block text-xs">
                             <div class="flex w-1/2">
@@ -191,11 +194,18 @@ const items = ref([
                             </div>
                         </div>
                         <Container group-name="1"
-                            class="h-20 p-2 mt-2 mb-2 overflow-auto bg-blue-200 rounded-md custom-scroll"
+                            class="h-20 p-2 mt-2 mb-2 overflow-auto rounded-lg shadow-md shadow-primary custom-scroll"
                             @drop="onDrop(task.id, $event)">
                             <div class="grid grid-cols-2 gap-1">
-                                <div v-for="item in listaDatos[task.id]" class="mt-1 bg-gray-400 rounded-md">
-                                   {{item.Nombres_Apellidos}}
+                                <div v-for="item in listaDatos[task.id]" class="p-1 mt-1 border-2 rounded-md">
+                                    <div class="flex justify-between w-full">
+                                        <p>{{item.Nombres_Apellidos}}</p>
+                                        <p class="text-danger">x</p>
+                                    </div>
+                                    <div class="flex justify-between w-full">
+                                        <p>7:00 - 16:30</p>
+                                        <p class="text-primary">I</p>
+                                    </div>
                                 </div>
                             </div>
                         </Container>
@@ -206,8 +216,8 @@ const items = ref([
                     <h2 class="font-semibold leading-6 text-center capitalize text-primary">Personal</h2>
                     <Container
                         class="relative flex flex-col h-full px-1 py-1 overflow-y-auto gap custom-scroll gap-x-2 sm:px-1"
-                        behaviour="copy" group-name="1" :get-child-payload="getChildPayload1">
-                        <Draggable v-for="item in personal"
+                        behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
+                        <Draggable v-for="item in listaDatos.person"
                             class="relative flex justify-between py-2 pl-2 mt-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200">
                             <div class="flex min-w-0">
                                 <!-- <img class="flex-none w-12 h-12 rounded-full bg-gray-50" :src="item.imageUrl"
