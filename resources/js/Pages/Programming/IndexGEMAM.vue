@@ -209,22 +209,37 @@ const items = ref([
 
             </div>
 
-            <div class=" copy  grid grid-cols-2">
-                <div class="w-2/3 item overflow-y-auto max-h-96">
-                    <Container group-name="1" v-for="task in tasks" class="p-2 mb-2 bg-gray-100 rounded-md"
-                        :get-child-payload="getChildPayload2" @drop="onDrop('items2', $event)">
-                        <div>
-                            <p>{{ task.name }}</p>
-                            <div class="grid grid-cols-3 gap-1">
+            <div class="h-screen copy">
+                <div class="grid w-5/6 grid-cols-2 overflow-auto border rounded-md shadow-lg custom-scroll item sm:grid-cols-2">
+                    <div v-for="task in tasks"
+                        class="flex flex-col justify-between p-2 m-2 border border-blue-800 rounded-md shadow-lg">
+                        <div class="flex">
+                            <p class="w-1/4 mr-1 font-bold">Actividad:</p>
+                            <p v-tooltip.top="task.name" class="block w-full overflow-hidden whitespace-nowrap text-ellipsis">{{ task.name }}</p>
+                        </div>
+                        <div class="flex">
+                            <div class="flex w-1/2">
+                                <p class="w-1/2 font-bold">Inicio:</p>
+                                <p class="w-1/2">{{ task.startDate }}
+                                </p>
+                            </div>
+                            <div class="flex w-1/2">
+                                <p class="w-1/2 font-bold">Fin:</p>
+                                <p class="w-1/2">{{ task.endDate }}
+                                </p>
+                            </div>
+                        </div>
+                        <Container group-name="1" class="h-20 p-2 mt-2 mb-2 bg-blue-200 rounded-md"
+                            :get-child-payload="getChildPayload2" @drop="onDrop('items2', $event)">
+                            <div class="grid grid-cols-2 gap-1">
                                 <Draggable v-for="item in data.items2" :key="item.id">
                                     <div class="mt-1 bg-gray-400 rounded-md">
                                         {{ item.data }}
                                     </div>
                                 </Draggable>
                             </div>
-
-                        </div>
-                    </Container>
+                        </Container>
+                    </div>
                 </div>
                 <!-- <div class="w-1/3 item">
                     <Container class="item" behaviour="copy" group-name="1" :get-child-payload="getChildPayload1">
