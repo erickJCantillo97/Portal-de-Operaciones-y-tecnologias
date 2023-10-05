@@ -209,8 +209,8 @@ const items = ref([
 
             </div>
 
-            <div class="flex w-full overflow-y-auto copy max-h-96">
-                <div class="w-2/3 item ">
+            <div class=" copy  grid grid-cols-2">
+                <div class="w-2/3 item overflow-y-auto max-h-96">
                     <Container group-name="1" v-for="task in tasks" class="p-2 mb-2 bg-gray-100 rounded-md"
                         :get-child-payload="getChildPayload2" @drop="onDrop('items2', $event)">
                         <div>
@@ -226,7 +226,7 @@ const items = ref([
                         </div>
                     </Container>
                 </div>
-                <div class="w-1/3 item">
+                <!-- <div class="w-1/3 item">
                     <Container class="item" behaviour="copy" group-name="1" :get-child-payload="getChildPayload1">
                         <Draggable v-for="item in data.items1" :key="item.id">
                             <div class="mt-1 bg-gray-400 draggable-item">
@@ -234,38 +234,39 @@ const items = ref([
                             </div>
                         </Draggable>
                     </Container>
-                </div>
+                </div> -->
 
-            </div>
-            <div class="overflow-hidden bg-white divide-y divide-gray-100 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
-                <Container
-                    class="relative flex flex-col justify-between px-1 py-1 overflow-y-auto h-96 gap-x-2 hover:bg-gray-50 sm:px-6"
-                    behaviour="copy" group-name="1" :get-child-payload="getChildPayload1">
-                    <h2 class="font-semibold leading-6 text-center capitalize text-primary">Personal</h2>
-                    <Draggable v-for="item in data.items1" :key="item.id"
-                        class="relative flex justify-between px-4 py-5 gap-x-6 hover:bg-gray-50 sm:px-6">
-                        <div class="flex min-w-0 gap-x-4">
-                            <img class="flex-none w-12 h-12 rounded-full bg-gray-50" alt="profile-photo" />
-                            <div class="flex-auto min-w-0">
-                                <p class="text-sm font-semibold leading-6 text-gray-900">
-                                    <a>
-                                        <span class="absolute inset-x-0 bottom-0 -top-px" />
-                                        {{ item.data }}
-                                    </a>
-                                </p>
-                                <p class="flex mt-1 text-xs leading-5 text-gray-500">Cargo:
-                                    <a :href="`mailto:${item.data}`" class="relative truncate hover:underline">
-                                        {{ item.data }}
-                                    </a>
-                                </p>
+                <div
+                    class="overflow-hidden bg-white divide-y divide-gray-100 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
+                    <Container
+                        class="relative flex flex-col justify-between px-1 py-1 overflow-y-auto h-96 gap-x-2 hover:bg-gray-50 sm:px-6"
+                        behaviour="copy" group-name="1" :get-child-payload="getChildPayload1">
+                        <h2 class="font-semibold leading-6 text-center capitalize text-primary">Personal</h2>
+                        <Draggable v-for="item in data.items1" :key="item.id"
+                            class="relative flex justify-between px-4 py-5 gap-x-6 hover:bg-gray-50 sm:px-6">
+                            <div class="flex min-w-0 gap-x-4">
+                                <img class="flex-none w-12 h-12 rounded-full bg-gray-50" alt="profile-photo" />
+                                <div class="flex-auto min-w-0">
+                                    <p class="text-sm font-semibold leading-6 text-gray-900">
+                                        <a>
+                                            <span class="absolute inset-x-0 bottom-0 -top-px" />
+                                            {{ item.data }}
+                                        </a>
+                                    </p>
+                                    <p class="flex mt-1 text-xs leading-5 text-gray-500">Cargo:
+                                        <a :href="`mailto:${item.data}`" class="relative truncate hover:underline">
+                                            {{ item.data }}
+                                        </a>
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                        <!-- <img class="flex-none w-12 h-12 rounded-full bg-gray-50" alt="profile-photo" />
-                            <div class="flex-none w-full h-12 bg-gray-100 rounded-lg">
-                                <p class="text-sm font-semibold leading-6 text-gray-900">{{ item.data }}</p>
-                            </div> -->
-                    </Draggable>
-                </Container>
+                            <!-- <img class="flex-none w-12 h-12 rounded-full bg-gray-50" alt="profile-photo" />
+                                <div class="flex-none w-full h-12 bg-gray-100 rounded-lg">
+                                    <p class="text-sm font-semibold leading-6 text-gray-900">{{ item.data }}</p>
+                                </div> -->
+                        </Draggable>
+                    </Container>
+                </div>
             </div>
 
         </div>
