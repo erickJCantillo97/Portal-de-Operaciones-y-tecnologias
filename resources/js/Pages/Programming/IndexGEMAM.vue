@@ -19,7 +19,7 @@ import { applyDrag, generateItems } from "@/composable/helpers.js";
 //#region Draggable
 const data = ref({
     items1: generateItems(2, (i) => ({
-        id: "1"+i,
+        id: "1" + i,
         data: `Personal:\ncargo- ${i}`
     })),
     items2: [],
@@ -31,11 +31,7 @@ const onDrop = (collection, dropResult) => {
 }
 
 const getChildPayload1 = (index) => {
-    return data.value.items1[index-1];
-}
-
-const getChildPayload2 = (index) => {
-    return data.value.items2[index-1];
+    return data.value.items1[index - 1];
 }
 
 //#endregion
@@ -186,7 +182,7 @@ const items = ref([
 
 <template>
     <AppLayout>
-        <div class="w-full md:p-4 px-auto">
+        <div class="w-full max-h-screen md:p-4 px-auto">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
@@ -210,13 +206,15 @@ const items = ref([
 
             </div>
 
-            <div class="copy">
-                <div class="grid w-5/6 h-screen grid-cols-2 overflow-auto border rounded-md shadow-lg custom-scroll item sm:grid-cols-2">
+            <div class="max-h-screen overflow-y-auto copy">
+                <div
+                    class="overflow-auto border rounded-md shadow-lg custom-scroll item">
                     <div v-for="task in tasks"
                         class="flex flex-col justify-between p-2 m-2 border border-blue-800 rounded-md shadow-lg">
                         <div class="flex">
                             <p class="w-1/4 mr-1 font-bold">Actividad:</p>
-                            <p v-tooltip.top="task.name" class="block w-full overflow-hidden whitespace-nowrap text-ellipsis">{{ task.name }}</p>
+                            <p v-tooltip.top="task.name"
+                                class="block w-full overflow-hidden whitespace-nowrap text-ellipsis">{{ task.name }}</p>
                         </div>
                         <div class="block text-xs">
                             <div class="flex w-1/2">
@@ -230,13 +228,12 @@ const items = ref([
                                 </p>
                             </div>
                         </div>
-                        <Container group-name="1" class="h-20 p-2 mt-2 mb-2 overflow-auto bg-blue-200 rounded-md custom-scroll"
+                        <Container group-name="1"
+                            class="h-20 p-2 mt-2 mb-2 overflow-auto bg-blue-200 rounded-md custom-scroll"
                             @drop="onDrop('items2', $event)">
                             <div class="grid grid-cols-2 gap-1">
-                                <div v-for="item in data.items2" :key="item.id">
-                                    <div class="mt-1 bg-gray-400 rounded-md">
+                                <div v-for="item in data.items2" :key="item.id" class="mt-1 bg-gray-400 rounded-md">
                                         {{ item.data }}
-                                    </div>
                                 </div>
                             </div>
                         </Container>
