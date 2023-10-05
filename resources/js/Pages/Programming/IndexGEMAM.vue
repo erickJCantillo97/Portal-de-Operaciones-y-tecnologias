@@ -158,7 +158,7 @@ const items = ref([
 
 <template>
     <AppLayout>
-        <div class="w-full max-h-screen md:p-4 px-auto">
+        <div class="w-full h-screen md:p-4 px-auto">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
@@ -170,13 +170,15 @@ const items = ref([
 
             </div>
 
-            <div class="flex max-h-screen gap-8 overflow-y-auto">
+            <!--LISTA PROGRAMACIÓN DE ACTIVIDADES-->
+            <div class="flex h-[80%] gap-8">
                 <div class="overflow-auto border rounded-md shadow-lg custom-scroll item">
                     <div v-for="task in tasks"
                         class="flex flex-col justify-between p-2 m-2 border border-blue-800 rounded-md shadow-lg">
                         <div class="flex">
-                            <p v-tooltip.top="task.name"
-                                class="block w-full overflow-hidden text-ellipsis">{{ task.name }}</p>
+                            <p v-tooltip.top="task.name" class="block w-full overflow-hidden text-ellipsis">{{ task.name
+                            }}
+                            </p>
                         </div>
                         <div class="block text-xs">
                             <div class="flex w-1/2">
@@ -195,23 +197,24 @@ const items = ref([
                             @drop="onDrop(task.id, $event)">
                             <div class="grid grid-cols-2 gap-1">
                                 <div v-for="item in listaDatos[task.id]" class="mt-1 bg-gray-400 rounded-md">
-                                   {{item.Nombres_Apellidos}}
+                                    {{ item.Nombres_Apellidos }}
                                 </div>
                             </div>
                         </Container>
                     </div>
                 </div>
+
+                <!--LISTA PERSONAL-->
                 <div
-                    class="w-2/3 h-screen overflow-hidden bg-white divide-y divide-gray-100 shadow-lg ring-1 ring-gray-900/5 sm:rounded-xl">
+                    class="w-2/3 h-[100%] overflow-y-auto custom-scroll bg-white divide-y divide-gray-100 shadow-lg ring-1 ring-gray-900/5 sm:rounded-xl">
                     <h2 class="font-semibold leading-6 text-center capitalize text-primary">Personal</h2>
-                    <Container
-                        class="relative flex flex-col h-full px-1 py-1 overflow-y-auto gap custom-scroll gap-x-2 sm:px-1"
+                    <Container class="relative flex flex-col h-screen px-1 py-1 gap-x-2 sm:px-1 md:gap-1 lg:gap-1"
                         behaviour="copy" group-name="1" :get-child-payload="getChildPayload1">
                         <Draggable v-for="item in personal"
                             class="relative flex justify-between py-2 pl-2 mt-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200">
                             <div class="flex min-w-0">
                                 <!-- <img class="flex-none w-12 h-12 rounded-full bg-gray-50" :src="item.imageUrl"
-                                    alt="profile-photo" /> -->
+                                        alt="profile-photo" /> -->
                                 <div class="flex-auto min-w-0">
                                     <p class="text-sm font-semibold leading-6 text-gray-900">
                                         {{ item.Nombres_Apellidos }}
@@ -222,14 +225,13 @@ const items = ref([
                                 </div>
                             </div>
                             <!-- <img class="flex-none w-12 h-12 rounded-full bg-gray-50" alt="profile-photo" />
-                                <div class="flex-none w-full h-12 bg-gray-100 rounded-lg">
-                                    <p class="text-sm font-semibold leading-6 text-gray-900">{{ item.data }}</p>
-                                </div> -->
+                                    <div class="flex-none w-full h-12 bg-gray-100 rounded-lg">
+                                        <p class="text-sm font-semibold leading-6 text-gray-900">{{ item.data }}</p>
+                                    </div> -->
                         </Draggable>
                     </Container>
                 </div>
             </div>
-
         </div>
 
 
