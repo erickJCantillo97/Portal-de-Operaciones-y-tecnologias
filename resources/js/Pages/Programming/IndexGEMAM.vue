@@ -1,25 +1,24 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { FilterMatchMode } from 'primevue/api';
-import Button from '@/Components/Button.vue';
-import Calendar from 'primevue/calendar';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import InputText from 'primevue/inputtext';
 import '../../../sass/dataTableCustomized.scss';
-import Avatars from '@/Components/Avatars.vue';
-import ProjectCard from '@/Components/ProjectCard.vue';
-import MinimalMenu from '@/Components/MinimalMenu.vue';
-import { ChevronRightIcon } from '@heroicons/vue/20/solid'
 import { Container, Draggable } from "vue-dndrop";
 import { applyDrag } from "@/composable/helpers.js";
 
 //#region Draggable
 const data = ref({
-    items2: [],
+    empleados: generateItems(2, (i) => ({
+        id: "1" + i,
+        data: `Persona ${i}`
+    }))
 })
+
+axios.get(route('get.empleados.gerencia')).then((res) => {
+    console.log(res)
+})
+
 
 const onDrop = (collection, dropResult) => {
     console.log(dropResult)
@@ -27,11 +26,7 @@ const onDrop = (collection, dropResult) => {
 }
 
 const getChildPayload1 = (index) => {
-    return data.value.items1[index];
-}
-
-const getChildPayload2 = (index) => {
-    return data.value.items2[index];
+    return data.value.empleados[index];
 }
 
 //#endregion
@@ -85,7 +80,7 @@ function obtenerLunesYViernesSemanaActual() {
     };
 }
 
-const getTask = (option) => {
+const getTask = async (option) => {
 
     const today = new Date();
     optionValue.value = option
@@ -116,11 +111,15 @@ const getTask = (option) => {
         tasks.value = [];
         loading.value = true;
 
-        axios.get(route('actividadesDeultimonivel', { dates: dates.value })).then((res) => {
+        await axios.get(route('actividadesDeultimonivel', { dates: dates.value })).then((res) => {
             loading.value = false;
             tasks.value = res.data
             projects.value = [...new Set(res.data.map(obj => obj.project.id))]
         })
+        tasks.value.forEach(element => {
+            data.value[element.id] = []
+        });
+        console.log(data.value)
     }
 
 }
@@ -183,7 +182,7 @@ const items = ref([
 
             </div>
 
-            <div class="max-h-screen overflow-y-auto flex gap-8">
+            <div class="flex max-h-screen gap-8 overflow-y-auto">
                 <div class="overflow-auto border rounded-md shadow-lg custom-scroll item">
                     <div v-for="task in tasks"
                         class="flex flex-col justify-between p-2 m-2 border border-blue-800 rounded-md shadow-lg">
@@ -206,9 +205,9 @@ const items = ref([
                         </div>
                         <Container group-name="1"
                             class="h-20 p-2 mt-2 mb-2 overflow-auto bg-blue-200 rounded-md custom-scroll"
-                            @drop="onDrop('items2', $event)">
+                            @drop="onDrop(task.id, $event)">
                             <div class="grid grid-cols-2 gap-1">
-                                <div v-for="item in data.items2" :key="item.id" class="mt-1 bg-gray-400 rounded-md">
+                                <div v-for="item in data[task.id]" :key="item.id" class="mt-1 bg-gray-400 rounded-md">
                                     {{ item.data }}
                                 </div>
                             </div>
@@ -219,7 +218,7 @@ const items = ref([
                     class="w-2/3 overflow-hidden bg-white divide-y h-screen divide-gray-100 shadow-lg ring-1 ring-gray-900/5 sm:rounded-xl">
                     <h2 class="font-semibold leading-6 text-center capitalize text-primary">Personal</h2>
                     <Container
-                        class="relative flex flex-col gap px-1 py-1 overflow-y-auto h-full custom-scroll gap-x-2  sm:px-1"
+                        class="relative flex flex-col h-full px-1 py-1 overflow-y-auto gap custom-scroll gap-x-2 sm:px-1"
                         behaviour="copy" group-name="1" :get-child-payload="getChildPayload1">
                         <Draggable v-for="item in personal" :key="item.Num_SAP"
                             class="relative flex justify-between py-2 mt-2 shadow-md cursor-pointer  sm:rounded-xl hover:bg-blue-200 pl-2">
@@ -251,7 +250,7 @@ const items = ref([
                 <ul role="list"
                     class="overflow-hidden bg-white divide-y divide-gray-100 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
                     <li v-for="person in people" :key="person.email"
-                        class="relative flex justify-between px-4 py-5 gap-x-6  sm:px-6">
+                        class="relative flex justify-between px-4 py-5 gap-x-6 sm:px-6">
                         <div class="flex min-w-0 gap-x-4">
                             <img class="flex-none w-12 h-12 rounded-full bg-gray-50" :src="person.imageUrl" alt="" />
                             <div class="flex-auto min-w-0">
