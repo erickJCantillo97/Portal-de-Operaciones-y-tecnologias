@@ -18,11 +18,9 @@ import { applyDrag, generateItems } from "@/composable/helpers.js";
 
 //#region Draggable
 const data = ref({
-    items1: generateItems(10, (i) => ({
+    items1: generateItems(2, (i) => ({
         id: "1" + i,
-        data: `Personal:\ncargo- ${i}`,
-        imageUrl:
-            'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+        data: `Personal:\ncargo- ${i}`
     })),
     items2: [],
 })
@@ -170,24 +168,10 @@ const items = ref([
 
 //#endregion
 </script>
-<style scoped>
-.copy {
-    display: flex;
-    gap: 2rem;
-}
-
-.items1 {
-    flex: 1;
-    flex-wrap: wrap;
-    flex-direction: column;
-    background-color: blue;
-
-}
-</style>
 
 <template>
     <AppLayout>
-        <div class="w-full md:p-4 px-auto">
+        <div class="w-full max-h-screen md:p-4 px-auto">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
@@ -199,9 +183,8 @@ const items = ref([
 
             </div>
 
-            <div class="copy">
-                <div
-                    class="grid w-5/6 h-screen grid-cols-2 overflow-auto border rounded-md shadow-lg custom-scroll item sm:grid-cols-2">
+            <div class="max-h-screen overflow-y-auto flex gap-8">
+                <div class="overflow-auto border rounded-md shadow-lg custom-scroll item">
                     <div v-for="task in tasks"
                         class="flex flex-col justify-between p-2 m-2 border border-blue-800 rounded-md shadow-lg">
                         <div class="flex">
@@ -225,10 +208,8 @@ const items = ref([
                             class="h-20 p-2 mt-2 mb-2 overflow-auto bg-blue-200 rounded-md custom-scroll"
                             @drop="onDrop('items2', $event)">
                             <div class="grid grid-cols-2 gap-1">
-                                <div v-for="item in data.items2" :key="item.id">
-                                    <div class="mt-1 bg-gray-400 rounded-md">
-                                        {{ item.data }}
-                                    </div>
+                                <div v-for="item in data.items2" :key="item.id" class="mt-1 bg-gray-400 rounded-md">
+                                    {{ item.data }}
                                 </div>
                             </div>
                         </Container>

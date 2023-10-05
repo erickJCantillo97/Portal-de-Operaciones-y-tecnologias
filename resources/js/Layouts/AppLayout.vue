@@ -1,12 +1,11 @@
 <template>
-    <div class="collapsible-vertical" :class="menu ? 'toggle-sidebar' : ''">
-        <div class="bg-GECON hiden"></div>
-        <main class="">
+    <div class="max-h-screen collapsible-vertical" :class="menu ? 'toggle-sidebar' : ''">
+        <main>
             <div class="fixed inset-0 bg-[black]/60 z-10" :class="{ hidden: !menu }" @click="menu = !menu"></div>
 
             <MenuSidebar class="lg:block " :class="{ hidden: !menu }"></MenuSidebar>
             <div
-                class="z-10 flex items-center justify-between h-16 px-4 pl-8 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 md:ml-16">
+                class="z-10 flex items-center justify-between h-16 px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 md:ml-16">
                 <div>
                     <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="menu = !menu">
                         <span class="sr-only">Open sidebar</span>
@@ -15,64 +14,58 @@
                     <h1 class="hidden text-xl font-extrabold lg:block text-primary">Portal de Operaciones Tecnológicas e
                         Inteligencia Artificial</h1>
                 </div>
-                <div class="flex ">
-                    <div class="flex items-center ">
-                        <button type="button" class="text-gray-400 hover:text-gray-500">
-                            <span class="sr-only">View notifications</span>
-                            <div class="relative w-6 h-6" title="Notificaciones">
-                                <BellIcon aria-hidden="true" />
-                                <span class="flex w-3 h-3">
-                                    <span
-                                        class="absolute inline-flex w-3 h-3 ml-3 bg-red-500 rounded-full -mt-7 animate-pulse"></span>
+                <div class="flex items-center ">
+                    <button type="button" class="text-gray-400 hover:text-gray-500">
+                        <span class="sr-only">View notifications</span>
+                        <div class="relative w-6 h-6" title="Notificaciones">
+                            <BellIcon aria-hidden="true" />
+                            <span class="flex w-3 h-3">
+                                <span
+                                    class="absolute inline-flex w-3 h-3 ml-3 bg-red-500 rounded-full -mt-7 animate-pulse"></span>
+                            </span>
+                        </div>
+                    </button>
+                    <DropdownSetting title="Utilidades"></DropdownSetting>
+                    <Menu as="div" class="relative inline-block text-left">
+                        <div title="Perfil">
+                            <MenuButton
+                                class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white rounded-md hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                                <span class="sr-only">Open user menu</span>
+                                <img class="w-8 h-8 rounded-full bg-gray-50" :src="$page.props.auth.user.photo" alt="" />
+                                <span class="hidden lg:flex lg:items-center">
+                                    <span class="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">{{
+                                        $page.props.auth.user.short_name }}</span>
                                 </span>
-                            </div>
-                        </button>
-                        <DropdownSetting title="Utilidades"></DropdownSetting>
-                        <Menu as="div" class="relative inline-block text-left">
-                            <div title="Perfil">
-                                <MenuButton
-                                    class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white rounded-md hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
-                                    <span class="sr-only">Open user menu</span>
-                                    <img class="w-8 h-8 rounded-full bg-gray-50" :src="$page.props.auth.user.photo"
-                                        alt="" />
-                                    <span class="hidden lg:flex lg:items-center">
-                                        <span class="ml-4 text-sm font-semibold leading-6 text-gray-900"
-                                            aria-hidden="true">{{ $page.props.auth.user.short_name }}</span>
-                                    </span>
-                                    <ChevronDownIcon class="w-5 h-5 ml-2 -mr-1 text-violet-200 hover:text-violet-100"
-                                        aria-hidden="true" />
-                                </MenuButton>
-                            </div>
+                                <ChevronDownIcon class="w-5 h-5 ml-2 -mr-1 text-violet-200 hover:text-violet-100"
+                                    aria-hidden="true" />
+                            </MenuButton>
+                        </div>
 
-                            <transition enter-active-class="transition duration-100 ease-out"
-                                enter-from-class="transform scale-95 opacity-0"
-                                enter-to-class="transform scale-100 opacity-100"
-                                leave-active-class="transition duration-75 ease-in"
-                                leave-from-class="transform scale-100 opacity-100"
-                                leave-to-class="transform scale-95 opacity-0">
-                                <MenuItems
-                                    class="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                    <div class="px-1 py-1">
-                                        <MenuItem v-slot="{ active }">
-                                        <button @click="logout" :class="[
-                                            active ? 'bg-primary text-white' : 'text-gray-900',
-                                            'group flex w-full items-center rounded-md px-2 py-2 text-sm',]">
-                                            <ArrowLeftCircleIcon :active="active" class="w-5 h-5 mr-2 text-violet-400"
-                                                aria-hidden="true" />
-                                            Salir
-                                        </button>
-                                        </MenuItem>
-                                    </div>
-                                </MenuItems>
-                            </transition>
-                        </Menu>
-                    </div>
+                        <transition enter-active-class="transition duration-100 ease-out"
+                            enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100"
+                            leave-active-class="transition duration-75 ease-in"
+                            leave-from-class="transform scale-100 opacity-100"
+                            leave-to-class="transform scale-95 opacity-0">
+                            <MenuItems
+                                class="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                <div class="px-1 py-1">
+                                    <MenuItem v-slot="{ active }">
+                                    <button @click="logout" :class="[
+                                        active ? 'bg-primary text-white' : 'text-gray-900',
+                                        'group flex w-full items-center rounded-md px-2 py-2 text-sm',]">
+                                        <ArrowLeftCircleIcon :active="active" class="w-5 h-5 mr-2 text-violet-400"
+                                            aria-hidden="true" />
+                                        Salir
+                                    </button>
+                                    </MenuItem>
+                                </div>
+                            </MenuItems>
+                        </transition>
+                    </Menu>
                 </div>
             </div>
-            <div class="mt-1 bg-white rounded-lg shadow-2xl sm:ml-20 sm:mr-1 mb-14">
-
+            <div class="rounded-lg shadow-2xl g-white sm:ml-20 sm:mr-1">
                 <slot />
-
             </div>
             <div class="fixed inset-x-0 bottom-0 pointer-events-none sm:flex sm:justify-center sm:px-6 sm:pb-5 lg:px-8">
                 <div
