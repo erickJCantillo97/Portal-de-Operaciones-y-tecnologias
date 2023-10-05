@@ -100,25 +100,17 @@ const clearFilter = () => {
 
 <template>
   <AppLayout>
-    <UserHeader></UserHeader>
-    <div class="sm:p-6 space-y-5">
+    <div class="sm:p-6 space-y-5 overflow-y-scroll max-h-screen">
       <!-- <div class="max-w-full p-3 border-2 border-blue-100 rounded-xl">
                             <dl class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                                 <ProjectCard v-for="project of projects" :project="project" :activo="false" />
                             </dl>
                         </div> -->
+      <UserHeader></UserHeader>
       <!--DATATABLE PROYECTOS-->
-      <div class="p-3 rounded-xl m-1 shadow-2xl">
-        <DataTable
-          id="tabla"
-          stripedRows
-          class="p-datatable-sm"
-          :value="projects"
-          v-model:filters="filters"
-          dataKey="id"
-          filterDisplay="menu"
-          :loading="loading"
-          :globalFilterFields="[
+      <div class="p-3 rounded-xl m-1 shadow-md">
+        <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters" dataKey="id"
+          filterDisplay="menu" :loading="loading" :globalFilterFields="[
             'name',
             'gerencia',
             'start_date',
@@ -126,22 +118,13 @@ const clearFilter = () => {
             'hoursPerDay',
             'daysPerWeek',
             'daysPerMonth',
-          ]"
-          currentPageReportTemplate=" {first} al {last} de {totalRecords}"
+          ]" currentPageReportTemplate=" {first} al {last} de {totalRecords}"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-          :paginator="true"
-          :rows="10"
-          :rowsPerPageOptions="[10, 25, 50, 100]"
-        >
+          :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
           <!--COLUMNAS-->
           <Column field="name" header="Proyecto">
             <template #body="slotProps">
-              <ProjectCardMinimal
-                :project="slotProps.data"
-                :activo="false"
-                :menu="false"
-                :avance="false"
-              />
+              <ProjectCardMinimal :project="slotProps.data" :activo="false" :menu="false" :avance="false" />
             </template>
           </Column>
           <Column field="avance" header="Ejecución">
@@ -164,30 +147,20 @@ const clearFilter = () => {
           <!--ACCIONES-->
           <Column header="Acciones" class="space-x-3">
             <template #body="slotProps">
-              <div
-                class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8"
-              >
+              <div class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8">
                 <div title="Ver programacion">
-                  <Button
-                    severity="primary"
-                    @click="
-                      router.get(route('programming'), { id: slotProps.data.project_id })
-                    "
-                    class="hover:bg-primary"
-                  >
+                  <Button severity="primary" @click="
+                    router.get(route('programming'), { id: slotProps.data.project_id })
+                    " class="hover:bg-primary">
                     <i class="fa-solid fa-list-check" />
                   </Button>
                 </div>
                 <div title="Ver cronograma">
-                  <Button
-                    severity="success"
-                    @click="
-                      router.get(
-                        route('createSchedule.create', slotProps.data.project_id)
-                      )
-                    "
-                    class="hover:bg-danger"
-                  >
+                  <Button severity="success" @click="
+                    router.get(
+                      route('createSchedule.create', slotProps.data.project_id)
+                    )
+                    " class="hover:bg-danger">
                     <i class="fa-solid fa-chart-gantt" />
                   </Button>
                 </div>
@@ -196,7 +169,7 @@ const clearFilter = () => {
           </Column>
         </DataTable>
       </div>
-      <div class="p-3 rounded-xl m-1 shadow-2xl">
+      <div class="p-8 rounded-xl m-1 shadow-md">
         <DataChart></DataChart>
       </div>
     </div>

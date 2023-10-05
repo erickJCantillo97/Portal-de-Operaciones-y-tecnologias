@@ -20,7 +20,7 @@ import { applyDrag, generateItems } from "@/composable/helpers.js";
 const data = ref({
     items1: generateItems(2, (i) => ({
         id: "1" + i,
-        data: `Personal:\ncargo- ${i}`
+        data: `cargo ${i}`
     })),
     items2: [],
 })
@@ -31,12 +31,9 @@ const onDrop = (collection, dropResult) => {
 }
 
 const getChildPayload1 = (index) => {
-    return data.value.items1[index - 1];
+    return data.value.items1[index];
 }
 
-const getChildPayload2 = (index) => {
-    return data.value.items2[index - 1];
-}
 
 //#endregion
 
@@ -172,25 +169,24 @@ const items = ref([
 <template>
     <AppLayout>
         <div class="w-full max-h-screen md:p-4 px-auto">
-            <div class="flex items-center mx-2 mb-2">
-                <div class="flex-auto">
-                    <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
-                        Programación de Actividades
-                    </h1>
+                <div class="flex items-center mx-2 mb-2">
+                    <div class="flex-auto">
+                        <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
+                            Programación de Actividades
+                        </h1>
+                    </div>
                 </div>
-            </div>
             <div>
+        </div>
 
-            </div>
-
-            <div class="max-h-screen overflow-y-auto flex gap-8">
+            <!--LISTA DE TAREAS-->
+            <div class="max-h-screen overflow-y-auto flex gap-2">
                 <div class="overflow-auto border rounded-md shadow-lg custom-scroll item">
                     <div v-for="task in tasks"
                         class="flex flex-col justify-between p-2 m-2 border border-blue-800 rounded-md shadow-lg">
                         <div class="flex">
-                            <p class="w-1/4 mr-1 font-bold">Actividad:</p>
-                            <p v-tooltip.top="task.name"
-                                class="block w-full overflow-hidden whitespace-nowrap text-ellipsis">{{ task.name }}</p>
+                            <p v-tooltip.top="task.name" class="block w-full overflow-hidden  text-ellipsis">{{ task.name }}
+                            </p>
                         </div>
                         <div class="block text-xs">
                             <div class="flex w-1/2">
@@ -215,8 +211,9 @@ const items = ref([
                         </Container>
                     </div>
                 </div>
-                <div
-                    class="w-96 overflow-hidden bg-white divide-y h-screen divide-gray-100 shadow-lg ring-1 ring-gray-900/5 sm:rounded-xl">
+
+                <!--LISTA DE PERSONAL-->
+                <div class="w-3/4 overflow-hidden bg-white divide-y h-screen divide-gray-100 shadow-lg ring-1 ring-gray-900/5 sm:rounded-xl">
                     <h2 class="font-semibold leading-6 text-center capitalize text-primary">Personal</h2>
                     <Container
                         class="relative flex flex-col gap px-1 py-1 overflow-y-auto h-full custom-scroll gap-x-2  sm:px-1"
@@ -248,7 +245,6 @@ const items = ref([
                     </Container>
                 </div>
             </div>
-
         </div>
 
 
