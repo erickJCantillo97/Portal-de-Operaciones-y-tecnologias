@@ -6,7 +6,6 @@ import '@bryntum/gantt/locales/gantt.locale.Es.js';
 import { DateHelper, Gantt, List, LocaleManager, ProjectModel, StringHelper, Widget } from '@bryntum/gantt/gantt.module.js';
 import '../../css/app.scss'
 import { useSweetalert } from '@/composable/sweetAlert';
-import { number } from 'echarts/core';
 const { toast } = useSweetalert();
 const props = defineProps({
     project: Number,

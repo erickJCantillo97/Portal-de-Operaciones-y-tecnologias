@@ -11,8 +11,16 @@
                         <span class="sr-only">Open sidebar</span>
                         <Bars3CenterLeftIcon class="w-6 h-6" aria-hidden="true" />
                     </button>
-                    <h1 class="hidden text-xl font-extrabold lg:block text-primary">Portal de Operaciones Tecnológicas e
+                    <div class="flex items-center space-x-12 ">
+                        <h1 class="hidden text-xl font-extrabold lg:block text-primary">Portal de Operaciones Tecnológicas e
                         Inteligencia Artificial</h1>
+                    <div class="p-2 font-extrabold uppercase bg-orange-300 rounded-md ">
+                        <div class="flex items-center px-5 py-1 space-x-2 text-primary">
+                            <i class="pi pi-exclamation-circle"></i>
+                            <p class="">Modo de pruebas</p>
+                        </div>
+                    </div>
+                    </div>
                 </div>
                 <div class="flex items-center ">
                     <button type="button" class="text-gray-400 hover:text-gray-500">
@@ -66,20 +74,6 @@
             </div>
             <div class="rounded-lg shadow-2xl g-white sm:ml-20 sm:mr-1">
                 <slot />
-            </div>
-            <div class="fixed inset-x-0 bottom-0 pointer-events-none sm:flex sm:justify-center sm:px-6 sm:pb-5 lg:px-8">
-                <div
-                    class="pointer-events-auto flex items-center justify-between gap-x-6 bg-gray-900 px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
-                    <p class="text-sm leading-6 text-white">
-                        <button @click="sugerenciaVisible = true">
-                            <strong class="font-semibold">POT 2023</strong><svg viewBox="0 0 2 2"
-                                class="mx-2 inline h-0.5 w-0.5 fill-current" aria-hidden="true">
-                                <circle cx="1" cy="1" r="1" />
-                            </svg>Estas en el portal de pruebas, si tienes sugerencias o fallas reportalas
-                            aqui&nbsp;<span aria-hidden="true">&rarr;</span>
-                        </button>
-                    </p>
-                </div>
             </div>
             <div class="fixed right-0 z-50 w-12 top-1/2 hover:animate-pulse">
                 <button v-tooltip="'¿Alguna sugerencia?'" @click="sugerenciaVisible = true" v-if="!sugerenciaVisible"
@@ -209,8 +203,8 @@
                                                                     <label for="description"
                                                                         class="block text-base font-bold leading-6 text-gray-900">Descripción</label>
                                                                     <div class="mt-2">
-                                                                        <textarea id="description" name="description"
-                                                                            rows="4" v-model="sugerencia"
+                                                                        <textarea id="description" name="description" placeholder="Buzon de sugerencias en desarrollo"
+                                                                            rows="4" v-model="sugerencia" readonly
                                                                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                                                                     </div>
                                                                 </div>
@@ -222,7 +216,7 @@
                                                     <button type="button"
                                                         class="px-3 py-2 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                                                         @click="sugerenciaVisible = false">Cancelar</button>
-                                                    <button type="submit" @click="enviaSugerencia()"
+                                                    <button type="submit"
                                                         class="inline-flex justify-center px-3 py-2 ml-4 text-sm font-semibold text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Guardar</button>
                                                 </div>
                                             </div>
@@ -259,6 +253,7 @@ import Button from '@/Components/Button.vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 import html2canvas from 'html2canvas';
 import RadioButton from 'primevue/radiobutton';
+import Tag from 'primevue/tag';
 
 import { useSweetalert } from '@/composable/sweetAlert';
 const { toast } = useSweetalert();
