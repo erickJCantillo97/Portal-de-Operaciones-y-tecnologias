@@ -54,6 +54,5 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('getContracts', [ContractController::class, 'getContracts'])->name('getContracts');
 
     //CRUD Programming
-    Route::get('/programming', [ProgrammingController::class, 'index'])->name('programming');
-    Route::get('/programming-GEMAM', [ProgrammingController::class, 'indexGEMAM'])->name('programming.index.GEMAM');
+    
 });

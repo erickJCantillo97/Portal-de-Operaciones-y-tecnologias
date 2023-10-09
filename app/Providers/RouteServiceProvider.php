@@ -40,6 +40,8 @@ class RouteServiceProvider extends ServiceProvider
                     ->group(base_path('routes/Customs/Personal.php'));
             Route::middleware('web')
                     ->group(base_path('routes/Customs/Project.php'));
+            Route::middleware('web')
+                    ->group(base_path('routes/Customs/Programming.php'));
 
             Route::middleware('web')
                 ->prefix('security')
