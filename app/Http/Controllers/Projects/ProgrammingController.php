@@ -24,7 +24,7 @@ class ProgrammingController extends Controller
         ]);
         $task = VirtualTask::find($validateData['task_id']);
         $validateData['hora_fin'] = '16:30';
-        if($task->durationUnit == 'hours' &&$task->duration < 8.5){
+        if($task->durationUnit == 'hours' && $task->duration < 8.5){
                 $validateData['hora_fin'] = Carbon::parse('16:30')->addHours($task->duration)->format('H:i');
         }
         $validateData['hora_inicio'] = '7:00';

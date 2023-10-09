@@ -6,17 +6,18 @@ import axios from 'axios';
 import '../../../sass/dataTableCustomized.scss';
 import { Container, Draggable } from "vue-dndrop";
 import { applyDrag } from "@/composable/helpers.js";
-import { XMarkIcon, PencilIcon, QuestionMarkCircleIcon, Bars3Icon } from "@heroicons/vue/20/solid";
+import { XMarkIcon, PencilIcon, Bars3Icon } from "@heroicons/vue/20/solid";
 import { useSweetalert } from '@/composable/sweetAlert';
 import Knob from 'primevue/knob';
 const { toast } = useSweetalert();
 //#region Draggable
 const listaDatos = ref({})
-
+const fecha=ref(new Date())
 const personal = ref()
 
-const onDrop = (collection, dropResult) => {
-    listaDatos.value[collection] = applyDrag(listaDatos.value[collection], dropResult);
+const onDrop = async (collection, dropResult) => {
+
+    listaDatos.value[collection] = applyDrag(listaDatos.value[collection], dropResult, fecha.value,collection);
 }
 
 const getChildPayload = (index) => {
