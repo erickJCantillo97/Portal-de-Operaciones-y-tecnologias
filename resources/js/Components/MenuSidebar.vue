@@ -108,6 +108,7 @@ const navigation = [
             // { name: 'Informes', href: '#' },
             // { name: 'Cronograma', href: 'showGantt' },
             { name: 'Programacion', href: 'programming' },
+            { name: 'Programacion GEMAM', href: 'programming.index.GEMAM' },
             { name: 'Unidades', href: 'ships.index' },
         ],
     },

@@ -8,6 +8,7 @@ import { Container, Draggable } from "vue-dndrop";
 import { applyDrag } from "@/composable/helpers.js";
 import { XMarkIcon, PencilIcon } from "@heroicons/vue/20/solid";
 import { useSweetalert } from '@/composable/sweetAlert';
+import Knob from 'primevue/knob';
 const { toast } = useSweetalert();
 //#region Draggable
 const listaDatos = ref({})
@@ -148,27 +149,50 @@ const editar = () => {
                     </h1>
                 </div>
             </div>
-            <div>
-
-            </div>
-
             <!--LISTA PROGRAMACIÓN DE ACTIVIDADES-->
-            <div class="flex h-[88%] gap-2">
+            <div class="flex h-full gap-2">
                 <div class="space-y-1 overflow-auto rounded-md shadow-lg custom-scroll snap-y snap-proximity">
                     <div v-for="task in tasks"
                         class="flex flex-col justify-between p-2 border rounded-md shadow-md h-1/2 snap-start">
                         <div class="flex flex-col justify-between h-1/3">
                             <p class="block w-full overflow-hidden">{{ task.name }}
                             </p>
-                            <div class="block text-xs">
-                                <div class="flex w-1/2">
-                                    <p class="font-bold">I:</p>
-                                    <p class="ml-3">{{ task.startDate }}
+                            <div class="grid items-center grid-cols-2 text-xs sm:grid-cols-6">
+                                <div class="">
+                                    <div class="grid grid-cols-2">
+                                        <p class="font-bold ">Inicio:</p>
+                                        <p class="">{{ task.startDate }}
+                                        </p>
+                                    </div>
+                                    <div class="grid grid-cols-2">
+                                        <p class="font-bold">Fin:</p>
+                                        <p class="">{{ task.endDate }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="hidden sm:flex sm:justify-center">
+                                    <Knob v-tooltip.top="'Avance: ' + parseInt(task.percentDone) + '%'"
+                                        :model-value=parseInt(task.percentDone) :size=50 valueTemplate="{value}%"
+                                        readonly />
+                                </div>
+                                <div class="hidden text-center sm:justify-center sm:block">
+                                    <p class="font-bold">Valor estimado</p>
+                                    <p class="">$1.000.000
                                     </p>
                                 </div>
-                                <div class="flex w-1/2">
-                                    <p class="font-bold">F:</p>
-                                    <p class="ml-2">{{ task.endDate }}
+                                <div class="hidden text-center sm:justify-center sm:block">
+                                    <p class="font-bold">Valor programado</p>
+                                    <p class="">$1.000.000
+                                    </p>
+                                </div>
+                                <div class="hidden text-center sm:justify-center sm:block">
+                                    <p class="font-bold">Valor dia</p>
+                                    <p class="">$1.000.000
+                                    </p>
+                                </div>
+                                <div class="hidden text-center sm:justify-center sm:block">
+                                    <p class="font-bold">Diferencia</p>
+                                    <p class="">$1.000.000
                                     </p>
                                 </div>
                             </div>
@@ -187,7 +211,24 @@ const editar = () => {
                                         </button>
                                     </div>
                                     <div class="flex items-center justify-between w-full align-middle">
-                                        <p>7:00 - 16:30</p>
+                                        <div class="flex space-x-2">
+                                            <span
+                                                class="inline-flex items-center gap-x-1.5 rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+                                                <svg class="h-1.5 w-1.5 fill-green-500" viewBox="0 0 6 6"
+                                                    aria-hidden="true">
+                                                    <circle cx="3" cy="3" r="3" />
+                                                </svg>
+                                                7:00 - 12:30
+                                            </span>
+                                            <span
+                                                class="inline-flex items-center gap-x-1.5 rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+                                                <svg class="h-1.5 w-1.5 fill-green-500" viewBox="0 0 6 6"
+                                                    aria-hidden="true">
+                                                    <circle cx="3" cy="3" r="3" />
+                                                </svg>
+                                                13:30 - 16:30
+                                            </span>
+                                        </div>
                                         <button v-tooltip.bottom="'En desarrollo'" @click="console.log()">
                                             <PencilIcon
                                                 class="h-4 p-0.5 border rounded-md bg-primary text-white border-primary hover:animate-pulse hover:scale-125" />
@@ -195,7 +236,7 @@ const editar = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div v-else class="items-center justify-center text-center align-middle ">
+                            <div v-else class="items-center justify-center text-center align-middle opacity-50">
                                 <h2 class="mt-4 text-xl font-medium tracking-wide text-gray-700">No hay personas asignadas
                                 </h2>
 
@@ -208,7 +249,7 @@ const editar = () => {
 
                 <!--LISTA PERSONAL-->
                 <div
-                    class="w-2/3 h-[100%] overflow-y-auto custom-scroll bg-white divide-y divide-gray-100 shadow-lg ring-1 ring-gray-900/5 sm:rounded-xl">
+                    class="w-2/3 h-full overflow-y-auto bg-white divide-y divide-gray-100 shadow-lg custom-scroll ring-1 ring-gray-900/5 sm:rounded-xl">
                     <h2 class="font-semibold leading-6 text-center capitalize text-primary">Personal</h2>
                     <Container
                         class="relative flex flex-col h-full px-1 py-1 overflow-y-auto gap custom-scroll gap-x-2 sm:px-1"
