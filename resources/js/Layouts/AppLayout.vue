@@ -14,7 +14,7 @@
                     <div class="flex items-center space-x-12 ">
                         <h1 class="hidden text-xl font-extrabold lg:block text-primary">Portal de Operaciones Tecnológicas e
                         Inteligencia Artificial</h1>
-                    <div class="p-2 font-extrabold uppercase bg-orange-300 rounded-md ">
+                    <div class="hidden p-2 font-extrabold uppercase bg-orange-300 rounded-md sm:block ">
                         <div class="flex items-center px-5 py-1 space-x-2 text-primary">
                             <i class="pi pi-exclamation-circle"></i>
                             <p class="">Modo de pruebas</p>

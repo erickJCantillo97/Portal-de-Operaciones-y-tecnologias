@@ -6,7 +6,7 @@ import axios from 'axios';
 import '../../../sass/dataTableCustomized.scss';
 import { Container, Draggable } from "vue-dndrop";
 import { applyDrag } from "@/composable/helpers.js";
-import { XMarkIcon, PencilIcon } from "@heroicons/vue/20/solid";
+import { XMarkIcon, PencilIcon, QuestionMarkCircleIcon, Bars3Icon } from "@heroicons/vue/20/solid";
 import { useSweetalert } from '@/composable/sweetAlert';
 import Knob from 'primevue/knob';
 const { toast } = useSweetalert();
@@ -149,24 +149,32 @@ const editar = () => {
                     </h1>
                 </div>
             </div>
-            <!--LISTA PROGRAMACIÓN DE ACTIVIDADES-->
-            <div class="flex h-full gap-2">
-                <div class="space-y-1 overflow-auto rounded-md shadow-lg custom-scroll snap-y snap-proximity">
+
+            <div class="h-[90%] block sm:grid-cols-3 sm:gap-1 sm:grid">
+                <!--LISTA PROGRAMACIÓN DE ACTIVIDADES-->
+                <div
+                    class="h-full col-span-2 space-y-1 overflow-y-auto shadow-lg custom-scroll snap-y snap-proximity ring-1 ring-gray-900/5 rounded-xl">
                     <div v-for="task in tasks"
                         class="flex flex-col justify-between p-2 border rounded-md shadow-md h-1/2 snap-start">
-                        <div class="flex flex-col justify-between h-1/3">
-                            <p class="block w-full overflow-hidden">{{ task.name }}
-                            </p>
+                        <div class="flex flex-col justify-between h-auto">
+                            <div class="flex items-start justify-between">
+                                <p class="block overflow-hidden">{{ task.name }}
+                                </p>
+                                <button v-tooltip.top="'Quitar'" @click="" class="block ml-1 sm:hidden">
+                                    <Bars3Icon
+                                        class="h-6 p-0.5 border rounded-md text-white bg-primary border-primary hover:animate-pulse hover:scale-125" />
+                                </button>
+                            </div>
                             <div class="grid items-center grid-cols-2 text-xs sm:grid-cols-6">
                                 <div class="">
-                                    <div class="grid grid-cols-2">
-                                        <p class="font-bold ">Inicio:</p>
-                                        <p class="">{{ task.startDate }}
+                                    <div class="flex justify-between">
+                                        <p class="font-bold ">I:</p>
+                                        <p class="font-mono">{{ task.startDate }}
                                         </p>
                                     </div>
-                                    <div class="grid grid-cols-2">
-                                        <p class="font-bold">Fin:</p>
-                                        <p class="">{{ task.endDate }}
+                                    <div class="flex justify-between">
+                                        <p class="font-bold">F:</p>
+                                        <p class="font-mono">{{ task.endDate }}
                                         </p>
                                     </div>
                                 </div>
@@ -198,7 +206,7 @@ const editar = () => {
                             </div>
                         </div>
                         <Container group-name="1"
-                            class="p-2 mt-2 mb-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 h-2/3 shadow-primary custom-scroll"
+                            class="h-full p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
                             @drop="onDrop(task.id, $event)">
                             <div class="grid grid-cols-2 gap-1"
                                 v-if="listaDatos[task.id] !== undefined && listaDatos[task.id].length != 0">
@@ -210,22 +218,21 @@ const editar = () => {
                                                 class="h-4 p-0.5 border rounded-md text-white bg-danger border-danger hover:animate-pulse hover:scale-125" />
                                         </button>
                                     </div>
-                                    <div class="flex items-center justify-between w-full align-middle">
-                                        <div class="flex space-x-2">
+                                    <div class="flex items-center justify-between w-full font-mono align-middle">
+                                        <div class="grid grid-cols-3 gap-1">
                                             <span
                                                 class="inline-flex items-center gap-x-1.5 rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-                                                <svg class="h-1.5 w-1.5 fill-green-500" viewBox="0 0 6 6"
-                                                    aria-hidden="true">
-                                                    <circle cx="3" cy="3" r="3" />
-                                                </svg>
+
                                                 7:00 - 12:30
                                             </span>
                                             <span
                                                 class="inline-flex items-center gap-x-1.5 rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-                                                <svg class="h-1.5 w-1.5 fill-green-500" viewBox="0 0 6 6"
-                                                    aria-hidden="true">
-                                                    <circle cx="3" cy="3" r="3" />
-                                                </svg>
+
+                                                13:30 - 16:30
+                                            </span>
+                                            <span
+                                                class="inline-flex items-center gap-x-1.5 rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+
                                                 13:30 - 16:30
                                             </span>
                                         </div>
@@ -249,17 +256,18 @@ const editar = () => {
 
                 <!--LISTA PERSONAL-->
                 <div
-                    class="w-2/3 h-full overflow-y-auto bg-white divide-y divide-gray-100 shadow-lg custom-scroll ring-1 ring-gray-900/5 sm:rounded-xl">
+                    class="hidden w-full h-full overflow-y-auto divide-y divide-gray-100 shadow-lg sm:block custom-scroll ring-1 ring-gray-900/5 rounded-xl">
                     <h2 class="font-semibold leading-6 text-center capitalize text-primary">Personal</h2>
                     <Container
-                        class="relative flex flex-col h-full px-1 py-1 overflow-y-auto gap custom-scroll gap-x-2 sm:px-1"
+                        class="relative flex flex-col h-full px-1 py-1 overflow-y-auto gap custom-scroll sm:px-1"
                         behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
-                        <Draggable v-for="item in personal"
+                        <Draggable v-for="item in personal" :drag-not-allowed="false"
                             class="relative flex justify-between py-2 pl-2 mt-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200">
-                            <div class="flex min-w-0">
-                                <!-- <img class="flex-none w-12 h-12 rounded-full bg-gray-50" :src="item.imageUrl"
-                                        alt="profile-photo" /> -->
-                                <div class="flex-auto min-w-0">
+                            <div class="flex items-center align-middle">
+                                <img class="w-12 h-12 rounded-full"
+                                    :src="'https://ui-avatars.com/api/?name=' + item.Nombres_Apellidos"
+                                    alt="profile-photo" />
+                                <div class="flex-auto mx-1">
                                     <p class="text-sm font-semibold leading-6 text-gray-900">
                                         {{ item.Nombres_Apellidos }}
                                     </p>
@@ -267,11 +275,10 @@ const editar = () => {
                                         {{ item.Cargo }}
                                     </p>
                                 </div>
+                                <button class="flex items-center justify-center h-6 p-1 m-1 font-mono text-sm text-white align-middle rounded-md w-9 bg-primary" v-tooltip.top="'Ver programacion'" @click="console.log('Hola mundo')">
+                                    <p> 1.0H </p>
+                                </button>
                             </div>
-                            <!-- <img class="flex-none w-12 h-12 rounded-full bg-gray-50" alt="profile-photo" />
-                                    <div class="flex-none w-full h-12 bg-gray-100 rounded-lg">
-                                        <p class="text-sm font-semibold leading-6 text-gray-900">{{ item.data }}</p>
-                                    </div> -->
                         </Draggable>
                     </Container>
                 </div>
