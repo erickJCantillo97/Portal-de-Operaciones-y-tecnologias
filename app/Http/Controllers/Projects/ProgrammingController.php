@@ -29,11 +29,18 @@ class ProgrammingController extends Controller
         }
         $validateData['hora_inicio'] = '7:00';
         $validateData['hora_fin'] = '16:30';
-        Schedule::create($validateData);
+        //lo comente para que no guardara cada vez que hacia algo y no llenara datos basura
+        // Schedule::create($validateData);
+        return 'Hecho';
     }
 
     public function indexGEMAM()
     {
         return Inertia::render('Programming/IndexGEMAM');
+    }
+
+    public function delete(Request $request){
+        //hace algo
+        return 'Hecho';
     }
 }

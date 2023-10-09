@@ -1,4 +1,4 @@
-export const applyDrag = (arr, dragResult, fecha, task) => {
+export const applyDrag = async (arr, dragResult, fecha, task) => {
     const { removedIndex, addedIndex, payload } = dragResult;
     if (removedIndex === null && addedIndex === null) return arr;
     const result = [...arr];
@@ -9,11 +9,10 @@ export const applyDrag = (arr, dragResult, fecha, task) => {
     }
 
     if (addedIndex !== null) {
-        axios.post(route('programming.store'),{task_id:task,employee_id:payload.Num_SAP,fecha:fecha}).then((res) => {
+        await axios.post(route('programming.store'), { task_id: task, employee_id: payload.Num_SAP, fecha: fecha }).then((res) => {
+            result.splice(addedIndex, 0, itemToAdd);
         })
-        result.splice(addedIndex, 0, itemToAdd);
     }
-
     return result;
 };
 
