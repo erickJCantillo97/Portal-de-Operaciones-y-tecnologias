@@ -18,8 +18,8 @@ class ProgrammingController extends Controller
 
     public function store(Request $request){
         $validateData = $request->validate([
-            'task_id' => 'requeried',
-            'employee_id' => 'requeried',
+            'task_id' => 'required',
+            'employee_id' => 'required',
             'fecha' => 'required|date',
         ]);
         $task = VirtualTask::find($validateData['task_id']);
