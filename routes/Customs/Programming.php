@@ -10,5 +10,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::delete('/programming/delete', [ProgrammingController::class, 'delete'])->name('programming.delete');
     Route::get('/programming-GEMAM', [ProgrammingController::class, 'indexGEMAM'])->name('programming.index.GEMAM');
 
+    Route::get('actividadesDeultimonivel', [ProgrammingController::class, 'endNivelActivities'])->name('actividadesDeultimonivel');
+
 
 });

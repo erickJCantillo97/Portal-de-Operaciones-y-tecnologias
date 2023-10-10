@@ -38,8 +38,8 @@ const submit = () => {
       <body class="h-full">
       ```
     -->
-    <div class="min-w-full min-h-screen flex sm:justify-center justify-center items-center">
-        <div class="sm:max-w-sm min-w-max">
+    <div class="min-w-full min-h-screen flex justify-center items-center">
+        <div class="max-w-sm md:min-w-max px-2">
             <video autoplay="autoplay" class="video hidden md:block" loop="loop" muted="muted" preload="">
                 <source src="/video/video_margen_completa_home.mp4" type="video/mp4">
             </video>
