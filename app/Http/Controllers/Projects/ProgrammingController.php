@@ -46,4 +46,9 @@ class ProgrammingController extends Controller
     {
         return Inertia::render('Programming/IndexGEMAM');
     }
+
+    public function delete(Request $request){
+        //hace algo
+        return 'Hecho';
+    }
 }

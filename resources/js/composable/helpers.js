@@ -1,5 +1,4 @@
-export const applyDrag = async (arr, dragResult, fecha, task) => {
-    let statusConsult = false
+export const applyDrag = (arr, dragResult, fecha, task) => {
     const { removedIndex, addedIndex, payload } = dragResult;
     if (removedIndex === null && addedIndex === null) return arr;
     const result = [...arr];
@@ -10,17 +9,10 @@ export const applyDrag = async (arr, dragResult, fecha, task) => {
     }
 
     if (addedIndex !== null) {
-        result.splice(addedIndex, 0, itemToAdd);
         axios.post(route('programming.store'),{task_id:task,employee_id:payload.Num_SAP,fecha:fecha}).then((res) => {
-            statusConsult = res.data.status
         })
-        if(statusConsult){
-            console.log("Consulta Terminada")
-            // result.splice(addedIndex, 0, itemToAdd);
-            console.log(result);
-        }
+        result.splice(addedIndex, 0, itemToAdd);
     }
-
     return result;
 };
 
