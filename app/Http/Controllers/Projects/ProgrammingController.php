@@ -35,14 +35,14 @@ class ProgrammingController extends Controller
             'hora_fin' => '16:30'
         ]);
 
-        $task =  VirtualTask::where('id', $validateData['task_id'])->get()->map(function($task){
+        $task =  VirtualTask::where('id', $validateData['task_id'])->get()->map(function($task) use ($validateData){
             return [
                 'name' => $task['name'],
                 'id' => $task['id'],
                 'endDate' => $task['endDate'],
                 'percentDone' => $task['percentDone'],
                 'startDate' => $task['startDate'],
-                'people' => Schedule::with('scheduleTimes')->where('task_id', $task['id'])->get()
+                'people' => Schedule::where('fecha', $validateData['fecha'])->with('scheduleTimes')->where('task_id', $task['id'])->get()
             ];
         });
 
@@ -98,7 +98,7 @@ class ProgrammingController extends Controller
                     'endDate' => $task['endDate'],
                     'percentDone' => $task['percentDone'],
                     'startDate' => $task['startDate'],
-                    'people' => Schedule::with('scheduleTimes')->where('task_id', $task['id'])->get()
+                    'people' => Schedule::where('fecha', $date_start)->with('scheduleTimes')->where('task_id', $task['id'])->get()
                 ];
             }),
         );

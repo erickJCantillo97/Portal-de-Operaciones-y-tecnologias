@@ -18,7 +18,6 @@ const dates = ref([]);
 const tasks = ref([]);
 const loading = ref(false);
 const optionValue = ref('today')
-const projects = ref()
 
 const onDrop = async (collection, dropResult) => {
     listaDatos.value[collection] = await applyDrag(listaDatos.value[collection], dropResult, fecha.value, collection);
@@ -78,7 +77,10 @@ const getTask = async (option) => {
 
 }
 
-
+function format24h(hora) {
+    return new Date("1970-01-01T" + hora).toLocaleString('es-CO',
+        { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+}
 
 //#region
 const quitar = async (task, index, person) => {
@@ -125,14 +127,10 @@ const editar = () => {
                     class="relative h-full row-start-2 row-span-6 sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 overflow-y-auto shadow-lg custom-scroll snap-y snap-proximity ring-1 ring-gray-900/5 rounded-xl">
                     <div v-for="task in tasks"
                         class="h-1/2 flex flex-col justify-between p-2 border rounded-md shadow-md sm:h-1/2 snap-start">
-                        <div class="flex flex-col justify-between h-auto">
-                            <div class="flex items-start justify-between">
+                        <div class="grid grid-rows-2">
+                            <div class="">
                                 <p class="block overflow-hidden">{{ task.name }}
                                 </p>
-                                <!-- <button v-tooltip.top="'Quitar'" @click="" class="block ml-1 sm:hidden">
-                                    <Bars3Icon
-                                        class="h-6 p-0.5 border rounded-md text-white bg-primary border-primary hover:animate-pulse hover:scale-125" />
-                                </button> -->
                             </div>
                             <div class="grid items-center grid-cols-2 text-xs sm:grid-cols-6">
                                 <div class="">
@@ -174,14 +172,15 @@ const editar = () => {
                                 </div>
                             </div>
                         </div>
-                        <Container group-name="1"
+                        <Container
                             class="h-2/3 p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
                             @drop="onDrop(task.id, $event)">
                             <div class="grid grid-cols-2 gap-1"
                                 v-if="listaDatos[task.id] !== undefined && listaDatos[task.id].length != 0">
                                 <div v-for="(item, index) in listaDatos[task.id]" class="p-1 mt-1 border-2 rounded-md">
                                     <div class="flex items-center justify-between w-full">
-                                        <p class="text-sm font-semibold ">{{ item.employee != undefined ? item.employee.Nombres_Apellidos : item.Nombres_Apellidos}}</p>
+                                        <p class="text-sm font-semibold ">{{ item.employee != undefined ?
+                                            item.employee.Nombres_Apellidos : item.Nombres_Apellidos }}</p>
                                         <button v-tooltip.top="'En desarrollo'" @click="quitar(task, index, item)">
                                             <XMarkIcon
                                                 class="h-4 p-0.5 border rounded-md text-white bg-danger border-danger hover:animate-pulse hover:scale-125" />
@@ -189,10 +188,9 @@ const editar = () => {
                                     </div>
                                     <div class="flex items-center justify-between w-full font-mono align-middle">
                                         <div class="grid grid-cols-3 gap-1">
-                                            <span
-                                            v-for="horario in item.schedule_times"
+                                            <span v-for="horario in item.schedule_times"
                                                 class="inline-flex items-center gap-x-1.5 rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-                                                {{horario.hora_inicio}}-{{horario.hora_fin}}
+                                                {{ format24h(horario.hora_inicio) }}-{{ format24h(horario.hora_fin) }}
                                             </span>
                                         </div>
                                         <button v-tooltip.bottom="'En desarrollo'" @click="console.log('En desarrollo')">
@@ -216,8 +214,9 @@ const editar = () => {
                 <div
                     class="row-start-1 sm:col-start-3 h-full overflow-y-hidden sm:overflow-y-auto divide-y divide-gray-100 shadow-lg sm:block custom-scroll ring-1 ring-gray-900/5 rounded-xl">
                     <!-- <h2 class="font-semibold text-center capitalize text-primary">Personal</h2> -->
-                    <Container class="flex h-full sm:space-x-0 w-full overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:block sm:py-1 sm:px-1" behaviour="copy" group-name="1"
-                        :get-child-payload="getChildPayload">
+                    <Container
+                        class="flex h-full sm:space-x-0 w-full overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
+                        behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
                         <Draggable v-for="item in personal" :drag-not-allowed="false"
                             class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200">
                             <div class="grid grid-cols-6">
