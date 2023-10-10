@@ -263,7 +263,7 @@ const editar = () => {
                         class="relative flex flex-col h-full px-1 py-1 overflow-y-auto gap custom-scroll sm:px-1"
                         behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
                         <Draggable v-for="item in personal" :drag-not-allowed="false"
-                            class="relative flex justify-between py-2 pl-2 mt-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200">
+                            class="relative flex justify-between py-2 pl-2 mt-2 shadow-md cursor-pointer sm:rounded-xl  h-auto   hover:bg-blue-200">
                             <div class="flex items-center align-middle">
                                 <img class="w-12 h-12 rounded-full"
                                     :src="'https://ui-avatars.com/api/?name=' + item.Nombres_Apellidos"

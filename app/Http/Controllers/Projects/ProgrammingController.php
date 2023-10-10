@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Schedule;
 use App\Models\VirtualTask;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -17,7 +18,8 @@ class ProgrammingController extends Controller
     }
 
     public function store(Request $request){
-        $validateData = $request->validate([
+        try{
+            $validateData = $request->validate([
             'task_id' => 'required',
             'employee_id' => 'required',
             'fecha' => 'required|date',
@@ -30,6 +32,14 @@ class ProgrammingController extends Controller
         $validateData['hora_inicio'] = '7:00';
         $validateData['hora_fin'] = '16:30';
         Schedule::create($validateData);
+        return response()->json([
+            'status' => true,
+        ], 200);
+        }catch (Exception $e){
+            return 500;
+        }
+
+
     }
 
     public function indexGEMAM()
