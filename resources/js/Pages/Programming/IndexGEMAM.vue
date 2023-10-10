@@ -97,7 +97,7 @@ const editar = () => {
 
 <template>
     <AppLayout>
-        <div class="w-full h-screen md:p-4 px-auto">
+        <div class="relative h-full w-full p-2">
             <div class="grid justify-center mb-2 grid-col-1 sm:flex sm:justify-between sm:items-center">
                 <p class="text-xl font-semibold leading-6 text-center capitalize text-primary">
                     Programación de Actividades
@@ -120,11 +120,10 @@ const editar = () => {
                         type="date" name="date" id="date" v-model="fecha" @change="getTask('date')">
                 </div>
             </div>
-
-            <div class="h-[83%] grid grid-rows-auto sm:grid-rows-1 sm:grid-cols-3 sm:gap-1 ">
+            <div class="relative h-full grid grid-rows-auto sm:grid-rows-1 sm:grid-cols-3 sm:gap-1 ">
                 <!--LISTA PROGRAMACIÓN DE ACTIVIDADES-->
                 <div
-                    class="h-full row-start-2 row-span-6 sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 overflow-y-auto shadow-lg custom-scroll snap-y snap-proximity ring-1 ring-gray-900/5 rounded-xl">
+                    class="relative h-full row-start-2 row-span-6 sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 overflow-y-auto shadow-lg custom-scroll snap-y snap-proximity ring-1 ring-gray-900/5 rounded-xl">
                     <div v-for="task in tasks"
                         class="h-1/2 flex flex-col justify-between p-2 border rounded-md shadow-md sm:h-1/2 snap-start">
                         <div class="flex flex-col justify-between h-auto">
@@ -226,12 +225,12 @@ const editar = () => {
                 </div>
                 <!--LISTA PERSONAL-->
                 <div
-                    class="row-start-1 sm:col-start-3 overflow-x-auto h-full sm:overflow-y-auto divide-y divide-gray-100 shadow-lg sm:block custom-scroll ring-1 ring-gray-900/5 rounded-xl">
-                    <h2 class="font-semibold leading-6 text-center capitalize text-primary">Personal</h2>
-                    <Container class="min-w-screen flex overflow-x-auto sm:block px-1 py-1 sm:px-1" behaviour="copy" group-name="1"
+                    class="row-start-1 sm:col-start-3 h-full overflow-y-hidden sm:overflow-y-auto divide-y divide-gray-100 shadow-lg sm:block custom-scroll ring-1 ring-gray-900/5 rounded-xl">
+                    <!-- <h2 class="font-semibold text-center capitalize text-primary">Personal</h2> -->
+                    <Container class="flex h-full sm:space-x-0 w-full overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:block sm:py-1 sm:px-1" behaviour="copy" group-name="1"
                         :get-child-payload="getChildPayload">
                         <Draggable v-for="item in personal" :drag-not-allowed="false"
-                            class="py-2 pl-2 w-96 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200">
+                            class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200">
                             <div class="grid grid-cols-6">
                                 <div class="flex items-center w-full">
                                     <img class=" w-12 h-12 rounded-full"
