@@ -70,10 +70,9 @@ const getTask = async (option) => {
         await axios.get(route('actividadesDeultimonivel', { dates: dates.value })).then((res) => {
             loading.value = false;
             tasks.value = res.data
-            projects.value = [...new Set(res.data.map(obj => obj.project.id))]
         })
         tasks.value.forEach(element => {
-            listaDatos.value[element.id] = []
+            listaDatos.value[element.id] = element.people
         });
     }
 
@@ -183,7 +182,7 @@ const editar = () => {
                                 v-if="listaDatos[task.id] !== undefined && listaDatos[task.id].length != 0">
                                 <div v-for="(item, index) in listaDatos[task.id]" class="p-1 mt-1 border-2 rounded-md">
                                     <div class="flex items-center justify-between w-full">
-                                        <p class="text-sm font-semibold ">{{ item.Nombres_Apellidos }}</p>
+                                        <p class="text-sm font-semibold ">{{ item.employee != undefined ? item.employee.Nombres_Apellidos : item.Nombres_Apellidos}}</p>
                                         <button v-tooltip.top="'En desarrollo'" @click="quitar(task, index, item)">
                                             <XMarkIcon
                                                 class="h-4 p-0.5 border rounded-md text-white bg-danger border-danger hover:animate-pulse hover:scale-125" />
@@ -192,19 +191,9 @@ const editar = () => {
                                     <div class="flex items-center justify-between w-full font-mono align-middle">
                                         <div class="grid grid-cols-3 gap-1">
                                             <span
+                                            v-for="horario in item.schedule_times"
                                                 class="inline-flex items-center gap-x-1.5 rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-
-                                                7:00 - 12:30
-                                            </span>
-                                            <span
-                                                class="inline-flex items-center gap-x-1.5 rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-
-                                                13:30 - 16:30
-                                            </span>
-                                            <span
-                                                class="inline-flex items-center gap-x-1.5 rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-
-                                                13:30 - 16:30
+                                                {{horario.hora_inicio}}-{{horario.hora_fin}}
                                             </span>
                                         </div>
                                         <button v-tooltip.bottom="'En desarrollo'" @click="console.log('En desarrollo')">
