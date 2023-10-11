@@ -159,6 +159,7 @@ const editar = () => {
                             <div class="">
                                 <p class="block overflow-hidden">{{ task.name }}
                                 </p>
+                                <p class="text-xs text-primary italic uppercase">{{task.project}}</p>
                             </div>
                             <div class="grid items-center grid-cols-2 text-xs sm:grid-cols-6">
                                 <div class="">
@@ -188,11 +189,11 @@ const editar = () => {
                                     <p class="">$1.000.000
                                     </p>
                                 </div>
-                                <div class="hidden text-center sm:justify-center sm:block">
+                                <!-- <div class="hidden text-center sm:justify-center sm:block">
                                     <p class="font-bold">Valor dia</p>
                                     <p class="">$1.000.000
                                     </p>
-                                </div>
+                                </div> -->
                                 <div class="hidden text-center sm:justify-center sm:block">
                                     <p class="font-bold">Diferencia</p>
                                     <p class="">$1.000.000

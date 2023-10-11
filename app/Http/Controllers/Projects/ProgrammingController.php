@@ -85,7 +85,7 @@ class ProgrammingController extends Controller
 
 
         return response()->json(
-            VirtualTask::with('project',  'assignments')->where(function ($query) use ($date_start, $date_end) {
+            VirtualTask::where(function ($query) use ($date_start, $date_end) {
                 $query->whereBetween('startdate', [$date_start, $date_end])
                     ->orWhereBetween('enddate', [$date_start, $date_end])
                     ->orWhere(function ($query) use ($date_start, $date_end) {
@@ -98,6 +98,7 @@ class ProgrammingController extends Controller
                     'id' => $task['id'],
                     'endDate' => $task['endDate'],
                     'percentDone' => $task['percentDone'],
+                    'project' => $task->project->name,
                     'startDate' => $task['startDate'],
                 ];
             }),
