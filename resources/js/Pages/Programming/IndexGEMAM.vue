@@ -102,6 +102,15 @@ const editar = () => {
 }
 //#endregion
 </script>
+<style scoped>
+.custom-image {
+    width: 200px;
+    height: 50px;
+    object-position: 50% 30%;
+    border-radius: 10% 25%;;
+    object-fit: cover; /* Opciones: 'cover', 'contain', 'fill', etc. */
+}
+</style>
 
 <template>
     <AppLayout>
@@ -131,7 +140,7 @@ const editar = () => {
             <div class="relative h-full grid grid-rows-auto sm:grid-rows-1 sm:grid-cols-3 sm:gap-1 ">
                 <!--LISTA PROGRAMACIÓN DE ACTIVIDADES-->
                 <div
-                    class="relative h-full row-start-2 row-span-6 sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 overflow-y-auto shadow-lg custom-scroll snap-y snap-proximity ring-1 ring-gray-900/5 rounded-xl">
+                    class="relative h-[85%] row-start-2 row-span-6 sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 overflow-y-auto shadow-lg custom-scroll snap-y snap-proximity ring-1 ring-gray-900/5 rounded-xl">
                     <div v-for="task in tasks"
                         class="h-1/2 flex flex-col justify-between p-2 border rounded-md shadow-md sm:h-1/2 snap-start">
                         <div class="grid grid-rows-2">
@@ -222,13 +231,13 @@ const editar = () => {
                     class="row-start-1 sm:col-start-3 h-full overflow-y-hidden sm:overflow-y-auto divide-y divide-gray-100 shadow-lg sm:block custom-scroll ring-1 ring-gray-900/5 rounded-xl">
                     <!-- <h2 class="font-semibold text-center capitalize text-primary">Personal</h2> -->
                     <Container
-                        class="flex h-full sm:space-x-0 w-full overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
+                        class="flex h-[85%] sm:space-x-0 w-full overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
                         behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
                         <Draggable v-for="item in personal" :drag-not-allowed="false"
-                            class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200">
+                            class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200 hover:scale-[102%]">
                             <div class="grid grid-cols-6">
                                 <div class="flex items-center w-full">
-                                    <img class=" w-12 h-12 rounded-full"
+                                    <img class="custom-image"
                                         :src="item.photo"
                                         alt="profile-photo" />
                                 </div>
