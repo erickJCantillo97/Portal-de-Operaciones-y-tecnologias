@@ -4,13 +4,11 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import '../../../sass/dataTableCustomized.scss';
 import { Container, Draggable } from "vue-dndrop";
-import { applyDrag } from "@/composable/helpers.js";
-import { XMarkIcon, PencilIcon, Bars3Icon } from "@heroicons/vue/20/solid";
+import { XMarkIcon, PencilIcon } from "@heroicons/vue/20/solid";
 import { useSweetalert } from '@/composable/sweetAlert';
 import Knob from 'primevue/knob';
 import Skeleton from 'primevue/skeleton';
 import ProgressSpinner from 'primevue/progressspinner';
-import { TaskDragCreate } from '@bryntum/gantt';
 const { toast } = useSweetalert();
 //#region Draggable
 const listaDatos = ref({})
@@ -20,13 +18,20 @@ const dates = ref([]);
 const tasks = ref([]);
 const loadingProgram = ref(true);
 const loadingPerson = ref(true);
+const loadingTasks = ref(true)
 const loadingTask = ref({})
 const optionValue = ref('today')
 
 const onDrop = async (collection, dropResult) => {
-    loadingTask.value[collection] = true
-    listaDatos.value[collection] = await applyDrag(listaDatos.value[collection], dropResult, fecha.value, collection);
-    loadingTask.value[collection] = false
+    const { addedIndex, payload } = dropResult;
+    if (addedIndex !== null) {
+        loadingTask.value[collection] = true
+        await axios.post(route('programming.store'),{task_id:collection,employee_id:payload.Num_SAP,fecha:fecha.value}).then((res) => {
+            listaDatos.value[collection] = res.data.task[0].people
+            loadingTask.value[collection] = false
+        })
+    }
+
 }
 
 const getFoto = (correo) => {
@@ -80,15 +85,17 @@ const getTask = async (option) => {
         tasks.value = [];
         await axios.get(route('actividadesDeultimonivel', { dates: dates.value })).then((res) => {
             tasks.value = res.data
+            loadingProgram.value = false;
         })
         tasks.value.forEach(element => {
             loadingTask.value[element.id] = true
             axios.get(route('get.schedule.task',{ task_id: element.id, date: dates.value[0] })).then((res) => {
                 listaDatos.value[element.id] = res.data.schedule
                 loadingTask.value[element.id] = false
+                loadingTasks.value = false
             })
         });
-        loadingProgram.value = false;
+
     }
 
 }
@@ -202,9 +209,10 @@ const editar = () => {
                                 </div>
                             </div>
                         </div>
-                        <div v-if="loadingTask[task.id]" class="h-full p-2 flex-col flex justify-center items-center">
+
+                        <div v-if="loadingTasks ? true : loadingTask[task.id]? true:false " class="h-full p-2 flex-col flex justify-center items-center">
                             <ProgressSpinner />
-                            <p class="animate-pulse text-primary font-bold">Guardando cambios</p>
+                            <p class="animate-pulse text-primary font-bold">{{loadingTasks? 'Cargando personas asignadas':'Guardando cambios'}}</p>
                         </div>
                         <Container v-if="!loadingTask[task.id]"
                             class="h-full p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
