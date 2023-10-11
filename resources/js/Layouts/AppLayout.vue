@@ -72,7 +72,7 @@
                     </Menu>
                 </div>
             </div>
-            <div class="rounded-lg shadow-2xl g-white sm:ml-20 sm:mr-1">
+            <div class="h-[92vh] rounded-lg shadow-2xl g-white sm:ml-20 sm:mr-1">
                 <slot />
             </div>
             <div class="fixed right-0 z-50 w-12 top-1/2 hover:animate-pulse">
