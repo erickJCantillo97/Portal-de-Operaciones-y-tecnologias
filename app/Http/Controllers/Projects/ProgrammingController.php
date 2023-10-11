@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
+use App\Models\Gantt\Task;
 use App\Models\Schedule;
 use App\Models\ScheduleTime;
 use App\Models\VirtualTask;
@@ -98,10 +99,18 @@ class ProgrammingController extends Controller
                     'endDate' => $task['endDate'],
                     'percentDone' => $task['percentDone'],
                     'startDate' => $task['startDate'],
-                    'people' => []
                 ];
             }),
         );
+    }
+
+    public function getScheduleTask(Task $task, Request $request){
+        $date = Carbon::parse($request->date)->format('Y-m-d');
+        $schedule = Schedule::where('fecha', $date)->with('scheduleTimes')->where('task_id', $task->id)->get();
+
+        return response()->json([
+            'schedule' => $schedule,
+        ], 200);
     }
 
 }
