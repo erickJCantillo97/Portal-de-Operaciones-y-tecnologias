@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
+use App\Models\Gantt\Task;
 use App\Models\Schedule;
 use App\Models\ScheduleTime;
 use App\Models\VirtualTask;
@@ -85,7 +86,7 @@ class ProgrammingController extends Controller
         }, $tareas);
 
         return response()->json(
-            VirtualTask::with('project', 'assignments')->where(function ($query) use ($date_start, $date_end) {
+            VirtualTask::where(function ($query) use ($date_start, $date_end) {
                 $query->whereBetween('startdate', [$date_start, $date_end])
                     ->orWhereBetween('enddate', [$date_start, $date_end])
                     ->orWhere(function ($query) use ($date_start, $date_end) {
@@ -98,10 +99,21 @@ class ProgrammingController extends Controller
                     'id' => $task['id'],
                     'endDate' => $task['endDate'],
                     'percentDone' => $task['percentDone'],
+                    'project' => $task->project->name,
                     'startDate' => $task['startDate'],
-                    'people' => [],
                 ];
             }),
         );
     }
+
+    public function getScheduleTask( Request $request){
+        $date = Carbon::parse($request->date)->format('Y-m-d');
+
+        $schedule = Schedule::where('fecha', $date)->with('scheduleTimes')->where('task_id', $request->task_id)->get();
+
+        return response()->json([
+            'schedule' => $schedule,
+        ], 200);
+    }
+
 }
