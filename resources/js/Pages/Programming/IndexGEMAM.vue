@@ -110,6 +110,15 @@ const editar = () => {
 }
 //#endregion
 </script>
+<style scoped>
+.custom-image {
+    width: 200px;
+    height: 50px;
+    object-position: 50% 30%;
+    border-radius: 10% 25%;;
+    object-fit: cover; /* Opciones: 'cover', 'contain', 'fill', etc. */
+}
+</style>
 
 <template>
     <AppLayout>
@@ -243,13 +252,15 @@ const editar = () => {
                     class="row-start-1 sm:col-start-3 h-full overflow-y-hidden sm:overflow-y-auto divide-y divide-gray-100 shadow-lg sm:block custom-scroll ring-1 ring-gray-900/5 rounded-xl">
                     <h2 class="font-semibold text-center capitalize text-primary">Personal</h2>
                     <Container
-                        class="flex h-full sm:space-x-0 w-full overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
+                        class="flex h-[85%] sm:space-x-0 w-full overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
                         behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
                         <Draggable v-for="item in personal" :drag-not-allowed="false"
-                            class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200">
+                            class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
                             <div class="grid grid-cols-6">
                                 <div class="flex items-center w-full">
-                                    <img class=" w-12 h-12 rounded-full" :src="item.photo" alt="profile-photo" />
+                                    <img class="custom-image"
+                                        :src="item.photo"
+                                        alt="profile-photo" />
                                 </div>
                                 <div class="col-span-4 mx-1">
                                     <p class="text-sm font-semibold leading-6 text-gray-900">

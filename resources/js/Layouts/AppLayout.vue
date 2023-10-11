@@ -13,13 +13,13 @@
                     </button>
                     <div class="flex items-center space-x-12 ">
                         <h1 class="hidden text-xl font-extrabold lg:block text-primary">Portal de Operaciones Tecnológicas e
-                        Inteligencia Artificial</h1>
-                    <div class="hidden p-2 font-extrabold uppercase bg-orange-300 rounded-md sm:block ">
-                        <div class="flex items-center px-5 py-1 space-x-2 text-primary">
-                            <i class="pi pi-exclamation-circle"></i>
-                            <p class="">Modo de pruebas</p>
+                            Inteligencia Artificial</h1>
+                        <div class="hidden p-2 font-extrabold uppercase bg-orange-300 rounded-md sm:block ">
+                            <div class="flex items-center px-5 py-1 space-x-2 text-primary">
+                                <i class="pi pi-exclamation-circle"></i>
+                                <p class="">Modo de pruebas</p>
+                            </div>
                         </div>
-                    </div>
                     </div>
                 </div>
                 <div class="flex items-center ">
@@ -39,7 +39,7 @@
                             <MenuButton
                                 class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white rounded-md hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
                                 <span class="sr-only">Open user menu</span>
-                                <img class="w-8 h-8 rounded-full bg-gray-50" :src="$page.props.auth.user.photo" alt="" />
+                                <img class="custom-image" :src="$page.props.auth.user.photo" alt="" />
                                 <span class="hidden lg:flex lg:items-center">
                                     <span class="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">{{
                                         $page.props.auth.user.short_name }}</span>
@@ -55,7 +55,7 @@
                             leave-from-class="transform scale-100 opacity-100"
                             leave-to-class="transform scale-95 opacity-0">
                             <MenuItems
-                                class="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                class="z-[999999] absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                 <div class="px-1 py-1">
                                     <MenuItem v-slot="{ active }">
                                     <button @click="logout" :class="[
@@ -203,7 +203,8 @@
                                                                     <label for="description"
                                                                         class="block text-base font-bold leading-6 text-gray-900">Descripción</label>
                                                                     <div class="mt-2">
-                                                                        <textarea id="description" name="description" placeholder="Buzon de sugerencias en desarrollo"
+                                                                        <textarea id="description" name="description"
+                                                                            placeholder="Buzon de sugerencias en desarrollo"
                                                                             rows="4" v-model="sugerencia" readonly
                                                                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                                                                     </div>
@@ -286,4 +287,12 @@ const enviaSugerencia = () => {
     sugerencia.value = null
 }
 </script>
-
+<style scoped>
+.custom-image {
+    width: 32px;
+    height: 32px;
+    object-position: 50% 30%;
+    border-radius: 99999px;
+    object-fit: cover;
+}
+</style>
