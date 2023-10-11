@@ -98,7 +98,7 @@ class ProgrammingController extends Controller
                     'endDate' => $task['endDate'],
                     'percentDone' => $task['percentDone'],
                     'startDate' => $task['startDate'],
-                    'people' => Schedule::where('fecha', $date_start)->with('scheduleTimes')->where('task_id', $task['id'])->get()
+                    'people' => []
                 ];
             }),
         );
