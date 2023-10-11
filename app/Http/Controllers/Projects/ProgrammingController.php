@@ -104,9 +104,10 @@ class ProgrammingController extends Controller
         );
     }
 
-    public function getScheduleTask(Task $task, Request $request){
+    public function getScheduleTask( Request $request){
         $date = Carbon::parse($request->date)->format('Y-m-d');
-        $schedule = Schedule::where('fecha', $date)->with('scheduleTimes')->where('task_id', $task->id)->get();
+
+        $schedule = Schedule::where('fecha', $date)->with('scheduleTimes')->where('task_id', $request->task_id)->get();
 
         return response()->json([
             'schedule' => $schedule,

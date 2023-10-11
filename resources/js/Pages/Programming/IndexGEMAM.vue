@@ -82,8 +82,8 @@ const getTask = async (option) => {
         })
         tasks.value.forEach(element => {
             loadingTask.value[element.id] = true
-            axios.get(route('get.schedule.task', { task_id: element.id, date: dates.value[0] })).then((res) => {
-                listaDatos.value[element.id] = res.data
+            axios.get(route('get.schedule.task',{task_id: element.id, date: dates.value[0] })).then((res) => {
+                listaDatos.value[element.id] = res.data.schedule
                 loadingTask.value[element.id] = false
             })
         });
