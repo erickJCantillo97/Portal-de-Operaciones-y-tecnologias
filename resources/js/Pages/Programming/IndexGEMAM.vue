@@ -1,6 +1,5 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { FilterMatchMode } from 'primevue/api';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import '../../../sass/dataTableCustomized.scss';
@@ -9,6 +8,8 @@ import { applyDrag } from "@/composable/helpers.js";
 import { XMarkIcon, PencilIcon, Bars3Icon } from "@heroicons/vue/20/solid";
 import { useSweetalert } from '@/composable/sweetAlert';
 import Knob from 'primevue/knob';
+import Skeleton from 'primevue/skeleton';
+import ProgressSpinner from 'primevue/progressspinner';
 const { toast } = useSweetalert();
 //#region Draggable
 const listaDatos = ref({})
@@ -16,15 +17,19 @@ const fecha = ref(new Date().toISOString().split("T")[0])
 const personal = ref()
 const dates = ref([]);
 const tasks = ref([]);
-const loading = ref(false);
+const loadingProgram = ref(true);
+const loadingPerson = ref(true);
+const loadingTask = ref({})
 const optionValue = ref('today')
 
 const onDrop = async (collection, dropResult) => {
+    loadingTask.value[collection] = true
     listaDatos.value[collection] = await applyDrag(listaDatos.value[collection], dropResult, fecha.value, collection);
+    loadingTask.value[collection] = false
 }
 
 const getFoto = (correo) => {
-     axios.post(route('get.foto', correo)).then((res) => {
+    axios.post(route('get.foto', correo)).then((res) => {
         return res.data.photo
     })
 
@@ -40,6 +45,7 @@ onMounted(() => {
     getTask('today')
     axios.get(route('get.personal')).then((res) => {
         personal.value = Object.values(res.data.personal)
+        loadingPerson.value = false
     })
 })
 
@@ -71,15 +77,17 @@ const getTask = async (option) => {
 
     if (dates.value[1] != null) {
         tasks.value = [];
-        loading.value = true;
-
         await axios.get(route('actividadesDeultimonivel', { dates: dates.value })).then((res) => {
-            loading.value = false;
             tasks.value = res.data
         })
         tasks.value.forEach(element => {
-            listaDatos.value[element.id] = element.people
+            loadingTask.value[element.id] = true
+            axios.get(route('actividadesDeultimonivel', element.id),{ date: dates.value[0] }).then((res) => {
+                listaDatos.value[element.id].person = res.data
+                loadingTask.value[element.id] = false
+            })
         });
+        loadingProgram.value = false;
     }
 
 }
@@ -114,7 +122,7 @@ const editar = () => {
 
 <template>
     <AppLayout>
-        <div class="relative h-full w-full p-2">
+        <div class="h-[90%]">
             <div class="grid justify-center mb-2 grid-col-1 sm:flex sm:justify-between sm:items-center">
                 <p class="text-xl font-semibold leading-6 text-center capitalize text-primary">
                     Programación de Actividades
@@ -137,10 +145,14 @@ const editar = () => {
                         type="date" name="date" id="date" v-model="fecha" @change="getTask('date')">
                 </div>
             </div>
-            <div class="relative h-full grid grid-rows-auto sm:grid-rows-1 sm:grid-cols-3 sm:gap-1 ">
+            <div class="h-full grid grid-rows-auto sm:grid-rows-1 sm:grid-cols-3 sm:gap-1 ">
                 <!--LISTA PROGRAMACIÓN DE ACTIVIDADES-->
-                <div
-                    class="relative h-[85%] row-start-2 row-span-6 sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 overflow-y-auto shadow-lg custom-scroll snap-y snap-proximity ring-1 ring-gray-900/5 rounded-xl">
+                <div v-if="loadingProgram"
+                    class="h-full row-start-2 row-span-6 sm:row-start-1 sm:col-start-1 sm:col-span-2 rounded-xl">
+                    <Skeleton width="100%" height="100%" class="rounded-xl" />
+                </div>
+                <div v-if="!loadingProgram"
+                    class="h-full row-start-2 row-span-6 sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 overflow-y-auto shadow-lg custom-scroll snap-y snap-proximity ring-1 ring-gray-900/5 rounded-xl">
                     <div v-for="task in tasks"
                         class="h-1/2 flex flex-col justify-between p-2 border rounded-md shadow-md sm:h-1/2 snap-start">
                         <div class="grid grid-rows-2">
@@ -188,9 +200,13 @@ const editar = () => {
                                 </div>
                             </div>
                         </div>
-                        <Container
-                            class="h-2/3 p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
-                            @drop="onDrop(task.id, $event)">
+                        <div v-if="loadingTask[task.id]" class="h-full p-2 flex-col flex justify-center items-center">
+                            <ProgressSpinner />
+                            <p class="animate-pulse text-primary font-bold">Guardando cambios</p>
+                        </div>
+                        <Container v-if="!loadingTask[task.id]"
+                            class="h-full p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
+                            @drop="onDrop(task.id, $event)" group-name="1">
                             <div class="grid grid-cols-2 gap-1"
                                 v-if="listaDatos[task.id] !== undefined && listaDatos[task.id].length != 0">
                                 <div v-for="(item, index) in listaDatos[task.id]" class="p-1 mt-1 border-2 rounded-md">
@@ -217,19 +233,24 @@ const editar = () => {
                                 </div>
                             </div>
                             <div v-else class="items-center justify-center text-center align-middle opacity-50">
-                                <h2 class="mt-4 text-xl font-medium tracking-wide text-gray-700">No hay personas asignadas
+                                <h2 class="mt-4 text-xl font-medium tracking-wide text-gray-700">No hay personas
+                                    asignadas
                                 </h2>
 
-                                <p class="mt-2 tracking-wide text-gray-500">Arrastre una persona de la lista de la izquierda
+                                <p class="mt-2 tracking-wide text-gray-500">Arrastre una persona de la lista de la
+                                    izquierda
                                     para agregarla a la actividad </p>
                             </div>
                         </Container>
                     </div>
                 </div>
                 <!--LISTA PERSONAL-->
-                <div
+                <div v-if="loadingPerson" class="row-start-1 sm:col-start-3 h-full shadow-lg sm:blocks rounded-xl">
+                    <Skeleton width="100%" height="100%" class="rounded-xl" />
+                </div>
+                <div v-if="!loadingPerson"
                     class="row-start-1 sm:col-start-3 h-full overflow-y-hidden sm:overflow-y-auto divide-y divide-gray-100 shadow-lg sm:block custom-scroll ring-1 ring-gray-900/5 rounded-xl">
-                    <!-- <h2 class="font-semibold text-center capitalize text-primary">Personal</h2> -->
+                    <h2 class="font-semibold text-center capitalize text-primary">Personal</h2>
                     <Container
                         class="flex h-[85%] sm:space-x-0 w-full overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
                         behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
