@@ -10,6 +10,7 @@ import { useSweetalert } from '@/composable/sweetAlert';
 import Knob from 'primevue/knob';
 import Skeleton from 'primevue/skeleton';
 import ProgressSpinner from 'primevue/progressspinner';
+import { TaskDragCreate } from '@bryntum/gantt';
 const { toast } = useSweetalert();
 //#region Draggable
 const listaDatos = ref({})
@@ -82,8 +83,8 @@ const getTask = async (option) => {
         })
         tasks.value.forEach(element => {
             loadingTask.value[element.id] = true
-            axios.get(route('get.schedule.task',{task_id: element.id, date: dates.value[0] })).then((res) => {
-                listaDatos.value[element.id] = res.data.schedule
+            axios.get(route('get.schedule.task',{ task_id: element.id, date: dates.value[0] })).then((res) => {
+                listaDatos.value[element.id].schedule = res.data
                 loadingTask.value[element.id] = false
             })
         });
@@ -122,7 +123,7 @@ const editar = () => {
 
 <template>
     <AppLayout>
-        <div class="h-[90%]">
+        <div class="h-[90%] px-2">
             <div class="grid justify-center mb-2 grid-col-1 sm:flex sm:justify-between sm:items-center">
                 <p class="text-xl font-semibold leading-6 text-center capitalize text-primary">
                     Programación de Actividades
@@ -145,14 +146,14 @@ const editar = () => {
                         type="date" name="date" id="date" v-model="fecha" @change="getTask('date')">
                 </div>
             </div>
-            <div class="h-full grid grid-rows-auto sm:grid-rows-1 sm:grid-cols-3 sm:gap-1 ">
+            <div class="h-full grid grid-rows-auto sm:grid-rows-1 sm:grid-cols-3 sm:gap-2">
                 <!--#region LISTA PROGRAMACIÓN DE ACTIVIDADES-->
                 <div v-if="loadingProgram"
                     class="h-full row-start-2 row-span-6 sm:row-start-1 sm:col-start-1 sm:col-span-2 rounded-xl">
                     <Skeleton width="100%" height="100%" class="rounded-xl" />
                 </div>
                 <div v-if="!loadingProgram"
-                    class="h-full row-start-2 row-span-6 sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 overflow-y-auto shadow-lg custom-scroll snap-y snap-proximity ring-1 ring-gray-900/5 rounded-xl">
+                    class="h-full row-start-2 row-span-6 p-1 sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 overflow-y-auto shadow-lg custom-scroll snap-y snap-proximity ring-1 ring-gray-900/5 rounded-xl">
                     <div v-for="task in tasks"
                         class="h-1/2 flex flex-col justify-between p-2 border rounded-md shadow-md sm:h-1/2 snap-start">
                         <div class="grid grid-rows-2">
@@ -255,7 +256,7 @@ const editar = () => {
                     class="row-start-1 sm:col-start-3 h-full overflow-y-hidden sm:overflow-y-auto divide-y divide-gray-100 shadow-lg sm:block custom-scroll ring-1 ring-gray-900/5 rounded-xl">
                     <h2 class="font-semibold text-center capitalize text-primary">Personal</h2>
                     <Container
-                        class="flex h-[85%] sm:space-x-0 w-full overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
+                        class="flex sm:space-x-0 w-full overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
                         behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
                         <Draggable v-for="item in personal" :drag-not-allowed="false"
                             class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
