@@ -1,6 +1,7 @@
 <?php
 
 use App\Events\TestWebsocket;
+use App\Ldap\User;
 use App\Models\Gantt\Task;
 use App\Models\Process;
 use App\Models\Projects\Project;
@@ -27,8 +28,13 @@ Route::get('/', function () {
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
+    Route::post('foto/{correo}', function ($correo){
+        return response()->json([
+            'photo' => User::where('userprincipalname', $correo)->first()->photo(),
+        ]);
+    })->name('get.foto');
+
     Route::get('/dashboard', function () {
-        // event(new TestWebsocket());
         $taskProject = VirtualTask::whereNull('task_id')->get()->map(function ($item) {
 
             return [
@@ -146,3 +152,6 @@ Route::get('/timeline', function () {
         'projects' => $taskProject,
     ]);
 })->name('timeline');
+
+
+

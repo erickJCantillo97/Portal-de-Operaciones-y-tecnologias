@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Personal;
 
 use App\Http\Controllers\Controller;
+use App\Ldap\User;
 use App\Models\Labor;
 use Illuminate\Http\Request;
 
@@ -32,7 +33,15 @@ class PersonalController extends Controller
     }
 
     public function getPersonal(){
-        $personal = getPersonalGerenciaOficina(auth()->user()->gerencia, auth()->user()->oficina);
+        $personal = getPersonalGerenciaOficina(auth()->user()->gerencia, auth()->user()->oficina)->map(function ($person)  {
+            return [
+                'Num_SAP' => $person['Num_SAP'],
+                'Correo' => $person['Correo'],
+                'Nombres_Apellidos' => $person['Nombres_Apellidos'],
+                'Cargo' => $person['Cargo'],
+                'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
+            ];
+        });
 
         return response()->json([
             'personal' => $personal,

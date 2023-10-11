@@ -24,6 +24,13 @@ const onDrop = async (collection, dropResult) => {
     listaDatos.value[collection] = await applyDrag(listaDatos.value[collection], dropResult, fecha.value, collection);
 }
 
+const getFoto = (correo) => {
+     axios.post(route('get.foto', correo)).then((res) => {
+        return res.data.photo
+    })
+
+}
+
 const getChildPayload = (index) => {
     return personal.value[index];
 }
@@ -224,7 +231,7 @@ const editar = () => {
                             <div class="grid grid-cols-6">
                                 <div class="flex items-center w-full">
                                     <img class=" w-12 h-12 rounded-full"
-                                        :src="'https://ui-avatars.com/api/?name=' + item.Nombres_Apellidos"
+                                        :src="item.photo"
                                         alt="profile-photo" />
                                 </div>
                                 <div class="col-span-4 mx-1">
