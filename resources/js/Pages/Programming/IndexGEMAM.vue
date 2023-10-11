@@ -42,7 +42,7 @@ const getChildPayload = (index) => {
 //#endregion
 
 onMounted(() => {
-    getTask('today')
+    getTask('tomorrow')
     axios.get(route('get.personal')).then((res) => {
         personal.value = Object.values(res.data.personal)
         loadingPerson.value = false
@@ -146,7 +146,7 @@ const editar = () => {
                 </div>
             </div>
             <div class="h-full grid grid-rows-auto sm:grid-rows-1 sm:grid-cols-3 sm:gap-1 ">
-                <!--LISTA PROGRAMACIÓN DE ACTIVIDADES-->
+                <!--#region LISTA PROGRAMACIÓN DE ACTIVIDADES-->
                 <div v-if="loadingProgram"
                     class="h-full row-start-2 row-span-6 sm:row-start-1 sm:col-start-1 sm:col-span-2 rounded-xl">
                     <Skeleton width="100%" height="100%" class="rounded-xl" />
@@ -244,7 +244,9 @@ const editar = () => {
                         </Container>
                     </div>
                 </div>
-                <!--LISTA PERSONAL-->
+                <!--#endregion -->
+
+                <!--#region LISTA PERSONAL-->
                 <div v-if="loadingPerson" class="row-start-1 sm:col-start-3 h-full shadow-lg sm:blocks rounded-xl">
                     <Skeleton width="100%" height="100%" class="rounded-xl" />
                 </div>
@@ -281,6 +283,7 @@ const editar = () => {
                         </Draggable>
                     </Container>
                 </div>
+                <!--#endregion -->
             </div>
         </div>
     </AppLayout>
