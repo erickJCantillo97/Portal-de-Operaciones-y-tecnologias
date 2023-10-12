@@ -9,8 +9,7 @@ import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } fro
 import Button from '../../Components/Button.vue';
 import { useSweetalert } from '@/composable/sweetAlert';
 import Knob from 'primevue/knob';
-import Skeleton from 'primevue/skeleton';
-import ProgressSpinner from 'primevue/progressspinner';
+import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 const { toast } = useSweetalert();
 //#region Draggable
 const listaDatos = ref({})
@@ -28,7 +27,7 @@ const onDrop = async (collection, dropResult) => {
     const { addedIndex, payload } = dropResult;
     if (addedIndex !== null) {
         loadingTask.value[collection] = true
-        await axios.post(route('programming.store'),{task_id:collection,employee_id:payload.Num_SAP,fecha:fecha.value}).then((res) => {
+        await axios.post(route('programming.store'), { task_id: collection, employee_id: payload.Num_SAP, fecha: fecha.value }).then((res) => {
             listaDatos.value[collection] = res.data.task[0].people
             loadingTask.value[collection] = false
         })
@@ -91,7 +90,7 @@ const getTask = async (option) => {
         })
         tasks.value.forEach(element => {
             loadingTask.value[element.id] = true
-            axios.get(route('get.schedule.task',{ task_id: element.id, date: dates.value[0] })).then((res) => {
+            axios.get(route('get.schedule.task', { task_id: element.id, date: dates.value[0] })).then((res) => {
                 listaDatos.value[element.id] = res.data.schedule
                 loadingTask.value[element.id] = false
                 loadingTasks.value = false
@@ -140,6 +139,36 @@ const employeeDialog = (item) => {
     object-fit: cover;
     /* Opciones: 'cover', 'contain', 'fill', etc. */
 }
+
+.loader {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.loader:before,
+.loader:after {
+    content: '';
+    border-radius: 50%;
+    position: absolute;
+    inset: 0;
+    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.3) inset;
+}
+
+.loader:after {
+    box-shadow: 0 2px 0 rgb(46 48 146) inset;
+    animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0)
+    }
+
+    100% {
+        transform: rotate(360deg)
+    }
+}
 </style>
 
 <template>
@@ -170,18 +199,21 @@ const employeeDialog = (item) => {
             <div class="h-full grid grid-rows-auto sm:grid-rows-1 sm:grid-cols-3 sm:gap-2">
                 <!--#region LISTA PROGRAMACIÓN DE ACTIVIDADES-->
                 <div v-if="loadingProgram"
-                    class="h-full row-start-2 row-span-6 sm:row-start-1 sm:col-start-1 sm:col-span-2 rounded-xl">
-                    <Skeleton width="100%" height="100%" class="rounded-xl" />
+                    class="h-full row-start-2 row-span-6 sm:flex sm:flex-col sm:justify-center sm:items-center sm:row-start-1 sm:col-start-1 sm:col-span-2 rounded-xl">
+                    <span class="h-full w-full loader flex justify-center items-center">
+                        <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
+                    </span>
+                    <p class="animate-pulse text-primary font-bold"> Cargando actividades</p>
                 </div>
                 <div v-if="!loadingProgram"
-                    class="h-full row-start-2 row-span-6 p-1 sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 overflow-y-auto shadow-lg custom-scroll snap-y snap-proximity ring-1 ring-gray-900/5 rounded-xl">
+                    class="h-full row-start-2 row-span-6 p-1 sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 overflow-y-auto custom-scroll snap-y snap-proximity rounded-xl">
                     <div v-for="task in tasks"
                         class="h-1/2 flex flex-col justify-between p-2 border rounded-md shadow-md sm:h-1/2 snap-start">
                         <div class="grid grid-rows-2">
                             <div class="">
                                 <p class="block overflow-hidden">{{ task.name }}
                                 </p>
-                                <p class="text-xs text-primary italic uppercase">{{task.project}}</p>
+                                <p class="text-xs text-primary italic uppercase">{{ task.project }}</p>
                             </div>
                             <div class="grid items-center grid-cols-2 text-xs sm:grid-cols-6">
                                 <div class="">
@@ -224,9 +256,12 @@ const employeeDialog = (item) => {
                             </div>
                         </div>
 
-                        <div v-if="loadingTasks ? true : loadingTask[task.id]? true:false " class="h-full p-2 flex-col flex justify-center items-center">
-                            <ProgressSpinner />
-                            <p class="animate-pulse text-primary font-bold">{{loadingTasks? 'Cargando personas asignadas':'Guardando cambios'}}</p>
+                        <div v-if="loadingTasks ? true : loadingTask[task.id] ? true : false"
+                            class="h-full p-2 flex-col flex justify-center items-center">
+                            <span class="h-full w-full loader flex justify-center items-center">
+                                <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
+                            </span>
+                            <p class="animate-pulse text-primary font-bold">{{ loadingTasks ? 'Cargando personas asignadas':'Guardando cambios'}}</p>
                         </div>
                         <Container v-if="!loadingTask[task.id]"
                             class="h-full p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
@@ -271,8 +306,12 @@ const employeeDialog = (item) => {
                 <!--#endregion -->
 
                 <!--#region LISTA PERSONAL-->
-                <div v-if="loadingPerson" class="row-start-1 sm:col-start-3 h-full shadow-lg sm:blocks rounded-xl">
-                    <Skeleton width="100%" height="100%" class="rounded-xl" />
+                <div v-if="loadingPerson"
+                    class="row-start-1 sm:col-start-3 h-full shadow-lg sm:flex sm:flex-col sm:items-center sm:justify-center rounded-xl">
+                    <span class="h-full w-full loader flex justify-center items-center">
+                        <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
+                    </span>
+                    <p class="animate-pulse text-primary font-bold"> Cargando personas</p>
                 </div>
                 <div v-if="!loadingPerson"
                     class="row-start-1 sm:col-start-3 h-full overflow-y-hidden sm:overflow-y-auto divide-y divide-gray-100 shadow-lg sm:block custom-scroll ring-1 ring-gray-900/5 rounded-xl">
@@ -385,8 +424,9 @@ const employeeDialog = (item) => {
 
                         </TransitionChild>
                     </div>
-            </div>
-        </Dialog>
-    </TransitionRoot>
+                </div>
+            </Dialog>
+        </TransitionRoot>
 
-</AppLayout></template>
+    </AppLayout>
+</template>
