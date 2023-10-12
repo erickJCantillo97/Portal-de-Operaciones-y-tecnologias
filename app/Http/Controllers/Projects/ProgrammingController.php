@@ -19,8 +19,9 @@ class ProgrammingController extends Controller
         return Inertia::render('Programming/Index');
     }
 
-    public function store(Request $request){
-        try{
+    public function store(Request $request)
+    {
+        try {
             $validateData = $request->validate([
             'task_id' => 'required',
             'employee_id' => 'required',
@@ -38,14 +39,13 @@ class ProgrammingController extends Controller
 
         $task = Schedule::where('fecha', $validateData['fecha'])->with('scheduleTimes')->where('task_id', $validateData['task_id'])->get();
 
-        return response()->json([
-            'status' => true,
-            'task' => $task,
-        ], 200);
-        }catch (Exception $e){
+            return response()->json([
+                'status' => true,
+                'task' => $task,
+            ], 200);
+        } catch (Exception $e) {
             return $e;
         }
-
 
     }
 
@@ -54,12 +54,14 @@ class ProgrammingController extends Controller
         return Inertia::render('Programming/IndexGEMAM');
     }
 
-    public function delete(Request $request){
+    public function delete(Request $request)
+    {
         //hace algo
         return 'Hecho';
     }
 
-    public function endNivelActivities(Request $request){
+    public function endNivelActivities(Request $request)
+    {
         if (isset($request->dates[0])) {
             $date_start = Carbon::parse($request->dates[0])->format('Y-m-d');
             $date_end = Carbon::parse($request->dates[1])->format('Y-m-d');
@@ -74,7 +76,6 @@ class ProgrammingController extends Controller
             return $objeto['task_id'];
         }, $tareas);
 
-
         return response()->json(
             VirtualTask::where(function ($query) use ($date_start, $date_end) {
                 $query->whereBetween('startdate', [$date_start, $date_end])
@@ -83,7 +84,7 @@ class ProgrammingController extends Controller
                         $query->where('enddate', '>', $date_end)
                             ->where('startdate', '<', $date_start);
                     });
-            })->whereNotIn('id', array_unique($ids))->get()->map(function($task) use ($date_start){
+            })->whereNotIn('id', array_unique($ids))->get()->map(function ($task) {
                 return [
                     'name' => $task['name'],
                     'id' => $task['id'],
