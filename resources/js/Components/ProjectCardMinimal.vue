@@ -86,7 +86,7 @@ const items = ref([
     </div> -->
     <div :class="activo ? 'bg-sky-500 text-white' : 'bg-white text-gray-90' + clases"
         class="flex items-center rounded-md h-14 min-w-max">
-        <img :src="project.file ? project.file:'/images/generic-boat.png'" class="h-0 mr-1 rounded-lg sm:h-12 sm:w-16" />
+        <img :src="project.file" onerror="this.src='/images/generic-boat.png'" class="h-0 mr-1 rounded-lg sm:h-12 sm:w-16" />
         <div class="flex-col">
             <p class="text-xs font-bold">{{ project.name }}</p>
             <div class="flex space-x-1">
