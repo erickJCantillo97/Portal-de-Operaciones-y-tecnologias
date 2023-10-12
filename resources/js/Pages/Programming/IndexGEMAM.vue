@@ -27,8 +27,8 @@ const onDrop = async (collection, dropResult) => {
     const { addedIndex, payload } = dropResult;
     if (addedIndex !== null) {
         loadingTask.value[collection] = true
-        await axios.post(route('programming.store'), { task_id: collection, employee_id: payload.Num_SAP, fecha: fecha.value }).then((res) => {
-            listaDatos.value[collection] = res.data.task[0].people
+        await axios.post(route('programming.store'), { task_id: collection, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: dates.value[0] }).then((res) => {
+            listaDatos.value[collection] = res.data.task
             loadingTask.value[collection] = false
         })
     }
@@ -270,8 +270,7 @@ const employeeDialog = (item) => {
                                 v-if="listaDatos[task.id] !== undefined && listaDatos[task.id].length != 0">
                                 <div v-for="(item, index) in listaDatos[task.id]" class="p-1 mt-1 border-2 rounded-md">
                                     <div class="flex items-center justify-between w-full">
-                                        <p class="text-sm font-semibold ">{{ item.employee != undefined ?
-                                            item.employee.Nombres_Apellidos : item.Nombres_Apellidos }}</p>
+                                        <p class="text-sm font-semibold ">{{ item.name }}</p>
                                         <button v-tooltip.top="'En desarrollo'" @click="quitar(task, index, item)">
                                             <XMarkIcon
                                                 class="h-4 p-0.5 border rounded-md text-white bg-danger border-danger hover:animate-pulse hover:scale-125" />
