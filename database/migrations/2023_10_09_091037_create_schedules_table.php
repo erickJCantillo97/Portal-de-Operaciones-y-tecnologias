@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('employee_id')->unsigned();
+            $table->string('name');
             $table->bigInteger('task_id')->unsigned();
             $table->date('fecha');
             $table->boolean('status')->default(0);

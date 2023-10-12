@@ -9,8 +9,7 @@ import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } fro
 import Button from '../../Components/Button.vue';
 import { useSweetalert } from '@/composable/sweetAlert';
 import Knob from 'primevue/knob';
-import Skeleton from 'primevue/skeleton';
-import ProgressSpinner from 'primevue/progressspinner';
+import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 const { toast } = useSweetalert();
 
 //#region Draggable
@@ -33,6 +32,8 @@ const onDrop = async (collection, dropResult) => {
         loadingTask.value[collection] = true
         await axios.post(route('programming.store'), { task_id: collection, employee_id: payload.Num_SAP, fecha: fecha.value }).then((res) => {
             listaDatos.value[collection] = res.data.task[0].people
+        await axios.post(route('programming.store'), { task_id: collection, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: dates.value[0] }).then((res) => {
+            listaDatos.value[collection] = res.data.task
             loadingTask.value[collection] = false
         })
     }
@@ -158,6 +159,36 @@ const employeeDialog = (item) => {
     object-fit: cover;
     /* Opciones: 'cover', 'contain', 'fill', etc. */
 }
+
+.loader {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.loader:before,
+.loader:after {
+    content: '';
+    border-radius: 50%;
+    position: absolute;
+    inset: 0;
+    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.3) inset;
+}
+
+.loader:after {
+    box-shadow: 0 2px 0 rgb(46 48 146) inset;
+    animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0)
+    }
+
+    100% {
+        transform: rotate(360deg)
+    }
+}
 </style>
 
 <template>
@@ -188,11 +219,14 @@ const employeeDialog = (item) => {
             <div class="grid h-full grid-rows-auto sm:grid-rows-1 sm:grid-cols-3 sm:gap-2">
                 <!--LISTA PROGRAMACIÓN DE ACTIVIDADES-->
                 <div v-if="loadingProgram"
-                    class="h-full row-span-6 row-start-2 sm:row-start-1 sm:col-start-1 sm:col-span-2 rounded-xl">
-                    <Skeleton width="100%" height="100%" class="rounded-xl" />
+                    class="h-full row-span-6 row-start-2 sm:flex sm:flex-col sm:justify-center sm:items-center sm:row-start-1 sm:col-start-1 sm:col-span-2 rounded-xl">
+                    <span class="flex items-center justify-center w-full h-full loader">
+                        <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
+                    </span>
+                    <p class="font-bold animate-pulse text-primary"> Cargando actividades</p>
                 </div>
                 <div v-if="!loadingProgram"
-                    class="h-full row-span-6 row-start-2 p-1 overflow-y-auto shadow-lg sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 custom-scroll snap-y snap-proximity ring-1 ring-gray-900/5 rounded-xl">
+                    class="h-full row-span-6 row-start-2 p-1 overflow-y-auto sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 custom-scroll snap-y snap-proximity rounded-xl">
                     <div v-for="task in tasks"
                         class="flex flex-col justify-between p-2 border rounded-md shadow-md h-1/2 sm:h-1/2 snap-start">
                         <div class="grid grid-rows-2">
@@ -244,9 +278,10 @@ const employeeDialog = (item) => {
 
                         <div v-if="loadingTasks ? true : loadingTask[task.id] ? true : false"
                             class="flex flex-col items-center justify-center h-full p-2">
-                            <ProgressSpinner />
-                            <p class="font-bold animate-pulse text-primary">
-                                {{ loadingTasks ? 'Cargando personas asignadas' : 'Guardando cambios' }}</p>
+                            <span class="flex items-center justify-center w-full h-full loader">
+                                <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
+                            </span>
+                            <p class="font-bold animate-pulse text-primary">{{ loadingTasks ? 'Cargando personas asignadas':'Guardando cambios'}}</p>
                         </div>
                         <Container v-if="!loadingTask[task.id]"
                             class="h-full p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
@@ -255,8 +290,7 @@ const employeeDialog = (item) => {
                                 v-if="listaDatos[task.id] !== undefined && listaDatos[task.id].length != 0">
                                 <div v-for="(item, index) in listaDatos[task.id]" class="p-1 mt-1 border-2 rounded-md">
                                     <div class="flex items-center justify-between w-full">
-                                        <p class="text-sm font-semibold ">{{ item.employee != undefined ?
-                                            item.employee.Nombres_Apellidos : item.Nombres_Apellidos }}</p>
+                                        <p class="text-sm font-semibold ">{{ item.name }}</p>
                                         <button v-tooltip.top="'En desarrollo'" @click="quitar(task, index, item)">
                                             <XMarkIcon
                                                 class="h-4 p-0.5 border rounded-md text-white bg-danger border-danger hover:animate-pulse hover:scale-125" />
@@ -291,8 +325,12 @@ const employeeDialog = (item) => {
                 <!--#endregion -->
 
                 <!--#region LISTA PERSONAL-->
-                <div v-if="loadingPerson" class="h-full row-start-1 shadow-lg sm:col-start-3 sm:blocks rounded-xl">
-                    <Skeleton width="100%" height="100%" class="rounded-xl" />
+                <div v-if="loadingPerson"
+                    class="h-full row-start-1 shadow-lg sm:col-start-3 sm:flex sm:flex-col sm:items-center sm:justify-center rounded-xl">
+                    <span class="flex items-center justify-center w-full h-full loader">
+                        <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
+                    </span>
+                    <p class="font-bold animate-pulse text-primary"> Cargando personas</p>
                 </div>
                 <div v-if="!loadingPerson"
                     class="h-full row-start-1 overflow-y-hidden divide-y divide-gray-100 shadow-lg sm:col-start-3 sm:overflow-y-auto sm:block custom-scroll ring-1 ring-gray-900/5 rounded-xl">

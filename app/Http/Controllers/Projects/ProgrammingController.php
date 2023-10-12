@@ -32,30 +32,21 @@ class ProgrammingController extends Controller
     {
         try {
             $validateData = $request->validate([
-                'task_id' => 'required',
-                'employee_id' => 'required',
-                'fecha' => 'required|date',
-            ]);
+            'task_id' => 'required',
+            'employee_id' => 'required',
+            'name' => 'required',
+            'fecha' => 'required|date',
+        ]);
 
-            $schedule = Schedule::firstOrNew($validateData);
+        $schedule = Schedule::firstOrNew($validateData);
+        $schedule->save();
+        ScheduleTime::create([
+            'schedule_id' => $schedule->id,
+            'hora_inicio' => '7:00',
+            'hora_fin' => '16:30'
+        ]);
 
-            $schedule->save();
-            ScheduleTime::create([
-                'schedule_id' => $schedule->id,
-                'hora_inicio' => '7:00',
-                'hora_fin' => '16:30',
-            ]);
-
-            $task = VirtualTask::where('id', $validateData['task_id'])->get()->map(function ($task) use ($validateData) {
-                return [
-                    'name' => $task['name'],
-                    'id' => $task['id'],
-                    'endDate' => $task['endDate'],
-                    'percentDone' => $task['percentDone'],
-                    'startDate' => $task['startDate'],
-                    'people' => Schedule::where('fecha', $validateData['fecha'])->with('scheduleTimes')->where('task_id', $task['id'])->get(),
-                ];
-            });
+        $task = Schedule::where('fecha', $validateData['fecha'])->with('scheduleTimes')->where('task_id', $validateData['task_id'])->get();
 
             return response()->json([
                 'status' => true,

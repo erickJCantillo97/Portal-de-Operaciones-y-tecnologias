@@ -12,11 +12,6 @@ class Schedule extends Model
     use SoftDeletes;
 
     protected $guarded = [];
-    protected $appends = ['employee'];
-
-    public function getEmployeeAttribute(){
-        return searchEmpleados('Num_SAP' , $this->employee_id)->first();
-    }
 
     public function scheduleTimes(){
         return $this->hasMany(ScheduleTime::class);
