@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
-use App\Models\Gantt\Task;
 use App\Models\Schedule;
 use App\Models\ScheduleTime;
 use App\Models\VirtualTask;
@@ -19,6 +18,16 @@ class ProgrammingController extends Controller
         return Inertia::render('Programming/Index');
     }
 
+    /**
+     * La función almacena una programación y crea un horario para una tarea y luego devuelve la
+     * información de la tarea junto con la programación.
+     *
+     * @param {Request} request - El parámetro `` es una instancia de la clase
+     * `Illuminate\Http\Request`. Representa la solicitud HTTP realizada al servidor y contiene
+     * información como el método de solicitud, encabezados y datos de entrada.
+     *
+     * @returns una respuesta JSON con un estado y datos de la tarea.
+     */
     public function store(Request $request)
     {
         try {
@@ -69,6 +78,18 @@ class ProgrammingController extends Controller
         return 'Hecho';
     }
 
+    /**
+     * La función `endNivelActivities` recupera una lista de tareas virtuales que finalizaron dentro de
+     * un rango de fechas específico, excluyendo las tareas asociadas con un ID de tarea.
+     *
+     * @param {Request} request - El parámetro `` es una instancia de la clase
+     * `Illuminate\Http\Request`. Representa la solicitud HTTP realizada al servidor y contiene diversa
+     * información, como parámetros de solicitud, encabezados y el cuerpo de la solicitud.
+     *
+     * @returns una respuesta JSON. La respuesta contiene una colección de objetos VirtualTask que
+     * cumplen determinadas condiciones. Cada objeto VirtualTask se transforma en una matriz con las
+     * siguientes propiedades: 'nombre', 'id', 'endDate', 'percentDone', 'project' y 'startDate'.
+     */
     public function endNivelActivities(Request $request)
     {
         if (isset($request->dates[0])) {
@@ -106,7 +127,19 @@ class ProgrammingController extends Controller
         );
     }
 
-    public function getScheduleTask( Request $request){
+    /**
+     * La función recupera una programación para una tarea específica en una fecha determinada y la
+     * devuelve como una respuesta JSON.
+     *
+     * @param {Request} request - El parámetro  es una instancia de la clase Request, que se
+     * utiliza para recuperar datos de la solicitud HTTP. Contiene información como el método de
+     * solicitud, encabezados y datos de entrada.
+     *
+     * @returns una respuesta JSON con la variable 'programación', que contiene los datos de
+     * programación recuperados de la base de datos.
+     */
+    public function getScheduleTask(Request $request)
+    {
         $date = Carbon::parse($request->date)->format('Y-m-d');
 
         $schedule = Schedule::where('fecha', $date)->with('scheduleTimes')->where('task_id', $request->task_id)->get();
@@ -115,5 +148,4 @@ class ProgrammingController extends Controller
             'schedule' => $schedule,
         ], 200);
     }
-
 }
