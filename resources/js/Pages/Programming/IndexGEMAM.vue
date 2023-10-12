@@ -4,7 +4,9 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import '../../../sass/dataTableCustomized.scss';
 import { Container, Draggable } from "vue-dndrop";
-import { XMarkIcon, PencilIcon } from "@heroicons/vue/20/solid";
+import { XMarkIcon, PencilIcon, Bars3Icon } from "@heroicons/vue/20/solid";
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import Button from '../../Components/Button.vue';
 import { useSweetalert } from '@/composable/sweetAlert';
 import Knob from 'primevue/knob';
 import Skeleton from 'primevue/skeleton';
@@ -117,14 +119,26 @@ const editar = () => {
 
 }
 //#endregion
+
+//#region Modal Persona
+const employee = ref([])
+const open = ref(false)
+
+const employeeDialog = (item) => {
+    open.value = true
+    employee.value = item
+}
+//#endregion
 </script>
 <style scoped>
 .custom-image {
     width: 200px;
     height: 50px;
     object-position: 50% 30%;
-    border-radius: 10% 25%;;
-    object-fit: cover; /* Opciones: 'cover', 'contain', 'fill', etc. */
+    border-radius: 10% 25%;
+    ;
+    object-fit: cover;
+    /* Opciones: 'cover', 'contain', 'fill', etc. */
 }
 </style>
 
@@ -264,15 +278,13 @@ const editar = () => {
                     class="row-start-1 sm:col-start-3 h-full overflow-y-hidden sm:overflow-y-auto divide-y divide-gray-100 shadow-lg sm:block custom-scroll ring-1 ring-gray-900/5 rounded-xl">
                     <h2 class="font-semibold text-center capitalize text-primary">Personal</h2>
                     <Container
-                        class="flex sm:space-x-0 w-full overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
+                        class="flex h-[87%] sm:space-x-0 w-full overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
                         behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
                         <Draggable v-for="item in personal" :drag-not-allowed="false"
                             class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
                             <div class="grid grid-cols-6">
                                 <div class="flex items-center w-full">
-                                    <img class="custom-image"
-                                        :src="item.photo"
-                                        alt="profile-photo" />
+                                    <img class="custom-image" :src="item.photo" alt="profile-photo" />
                                 </div>
                                 <div class="col-span-4 mx-1">
                                     <p class="text-sm font-semibold leading-6 text-gray-900">
@@ -285,7 +297,7 @@ const editar = () => {
                                 <div class="flex items-center justify-center w-full">
                                     <button
                                         class="flex items-center justify-center h-6 p-1 m-1 font-mono text-sm text-white align-middle rounded-md w-9 bg-primary"
-                                        v-tooltip.top="'Ver programacion'" @click="console.log('Hola mundo')">
+                                        v-tooltip.top="'Ver programacion'" @click="employeeDialog(item)">
                                         <p> 1.0H </p>
                                     </button>
                                 </div>
@@ -296,5 +308,85 @@ const editar = () => {
                 <!--#endregion -->
             </div>
         </div>
-    </AppLayout>
-</template>
+        <!-- MODAL DE PERSONAS -->
+        <TransitionRoot as="template" :show="open">
+            <Dialog as="div" class="relative z-30" @close="open = false">
+                <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
+                    leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+                    <div class="fixed h-screen w-screen inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-30" />
+                </TransitionChild>
+                <div class="fixed inset-0 z-50 overflow-y-auto h-screen">
+                    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                        <TransitionChild as="template" enter="ease-out duration-300"
+                            enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
+                            leave-from="opacity-100 translate-y-0 sm:scale-100"
+                            leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                            <DialogPanel
+                                class="grid grid-cols-1 relative transform overflow-hidden rounded-lg bg-white px-2 pb-4 pt-2 text-left shadow-xl transition-all sm:my-8 w-xl">
+                                <div>
+                                    <div class="px-2 mt-2 text-center">
+                                        <DialogTitle as="h3"
+                                            class="text-5xl font-semibold text-primary text-center capitalize">
+                                            Ver Detalle de Horario
+                                        </DialogTitle>
+                                    </div>
+                                    <div class="bg-white py-8 md:py-8">
+                                        <div
+                                            class="mx-auto grid max-w-7xl grid-cols-2 gap-x-8 gap-y-20 px-6 lg:px-8 xl:grid-cols-2">
+                                            <div class="flex flex-col gap-10 pt-12 sm:flex-column">
+                                                <img class="aspect-[4/5] w-52 flex-none rounded-3xl object-cover shadow-lg"
+                                                    :src="employee.photo" alt="Foto" />
+                                                <div class="max-w-xl flex-auto">
+                                                    <h3
+                                                        class="text-lg font-semibold leading-8 tracking-tight text-gray-900">
+                                                        {{ employee.Nombres_Apellidos }}
+                                                    </h3>
+                                                    <p class="text-base leading-7 text-gray-600">{{ employee.Cargo }}</p>
+                                                    <p class="mt-6 text-base leading-7 text-gray-600">{{ employee.bio }}</p>
+                                                    <ul role="list" class="mt-6 flex gap-x-6">
+                                                        <li>
+                                                            <a :href="employee.twitterUrl"
+                                                                class="text-gray-400 hover:text-gray-500">
+                                                                <span class="sr-only">Twitter</span>
+                                                                <svg class="h-5 w-5" aria-hidden="true" fill="currentColor"
+                                                                    viewBox="0 0 20 20">
+                                                                    <!-- Icono de Twitter -->
+                                                                </svg>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a :href="employee.linkedinUrl"
+                                                                class="text-gray-400 hover:text-gray-500">
+                                                                <span class="sr-only">LinkedIn</span>
+                                                                <svg class="h-5 w-5" aria-hidden="true" fill="currentColor"
+                                                                    viewBox="0 0 20 20">
+                                                                    <!-- Icono de LinkedIn -->
+                                                                </svg>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="max-w-2xl border border-solid border-blue-500 shadow-md rounded-lg">
+                                                <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                                                    About the team
+                                                </h2>
+                                                <p class="mt-6 text-lg leading-8 text-gray-600">
+                                                    We’re a dynamic group of individuals who are passionate about what we do
+                                                    and dedicated to
+                                                    delivering the best results for our clients.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </DialogPanel>
+
+                        </TransitionChild>
+                    </div>
+            </div>
+        </Dialog>
+    </TransitionRoot>
+
+</AppLayout></template>
