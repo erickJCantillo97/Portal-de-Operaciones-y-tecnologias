@@ -30,13 +30,12 @@ const onDrop = async (collection, dropResult) => {
     const { addedIndex, payload } = dropResult;
     if (addedIndex !== null) {
         loadingTask.value[collection] = true
-        await axios.post(route('programming.store'), { task_id: collection, employee_id: payload.Num_SAP, fecha: fecha.value }).then((res) => {
-            listaDatos.value[collection] = res.data.task[0].people
         await axios.post(route('programming.store'), { task_id: collection, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: dates.value[0] }).then((res) => {
             listaDatos.value[collection] = res.data.task
             loadingTask.value[collection] = false
         })
     }
+
 }
 
 // El código anterior define una función llamada `getFoto` que toma un parámetro `correo`. Dentro de la
