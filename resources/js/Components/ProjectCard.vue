@@ -78,7 +78,7 @@ const items = ref([
 
 <template>
     <div v-if="cagando" :class="activo ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
-        class="flex w-60 rounded-md hover:z-20 hover:scale-110">
+        class="flex rounded-md w-60 hover:z-20 hover:scale-110">
         <Skeleton shape="circle" size="2rem" class="mr-2"></Skeleton>
         <div class="align-self-center" style="flex: 1">
             <Skeleton width="100%" class="mb-1"></Skeleton>
@@ -86,22 +86,22 @@ const items = ref([
         </div>
     </div>
     <div v-else :class="activo ? 'bg-sky-500 text-white' : 'bg-white text-gray-90'"
-        class="flex items-center h-14 w-60 rounded-md border hover:z-20 hover:scale-110">
-        <img :src=project.file class="rounded-lg h-0 sm:h-12 sm:w-16 m-1"/>
+        class="flex items-center border rounded-md h-14 w-60 hover:z-20 hover:scale-110">
+        <img :src="project.file" onerror="this.src='/images/generic-boat.png'" class="h-0 mr-1 rounded-lg sm:h-12 sm:w-16" />
         <div class="w-3/5 h-full m-1 text-center">
-            <p class="text-xs font-bold m-1">{{ project.name }}</p>
+            <p class="m-1 text-xs font-bold">{{ project.name }}</p>
             <!-- <div class="flex space-x-1">
                 <p class="text-xs italic">Inicio:</p>
                 <p class="text-xs italic"> {{ project.fechaI }}</p>
             </div> -->
-            <ProgressBar v-if="avance" class="h-full justify-end" :value="parseInt(project.avance)"></ProgressBar>
+            <ProgressBar v-if="avance" class="justify-end h-full" :value="parseInt(project.avance)"></ProgressBar>
         </div>
-        <div v-if="menu" class="m-1 flex w-1/8 justify-center">
+        <div v-if="menu" class="flex justify-center m-1 w-1/8">
             <MinimalMenu :items="items" :header="true">
                 <template #header>
-                    <div class="flex relative text-center text-black">
-                        <p class="text-xs w-4/5 font-bold">{{ project.name }}</p>
-                        <p class="text-xs w-1/5 font-bold">{{ parseInt(project.avance) }}%</p>
+                    <div class="relative flex text-center text-black">
+                        <p class="w-4/5 text-xs font-bold">{{ project.name }}</p>
+                        <p class="w-1/5 text-xs font-bold">{{ parseInt(project.avance) }}%</p>
                     </div>
                 </template>
             </MinimalMenu>

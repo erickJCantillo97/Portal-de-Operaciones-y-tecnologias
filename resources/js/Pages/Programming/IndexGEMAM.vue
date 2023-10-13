@@ -11,6 +11,7 @@ import { useSweetalert } from '@/composable/sweetAlert';
 import Knob from 'primevue/knob';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 const { toast } = useSweetalert();
+
 //#region Draggable
 const listaDatos = ref({})
 const date = ref(new Date().toISOString().split("T")[0])
@@ -23,6 +24,8 @@ const loadingTasks = ref(true)
 const loadingTask = ref({})
 const optionValue = ref('today')
 
+// El código anterior define una función `onDrop` en Vue. Esta función se activa cuando un elemento se
+// coloca en una colección.
 const onDrop = async (collection, dropResult) => {
     const { addedIndex, payload } = dropResult;
     if (addedIndex !== null) {
@@ -35,19 +38,25 @@ const onDrop = async (collection, dropResult) => {
 
 }
 
+// El código anterior define una función llamada `getFoto` que toma un parámetro `correo`. Dentro de la
+// función, realiza una solicitud POST a una ruta llamada `'get.foto'` con el parámetro `correo` como
+// carga útil. Luego recupera los datos de la "foto" de la respuesta y los devuelve.
 const getFoto = (correo) => {
     axios.post(route('get.foto', correo)).then((res) => {
         return res.data.photo
     })
-
 }
 
+// El código anterior define una función llamada "getChildPayload" que toma un parámetro "índice". Esta
+// función devuelve el valor en el índice especificado en la variable "personal".
 const getChildPayload = (index) => {
     return personal.value[index];
 }
 
 //#endregion
 
+// El código anterior utiliza el gancho de ciclo de vida `onMounted` de Vue para ejecutar algún código
+// cuando el componente está montado.
 onMounted(() => {
     getTask('tomorrow')
     axios.get(route('get.personal')).then((res) => {
@@ -57,9 +66,13 @@ onMounted(() => {
 })
 
 
-
+// El código anterior es una función de Vue.js que recupera tareas según la opción seleccionada.
 const getTask = async (option) => {
+<<<<<<< HEAD
 
+=======
+    const today = new Date();
+>>>>>>> 4a53ab51f227ef38084b7d445df9c6f149ba8703
     optionValue.value = option
     switch (option) {
         case 'today':
@@ -95,24 +108,32 @@ const getTask = async (option) => {
                 loadingTasks.value = false
             })
         });
-
     }
-
 }
 
+// El código anterior es una función llamada `format24h` que toma un parámetro `hora` (que representa
+// una hora en formato de 24 horas) y devuelve una cadena de hora formateada en formato de 12 horas con
+// AM/PM.
 function format24h(hora) {
     return new Date("1970-01-01T" + hora).toLocaleString('es-CO',
         { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 }
-
 //#region
-const deleteSchedule = async (task, index, person) => {
-    console.log(person.employee_id)
-    await axios.post(route('programming.delete'), { task_id: task.id, employee_id: person.employee_id, fecha: dates.value[0] }).then((res) => {
-       listaDatos.value[task.id] = res.data.task
-        toast('Se ha eliminado a ' + person.name + ' de la tarea ' + task.name, 'success');
+
+// El código anterior define una función llamada "quitar" que toma tres parámetros: "tarea", "índice" y
+// "persona". Dentro de la función realiza una solicitud POST asíncrona usando axios a una ruta llamada
+// "programming.delete" con los datos { task_id: tarea, empleado_id: persona.Num_SAP, fecha: fecha}. Si
+// la solicitud tiene éxito, registra la respuesta en la consola, elimina un elemento de la matriz
+// "listaDatos.value[task.id]" en el índice especificado y muestra un mensaje de notificación de éxito.
+// También hay definida una función "editar" vacía.
+const quitar = async (task, index, person) => {
+    await axios.post(route('programming.delete'), { task_id: task, employee_id: person.Num_SAP, fecha: fecha }).then((res) => {
+        console.log(res)
+        listaDatos.value[task.id].splice(index, 1);
+        toast('Se ha eliminado a ' + person.Nombres_Apellidos + ' de la tarea ' + task.name, 'success');
     })
 }
+
 const editar = () => {
 
 }
@@ -122,6 +143,9 @@ const editar = () => {
 const employee = ref([])
 const open = ref(false)
 
+// El código anterior define una función llamada `employeeDialog` que toma un parámetro `item`. Dentro
+// de la función, establece el valor de "open" en "verdadero" y el valor de "employee" en el
+// parámetro "elemento".
 const employeeDialog = (item) => {
     open.value = true
     employee.value = item
@@ -195,24 +219,24 @@ const employeeDialog = (item) => {
                         type="date" name="date" id="date" v-model="date" @change="getTask('date')">
                 </div>
             </div>
-            <div class="h-full grid grid-rows-auto sm:grid-rows-1 sm:grid-cols-3 sm:gap-2">
-                <!--#region LISTA PROGRAMACIÓN DE ACTIVIDADES-->
+            <div class="grid h-full grid-rows-auto sm:grid-rows-1 sm:grid-cols-3 sm:gap-2">
+                <!--LISTA PROGRAMACIÓN DE ACTIVIDADES-->
                 <div v-if="loadingProgram"
-                    class="h-full row-start-2 row-span-6 sm:flex sm:flex-col sm:justify-center sm:items-center sm:row-start-1 sm:col-start-1 sm:col-span-2 rounded-xl">
-                    <span class="h-full w-full loader flex justify-center items-center">
+                    class="h-full row-span-6 row-start-2 sm:flex sm:flex-col sm:justify-center sm:items-center sm:row-start-1 sm:col-start-1 sm:col-span-2 rounded-xl">
+                    <span class="flex items-center justify-center w-full h-full loader">
                         <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
                     </span>
-                    <p class="animate-pulse text-primary font-bold"> Cargando actividades</p>
+                    <p class="font-bold animate-pulse text-primary"> Cargando actividades</p>
                 </div>
                 <div v-if="!loadingProgram"
-                    class="h-full row-start-2 row-span-6 p-1 sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 overflow-y-auto custom-scroll snap-y snap-proximity rounded-xl">
+                    class="h-full row-span-6 row-start-2 p-1 overflow-y-auto sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 custom-scroll snap-y snap-proximity rounded-xl">
                     <div v-for="task in tasks"
-                        class="h-1/2 flex flex-col justify-between p-2 border rounded-md shadow-md sm:h-1/2 snap-start">
+                        class="flex flex-col justify-between p-2 border rounded-md shadow-md h-1/2 sm:h-1/2 snap-start">
                         <div class="grid grid-rows-2">
                             <div class="">
                                 <p class="block overflow-hidden">{{ task.name }}
                                 </p>
-                                <p class="text-xs text-primary italic uppercase">{{ task.project }}</p>
+                                <p class="text-xs italic uppercase text-primary">{{ task.project }}</p>
                             </div>
                             <div class="grid items-center grid-cols-2 text-xs sm:grid-cols-6">
                                 <div class="">
@@ -256,11 +280,11 @@ const employeeDialog = (item) => {
                         </div>
 
                         <div v-if="loadingTasks ? true : loadingTask[task.id] ? true : false"
-                            class="h-full p-2 flex-col flex justify-center items-center">
-                            <span class="h-full w-full loader flex justify-center items-center">
+                            class="flex flex-col items-center justify-center h-full p-2">
+                            <span class="flex items-center justify-center w-full h-full loader">
                                 <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
                             </span>
-                            <p class="animate-pulse text-primary font-bold">{{ loadingTasks ? 'Cargando personas asignadas':'Guardando cambios'}}</p>
+                            <p class="font-bold animate-pulse text-primary">{{ loadingTasks ? 'Cargando personas asignadas':'Guardando cambios'}}</p>
                         </div>
                         <Container v-if="!loadingTask[task.id]"
                             class="h-full p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
@@ -305,14 +329,14 @@ const employeeDialog = (item) => {
 
                 <!--#region LISTA PERSONAL-->
                 <div v-if="loadingPerson"
-                    class="row-start-1 sm:col-start-3 h-full shadow-lg sm:flex sm:flex-col sm:items-center sm:justify-center rounded-xl">
-                    <span class="h-full w-full loader flex justify-center items-center">
+                    class="h-full row-start-1 shadow-lg sm:col-start-3 sm:flex sm:flex-col sm:items-center sm:justify-center rounded-xl">
+                    <span class="flex items-center justify-center w-full h-full loader">
                         <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
                     </span>
-                    <p class="animate-pulse text-primary font-bold"> Cargando personas</p>
+                    <p class="font-bold animate-pulse text-primary"> Cargando personas</p>
                 </div>
                 <div v-if="!loadingPerson"
-                    class="row-start-1 sm:col-start-3 h-full overflow-y-hidden sm:overflow-y-auto divide-y divide-gray-100 shadow-lg sm:block custom-scroll ring-1 ring-gray-900/5 rounded-xl">
+                    class="h-full row-start-1 overflow-y-hidden divide-y divide-gray-100 shadow-lg sm:col-start-3 sm:overflow-y-auto sm:block custom-scroll ring-1 ring-gray-900/5 rounded-xl">
                     <h2 class="font-semibold text-center capitalize text-primary">Personal</h2>
                     <Container
                         class="flex h-[87%] sm:space-x-0 w-full overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
@@ -345,48 +369,48 @@ const employeeDialog = (item) => {
                 <!--#endregion -->
             </div>
         </div>
-        <!-- MODAL DE PERSONAS -->
+        <!--#region MODAL DE PERSONAS -->
         <TransitionRoot as="template" :show="open">
             <Dialog as="div" class="relative z-30" @close="open = false">
                 <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
                     leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-                    <div class="fixed h-screen w-screen inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-30" />
+                    <div class="fixed inset-0 z-30 w-screen h-screen transition-opacity bg-gray-500 bg-opacity-75" />
                 </TransitionChild>
-                <div class="fixed inset-0 z-50 overflow-y-auto h-screen">
-                    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div class="fixed inset-0 z-50 h-screen overflow-y-auto">
+                    <div class="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
                         <TransitionChild as="template" enter="ease-out duration-300"
                             enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
                             leave-from="opacity-100 translate-y-0 sm:scale-100"
                             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                             <DialogPanel
-                                class="grid grid-cols-1 relative transform overflow-hidden rounded-lg bg-white px-2 pb-4 pt-2 text-left shadow-xl transition-all sm:my-8 w-xl">
+                                class="relative grid grid-cols-1 px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 w-xl">
                                 <div>
                                     <div class="px-2 mt-2 text-center">
                                         <DialogTitle as="h3"
-                                            class="text-5xl font-semibold text-primary text-center capitalize">
-                                            Ver Detalle de Horario
+                                            class="text-3xl font-semibold text-center capitalize text-primary">
+                                            Ver detalle de horario
                                         </DialogTitle>
                                     </div>
-                                    <div class="bg-white py-8 md:py-8">
+                                    <div class="py-8 bg-white md:py-8">
                                         <div
-                                            class="mx-auto grid max-w-7xl grid-cols-2 gap-x-8 gap-y-20 px-6 lg:px-8 xl:grid-cols-2">
-                                            <div class="flex flex-col gap-10 pt-12 sm:flex-column">
+                                            class="grid grid-cols-2 px-6 mx-auto max-w-7xl gap-x-8 gap-y-20 lg:px-8 xl:grid-cols-2">
+                                            <div class="flex flex-col items-center justify-center gap-10 pt-12 sm:flex-col">
                                                 <img class="aspect-[4/5] w-52 flex-none rounded-3xl object-cover shadow-lg"
                                                     :src="employee.photo" alt="Foto" />
-                                                <div class="max-w-xl flex-auto">
+                                                <div class="max-w-xl text-center">
                                                     <h3
                                                         class="text-lg font-semibold leading-8 tracking-tight text-gray-900">
                                                         {{ employee.Nombres_Apellidos }}
                                                     </h3>
                                                     <p class="text-base leading-7 text-gray-600">{{ employee.Cargo }}</p>
-                                                    <p class="mt-6 text-base leading-7 text-gray-600">{{ employee.bio }}</p>
-                                                    <ul role="list" class="mt-6 flex gap-x-6">
+                                                    <p class="text-base leading-7 text-gray-600">{{ employee.Correo }}</p>
+                                                    <ul role="list" class="flex justify-center mt-6 gap-x-6">
                                                         <li>
                                                             <a :href="employee.twitterUrl"
                                                                 class="text-gray-400 hover:text-gray-500">
                                                                 <span class="sr-only">Twitter</span>
-                                                                <svg class="h-5 w-5" aria-hidden="true" fill="currentColor"
+                                                                <svg class="w-5 h-5" aria-hidden="true" fill="currentColor"
                                                                     viewBox="0 0 20 20">
                                                                     <!-- Icono de Twitter -->
                                                                 </svg>
@@ -396,7 +420,7 @@ const employeeDialog = (item) => {
                                                             <a :href="employee.linkedinUrl"
                                                                 class="text-gray-400 hover:text-gray-500">
                                                                 <span class="sr-only">LinkedIn</span>
-                                                                <svg class="h-5 w-5" aria-hidden="true" fill="currentColor"
+                                                                <svg class="w-5 h-5" aria-hidden="true" fill="currentColor"
                                                                     viewBox="0 0 20 20">
                                                                     <!-- Icono de LinkedIn -->
                                                                 </svg>
@@ -405,26 +429,24 @@ const employeeDialog = (item) => {
                                                     </ul>
                                                 </div>
                                             </div>
-                                            <div class="max-w-2xl border border-solid border-blue-500 shadow-md rounded-lg">
-                                                <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                                                    About the team
-                                                </h2>
-                                                <p class="mt-6 text-lg leading-8 text-gray-600">
-                                                    We’re a dynamic group of individuals who are passionate about what we do
-                                                    and dedicated to
-                                                    delivering the best results for our clients.
-                                                </p>
+
+                                            <div class="max-w-2xl border border-blue-500 border-solid rounded-lg shadow-md">
+                                                <div class="grid grid-cols-3 gap-1">
+                                                    <span v-for="horario in item.schedule_times"
+                                                        class="inline-flex items-center gap-x-1.5 rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+                                                        <!-- {{ format24h(horario.hora_inicio) }}-{{ format24h(horario.hora_fin) }} -->
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </DialogPanel>
-
                         </TransitionChild>
                     </div>
                 </div>
             </Dialog>
         </TransitionRoot>
-
+        <!--#endregion-->
     </AppLayout>
 </template>
