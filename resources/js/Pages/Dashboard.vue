@@ -16,8 +16,9 @@ import Button from "@/Components/Button.vue";
 import ProgressBar from "primevue/progressbar";
 import DataChart from "./DataChart.vue";
 import "../../sass/dataTableCustomized.scss";
-import Chart from "primevue/chart";
+import DolarTRM from "./DolarTRM.vue";
 // import TimeLine from './TimeLine.vue';
+
 
 const props = defineProps({
     projects: Array,
@@ -37,7 +38,6 @@ const colors = {
     GEFAD: "bg-sky-500",
     GECON: "bg-pink-500",
 };
-const trmUSD = ref()
 const personal = ref([]);
 const totalMembers = ref(0);
 const loading = ref(false);
@@ -60,8 +60,6 @@ onMounted(() => {
     //     }
     // })
     // getTask();
-    chartOptions.value = setChartOptions();
-    trmUSD.value = setChartData()
 }
 );
 
@@ -100,69 +98,6 @@ const clearFilter = () => {
 //             })
 //     }, 200);
 // }
-
-const setChartOptions = () => {
-    const documentStyle = getComputedStyle(document.documentElement);
-    const textColor = documentStyle.getPropertyValue('--text-color');
-    const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-    const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
-
-    return {
-        maintainAspectRatio: false,
-        aspectRatio: 0.6,
-        plugins: {
-            legend: {
-                labels: {
-                    color: textColor
-                }
-            }
-        },
-        scales: {
-            x: {
-                ticks: {
-                    color: textColorSecondary
-                },
-                grid: {
-                    color: surfaceBorder
-                }
-            },
-            y: {
-                ticks: {
-                    color: textColorSecondary
-                },
-                grid: {
-                    color: surfaceBorder
-                }
-            }
-        }
-    };
-}
-const setChartData = async () => {
-    let valor = []
-    var tasa = []
-    var dia = []
-    await axios.get('https://www.datos.gov.co/resource/32sa-8pi3.json').then((res) => {
-        valor = res.data.slice(0, 5)
-    });
-    const documentStyle = getComputedStyle(document.documentElement);
-    valor.forEach(element => {
-        tasa.push(parseInt(element.valor))
-        dia.push(element.vigenciadesde)
-    });
-    console.log(tasa)
-    return {
-        labels: dia,
-        datasets: [
-            {
-                label: 'Dolar',
-                data: tasa,
-                fill: false,
-                borderColor: documentStyle.getPropertyValue('--blue-500'),
-                tension: 0.4
-            },
-        ]
-    };
-};
 </script>
 
 <template>
@@ -174,10 +109,8 @@ const setChartData = async () => {
                             </dl>
                         </div> -->
             <div class="flex justify-between">
-                <UserHeader />
-                <div class="card">
-                    <Chart type="line" :data="trmUSD" :options="chartOptions" class="h-30rem" />
-                </div>
+                <UserHeader/>
+                <DolarTRM />
             </div>
             <!--DATATABLE PROYECTOS-->
             <div class="p-3 m-1 shadow-md rounded-xl">

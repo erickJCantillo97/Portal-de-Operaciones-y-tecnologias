@@ -199,7 +199,7 @@ const exportarExcel = () => {
 
 <template>
     <AppLayout>
-        <div class="w-full p-4 px-auto">
+        <div class="h-full p-4 px-auto custom-scroll overflow-y-auto">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 text-primary">
@@ -246,7 +246,7 @@ const exportarExcel = () => {
                 <Column field="name" header="Nombre">
                     <template #body="slotProps">
                         <div class="flex space-x-2 items-center">
-                            <Image :src="slotProps.data.file" alt="Image" class="h-8 w-8 rounded-full" preview />
+                            <img :src="slotProps.data.file" onerror="this.src='/images/generic-boat.png'" alt="Image"  class="h-0 mr-1 rounded-lg sm:h-12 sm:w-16" />
                             <p>{{ slotProps.data.name }} </p>
                         </div>
                     </template>
@@ -297,7 +297,6 @@ const exportarExcel = () => {
                 </Column>
             </DataTable>
         </div>
-
         <!--MODAL DE FORMULARIO-->
         <TransitionRoot as="template" :show="open">
             <Dialog as="div" class="relative z-30" @close="open = false">

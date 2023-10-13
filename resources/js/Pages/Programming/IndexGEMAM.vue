@@ -67,6 +67,7 @@ onMounted(() => {
 
 // El código anterior es una función de Vue.js que recupera tareas según la opción seleccionada.
 const getTask = async (option) => {
+    loadingProgram.value=true
     optionValue.value = option
     switch (option) {
         case 'today':
