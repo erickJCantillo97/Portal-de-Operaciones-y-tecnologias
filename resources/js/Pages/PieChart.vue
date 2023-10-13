@@ -25,7 +25,6 @@ const props = defineProps({
         default: null
     }
 });
-console.log(props.series)
 use([
     TitleComponent,
     TooltipComponent,
