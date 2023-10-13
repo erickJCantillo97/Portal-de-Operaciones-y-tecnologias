@@ -34,6 +34,7 @@ export function useSweetalert() {
                             icon: "success",
                             title: title + " Eliminado",
                         });
+
                     },
                 });
             },

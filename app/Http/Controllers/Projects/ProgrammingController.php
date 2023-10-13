@@ -19,6 +19,10 @@ class ProgrammingController extends Controller
         return Inertia::render('Programming/Index');
     }
 
+    private function getSchedule($fecha, $taskId){
+       return  Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get();
+    }
+
     public function store(Request $request)
     {
         try {
@@ -27,21 +31,20 @@ class ProgrammingController extends Controller
             'employee_id' => 'required',
             'name' => 'required',
             'fecha' => 'required|date',
-        ]);
+            ]);
 
-        $schedule = Schedule::firstOrNew($validateData);
-        $schedule->save();
-        ScheduleTime::create([
-            'schedule_id' => $schedule->id,
-            'hora_inicio' => '7:00',
-            'hora_fin' => '16:30'
-        ]);
+            $schedule = Schedule::firstOrNew($validateData);
+            $schedule->save();
 
-        $task = Schedule::where('fecha', $validateData['fecha'])->with('scheduleTimes')->where('task_id', $validateData['task_id'])->get();
+            ScheduleTime::create([
+                'schedule_id' => $schedule->id,
+                'hora_inicio' => '7:00',
+                'hora_fin' => '16:30'
+            ]);
 
             return response()->json([
                 'status' => true,
-                'task' => $task,
+                'task' => $this->getSchedule($validateData['fecha'],$validateData['task_id'] ),
             ], 200);
         } catch (Exception $e) {
             return $e;
@@ -54,10 +57,14 @@ class ProgrammingController extends Controller
         return Inertia::render('Programming/IndexGEMAM');
     }
 
-    public function delete(Request $request)
+    public function deleteSchedule(Schedule $schedule)
     {
-        //hace algo
-        return 'Hecho';
+        $schedule->delete();
+        ScheduleTime::where('schedule_id', $schedule->id)->delete();
+        return response()->json([
+            'status' => true,
+            'task' => $this->getSchedule($schedule->fecha, $schedule->task_id ),
+        ], 200);
     }
 
     public function endNivelActivities(Request $request)

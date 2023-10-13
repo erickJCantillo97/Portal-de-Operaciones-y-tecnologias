@@ -13,7 +13,7 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 const { toast } = useSweetalert();
 //#region Draggable
 const listaDatos = ref({})
-const fecha = ref(new Date().toISOString().split("T")[0])
+const date = ref(new Date().toISOString().split("T")[0])
 const personal = ref()
 const dates = ref([]);
 const tasks = ref([]);
@@ -60,23 +60,22 @@ onMounted(() => {
 
 const getTask = async (option) => {
 
-    const today = new Date();
     optionValue.value = option
     switch (option) {
         case 'today':
-            dates.value[0] = today;
-            dates.value[1] = today;
+            dates.value[0] = new Date();
+            dates.value[1] = new Date();
             break;
         case 'tomorrow':
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
+            date.value = tomorrow.toISOString().split("T")[0];
             dates.value[0] = tomorrow;
             dates.value[1] = tomorrow;
             break;
-
         case 'date':
-            dates.value[0] = fecha.value;
-            dates.value[1] = fecha.value;
+            dates.value[0] = date.value;
+            dates.value[1] = date.value;
             break;
         default:
             break;
@@ -107,11 +106,11 @@ function format24h(hora) {
 }
 
 //#region
-const quitar = async (task, index, person) => {
-    await axios.post(route('programming.delete'), { task_id: task, employee_id: person.Num_SAP, fecha: fecha }).then((res) => {
-        console.log(res)
-        listaDatos.value[task.id].splice(index, 1);
-        toast('Se ha eliminado a ' + person.Nombres_Apellidos + ' de la tarea ' + task.name, 'success');
+const deleteSchedule = async (task, index, person) => {
+    console.log(person.employee_id)
+    await axios.post(route('programming.delete'), { task_id: task.id, employee_id: person.employee_id, fecha: dates.value[0] }).then((res) => {
+       listaDatos.value[task.id] = res.data.task
+        toast('Se ha eliminado a ' + person.name + ' de la tarea ' + task.name, 'success');
     })
 }
 const editar = () => {
@@ -193,7 +192,7 @@ const employeeDialog = (item) => {
                     <input
                         :class="optionValue == 'date' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
                         class="inline-flex items-center px-3 py-2 -ml-px text-xs font-semibold rounded-md shadow-md alturah8 text-primary border-primary"
-                        type="date" name="date" id="date" v-model="fecha" @change="getTask('date')">
+                        type="date" name="date" id="date" v-model="date" @change="getTask('date')">
                 </div>
             </div>
             <div class="h-full grid grid-rows-auto sm:grid-rows-1 sm:grid-cols-3 sm:gap-2">
@@ -271,7 +270,7 @@ const employeeDialog = (item) => {
                                 <div v-for="(item, index) in listaDatos[task.id]" class="p-1 mt-1 border-2 rounded-md">
                                     <div class="flex items-center justify-between w-full">
                                         <p class="text-sm font-semibold ">{{ item.name }}</p>
-                                        <button v-tooltip.top="'En desarrollo'" @click="quitar(task, index, item)">
+                                        <button v-tooltip.top="'Eliminar de la Actividad'" @click="deleteSchedule(task, index, item)">
                                             <XMarkIcon
                                                 class="h-4 p-0.5 border rounded-md text-white bg-danger border-danger hover:animate-pulse hover:scale-125" />
                                         </button>
