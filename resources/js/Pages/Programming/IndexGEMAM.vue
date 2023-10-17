@@ -69,12 +69,12 @@ onMounted(() => {
     getTask('tomorrow')
     axios.get(route('get.personal')).then((res) => {
         personal.value = Object.values(res.data.personal)
-        loadingPerson.value = false
         personal.value.forEach(element => {
             axios.get(route('get.assignment.hours', [date.value, (element.Num_SAP)])).then((res) => {
                 personalHours.value[(element.Num_SAP)] = res.data;
             });
         })
+        loadingPerson.value = false
     })
 })
 
@@ -338,7 +338,7 @@ const employeeDialog = (item) => {
                     <p class="font-bold animate-pulse text-primary"> Cargando personas</p>
                 </div>
                     <Container v-if="!loadingPerson" oncontextmenu="return false" onkeydown="return false"
-                        class="h-[105%] rounded-xl shadow-lg bg-white sm:space-x-0 w-full custom-scroll sm:overflow-y-auto sm:flex-col sm:py-1 sm:px-1"
+                        class="h-[105%] rounded-xl shadow-lg bg-white sm:space-x-0 space-y-1 w-full custom-scroll sm:overflow-y-auto sm:flex-col sm:py-1 sm:px-1"
                         behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
                         <Draggable v-for="item in personal" :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false:true"
                             class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
@@ -355,11 +355,11 @@ const employeeDialog = (item) => {
                                     </p>
                                 </div>
                                 <div class="flex items-center justify-center w-full">
-                                    <button
+                                    <button title="Horas programadas"
                                     :class="personalHours[(item.Num_SAP)] < 9.5 ? 'bg-primary' : 'bg-success'"
-                                        class="flex items-center justify-center h-6 p-1 m-1 font-mono text-sm text-white align-middle rounded-md w-9"
-                                        v-tooltip.top="'Ver programacion'" @click="employeeDialog(item)">
-                                        <p >{{personalHours[(item.Num_SAP)]}} </p>
+                                        class="flex items-center justify-center h-10 p-1 m-1 font-mono text-sm text-white align-middle rounded-md w-12"
+                                    @click="employeeDialog(item)">
+                                        <p >{{personalHours[(item.Num_SAP)]}} Horas </p>
                                     </button>
                                 </div>
                             </div>
