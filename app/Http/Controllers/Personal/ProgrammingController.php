@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Projects;
+namespace App\Http\Controllers\Personal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Schedule;
@@ -24,8 +24,6 @@ class ProgrammingController extends Controller
      *
      * @param {Request} request - El parámetro `` es una instancia de la clase
      * `Illuminate\Http\Request`. Representa la solicitud HTTP realizada al servidor y contiene
-     * información como el método de solicitud, encabezados y datos de entrada.
-     *
      * @returns una respuesta JSON con un estado y datos de la tarea.
      */
     public function store(Request $request)
@@ -40,6 +38,11 @@ class ProgrammingController extends Controller
 
             $schedule = Schedule::firstOrNew($validateData);
             $schedule->save();
+
+                // $segundosAcumulados = ScheduleTime::where('schedule_id' , $schedule->id,)->selectRaw('SUM(TIME_TO_SEC(datediff(hora_fin, hora_inicio))) as diferencia_acumulada')->get();
+
+                // return $segundosAcumulados[0]->diferencia_acumulada/3600;
+
 
             ScheduleTime::create([
                 'schedule_id' => $schedule->id,
@@ -142,4 +145,9 @@ class ProgrammingController extends Controller
             'schedule' => $schedule,
         ], 200);
     }
+
+    private function getSchedule($fecha, $taskId){
+        return  Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get();
+    }
+
 }

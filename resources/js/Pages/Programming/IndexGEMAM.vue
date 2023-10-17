@@ -68,11 +68,6 @@ onMounted(() => {
 
 // El código anterior es una función de Vue.js que recupera tareas según la opción seleccionada.
 const getTask = async (option) => {
-<<<<<<< HEAD
-
-=======
-    const today = new Date();
->>>>>>> 4a53ab51f227ef38084b7d445df9c6f149ba8703
     optionValue.value = option
     switch (option) {
         case 'today':
@@ -126,7 +121,7 @@ function format24h(hora) {
 // la solicitud tiene éxito, registra la respuesta en la consola, elimina un elemento de la matriz
 // "listaDatos.value[task.id]" en el índice especificado y muestra un mensaje de notificación de éxito.
 // También hay definida una función "editar" vacía.
-const quitar = async (task, index, person) => {
+const deleteSchedule = async (task, index, person) => {
     await axios.post(route('programming.delete'), { task_id: task, employee_id: person.Num_SAP, fecha: fecha }).then((res) => {
         console.log(res)
         listaDatos.value[task.id].splice(index, 1);
