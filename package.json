@@ -20,8 +20,8 @@
         "vue": "^3.2.31"
     },
     "dependencies": {
-        "@bryntum/gantt": "npm:@bryntum/gantt-trial@^5.5.1",
-        "@bryntum/gantt-vue-3": "^5.5.1",
+        "@bryntum/gantt-trial": "^5.5.4",
+        "@bryntum/gantt-vue-3": "^5.5.4",
         "@headlessui/vue": "^1.7.16",
         "@heroicons/vue": "^2.0.18",
         "@suadelabs/vue3-multiselect": "^1.0.2",
