@@ -16,9 +16,11 @@ const { toast } = useSweetalert();
 const listaDatos = ref({})
 const date = ref(new Date().toISOString().split("T")[0])
 const personal = ref()
+
 const tasks = ref([]);
 const loadingProgram = ref(true);
 const loadingPerson = ref(true);
+const personalHours = ref([]);
 const loadingTasks = ref(true)
 const loadingTask = ref({})
 const optionValue = ref('today')
@@ -31,10 +33,17 @@ const onDrop = async (collection, dropResult) => {
         loadingTask.value[collection] = true
         await axios.post(route('programming.store'), { task_id: collection, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: date.value }).then((res) => {
             listaDatos.value[collection] = res.data.task
+            personalHours.value[payload.Num_SAP] = res.data.hours
             loadingTask.value[collection] = false
         })
     }
 
+}
+
+const getAssignmentHours = (employee_id) => {
+    axios.get(route('get.assignment.hours', [date.value, employee_id])).then((res) => {
+        personalHours.value[employee_id] = res.data;
+    })
 }
 
 // El código anterior define una función llamada `getFoto` que toma un parámetro `correo`. Dentro de la
@@ -112,8 +121,10 @@ function format24h(hora) {
 // "listaDatos.value[task.id]" en el índice especificado y muestra un mensaje de notificación de éxito.
 // También hay definida una función "editar" vacía.
 const deleteSchedule = async (task, index, schedule) => {
+
     await axios.post(route('programming.delete', schedule.id )).then((res) => {
         listaDatos.value[task.id]=res.data.task
+        getAssignmentHours(schedule.employee_id)
         toast('Se ha eliminado a ' + schedule.name + ' de la tarea ' + task.name, 'success');
     })
 }
@@ -268,7 +279,7 @@ const employeeDialog = (item) => {
                             <span class="flex items-center justify-center w-full h-full loader">
                                 <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
                             </span>
-                            <p class="font-bold animate-pulse text-primary">{{ loadingTasks ? 'Cargando personasa signadas':'Guardando cambios'}}</p>
+                            <p class="font-bold animate-pulse text-primary">{{ loadingTasks ? 'Cargando personas asignadas':'Guardando cambios'}}</p>
                         </div>
                         <Container v-if="!loadingTask[task.id]"
                             class="h-full p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
@@ -342,9 +353,10 @@ const employeeDialog = (item) => {
                                 </div>
                                 <div class="flex items-center justify-center w-full">
                                     <button
-                                        class="flex items-center justify-center h-6 p-1 m-1 font-mono text-sm text-white align-middle rounded-md w-9 bg-primary"
+                                    :class="personalHours[item.Num_SAP] < 9.5 ? 'bg-primary' : 'bg-success'"
+                                        class="flex items-center justify-center h-6 p-1 m-1 font-mono text-sm text-white align-middle rounded-md w-9"
                                         v-tooltip.top="'Ver programacion'" @click="employeeDialog(item)">
-                                        <p> 1.0H </p>
+                                        <p > {{getAssignmentHours(item.Num_SAP)}} {{personalHours[item.Num_SAP]}} </p>
                                     </button>
                                 </div>
                             </div>
