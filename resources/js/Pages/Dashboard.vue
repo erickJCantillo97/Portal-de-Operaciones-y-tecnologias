@@ -16,7 +16,6 @@ import Button from "@/Components/Button.vue";
 import ProgressBar from "primevue/progressbar";
 import DataChart from "./DataChart.vue";
 import "../../sass/dataTableCustomized.scss";
-import DolarTRM from "./DolarTRM.vue";
 // import TimeLine from './TimeLine.vue';
 
 
@@ -110,7 +109,7 @@ const clearFilter = () => {
                         </div> -->
             <div class="flex justify-between">
                 <UserHeader/>
-                <DolarTRM />
+                <!-- <DolarTRM /> -->
             </div>
             <!--DATATABLE PROYECTOS-->
             <div class="p-3 m-1 shadow-md rounded-xl">

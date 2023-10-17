@@ -1,4 +1,15 @@
 <template>
+    <div class="flex items-center gap-x-6 bg-orange-300 px-6 sm:before:flex-1">
+        <p class="text-sm leading-6 text-white space-x-2">
+            <strong class="font-semibold">Modo de pruebas</strong>
+        </p>
+        <div class="flex flex-1 justify-end">
+            <!-- <button type="button" class="-m-3 p-3 focus-visible:outline-offset-[-4px]">
+                <span class="sr-only">Dismiss</span>
+                <XMarkIcon class="h-5 w-5 text-white" aria-hidden="true" />
+            </button> -->
+        </div>
+    </div>
     <div class="max-h-screen collapsible-vertical" :class="menu ? 'toggle-sidebar' : ''">
         <main>
             <div class="fixed inset-0 bg-[black]/60 z-10" :class="{ hidden: !menu }" @click="menu = !menu"></div>
@@ -14,12 +25,13 @@
                     <div class="flex items-center space-x-12 ">
                         <h1 class="hidden text-xl font-extrabold lg:block text-primary">Portal de Operaciones Tecnológicas e
                             Inteligencia Artificial</h1>
-                        <div class="hidden p-2 font-extrabold uppercase bg-orange-300 rounded-md sm:block ">
+                        <!-- <div class="hidden p-2 font-extrabold uppercase bg-orange-300 rounded-md sm:block ">
                             <div class="flex items-center px-5 py-1 space-x-2 text-primary">
                                 <i class="pi pi-exclamation-circle"></i>
                                 <p class="">Modo de pruebas</p>
                             </div>
-                        </div>
+                        </div> -->
+                        <DolarTRM />
                     </div>
                 </div>
                 <div class="flex items-center ">
@@ -246,7 +258,8 @@ import {
     BellIcon, ChevronDownIcon, ArrowLeftCircleIcon,
     QuestionMarkCircleIcon,
     XCircleIcon, XMarkIcon,
-    CheckIcon
+    CheckIcon,
+ExclamationTriangleIcon
 } from '@heroicons/vue/20/solid'
 import MenuSidebar from '@/Components/MenuSidebar.vue';
 import DropdownSetting from '@/Components/DropdownSetting.vue';
@@ -255,7 +268,7 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 import html2canvas from 'html2canvas';
 import RadioButton from 'primevue/radiobutton';
 import Tag from 'primevue/tag';
-
+import DolarTRM from "@/Components/DolarTRM.vue";
 import { useSweetalert } from '@/composable/sweetAlert';
 const { toast } = useSweetalert();
 
