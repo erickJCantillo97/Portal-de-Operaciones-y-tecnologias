@@ -124,7 +124,7 @@ const clearFilter = () => {
                         'daysPerMonth',
                     ]" currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-                    :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
+                    :paginator="true" :rows="5" :rowsPerPageOptions="[5, 10, 25, 50, 100]">
                     <!--COLUMNAS-->
                     <Column field="name" header="Proyecto">
                         <template #body="slotProps">
