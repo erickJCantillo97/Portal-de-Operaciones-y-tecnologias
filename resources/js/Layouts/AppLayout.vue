@@ -121,7 +121,7 @@
                                                         <div class="flex items-center justify-between">
                                                             <DialogTitle
                                                                 class="text-base font-semibold leading-6 text-white">
-                                                                ¡Bienvenido a POT!</DialogTitle>
+                                                                ¡Bienvenido a TOP!</DialogTitle>
                                                         </div>
                                                         <div class="mt-1">
                                                             <p class="text-sm text-indigo-300">En este espacio podras
@@ -134,7 +134,7 @@
                                                     <div
                                                         class="h-[60%] p-6 shadow-xl space-y-4 custom-scroll overflow-y-auto bg-white">
 
-                                                        <div class="w-full p-2 border rounded-md shadow-lg">
+                                                        <!-- <div class="w-full p-2 border rounded-md shadow-lg">
                                                             <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui
                                                                 odit tempora delectus sint repudiandae sed! Sapiente eaque
                                                                 ab
@@ -165,7 +165,7 @@
                                                                 dicta eos cum minima amet cupiditate delectus vero?
                                                                 Reprehenderit rem voluptatibus optio?</p>
                                                             <p class="mt-1 text-xs">DD/MM/AAAA</p>
-                                                        </div>
+                                                        </div> -->
                                                     </div>
                                                     <div class="flex flex-col justify-between flex-1">
                                                         <div class="px-4 divide-y divide-gray-200 sm:px-6">

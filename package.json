@@ -22,6 +22,11 @@
     "dependencies": {
         "@bryntum/gantt": "npm:@bryntum/gantt-trial@^5.5.1",
         "@bryntum/gantt-vue-3": "^5.5.1",
+        "@fullcalendar/core": "^6.1.9",
+        "@fullcalendar/daygrid": "^6.1.9",
+        "@fullcalendar/interaction": "^6.1.9",
+        "@fullcalendar/timegrid": "^6.1.9",
+        "@fullcalendar/vue3": "^6.1.9",
         "@headlessui/vue": "^1.7.16",
         "@heroicons/vue": "^2.0.18",
         "@suadelabs/vue3-multiselect": "^1.0.2",
