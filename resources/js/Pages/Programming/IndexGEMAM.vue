@@ -20,7 +20,7 @@ const personal = ref()
 const tasks = ref([]);
 const loadingProgram = ref(true);
 const loadingPerson = ref(true);
-const personalHours = ref([]);
+const personalHours = ref({});
 const loadingTasks = ref(true)
 const loadingTask = ref({})
 const optionValue = ref('today')
@@ -33,7 +33,7 @@ const onDrop = async (collection, dropResult) => {
         loadingTask.value[collection] = true
         await axios.post(route('programming.store'), { task_id: collection, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: date.value }).then((res) => {
             listaDatos.value[collection] = res.data.task
-            personalHours.value[payload.Num_SAP] = res.data.hours
+            personalHours.value[(payload.Num_SAP)] = res.data.hours
             loadingTask.value[collection] = false
         })
     }
@@ -42,7 +42,7 @@ const onDrop = async (collection, dropResult) => {
 
 const getAssignmentHours = (employee_id) => {
     axios.get(route('get.assignment.hours', [date.value, employee_id])).then((res) => {
-        personalHours.value[employee_id] = res.data;
+        personalHours.value[(employee_id)] = res.data;
     })
 }
 
@@ -70,6 +70,11 @@ onMounted(() => {
     axios.get(route('get.personal')).then((res) => {
         personal.value = Object.values(res.data.personal)
         loadingPerson.value = false
+        personal.value.forEach(element => {
+            axios.get(route('get.assignment.hours', [date.value, (element.Num_SAP)])).then((res) => {
+                personalHours.value[(element.Num_SAP)] = res.data;
+            });
+        })
     })
 })
 
@@ -124,7 +129,8 @@ const deleteSchedule = async (task, index, schedule) => {
 
     await axios.post(route('programming.delete', schedule.id )).then((res) => {
         listaDatos.value[task.id]=res.data.task
-        getAssignmentHours(schedule.employee_id)
+        console.log(schedule)
+        getAssignmentHours((schedule.employee_id))
         toast('Se ha eliminado a ' + schedule.name + ' de la tarea ' + task.name, 'success');
     })
 }
@@ -334,7 +340,7 @@ const employeeDialog = (item) => {
                     <Container v-if="!loadingPerson" oncontextmenu="return false" onkeydown="return false"
                         class="h-[105%] rounded-xl shadow-lg bg-white sm:space-x-0 w-full custom-scroll sm:overflow-y-auto sm:flex-col sm:py-1 sm:px-1"
                         behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
-                        <Draggable v-for="item in personal" :drag-not-allowed="false"
+                        <Draggable v-for="item in personal" :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false:true"
                             class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
                             <div class="grid grid-cols-6">
                                 <div class="flex items-center w-full">
@@ -350,10 +356,10 @@ const employeeDialog = (item) => {
                                 </div>
                                 <div class="flex items-center justify-center w-full">
                                     <button
-                                    :class="personalHours[item.Num_SAP] < 9.5 ? 'bg-primary' : 'bg-success'"
+                                    :class="personalHours[(item.Num_SAP)] < 9.5 ? 'bg-primary' : 'bg-success'"
                                         class="flex items-center justify-center h-6 p-1 m-1 font-mono text-sm text-white align-middle rounded-md w-9"
                                         v-tooltip.top="'Ver programacion'" @click="employeeDialog(item)">
-                                        <p > {{getAssignmentHours(item.Num_SAP)}} {{personalHours[item.Num_SAP]}} </p>
+                                        <p >{{personalHours[(item.Num_SAP)]}} </p>
                                     </button>
                                 </div>
                             </div>
