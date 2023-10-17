@@ -321,10 +321,10 @@ const employeeDialog = (item) => {
                     <p class="font-bold animate-pulse text-primary"> Cargando personas</p>
                 </div>
                 <div v-if="!loadingPerson"
-                    class="h-full row-start-1 overflow-y-hidden divide-y divide-gray-100 shadow-lg sm:col-start-3 sm:overflow-y-auto sm:block custom-scroll ring-1 ring-gray-900/5 rounded-xl">
+                    class="h-full row-start-1 divide-y divide-gray-100 shadow-lg sm:col-start-3 ring-1 ring-gray-900/5 rounded-xl">
                     <h2 class="font-semibold text-center capitalize text-primary">Personal</h2>
                     <Container
-                        class="flex h-[87%] sm:space-x-0 w-full overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
+                        class="flex h-full sm:space-x-0 w-full custom-scroll sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
                         behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
                         <Draggable v-for="item in personal" :drag-not-allowed="false"
                             class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">

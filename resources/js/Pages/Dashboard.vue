@@ -102,7 +102,7 @@ const clearFilter = () => {
 
 <template>
     <AppLayout>
-        <div class="max-h-screen space-y-5 overflow-y-scroll sm:p-6">
+        <div class="max-h-screen space-y-5 overflow-y-scroll custom-scroll sm:p-6">
             <!-- <div class="max-w-full p-3 border-2 border-blue-100 rounded-xl">
                             <dl class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                                 <ProjectCard v-for="project of projects" :project="project" :activo="false" />
