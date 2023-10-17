@@ -6,10 +6,13 @@ import '../../../sass/dataTableCustomized.scss';
 import { Container, Draggable } from "vue-dndrop";
 import { XMarkIcon, PencilIcon, Bars3Icon } from "@heroicons/vue/20/solid";
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import Button from '../../Components/Button.vue';
+import Button from '@/Components/Button.vue';
 import { useSweetalert } from '@/composable/sweetAlert';
 import Knob from 'primevue/knob';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import Combobox from '@/Components/Combobox.vue';
+import TextInput from '@/Components/TextInput.vue';
+import FullCalendar from '@/Components/FullCalendar.vue'
 const { toast } = useSweetalert();
 
 //#region Draggable
@@ -81,7 +84,7 @@ onMounted(() => {
 
 // El código anterior es una función de Vue.js que recupera tareas según la opción seleccionada.
 const getTask = async (option) => {
-    loadingProgram.value=true
+    loadingProgram.value = true
     optionValue.value = option
     switch (option) {
         case 'today':
@@ -127,8 +130,8 @@ function format24h(hora) {
 // También hay definida una función "editar" vacía.
 const deleteSchedule = async (task, index, schedule) => {
 
-    await axios.post(route('programming.delete', schedule.id )).then((res) => {
-        listaDatos.value[task.id]=res.data.task
+    await axios.post(route('programming.delete', schedule.id)).then((res) => {
+        listaDatos.value[task.id] = res.data.task
         console.log(schedule)
         getAssignmentHours((schedule.employee_id))
         toast('Se ha eliminado a ' + schedule.name + ' de la tarea ' + task.name, 'success');
@@ -143,6 +146,8 @@ const editar = () => {
 //#region Modal Persona
 const employee = ref([])
 const open = ref(false)
+const taskSelect = ref()
+const showHours = ref(false)
 
 // El código anterior define una función llamada `employeeDialog` que toma un parámetro `item`. Dentro
 // de la función, establece el valor de "open" en "verdadero" y el valor de "employee" en el
@@ -150,6 +155,10 @@ const open = ref(false)
 const employeeDialog = (item) => {
     open.value = true
     employee.value = item
+}
+
+const submit = () => {
+    console.log('Hello!');
 }
 //#endregion
 </script>
@@ -229,6 +238,7 @@ const employeeDialog = (item) => {
                     </span>
                     <p class="font-bold animate-pulse text-primary"> Cargando actividades</p>
                 </div>
+
                 <div v-if="!loadingProgram"
                     class="h-full row-span-6 row-start-2 p-1 overflow-y-auto sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 custom-scroll snap-y snap-proximity rounded-xl">
                     <div v-for="task in tasks"
@@ -267,11 +277,6 @@ const employeeDialog = (item) => {
                                     <p class="">$1.000.000
                                     </p>
                                 </div>
-                                <!-- <div class="hidden text-center sm:justify-center sm:block">
-                                    <p class="font-bold">Valor dia</p>
-                                    <p class="">$1.000.000
-                                    </p>
-                                </div> -->
                                 <div class="hidden text-center sm:justify-center sm:block">
                                     <p class="font-bold">Diferencia</p>
                                     <p class="">$1.000.000
@@ -285,7 +290,8 @@ const employeeDialog = (item) => {
                             <span class="flex items-center justify-center w-full h-full loader">
                                 <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
                             </span>
-                            <p class="font-bold animate-pulse text-primary">{{ loadingTasks ? 'Cargando personas asignadas':'Guardando cambios'}}</p>
+                            <p class="font-bold animate-pulse text-primary">
+                                {{ loadingTasks ? 'Cargando personas asignadas' : 'Guardando cambios' }}</p>
                         </div>
                         <Container v-if="!loadingTask[task.id]"
                             class="h-full p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
@@ -337,34 +343,34 @@ const employeeDialog = (item) => {
                     </span>
                     <p class="font-bold animate-pulse text-primary"> Cargando personas</p>
                 </div>
-                    <Container v-if="!loadingPerson" oncontextmenu="return false" onkeydown="return false"
-                        class="h-[105%] rounded-xl shadow-lg bg-white sm:space-x-0 space-y-1 w-full custom-scroll sm:overflow-y-auto sm:flex-col sm:py-1 sm:px-1"
-                        behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
-                        <Draggable v-for="item in personal" :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false:true"
-                            class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
-                            <div class="grid grid-cols-6">
-                                <div class="flex items-center w-full">
-                                    <img class="custom-image" :src="item.photo" draggable="false" alt="profile-photo" />
-                                </div>
-                                <div class="col-span-4 mx-1">
-                                    <p class="text-sm font-semibold leading-6 text-gray-900">
-                                        {{ item.Nombres_Apellidos }}
-                                    </p>
-                                    <p class="flex mt-1 text-xs leading-5 text-gray-500">
-                                        {{ item.Cargo }}
-                                    </p>
-                                </div>
-                                <div class="flex items-center justify-center w-full">
-                                    <button title="Horas programadas"
-                                    :class="personalHours[(item.Num_SAP)] < 9.5 ? 'bg-primary' : 'bg-success'"
-                                        class="flex items-center justify-center h-10 p-1 m-1 font-mono text-sm text-white align-middle rounded-md w-12"
-                                    @click="employeeDialog(item)">
-                                        <p >{{personalHours[(item.Num_SAP)]}} Horas </p>
-                                    </button>
-                                </div>
+                <Container v-if="!loadingPerson" oncontextmenu="return false" onkeydown="return false"
+                    class="h-[105%] rounded-xl shadow-lg bg-white sm:space-x-0 space-y-1 w-full custom-scroll sm:overflow-y-auto sm:flex-col sm:py-1 sm:px-1"
+                    behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
+                    <Draggable v-for="item in personal" :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
+                        class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
+                        <div class="grid grid-cols-6">
+                            <div class="flex items-center w-full">
+                                <img class="custom-image" :src="item.photo" draggable="false" alt="profile-photo" />
                             </div>
-                        </Draggable>
-                    </Container>
+                            <div class="col-span-4 mx-1">
+                                <p class="text-sm font-semibold leading-6 text-gray-900">
+                                    {{ item.Nombres_Apellidos }}
+                                </p>
+                                <p class="flex mt-1 text-xs leading-5 text-gray-500">
+                                    {{ item.Cargo }}
+                                </p>
+                            </div>
+                            <div class="flex items-center justify-center w-full">
+                                <button title="Horas programadas"
+                                    :class="personalHours[(item.Num_SAP)] < 9.5 ? 'bg-primary' : 'bg-success'"
+                                    class="flex items-center justify-center h-10 p-1 m-1 font-mono text-sm text-white align-middle rounded-md w-12"
+                                    @click="employeeDialog(item)">
+                                    <p>{{ personalHours[(item.Num_SAP)] }} Horas </p>
+                                </button>
+                            </div>
+                        </div>
+                    </Draggable>
+                </Container>
                 <!--#endregion -->
             </div>
         </div>
@@ -383,27 +389,29 @@ const employeeDialog = (item) => {
                             leave-from="opacity-100 translate-y-0 sm:scale-100"
                             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                             <DialogPanel
-                                class="relative grid grid-cols-1 px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 w-xl">
-                                <div>
-                                    <div class="px-2 mt-2 text-center">
-                                        <DialogTitle as="h3"
-                                            class="text-3xl font-semibold text-center capitalize text-primary">
-                                            Ver detalle de horario
-                                        </DialogTitle>
-                                    </div>
-                                    <div class="py-8 bg-white md:py-8">
-                                        <div
-                                            class="grid grid-cols-2 px-6 mx-auto max-w-7xl gap-x-8 gap-y-20 lg:px-8 xl:grid-cols-2">
+                                class="max-w-screen-2xl p-6 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8">
+
+                                <div class="px-2 mt-2 text-center">
+                                    <DialogTitle as="h3" class="text-3xl font-semibold text-center text-primary">
+                                        Ver detalle de horario
+                                    </DialogTitle>
+                                </div>
+                                <div class="py-2 bg-white">
+                                    <div class="grid grid-cols-4 mx-auto max-w-[100%] gap-x-2 gap-y-20">
+                                        <!--COLUMNA 1 (SECCIÓN INFORMACIÓN DEL EMPLEADO)-->
+                                        <div class="col-span-1">
                                             <div class="flex flex-col items-center justify-center gap-10 pt-12 sm:flex-col">
-                                                <img class="aspect-[4/5] w-52 flex-none rounded-3xl object-cover shadow-lg"
+                                                <img class="aspect-[4/5] w-32 flex-none rounded-3xl object-cover shadow-2xl"
                                                     :src="employee.photo" alt="Foto" />
                                                 <div class="max-w-xl text-center">
                                                     <h3
-                                                        class="text-lg font-semibold leading-8 tracking-tight text-gray-900">
+                                                        class="text-lg font-semibold whitespace-nowrap leading-8 tracking-tight text-gray-900">
                                                         {{ employee.Nombres_Apellidos }}
                                                     </h3>
-                                                    <p class="text-base leading-7 text-gray-600">{{ employee.Cargo }}</p>
-                                                    <p class="text-base leading-7 text-gray-600">{{ employee.Correo }}</p>
+                                                    <p class="text-base leading-7 text-gray-600">{{ employee.Cargo }}
+                                                    </p>
+                                                    <p class="text-base leading-7 text-gray-600">{{ employee.Correo }}
+                                                    </p>
                                                     <ul role="list" class="flex justify-center mt-6 gap-x-6">
                                                         <li>
                                                             <a :href="employee.twitterUrl"
@@ -428,14 +436,43 @@ const employeeDialog = (item) => {
                                                     </ul>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <!--COLUMNA 2 (FullCalendar) Y 3 (SELECCIÓN DE ACTIVIDADES)-->
+                                        <div class="flex flex-nowrap col-span-2">
+                                            <FullCalendar />
 
-                                            <div class="max-w-2xl border border-blue-500 border-solid rounded-lg shadow-md">
-                                                <div class="grid grid-cols-3 gap-1">
-                                                    <span v-for="horario in item.schedule_times"
-                                                        class="inline-flex items-center gap-x-1.5 rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-                                                        <!-- {{ format24h(horario.hora_inicio) }}-{{ format24h(horario.hora_fin) }} -->
-                                                    </span>
-                                                </div>
+                                        </div>
+                                        <!--SELECCIÓN DE ACTIVIDADES-->
+                                        <div
+                                            class="w-full col-span-1 m-1 p-3 overflow-hidden text-left overflow-y-auto custom-scroll bg-white rounded-lg shadow-xl sm:my-8">
+                                            <Combobox class="mt-2 text-left" label="Actividad"
+                                                placeholder="Seleccione Actividad" :options="tasks" v-model="taskSelect">
+                                            </Combobox>
+
+                                            <!--RADIO BUTTONS DE HORAS-->
+                                            <div class="flex flex-wrap space-x-2  w-full h-10 mt-4">
+                                                <input type="radio" name="action" value="Horas" v-model="showHours">
+                                                <label for="Horas">Intervalo</label>
+                                                <input type="radio" name="action" value="Resto" v-model="showHours">
+                                                <label for="Resto">Resto</label>
+                                            </div>
+
+                                            <div v-if="showHours === 'Horas'" class="w-full h-auto">
+                                                <!--CAMPO HORA INICIO-->
+                                                <TextInput class="mt-2 text-left" type="time" label="Hora de inicio">
+                                                </TextInput>
+
+                                                <!--CAMPO HORA FINALIZACIÓN-->
+                                                <TextInput class="mt-2 text-left" type="time" label="Hora de Finalización">
+                                                </TextInput>
+                                            </div>
+                                            <div class="mt-2 flex space-x-4 px-2">
+                                                <Button class="hover:bg-danger text-danger border-danger" severity="danger"
+                                                    @click="open = false">Cancelar</Button>
+                                                <Button severity="success" :loading="false"
+                                                    class="text-success hover:bg-success border-success" @click="submit()">
+                                                    Guardar
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>
