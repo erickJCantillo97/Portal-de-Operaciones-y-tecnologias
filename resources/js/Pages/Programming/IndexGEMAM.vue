@@ -325,23 +325,20 @@ const employeeDialog = (item) => {
 
                 <!--#region LISTA PERSONAL-->
                 <div v-if="loadingPerson"
-                    class="h-full row-start-1 shadow-lg sm:col-start-3 sm:flex sm:flex-col sm:items-center sm:justify-center rounded-xl">
+                    class="h-[105%] row-start-1 shadow-lg sm:col-start-3 sm:flex sm:flex-col sm:items-center sm:justify-center rounded-xl">
                     <span class="flex items-center justify-center w-full h-full loader">
                         <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
                     </span>
                     <p class="font-bold animate-pulse text-primary"> Cargando personas</p>
                 </div>
-                <div v-if="!loadingPerson"
-                    class="h-full row-start-1 divide-y divide-gray-100 shadow-lg sm:col-start-3 ring-1 ring-gray-900/5 rounded-xl">
-                    <h2 class="font-semibold text-center capitalize text-primary">Personal</h2>
-                    <Container
-                        class="flex h-full sm:space-x-0 w-full custom-scroll sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
+                    <Container v-if="!loadingPerson" oncontextmenu="return false" onkeydown="return false"
+                        class="h-[105%] rounded-xl shadow-lg bg-white sm:space-x-0 w-full custom-scroll sm:overflow-y-auto sm:flex-col sm:py-1 sm:px-1"
                         behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
                         <Draggable v-for="item in personal" :drag-not-allowed="false"
                             class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
                             <div class="grid grid-cols-6">
                                 <div class="flex items-center w-full">
-                                    <img class="custom-image" :src="item.photo" alt="profile-photo" />
+                                    <img class="custom-image" :src="item.photo" draggable="false" alt="profile-photo" />
                                 </div>
                                 <div class="col-span-4 mx-1">
                                     <p class="text-sm font-semibold leading-6 text-gray-900">
@@ -362,7 +359,6 @@ const employeeDialog = (item) => {
                             </div>
                         </Draggable>
                     </Container>
-                </div>
                 <!--#endregion -->
             </div>
         </div>
