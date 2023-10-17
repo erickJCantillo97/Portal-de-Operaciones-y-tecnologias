@@ -36,23 +36,31 @@ class ProgrammingController extends Controller
             'fecha' => 'required|date',
             ]);
 
-            $schedule = Schedule::firstOrNew($validateData);
-            $schedule->save();
+            $status = true;
+            $codigo = 0;
+            $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
 
-                // $segundosAcumulados = ScheduleTime::where('schedule_id' , $schedule->id,)->selectRaw('SUM(TIME_TO_SEC(datediff(hora_fin, hora_inicio))) as diferencia_acumulada')->get();
+            if($hours < 9.5){
+                $schedule = Schedule::firstOrNew($validateData);
+                $schedule->save();
 
-                // return $segundosAcumulados[0]->diferencia_acumulada/3600;
+                ScheduleTime::create([
+                    'schedule_id' => $schedule->id,
+                    'hora_inicio' => '7:00',
+                    'hora_fin' => '16:30'
+                ]);
+            }else{
+                $status = false;
+                $codigo = 1001; //Codigo para el caso en se trate de programar alguien con mas de 9.5 horas
+            }
 
-
-            ScheduleTime::create([
-                'schedule_id' => $schedule->id,
-                'hora_inicio' => '7:00',
-                'hora_fin' => '16:30'
-            ]);
+            $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
 
             return response()->json([
-                'status' => true,
+                'status' => $status,
+                'codigo' => $codigo,
                 'task' => $this->getSchedule($validateData['fecha'],$validateData['task_id'] ),
+                'hours' => $hours
             ], 200);
         } catch (Exception $e) {
             return $e;
@@ -72,6 +80,7 @@ class ProgrammingController extends Controller
         return response()->json([
             'status' => true,
             'task' => $this->getSchedule($schedule->fecha, $schedule->task_id ),
+            'hours' => $this->getAssignmentHour($schedule->fecha, $schedule->employee_id)
         ], 200);
     }
 
@@ -152,5 +161,20 @@ class ProgrammingController extends Controller
     }
     private function getSchedule($fecha, $taskId){
         return  Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get();
+    }
+
+
+    /*
+    * Esta función obtiene el numero de horas asignadas a una persona en una fecha especifica
+    */
+    public function getAssignmentHour($fecha, $userId){
+        $schedule = Schedule::where([
+            'fecha' => $fecha,
+            'employee_id' => $userId
+        ])->pluck('id')->toArray();
+
+        $horas_acumulados = ScheduleTime::whereIn('schedule_id' , $schedule,)->selectRaw('SUM(datediff(mi,hora_inicio, hora_fin)) as diferencia_acumulada')->get();
+
+        return  $horas_acumulados[0]->diferencia_acumulada/60;
     }
 }

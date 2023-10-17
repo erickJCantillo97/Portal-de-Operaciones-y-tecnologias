@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Personal\PersonalController;
+use App\Http\Controllers\Personal\ProgrammingController;
 use App\Models\Labor;
 use Illuminate\Support\Facades\Route;
 
@@ -24,4 +25,6 @@ use Illuminate\Support\Facades\Route;
         Route::get('getCargos', [personalController::class, 'getCargos'])->name('get.cargos');
 
         Route::get('getPersonal', [personalController::class, 'getPersonal'])->name('get.personal');
+
+        Route::get('getAssignmentHour/{fecha}/{userId}', [ProgrammingController::class, 'getAssignmentHour'])->name('get.assignment.hours');
 });
