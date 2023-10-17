@@ -17,12 +17,13 @@ const { toast } = useSweetalert();
 
 //#region Draggable
 const listaDatos = ref({})
-const fecha = ref(new Date().toISOString().split("T")[0])
+const date = ref(new Date().toISOString().split("T")[0])
 const personal = ref()
-const dates = ref([]);
+
 const tasks = ref([]);
 const loadingProgram = ref(true);
 const loadingPerson = ref(true);
+const personalHours = ref({});
 const loadingTasks = ref(true)
 const loadingTask = ref({})
 const optionValue = ref('today')
@@ -33,11 +34,19 @@ const onDrop = async (collection, dropResult) => {
     const { addedIndex, payload } = dropResult;
     if (addedIndex !== null) {
         loadingTask.value[collection] = true
-        await axios.post(route('programming.store'), { task_id: collection, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: dates.value[0] }).then((res) => {
+        await axios.post(route('programming.store'), { task_id: collection, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: date.value }).then((res) => {
             listaDatos.value[collection] = res.data.task
+            personalHours.value[(payload.Num_SAP)] = res.data.hours
             loadingTask.value[collection] = false
         })
     }
+
+}
+
+const getAssignmentHours = (employee_id) => {
+    axios.get(route('get.assignment.hours', [date.value, employee_id])).then((res) => {
+        personalHours.value[(employee_id)] = res.data;
+    })
 }
 
 // El código anterior define una función llamada `getFoto` que toma un parámetro `correo`. Dentro de la
@@ -63,6 +72,11 @@ onMounted(() => {
     getTask('tomorrow')
     axios.get(route('get.personal')).then((res) => {
         personal.value = Object.values(res.data.personal)
+        personal.value.forEach(element => {
+            axios.get(route('get.assignment.hours', [date.value, (element.Num_SAP)])).then((res) => {
+                personalHours.value[(element.Num_SAP)] = res.data;
+            });
+        })
         loadingPerson.value = false
     })
 })
@@ -70,43 +84,33 @@ onMounted(() => {
 
 // El código anterior es una función de Vue.js que recupera tareas según la opción seleccionada.
 const getTask = async (option) => {
-    const today = new Date();
+    loadingProgram.value = true
     optionValue.value = option
     switch (option) {
         case 'today':
-            dates.value[0] = today;
-            dates.value[1] = today;
+            date.value = new Date().toISOString().split("T")[0];
             break;
         case 'tomorrow':
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            dates.value[0] = tomorrow;
-            dates.value[1] = tomorrow;
-            break;
-
-        case 'date':
-            dates.value[0] = fecha.value;
-            dates.value[1] = fecha.value;
+            var tomorrow = new Date()
+            date.value = new Date(tomorrow.setDate(tomorrow.getDate() + 1)).toISOString().split("T")[0];
             break;
         default:
             break;
     }
-
-    if (dates.value[1] != null) {
-        tasks.value = [];
-        await axios.get(route('actividadesDeultimonivel', { dates: dates.value })).then((res) => {
-            tasks.value = res.data
-            loadingProgram.value = false;
+    tasks.value = [];
+    await axios.get(route('actividadesDeultimonivel', { date: date.value })).then((res) => {
+        tasks.value = res.data
+        loadingProgram.value = false;
+    })
+    tasks.value.forEach(element => {
+        loadingTask.value[element.id] = true
+        axios.get(route('get.schedule.task', { task_id: element.id, date: date.value })).then((res) => {
+            listaDatos.value[element.id] = res.data.schedule
+            loadingTask.value[element.id] = false
+            loadingTasks.value = false
         })
-        tasks.value.forEach(element => {
-            loadingTask.value[element.id] = true
-            axios.get(route('get.schedule.task', { task_id: element.id, date: dates.value[0] })).then((res) => {
-                listaDatos.value[element.id] = res.data.schedule
-                loadingTask.value[element.id] = false
-                loadingTasks.value = false
-            })
-        });
-    }
+    });
+
 }
 
 // El código anterior es una función llamada `format24h` que toma un parámetro `hora` (que representa
@@ -124,11 +128,13 @@ function format24h(hora) {
 // la solicitud tiene éxito, registra la respuesta en la consola, elimina un elemento de la matriz
 // "listaDatos.value[task.id]" en el índice especificado y muestra un mensaje de notificación de éxito.
 // También hay definida una función "editar" vacía.
-const quitar = async (task, index, person) => {
-    await axios.post(route('programming.delete'), { task_id: task, employee_id: person.Num_SAP, fecha: fecha }).then((res) => {
-        console.log(res)
-        listaDatos.value[task.id].splice(index, 1);
-        toast('Se ha eliminado a ' + person.Nombres_Apellidos + ' de la tarea ' + task.name, 'success');
+const deleteSchedule = async (task, index, schedule) => {
+
+    await axios.post(route('programming.delete', schedule.id)).then((res) => {
+        listaDatos.value[task.id] = res.data.task
+        console.log(schedule)
+        getAssignmentHours((schedule.employee_id))
+        toast('Se ha eliminado a ' + schedule.name + ' de la tarea ' + task.name, 'success');
     })
 }
 
@@ -220,7 +226,7 @@ const submit = () => {
                     <input
                         :class="optionValue == 'date' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
                         class="inline-flex items-center px-3 py-2 -ml-px text-xs font-semibold rounded-md shadow-md alturah8 text-primary border-primary"
-                        type="date" name="date" id="date" v-model="fecha" @change="getTask('date')">
+                        type="date" name="date" id="date" v-model="date" @change="getTask('date')">
                 </div>
             </div>
             <div class="grid h-full grid-rows-auto sm:grid-rows-1 sm:grid-cols-3 sm:gap-2">
@@ -235,7 +241,7 @@ const submit = () => {
 
                 <div v-if="!loadingProgram"
                     class="h-full row-span-6 row-start-2 p-1 overflow-y-auto sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 custom-scroll snap-y snap-proximity rounded-xl">
-                    <!-- <div v-for="task in tasks"
+                    <div v-for="task in tasks"
                         class="flex flex-col justify-between p-2 border rounded-md shadow-md h-1/2 sm:h-1/2 snap-start">
                         <div class="grid grid-rows-2">
                             <div class="">
@@ -295,7 +301,8 @@ const submit = () => {
                                 <div v-for="(item, index) in listaDatos[task.id]" class="p-1 mt-1 border-2 rounded-md">
                                     <div class="flex items-center justify-between w-full">
                                         <p class="text-sm font-semibold ">{{ item.name }}</p>
-                                        <button v-tooltip.top="'En desarrollo'" @click="quitar(task, index, item)">
+                                        <button v-tooltip.top="'Eliminar de la Actividad'"
+                                            @click="deleteSchedule(task, index, item)">
                                             <XMarkIcon
                                                 class="h-4 p-0.5 border rounded-md text-white bg-danger border-danger hover:animate-pulse hover:scale-125" />
                                         </button>
@@ -324,49 +331,46 @@ const submit = () => {
                                     para agregarla a la actividad </p>
                             </div>
                         </Container>
-                    </div> -->
+                    </div>
                 </div>
                 <!--#endregion -->
 
                 <!--#region LISTA PERSONAL-->
                 <div v-if="loadingPerson"
-                    class="h-full row-start-1 shadow-lg sm:col-start-3 sm:flex sm:flex-col sm:items-center sm:justify-center rounded-xl">
+                    class="h-[105%] row-start-1 shadow-lg sm:col-start-3 sm:flex sm:flex-col sm:items-center sm:justify-center rounded-xl">
                     <span class="flex items-center justify-center w-full h-full loader">
                         <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
                     </span>
                     <p class="font-bold animate-pulse text-primary"> Cargando personas</p>
                 </div>
-                <div v-if="!loadingPerson"
-                    class="h-full row-start-1 overflow-y-hidden divide-y divide-gray-100 shadow-lg sm:col-start-3 sm:overflow-y-auto sm:block custom-scroll ring-1 ring-gray-900/5 rounded-xl">
-                    <h2 class="font-semibold text-center capitalize text-primary">Personal</h2>
-                    <Container
-                        class="flex h-[87%] sm:space-x-0 w-full overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
-                        behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
-                        <Draggable v-for="item in personal" :drag-not-allowed="false"
-                            class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
-                            <div class="grid grid-cols-6">
-                                <div class="flex items-center w-full">
-                                    <img class="custom-image" :src="item.photo" alt="profile-photo" />
-                                </div>
-                                <div class="col-span-4 mx-1">
-                                    <p class="text-sm font-semibold leading-6 text-gray-900">
-                                        {{ item.Nombres_Apellidos }}
-                                    </p>
-                                    <p class="flex mt-1 text-xs leading-5 text-gray-500">
-                                        {{ item.Cargo }}
-                                    </p>
-                                </div>
-                                <div class="flex items-center justify-center w-full">
-                                    <button
-                                        class="flex items-center justify-center h-6 p-1 m-1 font-mono text-sm text-white align-middle rounded-md w-9 bg-primary"
-                                        v-tooltip.top="'Ver programacion'" @click="employeeDialog(item)">
-                                        <p> 1.0H </p>
-                                    </button>
-                                </div>
+                <Container v-if="!loadingPerson" oncontextmenu="return false" onkeydown="return false"
+                    class="h-[105%] rounded-xl shadow-lg bg-white sm:space-x-0 space-y-1 w-full custom-scroll sm:overflow-y-auto sm:flex-col sm:py-1 sm:px-1"
+                    behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
+                    <Draggable v-for="item in personal" :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
+                        class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
+                        <div class="grid grid-cols-6">
+                            <div class="flex items-center w-full">
+                                <img class="custom-image" :src="item.photo" draggable="false" alt="profile-photo" />
                             </div>
-                        </Draggable>
-                    </Container>
-                </div>
+                            <div class="col-span-4 mx-1">
+                                <p class="text-sm font-semibold leading-6 text-gray-900">
+                                    {{ item.Nombres_Apellidos }}
+                                </p>
+                                <p class="flex mt-1 text-xs leading-5 text-gray-500">
+                                    {{ item.Cargo }}
+                                </p>
+                            </div>
+                            <div class="flex items-center justify-center w-full">
+                                <button title="Horas programadas"
+                                    :class="personalHours[(item.Num_SAP)] < 9.5 ? 'bg-primary' : 'bg-success'"
+                                    class="flex items-center justify-center h-10 p-1 m-1 font-mono text-sm text-white align-middle rounded-md w-12"
+                                    @click="employeeDialog(item)">
+                                    <p>{{ personalHours[(item.Num_SAP)] }} Horas </p>
+                                </button>
+                            </div>
+                        </div>
+                    </Draggable>
+                </Container>
                 <!--#endregion -->
             </div>
         </div>

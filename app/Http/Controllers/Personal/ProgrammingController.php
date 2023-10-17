@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Projects;
+namespace App\Http\Controllers\Personal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Schedule;
@@ -24,8 +24,6 @@ class ProgrammingController extends Controller
      *
      * @param {Request} request - El parámetro `` es una instancia de la clase
      * `Illuminate\Http\Request`. Representa la solicitud HTTP realizada al servidor y contiene
-     * información como el método de solicitud, encabezados y datos de entrada.
-     *
      * @returns una respuesta JSON con un estado y datos de la tarea.
      */
     public function store(Request $request)
@@ -36,21 +34,33 @@ class ProgrammingController extends Controller
             'employee_id' => 'required',
             'name' => 'required',
             'fecha' => 'required|date',
-        ]);
+            ]);
 
-        $schedule = Schedule::firstOrNew($validateData);
-        $schedule->save();
-        ScheduleTime::create([
-            'schedule_id' => $schedule->id,
-            'hora_inicio' => '7:00',
-            'hora_fin' => '16:30'
-        ]);
+            $status = true;
+            $codigo = 0;
+            $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
 
-        $task = Schedule::where('fecha', $validateData['fecha'])->with('scheduleTimes')->where('task_id', $validateData['task_id'])->get();
+            if($hours < 9.5){
+                $schedule = Schedule::firstOrNew($validateData);
+                $schedule->save();
+
+                ScheduleTime::create([
+                    'schedule_id' => $schedule->id,
+                    'hora_inicio' => '7:00',
+                    'hora_fin' => '16:30'
+                ]);
+            }else{
+                $status = false;
+                $codigo = 1001; //Codigo para el caso en se trate de programar alguien con mas de 9.5 horas
+            }
+
+            $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
 
             return response()->json([
-                'status' => true,
-                'task' => $task,
+                'status' => $status,
+                'codigo' => $codigo,
+                'task' => $this->getSchedule($validateData['fecha'],$validateData['task_id'] ),
+                'hours' => $hours
             ], 200);
         } catch (Exception $e) {
             return $e;
@@ -63,10 +73,15 @@ class ProgrammingController extends Controller
         return Inertia::render('Programming/IndexGEMAM');
     }
 
-    public function delete(Request $request)
+    public function deleteSchedule(Schedule $schedule)
     {
-        //hace algo
-        return 'Hecho';
+        $schedule->delete();
+        ScheduleTime::where('schedule_id', $schedule->id)->delete();
+        return response()->json([
+            'status' => true,
+            'task' => $this->getSchedule($schedule->fecha, $schedule->task_id ),
+            'hours' => $this->getAssignmentHour($schedule->fecha, $schedule->employee_id)
+        ], 200);
     }
 
     /**
@@ -86,7 +101,12 @@ class ProgrammingController extends Controller
         if (isset($request->dates[0])) {
             $date_start = Carbon::parse($request->dates[0])->format('Y-m-d');
             $date_end = Carbon::parse($request->dates[1])->format('Y-m-d');
-        } else {
+        }
+        elseif(isset($request->date)){
+            $date_start = Carbon::parse($request->date)->format('Y-m-d');
+            $date_end = Carbon::parse($request->date)->format('Y-m-d');
+        }
+        else {
             $date_start = Carbon::now()->format('Y-m-d');
             $date_end = Carbon::now()->format('Y-m-d');
         }
@@ -138,5 +158,23 @@ class ProgrammingController extends Controller
         return response()->json([
             'schedule' => $schedule,
         ], 200);
+    }
+    private function getSchedule($fecha, $taskId){
+        return  Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get();
+    }
+
+
+    /*
+    * Esta función obtiene el numero de horas asignadas a una persona en una fecha especifica
+    */
+    public function getAssignmentHour($fecha, $userId){
+        $schedule = Schedule::where([
+            'fecha' => $fecha,
+            'employee_id' => $userId
+        ])->pluck('id')->toArray();
+
+        $horas_acumulados = ScheduleTime::whereIn('schedule_id' , $schedule,)->selectRaw('SUM(datediff(mi,hora_inicio, hora_fin)) as diferencia_acumulada')->get();
+
+        return  $horas_acumulados[0]->diferencia_acumulada/60;
     }
 }

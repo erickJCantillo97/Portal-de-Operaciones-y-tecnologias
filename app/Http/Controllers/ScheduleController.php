@@ -171,8 +171,6 @@ class ScheduleController extends Controller
 
     public function syncImporter(Project $project, Request $request)
     {
-
-
         return response()->json([
             'success' => true,
             'requestId' => $request->requestId,

@@ -177,7 +177,7 @@ const showShips = (selectCustomer) => {
                 </div>
             </div>
             <!--DATATABLE-->
-            <DataTable id="tabla" stripedRows class="p-datatable-sm" :scrollHeight="height" :value="customers"
+            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="customers"
                 v-model:filters="filters" dataKey="id" filterDisplay="menu" :loading="props.loading"
                 :globalFilterFields="['NIT', 'name', 'type', 'email']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
