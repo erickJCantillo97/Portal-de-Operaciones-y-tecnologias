@@ -16,7 +16,6 @@ const { toast } = useSweetalert();
 const listaDatos = ref({})
 const date = ref(new Date().toISOString().split("T")[0])
 const personal = ref()
-const dates = ref([]);
 const tasks = ref([]);
 const loadingProgram = ref(true);
 const loadingPerson = ref(true);
@@ -30,7 +29,7 @@ const onDrop = async (collection, dropResult) => {
     const { addedIndex, payload } = dropResult;
     if (addedIndex !== null) {
         loadingTask.value[collection] = true
-        await axios.post(route('programming.store'), { task_id: collection, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: dates.value[0] }).then((res) => {
+        await axios.post(route('programming.store'), { task_id: collection, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: date.value }).then((res) => {
             listaDatos.value[collection] = res.data.task
             loadingTask.value[collection] = false
         })
@@ -68,42 +67,33 @@ onMounted(() => {
 
 // El código anterior es una función de Vue.js que recupera tareas según la opción seleccionada.
 const getTask = async (option) => {
+    loadingProgram.value=true
     optionValue.value = option
     switch (option) {
         case 'today':
-            dates.value[0] = new Date();
-            dates.value[1] = new Date();
+            date.value = new Date().toISOString().split("T")[0];
             break;
         case 'tomorrow':
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            date.value = tomorrow.toISOString().split("T")[0];
-            dates.value[0] = tomorrow;
-            dates.value[1] = tomorrow;
-            break;
-        case 'date':
-            dates.value[0] = date.value;
-            dates.value[1] = date.value;
+            var tomorrow = new Date()
+            date.value = new Date(tomorrow.setDate(tomorrow.getDate() + 1)).toISOString().split("T")[0];
             break;
         default:
             break;
     }
-
-    if (dates.value[1] != null) {
-        tasks.value = [];
-        await axios.get(route('actividadesDeultimonivel', { dates: dates.value })).then((res) => {
-            tasks.value = res.data
-            loadingProgram.value = false;
+    tasks.value = [];
+    await axios.get(route('actividadesDeultimonivel', { date: date.value })).then((res) => {
+        tasks.value = res.data
+        loadingProgram.value = false;
+    })
+    tasks.value.forEach(element => {
+        loadingTask.value[element.id] = true
+        axios.get(route('get.schedule.task', { task_id: element.id, date: date.value })).then((res) => {
+            listaDatos.value[element.id] = res.data.schedule
+            loadingTask.value[element.id] = false
+            loadingTasks.value = false
         })
-        tasks.value.forEach(element => {
-            loadingTask.value[element.id] = true
-            axios.get(route('get.schedule.task', { task_id: element.id, date: dates.value[0] })).then((res) => {
-                listaDatos.value[element.id] = res.data.schedule
-                loadingTask.value[element.id] = false
-                loadingTasks.value = false
-            })
-        });
-    }
+    });
+
 }
 
 // El código anterior es una función llamada `format24h` que toma un parámetro `hora` (que representa
@@ -121,11 +111,10 @@ function format24h(hora) {
 // la solicitud tiene éxito, registra la respuesta en la consola, elimina un elemento de la matriz
 // "listaDatos.value[task.id]" en el índice especificado y muestra un mensaje de notificación de éxito.
 // También hay definida una función "editar" vacía.
-const deleteSchedule = async (task, index, person) => {
-    await axios.post(route('programming.delete'), { task_id: task, employee_id: person.Num_SAP, fecha: fecha }).then((res) => {
-        console.log(res)
-        listaDatos.value[task.id].splice(index, 1);
-        toast('Se ha eliminado a ' + person.Nombres_Apellidos + ' de la tarea ' + task.name, 'success');
+const deleteSchedule = async (task, index, schedule) => {
+    await axios.post(route('programming.delete', schedule.id )).then((res) => {
+        listaDatos.value[task.id]=res.data.task
+        toast('Se ha eliminado a ' + schedule.name + ' de la tarea ' + task.name, 'success');
     })
 }
 
@@ -279,7 +268,7 @@ const employeeDialog = (item) => {
                             <span class="flex items-center justify-center w-full h-full loader">
                                 <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
                             </span>
-                            <p class="font-bold animate-pulse text-primary">{{ loadingTasks ? 'Cargando personas asignadas':'Guardando cambios'}}</p>
+                            <p class="font-bold animate-pulse text-primary">{{ loadingTasks ? 'Cargando personasa signadas':'Guardando cambios'}}</p>
                         </div>
                         <Container v-if="!loadingTask[task.id]"
                             class="h-full p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
@@ -289,7 +278,8 @@ const employeeDialog = (item) => {
                                 <div v-for="(item, index) in listaDatos[task.id]" class="p-1 mt-1 border-2 rounded-md">
                                     <div class="flex items-center justify-between w-full">
                                         <p class="text-sm font-semibold ">{{ item.name }}</p>
-                                        <button v-tooltip.top="'Eliminar de la Actividad'" @click="deleteSchedule(task, index, item)">
+                                        <button v-tooltip.top="'Eliminar de la Actividad'"
+                                            @click="deleteSchedule(task, index, item)">
                                             <XMarkIcon
                                                 class="h-4 p-0.5 border rounded-md text-white bg-danger border-danger hover:animate-pulse hover:scale-125" />
                                         </button>
@@ -331,10 +321,10 @@ const employeeDialog = (item) => {
                     <p class="font-bold animate-pulse text-primary"> Cargando personas</p>
                 </div>
                 <div v-if="!loadingPerson"
-                    class="h-full row-start-1 overflow-y-hidden divide-y divide-gray-100 shadow-lg sm:col-start-3 sm:overflow-y-auto sm:block custom-scroll ring-1 ring-gray-900/5 rounded-xl">
+                    class="h-full row-start-1 divide-y divide-gray-100 shadow-lg sm:col-start-3 ring-1 ring-gray-900/5 rounded-xl">
                     <h2 class="font-semibold text-center capitalize text-primary">Personal</h2>
                     <Container
-                        class="flex h-[87%] sm:space-x-0 w-full overflow-x-auto sm:overflow-x-hidden sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
+                        class="flex h-full sm:space-x-0 w-full custom-scroll sm:overflow-y-auto sm:block sm:py-1 sm:px-1"
                         behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
                         <Draggable v-for="item in personal" :drag-not-allowed="false"
                             class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">

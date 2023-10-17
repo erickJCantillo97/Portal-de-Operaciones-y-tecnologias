@@ -16,7 +16,9 @@ import Button from "@/Components/Button.vue";
 import ProgressBar from "primevue/progressbar";
 import DataChart from "./DataChart.vue";
 import "../../sass/dataTableCustomized.scss";
+import DolarTRM from "./DolarTRM.vue";
 // import TimeLine from './TimeLine.vue';
+
 
 const props = defineProps({
     projects: Array,
@@ -36,7 +38,6 @@ const colors = {
     GEFAD: "bg-sky-500",
     GECON: "bg-pink-500",
 };
-
 const personal = ref([]);
 const totalMembers = ref(0);
 const loading = ref(false);
@@ -44,7 +45,7 @@ const tasks = ref([]);
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
-
+const chartOptions = ref();
 onMounted(() => {
     initFilters();
     // axios.get(route('get.empleados.gerencia')).then((res) => {
@@ -59,7 +60,8 @@ onMounted(() => {
     //     }
     // })
     // getTask();
-});
+}
+);
 
 const formatCurrency = (value) => {
     return parseFloat(value).toLocaleString("es-CO", {
@@ -100,13 +102,16 @@ const clearFilter = () => {
 
 <template>
     <AppLayout>
-        <div class="max-h-screen space-y-5 overflow-y-scroll sm:p-6">
+        <div class="max-h-screen space-y-5 overflow-y-scroll custom-scroll sm:p-6">
             <!-- <div class="max-w-full p-3 border-2 border-blue-100 rounded-xl">
                             <dl class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                                 <ProjectCard v-for="project of projects" :project="project" :activo="false" />
                             </dl>
                         </div> -->
-            <UserHeader></UserHeader>
+            <div class="flex justify-between">
+                <UserHeader/>
+                <DolarTRM />
+            </div>
             <!--DATATABLE PROYECTOS-->
             <div class="p-3 m-1 shadow-md rounded-xl">
                 <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"

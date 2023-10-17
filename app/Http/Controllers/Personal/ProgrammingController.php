@@ -92,7 +92,12 @@ class ProgrammingController extends Controller
         if (isset($request->dates[0])) {
             $date_start = Carbon::parse($request->dates[0])->format('Y-m-d');
             $date_end = Carbon::parse($request->dates[1])->format('Y-m-d');
-        } else {
+        }
+        elseif(isset($request->date)){
+            $date_start = Carbon::parse($request->date)->format('Y-m-d');
+            $date_end = Carbon::parse($request->date)->format('Y-m-d');
+        }
+        else {
             $date_start = Carbon::now()->format('Y-m-d');
             $date_end = Carbon::now()->format('Y-m-d');
         }
@@ -145,9 +150,7 @@ class ProgrammingController extends Controller
             'schedule' => $schedule,
         ], 200);
     }
-
     private function getSchedule($fecha, $taskId){
         return  Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get();
     }
-
 }
