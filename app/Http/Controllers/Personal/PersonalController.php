@@ -35,7 +35,7 @@ class PersonalController extends Controller
     public function getPersonal(){
         $personal = getPersonalGerenciaOficina(auth()->user()->gerencia, auth()->user()->oficina)->map(function ($person)  {
             return [
-                'Num_SAP' => $person['Num_SAP'],
+                'Num_SAP' => (int) $person['Num_SAP'],
                 'Correo' => $person['Correo'],
                 'Nombres_Apellidos' => $person['Nombres_Apellidos'],
                 'Cargo' => $person['Cargo'],
