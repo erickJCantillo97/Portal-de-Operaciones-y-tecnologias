@@ -16,4 +16,8 @@ class Schedule extends Model
     public function scheduleTimes(){
         return $this->hasMany(ScheduleTime::class);
     }
+
+    public function task(){
+        return $this->hasOne(Task::class);
+    }
 }
