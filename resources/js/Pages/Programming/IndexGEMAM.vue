@@ -159,6 +159,10 @@ const Resto = ref(false)
 const employeeDialog = (item) => {
     open.value = true
     employee.value = item
+    axios.get(route('get.times.employees', {date: date.value, employee_id: item.Num_SAP})).then( (res) => {
+        console.log(res.data)
+    }
+    )
 }
 
 const clearOptions = () => {

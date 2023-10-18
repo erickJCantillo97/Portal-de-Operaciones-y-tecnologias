@@ -21,10 +21,11 @@ use Illuminate\Support\Facades\Route;
 
         Route::get('getPersonalCargo/', [PersonalController::class, 'getPersonalCargo'])->name('get.personal.cargo');
 
-
         Route::get('getCargos', [personalController::class, 'getCargos'])->name('get.cargos');
 
         Route::get('getPersonal', [personalController::class, 'getPersonal'])->name('get.personal');
 
         Route::get('getAssignmentHour/{fecha}/{userId}', [ProgrammingController::class, 'getAssignmentHour'])->name('get.assignment.hours');
+
+        Route::get('getTimesEmployee', [ProgrammingController::class, 'getTimesSchedulesEmployee'])->name('get.times.employees');
 });

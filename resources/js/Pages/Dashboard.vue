@@ -16,6 +16,7 @@ import Button from "@/Components/Button.vue";
 import ProgressBar from "primevue/progressbar";
 import DataChart from "./DataChart.vue";
 import "../../sass/dataTableCustomized.scss";
+
 // import TimeLine from './TimeLine.vue';
 
 
