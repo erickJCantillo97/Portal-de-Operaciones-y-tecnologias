@@ -185,7 +185,15 @@ class ProgrammingController extends Controller
 
         $schedulesIds = Schedule::where('fecha', $date)->with('scheduleTimes')->where('employee_id', $request->employee_id)->pluck('id')->toArray();
 
-        $times = ScheduleTime::whereIn('schedule_id', $schedulesIds)->with('schedule', 'schedule.task')->get();
+        $times = ScheduleTime::whereIn('schedule_id', $schedulesIds)->with('schedule', 'schedule.task', 'schedule.task.project')->get()->map(function ($time){
+            return [
+                'id' => $time['id'],
+                'hora_inicio' => $time['hora_inicio'],
+                'hora_fin' => $time['hora_fin'],
+                'task' => $time['schedule']['task']['name'],
+                'project' => $time['schedule']['task']['project']['name'],
+            ];
+        });
 
         return response()->json([
             'times' => $times,
