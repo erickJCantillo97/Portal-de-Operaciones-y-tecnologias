@@ -12,4 +12,8 @@ class ScheduleTime extends Model
     use SoftDeletes;
 
     protected $guarded = [];
+
+    public function Schedule(){
+        return $this->belongsTo(Schedule::class);
+    }
 }

@@ -155,6 +155,7 @@ class ProgrammingController extends Controller
 
         $schedule = Schedule::where('fecha', $date)->with('scheduleTimes')->where('task_id', $request->task_id)->get();
 
+
         return response()->json([
             'schedule' => $schedule,
         ], 200);
@@ -176,5 +177,19 @@ class ProgrammingController extends Controller
         $horas_acumulados = ScheduleTime::whereIn('schedule_id' , $schedule,)->selectRaw('SUM(datediff(mi,hora_inicio, hora_fin)) as diferencia_acumulada')->get();
 
         return  $horas_acumulados[0]->diferencia_acumulada/60;
+    }
+
+
+    public function getTimesSchedulesEmployee(Request $request){
+        $date = Carbon::parse($request->date)->format('Y-m-d');
+
+        $schedulesIds = Schedule::where('fecha', $date)->with('scheduleTimes')->where('employee_id', $request->employee_id)->pluck('id')->toArray();
+
+        $times = ScheduleTime::whereIn('schedule_id', $schedulesIds)->with('schedule', 'schedule.task')->get();
+
+        return response()->json([
+            'times' => $times,
+        ]);
+
     }
 }
