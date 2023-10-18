@@ -147,7 +147,11 @@ const editar = () => {
 const employee = ref([])
 const open = ref(false)
 const taskSelect = ref()
+const turnSelect = ref()
+const selectedOption = ref('Horas')
 const showHours = ref(false)
+const showTurns = ref(false)
+const Resto = ref(false)
 
 // El código anterior define una función llamada `employeeDialog` que toma un parámetro `item`. Dentro
 // de la función, establece el valor de "open" en "verdadero" y el valor de "employee" en el
@@ -155,6 +159,11 @@ const showHours = ref(false)
 const employeeDialog = (item) => {
     open.value = true
     employee.value = item
+}
+
+const clearOptions = () => {
+    showHours.value = ''
+    showTurns.value = ''
 }
 
 const submit = () => {
@@ -346,7 +355,8 @@ const submit = () => {
                 <Container v-if="!loadingPerson" oncontextmenu="return false" onkeydown="return false"
                     class="h-[105%] rounded-xl shadow-lg bg-white sm:space-x-0 space-y-1 w-full custom-scroll sm:overflow-y-auto sm:flex-col sm:py-1 sm:px-1"
                     behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
-                    <Draggable v-for="item in personal" :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
+                    <Draggable v-for="item in personal"
+                        :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
                         class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
                         <div class="grid grid-cols-6">
                             <div class="flex items-center w-full">
@@ -437,12 +447,12 @@ const submit = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <!--COLUMNA 2 (FullCalendar) Y 3 (SELECCIÓN DE ACTIVIDADES)-->
+                                        <!--COLUMNA 2 - (FullCalendar)-->
                                         <div class="flex flex-nowrap col-span-2">
                                             <FullCalendar />
 
                                         </div>
-                                        <!--SELECCIÓN DE ACTIVIDADES-->
+                                        <!--COLUMNA 3 - SELECCIÓN DE ACTIVIDADES-->
                                         <div
                                             class="w-full col-span-1 m-1 p-3 overflow-hidden text-left overflow-y-auto custom-scroll bg-white rounded-lg shadow-xl sm:my-8">
                                             <Combobox class="mt-2 text-left" label="Actividad"
@@ -453,10 +463,13 @@ const submit = () => {
                                             <div class="flex flex-wrap space-x-2  w-full h-10 mt-4">
                                                 <input type="radio" name="action" value="Horas" v-model="showHours">
                                                 <label for="Horas">Intervalo</label>
-                                                <input type="radio" name="action" value="Resto" v-model="showHours">
+                                                <input type="radio" name="action" value="Resto" v-model="Resto">
                                                 <label for="Resto">Resto</label>
+                                                <input type="radio" name="action" value="Turno" v-model="showTurns">
+                                                <label for="Turno">Turno</label>
                                             </div>
 
+                                            <!--sección de selección de horas-->
                                             <div v-if="showHours === 'Horas'" class="w-full h-auto">
                                                 <!--CAMPO HORA INICIO-->
                                                 <TextInput class="mt-2 text-left" type="time" label="Hora de inicio">
@@ -466,6 +479,22 @@ const submit = () => {
                                                 <TextInput class="mt-2 text-left" type="time" label="Hora de Finalización">
                                                 </TextInput>
                                             </div>
+
+                                            <!--sección de selección de turnos-->
+                                            <div v-if="showTurns === 'Turno'" class="w-full h-auto">
+                                                <!--campo select de turnos-->
+                                                <Combobox class="mt-2 text-left" label="Turnos"
+                                                    placeholder="Seleccione Turno" :options="tasks" v-model="turnSelect">
+                                                </Combobox>
+                                            </div>
+
+                                            <!--sección de Resto-->
+                                            <!-- <div class="w-full h-auto" @change="clearOptions()">
+
+                                            </div> -->
+
+
+                                            <!--BOTONES GUARDAR Y CANCELAR DEL MODAL-->
                                             <div class="mt-2 flex space-x-4 px-2">
                                                 <Button class="hover:bg-danger text-danger border-danger" severity="danger"
                                                     @click="open = false">Cancelar</Button>
