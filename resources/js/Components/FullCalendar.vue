@@ -19,6 +19,9 @@ export default defineComponent({
     components: {
         FullCalendar,
     },
+    mounted() {
+
+    },
     data() {
         return {
             calendarOptions: {
@@ -141,6 +144,8 @@ li {
 b {
     /* used for event dates/times */
     margin-right: 3px;
+    font-size: 16px;
+
 }
 
 .demo-app {
