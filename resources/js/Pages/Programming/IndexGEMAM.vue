@@ -146,12 +146,10 @@ const editar = () => {
 //#region Modal Persona
 const employee = ref([])
 const open = ref(false)
-const taskSelect = ref()
+const events = ref([])
 const turnSelect = ref()
-const selectedOption = ref('Horas')
-const showHours = ref(false)
-const showTurns = ref(false)
-const Resto = ref(false)
+const rendersCalendars = ref(0)
+const showHours = ref('Horas')
 
 // El código anterior define una función llamada `employeeDialog` que toma un parámetro `item`. Dentro
 // de la función, establece el valor de "open" en "verdadero" y el valor de "employee" en el
@@ -159,15 +157,15 @@ const Resto = ref(false)
 const employeeDialog = (item) => {
     open.value = true
     employee.value = item
-    axios.get(route('get.times.employees', {date: date.value, employee_id: item.Num_SAP})).then( (res) => {
-        console.log(res.data)
-    }
-    )
-}
+    axios.get(route('get.times.employees', { date: date.value, employee_id: item.Num_SAP }))
+        .then((res) => {
+            events.value = res.data.times
+            rendersCalendars.value++;
+        })
+        .catch(error => {
+            console.log(error);
+        })
 
-const clearOptions = () => {
-    showHours.value = ''
-    showTurns.value = ''
 }
 
 const submit = () => {
@@ -181,9 +179,14 @@ const submit = () => {
     height: 50px;
     object-position: 50% 30%;
     border-radius: 10% 25%;
-    ;
     object-fit: cover;
     /* Opciones: 'cover', 'contain', 'fill', etc. */
+}
+
+.info-resto {
+    font-size: 15px;
+    text-wrap: balance;
+    opacity: .5;
 }
 
 .loader {
@@ -453,7 +456,7 @@ const submit = () => {
                                         </div>
                                         <!--COLUMNA 2 - (FullCalendar)-->
                                         <div class="flex flex-nowrap col-span-2">
-                                            <FullCalendar />
+                                            <FullCalendar :initialEvents="events"  :date="date" :project="project" :key="rendersCalendars" />
 
                                         </div>
                                         <!--COLUMNA 3 - SELECCIÓN DE ACTIVIDADES-->
@@ -464,12 +467,12 @@ const submit = () => {
                                             </Combobox>
 
                                             <!--RADIO BUTTONS DE HORAS-->
-                                            <div class="flex flex-wrap space-x-2  w-full h-10 mt-4">
+                                            <div class="flex flex-wrap space-x-2 w-full h-10 mt-4">
                                                 <input type="radio" name="action" value="Horas" v-model="showHours">
                                                 <label for="Horas">Intervalo</label>
-                                                <input type="radio" name="action" value="Resto" v-model="Resto">
+                                                <input type="radio" name="action" value="Resto" v-model="showHours">
                                                 <label for="Resto">Resto</label>
-                                                <input type="radio" name="action" value="Turno" v-model="showTurns">
+                                                <input type="radio" name="action" value="Turno" v-model="showHours">
                                                 <label for="Turno">Turno</label>
                                             </div>
 
@@ -485,7 +488,7 @@ const submit = () => {
                                             </div>
 
                                             <!--sección de selección de turnos-->
-                                            <div v-if="showTurns === 'Turno'" class="w-full h-auto">
+                                            <div v-if="showHours === 'Turno'" class="w-full h-auto">
                                                 <!--campo select de turnos-->
                                                 <Combobox class="mt-2 text-left" label="Turnos"
                                                     placeholder="Seleccione Turno" :options="tasks" v-model="turnSelect">
@@ -493,9 +496,12 @@ const submit = () => {
                                             </div>
 
                                             <!--sección de Resto-->
-                                            <!-- <div class="w-full h-auto" @change="clearOptions()">
-
-                                            </div> -->
+                                            <div v-if="showHours === 'Resto'"
+                                                class="flex flex-nowrap justify-center w-full h-auto">
+                                                <p class="info-resto">
+                                                    <i>Se asignarán por defecto las horas que no se programaron</i>
+                                                </p>
+                                            </div>
 
 
                                             <!--BOTONES GUARDAR Y CANCELAR DEL MODAL-->

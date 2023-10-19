@@ -1,27 +1,26 @@
-<script>
+<script >
 import { defineComponent } from 'vue'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
-import { Calendar } from '@fullcalendar/core';
 import esLocale from '@fullcalendar/core/locales/es';
+import { Calendar } from '@fullcalendar/core';
 import { INITIAL_EVENTS, createEventId } from '../event-utils'
-
-// let calendar = new Calendar(calendarEl, {
-//     locales: [esLocale],
-//     locale: 'es'
-// });
-
-// calendar.setOption('locale', 'es');
 
 export default defineComponent({
     components: {
         FullCalendar,
     },
-    mounted() {
-
+    props: {
+        initialEvents: Array,
+        date: Date,
+        project: String
     },
+    // mounted() {
+
+    // },
+
     data() {
         return {
             calendarOptions: {
@@ -31,13 +30,15 @@ export default defineComponent({
                     interactionPlugin // needed for dateClick
                 ],
                 headerToolbar: {
-                    left: '',
+                    left: 'today',
                     center: 'title',
                     right: ''
                     // right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
                 initialView: 'timeGridDay', //onMounted type calendar view
-                initialEvents: INITIAL_EVENTS, // alternatively, use the `events` setting to fetch from a feed
+                initialDate: this.date,
+                initialEvents: this.initialEvents, // alternatively, use the `events` setting to fetch from a feed
+                allDaySlot: false,
                 editable: true,
                 selectable: true,
                 selectMirror: true,
@@ -45,7 +46,30 @@ export default defineComponent({
                 weekends: true,
                 select: this.handleDateSelect,
                 eventClick: this.handleEventClick,
-                eventsSet: this.handleEvents
+                eventsSet: this.handleEvents,
+                locale: esLocale,
+                // eventColor: '#378006',
+                // eventClassNames: 'custom-event-class',
+                eventTimeFormat: { // like '14:30:00'
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    meridiem: 'short',
+                    hour12: true
+                },
+                slotLabelFormat: {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    meridiem: 'short',
+                    hour12: true
+                },
+                customBoldStyle: {
+                    fontWeight: 'bold',
+                    fontSize: '50px',
+                },
+                customItalicStyle: {
+                    fontStyle: 'italic',
+                    fontSize: '50px',
+                },
                 /* you can update a remote database when these fire:
                 eventAdd:
                 eventChange:
@@ -71,6 +95,7 @@ export default defineComponent({
                     title,
                     start: selectInfo.startStr,
                     end: selectInfo.endStr,
+                    color: 'purple'
                     // allDay: selectInfo.allDay
                 })
             }
@@ -81,6 +106,7 @@ export default defineComponent({
             }
         },
         handleEvents(events) {
+            // console.log(events)
             this.currentEvents = events
         },
     }
@@ -115,10 +141,10 @@ export default defineComponent({
             </div>
         </div> -->
         <div class='max-w-full w-full h-[90%]'>
-            <FullCalendar class='w-full h-96' :options='calendarOptions'>
+            <FullCalendar class='w-full h-96' :options='calendarOptions' :style="customBoldClass">
                 <template v - slot: eventContent=' arg'>
-                    <b>{{ arg.timeText }}</b>
-                    <i>{{ arg.event.title }}</i>
+                    <h2> {{ arg.timeText }} </h2>
+                    <h1> {{ arg.event.title }} </h1>
                 </template>
             </FullCalendar>
         </div>
@@ -141,21 +167,34 @@ li {
     padding: 0;
 }
 
-b {
-    /* used for event dates/times */
-    margin-right: 3px;
-    font-size: 16px;
-
-}
-
 .demo-app {
     display: flex;
     width: 100%;
     min-height: 100%;
     font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-    font-size: 12px;
+    font-size: .7rem;
 }
 
+.customBoldClass {
+    font-weight: bold;
+    font-size: 12px;
+    /* Cambia el tamaño de fuente de <b> */
+}
+
+.customItalicClass {
+    font-style: italic;
+    /* Cambia el estilo de fuente de <i> */
+    font-size: 14px;
+    /* Cambia el tamaño de fuente de <i> */
+}
+
+/* .custom-event-class {
+    background: linear-gradient(to right, #FF5733, #FFA500);
+    color: white;
+    border: 2px solid #FF5733;
+} */
+
+/*
 .demo-app-sidebar {
     width: 900px;
     line-height: 1.5;
@@ -173,9 +212,9 @@ b {
 }
 
 .fc {
-    /* the calendar root */
+    // the calendar root
     max-width: 1100px;
     margin: 0 auto;
     font-size: 10px;
-}
+} */
 </style>
