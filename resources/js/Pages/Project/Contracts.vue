@@ -1,13 +1,12 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted} from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
 import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline';
 import { useSweetalert } from '@/composable/sweetAlert';
 import { webNotifications } from '@/composable/webNotifications';

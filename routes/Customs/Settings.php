@@ -6,6 +6,7 @@ use App\Http\Controllers\SWBS\ProcessController;
 use App\Http\Controllers\SWBS\SpecificActivityController;
 use App\Http\Controllers\SWBS\SubSystemController;
 use App\Http\Controllers\SWBS\SystemController;
+use App\Http\Controllers\Personal\ShiftController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -28,5 +29,5 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('gruposConstructivos/get', function () {
         return response()->json([gruposConstructivos()], 200);
     })->name('gruposConstructivos.index');
-
+    Route::resource('shift', ShiftController::class);
 });

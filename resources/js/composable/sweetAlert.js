@@ -19,7 +19,7 @@ export function useSweetalert() {
     });
     const confirmDelete = (id, title, url) =>
         Swal.fire({
-            title: "¿Está seguro de eliminar este " + title,
+            title: "¿Está seguro de eliminar este " + title + "?",
             text: "Esta acción no podrá ser reestablecida 😕",
             showCancelButton: true,
             confirmButtonText: "Sí, Eliminar",

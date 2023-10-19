@@ -8,13 +8,14 @@ import Systems from './../Components/SWBS/Systems.vue';
 import SubSystems from './../Components/SWBS/SubSystems.vue';
 import Processes from './../Components/SWBS/Processes.vue';
 import BaseActivities from './../Components/SWBS/BaseActivities.vue';
-import { CreditCardIcon, KeyIcon, SquaresPlusIcon, UserCircleIcon, UserGroupIcon } from '@heroicons/vue/24/outline'
+import { CreditCardIcon, KeyIcon, SquaresPlusIcon, ClockIcon, UserGroupIcon } from '@heroicons/vue/24/outline'
 import Gerencias from './../Components/Gerencias.vue';
+import Shifts from './../Components/Shifts.vue';
 const menu = ref('VB')
 const navigation = [
     { name: 'Variables Basicas', value: 'VB', icon: SquaresPlusIcon, current: true },
     { name: 'SWBS', value: 'SW', icon: KeyIcon, current: false },
-    //   { name: 'Plan & Billing', value: '#', icon: CreditCardIcon, current: false },
+    { name: 'Horarios', value: 'SC', icon: ClockIcon, current: false }, //SC->schedules
     //   { name: 'Team', value: '#', icon: UserGroupIcon, current: false },
     //   { name: 'Integrations', value: '#', icon: SquaresPlusIcon, current: false },
 ]
@@ -118,6 +119,23 @@ const navigation = [
                             </DisclosureButton>
                             <DisclosurePanel class="pb-2 text-sm text-gray-500">
                                 <BaseActivities></BaseActivities>
+                            </DisclosurePanel>
+                        </Disclosure>
+                    </div>
+                    <div class="mx-auto w-full  rounded-2xl bg-white p-2" v-if="menu == 'SC'">
+                        <div>
+                            <h3 class="text-base font-semibold leading-6 text-gray-900">Horarios</h3>
+                            <p class="mt-1 text-sm text-gray-500 text-justify">Aquí encontrarás los horarios basicos parametrizados</p>
+                        </div>
+                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
+                            <DisclosureButton
+                                class="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75 uppercase">
+                                <span>Horarios</span>
+                                <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''"
+                                    class="h-5 w-5 text-purple-500" />
+                            </DisclosureButton>
+                            <DisclosurePanel class="pt-4 pb-2 text-sm text-gray-500">
+                                <Shifts/>
                             </DisclosurePanel>
                         </Disclosure>
                     </div>
