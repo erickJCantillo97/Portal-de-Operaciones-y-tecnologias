@@ -47,7 +47,7 @@ class ProgrammingController extends Controller
                 ScheduleTime::create([
                     'schedule_id' => $schedule->id,
                     'hora_inicio' => '7:00',
-                    'hora_fin' => '16:30'
+                    'hora_fin' => '12:00'
                 ]);
             }else{
                 $status = false;
@@ -185,11 +185,11 @@ class ProgrammingController extends Controller
 
         $schedulesIds = Schedule::where('fecha', $date)->with('scheduleTimes')->where('employee_id', $request->employee_id)->pluck('id')->toArray();
 
-        $times = ScheduleTime::whereIn('schedule_id', $schedulesIds)->with('schedule', 'schedule.task', 'schedule.task.project')->get()->map(function ($time){
+        $times = ScheduleTime::whereIn('schedule_id', $schedulesIds)->with('schedule', 'schedule.task', 'schedule.task.project')->get()->map(function ($time) use($date){
             return [
                 'id' => $time['id'],
-                'hora_inicio' => $time['hora_inicio'],
-                'hora_fin' => $time['hora_fin'],
+                'hora_inicio' => Carbon::parse($date . $time['hora_inicio'])->toIso8601String(),
+                'hora_fin' => Carbon::parse($date . $time['hora_fin'])->toIso8601String(),
                 'task' => $time['schedule']['task']['name'],
                 'project' => $time['schedule']['task']['project']['name'],
             ];
