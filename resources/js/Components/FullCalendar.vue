@@ -48,6 +48,19 @@ export default defineComponent({
                 eventClick: this.handleEventClick,
                 eventsSet: this.handleEvents,
                 locale: esLocale,
+                eventOverlap: false,
+                nowIndicator: true,
+                selectable: true,
+                selectConstraint: {
+                    start: "07:00",
+                    end: "14:30",
+                },
+                businessHours: {
+                    // days of week. an array of zero-based day of week integers (0=Sunday)
+                    daysOfWeek: [1, 2, 3, 4, 5], // Monday - Friday
+                    startTime: '07:00', // a start time (07am in this example)
+                    endTime: '16:30', // an end time (4:30pm in this example)
+                },
                 // eventColor: '#378006',
                 // eventClassNames: 'custom-event-class',
                 eventTimeFormat: { // like '14:30:00'
@@ -61,14 +74,6 @@ export default defineComponent({
                     minute: '2-digit',
                     meridiem: 'short',
                     hour12: true
-                },
-                customBoldStyle: {
-                    fontWeight: 'bold',
-                    fontSize: '50px',
-                },
-                customItalicStyle: {
-                    fontStyle: 'italic',
-                    fontSize: '50px',
                 },
                 /* you can update a remote database when these fire:
                 eventAdd:
@@ -109,112 +114,32 @@ export default defineComponent({
             // console.log(events)
             this.currentEvents = events
         },
+        handleDateClick(selectInfo) {
+            // Solo se permitirá la creación de eventos dentro del rango "07:00" a "14:30"
+            if (
+                selectInfo.start >= selectInfo.view.activeStart &&
+                selectInfo.start <= selectInfo.view.activeEnd
+            ) {
+                // Crea el evento dentro del rango permitido
+                // Puedes usar selectInfo.start y selectInfo.end para obtener las fechas seleccionadas
+            } else {
+                console.log("No puedes crear eventos fuera del horario restringido.");
+            }
+        },
     }
 })
 </script>
 
 <template>
-    <div class='demo-app'>
-        <!-- <div class='demo-app-sidebar'>
-            <div class='demo-app-sidebar-section'>
-                <h2>Instructions</h2>
-                <ul>
-                    <li>Select dates and you will be prompted to create a new event</li>
-                    <li>Drag, drop, and resize events</li>
-                    <li>Click an event to delete it</li>
-                </ul>
-            </div>
-            <div class='demo-app-sidebar-section'>
-                <label>
-                    <input type='checkbox' :checked='calendarOptions.weekends' @change='handleWeekendsToggle' />
-                    toggle weekends
-                </label>
-            </div>
-            <div class='demo-app-sidebar-section'>
-                <h2>All Events ({{ currentEvents.length }})</h2>
-                <ul>
-                    <li v-for='event in currentEvents' :key='event.id'>
-                        <b>{{ event.startStr }}</b>
-                        <i>{{ event.title }}</i>
-                    </li>
-                </ul>
-            </div>
-        </div> -->
-        <div class='max-w-full w-full h-[90%]'>
-            <FullCalendar class='w-full h-96' :options='calendarOptions' :style="customBoldClass">
+    <div class='flex w-full min-h-[100%] font-sans text-sm rounded-md font-bold shadow-md border border-solid p-2'>
+        <div class='max-w-full w-full h-[60%]'>
+            <FullCalendar class='w-full h-96 custom-scroll' :options='calendarOptions' @dateClick="handleDateClick()">
                 <template v - slot: eventContent=' arg'>
-                    <h2> {{ arg.timeText }} </h2>
-                    <h1> {{ arg.event.title }} </h1>
+                    <!--Los estilos de estos elementos se encuentran en 'resources/css/custom/fullcalendar.css'-->
+                    <b> {{ arg.timeText }} </b>
+                    <i> {{ arg.event.title }} </i>
                 </template>
             </FullCalendar>
         </div>
     </div>
 </template>
-
-<style scoped lang='css'>
-h2 {
-    margin: 0;
-    font-size: 16px;
-}
-
-ul {
-    margin: 0;
-    padding: 0 0 0 1.5em;
-}
-
-li {
-    margin: 1.5em 0;
-    padding: 0;
-}
-
-.demo-app {
-    display: flex;
-    width: 100%;
-    min-height: 100%;
-    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-    font-size: .7rem;
-}
-
-.customBoldClass {
-    font-weight: bold;
-    font-size: 12px;
-    /* Cambia el tamaño de fuente de <b> */
-}
-
-.customItalicClass {
-    font-style: italic;
-    /* Cambia el estilo de fuente de <i> */
-    font-size: 14px;
-    /* Cambia el tamaño de fuente de <i> */
-}
-
-/* .custom-event-class {
-    background: linear-gradient(to right, #FF5733, #FFA500);
-    color: white;
-    border: 2px solid #FF5733;
-} */
-
-/*
-.demo-app-sidebar {
-    width: 900px;
-    line-height: 1.5;
-    background: #eaf9ff;
-    border-right: 1px solid #d3e2e8;
-}
-
-.demo-app-sidebar-section {
-    padding: 2em;
-}
-
-.demo-app-main {
-    flex-grow: 1;
-    padding: 3em;
-}
-
-.fc {
-    // the calendar root
-    max-width: 1100px;
-    margin: 0 auto;
-    font-size: 10px;
-} */
-</style>

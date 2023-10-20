@@ -7,11 +7,12 @@ define('ROUTE_API', 'https://servicioapi.cotecmar.com');
 function getEmpleadosAPI(): mixed
 {
     try {
-        if (getToken()){
-            $json =  Http::acceptJson()->withToken(session()->get('token'))
-                    ->get(ROUTE_API.'/listado_personal_cargo_costo_da_view'
-                    )->json();
-            return  collect($json);
+        if (getToken()) {
+            $json = Http::acceptJson()->withToken(session()->get('token'))
+                ->get(ROUTE_API.'/listado_personal_cargo_costo_da_view'
+                )->json();
+
+            return collect($json);
         }
         dd('Sin token');
 
@@ -64,27 +65,24 @@ function searchEmpleados(string $clave, string $valor)
     });
 }
 
-function pokeapi()
+function UpdateCargos()
 {
-    HTTP::acceptJson()->get('https://pokeapi.co/api/v2/pokemon/');
-}
-
-function UpdateCargos() {
     try {
-        if (getToken()){
-            $json =  Http::acceptJson()->withToken(session()->get('token'))
-                    ->get(ROUTE_API.'/listado_cargo_promedio_salarial_da_view'
-                    )->json();
-                    foreach ($json as $key => $cargo) {
-                        Labor::firstOrCreate([
-                            'name' => $cargo['Cargo'],
-                            'gerencia' => $cargo['Gerencia'],
-                            'w' => $cargo['Costo_Mes'],
-                            'costo_dia' => $cargo['Costo_Dia'],
-                            'costo_hora' => $cargo['Costo_Hora'],
-                        ]);
-                    }
-            return  collect($json);
+        if (getToken()) {
+            $json = Http::acceptJson()->withToken(session()->get('token'))
+                ->get(ROUTE_API.'/listado_cargo_promedio_salarial_da_view'
+                )->json();
+            foreach ($json as $key => $cargo) {
+                Labor::firstOrCreate([
+                    'name' => $cargo['Cargo'],
+                    'gerencia' => $cargo['Gerencia'],
+                    'w' => $cargo['Costo_Mes'],
+                    'costo_dia' => $cargo['Costo_Dia'],
+                    'costo_hora' => $cargo['Costo_Hora'],
+                ]);
+            }
+
+            return collect($json);
         }
         dd('Sin token');
 
@@ -94,17 +92,18 @@ function UpdateCargos() {
 
 }
 
-function getPersonalGerenciaOficina(string $gerencia = null, string $oficina = null ){
+function getPersonalGerenciaOficina(string $gerencia = null, string $oficina = null)
+{
     $personal = [];
-        if( $gerencia == null){
-            $personal = getEmpleadosAPI();
-        }elseif( $gerencia != null && $oficina == null){
-            $personal = searchEmpleados('Gerencia', $gerencia);
-        }elseif($gerencia != null && $oficina != null){
-            $personal = searchEmpleados('Gerencia', $gerencia)->filter(function ($employee) use ($gerencia, $oficina) {
-                return $employee['Gerencia'] == $gerencia && $employee['Oficina'] == $oficina;
-            });
-        }
+    if ($gerencia == null) {
+        $personal = getEmpleadosAPI();
+    } elseif ($gerencia != null && $oficina == null) {
+        $personal = searchEmpleados('Gerencia', $gerencia);
+    } elseif ($gerencia != null && $oficina != null) {
+        $personal = searchEmpleados('Gerencia', $gerencia)->filter(function ($employee) use ($gerencia, $oficina) {
+            return $employee['Gerencia'] == $gerencia && $employee['Oficina'] == $oficina;
+        });
+    }
 
-        return $personal;
+    return $personal;
 }

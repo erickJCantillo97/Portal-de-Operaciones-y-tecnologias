@@ -5,12 +5,11 @@ namespace App\Http\Controllers\Personal;
 use App\Http\Controllers\Controller;
 use App\Ldap\User;
 use App\Models\Labor;
-use Illuminate\Http\Request;
 
 class PersonalController extends Controller
 {
-
-    public function getPersonalCargo(){
+    public function getPersonalCargo()
+    {
 
         $personal = getPersonalGerenciaOficina(auth()->user()->gerencia)->groupBy('Cargo');
 
@@ -19,21 +18,24 @@ class PersonalController extends Controller
         ]);
     }
 
-    public function getCargos(){
-       $cargos  = Labor::get()->map(function ($cargo) {
+    public function getCargos()
+    {
+        $cargos = Labor::get()->map(function ($cargo) {
             return [
                 'id' => $cargo->id,
                 'name' => $cargo->name,
                 'costo_hora' => '$ '.number_format($cargo->costo_hora, 0),
             ];
         });
+
         return response()->json([
             'cargos' => $cargos,
         ]);
     }
 
-    public function getPersonal(){
-        $personal = getPersonalGerenciaOficina(auth()->user()->gerencia, auth()->user()->oficina)->map(function ($person)  {
+    public function getPersonal()
+    {
+        $personal = getPersonalGerenciaOficina(auth()->user()->gerencia, auth()->user()->oficina)->map(function ($person) {
             return [
                 'Num_SAP' => (int) $person['Num_SAP'],
                 'Correo' => $person['Correo'],
