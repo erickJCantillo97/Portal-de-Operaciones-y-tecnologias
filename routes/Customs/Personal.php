@@ -5,27 +5,29 @@ use App\Http\Controllers\Personal\ProgrammingController;
 use App\Models\Labor;
 use Illuminate\Support\Facades\Route;
 
-    Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
-        Route::get('costoPersonal', function(){
-            $sum = getPersonalGerenciaOficina(auth()->user()->gerencia)->sum(function ($objeto) {
-                return $objeto['Ingresos_Mes'];
-            });
-            return  $sum;
+    Route::get('costoPersonal', function () {
+        $sum = getPersonalGerenciaOficina(auth()->user()->gerencia)->sum(function ($objeto) {
+            return $objeto['Ingresos_Mes'];
         });
 
-        Route::get('updateCargo', function (){
-            updateCargos();
-            return Labor::get();
-        });
+        return $sum;
+    });
 
-        Route::get('getPersonalCargo/', [PersonalController::class, 'getPersonalCargo'])->name('get.personal.cargo');
+    Route::get('updateCargo', function () {
+        updateCargos();
 
-        Route::get('getCargos', [personalController::class, 'getCargos'])->name('get.cargos');
+        return Labor::get();
+    });
 
-        Route::get('getPersonal', [personalController::class, 'getPersonal'])->name('get.personal');
+    Route::get('getPersonalCargo/', [PersonalController::class, 'getPersonalCargo'])->name('get.personal.cargo');
 
-        Route::get('getAssignmentHour/{fecha}/{userId}', [ProgrammingController::class, 'getAssignmentHour'])->name('get.assignment.hours');
+    Route::get('getCargos', [personalController::class, 'getCargos'])->name('get.cargos');
 
-        Route::get('getTimesEmployee', [ProgrammingController::class, 'getTimesSchedulesEmployee'])->name('get.times.employees');
+    Route::get('getPersonal', [personalController::class, 'getPersonal'])->name('get.personal');
+
+    Route::get('getAssignmentHour/{fecha}/{userId}', [ProgrammingController::class, 'getAssignmentHour'])->name('get.assignment.hours');
+
+    Route::get('getTimesEmployee', [ProgrammingController::class, 'getTimesSchedulesEmployee'])->name('get.times.employees');
 });

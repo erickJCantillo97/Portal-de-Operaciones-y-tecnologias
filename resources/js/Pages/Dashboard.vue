@@ -15,6 +15,7 @@ import { MagnifyingGlassIcon, PencilIcon, TrashIcon } from "@heroicons/vue/20/so
 import Button from "@/Components/Button.vue";
 import ProgressBar from "primevue/progressbar";
 import DataChart from "./DataChart.vue";
+// import OurTeam from "@/Components/OurTeam.vue";
 import "../../sass/dataTableCustomized.scss";
 
 // import TimeLine from './TimeLine.vue';
@@ -108,8 +109,9 @@ const clearFilter = () => {
                                 <ProjectCard v-for="project of projects" :project="project" :activo="false" />
                             </dl>
                         </div> -->
+            <!-- <OurTeam /> -->
             <div class="flex justify-between">
-                <UserHeader/>
+                <UserHeader />
                 <!-- <DolarTRM /> -->
             </div>
             <!--DATATABLE PROYECTOS-->

@@ -40,7 +40,6 @@ const onDrop = async (collection, dropResult) => {
             loadingTask.value[collection] = false
         })
     }
-
 }
 
 const getAssignmentHours = (employee_id) => {
@@ -146,12 +145,10 @@ const editar = () => {
 //#region Modal Persona
 const employee = ref([])
 const open = ref(false)
-const taskSelect = ref()
+const events = ref([])
 const turnSelect = ref()
-const selectedOption = ref('Horas')
-const showHours = ref(false)
-const showTurns = ref(false)
-const Resto = ref(false)
+const rendersCalendars = ref(0)
+const showHours = ref('Horas')
 
 // El código anterior define una función llamada `employeeDialog` que toma un parámetro `item`. Dentro
 // de la función, establece el valor de "open" en "verdadero" y el valor de "employee" en el
@@ -159,15 +156,14 @@ const Resto = ref(false)
 const employeeDialog = (item) => {
     open.value = true
     employee.value = item
-    axios.get(route('get.times.employees', {date: date.value, employee_id: item.Num_SAP})).then( (res) => {
-        console.log(res.data)
-    }
-    )
-}
-
-const clearOptions = () => {
-    showHours.value = ''
-    showTurns.value = ''
+    axios.get(route('get.times.employees', { date: date.value, employee_id: item.Num_SAP }))
+        .then((res) => {
+            events.value = res.data.times
+            rendersCalendars.value++;
+        })
+        .catch(error => {
+            console.log(error);
+        })
 }
 
 const submit = () => {
@@ -181,9 +177,14 @@ const submit = () => {
     height: 50px;
     object-position: 50% 30%;
     border-radius: 10% 25%;
-    ;
     object-fit: cover;
     /* Opciones: 'cover', 'contain', 'fill', etc. */
+}
+
+.info-resto {
+    font-size: 15px;
+    text-wrap: balance;
+    opacity: .5;
 }
 
 .loader {
@@ -377,7 +378,7 @@ const submit = () => {
                             <div class="flex items-center justify-center w-full">
                                 <button title="Horas programadas"
                                     :class="personalHours[(item.Num_SAP)] < 9.5 ? 'bg-primary' : 'bg-success'"
-                                    class="flex items-center justify-center h-10 p-1 m-1 font-mono text-sm text-white align-middle rounded-md w-12"
+                                    class="flex items-center justify-center w-12 h-10 p-1 m-1 font-mono text-sm text-white align-middle rounded-md"
                                     @click="employeeDialog(item)">
                                     <p>{{ personalHours[(item.Num_SAP)] }} Horas </p>
                                 </button>
@@ -403,7 +404,7 @@ const submit = () => {
                             leave-from="opacity-100 translate-y-0 sm:scale-100"
                             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                             <DialogPanel
-                                class="max-w-screen-2xl p-6 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8">
+                                class="p-6 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl max-w-screen-2xl sm:my-8">
 
                                 <div class="px-2 mt-2 text-center">
                                     <DialogTitle as="h3" class="text-3xl font-semibold text-center text-primary">
@@ -414,12 +415,13 @@ const submit = () => {
                                     <div class="grid grid-cols-4 mx-auto max-w-[100%] gap-x-2 gap-y-20">
                                         <!--COLUMNA 1 (SECCIÓN INFORMACIÓN DEL EMPLEADO)-->
                                         <div class="col-span-1">
-                                            <div class="flex flex-col items-center justify-center gap-10 pt-12 sm:flex-col">
-                                                <img class="aspect-[4/5] w-32 flex-none rounded-3xl object-cover shadow-2xl"
+                                            <div
+                                                class="flex flex-col items-center justify-center gap-10 pt-12 font-bold border border-solid rounded-md shadow-md sm:flex-col">
+                                                <img class="aspect-[4/5] w-32 flex-none rounded-3xl object-cover shadow-md"
                                                     :src="employee.photo" alt="Foto" />
                                                 <div class="max-w-xl text-center">
                                                     <h3
-                                                        class="text-lg font-semibold whitespace-nowrap leading-8 tracking-tight text-gray-900">
+                                                        class="text-lg font-semibold leading-8 tracking-tight text-gray-900 whitespace-nowrap">
                                                         {{ employee.Nombres_Apellidos }}
                                                     </h3>
                                                     <p class="text-base leading-7 text-gray-600">{{ employee.Cargo }}
@@ -452,24 +454,25 @@ const submit = () => {
                                             </div>
                                         </div>
                                         <!--COLUMNA 2 - (FullCalendar)-->
-                                        <div class="flex flex-nowrap col-span-2">
-                                            <FullCalendar />
+                                        <div class="flex col-span-2 flex-nowrap">
+                                            <FullCalendar :initialEvents="events" :date="date" :project="project"
+                                                :key="rendersCalendars" />
 
                                         </div>
                                         <!--COLUMNA 3 - SELECCIÓN DE ACTIVIDADES-->
                                         <div
-                                            class="w-full col-span-1 m-1 p-3 overflow-hidden text-left overflow-y-auto custom-scroll bg-white rounded-lg shadow-xl sm:my-8">
+                                            class="w-full col-span-1 p-3 m-1 overflow-hidden overflow-y-auto font-bold text-left bg-white border border-solid rounded-md shadow-md custom-scroll sm:my-8">
                                             <Combobox class="mt-2 text-left" label="Actividad"
                                                 placeholder="Seleccione Actividad" :options="tasks" v-model="taskSelect">
                                             </Combobox>
 
                                             <!--RADIO BUTTONS DE HORAS-->
-                                            <div class="flex flex-wrap space-x-2  w-full h-10 mt-4">
+                                            <div class="flex flex-wrap w-full h-10 mt-4 space-x-2">
                                                 <input type="radio" name="action" value="Horas" v-model="showHours">
                                                 <label for="Horas">Intervalo</label>
-                                                <input type="radio" name="action" value="Resto" v-model="Resto">
+                                                <input type="radio" name="action" value="Resto" v-model="showHours">
                                                 <label for="Resto">Resto</label>
-                                                <input type="radio" name="action" value="Turno" v-model="showTurns">
+                                                <input type="radio" name="action" value="Turno" v-model="showHours">
                                                 <label for="Turno">Turno</label>
                                             </div>
 
@@ -485,7 +488,7 @@ const submit = () => {
                                             </div>
 
                                             <!--sección de selección de turnos-->
-                                            <div v-if="showTurns === 'Turno'" class="w-full h-auto">
+                                            <div v-if="showHours === 'Turno'" class="w-full h-auto">
                                                 <!--campo select de turnos-->
                                                 <Combobox class="mt-2 text-left" label="Turnos"
                                                     placeholder="Seleccione Turno" :options="tasks" v-model="turnSelect">
@@ -493,13 +496,16 @@ const submit = () => {
                                             </div>
 
                                             <!--sección de Resto-->
-                                            <!-- <div class="w-full h-auto" @change="clearOptions()">
-
-                                            </div> -->
+                                            <div v-if="showHours === 'Resto'"
+                                                class="flex justify-center w-full h-auto flex-nowrap">
+                                                <p class="info-resto">
+                                                    <i>Se asignarán por defecto las horas que no se programaron</i>
+                                                </p>
+                                            </div>
 
 
                                             <!--BOTONES GUARDAR Y CANCELAR DEL MODAL-->
-                                            <div class="mt-2 flex space-x-4 px-2">
+                                            <div class="flex px-2 mt-2 space-x-4">
                                                 <Button class="hover:bg-danger text-danger border-danger" severity="danger"
                                                     @click="open = false">Cancelar</Button>
                                                 <Button severity="success" :loading="false"
