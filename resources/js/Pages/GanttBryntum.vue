@@ -644,12 +644,8 @@ const onSettingsMarginChange = ({ value }) => {
 </script>
 <template>
     <AppLayout>
-        <div class="">
-            <div class="h-full">
-                <div class="h-screen overflow-hidden shadow-xl sm:rounded-lg">
-                    <div id="container" class="h-full overflow-hidden text-xs shadow-xl sm:rounded-lg">
-                    </div>
-                </div>
+        <div class="rounded-xl shadow-xl p-1 h-[85vh]">
+            <div id="container" class="h-full text-xs sm:rounded-lg">
             </div>
         </div>
     </AppLayout>

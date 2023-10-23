@@ -17,12 +17,12 @@
             <MenuSidebar class="lg:block " :class="{ hidden: !menu }"></MenuSidebar>
             <div
                 class="z-10 flex items-center justify-between h-16 px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 md:ml-16">
-                <div>
+                <div class="w-full">
                     <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="menu = !menu">
                         <span class="sr-only">Open sidebar</span>
                         <Bars3CenterLeftIcon class="w-6 h-6" aria-hidden="true" />
                     </button>
-                    <div class="flex items-center space-x-12 ">
+                    <div class="hidden lg:flex items-center justify-between">
                         <h1 class="hidden text-xl font-extrabold lg:block text-primary">Portal de Operaciones Tecnológicas e
                             Inteligencia Artificial</h1>
                         <!-- <div class="hidden p-2 font-extrabold uppercase bg-orange-300 rounded-md sm:block ">
@@ -87,11 +87,11 @@
             <div class="h-[92vh] rounded-lg shadow-2xl g-white sm:ml-20 sm:mr-1">
                 <slot />
             </div>
-            <div class="fixed right-0 z-50 w-12 top-1/2 hover:animate-pulse">
+            <div class="fixed right-0 z-50 w-12 top-1/4 animate-pulse">
                 <button v-tooltip="'¿Alguna sugerencia?'" @click="sugerenciaVisible = true" v-if="!sugerenciaVisible"
                     class="flex-col p-2 bg-blue-200 opacity-80 rounded-tl-3xl rounded-bl-3xl">
                     <QuestionMarkCircleIcon class="w-6 -rotate-90" />
-                    <p class="rotate-180" style="writing-mode: vertical-lr;">Sugerencias</p>
+                    <p class="rotate-180" style="writing-mode: vertical-lr"></p>
                 </button>
             </div>
             <TransitionRoot as="template" :show="sugerenciaVisible">
@@ -257,9 +257,7 @@ import {
 import {
     BellIcon, ChevronDownIcon, ArrowLeftCircleIcon,
     QuestionMarkCircleIcon,
-    XCircleIcon, XMarkIcon,
-    CheckIcon,
-ExclamationTriangleIcon
+    XCircleIcon
 } from '@heroicons/vue/20/solid'
 import MenuSidebar from '@/Components/MenuSidebar.vue';
 import DropdownSetting from '@/Components/DropdownSetting.vue';

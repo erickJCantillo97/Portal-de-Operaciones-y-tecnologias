@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Personal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Shift;
+use DateTime;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -45,32 +46,48 @@ class ShiftController extends Controller
      */
     public function store(Request $request)
     {
-        $validateData = $request->validate([
-            'name' => 'required',
-            'startShift' => 'date|required',
-            'endShift' => 'date|required',
-            'startBreak' => 'date|required',
-            'endBreak' => 'date|required',
-            'status' => 'nullable|boolean',
-            'description' => 'nullable',
-        ]);
-        if ($validateData['startShift'] < $validateData['endShift']) {
-            $validateData['startShift'] < -'1970-01-01T' + $validateData['startShift'];
-            $validateData['endShift'] < -'1970-01-02T' + $validateData['endShift'];
-        } else {
-            $validateData['startShift'] < -'1970-01-01T' + $validateData['startShift'];
-            $validateData['endShift'] < -'1970-01-01T' + $validateData['endShift'];
-        }
-        if ($validateData['startBreak'] < $validateData['endBreak']) {
-            $validateData['startBreak'] < -'1970-01-01T' + $validateData['startBreak'];
-            $validateData['endBreak'] < -'1970-01-02T' + $validateData['endBreak'];
-        } else {
-            $validateData['startBreak'] < -'1970-01-01T' + $validateData['startBreak'];
-            $validateData['endBreak'] < -'1970-01-01T' + $validateData['endBreak'];
-        }
-
         try {
+            $validateData = $request->validate([
+                'name' => 'required',
+                'startShift' => 'date_format:"H:i"|required',
+                'endShift' => 'date_format:"H:i"|required',
+                'startBreak' => 'nullable|date_format:"H:i"',
+                'endBreak' => 'nullable|date_format:"H:i"',
+                'status' => 'nullable|boolean',
+                'description' => 'nullable',
+            ]);
+
+            $validateData['startShift'] = new DateTime("1970-01-01T" . $validateData['startShift'] . ":00");
+            $validateData['endShift'] = new DateTime("1970-01-01T" . $validateData['endShift'] . ":00");
+            if ($validateData['startShift'] > $validateData['endShift']) {
+                $validateData['endShift']->modify('+1 day');
+            };
+            $validateData['startBreak'] = new DateTime("1970-01-01T" . $validateData['startBreak'] . ":00");
+            $validateData['endBreak'] = new DateTime("1970-01-01T" . $validateData['endBreak'] . ":00");
+            if ($validateData['startBreak'] ==  $validateData['endBreak']) {
+                $validateData['endBreak']=null;
+                $validateData['startBreak']=null;
+            }elseif ($validateData['startBreak'] >  $validateData['endBreak']) {
+                $validateData['endBreak']->modify('+1 day');
+            };
+
+            // dd($validateData);
             Shift::create($validateData);
+            return response()->json([
+                Shift::orderBy('name')->get()->map(function ($shift) {
+                    return [
+                        'id' => $shift['id'],
+                        'name' => $shift['name'],
+                        'startShift' => $shift['startShift'],
+                        'endShift' => $shift['endShift'],
+                        'startBreak' => $shift['startBreak'],
+                        'endBreak' => $shift['endBreak'],
+                        'hours' => $shift['hours'],
+                        'status' => $shift['status'],
+                        'description' => $shift['description']
+                    ];
+                })
+            ], 200);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
@@ -99,14 +116,27 @@ class ShiftController extends Controller
     {
         $validateData = $request->validate([
             'name' => 'required',
-            'startShift' => 'date|required',
-            'endShift' => 'date|required',
-            'startBreak' => 'nullable|date',
-            'endBreak' => 'nullable|date',
+            'startShift' => 'date_format:"H:i"|required',
+            'endShift' => 'date_format:"H:i"|required',
+            'startBreak' => 'nullable|date_format:"H:i"',
+            'endBreak' => 'nullable|date_format:"H:i"',
             'status' => 'nullable|boolean',
             'description' => 'nullable',
         ]);
+        $validateData['startShift'] = new DateTime("1970-01-01T" . $validateData['startShift'] . ":00");
+        $validateData['endShift'] = new DateTime("1970-01-01T" . $validateData['endShift'] . ":00");
+        if ($validateData['startShift'] > $validateData['endShift']) {
+            $validateData['endShift']->modify('+1 day');
+        };
+        $validateData['startBreak'] = new DateTime("1970-01-01T" . $validateData['startBreak'] . ":00");
+        $validateData['endBreak'] = new DateTime("1970-01-01T" . $validateData['endBreak'] . ":00");
 
+        if ($validateData['startBreak'] ==  $validateData['endBreak']) {
+            $validateData['endBreak']=null;
+            $validateData['startBreak']=null;
+        }elseif ($validateData['startBreak'] >  $validateData['endBreak']) {
+            $validateData['endBreak']->modify('+1 day');
+        };
         try {
             $shift->update($validateData);
             return response()->json([
@@ -124,7 +154,6 @@ class ShiftController extends Controller
                     ];
                 })
             ], 200);
-
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
