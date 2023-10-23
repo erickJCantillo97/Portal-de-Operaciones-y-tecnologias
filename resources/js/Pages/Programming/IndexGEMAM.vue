@@ -69,20 +69,12 @@ const getChildPayload = (index) => {
 // cuando el componente está montado.
 onMounted(() => {
     getTask('tomorrow')
-    axios.get(route('get.personal')).then((res) => {
-        personal.value = Object.values(res.data.personal)
-        personal.value.forEach(element => {
-            axios.get(route('get.assignment.hours', [date.value, (element.Num_SAP)])).then((res) => {
-                personalHours.value[(element.Num_SAP)] = res.data;
-            });
-        })
-        loadingPerson.value = false
-    })
 })
 
 
 // El código anterior es una función de Vue.js que recupera tareas según la opción seleccionada.
 const getTask = async (option) => {
+    loadingPerson.value = true
     loadingProgram.value = true
     optionValue.value = option
     switch (option) {
@@ -109,6 +101,15 @@ const getTask = async (option) => {
             loadingTasks.value = false
         })
     });
+    axios.get(route('get.personal')).then((res) => {
+        personal.value = Object.values(res.data.personal)
+        personal.value.forEach(element => {
+            axios.get(route('get.assignment.hours', [date.value, (element.Num_SAP)])).then((res) => {
+                personalHours.value[element.Num_SAP] = res.data;
+            });
+        })
+        loadingPerson.value = false
+    })
 
 }
 

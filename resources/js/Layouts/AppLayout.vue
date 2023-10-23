@@ -87,7 +87,7 @@
             <div class="h-[92vh] rounded-lg shadow-2xl g-white sm:ml-20 sm:mr-1">
                 <slot />
             </div>
-            <div class="fixed right-0 z-50 w-12 top-1/4 animate-pulse">
+            <div class="fixed right-[-5px] z-50 w-10 top-1/4 animate-pulse">
                 <button v-tooltip="'¿Alguna sugerencia?'" @click="sugerenciaVisible = true" v-if="!sugerenciaVisible"
                     class="flex-col p-2 bg-blue-200 opacity-80 rounded-tl-3xl rounded-bl-3xl">
                     <QuestionMarkCircleIcon class="w-6 -rotate-90" />
