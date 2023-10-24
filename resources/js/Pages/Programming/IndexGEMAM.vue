@@ -103,8 +103,8 @@ const getTask = async (option) => {
     });
     axios.get(route('get.personal')).then((res) => {
         personal.value = Object.values(res.data.personal)
-        personal.value.forEach(element => {
-            axios.get(route('get.assignment.hours', [date.value, (element.Num_SAP)])).then((res) => {
+        personal.value.forEach(async element => {
+            await axios.get(route('get.assignment.hours', [date.value, (element.Num_SAP)])).then((res) => {
                 personalHours.value[element.Num_SAP] = res.data;
             });
         })

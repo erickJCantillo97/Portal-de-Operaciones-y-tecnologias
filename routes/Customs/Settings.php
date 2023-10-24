@@ -8,6 +8,7 @@ use App\Http\Controllers\SWBS\SubSystemController;
 use App\Http\Controllers\SWBS\SystemController;
 use App\Http\Controllers\Personal\ShiftController;
 use App\Http\Controllers\Suggestion\SuggestionController;
+use App\Models\Suggestion;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -33,4 +34,5 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::resource('shift', ShiftController::class);
     Route::resource('suggestion', SuggestionController::class);
+
 });

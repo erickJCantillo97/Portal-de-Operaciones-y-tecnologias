@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Suggestion;
 
 use App\Http\Controllers\Controller;
-use App\Ldap\User;
 use App\Models\Suggestion;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\JsonResponse;
+use Inertia\Inertia;
 
 class SuggestionController extends Controller
 {
@@ -19,6 +19,7 @@ class SuggestionController extends Controller
     {
         return response()->json([ Suggestion::where('user_id', $request->user()->id)->get()], 200);
     }
+
     /**
      * Show the form for creating a new resource.
      */
