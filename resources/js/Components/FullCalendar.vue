@@ -51,9 +51,13 @@ export default defineComponent({
                 eventOverlap: false,
                 nowIndicator: true,
                 selectable: true,
+                eventConstraint: {
+                    startTime: '07:00',
+                    endTime: '16:30',
+                },
                 selectConstraint: {
-                    start: "07:00",
-                    end: "14:30",
+                    startTime: "07:00",
+                    endTime: "16:30",
                 },
                 businessHours: {
                     // days of week. an array of zero-based day of week integers (0=Sunday)
