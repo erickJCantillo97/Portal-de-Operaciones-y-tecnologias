@@ -132,7 +132,6 @@ const deleteSchedule = async (task, index, schedule) => {
 
     await axios.post(route('programming.delete', schedule.id)).then((res) => {
         listaDatos.value[task.id] = res.data.task
-        console.log(schedule)
         getAssignmentHours((schedule.employee_id))
         toast('Se ha eliminado a ' + schedule.name + ' de la tarea ' + task.name, 'success');
     })

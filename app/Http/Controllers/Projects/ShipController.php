@@ -75,8 +75,6 @@ class ShipController extends Controller
         } catch (Exception $e) {
             return back()->withErrors(['message' => 'Ocurrió un error al crear el Buque: '.$e->getMessage()], 500);
         }
-
-        return redirect('ships.index');
     }
 
     /**
