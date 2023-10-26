@@ -164,7 +164,7 @@
                                                                 <div class="flex pt-1 mt-1 border-t border-gray-300 ">
                                                                     <span v-if="suggestion.type == 'Error'"
                                                                         class="flex justify-center px-2 text-xs font-medium rounded-md"
-                                                                        :class="suggestion.status == 1 ? 'bg-red-100 text-red-700' : 'border-success'">{{
+                                                                        :class="suggestion.status == 1 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-success'">{{
                                                                             suggestion.status == 1 ? 'Pendiente' : 'Resuelto'
                                                                         }}</span>
                                                                     <p class="w-full text-xs text-end">{{
@@ -265,7 +265,6 @@ const sugerenciaVisible = ref(false)
 const suggestions = ref([])
 
 onMounted(() => {
-    document.body.classList.add('overflow-y-hidden');
     loadSuggestions()
 });
 
@@ -302,7 +301,7 @@ const createSuggestion = () => {
 }
 
 const loadSuggestions = () => {
-    axios.get(route('suggestion.index')).then((res) => {
+    axios.get(route('suggestion.create')).then((res) => {
         suggestions.value = res.data[0]
     })
 

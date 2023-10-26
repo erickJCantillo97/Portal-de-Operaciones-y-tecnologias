@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Illuminate\Http\JsonResponse;
 
 class SuggestionController extends Controller
 {
@@ -16,23 +17,23 @@ class SuggestionController extends Controller
      */
     public function index(Request $request)
     {
-        // dd($request->option);
+
         $validateData = $request->validate([
             'type' => 'nullable|string',
             'date' => 'nullable|date'
         ]);
-        $suggestion=[];
+        $suggestion = [];
         if ($request->user()->username == 'gbuelvas') {
             if (!isset($validateData['type']) and !isset($validateData['date'])) {
                 // dd('llega ambas null');
-                $suggestion= Inertia::render('Suggestions', [
+                $suggestion = Inertia::render('Suggestions', [
                     'suggestions' => Suggestion::with('User')
                         ->get(),
                     'permission' => true
                 ]);
             } else if (!isset($validateData['type']) and isset($validateData['date'])) {
                 // dd('llega type = null');
-                $suggestion=Inertia::render('Suggestions', [
+                $suggestion = Inertia::render('Suggestions', [
                     'suggestions' => Suggestion::with('User')
                         ->whereDate('created_at', '=', $validateData['date'])
                         ->get(),
@@ -40,7 +41,7 @@ class SuggestionController extends Controller
                 ]);
             } else if (isset($validateData['type']) and !isset($validateData['date'])) {
                 // dd('llega date = null');
-                $suggestion=Inertia::render('Suggestions', [
+                $suggestion = Inertia::render('Suggestions', [
                     'suggestions' => Suggestion::with('User')
                         ->where('type', '=', $validateData['type'])
                         ->get(),
@@ -48,7 +49,7 @@ class SuggestionController extends Controller
                 ]);
             } else {
                 // dd('llega ambas definidas');
-                $suggestion=Inertia::render('Suggestions', [
+                $suggestion = Inertia::render('Suggestions', [
                     'suggestions' => Suggestion::with('User')
                         ->where('type', '=', $validateData['type'])
                         ->whereDate('created_at', '=', $validateData['date'])
@@ -57,7 +58,7 @@ class SuggestionController extends Controller
                 ]);
             }
         } else {
-            $suggestion= Inertia::render('Suggestions', [
+            $suggestion = Inertia::render('Suggestions', [
                 'suggestions' => Suggestion::with('User')
                     ->where('user_id', $request->user()->id)
                     ->get()
@@ -69,9 +70,12 @@ class SuggestionController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): JsonResponse
     {
-        //
+        return response()->json([
+            Suggestion::where('user_id', auth()->user()->id)
+                ->get()
+        ], 200);
     }
 
     /**
@@ -100,9 +104,8 @@ class SuggestionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Suggestion $suggestion)
+    public function show()
     {
-        //
     }
 
     /**
