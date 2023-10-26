@@ -17,15 +17,15 @@ const navigation = [
     { name: 'Variables Basicas', value: 'VB', icon: SquaresPlusIcon, current: true },
     { name: 'SWBS', value: 'SW', icon: KeyIcon, current: false },
     { name: 'Horarios', value: 'SC', icon: ClockIcon, current: false }, //SC->schedules
-    { name: 'Sugerencias', value: 'SU', icon: UserGroupIcon, current: false },
+    // { name: 'Sugerencias', value: 'SU', icon: UserGroupIcon, current: false },
     //   { name: 'Integrations', value: '#', icon: SquaresPlusIcon, current: false },
 ]
 </script>
 
 <template>
     <AppLayout>
-        <div class="p-2 -mt-4 lg:grid lg:grid-cols-12 lg:gap-x-5">
-            <aside class="px-2 py-6 sm:px-6 lg:col-span-3 lg:px-0 lg:py-0">
+        <div class="p-2 -mt-4 lg:grid lg:grid-cols-12 lg:gap-x-2">
+            <aside class="px-2 py-6 sm:px-6 lg:col-span-2 lg:px-0 lg:py-0">
                 <nav class="space-y-1">
                     <a v-for="item in navigation" :key="item.name"
                         :class="[menu == item.value ? 'bg-gray-50 text-indigo-700 hover:bg-white hover:text-indigo-700' : 'text-gray-900 hover:bg-gray-50 hover:text-gray-900', 'group flex items-center rounded-md px-3 py-2 text-sm font-medium cursor-pointer']"
@@ -38,7 +38,7 @@ const navigation = [
                 </nav>
             </aside>
 
-            <div class="max-h-screen space-y-6 overflow-y-auto sm:px-6 lg:col-span-9 lg:px-0 custom-scroll">
+            <div class="max-h-screen space-y-6 sm:px-6 lg:col-span-10 lg:px-0">
                 <div class="w-full">
                     <div class="w-full p-2 mx-auto bg-white rounded-2xl" v-if="menu == 'VB'">
                         <div>
@@ -152,8 +152,8 @@ const navigation = [
                                 <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''"
                                     class="w-5 h-5 text-purple-500" />
                             </DisclosureButton>
-                            <DisclosurePanel class="pt-4 pb-2 text-sm text-gray-500">
-                                <Suggestions/>
+                            <DisclosurePanel class="pt-4 pb-2 text-sm text-gray-500 ">
+                                <Suggestions />
                             </DisclosurePanel>
                         </Disclosure>
                     </div>

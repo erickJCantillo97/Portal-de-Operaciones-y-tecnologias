@@ -220,30 +220,29 @@ const submit = () => {
 
 <template>
     <AppLayout>
-        <div class="h-[90%] px-2">
-            <div class="grid justify-center mb-2 grid-col-1 sm:flex sm:justify-between sm:items-center">
-                <p class="text-xl font-semibold leading-6 text-center capitalize text-primary">
-                    Programación de Actividades
-                </p>
-                <div class="flex items-center space-x-2">
-                    <span class="shadow-md md:block">
-                        <button type="button"
-                            :class="optionValue == 'today' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
-                            @click="getTask('today')"
-                            class="relative inline-flex items-center px-3 py-2 text-sm font-semibold alturah8 rounded-l-md 0 ring-1 ring-inset ring-gray-300 focus:z-10">Hoy</button>
-                        <button type="button"
-                            :class="optionValue == 'tomorrow' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
-                            @click="getTask('tomorrow')"
-                            class="relative inline-flex items-center px-3 py-2 -ml-px text-sm font-semibold alturah8 rounded-r-md ring-1 ring-inset ring-gray-300 focus:z-10">Mañana</button>
-                    </span>
-                    <p class="font-bold text-primary">Fecha:</p>
-                    <input
-                        :class="optionValue == 'date' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
-                        class="inline-flex items-center px-3 py-2 -ml-px text-xs font-semibold rounded-md shadow-md alturah8 text-primary border-primary"
-                        type="date" name="date" id="date" v-model="date" @change="getTask('date')">
-                </div>
+        <div class="grid justify-center px-1 grid-col-1 sm:flex sm:justify-between sm:items-center">
+            <p class="text-xl font-semibold leading-6 text-center capitalize text-primary">
+                Programación de Actividades
+            </p>
+            <div class="flex items-center space-x-2">
+                <span class="shadow-md md:block">
+                    <button type="button"
+                        :class="optionValue == 'today' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+                        @click="getTask('today')"
+                        class="relative inline-flex items-center px-3 py-2 text-sm font-semibold alturah8 rounded-l-md 0 ring-1 ring-inset ring-gray-300 focus:z-10">Hoy</button>
+                    <button type="button"
+                        :class="optionValue == 'tomorrow' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+                        @click="getTask('tomorrow')"
+                        class="relative inline-flex items-center px-3 py-2 -ml-px text-sm font-semibold alturah8 rounded-r-md ring-1 ring-inset ring-gray-300 focus:z-10">Mañana</button>
+                </span>
+                <p class="font-bold text-primary">Fecha:</p>
+                <input :class="optionValue == 'date' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+                    class="inline-flex items-center px-3 py-2 -ml-px text-xs font-semibold rounded-md shadow-md alturah8 text-primary border-primary"
+                    type="date" name="date" id="date" v-model="date" @change="getTask('date')">
             </div>
-            <div class="grid h-full grid-rows-auto sm:grid-rows-1 sm:grid-cols-3 sm:gap-2">
+        </div>
+        <div class="flex max-w-full max-h-full min-w-full min-h-full">
+            <div class="grid grid-cols-3">
                 <!--LISTA PROGRAMACIÓN DE ACTIVIDADES-->
                 <div v-if="loadingProgram"
                     class="h-full row-span-6 row-start-2 sm:flex sm:flex-col sm:justify-center sm:items-center sm:row-start-1 sm:col-start-1 sm:col-span-2 rounded-xl">
@@ -252,9 +251,8 @@ const submit = () => {
                     </span>
                     <p class="font-bold animate-pulse text-primary"> Cargando actividades</p>
                 </div>
-
-                <div v-if="!loadingProgram"
-                    class="h-full row-span-6 row-start-2 p-1 overflow-y-auto sm:row-start-1 sm:col-start-1 sm:col-span-2 sm:space-y-1 custom-scroll snap-y snap-proximity rounded-xl">
+                <div v-else
+                    class="h-full col-span-2 col-start-1 p-1 space-y-1 overflow-y-auto custom-scroll snap-y snap-proximity rounded-xl">
                     <div v-for="task in tasks"
                         class="flex flex-col justify-between p-2 border rounded-md shadow-md h-1/2 sm:h-1/2 snap-start">
                         <div class="grid grid-rows-2">
@@ -348,7 +346,6 @@ const submit = () => {
                     </div>
                 </div>
                 <!--#endregion -->
-
                 <!--#region LISTA PERSONAL-->
                 <div v-if="loadingPerson"
                     class="h-[105%] row-start-1 shadow-lg sm:col-start-3 sm:flex sm:flex-col sm:items-center sm:justify-center rounded-xl">
@@ -357,12 +354,12 @@ const submit = () => {
                     </span>
                     <p class="font-bold animate-pulse text-primary"> Cargando personas</p>
                 </div>
-                <Container v-if="!loadingPerson" oncontextmenu="return false" onkeydown="return false"
-                    class="h-[105%] rounded-xl shadow-lg bg-white sm:space-x-0 space-y-1 w-full custom-scroll sm:overflow-y-auto sm:flex-col sm:py-1 sm:px-1"
+                <div class="h-full p-3 overflow-y-auto custom-scroll">
+                    <Container oncontextmenu="return false" onkeydown="return false"
                     behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
                     <Draggable v-for="item in personal"
                         :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
-                        class="py-2 pl-2 shadow-md cursor-pointer sm:rounded-xl hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
+                        class="rounded-xl p-1 shadow-md cursor-pointer hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
                         <div class="grid grid-cols-6">
                             <div class="flex items-center w-full">
                                 <img class="custom-image" :src="item.photo" draggable="false" alt="profile-photo" />
@@ -386,6 +383,7 @@ const submit = () => {
                         </div>
                     </Draggable>
                 </Container>
+                </div>
                 <!--#endregion -->
             </div>
         </div>

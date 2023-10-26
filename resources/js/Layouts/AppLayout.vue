@@ -1,36 +1,25 @@
 <template>
-    <div class="flex items-center px-6 bg-orange-300 gap-x-6 sm:before:flex-1">
-        <p class="space-x-2 text-sm leading-6 text-white">
+    <div class="max-h-[3vh] flex items-center px-6 bg-orange-300 gap-x-6 sm:before:flex-1">
+        <p class="space-x-2 text-sm text-white">
             <strong class="font-semibold">Modo de pruebas</strong>
         </p>
         <div class="flex justify-end flex-1">
-            <!-- <button type="button" class="-m-3 p-3 focus-visible:outline-offset-[-4px]">
-                <span class="sr-only">Dismiss</span>
-                <XMarkIcon class="w-5 h-5 text-white" aria-hidden="true" />
-            </button> -->
         </div>
     </div>
     <div class="max-h-screen collapsible-vertical" :class="menu ? 'toggle-sidebar' : ''">
         <main>
             <div class="fixed inset-0 bg-[black]/60 z-10" :class="{ hidden: !menu }" @click="menu = !menu"></div>
-
             <MenuSidebar class="lg:block " :class="{ hidden: !menu }"></MenuSidebar>
             <div
-                class="z-10 flex items-center justify-between h-16 px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 md:ml-16">
+                class="max-h-[6vh] z-10 flex items-center justify-between h-auto px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 md:ml-16">
                 <div class="w-full">
-                    <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="menu = !menu">
+                    <button type="button" class="-ml-7 p-2.5 text-gray-700 lg:hidden" @click="menu = !menu">
                         <span class="sr-only">Open sidebar</span>
                         <Bars3CenterLeftIcon class="w-6 h-6" aria-hidden="true" />
                     </button>
                     <div class="items-center justify-between hidden lg:flex">
                         <h1 class="hidden text-xl font-extrabold lg:block text-primary">Portal de Operaciones Tecnológicas e
                             Inteligencia Artificial</h1>
-                        <!-- <div class="hidden p-2 font-extrabold uppercase bg-orange-300 rounded-md sm:block ">
-                            <div class="flex items-center px-5 py-1 space-x-2 text-primary">
-                                <i class="pi pi-exclamation-circle"></i>
-                                <p class="">Modo de pruebas</p>
-                            </div>
-                        </div> -->
                         <DolarTRM />
                     </div>
                 </div>
@@ -41,7 +30,7 @@
                             <BellIcon aria-hidden="true" />
                             <span class="flex w-3 h-3">
                                 <span
-                                    class="absolute inline-flex w-3 h-3 ml-3 bg-red-500 rounded-full -mt-7 animate-pulse"></span>
+                                    class="absolute inline-flex w-3 h-3 ml-3 bg-red-500 rounded-full -mt-7"></span>
                             </span>
                         </div>
                     </button>
@@ -53,7 +42,7 @@
                                 <span class="sr-only">Open user menu</span>
                                 <img class="custom-image" :src="$page.props.auth.user.photo" alt="" />
                                 <span class="hidden lg:flex lg:items-center">
-                                    <span class="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">{{
+                                    <span class="ml-4 text-xs font-semibold text-gray-900" aria-hidden="true">{{
                                         $page.props.auth.user.short_name }}</span>
                                 </span>
                                 <ChevronDownIcon class="w-5 h-5 ml-2 -mr-1 text-violet-200 hover:text-violet-100"
@@ -84,7 +73,7 @@
                     </Menu>
                 </div>
             </div>
-            <div class="h-screen rounded-lg shadow-2xl g-white sm:ml-20 sm:mr-1">
+            <div class="max-h-[90vh] flex flex-col min-h-[90vh] p-1 gap-1 border border-gray-200 bg-white rounded-lg shadow-2xl g-white sm:ml-20 sm:mr-1">
                 <slot />
             </div>
             <div class="fixed right-[-5px] z-50 w-10 top-1/4 animate-pulse" data-html2canvas-ignore>

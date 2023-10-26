@@ -23,4 +23,7 @@ class Suggestion extends Model implements Auditable
             set: fn ($value) => $value,
         );
     }
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }

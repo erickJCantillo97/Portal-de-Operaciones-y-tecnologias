@@ -7,7 +7,6 @@ use App\Models\Suggestion;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 
 class SuggestionController extends Controller
@@ -15,9 +14,56 @@ class SuggestionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request) : JsonResponse
+    public function index(Request $request)
     {
-        return response()->json([ Suggestion::where('user_id', $request->user()->id)->get()], 200);
+        // dd($request->option);
+        $validateData = $request->validate([
+            'type' => 'nullable|string',
+            'date' => 'nullable|date'
+        ]);
+        $suggestion=[];
+        if ($request->user()->username == 'gbuelvas') {
+            if (!isset($validateData['type']) and !isset($validateData['date'])) {
+                // dd('llega ambas null');
+                $suggestion= Inertia::render('Suggestions', [
+                    'suggestions' => Suggestion::with('User')
+                        ->get(),
+                    'permission' => true
+                ]);
+            } else if (!isset($validateData['type']) and isset($validateData['date'])) {
+                // dd('llega type = null');
+                $suggestion=Inertia::render('Suggestions', [
+                    'suggestions' => Suggestion::with('User')
+                        ->whereDate('created_at', '=', $validateData['date'])
+                        ->get(),
+                    'permission' => true
+                ]);
+            } else if (isset($validateData['type']) and !isset($validateData['date'])) {
+                // dd('llega date = null');
+                $suggestion=Inertia::render('Suggestions', [
+                    'suggestions' => Suggestion::with('User')
+                        ->where('type', '=', $validateData['type'])
+                        ->get(),
+                    'permission' => true
+                ]);
+            } else {
+                // dd('llega ambas definidas');
+                $suggestion=Inertia::render('Suggestions', [
+                    'suggestions' => Suggestion::with('User')
+                        ->where('type', '=', $validateData['type'])
+                        ->whereDate('created_at', '=', $validateData['date'])
+                        ->get(),
+                    'permission' => true
+                ]);
+            }
+        } else {
+            $suggestion= Inertia::render('Suggestions', [
+                'suggestions' => Suggestion::with('User')
+                    ->where('user_id', $request->user()->id)
+                    ->get()
+            ]);
+        }
+        return $suggestion;
     }
 
     /**
@@ -37,7 +83,7 @@ class SuggestionController extends Controller
             $validateData = $request->validate([
                 'details' => 'required',
                 'type' => 'required',
-                'urlAddress'=>'required'
+                'urlAddress' => 'required'
             ]);
             $validateData['user_id'] = $request->user()->id;
             $validateData['capture'] = Storage::putFileAs(
@@ -73,9 +119,9 @@ class SuggestionController extends Controller
     public function update(Request $request, Suggestion $suggestion)
     {
         $validateData = $request->validate([
-            //
+            'answer' => 'required'
         ]);
-
+        $validateData['status'] = false;
         try {
             $suggestion->update($validateData);
         } catch (Exception $e) {

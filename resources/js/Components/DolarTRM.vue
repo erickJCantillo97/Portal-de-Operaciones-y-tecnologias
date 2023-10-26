@@ -14,23 +14,15 @@ axios.get('https://www.datos.gov.co/resource/mcec-87by.json?$limit=2').then((res
 
 </script>
 <template>
-    <div v-if="rate > 0">
-        <div :key="rate">
-            <p class="text-xs font-normal text-gray-900 whitespace-nowrap">TRM Hoy</p>
-            <div class="items-baseline block text-xl font-semibold text-primary">
-                <div class="flex space-x-1 whitespace-nowrap">
-                <p>${{ rateT.valor }} </p>
-                <div
-                    :class="[change > 0 ? 'bg-green-100 text-primary' : 'bg-red-100 text-red-800', 'inline-flex px-1 items-center rounded-full text-xs font-medium']">
-                    <ArrowUpIcon v-if="change > 0" class="self-center flex-shrink-0 w-3 h-3 text-green-500"
-                        aria-hidden="true" />
-                    <ArrowDownIcon v-else class="self-center flex-shrink-0 w-3 h-3 text-red-500" aria-hidden="true" />
-                    {{ change > 0 ? change.toFixed(2): change.toFixed(2)*-1}}%
-                </div>
-            </div>
-            <div>
-                <!-- <p class="text-xs font-medium text-gray-500">Anterior ${{ rateY.valor }}</p> -->
-            </div>
+    <div v-if="rate > 0" :key="rate"
+        :class="[change > 0 ? 'bg-green-100 text-primary' : 'bg-red-100 text-red-800', 'inline-flex items-center cursor-default rounded-full']">
+        <div class="flex flex-col items-center justify-center pl-3">
+            <p class="text-xs leading-4 text-gray-900">TRM Hoy</p>
+            <p class="text-sm font-semibold leading-4 text-primary">${{ rateT.valor }} </p>
+        </div>
+        <div>
+            <ArrowUpIcon v-if="change > 0" class="self-center flex-shrink-0 w-5 h-5 text-green-500" aria-hidden="true" />
+            <ArrowDownIcon v-else class="self-center flex-shrink-0 w-5 h-5 text-red-500" aria-hidden="true" />
         </div>
     </div>
-</div></template>
+</template>

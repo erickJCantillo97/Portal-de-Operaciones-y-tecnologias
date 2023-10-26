@@ -1,6 +1,7 @@
 <?php
 
 use App\Events\TestWebsocket;
+use App\Http\Controllers\Suggestion\SuggestionController;
 use App\Ldap\User;
 use App\Models\Gantt\Task;
 use App\Models\Process;
@@ -84,6 +85,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             'endDate' => Carbon::now()->addDays(260),
         ]);
     });
+
+    Route::resource('suggestion', SuggestionController::class);
 
 });
 
