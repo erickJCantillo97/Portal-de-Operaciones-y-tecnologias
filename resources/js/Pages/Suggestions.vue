@@ -14,12 +14,12 @@ const props = defineProps({
         default: false
     }
 })
-
+const op = ref();
 const { toast } = useSweetalert();
 const suggestionSelect = ref()
 const loading = ref(true)
 const date = ref(new Date().toISOString().split("T")[0])
-
+const type = ref('')
 const updateSuggestion = (s, n) => {
     router.put(route('suggestion.update', s), { answer: n }, {
         onSuccess: () => {
@@ -28,15 +28,15 @@ const updateSuggestion = (s, n) => {
     })
 }
 
-const filter = (type, date) => {
+const filter = () => {
     router.get(route('suggestion.index'),
         {
-            type: type,
-            date: date
+            type: type.value,
+            date: date.value
         },
         {
             preserveState: true,
-            only:['suggestions']
+            only: ['suggestions']
         }
     )
 }
@@ -46,7 +46,7 @@ function formatDateTime24h(dateTime) {
         { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
 }
 
-const op = ref();
+
 const toggle = (event) => {
     op.value.toggle(event);
 }
@@ -57,16 +57,16 @@ const toggle = (event) => {
             <div class="flex justify-between w-full">
                 <button
                     class="w-8 border rounded-md shadow-xl text-primary hover:text-white border-primary alturah8 pi pi-filter-slash hover:bg-primary"
-                    @click="filter(null, null)" type="button">
+                    @click="type = null ; date = null;filter()">
                 </button>
                 <div class="shadow-xl w-72">
-                    <button type="button" @click="filter('Sugerencia', null)"
+                    <button type="button" @click="type = 'Sugerencia' ; date = null;filter()"
                         class="relative inline-flex items-center justify-center w-1/3 text-sm font-semibold border border-r-0 hover:text-white hover:border-r hover:bg-primary hover:scale-105 text-primary alturah8 rounded-l-md 0 border-primary focus:z-10">
                         Sugerencias</button>
-                    <button type="button" @click="filter('Opinion', null)"
+                    <button type="button" @click="type = 'Opinion' ; date = null;filter()"
                         class="relative inline-flex items-center justify-center w-1/3 text-sm font-semibold border hover:text-white text-primary alturah8 border-primary hover:bg-primary hover:scale-105 focus:z-10">
                         Opinion</button>
-                    <button type="button" @click="filter('Error', null)"
+                    <button type="button" @click="type = 'Error' ; date = null;filter()"
                         class="relative inline-flex items-center justify-center w-1/3 text-sm font-semibold border border-danger hover:text-white text-danger alturah8 rounded-r-md hover:bg-danger hover:scale-105 focus:z-10">
                         Errores</button>
                 </div>
