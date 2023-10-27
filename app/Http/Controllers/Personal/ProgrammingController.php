@@ -69,10 +69,7 @@ class ProgrammingController extends Controller
 
     }
 
-    public function indexGEMAM()
-    {
-        return Inertia::render('Programming/IndexGEMAM');
-    }
+
 
     public function deleteSchedule(Schedule $schedule)
     {

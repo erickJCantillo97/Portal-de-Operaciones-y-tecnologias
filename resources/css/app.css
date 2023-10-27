@@ -18,27 +18,27 @@
     bottom: 23px;
     right: 28px;
     width: 280px;
-  }
+}
 
-  /* The popup chat - hidden by default */
-  .chat-popup {
+/* The popup chat - hidden by default */
+.chat-popup {
     /* display: none; */
     position: fixed;
     bottom: 0;
     right: 15px;
     z-index: 9;
-  }
+}
 
-  /* Add styles to the form container */
-  .form-container {
+/* Add styles to the form container */
+.form-container {
     max-width: 300px;
     padding: 10px;
     background-color: white;
     border-radius: 1rem;
-  }
+}
 
-  /* Full-width textarea */
-  .form-container textarea {
+/* Full-width textarea */
+.form-container textarea {
     width: 100%;
     padding: 15px;
     margin: 5px 0 22px 0;
@@ -46,142 +46,154 @@
     /* background: #5ddff96a; */
     resize: none;
     min-height: 200px;
-  }
+}
 
-  /* When the textarea gets focus, do something */
-  .form-container textarea:focus {
+/* When the textarea gets focus, do something */
+.form-container textarea:focus {
     background-color: #dddddd00;
     outline: none;
-  }
+}
 
-  /* Set a style for the submit/send button */
-  .form-container .btn {
+/* Set a style for the submit/send button */
+.form-container .btn {
     background-color: #04AA6D;
     color: white;
     padding: 16px 20px;
     border: none;
     cursor: pointer;
     width: 100%;
-    margin-bottom:10px;
+    margin-bottom: 10px;
     opacity: 0.8;
-  }
+}
 
-  /* Add a red background color to the cancel button */
-  .form-container .cancel {
+/* Add a red background color to the cancel button */
+.form-container .cancel {
     background-color: red;
-  }
+}
 
-  /* Add some hover effects to buttons */
-  .form-container .btn:hover, .open-button:hover {
+/* Add some hover effects to buttons */
+.form-container .btn:hover,
+.open-button:hover {
     opacity: 1;
-  }
+}
 
-.alturah8{
+.alturah8 {
     height: 2rem !important;
 }
 
 h4.statusmessage {
     margin: 1em 0 0 0;
-  }
+}
 
-  .b-fa.statusicon {
+.b-fa.statusicon {
     margin-inline-end: 0.5em;
-  }
+}
 
-  .b-toolbar > .b-content-element .b-button {
+.b-toolbar>.b-content-element .b-button {
     margin-inline-end: 0em;
-    height: '4em'!important;
-  }
+    height: '4em' !important;
+}
 
-  .b-task-baseline[data-index="0"] {
+.b-task-baseline[data-index="0"] {
     background-color: #ddd;
-  }
+}
 
-  .b-task-baseline[data-index="1"] {
+.b-task-baseline[data-index="1"] {
     background-color: lightgray;
-  }
+}
 
-  .b-task-baseline[data-index="2"] {
+.b-task-baseline[data-index="2"] {
     background-color: #c9c9c9;
-  }
+}
 
-  .b-task-baseline.b-baseline-ahead {
+.b-task-baseline.b-baseline-ahead {
     background-color: lightgreen;
-  }
-  .b-task-baseline.b-baseline-behind {
+}
+
+.b-task-baseline.b-baseline-behind {
     background-color: indianred;
-  }
-  .b-task-baseline.b-baseline-on-time {
+}
+
+.b-task-baseline.b-baseline-on-time {
     background-color: lightblue;
-  }
+}
 
-  .b-hide-baseline-1 .b-task-baseline[data-index="0"] {
+.b-hide-baseline-1 .b-task-baseline[data-index="0"] {
     display: none;
-  }
+}
 
-  .b-hide-baseline-2 .b-task-baseline[data-index="1"] {
+.b-hide-baseline-2 .b-task-baseline[data-index="1"] {
     display: none;
-  }
+}
 
-  .b-hide-baseline-3 .b-task-baseline[data-index="2"] {
+.b-hide-baseline-3 .b-task-baseline[data-index="2"] {
     display: none;
-  }
+}
 
 .b-color-picker-container {
     width: 18em !important;
     display: flex;
     flex-wrap: wrap;
     background-color: rgb(248, 249, 250);
-  }
-  .b-color-picker-container .b-color-picker-item {
+}
+
+.b-color-picker-container .b-color-picker-item {
     width: 3em;
     height: 3em;
     padding: 0.3em;
-  }
-  .b-color-picker-container .b-color-picker-item div {
+}
+
+.b-color-picker-container .b-color-picker-item div {
     width: 100%;
     height: 100%;
-  }
-  .b-color-picker-container .b-color-picker-item:hover {
+}
+
+.b-color-picker-container .b-color-picker-item:hover {
     box-shadow: 0 0 1em rgba(0, 0, 0, 0.7);
-  }
+}
 
-  .b-gantt .b-gantt-task .b-task-percent-bar, .b-gantt .b-gantt-task:hover .b-task-percent-bar {
+.b-gantt .b-gantt-task .b-task-percent-bar,
+.b-gantt .b-gantt-task:hover .b-task-percent-bar {
     background-color: rgba(0, 0, 0, 0.2);
-  }
+}
 
-  .b-inline-list {
+.b-inline-list {
     display: flex;
     flex-flow: row wrap;
     column-gap: 0.5em;
     row-gap: 0.5em;
     padding: 0.5em;
-  }
-  .b-inline-list .b-list-item {
+}
+
+.b-inline-list .b-list-item {
     flex: 0 0 calc(33.333% - 0.333em);
     box-shadow: lightgrey 0px 0px 4px 0px;
     display: flex;
     column-gap: 1em;
-  }
-  .b-inline-list .b-list-item .b-resource-detail {
+}
+
+.b-inline-list .b-list-item .b-resource-detail {
     flex: 1;
-  }
-  .b-inline-list .b-list-item .b-resource-city {
+}
+
+.b-inline-list .b-list-item .b-resource-city {
     display: flex;
     justify-content: space-between;
-  }
-  .b-inline-list .b-list-item img {
+}
+
+.b-inline-list .b-list-item img {
     height: 2em;
     width: 2em;
     border-radius: 50%;
-  }
-  .b-inline-list .b-list-item i {
-    color: red;
-  }
+}
 
-  .b-filestab .b-grid-cell i {
+.b-inline-list .b-list-item i {
+    color: red;
+}
+
+.b-filestab .b-grid-cell i {
     margin-inline-end: 0.3em;
-  }
+}
 
 
 .fondo {
