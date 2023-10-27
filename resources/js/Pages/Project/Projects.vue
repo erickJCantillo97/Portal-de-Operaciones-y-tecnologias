@@ -242,7 +242,7 @@ const items = [
 
 <template>
     <AppLayout>
-        <div class="w-full p-4 px-auto">
+        <div class="w-full overflow-y-auto custom-scroll">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">

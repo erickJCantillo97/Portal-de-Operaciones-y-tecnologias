@@ -8,23 +8,24 @@ import Systems from './../Components/SWBS/Systems.vue';
 import SubSystems from './../Components/SWBS/SubSystems.vue';
 import Processes from './../Components/SWBS/Processes.vue';
 import BaseActivities from './../Components/SWBS/BaseActivities.vue';
-import { CreditCardIcon, KeyIcon, SquaresPlusIcon, ClockIcon, UserGroupIcon } from '@heroicons/vue/24/outline'
+import { KeyIcon, SquaresPlusIcon, ClockIcon, UserGroupIcon } from '@heroicons/vue/24/outline'
 import Gerencias from './../Components/Gerencias.vue';
 import Shifts from './../Components/Shifts.vue';
+import Suggestions from './../../Suggestions.vue';
 const menu = ref('VB')
 const navigation = [
     { name: 'Variables Basicas', value: 'VB', icon: SquaresPlusIcon, current: true },
     { name: 'SWBS', value: 'SW', icon: KeyIcon, current: false },
     { name: 'Horarios', value: 'SC', icon: ClockIcon, current: false }, //SC->schedules
-    //   { name: 'Team', value: '#', icon: UserGroupIcon, current: false },
+    // { name: 'Sugerencias', value: 'SU', icon: UserGroupIcon, current: false },
     //   { name: 'Integrations', value: '#', icon: SquaresPlusIcon, current: false },
 ]
 </script>
 
 <template>
     <AppLayout>
-        <div class="lg:grid lg:grid-cols-12 lg:gap-x-5 p-2 -mt-4">
-            <aside class="px-2 py-6 sm:px-6 lg:col-span-3 lg:px-0 lg:py-0">
+        <div class="p-2 -mt-4 lg:grid lg:grid-cols-12 lg:gap-x-2">
+            <aside class="px-2 py-6 sm:px-6 lg:col-span-2 lg:px-0 lg:py-0">
                 <nav class="space-y-1">
                     <a v-for="item in navigation" :key="item.name"
                         :class="[menu == item.value ? 'bg-gray-50 text-indigo-700 hover:bg-white hover:text-indigo-700' : 'text-gray-900 hover:bg-gray-50 hover:text-gray-900', 'group flex items-center rounded-md px-3 py-2 text-sm font-medium cursor-pointer']"
@@ -37,41 +38,41 @@ const navigation = [
                 </nav>
             </aside>
 
-            <div class="space-y-6 sm:px-6 lg:col-span-9 lg:px-0 overflow-y-auto max-h-screen custom-scroll">
+            <div class="max-h-screen space-y-6 sm:px-6 lg:col-span-10 lg:px-0">
                 <div class="w-full">
-                    <div class="mx-auto w-full  rounded-2xl bg-white p-2" v-if="menu == 'VB'">
+                    <div class="w-full p-2 mx-auto bg-white rounded-2xl" v-if="menu == 'VB'">
                         <div>
                             <h3 class="text-base font-semibold leading-6 text-gray-900">Variables de Sistema</h3>
-                            <p class="mt-1 text-sm text-gray-500 text-justify">Aquí encontrarás las variables en la que se
+                            <p class="mt-1 text-sm text-justify text-gray-500">Aquí encontrarás las variables en la que se
                                 sustenta la aplicación, <strong class="text-red-800">
                                     ¡proceda con precaución!
                                 </strong> o ponte en contacto con los administradores del sistema.</p>
                         </div>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75 uppercase">
+                                class="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-purple-900 uppercase bg-purple-100 rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Gerencias</span>
                                 <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''"
-                                    class="h-5 w-5 text-purple-500" />
+                                    class="w-5 h-5 text-purple-500" />
                             </DisclosureButton>
                             <DisclosurePanel class="pt-4 pb-2 text-sm text-gray-500">
                                 <Gerencias></Gerencias>
                             </DisclosurePanel>
                         </Disclosure>
                     </div>
-                    <div class="mx-auto w-full  rounded-2xl bg-white p-2" v-if="menu == 'SW'">
+                    <div class="w-full p-2 mx-auto bg-white rounded-2xl" v-if="menu == 'SW'">
                         <div>
                             <h3 class="text-base font-semibold leading-6 text-gray-900">SWBS</h3>
-                            <p class="mt-1 text-sm text-gray-500 text-justify">Aquí encontrarás la base de datos que soporta
+                            <p class="mt-1 text-sm text-justify text-gray-500">Aquí encontrarás la base de datos que soporta
                                 el SWBS en el sistema, añade nuevas actividades, sistemas, subsistemas y grupos
                                 constructivos.</p>
                         </div>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-purple-900 bg-purple-100 rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Grupos Constructivos</span>
                                 <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''"
-                                    class="h-5 w-5 text-purple-500" />
+                                    class="w-5 h-5 text-purple-500" />
                             </DisclosureButton>
                             <DisclosurePanel class="pb-2 text-sm text-gray-500">
                                 <ConstructiveGrupo></ConstructiveGrupo>
@@ -79,10 +80,10 @@ const navigation = [
                         </Disclosure>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-purple-900 bg-purple-100 rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Sistemas</span>
                                 <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''"
-                                    class="h-5 w-5 text-purple-500" />
+                                    class="w-5 h-5 text-purple-500" />
                             </DisclosureButton>
                             <DisclosurePanel class="pb-2 text-sm text-gray-500">
                                 <Systems></Systems>
@@ -90,10 +91,10 @@ const navigation = [
                         </Disclosure>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-purple-900 bg-purple-100 rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Sub-Sistemas</span>
                                 <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''"
-                                    class="h-5 w-5 text-purple-500" />
+                                    class="w-5 h-5 text-purple-500" />
                             </DisclosureButton>
                             <DisclosurePanel class="pb-2 text-sm text-gray-500">
                                 <SubSystems></SubSystems>
@@ -101,10 +102,10 @@ const navigation = [
                         </Disclosure>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-purple-900 bg-purple-100 rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Proceso</span>
                                 <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''"
-                                    class="h-5 w-5 text-purple-500" />
+                                    class="w-5 h-5 text-purple-500" />
                             </DisclosureButton>
                             <DisclosurePanel class="pb-2 text-sm text-gray-500">
                                 <Processes></Processes>
@@ -112,30 +113,47 @@ const navigation = [
                         </Disclosure>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-purple-900 bg-purple-100 rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Actividades basicas</span>
                                 <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''"
-                                    class="h-5 w-5 text-purple-500" />
+                                    class="w-5 h-5 text-purple-500" />
                             </DisclosureButton>
                             <DisclosurePanel class="pb-2 text-sm text-gray-500">
                                 <BaseActivities></BaseActivities>
                             </DisclosurePanel>
                         </Disclosure>
                     </div>
-                    <div class="mx-auto w-full  rounded-2xl bg-white p-2" v-if="menu == 'SC'">
+                    <div class="w-full p-2 mx-auto bg-white rounded-2xl" v-if="menu == 'SC'">
                         <div>
                             <h3 class="text-base font-semibold leading-6 text-gray-900">Horarios</h3>
-                            <p class="mt-1 text-sm text-gray-500 text-justify">Aquí encontrarás los horarios basicos parametrizados</p>
+                            <p class="mt-1 text-sm text-justify text-gray-500">Aquí encontrarás los horarios basicos parametrizados</p>
                         </div>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75 uppercase">
+                                class="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-purple-900 uppercase bg-purple-100 rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Horarios</span>
                                 <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''"
-                                    class="h-5 w-5 text-purple-500" />
+                                    class="w-5 h-5 text-purple-500" />
                             </DisclosureButton>
                             <DisclosurePanel class="pt-4 pb-2 text-sm text-gray-500">
                                 <Shifts/>
+                            </DisclosurePanel>
+                        </Disclosure>
+                    </div>
+                    <div class="w-full p-2 mx-auto bg-white rounded-2xl" v-if="menu == 'SU'">
+                        <div>
+                            <h3 class="text-base font-semibold leading-6 text-gray-900">Sugerencias</h3>
+                            <!-- <p class="mt-1 text-sm text-justify text-gray-500">Aquí encontrarás los horarios basicos parametrizados</p> -->
+                        </div>
+                        <Disclosure as="div" class="mt-2" v-slot="{ open}">
+                            <DisclosureButton
+                                class="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-purple-900 uppercase bg-purple-100 rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                <span>Ver sugerencias</span>
+                                <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''"
+                                    class="w-5 h-5 text-purple-500" />
+                            </DisclosureButton>
+                            <DisclosurePanel class="pt-4 pb-2 text-sm text-gray-500 ">
+                                <Suggestions />
                             </DisclosurePanel>
                         </Disclosure>
                     </div>

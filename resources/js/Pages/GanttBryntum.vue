@@ -1,14 +1,15 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { onMounted } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import "@bryntum/gantt-trial/gantt.material.css";
 import '@bryntum/gantt-trial/locales/gantt.locale.Es.js';
 import { DateHelper, Gantt, List, LocaleManager, ProjectModel, StringHelper, Widget } from '@bryntum/gantt-trial/gantt.module.js';
 import '../../css/app.scss'
 import { useSweetalert } from '@/composable/sweetAlert';
+import ProjectCard from '@/Components/ProjectCard.vue';
 const { toast } = useSweetalert();
 const props = defineProps({
-    project: Number,
+    project: Object,
     groups: Array
 })
 LocaleManager.applyLocale('Es');
@@ -532,12 +533,9 @@ const toggleBaselineVisible = (index, visible) => {
 }
 //#endregion
 
-
-
 onMounted(() => {
     gantt.appendTo = 'container';
 })
-
 //#region toolbar
 
 //exportar
@@ -644,8 +642,11 @@ const onSettingsMarginChange = ({ value }) => {
 </script>
 <template>
     <AppLayout>
-        <div class="rounded-xl shadow-xl p-1 h-[85vh]">
-            <div id="container" class="h-full text-xs sm:rounded-lg">
+        <div class="grid grid-cols-5 justify-center w-full h-[10vh] overflow-y-auto">
+            <p>{{ props.project.name }}</p>
+        </div>
+        <div class="grid h-full grid-cols-1 grid-rows-1">
+            <div id="container" class="h-[80vh] flex-1 text-xs">
             </div>
         </div>
     </AppLayout>

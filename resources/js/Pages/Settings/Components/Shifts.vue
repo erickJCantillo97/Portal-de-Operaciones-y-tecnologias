@@ -342,7 +342,7 @@ const calcularDiferencia = (start, end) => {
                                                 </p>
                                                 <p>{{ calcularDiferencia(shift.startBreak, shift.endBreak) }} Horas</p>
                                             </div>
-                                            <div class="relative text-warning col-span-2"
+                                            <div class="relative col-span-2 text-warning"
                                                 v-if="calcularDiferencia(shift.startShift, shift.endShift)-calcularDiferencia(shift.startBreak, shift.endBreak) > 8.5">
                                                 <p>
                                                     Tiempo adicional

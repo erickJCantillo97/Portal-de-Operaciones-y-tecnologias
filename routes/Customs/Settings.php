@@ -29,5 +29,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('gruposConstructivos/get', function () {
         return response()->json([gruposConstructivos()], 200);
     })->name('gruposConstructivos.index');
+
     Route::resource('shift', ShiftController::class);
+
 });

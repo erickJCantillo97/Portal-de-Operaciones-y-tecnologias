@@ -1,266 +1,525 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { FilterMatchMode } from 'primevue/api';
-import Button from '@/Components/Button.vue';
-import Calendar from 'primevue/calendar';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import InputText from 'primevue/inputtext';
 import '../../../sass/dataTableCustomized.scss';
-import Avatars from '@/Components/Avatars.vue';
-import ProjectCard from '@/Components/ProjectCard.vue';
-import MinimalMenu from '@/Components/MinimalMenu.vue';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, CheckIcon, XCircleIcon } from '@heroicons/vue/20/solid';
+import { Container, Draggable } from "vue-dndrop";
+import { XMarkIcon, PencilIcon, Bars3Icon } from "@heroicons/vue/20/solid";
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import Button from '@/Components/Button.vue';
+import { useSweetalert } from '@/composable/sweetAlert';
+import Knob from 'primevue/knob';
+import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import Combobox from '@/Components/Combobox.vue';
+import TextInput from '@/Components/TextInput.vue';
+import FullCalendar from '@/Components/FullCalendar.vue'
+const { toast } = useSweetalert();
 
-const props = defineProps({
+//#region Draggable
+const listaDatos = ref({})
+const date = ref(new Date().toISOString().split("T")[0])
+const personal = ref()
 
-})
-
-
-const unidad = {
-    day: 'Dias',
-    hour: 'Horas'
-};
-
-const projects = ref()
-onMounted(() => {
-    getTask('today')
-})
-const dates = ref([]);
 const tasks = ref([]);
-const loading = ref(false);
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    'project.name': { value: null, matchMode: FilterMatchMode.CONTAINS },
-    'project.id': { value: null, matchMode: FilterMatchMode.EQUALS },
-    'manager': { value: null, matchMode: FilterMatchMode.CONTAINS },
-});
+const loadingProgram = ref(true);
+const loadingPerson = ref(true);
+const personalHours = ref({});
+const loadingTasks = ref(true)
+const loadingTask = ref({})
 const optionValue = ref('today')
 
-function obtenerLunesYViernesSemanaActual() {
-    const hoy = new Date();
-    const diaSemana = hoy.getDay(); // 0 para domingo, 1 para lunes, ..., 6 para sábado
-
-    // Calcula la fecha del lunes de la semana actual
-    const lunes = new Date(hoy);
-    lunes.setDate(hoy.getDate() - diaSemana + (diaSemana === 0 ? -6 : 1));
-
-    // Calcula la fecha del viernes de la semana actual
-    const viernes = new Date(lunes);
-    viernes.setDate(lunes.getDate() + 4);
-
-
-    return {
-        lunes: lunes,
-        viernes: viernes
-    };
+// El código anterior define una función `onDrop` en Vue. Esta función se activa cuando un elemento se
+// coloca en una colección.
+const onDrop = async (collection, dropResult) => {
+    const { addedIndex, payload } = dropResult;
+    if (addedIndex !== null) {
+        loadingTask.value[collection] = true
+        await axios.post(route('programming.store'), { task_id: collection, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: date.value }).then((res) => {
+            listaDatos.value[collection] = res.data.task
+            personalHours.value[(payload.Num_SAP)] = res.data.hours
+            loadingTask.value[collection] = false
+        })
+    }
 }
 
-const getTask = (option) => {
+const getAssignmentHours = (employee_id) => {
+    axios.get(route('get.assignment.hours', [date.value, employee_id])).then((res) => {
+        personalHours.value[(employee_id)] = res.data;
+    })
+}
 
-    const today = new Date();
+// El código anterior define una función llamada `getFoto` que toma un parámetro `correo`. Dentro de la
+// función, realiza una solicitud POST a una ruta llamada `'get.foto'` con el parámetro `correo` como
+// carga útil. Luego recupera los datos de la "foto" de la respuesta y los devuelve.
+const getFoto = (correo) => {
+    axios.post(route('get.foto', correo)).then((res) => {
+        return res.data.photo
+    })
+}
+
+// El código anterior define una función llamada "getChildPayload" que toma un parámetro "índice". Esta
+// función devuelve el valor en el índice especificado en la variable "personal".
+const getChildPayload = (index) => {
+    return personal.value[index];
+}
+
+//#endregion
+
+// El código anterior utiliza el gancho de ciclo de vida `onMounted` de Vue para ejecutar algún código
+// cuando el componente está montado.
+onMounted(() => {
+    getTask('tomorrow')
+})
+
+
+// El código anterior es una función de Vue.js que recupera tareas según la opción seleccionada.
+const getTask = async (option) => {
+    loadingPerson.value = true
+    loadingProgram.value = true
     optionValue.value = option
     switch (option) {
         case 'today':
-            dates.value[0] = today;
-            dates.value[1] = today;
+            date.value = new Date().toISOString().split("T")[0];
             break;
         case 'tomorrow':
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            dates.value[0] = tomorrow;
-            dates.value[1] = tomorrow;
-            break;
-
-        case 'week':
-            const week = new Date();
-            const fechasSemanaActual = obtenerLunesYViernesSemanaActual();
-            week.setDate(week.getDate() + 7);
-            dates.value[0] = fechasSemanaActual.lunes;
-            dates.value[1] = fechasSemanaActual.viernes;
+            var tomorrow = new Date()
+            date.value = new Date(tomorrow.setDate(tomorrow.getDate() + 1)).toISOString().split("T")[0];
             break;
         default:
             break;
     }
-
-    if (dates.value[1] != null) {
-        tasks.value = [];
-        loading.value = true;
-
-        axios.get(route('actividadesDeultimonivel', { dates: dates.value })).then((res) => {
-            loading.value = false;
-            tasks.value = res.data
-            projects.value = [...new Set(res.data.map(obj => obj.project.id))]
+    tasks.value = [];
+    await axios.get(route('actividadesDeultimonivel', { date: date.value })).then((res) => {
+        tasks.value = res.data
+        loadingProgram.value = false;
+    })
+    tasks.value.forEach(element => {
+        loadingTask.value[element.id] = true
+        axios.get(route('get.schedule.task', { task_id: element.id, date: date.value })).then((res) => {
+            listaDatos.value[element.id] = res.data.schedule
+            loadingTask.value[element.id] = false
+            loadingTasks.value = false
         })
-    }
+    });
+    axios.get(route('get.personal')).then((res) => {
+        personal.value = Object.values(res.data.personal)
+        personal.value.forEach(async element => {
+            await axios.get(route('get.assignment.hours', [date.value, (element.Num_SAP)])).then((res) => {
+                personalHours.value[element.Num_SAP] = res.data;
+            });
+        })
+        loadingPerson.value = false
+    })
 
 }
 
-const redondear = (value) => {
-    return new Intl.NumberFormat().format(Number(value).toFixed(2))
+// El código anterior es una función llamada `format24h` que toma un parámetro `hora` (que representa
+// una hora en formato de 24 horas) y devuelve una cadena de hora formateada en formato de 12 horas con
+// AM/PM.
+function format24h(hora) {
+    return new Date("1970-01-01T" + hora).toLocaleString('es-CO',
+        { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 }
-
-const filterProject = (id) => {
-    filters.value['project.id'].value = id;
-}
-
 //#region
-const items = ref([
-    {
-        label: 'Añadir recursos',
-        icon: 'fa-solid fa-chart-gantt',
-        url: {
-            name: 'createSchedule.create',
-            parametter: ''
-        }
-    },
-    {
-        label: 'Asignar colaborador',
-        icon: 'fa-solid fa-arrows-down-to-people',
-        url: {
-            name: 'createSchedule.create',
-            parametter: ''
-        }
-    },
 
-    {
-        label: 'Ver programacion',
-        icon: 'fa-solid fa-list-check',
-        url: {
-            name: 'programming',
-            parametter: ''
-        }
-    },
-]);
+// El código anterior define una función llamada "quitar" que toma tres parámetros: "tarea", "índice" y
+// "persona". Dentro de la función realiza una solicitud POST asíncrona usando axios a una ruta llamada
+// "programming.delete" con los datos { task_id: tarea, empleado_id: persona.Num_SAP, fecha: fecha}. Si
+// la solicitud tiene éxito, registra la respuesta en la consola, elimina un elemento de la matriz
+// "listaDatos.value[task.id]" en el índice especificado y muestra un mensaje de notificación de éxito.
+// También hay definida una función "editar" vacía.
+const deleteSchedule = async (task, index, schedule) => {
 
+    await axios.post(route('programming.delete', schedule.id)).then((res) => {
+        listaDatos.value[task.id] = res.data.task
+        getAssignmentHours((schedule.employee_id))
+        toast('Se ha eliminado a ' + schedule.name + ' de la tarea ' + task.name, 'success');
+    })
+}
+
+const editar = () => {
+
+}
 //#endregion
 
+//#region Modal Persona
+const employee = ref([])
+const open = ref(false)
+const events = ref([])
+const turnSelect = ref()
+const rendersCalendars = ref(0)
+const showHours = ref('Horas')
+
+// El código anterior define una función llamada `employeeDialog` que toma un parámetro `item`. Dentro
+// de la función, establece el valor de "open" en "verdadero" y el valor de "employee" en el
+// parámetro "elemento".
+const employeeDialog = (item) => {
+    open.value = true
+    employee.value = item
+    axios.get(route('get.times.employees', { date: date.value, employee_id: item.Num_SAP }))
+        .then((res) => {
+            events.value = res.data.times
+            rendersCalendars.value++;
+        })
+        .catch(error => {
+            console.log(error);
+        })
+}
+
+const submit = () => {
+    console.log('Hello!');
+}
+//#endregion
 </script>
+<style scoped>
+.custom-image {
+    width: 200px;
+    height: 50px;
+    object-position: 50% 30%;
+    border-radius: 10% 25%;
+    object-fit: cover;
+    /* Opciones: 'cover', 'contain', 'fill', etc. */
+}
+
+.info-resto {
+    font-size: 15px;
+    text-wrap: balance;
+    opacity: .5;
+}
+
+.loader {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.loader:before,
+.loader:after {
+    content: '';
+    border-radius: 50%;
+    position: absolute;
+    inset: 0;
+    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.3) inset;
+}
+
+.loader:after {
+    box-shadow: 0 2px 0 rgb(46 48 146) inset;
+    animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0)
+    }
+
+    100% {
+        transform: rotate(360deg)
+    }
+}
+</style>
 
 <template>
     <AppLayout>
-        <div class="w-full md:p-4 px-auto">
-            <div class="flex items-center mx-2 mb-2">
-                <div class="flex-auto">
-                    <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
-                        Programación de Actividades
-                    </h1>
-                </div>
+        <div class="grid justify-center px-1 grid-col-1 sm:flex sm:justify-between sm:items-center">
+            <p class="text-xl font-semibold leading-6 text-center capitalize text-primary">
+                Programación de Actividades
+            </p>
+            <div class="flex items-center space-x-2">
+                <span class="shadow-md md:block">
+                    <button type="button"
+                        :class="optionValue == 'today' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+                        @click="getTask('today')"
+                        class="relative inline-flex items-center px-3 py-2 text-sm font-semibold alturah8 rounded-l-md 0 ring-1 ring-inset ring-gray-300 focus:z-10">Hoy</button>
+                    <button type="button"
+                        :class="optionValue == 'tomorrow' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+                        @click="getTask('tomorrow')"
+                        class="relative inline-flex items-center px-3 py-2 -ml-px text-sm font-semibold alturah8 rounded-r-md ring-1 ring-inset ring-gray-300 focus:z-10">Mañana</button>
+                </span>
+                <p class="font-bold text-primary">Fecha:</p>
+                <input :class="optionValue == 'date' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+                    class="inline-flex items-center px-3 py-2 -ml-px text-xs font-semibold rounded-md shadow-md alturah8 text-primary border-primary"
+                    type="date" name="date" id="date" v-model="date" @change="getTask('date')">
             </div>
-            <div>
-                <div class="flex items-center my-4 space-x-2">
-                    <div class="hidden w-1/12 md:block">
-                        <Button icon="pi pi-filter-slash shadow-xl" @click="filterProject()" type="button" text=""
-                            severity="primary" class="hover:bg-primary ">
-                            Ver Todos
-                        </Button>
-                    </div>
-                    <div class="flex w-11/12 p-1 space-x-2 overflow-x-auto shadow-sm shadow-primary rounded-xl snap-x">
-                        <ProjectCard v-for="project in projects" :projectId=project :menu=false clases="cursor-pointer"
-                            @click="filterProject(project)" :activo="filters['project.id'].value == project" />
-                    </div>
-                </div>
-
-            </div>
-            <DataTable id="tabla" stripedRows class="items-center p-datatable-sm overflow-y-auto h-96" :value="tasks"
-                v-model:filters="filters" dataKey="id" filterDisplay="menu" :loading="loading" sortMode="multiple"
-                :globalFilterFields="['name', 'project', 'executor', 'manager', 'duration', 'startDate', 'endDate',]"
-                currentPageReportTemplate=" {first} al {last} de {totalRecords}"
-                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-                :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
-                <template #empty>
-                    <p class="pt-5 pb-5 text-center">No hay tareas para mostrar</p>
-                </template>
-                <template #loading>
-                    <p class="pt-5 pb-5 text-center">Cargando tareas...</p>
-                </template>
-
-                <template #header>
-                    <div class="flex justify-between w-full mb-2">
-                        <div class="flex space-x-4 alturah8">
-                            <Button icon="pi pi-filter-slash shadow-xl" @click="clearFilter()" type="button" text=""
-                                severity="primary" class="hover:bg-primary ">
-                                <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
-                            </Button>
-                            <span class="p-float-label">
-                                <InputText id="buscar" v-model="filters.global.value" type="search"
-                                    class="block text-gray-900 rounded-md shadow-xl alturah8 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
-                                <label for="buscar">Buscar...</label>
-                            </span>
-                        </div>
-                        <div class="flex justify-end mb-2 space-x-4 alturah8">
-                            <span class="hidden shadow-xl md:block">
-                                <button type="button"
-                                    :class="optionValue == 'today' ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
-                                    @click="getTask('today')"
-                                    class="relative inline-flex items-center px-3 py-2 text-sm font-semibold alturah8 rounded-l-md 0 ring-1 ring-inset ring-gray-300 focus:z-10">Hoy</button>
-                                <button type="button"
-                                    :class="optionValue == 'tomorrow' ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
-                                    @click="getTask('tomorrow')"
-                                    class="relative inline-flex items-center px-3 py-2 -ml-px text-sm font-semibold alturah8 ring-1 ring-inset ring-gray-300 focus:z-10">Mañana</button>
-                                <button type="button"
-                                    :class="optionValue == 'week' ? 'bg-sky-500 text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
-                                    @click="getTask('week')"
-                                    class="relative inline-flex items-center px-3 py-2 -ml-px text-sm font-semibold alturah8 rounded-r-md ring-1 ring-inset ring-gray-300 focus:z-10">Semana</button>
-                            </span>
-                            <span class="p-float-label">
-                                <calendar id="calendar" selectionMode="range" v-model="dates"
-                                    v-on:date-select="getTask('range')"
-                                    class="shadow-xl alturah8 focus:ring-2 focus:ring-indigo-600 focus:ring-inset h-9">
-                                </calendar>
-                                <label for="calendar">Rango de fechas</label>
-                            </span>
-                        </div>
-                    </div>
-                </template>
-
-                <!--COLUMNAS-->
-                <Column field="name" header="Tarea"></Column>
-                <Column field="project.ship.name" header="Proyecto" :show-filter-match-modes="false"
-                    v-if="filters['project.id'].value == null">
-                    <!-- <template #body="{ data }">
-                    {{ data.project.name }}
-                </template> -->
-                    <!-- <template #filter="{ filterModel, filterCallback }">
-                        <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
-                            placeholder="Busca por proyecto" />
-                    </template>
-                    <template #body="slotProps">
-
-                    </template> -->
-                </Column>
-                <Column field="manager" header="Responsable" :show-filter-match-modes="false">
-                    <template #filter="{ filterModel, filterCallback }">
-                        <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter"
-                            placeholder="Busca por Responsable" />
-                    </template>
-                </Column>
-                <Column field="executor" header="Ejecutor"></Column>
-                <Column field="duration" header="Duración">
-                    <template #body="slotProps">
-                        {{ redondear(slotProps.data.duration) }} {{ unidad[slotProps.data.durationUnit] }}
-                    </template>
-                </Column>
-                <Column field="startDate" header="Fecha inicio"></Column>
-                <Column field="endDate" header="Fecha fin"></Column>
-                <Column field="" header="Recursos">
-                    <template #body="slotProps">
-                        <Avatars :assignments=slotProps.data.assignments />
-                    </template>
-                </Column>
-                <Column field="" header="Acciones" bodyStyle="text-align:center">
-                    <template #body="slotProps">
-                        <MinimalMenu :items="items" :header="true">
-                            <template #header>
-                                <p class="font-semibold text-center text-black border-b border-gray-600">
-                                    {{ slotProps.data.name }}</p>
-                            </template>
-                        </MinimalMenu>
-                    </template>
-                </Column>
-            </DataTable>
         </div>
+        <div class="flex max-w-full max-h-full min-w-full min-h-full">
+            <div class="grid grid-cols-3">
+                <!--LISTA PROGRAMACIÓN DE ACTIVIDADES-->
+                <div v-if="loadingProgram"
+                    class="h-full row-span-6 row-start-2 sm:flex sm:flex-col sm:justify-center sm:items-center sm:row-start-1 sm:col-start-1 sm:col-span-2 rounded-xl">
+                    <span class="flex items-center justify-center w-full h-full loader">
+                        <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
+                    </span>
+                    <p class="font-bold animate-pulse text-primary"> Cargando actividades</p>
+                </div>
+                <div v-else
+                    class="h-full col-span-2 col-start-1 p-1 space-y-1 overflow-y-auto custom-scroll snap-y snap-proximity rounded-xl">
+                    <div v-for="task in tasks"
+                        class="flex flex-col justify-between p-2 border rounded-md shadow-md h-1/2 sm:h-1/2 snap-start">
+                        <div class="grid grid-rows-2">
+                            <div class="">
+                                <p class="block overflow-hidden">{{ task.name }}
+                                </p>
+                                <p class="text-xs italic uppercase text-primary">{{ task.project }}</p>
+                            </div>
+                            <div class="grid items-center grid-cols-2 text-xs sm:grid-cols-6">
+                                <div class="">
+                                    <div class="flex justify-between">
+                                        <p class="font-bold ">I:</p>
+                                        <p class="font-mono">{{ task.startDate }}
+                                        </p>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <p class="font-bold">F:</p>
+                                        <p class="font-mono">{{ task.endDate }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="hidden sm:flex sm:justify-center">
+                                    <Knob v-tooltip.top="'Avance: ' + parseInt(task.percentDone) + '%'"
+                                        :model-value=parseInt(task.percentDone) :size=50 valueTemplate="{value}%"
+                                        readonly />
+                                </div>
+                                <div class="hidden text-center sm:justify-center sm:block">
+                                    <p class="font-bold">Valor estimado</p>
+                                    <p class="">$1.000.000
+                                    </p>
+                                </div>
+                                <div class="hidden text-center sm:justify-center sm:block">
+                                    <p class="font-bold">Valor programado</p>
+                                    <p class="">$1.000.000
+                                    </p>
+                                </div>
+                                <div class="hidden text-center sm:justify-center sm:block">
+                                    <p class="font-bold">Diferencia</p>
+                                    <p class="">$1.000.000
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="loadingTasks ? true : loadingTask[task.id] ? true : false"
+                            class="flex flex-col items-center justify-center h-full p-2">
+                            <span class="flex items-center justify-center w-full h-full loader">
+                                <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
+                            </span>
+                            <p class="font-bold animate-pulse text-primary">
+                                {{ loadingTasks ? 'Cargando personas asignadas' : 'Guardando cambios' }}</p>
+                        </div>
+                        <Container v-if="!loadingTask[task.id]"
+                            class="h-full p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
+                            @drop="onDrop(task.id, $event)" group-name="1">
+                            <div class="grid grid-cols-2 gap-1"
+                                v-if="listaDatos[task.id] !== undefined && listaDatos[task.id].length != 0">
+                                <div v-for="(item, index) in listaDatos[task.id]" class="p-1 mt-1 border-2 rounded-md">
+                                    <div class="flex items-center justify-between w-full">
+                                        <p class="text-sm font-semibold ">{{ item.name }}</p>
+                                        <button v-tooltip.top="'Eliminar de la Actividad'"
+                                            @click="deleteSchedule(task, index, item)">
+                                            <XMarkIcon
+                                                class="h-4 p-0.5 border rounded-md text-white bg-danger border-danger hover:animate-pulse hover:scale-125" />
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center justify-between w-full font-mono align-middle">
+                                        <div class="grid grid-cols-3 gap-1">
+                                            <span v-for="horario in item.schedule_times"
+                                                class="inline-flex items-center gap-x-1.5 rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+                                                {{ format24h(horario.hora_inicio) }}-{{ format24h(horario.hora_fin) }}
+                                            </span>
+                                        </div>
+                                        <button v-tooltip.bottom="'En desarrollo'" @click="console.log('En desarrollo')">
+                                            <PencilIcon
+                                                class="h-4 p-0.5 border rounded-md bg-primary text-white border-primary hover:animate-pulse hover:scale-125" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else class="items-center justify-center text-center align-middle opacity-50">
+                                <h2 class="mt-4 text-xl font-medium tracking-wide text-gray-700">No hay personas
+                                    asignadas
+                                </h2>
+
+                                <p class="mt-2 tracking-wide text-gray-500">Arrastre una persona de la lista de la
+                                    izquierda
+                                    para agregarla a la actividad </p>
+                            </div>
+                        </Container>
+                    </div>
+                </div>
+                <!--#endregion -->
+                <!--#region LISTA PERSONAL-->
+                <div v-if="loadingPerson"
+                    class="h-[105%] row-start-1 shadow-lg sm:col-start-3 sm:flex sm:flex-col sm:items-center sm:justify-center rounded-xl">
+                    <span class="flex items-center justify-center w-full h-full loader">
+                        <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
+                    </span>
+                    <p class="font-bold animate-pulse text-primary"> Cargando personas</p>
+                </div>
+                <div class="h-full p-3 overflow-y-auto custom-scroll">
+                    <Container oncontextmenu="return false" onkeydown="return false"
+                    behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
+                    <Draggable v-for="item in personal"
+                        :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
+                        class="rounded-xl p-1 shadow-md cursor-pointer hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
+                        <div class="grid grid-cols-6">
+                            <div class="flex items-center w-full">
+                                <img class="custom-image" :src="item.photo" draggable="false" alt="profile-photo" />
+                            </div>
+                            <div class="col-span-4 mx-1">
+                                <p class="text-sm font-semibold leading-6 text-gray-900">
+                                    {{ item.Nombres_Apellidos }}
+                                </p>
+                                <p class="flex mt-1 text-xs leading-5 text-gray-500">
+                                    {{ item.Cargo }}
+                                </p>
+                            </div>
+                            <div class="flex items-center justify-center w-full">
+                                <button title="Horas programadas"
+                                    :class="personalHours[(item.Num_SAP)] < 9.5 ? 'bg-primary' : 'bg-success'"
+                                    class="flex items-center justify-center w-12 h-10 p-1 m-1 font-mono text-sm text-white align-middle rounded-md"
+                                    @click="employeeDialog(item)">
+                                    <p>{{ personalHours[(item.Num_SAP)] }} Horas </p>
+                                </button>
+                            </div>
+                        </div>
+                    </Draggable>
+                </Container>
+                </div>
+                <!--#endregion -->
+            </div>
+        </div>
+        <!--#region MODAL DE PERSONAS -->
+        <TransitionRoot as="template" :show="open">
+            <Dialog as="div" class="relative z-30" @close="open = false">
+                <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
+                    leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+                    <div class="fixed inset-0 z-30 w-screen h-screen transition-opacity bg-gray-500 bg-opacity-75" />
+                </TransitionChild>
+                <div class="fixed inset-0 z-50 h-screen overflow-y-auto">
+                    <div class="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
+                        <TransitionChild as="template" enter="ease-out duration-300"
+                            enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
+                            leave-from="opacity-100 translate-y-0 sm:scale-100"
+                            leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                            <DialogPanel
+                                class="p-6 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl max-w-screen-2xl sm:my-8">
+
+                                <div class="px-2 mt-2 text-center">
+                                    <DialogTitle as="h3" class="text-3xl font-semibold text-center text-primary">
+                                        Ver detalle de horario
+                                    </DialogTitle>
+                                </div>
+                                <div class="py-2 bg-white">
+                                    <div class="grid grid-cols-4 mx-auto max-w-[100%] gap-x-2 gap-y-20">
+                                        <!--COLUMNA 1 (SECCIÓN INFORMACIÓN DEL EMPLEADO)-->
+                                        <div class="col-span-1">
+                                            <div
+                                                class="flex flex-col items-center justify-center gap-10 pt-12 font-bold border border-solid rounded-md shadow-md sm:flex-col">
+                                                <img class="aspect-[4/5] w-32 flex-none rounded-3xl object-cover shadow-md"
+                                                    :src="employee.photo" alt="Foto" />
+                                                <div class="max-w-xl text-center">
+                                                    <h3
+                                                        class="text-lg font-semibold leading-8 tracking-tight text-gray-900 whitespace-nowrap">
+                                                        {{ employee.Nombres_Apellidos }}
+                                                    </h3>
+                                                    <p class="text-base leading-7 text-gray-600">{{ employee.Cargo }}
+                                                    </p>
+                                                    <p class="text-base leading-7 text-gray-600">{{ employee.Correo }}
+                                                    </p>
+                                                    <ul role="list" class="flex justify-center mt-6 gap-x-6">
+                                                        <li>
+                                                            <a :href="employee.twitterUrl"
+                                                                class="text-gray-400 hover:text-gray-500">
+                                                                <span class="sr-only">Twitter</span>
+                                                                <svg class="w-5 h-5" aria-hidden="true" fill="currentColor"
+                                                                    viewBox="0 0 20 20">
+                                                                    <!-- Icono de Twitter -->
+                                                                </svg>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a :href="employee.linkedinUrl"
+                                                                class="text-gray-400 hover:text-gray-500">
+                                                                <span class="sr-only">LinkedIn</span>
+                                                                <svg class="w-5 h-5" aria-hidden="true" fill="currentColor"
+                                                                    viewBox="0 0 20 20">
+                                                                    <!-- Icono de LinkedIn -->
+                                                                </svg>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--COLUMNA 2 - (FullCalendar)-->
+                                        <div class="flex col-span-3 flex-nowrap">
+                                                <FullCalendar :initialEvents="events" :tasks="tasks" :date="date" :employee="employee" :project="project"
+                                                    :key="rendersCalendars" />
+
+                                            </div>
+                                        <!--COLUMNA 3 - SELECCIÓN DE ACTIVIDADES-->
+                                        <div
+                                            class="w-full col-span-1 p-3 m-1 overflow-hidden overflow-y-auto font-bold text-left bg-white border border-solid rounded-md shadow-md custom-scroll sm:my-8">
+                                            <Combobox class="mt-2 text-left" label="Actividad"
+                                                placeholder="Seleccione Actividad" :options="tasks" v-model="taskSelect">
+                                            </Combobox>
+
+                                            <!--RADIO BUTTONS DE HORAS-->
+                                            <div class="flex flex-wrap w-full h-10 mt-4 space-x-2">
+                                                <input type="radio" name="action" value="Horas" v-model="showHours">
+                                                <label for="Horas">Intervalo</label>
+                                                <input type="radio" name="action" value="Resto" v-model="showHours">
+                                                <label for="Resto">Resto</label>
+                                                <input type="radio" name="action" value="Turno" v-model="showHours">
+                                                <label for="Turno">Turno</label>
+                                            </div>
+
+                                            <!--sección de selección de horas-->
+                                            <div v-if="showHours === 'Horas'" class="w-full h-auto">
+                                                <!--CAMPO HORA INICIO-->
+                                                <TextInput class="mt-2 text-left" type="time" label="Hora de inicio">
+                                                </TextInput>
+
+                                                <!--CAMPO HORA FINALIZACIÓN-->
+                                                <TextInput class="mt-2 text-left" type="time" label="Hora de Finalización">
+                                                </TextInput>
+                                            </div>
+
+                                            <!--sección de selección de turnos-->
+                                            <div v-if="showHours === 'Turno'" class="w-full h-auto">
+                                                <!--campo select de turnos-->
+                                                <Combobox class="mt-2 text-left" label="Turnos"
+                                                    placeholder="Seleccione Turno" :options="tasks" v-model="turnSelect">
+                                                </Combobox>
+                                            </div>
+
+                                            <!--sección de Resto-->
+                                            <div v-if="showHours === 'Resto'"
+                                                class="flex justify-center w-full h-auto flex-nowrap">
+                                                <p class="info-resto">
+                                                    <i>Se asignarán por defecto las horas que no se programaron</i>
+                                                </p>
+                                            </div>
+
+
+                                            <!--BOTONES GUARDAR Y CANCELAR DEL MODAL-->
+                                            <div class="flex px-2 mt-2 space-x-4">
+                                                <Button class="hover:bg-danger text-danger border-danger" severity="danger"
+                                                    @click="open = false">Cancelar</Button>
+                                                <Button severity="success" :loading="false"
+                                                    class="text-success hover:bg-success border-success" @click="submit()">
+                                                    Guardar
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </DialogPanel>
+                        </TransitionChild>
+                    </div>
+                </div>
+            </Dialog>
+        </TransitionRoot>
+        <!--#endregion-->
     </AppLayout>
 </template>

@@ -11,7 +11,6 @@ use App\Models\VirtualTask;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use PHPUnit\Metadata\Api\Dependencies;
 
 class ScheduleController extends Controller
 {
@@ -30,9 +29,8 @@ class ScheduleController extends Controller
                 'endDate' => $project->end_date,
             ]);
         }
-
         return Inertia::render('GanttBryntum', [
-            'project' => $project->id,
+            'project' => Project::with('ship')->where('id',$project->id)->first(),
             'groups' => $groups,
         ]);
     }
