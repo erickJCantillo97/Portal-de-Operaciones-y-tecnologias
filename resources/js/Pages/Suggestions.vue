@@ -17,8 +17,9 @@ const props = defineProps({
 const op = ref();
 const { toast } = useSweetalert();
 const suggestionSelect = ref()
-const loading = ref(true)
-const date = ref(new Date().toISOString().split("T")[0])
+const loading = ref(false)
+const date = ref()
+const today = ref(new Date().toISOString().split('T')[0])
 const type = ref('')
 const updateSuggestion = (s, n) => {
     router.put(route('suggestion.update', s), { answer: n }, {
@@ -29,6 +30,7 @@ const updateSuggestion = (s, n) => {
 }
 
 const filter = () => {
+    loading.value = true
     router.get(route('suggestion.index'),
         {
             type: type.value,
@@ -36,7 +38,10 @@ const filter = () => {
         },
         {
             preserveState: true,
-            only: ['suggestions']
+            only: ['suggestions'],
+            onSuccess: () => {
+                loading.value = false
+            }
         }
     )
 }
@@ -55,32 +60,35 @@ const toggle = (event) => {
     <AppLayout>
         <div class="flex h-8 min-w-full px-1 space-y-2">
             <div class="flex justify-between w-full">
-                <button
+                <button :class="type == null && date == null ? 'bg-primary text-white scale-105' : ''"
                     class="w-8 border rounded-md shadow-xl text-primary hover:text-white border-primary alturah8 pi pi-filter-slash hover:bg-primary"
-                    @click="type = null ; date = null;filter()">
+                    @click="type = null; date = null; filter()">
                 </button>
                 <div class="shadow-xl w-72">
-                    <button type="button" @click="type = 'Sugerencia' ; date = null;filter()"
+                    <button type="button" @click="type = 'Sugerencia'; filter()"
+                        :class="type == 'Sugerencia' ? 'bg-primary text-white scale-105' : ''"
                         class="relative inline-flex items-center justify-center w-1/3 text-sm font-semibold border border-r-0 hover:text-white hover:border-r hover:bg-primary hover:scale-105 text-primary alturah8 rounded-l-md 0 border-primary focus:z-10">
                         Sugerencias</button>
-                    <button type="button" @click="type = 'Opinion' ; date = null;filter()"
+                    <button type="button" @click="type = 'Opinion'; filter()"
+                        :class="type == 'Opinion' ? 'bg-primary text-white scale-105' : ''"
                         class="relative inline-flex items-center justify-center w-1/3 text-sm font-semibold border hover:text-white text-primary alturah8 border-primary hover:bg-primary hover:scale-105 focus:z-10">
                         Opinion</button>
-                    <button type="button" @click="type = 'Error' ; date = null;filter()"
+                    <button type="button" @click="type = 'Error'; filter()"
+                        :class="type == 'Error' ? 'bg-danger text-white scale-105' : ''"
                         class="relative inline-flex items-center justify-center w-1/3 text-sm font-semibold border border-danger hover:text-white text-danger alturah8 rounded-r-md hover:bg-danger hover:scale-105 focus:z-10">
                         Errores</button>
                 </div>
-                <input
+                <input :class="date != null ? 'bg-primary text-white scale-105 border-white fill-white' : ''"
                     class="relative inline-flex items-center justify-center text-sm font-semibold border rounded-md shadow-xl text-primary alturah8 border-primary hover:scale-105 focus:z-10"
-                    type="date" name="date" id="date" v-model="date">
+                    type="date" name="date" id="date" v-model="date" :max="today" @change="filter()">
             </div>
         </div>
-        <div class="flex max-w-full max-h-full min-w-full min-h-full" v-if="loading">
-            <div class="grid grid-cols-3 ">
+        <div class="flex max-w-full max-h-full min-w-full min-h-full" v-if="!loading">
+            <div class="grid grid-cols-3" v-if="props.suggestions.length > 0">
                 <div class="p-3 space-y-2 overflow-y-auto custom-scroll">
                     <div v-for="suggestion in props.suggestions"
                         @click="suggestionSelect == suggestion ? suggestionSelect = null : suggestionSelect = suggestion"
-                        :class="suggestion.type == 'Error' ? 'border-danger' : 'border-primary'"
+                        :class="suggestion.type == 'Error' ? 'border-danger' : 'border-primary', suggestion == suggestionSelect ? 'bg-blue-400' : ''"
                         class="w-full p-2 border rounded-md shadow-lg cursor-pointer hover:scale-105">
                         <div class="grid grid-cols-10">
                             <div class="flex items-center justify-center h-full">
@@ -169,14 +177,11 @@ const toggle = (event) => {
                             </div>
                             <span class="flex items-center col-span-1 text-primary">Fecha:</span>
                             <p class="flex items-center col-span-3">{{ formatDateTime24h(suggestionSelect.created_at) }}</p>
-                            <span class="flex items-center col-span-1 text-primary">Estado:</span>
+                            <span class="flex items-center col-span-1 text-primary" v-if="suggestionSelect.type == 'Error'">Estado:</span>
                             <span v-if="suggestionSelect.type == 'Error'"
                                 class="flex items-center justify-center col-span-3 font-medium rounded-md "
                                 :class="suggestionSelect.status == 1 ? 'bg-red-100 text-danger' : 'bg-green-100 text-success'">
                                 {{ suggestionSelect.status == 1 ? 'Pendiente' : 'Resuelto' }}
-                            </span>
-                            <span v-else class="flex items-center col-span-3 font-medium rounded-md ">
-                                No aplica
                             </span>
                         </div>
                         <div>
@@ -204,19 +209,25 @@ const toggle = (event) => {
                         </button>
                     </div>
                 </div>
-                <div class="flex flex-col items-center justify-center col-span-2 px-2 " v-else>
+                <div class="flex flex-col items-center justify-center w-full h-full col-span-2 px-2 " v-else>
                     <span class="flex items-center justify-center w-full h-full loader">
                         <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
                     </span>
                     <p class="font-bold animate-pulse text-primary"> Seleccione un reporte</p>
                 </div>
             </div>
+            <div v-else class="flex flex-col items-center justify-center w-full h-full pt-10">
+                <span class="flex items-center justify-center w-full h-full loader">
+                    <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
+                </span>
+                <p class="font-bold animate-pulse text-primary">No hay reportes que mostrar</p>
+            </div>
         </div>
         <div v-else class="flex flex-col items-center justify-center px-2 pt-10">
             <span class="flex items-center justify-center w-full loader">
                 <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
             </span>
-            <p class="font-bold animate-pulse text-primary"> Cargando reportes</p>
+            <p class="font-bold animate-pulse text-primary">Cargando reportes</p>
         </div>
 
     </AppLayout>
