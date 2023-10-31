@@ -4,7 +4,7 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import '../../../sass/dataTableCustomized.scss';
 import { Container, Draggable } from "vue-dndrop";
-import { XMarkIcon, PencilIcon, Bars3Icon } from "@heroicons/vue/20/solid";
+import { XMarkIcon, PencilIcon } from "@heroicons/vue/20/solid";
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import Button from '@/Components/Button.vue';
 import { useSweetalert } from '@/composable/sweetAlert';
@@ -45,15 +45,6 @@ const onDrop = async (collection, dropResult) => {
 const getAssignmentHours = (employee_id) => {
     axios.get(route('get.assignment.hours', [date.value, employee_id])).then((res) => {
         personalHours.value[(employee_id)] = res.data;
-    })
-}
-
-// El código anterior define una función llamada `getFoto` que toma un parámetro `correo`. Dentro de la
-// función, realiza una solicitud POST a una ruta llamada `'get.foto'` con el parámetro `correo` como
-// carga útil. Luego recupera los datos de la "foto" de la respuesta y los devuelve.
-const getFoto = (correo) => {
-    axios.post(route('get.foto', correo)).then((res) => {
-        return res.data.photo
     })
 }
 
@@ -347,16 +338,15 @@ const submit = () => {
                 </div>
                 <!--#endregion -->
                 <!--#region LISTA PERSONAL-->
-                <div v-if="loadingPerson"
-                    class="h-[105%] row-start-1 shadow-lg sm:col-start-3 sm:flex sm:flex-col sm:items-center sm:justify-center rounded-xl">
+                <div v-if="loadingPerson" class="h-full p-3 overflow-y-auto custom-scroll">
                     <span class="flex items-center justify-center w-full h-full loader">
                         <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
                     </span>
                     <p class="font-bold animate-pulse text-primary"> Cargando personas</p>
                 </div>
-                <div class="h-full p-3 overflow-y-auto custom-scroll">
-                    <Container oncontextmenu="return false" onkeydown="return false"
-                    behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
+                <Container oncontextmenu="return false" onkeydown="return false" behaviour="copy" group-name="1"
+                    :get-child-payload="getChildPayload"
+                    class="h-full px-3 overflow-y-auto custom-scroll snap-y snap-proximity space-y-1 py-1">
                     <Draggable v-for="item in personal"
                         :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
                         class="rounded-xl p-1 shadow-md cursor-pointer hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
@@ -383,7 +373,6 @@ const submit = () => {
                         </div>
                     </Draggable>
                 </Container>
-                </div>
                 <!--#endregion -->
             </div>
         </div>
