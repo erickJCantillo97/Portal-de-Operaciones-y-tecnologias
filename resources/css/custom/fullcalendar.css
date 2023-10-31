@@ -185,7 +185,8 @@
   flex-direction: row-reverse;
 }
 
-.fc .fc-toolbar.fc-header-toolbar {
+/*#region FullCalendar styles*/
+/* .fc .fc-toolbar.fc-header-toolbar {
   margin-bottom: 0.5em;
   background-color: #090979;
   color: #fff;
@@ -198,7 +199,6 @@
 
 .fc-scrollgrid-sync-inner {
   background-color: #1f18e9;
-  /* background: linear-gradient(220deg, #00d4ff 0%, #090979 50%, #00d4ff 100%); */
   color: #fff;
   text-transform: uppercase;
   font-style: italic;
@@ -225,7 +225,6 @@
 
 .fc .fc-non-business {
   border-radius: 1.5%;
-  /* background-color: #d2d9ff26; */
 }
 
 .fc-timegrid-event .fc-event-time {
@@ -244,17 +243,13 @@
 
 .fc-v-event {
   border-radius: 1.5%;
-  /* background-color: #2196f3; */
 
   background-color: #444CF7;
   opacity: 1;
   background-image: radial-gradient(rgb(160, 160, 160) 0.35000000000000003px, rgb(68, 76, 247) 0.35000000000000003px);
   background-size: 7px 7px;
-
-  /* background: rgb(2, 0, 36); */
-  /* background: linear-gradient(180deg, rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 33%, rgba(0, 212, 255, 1) 100%); */
-}
-
+} */
+/*#endregion*/
 
 @media only screen and (max-width: 768px) {
   .calendar-wrapper .fc-toolbar {

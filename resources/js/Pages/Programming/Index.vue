@@ -441,11 +441,11 @@ const submit = () => {
                                             </div>
                                         </div>
                                         <!--COLUMNA 2 - (FullCalendar)-->
-                                        <div class="flex col-span-2 flex-nowrap">
-                                            <FullCalendar :initialEvents="events" :date="date" :project="project"
-                                                :key="rendersCalendars" />
+                                        <div class="flex col-span-3 flex-nowrap">
+                                                <FullCalendar :initialEvents="events" :tasks="tasks" :date="date" :employee="employee" :project="project"
+                                                    :key="rendersCalendars" />
 
-                                        </div>
+                                            </div>
                                         <!--COLUMNA 3 - SELECCIÓN DE ACTIVIDADES-->
                                         <div
                                             class="w-full col-span-1 p-3 m-1 overflow-hidden overflow-y-auto font-bold text-left bg-white border border-solid rounded-md shadow-md custom-scroll sm:my-8">
