@@ -5,22 +5,15 @@ import { router, useForm } from '@inertiajs/vue3';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import Image from 'primevue/image';
 import Combobox from '@/Components/Combobox.vue';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
 import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline';
 import { useSweetalert } from '@/composable/sweetAlert';
-import { useConfirm } from "primevue/useconfirm";
-import axios from 'axios';
-// import plural from 'pluralize-es'
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
 import FileUpload from 'primevue/fileupload';
-// import Button from 'primevue/button';
 
-const confirm = useConfirm();
 const customerSelect = ref();
 const { toast } = useSweetalert();
 const loading = ref(false);
@@ -80,7 +73,6 @@ const submit = () => {
         })
         return 'creado';
     }
-    console.log(formData)
     router.post(route('ships.update', formData.id), formData, {
         preserveScroll: true,
         onSuccess: (res) => {
@@ -137,15 +129,6 @@ const clearErrors = () => {
     router.page.props.errors = {};
 };
 
-const formatDate = (value) => {
-    return value.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-};
-
-// Formatear el número en moneda (USD)
 const formatMeters = (value) => {
     // Eliminar caracteres no numéricos, excepto el punto decimal
     const unformattedLength = value.replace(/[^0-9.]/g, "");
@@ -159,60 +142,17 @@ const formatMeters = (value) => {
     return value;
 };
 
-const getContractStatusSeverity = (ship) => {
-    switch (ship.status) {
-        case 'INICIADO':
-            return 'info';
-
-        case 'PROCESO':
-            return 'warning';
-
-        case 'PENDIENTE':
-            return 'danger';
-
-        case 'FINALIZADO':
-            return 'success';
-
-        default:
-            return null;
-    }
-};
-
-const exportarExcel = () => {
-    //console.log(dt.value)
-    // Acquire Data (reference to the HTML table)
-    var table_elt = document.getElementById("tabla");
-
-    var workbook = XLSX.utils.table_to_book(table_elt);
-
-    var ws = workbook.Sheets["Sheet1"];
-    XLSX.utils.sheet_add_aoa(ws, [
-        ["Creado " + new Date().toISOString()]
-    ], { origin: -1 });
-
-    // Package and Release Data (`writeFile` tries to write and save an XLSB file)
-    XLSX.writeFile(workbook, 'Lista de Contratos_' + ship.nit + '_' + ship.name + ".xlsb");
-};
-
-
 </script>
 
 <template>
     <AppLayout>
-        <div class="h-full p-4 px-auto custom-scroll overflow-y-auto">
+        <div class="h-full custom-scroll overflow-y-auto">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 text-primary">
                         <p v-if="customer" icon="pi pi-eye">Unidades del cliente: {{ customer.name }}</p>
                         <p v-else>Todas las unidades</p>
                     </h1>
-                </div>
-
-                <div class="" title="Agregar Unidad">
-                    <Button @click="addItem()" severity="success">
-                        <PlusIcon class="w-6 h-6" aria-hidden="true" />
-                        Agregar
-                    </Button>
                 </div>
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="ships" v-model:filters="filters" dataKey="id"
@@ -229,7 +169,6 @@ const exportarExcel = () => {
                                     <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
                                 </Button>
                             </div>
-
                             <div class="relative flex rounded-md shadow-sm">
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <MagnifyingGlassIcon class="w-5 h-4 text-gray-400" aria-hidden="true" />
@@ -239,47 +178,44 @@ const exportarExcel = () => {
                                     v-model="filters.global.value" placeholder="Buscar..." />
                             </div>
                         </div>
+                        <div class="" title="Agregar Unidad">
+                            <Button @click="addItem()" severity="success">
+                                <PlusIcon class="w-5" aria-hidden="true" />
+                                </Button>
+                        </div>
                     </div>
                 </template>
 
                 <!--COLUMNAS-->
-                <Column field="name" header="Nombre">
+                <Column field="name" header="Nombre" class="w-3/12 p-1">
                     <template #body="slotProps">
                         <div class="flex space-x-2 items-center">
-                            <img :src="slotProps.data.file" onerror="this.src='/images/generic-boat.png'" alt="Image"  class="h-0 mr-1 rounded-lg sm:h-12 sm:w-16" />
+                            <img :src="slotProps.data.file" onerror="this.src='/images/generic-boat.png'" alt="Image"
+                                class="h-0 mr-1 rounded-lg sm:h-12 sm:w-16" />
                             <p>{{ slotProps.data.name }} </p>
                         </div>
                     </template>
                 </Column>
-                <Column field="customer.name" header="Cliente"></Column>
-                <Column field="type" header="Tipo de Buque"></Column>
-                <Column field="quilla" header="Quillas"></Column>
-                <Column field="pantoque" header="Pantoque"></Column>
-                <Column field="eslora" header="Eslora">
+                <Column field="customer.name" header="Cliente" class="w-1/12 p-1"></Column>
+                <Column field="type" header="Tipo" class="w-1/12 p-1"></Column>
+                <Column field="quilla" header="Quillas" class="w-1/12 p-1"></Column>
+                <Column field="pantoque" header="Pantoque" class="w-1/12 p-1"></Column>
+                <Column field="eslora" header="Eslora" class="w-1/12 p-1">
                     <template #body="slotProps">
                         {{ formatMeters(slotProps.data.eslora) }}
                     </template>
                 </Column>
-                <Column header="Cliente">
+                <Column header="Cliente" class="w-1/12 p-1">
                     <template #body="slotProps">
                         <p v-if=slotProps.data.customer>{{ slotProps.data.customer.name }}</p>
                         <p v-else> Sin asignar cliente</p>
                     </template>
                 </Column>
-                <Column field="details" header="Detalles"></Column>
-                <!-- <Column field="status" header="Estado" sortable>
-                    <template #body="slotProps">
-                        <Tag :value="slotProps.data.status" :severity="getContractStatusSeverity(slotProps.data)" />
-                    </template>
-                </Column> -->
-                <!-- <Column field="details" header="Detalles"></Column> -->
-
+                <Column field="details" header="Detalles" class="w-1/6 p-1"></Column>
                 <!--ACCIONES-->
-                <Column header="Acciones" class="space-x-3">
+                <Column header="Acciones" class="space-x-1 w-1/12 p-1 flex ">
                     <template #body="slotProps">
                         <!--BOTÓN EDITAR-->
-                        <div
-                            class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
                             <div title="Editar Unidad">
                                 <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
                                     <PencilIcon class="w-4 h-4 " aria-hidden="true" />
@@ -292,7 +228,6 @@ const exportarExcel = () => {
                                     <TrashIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
                             </div>
-                        </div>
                     </template>
                 </Column>
             </DataTable>
