@@ -452,66 +452,11 @@ const submit = () => {
                                             </div>
                                         </div>
                                         <!--COLUMNA 2 - (FullCalendar)-->
-                                        <div class="flex col-span-3 flex-nowrap">
+                                        <div class="flex col-span-3 flex-nowrap custom-scroll">
                                                 <FullCalendar :initialEvents="events" :tasks="tasks" :date="date" :employee="employee" :project="project"
                                                     :key="rendersCalendars" />
 
                                             </div>
-                                        <!--COLUMNA 3 - SELECCIÓN DE ACTIVIDADES-->
-                                        <div
-                                            class="w-full col-span-1 p-3 m-1 overflow-hidden overflow-y-auto font-bold text-left bg-white border border-solid rounded-md shadow-md custom-scroll sm:my-8">
-                                            <Combobox class="mt-2 text-left" label="Actividad"
-                                                placeholder="Seleccione Actividad" :options="tasks" v-model="taskSelect">
-                                            </Combobox>
-
-                                            <!--RADIO BUTTONS DE HORAS-->
-                                            <div class="flex flex-wrap w-full h-10 mt-4 space-x-2">
-                                                <input type="radio" name="action" value="Horas" v-model="showHours">
-                                                <label for="Horas">Intervalo</label>
-                                                <input type="radio" name="action" value="Resto" v-model="showHours">
-                                                <label for="Resto">Resto</label>
-                                                <input type="radio" name="action" value="Turno" v-model="showHours">
-                                                <label for="Turno">Turno</label>
-                                            </div>
-
-                                            <!--sección de selección de horas-->
-                                            <div v-if="showHours === 'Horas'" class="w-full h-auto">
-                                                <!--CAMPO HORA INICIO-->
-                                                <TextInput class="mt-2 text-left" type="time" label="Hora de inicio">
-                                                </TextInput>
-
-                                                <!--CAMPO HORA FINALIZACIÓN-->
-                                                <TextInput class="mt-2 text-left" type="time" label="Hora de Finalización">
-                                                </TextInput>
-                                            </div>
-
-                                            <!--sección de selección de turnos-->
-                                            <div v-if="showHours === 'Turno'" class="w-full h-auto">
-                                                <!--campo select de turnos-->
-                                                <Combobox class="mt-2 text-left" label="Turnos"
-                                                    placeholder="Seleccione Turno" :options="tasks" v-model="turnSelect">
-                                                </Combobox>
-                                            </div>
-
-                                            <!--sección de Resto-->
-                                            <div v-if="showHours === 'Resto'"
-                                                class="flex justify-center w-full h-auto flex-nowrap">
-                                                <p class="info-resto">
-                                                    <i>Se asignarán por defecto las horas que no se programaron</i>
-                                                </p>
-                                            </div>
-
-
-                                            <!--BOTONES GUARDAR Y CANCELAR DEL MODAL-->
-                                            <div class="flex px-2 mt-2 space-x-4">
-                                                <Button class="hover:bg-danger text-danger border-danger" severity="danger"
-                                                    @click="open = false">Cancelar</Button>
-                                                <Button severity="success" :loading="false"
-                                                    class="text-success hover:bg-success border-success" @click="submit()">
-                                                    Guardar
-                                                </Button>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </DialogPanel>

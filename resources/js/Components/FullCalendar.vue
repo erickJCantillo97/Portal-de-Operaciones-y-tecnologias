@@ -96,7 +96,7 @@ export default defineComponent({
           hour: 'numeric',
           minute: '2-digit',
           meridiem: 'short',
-          hour12: true
+          hour12: false
         },
         // you can update a remote database when these fire:
         // eventAdd: this.submit,
@@ -144,9 +144,12 @@ export default defineComponent({
       // console.log(events)
       this.currentEvents = events
     },
+    gandleItem(){
+      console.log('Hello World')
+    },
     submit(taskID, schedule) {
       console.log(schedule)
-      console.log(taskID);
+      console.log(taskID)
 
       let title = this.taskIDSelected.name
       let calendarApi = schedule.view.calendar
@@ -162,9 +165,6 @@ export default defineComponent({
           color: 'purple'
           // allDay: selectInfo.allDay
         })
-      } else {
-        calendarApi.remove()
-        alert("Por favor seleccione una tarea")
       }
 
       this.isOpen = false
@@ -188,7 +188,7 @@ export default defineComponent({
 <template>
   <div class='flex w-full min-h-[100%] font-sans text-sm rounded-md font-bold shadow-md border border-solid p-2'>
     <div class='max-w-full w-full h-[60%]'>
-      <FullCalendar class='w-full h-96 custom-scroll' :options='calendarOptions'>
+      <FullCalendar class='w-full h-96' :options='calendarOptions'>
         <template v - slot: eventContent=' arg'>
           <!--Los estilos de estos elementos se encuentran en 'resources/css/custom/fullcalendar.css'-->
           <b> {{ arg.timeText }} </b>
@@ -247,8 +247,9 @@ export default defineComponent({
                     </TextInput>
                   </div>
 
+
                   <!--sección de selección de turnos-->
-                  <div v-if="showHours === 'Turno'" class="w-full h-auto">
+                  <div v-if="showHours === 'Turno'" class="w-full h-64">
                     <!--campo select de turnos-->
                     <Combobox class="mt-2 text-left" label="Turnos" placeholder="Seleccione Turno" :options="tasks"
                       v-model="turnSelect">
@@ -261,7 +262,6 @@ export default defineComponent({
                       <i>Se asignarán por defecto las horas que no se programaron</i>
                     </p>
                   </div>
-
 
                   <!--BOTONES GUARDAR Y CANCELAR DEL MODAL-->
                   <div class="flex px-2 mt-2 space-x-4">

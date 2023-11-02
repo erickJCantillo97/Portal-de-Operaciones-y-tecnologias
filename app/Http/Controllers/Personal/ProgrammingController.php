@@ -69,8 +69,6 @@ class ProgrammingController extends Controller
 
     }
 
-
-
     public function deleteSchedule(Schedule $schedule)
     {
         $schedule->delete();
@@ -196,6 +194,5 @@ class ProgrammingController extends Controller
         return response()->json([
             'times' => $times,
         ]);
-
     }
 }
