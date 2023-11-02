@@ -41,6 +41,7 @@ const filter = () => {
             only: ['suggestions'],
             onSuccess: () => {
                 loading.value = false
+                suggestionSelect.value=null
             }
         }
     )
@@ -50,7 +51,6 @@ function formatDateTime24h(dateTime) {
     return new Date(dateTime).toLocaleString('es-CO',
         { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
 }
-
 
 const toggle = (event) => {
     op.value.toggle(event);
@@ -229,7 +229,6 @@ const toggle = (event) => {
             </span>
             <p class="font-bold animate-pulse text-primary">Cargando reportes</p>
         </div>
-
     </AppLayout>
 </template>
 

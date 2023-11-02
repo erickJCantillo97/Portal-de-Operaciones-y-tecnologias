@@ -4,7 +4,7 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import '../../../sass/dataTableCustomized.scss';
 import { Container, Draggable } from "vue-dndrop";
-import { XMarkIcon, PencilIcon, Bars3Icon } from "@heroicons/vue/20/solid";
+import { XMarkIcon, PencilIcon } from "@heroicons/vue/20/solid";
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import Button from '@/Components/Button.vue';
 import { useSweetalert } from '@/composable/sweetAlert';
@@ -45,15 +45,6 @@ const onDrop = async (collection, dropResult) => {
 const getAssignmentHours = (employee_id) => {
     axios.get(route('get.assignment.hours', [date.value, employee_id])).then((res) => {
         personalHours.value[(employee_id)] = res.data;
-    })
-}
-
-// El código anterior define una función llamada `getFoto` que toma un parámetro `correo`. Dentro de la
-// función, realiza una solicitud POST a una ruta llamada `'get.foto'` con el parámetro `correo` como
-// carga útil. Luego recupera los datos de la "foto" de la respuesta y los devuelve.
-const getFoto = (correo) => {
-    axios.post(route('get.foto', correo)).then((res) => {
-        return res.data.photo
     })
 }
 
@@ -103,11 +94,12 @@ const getTask = async (option) => {
     });
     axios.get(route('get.personal')).then((res) => {
         personal.value = Object.values(res.data.personal)
-        personal.value.forEach(async element => {
-            await axios.get(route('get.assignment.hours', [date.value, (element.Num_SAP)])).then((res) => {
-                personalHours.value[element.Num_SAP] = res.data;
-            });
-        })
+        personal.value.forEach(
+            async element => {
+                await axios.get(route('get.assignment.hours', [date.value, (element.Num_SAP)])).then((res) => {
+                    personalHours.value[element.Num_SAP] = res.data;
+                });
+            })
         loadingPerson.value = false
     })
 
@@ -244,8 +236,7 @@ const submit = () => {
         <div class="flex max-w-full max-h-full min-w-full min-h-full">
             <div class="grid grid-cols-3">
                 <!--LISTA PROGRAMACIÓN DE ACTIVIDADES-->
-                <div v-if="loadingProgram"
-                    class="h-full row-span-6 row-start-2 sm:flex sm:flex-col sm:justify-center sm:items-center sm:row-start-1 sm:col-start-1 sm:col-span-2 rounded-xl">
+                <div v-if="loadingProgram" class="h-[50vh] w-[60vw] flex flex-col justify-center items-center col-span-2">
                     <span class="flex items-center justify-center w-full h-full loader">
                         <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
                     </span>
@@ -347,16 +338,15 @@ const submit = () => {
                 </div>
                 <!--#endregion -->
                 <!--#region LISTA PERSONAL-->
-                <div v-if="loadingPerson"
-                    class="h-[105%] row-start-1 shadow-lg sm:col-start-3 sm:flex sm:flex-col sm:items-center sm:justify-center rounded-xl">
+                <div v-if="loadingPerson" class="h-[50vh] w-[30vw] flex flex-col justify-center items-center">
                     <span class="flex items-center justify-center w-full h-full loader">
                         <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
                     </span>
                     <p class="font-bold animate-pulse text-primary"> Cargando personas</p>
                 </div>
-                <div class="h-full p-3 overflow-y-auto custom-scroll">
-                    <Container oncontextmenu="return false" onkeydown="return false"
-                    behaviour="copy" group-name="1" :get-child-payload="getChildPayload">
+                <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy" group-name="1"
+                    :get-child-payload="getChildPayload"
+                    class="h-full px-3 overflow-y-auto custom-scroll snap-y snap-proximity space-y-1 py-1">
                     <Draggable v-for="item in personal"
                         :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
                         class="rounded-xl p-1 shadow-md cursor-pointer hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
@@ -383,7 +373,6 @@ const submit = () => {
                         </div>
                     </Draggable>
                 </Container>
-                </div>
                 <!--#endregion -->
             </div>
         </div>
