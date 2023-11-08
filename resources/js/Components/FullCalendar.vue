@@ -6,6 +6,7 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import esLocale from '@fullcalendar/core/locales/es'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import { XMarkIcon } from '@heroicons/vue/20/solid'
 import TextInput from '@/Components/TextInput.vue'
 import Button from '@/Components/Button.vue'
 import Combobox from '@/Components/Combobox.vue'
@@ -188,6 +189,9 @@ export default defineComponent({
       //       console.error('Error al crear el evento', error);
       //     });
       // }
+    },
+    closeDialog() {
+      this.isOpen = false
     }
   }
 })
@@ -208,7 +212,7 @@ export default defineComponent({
 
   <!--MODAL DE FORMULARIO-->
   <TransitionRoot as="template" :show="isOpen">
-    <Dialog as="div" class="relative z-30" @close="isOpen = false">
+    <Dialog as="div" class="relative z-30" @close="closeDialog()">
       <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
         leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
         <div class="fixed h-screen w-screen inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-30" />
@@ -229,6 +233,14 @@ export default defineComponent({
                     Nuevo Horario
                   </DialogTitle>
 
+                  <!--BOTÓN 'X'->(cerrar) DEL MODAL-->
+                  <div class="|">
+                    <button v-tooltip.top="'Cerrar'" @click="closeDialog()">
+                      <XMarkIcon
+                        class="h-4 p-0.5 border rounded-md text-white bg-danger border-danger hover:animate-pulse hover:scale-125" />
+                    </button>
+                  </div>
+
                   <!--COLUMNA 3 - SELECCIÓN DE ACTIVIDADES-->
                   <Combobox class="mt-2 text-left" label="Actividad" placeholder="Seleccione Actividad" :options="tasks"
                     v-model="idTaskSelected">
@@ -247,8 +259,7 @@ export default defineComponent({
                   <!--SELECCIÓN DE HORAS-->
                   <div v-if="showHours === 'Hours'" class="w-full h-auto">
                     <!--CAMPO HORA INICIO-->
-                    <TextInput class="mt-2 text-left" type="time" label="Hora de inicio"
-                    v-model="getStartDateEvent">
+                    <TextInput class="mt-2 text-left" type="time" label="Hora de inicio" v-model="getStartDateEvent">
                     </TextInput>
 
                     <!--CAMPO HORA FINALIZACIÓN-->
@@ -267,7 +278,7 @@ export default defineComponent({
                   <!--SELECCIÓN RESTO-->
                   <div v-if="showHours === 'Resto'" class="flex justify-center w-full h-auto flex-nowrap">
                     <span class="info-resto">
-                      <i>Se asignarán por defecto las Hours que no se programaron</i>
+                      <i>Se asignarán por defecto las horas que no se programaron</i>
                     </span>
                   </div>
 
@@ -278,7 +289,7 @@ export default defineComponent({
                       Eliminar
                     </Button>
 
-                    <Button class="hover:bg-danger text-danger border-danger" severity="danger" @click="isOpen = false">
+                    <Button class="hover:bg-danger text-danger border-danger" severity="danger" @click="closeDialog()">
                       Cancelar
                     </Button>
 
