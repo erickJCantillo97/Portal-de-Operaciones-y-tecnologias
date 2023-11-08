@@ -1,5 +1,5 @@
 <script >
-import { defineComponent, ref, onMounted } from 'vue'
+import { defineComponent } from 'vue'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
@@ -9,6 +9,7 @@ import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } fro
 import TextInput from '@/Components/TextInput.vue'
 import Button from '@/Components/Button.vue'
 import Combobox from '@/Components/Combobox.vue'
+import Moment from "moment"
 import { Calendar } from '@fullcalendar/core';
 import { INITIAL_EVENTS, createEventId } from '../event-utils'
 
@@ -107,9 +108,11 @@ export default defineComponent({
       },
       isOpen: false,
       scheduleSelected: null,
-      taskIDSelected: null,
+      idTaskSelected: null,
       selectedEvent: null,
       canDeleteEvent: false,
+      getStartDateEvent: null,
+      getEndDateEvent: null,
       taskSelected: [],
       turnSelect: [],
       showHours: 'Hours',
@@ -122,9 +125,14 @@ export default defineComponent({
     },
     handleDateSelect(selectInfo) {
       this.isOpen = true
-      console.log(selectInfo)
       this.selectedEvent = selectInfo
       this.canDeleteEvent = false
+
+      let formatStartDate = Moment(selectInfo.startStr).format('HH:mm')
+      this.getStartDateEvent = formatStartDate
+
+      let formatEndDate = Moment(selectInfo.endStr).format('HH:mm')
+      this.getEndDateEvent = formatEndDate
     },
     handleEditEventClick(clickInfo) {
       //TODO Permitir editar el modal
@@ -144,14 +152,14 @@ export default defineComponent({
       // console.log(events)
       this.currentEvents = events
     },
-    gandleItem(){
+    handleItem() {
       console.log('Hello World')
     },
-    submit(taskID, schedule) {
+    submit(idTask, schedule) {
       console.log(schedule)
-      console.log(taskID)
+      console.log(idTask)
 
-      let title = this.taskIDSelected.name
+      let title = this.idTaskSelected.name
       let calendarApi = schedule.view.calendar
 
       calendarApi.unselect() // clear date selection
@@ -186,8 +194,8 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class='flex w-full min-h-[100%] font-sans text-sm rounded-md font-bold shadow-md border border-solid p-2'>
-    <div class='max-w-full w-full h-[60%]'>
+  <section class='flex w-full min-h-[100%] font-sans text-sm rounded-md font-bold shadow-md border border-solid p-2'>
+    <article class='max-w-full w-full h-[60%]'>
       <FullCalendar class='w-full h-96' :options='calendarOptions'>
         <template v - slot: eventContent=' arg'>
           <!--Los estilos de estos elementos se encuentran en 'resources/css/custom/fullcalendar.css'-->
@@ -195,8 +203,8 @@ export default defineComponent({
           <i> {{ arg.event.title }} </i>
         </template>
       </FullCalendar>
-    </div>
-  </div>
+    </article>
+  </section>
 
   <!--MODAL DE FORMULARIO-->
   <TransitionRoot as="template" :show="isOpen">
@@ -206,7 +214,7 @@ export default defineComponent({
         <div class="fixed h-screen w-screen inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-30" />
       </TransitionChild>
       <div class="fixed inset-0 z-50 overflow-y-auto h-screen">
-        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0" >
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
           <TransitionChild as="template" enter="ease-out duration-300"
             enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
@@ -217,38 +225,38 @@ export default defineComponent({
               <div>
                 <div class="px-8 mt-2 text-center">
                   <DialogTitle as="h3" class="text-xl font-semibold text-primary text-center">
-                    {{ taskSelected.id != 0 ? 'Editar ' : 'Crear' }}
+                    {{ currentEvents != 0 ? 'Editar ' : 'Crear' }}
                     Nuevo Horario
                   </DialogTitle>
-                  <!--COLUMNA 3 - SELECCIÓN DE ACTIVIDADES-->
 
+                  <!--COLUMNA 3 - SELECCIÓN DE ACTIVIDADES-->
                   <Combobox class="mt-2 text-left" label="Actividad" placeholder="Seleccione Actividad" :options="tasks"
-                  v-model="taskIDSelected" >
+                    v-model="idTaskSelected">
                   </Combobox>
 
                   <!--RADIO BUTTONS DE HORAS-->
                   <div class="flex flex-wrap w-full justify-between h-10 mt-4 space-x-2">
-                    <input type="radio" name="action" value="Horas" v-model="showHours">
-                    <label for="Horas">Intervalo</label>
+                    <input type="radio" name="action" value="Hours" v-model="showHours">
+                    <label for="Hours">Intervalo</label>
                     <input type="radio" name="action" value="Resto" v-model="showHours">
                     <label for="Resto">Resto</label>
                     <input type="radio" name="action" value="Turno" v-model="showHours">
                     <label for="Turno">Turno</label>
                   </div>
 
-                  <!--sección de selección de horas-->
-                  <div v-if="showHours === 'Horas'" class="w-full h-auto">
+                  <!--SELECCIÓN DE HORAS-->
+                  <div v-if="showHours === 'Hours'" class="w-full h-auto">
                     <!--CAMPO HORA INICIO-->
-                    <TextInput class="mt-2 text-left" type="time" label="Hora de inicio">
+                    <TextInput class="mt-2 text-left" type="time" label="Hora de inicio"
+                    v-model="getStartDateEvent">
                     </TextInput>
 
                     <!--CAMPO HORA FINALIZACIÓN-->
-                    <TextInput class="mt-2 text-left" type="time" label="Hora de Finalización">
+                    <TextInput class="mt-2 text-left" type="time" label="Hora de Finalización" v-model="getEndDateEvent">
                     </TextInput>
                   </div>
 
-
-                  <!--sección de selección de turnos-->
+                  <!--SELECCIÓN DE TURNOS-->
                   <div v-if="showHours === 'Turno'" class="w-full h-64">
                     <!--campo select de turnos-->
                     <Combobox class="mt-2 text-left" label="Turnos" placeholder="Seleccione Turno" :options="tasks"
@@ -256,11 +264,11 @@ export default defineComponent({
                     </Combobox>
                   </div>
 
-                  <!--sección de Resto-->
+                  <!--SELECCIÓN RESTO-->
                   <div v-if="showHours === 'Resto'" class="flex justify-center w-full h-auto flex-nowrap">
-                    <p class="info-resto">
-                      <i>Se asignarán por defecto las horas que no se programaron</i>
-                    </p>
+                    <span class="info-resto">
+                      <i>Se asignarán por defecto las Hours que no se programaron</i>
+                    </span>
                   </div>
 
                   <!--BOTONES GUARDAR Y CANCELAR DEL MODAL-->
@@ -269,12 +277,13 @@ export default defineComponent({
                       @click="handleEditEventClick(selectedEvent)">
                       Eliminar
                     </Button>
-                    <Button class="hover:bg-danger text-danger border-danger" severity="danger"
-                      @click="isOpen = false">
+
+                    <Button class="hover:bg-danger text-danger border-danger" severity="danger" @click="isOpen = false">
                       Cancelar
                     </Button>
+
                     <Button severity="success" :loading="false" class="text-success hover:bg-success border-success"
-                      @click="submit(taskIDSelected, selectedEvent)">
+                      @click="submit(idTaskSelected, selectedEvent)">
                       {{ currentEvents != 0 ? 'Actualizar ' : 'Guardar' }}
                     </Button>
                   </div>
