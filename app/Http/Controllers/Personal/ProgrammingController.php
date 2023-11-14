@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Personal;
 use App\Http\Controllers\Controller;
 use App\Models\Schedule;
 use App\Models\ScheduleTime;
+use App\Models\Shift;
 use App\Models\VirtualTask;
 use Carbon\Carbon;
 use Exception;
@@ -15,7 +16,8 @@ class ProgrammingController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Programming/Index');
+        return Inertia::render('Programming/Index',[
+            'hours' => Shift::get()]);
     }
 
     /**
