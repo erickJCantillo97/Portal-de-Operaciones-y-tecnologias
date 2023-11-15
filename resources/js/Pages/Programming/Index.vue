@@ -2,7 +2,6 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import '../../../sass/dataTableCustomized.scss';
 import { Container, Draggable } from "vue-dndrop";
 import { XMarkIcon, PencilIcon, TrashIcon } from "@heroicons/vue/20/solid";
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
@@ -10,11 +9,14 @@ import Button from '@/Components/Button.vue';
 import { useSweetalert } from '@/composable/sweetAlert';
 import Knob from 'primevue/knob';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import Combobox from '@/Components/Combobox.vue';
-import TextInput from '@/Components/TextInput.vue';
 import FullCalendar from '@/Components/FullCalendar.vue'
 import OverlayPanel from 'primevue/overlaypanel';
 import Dropdown from 'primevue/dropdown';
+import SelectButton from 'primevue/selectbutton';
+import Calendar from 'primevue/calendar';
+
+
+
 const { toast } = useSweetalert();
 
 const props = defineProps({
@@ -171,9 +173,10 @@ const submit = () => {
 
 const editHorario = ref()
 const nuevoHorario = ref()
+const optionSelectHours = ref('select')
 const toggle = (event, horario) => {
     editHorario.value = horario
-    nuevoHorario.value=null
+    nuevoHorario.value = null
     op.value.toggle(event);
 }
 //#endregion
@@ -344,7 +347,7 @@ const toggle = (event, horario) => {
                                                     {{ format24h(horario.hora_inicio) }} {{ format24h(horario.hora_fin) }}
                                                 </span>
                                                 <button v-tooltip.bottom="'Cambiar horario'" class="hidden group-hover:flex"
-                                                    @click="toggle($event, horario)">
+                                                    @click="optionSelectHours = 'select';toggle($event, horario)">
                                                     <PencilIcon
                                                         class="h-4 p-0.5 border rounded-md bg-primary text-white border-primary hover:animate-pulse hover:scale-125" />
                                                 </button>
@@ -416,51 +419,90 @@ const toggle = (event, horario) => {
                         {{ format24h(editHorario.hora_inicio) }} {{ format24h(editHorario.hora_fin) }}
                     </p>
                 </div>
-                <p class="col-span-3 font-bold w-full text-center">Detalle de horario seleccionado</p>
-                <div v-if="nuevoHorario" class="col-span-3 grid grid-cols-7 gap-1 justify-between items-center">
-                    <p class="col-span-7 rounded-md text-center bg-green-100 px-1 py-1 text-green-900">
-                        {{ nuevoHorario.name }}
-                    </p>
-                    <p class="col-span-4">Horario:</p>
-                    <p class="col-span-3 rounded-md text-center bg-green-200 px-1 py-1 text-green-900">
-                        {{ formatdatetime24h(nuevoHorario.startShift) }} {{ formatdatetime24h(nuevoHorario.endShift) }}
-                    </p>
-                    <p v-if="nuevoHorario.startBreak" class="col-span-4">Descanso:</p>
-                    <p v-if="nuevoHorario.startBreak"
-                        class="col-span-3 rounded-md text-center bg-green-200 px-1 py-1 text-green-900">
-                        {{ formatdatetime24h(nuevoHorario.startBreak) }} {{ formatdatetime24h(nuevoHorario.endBreak) }}
-                    </p>
-                    <p class="col-span-4">Horas laboradas:</p>
-                    <p class="col-span-3 rounded-md text-center bg-green-200 px-1 py-1 text-green-900">
-                        {{ parseFloat(nuevoHorario.hours).toFixed(2) }}
-                    </p>
-                    <p v-if="nuevoHorario.hours.description" class="col-span-7 w-full text-center">Descripcion</p>
-                    <p v-if="nuevoHorario.hours.description"
-                        class="col-span-7 rounded-md text-center bg-green-100 px-1 py-1 text-green-900">
-                        {{ nuevoHorario.hours.description }}
-                    </p>
-                </div>
-                <Dropdown v-model="nuevoHorario" :options="props.hours" optionLabel="name" placeholder="Selecciona horario"
-                    class="w-full md:w-14rem col-span-3">
-                    <template #value="slotProps">
-                        <div v-if="slotProps.value" class="flex align-items-center">
-                            <p class="text-sm w-full text-center font-bold">{{ slotProps.value.name }}</p>
-                        </div>
-                        <span v-else>
-                            {{ slotProps.placeholder }}
-                        </span>
-                    </template>
-                    <template #option="slotProps">
-                        <div class="grid grid-cols-3 align-items-center">
-                            <p class="col-span-2 text-xs font-bold">{{ slotProps.option.name }}</p>
-                            <p class="text-xs">
-                                {{ formatdatetime24h(slotProps.option.startShift) }}
-                                {{ formatdatetime24h(slotProps.option.endShift)  }}
+                <span class="col-span-3 grid grid-cols-2">
+                    <button type="button"
+                        :class="optionSelectHours == 'select' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+                        @click="optionSelectHours = 'select'; nuevoHorario=null;"
+                        class="shadow-md px-3 py-2 text-sm font-semibold alturah8 rounded-l-md 0 ring-1 ring-inset ring-gray-300 focus:z-10">Seleccionar</button>
+                    <button type="button"
+                        :class="optionSelectHours == 'new' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+                        @click="optionSelectHours = 'new';nuevoHorario=null;nuevoHorario={}; nuevoHorario.name=null;nuevoHorario.startShift=null;nuevoHorario.endShift"
+                        class="shadow-md px-3 py-2 -ml-px text-sm font-semibold alturah8 rounded-r-md ring-1 ring-inset ring-gray-300 focus:z-10">Nuevo</button>
+                </span>
+                <div v-if="optionSelectHours == 'select'" class="col-span-3">
+                    <Dropdown v-model="nuevoHorario" :options="props.hours" optionLabel="name"
+                        placeholder="Selecciona horario" class="w-full md:w-14rem">
+                        <template #value="slotProps">
+                            <div v-if="slotProps.value" class="flex align-items-center">
+                                <p class="text-sm w-full text-center font-bold">{{ slotProps.value.name }}</p>
+                            </div>
+                            <span v-else>
+                                {{ slotProps.placeholder }}
+                            </span>
+                        </template>
+                        <template #option="slotProps">
+                            <div class="grid grid-cols-3 align-items-center">
+                                <p class="col-span-2 text-xs font-bold">{{ slotProps.option.name }}</p>
+                                <p class="text-xs">
+                                    {{ formatdatetime24h(slotProps.option.startShift) }}
+                                    {{ formatdatetime24h(slotProps.option.endShift) }}
+                                </p>
+                            </div>
+                        </template>
+                    </Dropdown>
+                    <div v-if="nuevoHorario">
+                        <p class="font-bold w-full text-center">Detalle de horario seleccionado</p>
+                        <div class="grid grid-cols-7 gap-1 justify-between items-center">
+                            <p class="col-span-7 rounded-md text-center bg-green-100 px-1 py-1 text-green-900">
+                                {{ nuevoHorario.name }}
+                            </p>
+                            <p class="col-span-4">Horario:</p>
+                            <p class="col-span-3 rounded-md text-center bg-green-200 px-1 py-1 text-green-900">
+                                {{ formatdatetime24h(nuevoHorario.startShift) }} {{ formatdatetime24h(nuevoHorario.endShift)
+                                }}
+                            </p>
+                            <p v-if="nuevoHorario.startBreak" class="col-span-4">Descanso:</p>
+                            <p v-if="nuevoHorario.startBreak"
+                                class="col-span-3 rounded-md text-center bg-green-200 px-1 py-1 text-green-900">
+                                {{ formatdatetime24h(nuevoHorario.startBreak) }} {{ formatdatetime24h(nuevoHorario.endBreak)
+                                }}
+                            </p>
+                            <p class="col-span-4">Horas laboradas:</p>
+                            <p class="col-span-3 rounded-md text-center bg-green-200 px-1 py-1 text-green-900">
+                                {{ parseFloat(nuevoHorario.hours).toFixed(2) }}
+                            </p>
+                            <p v-if="nuevoHorario.hours.description" class="col-span-7 w-full text-center">Descripcion</p>
+                            <p v-if="nuevoHorario.hours.description"
+                                class="col-span-7 rounded-md text-center bg-green-100 px-1 py-1 text-green-900">
+                                {{ nuevoHorario.hours.description }}
                             </p>
                         </div>
-                    </template>
-                </Dropdown>
-                <div class="grid grid-cols-2 col-span-3">
+                    </div>
+                </div>
+                <div v-if="optionSelectHours == 'new'" class="col-span-3 p-2 space-y-3">
+                    <p class="w-full text-center font-bold">Nuevo horario temporal</p>
+                    <div class="relative">
+                        <label for="name"
+                        class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Nombre</label>
+                    <input v-model="nuevoHorario.name" name="name" id="name" class="rounded-md border-0 alturah8 ring-1 ring-inset ring-gray-300 text-center">
+                    </div>
+
+                    <div class="relative">
+                        <label for="startShift"
+                        class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Hora inicio</label>
+                    <Calendar  v-model="nuevoHorario.startShift" name="startShift" id="startShift" timeOnly hourFormat="24" class="alturah8" :pt="{
+                        input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
+                    }" />
+                    </div>
+                    <div class="relative">
+                        <label for="endShift"
+                        class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Hora fin</label>
+                    <Calendar v-model="nuevoHorario.endShift" name="endShift" id="endShift" timeOnly hourFormat="24" class="alturah8" :pt="{
+                        input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
+                    }" />
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 col-span-3 gap-1">
                     <button @click="console.log('hace algo'); nuevoHorario = null; op.hide()"
                         class="col-start-2 border border-primary rounded-md p-2 font-bold text-primary">
                         <i class="fa-solid fa-floppy-disk"></i>
@@ -535,10 +577,10 @@ const toggle = (event, horario) => {
                                         </div>
                                         <!--COLUMNA 2 - (FullCalendar)-->
                                         <div class="flex col-span-3 flex-nowrap custom-scroll">
-                                                <FullCalendar :initialEvents="events" :tasks="tasks" :date="date" :employee="employee" :project="project"
-                                                    :key="rendersCalendars" />
+                                            <FullCalendar :initialEvents="events" :tasks="tasks" :date="date"
+                                                :employee="employee" :project="project" :key="rendersCalendars" />
 
-                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </DialogPanel>

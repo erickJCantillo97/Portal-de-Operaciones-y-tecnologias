@@ -11,16 +11,19 @@ import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } fro
 import { ClockIcon } from '@heroicons/vue/24/outline'
 import Calendar from 'primevue/calendar';
 
+import InputMask from 'primevue/inputmask';
+
+
 const { confirmDelete } = useSweetalert();
 const { toast } = useSweetalert();
 
 const shift = ref({
-    id: null,
-    name: null,
-    startShift: null,
-    endShift: null,
-    startBreak: null,
-    endBreak: null,
+    id: '',
+    name: '',
+    startShift: '',
+    endShift: '',
+    startBreak: '',
+    endBreak: '',
 })
 const shiftDialog = ref(false)
 
@@ -67,14 +70,14 @@ const deleteShift = async (s) => {
     getHours();
 }
 
-const editShift = (s) => {
+const editShift = async (s) => {
     shift.value = {
         id: s.id,
         name: s.name,
-        startShift: s.startShift,
-        endShift: s.endShift,
-        startBreak: s.startBreak,
-        endBreak: s.endBreak
+        startShift: format24h(s.startShift),
+        endShift: format24h(s.endShift),
+        startBreak: format24h(s.startBreak),
+        endBreak: format24h(s.endBreak)
     };
     shiftDialog.value = true;
 }
@@ -133,9 +136,9 @@ const shiftSave = (status, shift) => {
 }
 
 const calcularDiferencia = (start, end) => {
-    var horaInicio = format24h(start)
-    var horaFinal = format24h(end)
-
+    var horaInicio = String(start).length > 5 ? format24h(start) : start
+    var horaFinal = String(end).length > 5 ? format24h(end) : end
+    console.log(horaInicio + '---' + horaFinal + '---' + start + '---' + end)
     // Expresión regular para comprobar el formato de las horas
     var formatoHora = /^([01]?[0-9]|2[0-3]):[0-5][0-9]/;
 
@@ -205,13 +208,14 @@ const calcularDiferencia = (start, end) => {
             <Column field="name" header="Nombre" class="w-1/6"></Column>
             <Column header="Horario" class="">
                 <template #body="slotProps">
-                    {{ format24h(slotProps.data.startShift)+' a '+ format24h(slotProps.data.endShift) }}
+                    {{ format24h(slotProps.data.startShift) + ' a ' + format24h(slotProps.data.endShift) }}
                 </template>
             </Column>
 
             <Column field="startBreak" header="Descanso" class="">
                 <template #body="slotProps">
-                    {{ slotProps.data.startBreak ? format24h(slotProps.data.startBreak)+' a '+ format24h(slotProps.data.endBreak) : 'No aplica' }}
+                    {{ slotProps.data.startBreak ? format24h(slotProps.data.startBreak) + ' a ' +
+                        format24h(slotProps.data.endBreak) : 'No aplica' }}
                 </template>
             </Column>
             <Column header="Horas" class="">
@@ -286,47 +290,49 @@ const calcularDiferencia = (start, end) => {
                                                     placeholder="Nombre para identificar el horario" />
                                             </div>
                                             <div class="relative">
-                                                <label for="start"
+                                                <label
                                                     class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Horario</label>
                                                 <div
                                                     class="grid w-full grid-cols-2 gap-3 p-4 text-gray-900 border-0 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 ">
                                                     <div class="relative">
-                                                        <label for="start"
+                                                        <label for="startShift"
                                                             class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Inicio</label>
-                                                        <Calendar name="start" id="start" timeOnly
-                                                            v-model="shift.startShift"
-                                                            :model-value="format24h(shift.startShift)"
-                                                            class="block w-full text-gray-900 border-0 rounded-md shadow-sm alturah8 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                                            <Calendar name="start" id="start" timeOnly hourFormat="24"
+                                                            v-model="shift.startShift" class="alturah8" :pt="{
+                                                                input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
+                                                            }" />
                                                     </div>
                                                     <div class="relative">
-                                                        <label for="end"
+                                                        <label for="endShift"
                                                             class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Fin</label>
-                                                        <Calendar name="start" id="start" timeOnly v-model="shift.endShift"
-                                                            :model-value="format24h(shift.endShift)"
-                                                            class="block w-full text-gray-900 border-0 rounded-md shadow-sm alturah8 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                                        <Calendar name="endShift" id="endShift" timeOnly
+                                                            v-model="shift.endShift" hourFormat="24" class="alturah8" :pt="{
+                                                                input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
+                                                            }" />
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="relative">
-                                                <label for="start"
+                                                <label for="break"
                                                     class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Descanso</label>
                                                 <div name="break"
                                                     class="grid w-full grid-cols-2 gap-3 p-4 text-gray-900 border-0 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 ">
 
                                                     <div class="relative">
-                                                        <label for="start"
+                                                        <label for="startBreak"
                                                             class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Inicio</label>
-                                                        <Calendar name="start" id="start" timeOnly
-                                                            v-model="shift.startBreak"
-                                                            :model-value="format24h(shift.startBreak)"
-                                                            class="block w-full text-gray-900 border-0 rounded-md shadow-sm alturah8 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                                        <Calendar name="startBreak" id="startBreak" timeOnly hourFormat="24"
+                                                            v-model="shift.startBreak" class="alturah8" :pt="{
+                                                                input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
+                                                            }" />
                                                     </div>
                                                     <div class="relative">
-                                                        <label for="end"
+                                                        <label for="endBreak"
                                                             class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Fin</label>
-                                                        <Calendar name="start" id="start" timeOnly v-model="shift.endBreak"
-                                                            :model-value="format24h(shift.endBreak)"
-                                                            class="block w-full text-gray-900 border-0 rounded-md shadow-sm alturah8 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                                        <Calendar name="endBreak" id="endBreak" timeOnly hourFormat="24"
+                                                            v-model="shift.endBreak" class="alturah8" :pt="{
+                                                                input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
+                                                            }" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -334,7 +340,10 @@ const calcularDiferencia = (start, end) => {
                                                 <p>
                                                     Tiempo laborado
                                                 </p>
-                                                <p>{{ calcularDiferencia(shift.startShift, shift.endShift)-calcularDiferencia(shift.startBreak, shift.endBreak) }} Horas</p>
+                                                <p>{{ calcularDiferencia(shift.startShift,
+                                                    shift.endShift).toFixed(2) - calcularDiferencia(shift.startBreak, shift.endBreak).toFixed(2)
+                                                }}
+                                                    Horas</p>
                                             </div>
                                             <div class="relative">
                                                 <p>
@@ -343,11 +352,13 @@ const calcularDiferencia = (start, end) => {
                                                 <p>{{ calcularDiferencia(shift.startBreak, shift.endBreak) }} Horas</p>
                                             </div>
                                             <div class="relative col-span-2 text-warning"
-                                                v-if="calcularDiferencia(shift.startShift, shift.endShift)-calcularDiferencia(shift.startBreak, shift.endBreak) > 8.5">
+                                                v-if="calcularDiferencia(shift.startShift, shift.endShift) - calcularDiferencia(shift.startBreak, shift.endBreak) > 8.5">
                                                 <p>
                                                     Tiempo adicional
                                                 </p>
-                                                <p>{{ calcularDiferencia(shift.startShift, shift.endShift)-calcularDiferencia(shift.startBreak, shift.endBreak)- 8.5 }} Horas
+                                                <p>{{ calcularDiferencia(shift.startShift,
+                                                    shift.endShift) - calcularDiferencia(shift.startBreak, shift.endBreak) -
+                                                    8.5 }} Horas
                                                 </p>
                                             </div>
                                         </div>
