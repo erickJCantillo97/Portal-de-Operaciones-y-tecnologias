@@ -49,17 +49,17 @@ const filters = ref({
 const chartOptions = ref();
 onMounted(() => {
     initFilters();
-    // axios.get(route('get.empleados.gerencia')).then((res) => {
-    //     for (var gerencia of Object.values(res.data)) {
-    //         personal.value.push({
-    //             title: hasRole('Super Admin') ? gerencia[0].Gerencia : gerencia[0].Oficina,
-    //             initials: gerencia.length,
-    //             totalMembers: gerencia.length,
-    //             bgColorClass: gerencia[0].Gerencia != 'GECON' ? colors[gerencia[0].Gerencia] : 'bg-' + gerencia[0].Gerencia,
-    //         },)
-    //         totalMembers.value += gerencia.length
-    //     }
-    // })
+    axios.get(route('get.empleados.gerencia')).then((res) => {
+        for (var gerencia of Object.values(res.data)) {
+            personal.value.push({
+                title: hasRole('Super Admin') ? gerencia[0].Gerencia : gerencia[0].Oficina,
+                initials: gerencia.length,
+                totalMembers: gerencia.length,
+                bgColorClass: gerencia[0].Gerencia != 'GECON' ? colors[gerencia[0].Gerencia] : 'bg-' + gerencia[0].Gerencia,
+            },)
+            totalMembers.value += gerencia.length
+        }
+    })
     // getTask();
 }
 );
@@ -185,13 +185,12 @@ const clearFilter = () => {
             <TimeLine :projects="props.projects"></TimeLine>
         </div>  -->
 
-        <!-- <div class="grid grid-cols-1 gap-2 mb-8 md:grid-cols-2">
+        <div class="grid grid-cols-1 gap-2 mb-8 md:grid-cols-2">
             <div class="m-4">
                 <div
                     class="w-full p-4 font-extrabold text-center text-black rounded-xl bg-gradient-to-b from-gray-400 to-slate-50">
                     <h2 class="text-xl font-extrabold">Personal</h2>
                 </div>
-
                 <div role="list"
                     class="grid h-64 grid-cols-1 gap-2 px-2 my-6 mt-3 overflow-y-auto sm:grid-cols-2 sm:gap-2 lg:grid-cols-2 custom-scroll snap-y snap-proximity">
                     <div v-for="project in personal" :key="project.title"
@@ -211,7 +210,7 @@ const clearFilter = () => {
                     </div>
                 </div>
             </div>
-            <div class="m-4">
+            <!-- <div class="m-4">
                 <div class="w-full p-4 font-extrabold text-center text-black bg-gradient-to-b from-blue-400 to-slate-50">
                     <h2 class="text-xl font-extrabold ">Actividades de Hoy</h2>
                 </div>
@@ -227,7 +226,7 @@ const clearFilter = () => {
                         </li>
                     </ul>
                 </div>
-            </div>
-        </div> -->
+            </div> -->
+        </div>
     </AppLayout>
 </template>
