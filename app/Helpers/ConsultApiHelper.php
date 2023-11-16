@@ -3,7 +3,7 @@
 use App\Models\Labor;
 use Illuminate\Support\Facades\Http;
 
-define('ROUTE_API', 'https://servicioapi.cotecmar.com');
+define('ROUTE_API', 'https://sigcc.cotecmar.com:9090/servicio_api/public');
 function getEmpleadosAPI(): mixed
 {
     try {
