@@ -5,7 +5,7 @@ import Image from 'primevue/image';
 import OverlayPanel from 'primevue/overlaypanel';
 import { ref } from 'vue';
 import { useSweetalert } from '@/composable/sweetAlert'
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import Loading from "@/Components/Loading.vue";
 
 const props = defineProps({
     suggestions: Array,
@@ -18,9 +18,9 @@ const op = ref();
 const { toast } = useSweetalert();
 const suggestionSelect = ref()
 const loading = ref(false)
-const date = ref()
+const date = ref(null)
 const today = ref(new Date().toISOString().split('T')[0])
-const type = ref('')
+const type = ref(null)
 const updateSuggestion = (s, n) => {
     router.put(route('suggestion.update', s), { answer: n }, {
         onSuccess: () => {
@@ -58,8 +58,7 @@ const toggle = (event) => {
 </script>
 <template>
     <AppLayout>
-        <div class="flex h-8 min-w-full px-1 space-y-2">
-            <div class="flex justify-between w-full">
+        <div class="flex justify-between h-10 min-w-full p-1 border-b border-gray-200">
                 <button :class="type == null && date == null ? 'bg-primary text-white scale-105' : ''"
                     class="w-8 border rounded-md shadow-xl text-primary hover:text-white border-primary alturah8 pi pi-filter-slash hover:bg-primary"
                     @click="type = null; date = null; filter()">
@@ -81,7 +80,6 @@ const toggle = (event) => {
                 <input :class="date != null ? 'bg-primary text-white scale-105 border-white fill-white' : ''"
                     class="relative inline-flex items-center justify-center text-sm font-semibold border rounded-md shadow-xl text-primary alturah8 border-primary hover:scale-105 focus:z-10"
                     type="date" name="date" id="date" v-model="date" :max="today" @change="filter()">
-            </div>
         </div>
         <div class="flex max-w-full max-h-full min-w-full min-h-full" v-if="!loading">
             <div class="grid grid-cols-3" v-if="props.suggestions.length > 0">
@@ -130,10 +128,10 @@ const toggle = (event) => {
                     <span class="flex justify-center w-full p-2 text-lg font-bold text-primary">Detalles del reporte</span>
                     <p class="w-full h-auto p-2 border border-blue-100 rounded-md">{{ suggestionSelect.details }}</p>
                     <span class="flex justify-center w-full p-2 text-lg text-primary">Datos tecnicos</span>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div class="grid grid-cols-4 gap-1">
+                    <div class="grid grid-cols-2 gap-2 ">
+                        <div class="grid grid-cols-4 gap-1 border border-red-500">
                             <span class="flex items-center col-span-1 text-primary">URL:</span>
-                            <p class="flex items-center col-span-3">{{ suggestionSelect.urlAddress }}</p>
+                            <p class="flex items-center max-w-full col-span-3 break-all">{{ suggestionSelect.urlAddress }}</p>
                             <span class="flex items-center col-span-1 text-primary">Tipo:</span>
                             <p class="flex items-center col-span-3">{{ suggestionSelect.type }}</p>
                             <span class="flex items-center col-span-1 text-primary">Usuario:</span>
@@ -210,56 +208,16 @@ const toggle = (event) => {
                     </div>
                 </div>
                 <div class="flex flex-col items-center justify-center w-full h-full col-span-2 px-2 " v-else>
-                    <span class="flex items-center justify-center w-full h-full loader">
-                        <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
-                    </span>
-                    <p class="font-bold animate-pulse text-primary"> Seleccione un reporte</p>
+                    <Loading message="Seleccione un reporte"/>
                 </div>
             </div>
             <div v-else class="flex flex-col items-center justify-center w-full h-full pt-10">
-                <span class="flex items-center justify-center w-full h-full loader">
-                    <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
-                </span>
-                <p class="font-bold animate-pulse text-primary">No hay reportes que mostrar</p>
+                <Loading message="No hay reportes que mostrar"/>
             </div>
         </div>
         <div v-else class="flex flex-col items-center justify-center px-2 pt-10">
-            <span class="flex items-center justify-center w-full loader">
-                <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
-            </span>
-            <p class="font-bold animate-pulse text-primary">Cargando reportes</p>
+            <Loading message="Cargando reportes"/>
         </div>
     </AppLayout>
 </template>
 
-<style scoped>
-.loader {
-    position: relative;
-    width: 100px;
-    height: 100px;
-}
-
-.loader:before,
-.loader:after {
-    content: '';
-    border-radius: 50%;
-    position: absolute;
-    inset: 0;
-    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.3) inset;
-}
-
-.loader:after {
-    box-shadow: 0 2px 0 rgb(46 48 146) inset;
-    animation: rotate 2s linear infinite;
-}
-
-@keyframes rotate {
-    0% {
-        transform: rotate(0)
-    }
-
-    100% {
-        transform: rotate(360deg)
-    }
-}
-</style>
