@@ -39,25 +39,22 @@ class ProgrammingController extends Controller
                 'fecha' => 'required|date',
             ]);
 
-            $status = true;
-            $codigo = 0;
+            $status = false;
+            $codigo = 1001; //Codigo para el caso en se trate de programar alguien con mas de 9.5 horas
             $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
-
             if ($hours < 9.5) {
                 $schedule = Schedule::firstOrNew($validateData);
                 $schedule->save();
-
                 ScheduleTime::create([
                     'schedule_id' => $schedule->id,
                     'hora_inicio' => '7:00',
                     'hora_fin' => '16:30',
                 ]);
-            } else {
-                $status = false;
-                $codigo = 1001; //Codigo para el caso en se trate de programar alguien con mas de 9.5 horas
+                $status = true;
+                $codigo = 0; 
+                $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
             }
 
-            $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
 
             return response()->json([
                 'status' => $status,
@@ -69,6 +66,20 @@ class ProgrammingController extends Controller
             return $e;
         }
 
+    }
+
+    public function update(ScheduleTime $scheduleTime, Request $request){
+        
+        $scheduleTime->update([
+            'hora_inicio' => $request->hora_inicio,
+            'hora_fin' => $request->hora_fin,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'task' => $this->getSchedule($scheduleTime->schedule->fecha, $scheduleTime->schedule->task_id),
+            'hours' => $this->getAssignmentHour($scheduleTime->schedule->fecha, $scheduleTime->schedule->employee_id),
+        ], 200);
     }
 
     public function deleteSchedule(Schedule $schedule)
@@ -97,7 +108,7 @@ class ProgrammingController extends Controller
      */
     public function endNivelActivities(Request $request)
     {
-        if (isset($request->dates[0])) {
+        if (isset($request->dates[0]) && 1 != 0) {
             $date_start = Carbon::parse($request->dates[0])->format('Y-m-d');
             $date_end = Carbon::parse($request->dates[1])->format('Y-m-d');
         } elseif (isset($request->date)) {

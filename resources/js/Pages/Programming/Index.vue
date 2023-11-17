@@ -15,8 +15,6 @@ import Dropdown from 'primevue/dropdown';
 import SelectButton from 'primevue/selectbutton';
 import Calendar from 'primevue/calendar';
 
-
-
 const { toast } = useSweetalert();
 
 const props = defineProps({
@@ -261,9 +259,9 @@ const toggle = (event, horario) => {
                     <p class="font-bold animate-pulse text-primary"> Cargando actividades</p>
                 </div>
                 <div v-else
-                    class="h-full col-span-2 col-start-1 p-1 space-y-1 overflow-y-auto custom-scroll snap-y snap-proximity rounded-xl">
+                    class="h-full col-span-2 col-start-1 p-1 space-y-1 overflow-y-auto custom-scroll snap-y snap-mandatory rounded-xl">
                     <div v-for="task in tasks"
-                        class="flex flex-col justify-between p-2 border rounded-md shadow-md h-1/2 sm:h-1/2 snap-start">
+                        class="flex flex-col justify-between p-2 border rounded-md shadow-md h-full snap-start">
                         <div class="grid grid-rows-2">
                             <div class="">
                                 <p class="block overflow-hidden">{{ task.name }}

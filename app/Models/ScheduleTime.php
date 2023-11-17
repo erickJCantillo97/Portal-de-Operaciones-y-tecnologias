@@ -13,7 +13,7 @@ class ScheduleTime extends Model implements Auditable
     use \OwenIt\Auditing\Auditable;
     protected $guarded = [];
 
-    public function Schedule(){
+    public function schedule(){
         return $this->belongsTo(Schedule::class);
     }
 }
