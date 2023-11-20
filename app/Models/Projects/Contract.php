@@ -19,9 +19,4 @@ class Contract extends Model implements Auditable
     {
         return $this->belongsTo(Customer::class);
     }
-
-    public function ship()
-    {
-        return $this->belongsTo(Ship::class);
-    }
 }

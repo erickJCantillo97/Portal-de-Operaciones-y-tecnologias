@@ -314,7 +314,8 @@ const exportarExcel = () => {
 
                                             <TextInput class="text-left" label="Costo" type="number"
                                                 :placeholder="'Escriba el valor total estimado'" v-model="formData.cost"
-                                                :error="router.page.props.errors.cost"></TextInput>
+                                                :error="router.page.props.errors.cost">
+                                            </TextInput>
 
                                             <!--CAMPO FECHA INICIO-->
                                             <TextInput class="text-left" type="date" label="Fecha de inicio"
