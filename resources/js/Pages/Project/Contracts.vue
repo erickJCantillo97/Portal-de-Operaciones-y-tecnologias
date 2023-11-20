@@ -23,10 +23,25 @@ const filters = ref({
 const { contractNotification } = webNotifications();
 
 const customerSelect = ref({});
-const managerSelect = ref({});
-const typeOfSaleSelect = ref({});
-const currencySelect = ref({});
-const stateSelect = ref({});
+// const managerSelect = ref({});
+
+const typeOfSaleSelect = ref([
+    'VENTA DIRECTA',
+    'FINANCIADA',
+    'LEASING'
+]);
+
+const currencySelect = ref([
+    'COP',
+    'USD',
+    'EUR'
+]);
+
+const stateSelect = ref([
+    'LIQUIDADO',
+    'EN EJECUCIÓN'
+]);
+
 const open = ref(false)
 const query = ref('')
 
@@ -56,6 +71,7 @@ const formData = useForm({
 //#endregion
 
 onMounted(() => {
+    getManagers()
     // window.Echo.private("contracts").listen(".ContractsEvent", (e) => {
     //     // Push.Permission.get();
     //     const customerName = customerSelect.value
@@ -80,6 +96,15 @@ onMounted(() => {
     // contractNotification(customerSelect, managerSelect, formData.cost);
     initFilters();
 })
+
+const getManagers = (key, value) => {
+    axios.get(route('reuniones.agregarUsuariosAReunion', key, value), {
+    }).then((res) => {
+        toast('El usuario se ha agregado a la reunión satisfactoriamente.', 'success');
+    }).catch(error => {
+        toast('Por favor seleccione un usuario para agregar a la reunión.', 'success');
+    });
+}
 
 /* SUBMIT*/
 const submit = () => {
@@ -126,7 +151,6 @@ const submit = () => {
             loading.value = false;
         }
     })
-
 }
 
 const addItem = () => {
@@ -348,7 +372,7 @@ const excelExport = () => {
 
                                             <!--CAMPO TIPO DE VENTA-->
                                             <Combobox class="mt-2 text-left" label="Tipo de Venta"
-                                                placeholder="Seleccione un Tipo de Venta" :options="type_of_sale"
+                                                placeholder="Seleccione un Tipo de Venta"
                                                 v-model="typeOfSaleSelect">
                                             </Combobox>
 
@@ -383,7 +407,7 @@ const excelExport = () => {
 
                                             <!--CAMPO ESTADO DE VENTA-->
                                             <Combobox class="mt-2 text-left" label="Estado del Contrato"
-                                                placeholder="Seleccione un Tipo de Venta" :options="state"
+                                                placeholder="Seleccione un Tipo de Venta"
                                                 v-model="stateSelect">
                                             </Combobox>
 
