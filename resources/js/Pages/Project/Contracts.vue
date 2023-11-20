@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref, onMounted} from 'vue';
+import { ref, onMounted } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
@@ -23,7 +23,10 @@ const filters = ref({
 const { contractNotification } = webNotifications();
 
 const customerSelect = ref({});
-const shipSelect = ref({});
+const managerSelect = ref({});
+const typeOfSaleSelect = ref({});
+const currencySelect = ref({});
+const stateSelect = ref({});
 const open = ref(false)
 const query = ref('')
 
@@ -31,18 +34,23 @@ const query = ref('')
 const props = defineProps({
     contracts: Array,
     customers: Array,
-    ships: Array
+    managers: Array
 })
 
 //#region UseForm
 const formData = useForm({
     id: props.contracts?.id ?? '0',
+    contract_id: props.contracts?.contract_id ?? '0',
+    subject: props.contracts?.subject ?? '',
     customer_id: props.contracts?.customer_id ?? '0',
-    ship_id: props.contracts?.ship_id ?? '0',
-    name: props.contracts?.name ?? '',
-    cost: props.contracts?.cost ?? '0',
+    manager_id: props.contracts?.manager_id ?? '0',
+    type_of_sale: props.contracts?.type_of_sale ?? '',
+    supervisor: props.contracts?.supervisor ?? '',
     start_date: props.contracts?.start_date ?? '',
     end_date: props.contracts?.end_date ?? '',
+    currency: props.contracts?.currency ?? '0',
+    cost: props.contracts?.cost ?? '0',
+    state: props.contracts?.state ?? '',
     pdf: null
 });
 //#endregion
@@ -53,12 +61,12 @@ onMounted(() => {
     //     const customerName = customerSelect.value
     //         ? customerSelect.value.name
     //         : "Cliente no seleccionado";
-    //     const shipName = shipSelect.value
-    //         ? shipSelect.value.name
+    //     const managerName = managerSelect.value
+    //         ? managerSelect.value.name
     //         : "Buque no seleccionado";
     //     Push.create(e.message, {
     //         body: `Cliente: ${customerName},
-    //                 \nBuque: ${shipName},
+    //                 \nBuque: ${managerName},
     //                 \nCosto: ${formatCurrency(formData.cost)}`,
     //         icon: "/images/cotecmar-logo-bg-white.png",
     //         requireInteraction: true,
@@ -69,7 +77,7 @@ onMounted(() => {
     //         },
     //     });
     // });
-    // contractNotification(customerSelect, shipSelect, formData.cost);
+    // contractNotification(customerSelect, managerSelect, formData.cost);
     initFilters();
 })
 
@@ -81,13 +89,13 @@ const submit = () => {
         return;
     }
 
-    if (!shipSelect.value) {
+    if (!managerSelect.value) {
         toast('Por favor seleccione un buque.', 'error')
         return;
     }
 
     formData.customer_id = customerSelect.value.id
-    formData.ship_id = shipSelect.value.id
+    formData.manager_id = managerSelect.value.id
 
     if (formData.id == 0) {
         router.post(route('contracts.store'), formData, {
@@ -125,7 +133,7 @@ const addItem = () => {
     formData.reset();
     clearErrors();
     customerSelect.value = {}; //Resetear los datos
-    shipSelect.value = {}; //Resetear los datos
+    managerSelect.value = {}; //Resetear los datos
     open.value = true;
 }
 
@@ -133,12 +141,17 @@ const editItem = (contract) => {
     clearErrors();
 
     formData.id = contract.id;
+    formData.contract_id = contract.contract_id;
+    formData.subject = contract.subject;
     customerSelect.value = contract.customer; //Este dato viene del Contract::with('customer')
-    shipSelect.value = contract.ship; //Este dato viene del Contract::with('ship')
-    formData.name = contract.name;
-    formData.cost = contract.cost;
+    managerSelect.value = contract.manager; //Este dato viene del Contract::with('manager')
+    formData.type_of_sale = contract.type_of_sale;
+    formData.supervisor = contract.supervisor;
     formData.start_date = contract.start_date;
     formData.end_date = contract.end_date;
+    formData.currency = contract.currency;
+    formData.cost = contract.cost;
+    formData.state = contract.state;
     formData.pdf = contract.pdf;
     open.value = true;
 };
@@ -174,7 +187,7 @@ const formatCurrency = (value) => {
     });
 };
 
-const exportarExcel = () => {
+const excelExport = () => {
     //console.log(dt.value)
     // Acquire Data (reference to the HTML table)
     var table_elt = document.getElementById("tabla");
@@ -210,7 +223,7 @@ const exportarExcel = () => {
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="contracts" v-model:filters="filters"
                 dataKey="id" filterDisplay="menu" :loading="loading"
-                :globalFilterFields="['name', 'customer.name', 'ship.name', 'gerencia', 'cost', 'start_date', 'end_date']"
+                :globalFilterFields="['name', 'customer.name', 'manager.name', 'gerencia', 'cost', 'start_date', 'end_date']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -237,18 +250,25 @@ const exportarExcel = () => {
                 </template>
 
                 <!--COLUMNAS-->
-                <Column field="name" header="Nombre"></Column>
+                <Column field="contract_id" header="Contrato ID"></Column>
+                <!-- <Column field="subject" header="Objeto del Contrato"></Column> -->
                 <Column field="customer.name" header="Cliente"></Column>
-                <Column field="ship.name" header="Buque">
-
-                </Column>
+                <!-- <Column field="manager.name" header="Gerente"></Column> -->
+                <!-- <Column field="type_of_sale" header="Tipo de Venta"></Column> -->
+                <!-- <Column field="supervisor" header="Supervisor"></Column> -->
+                <Column field="start_date" header="Fecha Inicio"></Column>
+                <Column field="end_date" header="Fecha Finalización"></Column>
+                <!-- <Column field="currency" header="Moneda">
+                    <template #body="slotProps">
+                        {{ formatCurrency(slotProps.data.cost) }}
+                    </template>
+                </Column> -->
                 <Column field="cost" header="Costo">
                     <template #body="slotProps">
                         {{ formatCurrency(slotProps.data.cost) }}
                     </template>
                 </Column>
-                <Column field="start_date" header="Fecha Inicio"></Column>
-                <Column field="end_date" header="Fecha Finalización"></Column>
+                <!-- <Column field="state" header="Estado del Contrato"></Column> -->
                 <!-- <Column field="status" header="Estado" sortable>
                     <template #body="slotProps">
                         <Tag :value="slotProps.data.status" :severity="getContractStatusSeverity(slotProps.data)" />
@@ -302,28 +322,46 @@ const exportarExcel = () => {
                                             Contrato
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-2 border border-gray-200 rounded-lg">
+                                            <!--CAMPO CONTRATO ID-->
+                                            <TextInput class="mt-2 text-left" label="Contrato ID"
+                                                placeholder="Escriba ID del Contrato" v-model="formData.contract_id"
+                                                :error="$page.props.errors.contract_id">
+                                            </TextInput>
+
+                                            <!--CAMPO OBJETO DEL CONTRATO-->
+                                            <TextInput class="mt-2 text-left" label="Objeto del Contrato"
+                                                placeholder="Escriba Objeto del Contrato" v-model="formData.subject"
+                                                :error="$page.props.errors.subject">
+                                            </TextInput>
+
+                                            <!--CAMPO CLIENTE-->
                                             <Combobox class="mt-2 text-left" label="Cliente"
                                                 placeholder="Seleccione Cliente" :options="customers"
                                                 v-model="customerSelect">
                                             </Combobox>
 
-                                            <Combobox class="mt-2 text-left" label="Buque" placeholder="Seleccione Buque"
-                                                :options="ships" v-model="shipSelect">
+                                            <!--CAMPO GERENTE-->
+                                            <Combobox class="mt-2 text-left" label="Gerente"
+                                                placeholder="Seleccione Gerente" :options="managers"
+                                                v-model="managerSelect">
                                             </Combobox>
-                                            <TextInput class="mt-2 text-left" label="Nombre del Contrato"
-                                                placeholder="Escriba Nombre del Contrato" v-model="formData.name"
-                                                :error="$page.props.errors.name">
-                                            </TextInput>
 
-                                            <TextInput class="mt-2 text-left" type="number" label="Costo"
-                                                :placeholder="'Escriba el Costo del Contrato'" v-model="formData.cost"
-                                                :error="$page.props.errors.cost">
+                                            <!--CAMPO TIPO DE VENTA-->
+                                            <Combobox class="mt-2 text-left" label="Tipo de Venta"
+                                                placeholder="Seleccione un Tipo de Venta" :options="type_of_sale"
+                                                v-model="typeOfSaleSelect">
+                                            </Combobox>
+
+                                            <!--CAMPO SUPERVISOR-->
+                                            <TextInput class="mt-2 text-left" label="Supervisor"
+                                                placeholder="Escriba nombre del supervisor" v-model="formData.supervisor"
+                                                :error="$page.props.errors.supervisor">
                                             </TextInput>
 
                                             <!--CAMPO FECHA INICIO-->
                                             <TextInput class="mt-2 text-left" type="date" label="Fecha de inicio"
                                                 :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.start_date"
-                                                :error="$page.props.errors.cost">
+                                                :error="$page.props.errors.start_date">
                                             </TextInput>
 
                                             <!--CAMPO FECHA FINALIZACIÓN-->
@@ -332,11 +370,28 @@ const exportarExcel = () => {
                                                 :error="$page.props.errors.end_date">
                                             </TextInput>
 
+                                            <!--CAMPO MONEDA-->
+                                            <Combobox class="mt-2 text-left" label="Moneda" placeholder="Ej: COP"
+                                                :options="currency" v-model="currencySelect">
+                                            </Combobox>
+
+                                            <!--CAMPO PRECIO DE VENTA (cost)-->
+                                            <TextInput class="text-left" label="Precio de Venta" type="number"
+                                                :placeholder="'Escriba el valor total estimado'" v-model="formData.cost"
+                                                :error="router.page.props.errors.cost">
+                                            </TextInput>
+
+                                            <!--CAMPO ESTADO DE VENTA-->
+                                            <Combobox class="mt-2 text-left" label="Estado del Contrato"
+                                                placeholder="Seleccione un Tipo de Venta" :options="state"
+                                                v-model="stateSelect">
+                                            </Combobox>
+
+                                            <!--CAMPO SUBIR ARCHIVO-->
                                             <FileUpload chooseLabel="Adjuntar PDF" mode="basic" name="demo[]"
                                                 :multiple="false" accept=".pdf" :maxFileSize="1000000"
                                                 @input="formData.pdf = $event.target.files[0]">
                                             </FileUpload>
-
                                         </div>
                                     </div>
                                 </div>

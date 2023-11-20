@@ -9,13 +9,13 @@ function getEmpleadosAPI(): mixed
     try {
         if (getToken()) {
             $json = Http::acceptJson()->withToken(session()->get('token'))
-                ->get(ROUTE_API.'/listado_personal_cargo_costo_da_view'
+                ->get(
+                    ROUTE_API . '/listado_personal_cargo_costo_da_view'
                 )->json();
 
             return collect($json);
         }
         dd('Sin token');
-
     } catch (\Throwable $th) {
         dd($th);
     }
@@ -27,9 +27,9 @@ function getToken(): bool
     if (session()->get('token') == null) {
         return login();
     }
-    $user = Http::acceptJson()->withToken(session()->get('token'))->get(ROUTE_API.'/user');
+    $user = Http::acceptJson()->withToken(session()->get('token'))->get(ROUTE_API . '/user');
 
-    if (! isset($user['id'])) {
+    if (!isset($user['id'])) {
         return login();
     }
 
@@ -39,7 +39,8 @@ function getToken(): bool
 function login(): bool
 {
     try {
-        $login = Http::acceptJson()->post(ROUTE_API.'/auth/login',
+        $login = Http::acceptJson()->post(
+            ROUTE_API . '/auth/login',
             [
                 'username' => 'portalOperTecnologia',
                 'password' => 'cG9ydGFsT3BlclRlY25vbG9naWE=',
@@ -59,9 +60,8 @@ function login(): bool
 
 function searchEmpleados(string $clave, string $valor)
 {
-
     return getEmpleadosAPI()->filter(function ($employee) use ($clave, $valor) {
-        return $employee[$clave] == $valor;
+        return strpos($employee[$clave], $valor) !== false;
     });
 }
 
@@ -70,7 +70,8 @@ function UpdateCargos()
     try {
         if (getToken()) {
             $json = Http::acceptJson()->withToken(session()->get('token'))
-                ->get(ROUTE_API.'/listado_cargo_promedio_salarial_da_view'
+                ->get(
+                    ROUTE_API . '/listado_cargo_promedio_salarial_da_view'
                 )->json();
             foreach ($json as $key => $cargo) {
                 Labor::firstOrCreate([
@@ -85,11 +86,9 @@ function UpdateCargos()
             return collect($json);
         }
         dd('Sin token');
-
     } catch (\Throwable $th) {
         dd($th);
     }
-
 }
 
 function getPersonalGerenciaOficina(string $gerencia = null, string $oficina = null)

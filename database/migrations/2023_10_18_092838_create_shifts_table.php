@@ -24,7 +24,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
-        DB::statement('ALTER TABLE shifts ADD hours AS (ALTER TABLE shifts ADD hours AS (((DATEDIFF(s, startShift, endShift) - DATEDIFF(s, ISNULL(startBreak, 0), ISNULL(endBreak, 0))))/3600.0))');
+        DB::statement("ALTER TABLE shifts ADD hours AS (((DATEDIFF(s, startShift, endShift) - DATEDIFF(s, ISNULL(startBreak, 0), ISNULL(endBreak, 0))))/3600.0)");
     }
 
     /**

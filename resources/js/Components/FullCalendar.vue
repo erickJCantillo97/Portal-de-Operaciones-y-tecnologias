@@ -1,4 +1,4 @@
-<script >
+<script>
 import { defineComponent } from 'vue'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
@@ -24,6 +24,7 @@ export default defineComponent({
     TextInput,
     Button,
     Combobox,
+    XMarkIcon,
   },
   props: {
     initialEvents: Array,
@@ -227,18 +228,20 @@ export default defineComponent({
             <DialogPanel
               class="relative transform overflow-hidden rounded-lg bg-white px-2 pb-4 pt-2 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg ">
               <div>
-                <div class="px-8 mt-2 text-center">
-                  <DialogTitle as="h3" class="text-xl font-semibold text-primary text-center">
-                    {{ currentEvents != 0 ? 'Editar ' : 'Crear' }}
-                    Nuevo Horario
-                  </DialogTitle>
+                <div class="px-8 mt-2">
+                  <div class="flex items-center justify-between text-center">
+                    <DialogTitle as="h3" class="text-xl font-semibold text-primary text-center flex-grow">
+                      {{ currentEvents != 0 ? 'Editar ' : 'Crear' }}
+                      Nuevo Horario
+                    </DialogTitle>
 
-                  <!--BOTÓN 'X'->(cerrar) DEL MODAL-->
-                  <div class="|">
-                    <button v-tooltip.top="'Cerrar'" @click="closeDialog()">
-                      <XMarkIcon
-                        class="h-4 p-0.5 border rounded-md text-white bg-danger border-danger hover:animate-pulse hover:scale-125" />
-                    </button>
+                    <!-- BOTÓN 'X'->(cerrar) DEL MODAL -->
+                    <div class="w-8 h-8">
+                      <button v-tooltip.top="'Cerrar'" @click="closeDialog()">
+                        <XMarkIcon
+                          class="w-8 h-8 p-0.5 border rounded-md text-white bg-danger border-danger hover:bg-red-600" />
+                      </button>
+                    </div>
                   </div>
 
                   <!--COLUMNA 3 - SELECCIÓN DE ACTIVIDADES-->
@@ -247,29 +250,36 @@ export default defineComponent({
                   </Combobox>
 
                   <!--RADIO BUTTONS DE HORAS-->
-                  <div class="flex flex-wrap w-full justify-between h-10 mt-4 space-x-2">
-                    <input type="radio" name="action" value="Hours" v-model="showHours">
-                    <label for="Hours">Intervalo</label>
-                    <input type="radio" name="action" value="Resto" v-model="showHours">
-                    <label for="Resto">Resto</label>
-                    <input type="radio" name="action" value="Turno" v-model="showHours">
-                    <label for="Turno">Turno</label>
+                  <div class="flex flex-wrap w-full justify-around text-left align-items-center h-10 mt-4 space-x-2">
+                    <div>
+                      <input type="radio" name="action" value="Hours" v-model="showHours">
+                      <label for="Hours">Intervalo</label>
+                    </div>
+                    <div>
+                      <input type="radio" name="action" value="Resto" v-model="showHours">
+                      <label for="Resto">Resto</label>
+                    </div>
+                    <div>
+                      <input type="radio" name="action" value="Turno" v-model="showHours">
+                      <label for="Turno">Turno</label>
+                    </div>
                   </div>
 
                   <!--SELECCIÓN DE HORAS-->
                   <div v-if="showHours === 'Hours'" class="w-full h-auto">
-                    <!--CAMPO HORA INICIO-->
+
+                    <!--campo hora inicio-->
                     <TextInput class="mt-2 text-left" type="time" label="Hora de inicio" v-model="getStartDateEvent">
                     </TextInput>
 
-                    <!--CAMPO HORA FINALIZACIÓN-->
+                    <!--campo hora finalización-->
                     <TextInput class="mt-2 text-left" type="time" label="Hora de Finalización" v-model="getEndDateEvent">
                     </TextInput>
                   </div>
 
                   <!--SELECCIÓN DE TURNOS-->
                   <div v-if="showHours === 'Turno'" class="w-full h-64">
-                    <!--campo select de turnos-->
+                    <!--campo selección de turnos-->
                     <Combobox class="mt-2 text-left" label="Turnos" placeholder="Seleccione Turno" :options="tasks"
                       v-model="turnSelect">
                     </Combobox>
