@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Projects\TypeShip;
 use Exception;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class TypeShipController extends Controller
 {
@@ -14,7 +15,10 @@ class TypeShipController extends Controller
      */
     public function index()
     {
-        //
+        $typeShips = TypeShip::get();
+        return Inertia::render('TypeShips', [
+            'typeShips' => $typeShips,
+        ]);
     }
 
     /**

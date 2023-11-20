@@ -7,6 +7,7 @@ use App\Http\Controllers\Projects\ProgrammingController;
 use App\Http\Controllers\Projects\ProjectController;
 use App\Http\Controllers\Projects\QuoteController;
 use App\Http\Controllers\Projects\ShipController;
+use App\Http\Controllers\Projects\TypeShipController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     //CRUD Projects
     Route::resource('projects', ProjectController::class);
     Route::resource('tasks', TaskController::class);
+    Route::resource('typeShips', TypeShipController::class);
 
     //CRUD Authorizations
     Route::resource('authorizations', AuthorizationController::class);
@@ -54,5 +56,5 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('getContracts', [ContractController::class, 'getContracts'])->name('getContracts');
 
     //CRUD Programming
-    
+
 });

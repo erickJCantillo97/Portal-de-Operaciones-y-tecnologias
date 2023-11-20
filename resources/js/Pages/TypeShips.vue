@@ -77,20 +77,15 @@ const onToggle = (val) => {
                     <span class="font-bold white-space-nowrap text-success">Nueva clase</span>
                 </div>
             </template>
-            <div class="grid grid-cols-3">
-                <div class="flex items-center justify-between">
-                    <label>Nombre</label>
-                    <TextInput type="text" v-model="value" />
-                </div>
+            <div class="grid grid-cols-3 gap-3">
+
+                <TextInput label="Nombre" type="text" v-model="value" />
+                <TextInput label="Nombre" type="text" v-model="value" />
+                <TextInput label="Nombre" type="text" v-model="value" />
+                <TextInput label="Nombre" type="text" v-model="value" />
+                <TextInput label="Nombre" type="text" v-model="value" />
+
             </div>
-            <p class="m-0">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-                ea commodo consequat.
-                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
-                laborum.
-            </p>
             <template #footer>
                 <button
                     class="p-2 border rounded-md border-success text-success hover:border-primary hover:bg-primary hover:text-white"
@@ -100,5 +95,4 @@ const onToggle = (val) => {
                 </button>
             </template>
         </Dialog>
-    </AppLayout>
-</template>
+    </AppLayout></template>

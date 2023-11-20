@@ -14,11 +14,11 @@ defineProps({
     },
     showSup: {
         type: Boolean,
-        default: true
+        default: false
     },
     showEmailDomain: {
         type: Boolean,
-        default: true
+        default: false
     },
     error: {
         type: String,
@@ -61,7 +61,7 @@ defineEmits(['update:modelValue']);
                 required="" :placeholder="placeholder" :disabled="!enabled"
                 class="block w-full py-2 -mt-1 border-0 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 placeholder:italic focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" />
-            <div v-if="showEmailDomain" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <div v-if="showEmailDomain" class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 <span class="text-gray-500 sm:text-sm" id="price-currency">@cotecmar.com</span>
             </div>
             <button @click="toggleShow" type="button" v-if="type == 'password'"
