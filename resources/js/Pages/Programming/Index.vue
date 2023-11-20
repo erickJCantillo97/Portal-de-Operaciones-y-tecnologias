@@ -195,7 +195,6 @@ const toggle = (event, horario) => {
     text-wrap: balance;
     opacity: .5;
 }
-
 </style>
 
 <template>
@@ -225,7 +224,7 @@ const toggle = (event, horario) => {
             <div class="grid grid-cols-3">
                 <!--LISTA PROGRAMACIÓN DE ACTIVIDADES-->
                 <div v-if="loadingProgram" class="h-[50vh] w-[60vw] flex flex-col justify-center items-center col-span-2">
-                    <Loading message="Cargando actividades"/>
+                    <Loading message="Cargando actividades" />
                 </div>
                 <div v-else
                     class="h-full col-span-2 col-start-1 p-1 space-y-1 overflow-y-auto custom-scroll snap-y snap-mandatory rounded-xl">
@@ -275,7 +274,7 @@ const toggle = (event, horario) => {
 
                         <div v-if="loadingTasks ? true : loadingTask[task.id] ? true : false"
                             class="flex flex-col items-center justify-center h-full p-2">
-                            <Loading message="Cargando"/>
+                            <Loading message="Cargando" />
                         </div>
                         <Container v-if="!loadingTask[task.id]"
                             class="h-full p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
@@ -310,7 +309,7 @@ const toggle = (event, horario) => {
                                                     {{ format24h(horario.hora_inicio) }} {{ format24h(horario.hora_fin) }}
                                                 </span>
                                                 <button v-tooltip.bottom="'Cambiar horario'" class="hidden group-hover:flex"
-                                                    @click="optionSelectHours = 'select';toggle($event, horario)">
+                                                    @click="optionSelectHours = 'select'; toggle($event, horario)">
                                                     <PencilIcon
                                                         class="h-4 p-0.5 border rounded-md bg-primary text-white border-primary hover:animate-pulse hover:scale-125" />
                                                 </button>
@@ -335,7 +334,7 @@ const toggle = (event, horario) => {
                 <!--#endregion -->
                 <!--#region LISTA PERSONAL-->
                 <div v-if="loadingPerson" class="h-[50vh] w-[30vw] flex flex-col justify-center items-center">
-                    <Loading message="Cargando personas"/>
+                    <Loading message="Cargando personas" />
                 </div>
                 <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy" group-name="1"
                     :get-child-payload="getChildPayload"
@@ -382,11 +381,11 @@ const toggle = (event, horario) => {
                 <span class="grid grid-cols-2 col-span-3">
                     <button type="button"
                         :class="optionSelectHours == 'select' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
-                        @click="optionSelectHours = 'select'; nuevoHorario=null;"
+                        @click="optionSelectHours = 'select'; nuevoHorario = null;"
                         class="px-3 py-2 text-sm font-semibold shadow-md alturah8 rounded-l-md 0 ring-1 ring-inset ring-gray-300 focus:z-10">Seleccionar</button>
                     <button type="button"
                         :class="optionSelectHours == 'new' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
-                        @click="optionSelectHours = 'new';nuevoHorario=null;nuevoHorario={}; nuevoHorario.name=null;nuevoHorario.startShift=null;nuevoHorario.endShift"
+                        @click="optionSelectHours = 'new'; nuevoHorario = null; nuevoHorario = {}; nuevoHorario.name = null; nuevoHorario.startShift = null; nuevoHorario.endShift"
                         class="px-3 py-2 -ml-px text-sm font-semibold shadow-md alturah8 rounded-r-md ring-1 ring-inset ring-gray-300 focus:z-10">Nuevo</button>
                 </span>
                 <div v-if="optionSelectHours == 'select'" class="col-span-3">
@@ -443,23 +442,28 @@ const toggle = (event, horario) => {
                     <p class="w-full font-bold text-center">Nuevo horario temporal</p>
                     <div class="relative">
                         <label for="name"
-                        class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Nombre</label>
-                    <input v-model="nuevoHorario.name" name="name" id="name" class="text-center border-0 rounded-md alturah8 ring-1 ring-inset ring-gray-300">
+                            class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Nombre</label>
+                        <input v-model="nuevoHorario.name" name="name" id="name"
+                            class="text-center border-0 rounded-md alturah8 ring-1 ring-inset ring-gray-300">
                     </div>
 
                     <div class="relative">
                         <label for="startShift"
-                        class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Hora inicio</label>
-                    <Calendar  v-model="nuevoHorario.startShift" name="startShift" id="startShift" timeOnly hourFormat="24" class="alturah8" :pt="{
-                        input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
-                    }" />
+                            class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Hora
+                            inicio</label>
+                        <Calendar v-model="nuevoHorario.startShift" name="startShift" id="startShift" timeOnly
+                            hourFormat="24" class="alturah8" :pt="{
+                                input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
+                            }" />
                     </div>
                     <div class="relative">
                         <label for="endShift"
-                        class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Hora fin</label>
-                    <Calendar v-model="nuevoHorario.endShift" name="endShift" id="endShift" timeOnly hourFormat="24" class="alturah8" :pt="{
-                        input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
-                    }" />
+                            class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Hora
+                            fin</label>
+                        <Calendar v-model="nuevoHorario.endShift" name="endShift" id="endShift" timeOnly hourFormat="24"
+                            class="alturah8" :pt="{
+                                input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
+                            }" />
                     </div>
                 </div>
                 <div class="grid grid-cols-2 col-span-3 gap-1">

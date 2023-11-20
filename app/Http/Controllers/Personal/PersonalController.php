@@ -59,7 +59,7 @@ class PersonalController extends Controller
         try {
             Personal::create($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
     }
 
@@ -91,7 +91,7 @@ class PersonalController extends Controller
         try {
             $personal->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
 
@@ -103,10 +103,9 @@ class PersonalController extends Controller
         try {
             $personal->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }
-
 
     public function getPersonalCargo()
     {
@@ -120,13 +119,14 @@ class PersonalController extends Controller
 
     public function getCargos()
     {
-        $cargos  = Labor::get()->map(function ($cargo) {
+        $cargos = Labor::get()->map(function ($cargo) {
             return [
                 'id' => $cargo->id,
                 'name' => $cargo->name,
-                'costo_hora' => '$ ' . number_format($cargo->costo_hora, 0),
+                'costo_hora' => '$ '.number_format($cargo->costo_hora, 0),
             ];
         });
+
         return response()->json([
             'cargos' => $cargos,
         ]);
@@ -134,7 +134,7 @@ class PersonalController extends Controller
 
     /*
         Esta funcion permite devolver las personas de una oficiana
-        permite buscarlas con el request de gerencia y oficina 
+        permite buscarlas con el request de gerencia y oficina
         o devolverá el personal de la Oficina de la persona logueada
     */
     public function getPersonalGerenicaOcifina(Request $request)
@@ -162,13 +162,14 @@ class PersonalController extends Controller
     {
         $key = $request->key;
         $value = $request->value;
-        if (!isset($request->all)) {
+        if (! isset($request->all)) {
             return response()->json([
-                'employees' => searchEmpleados($key, $value)->filter(function ($employee) {
+                'employees' => searchEmpleados($key, $value)->all(function ($employee) { //TODO Cambiar el all() por filter()
                     return $employee['Gerencia'] == Auth::user()->gerencia;
                 }),
             ]);
         }
+
         return response()->json([
             'employees' => searchEmpleados($key, $value),
         ]);
