@@ -1,9 +1,9 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { onMounted, reactive, ref } from 'vue';
-import "@bryntum/gantt-trial/gantt.material.css";
-import '@bryntum/gantt-trial/locales/gantt.locale.Es.js';
-import { DateHelper, Gantt, List, LocaleManager, ProjectModel, StringHelper, Widget } from '@bryntum/gantt-trial/gantt.module.js';
+import "@bryntum/gantt/gantt.material.css";
+import '@bryntum/gantt/locales/gantt.locale.Es.js';
+import { DateHelper, Gantt, List, LocaleManager, ProjectModel, StringHelper, Widget } from '@bryntum/gantt/gantt.module.js';
 import '../../css/app.scss'
 import { useSweetalert } from '@/composable/sweetAlert';
 import ProjectCard from '@/Components/ProjectCard.vue';

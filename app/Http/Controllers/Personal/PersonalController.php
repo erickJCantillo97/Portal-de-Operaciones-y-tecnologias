@@ -33,7 +33,27 @@ class PersonalController extends Controller
     public function store(Request $request)
     {
         $validateData = $request->validate([
-            //
+            'name' => 'required|string|unique:type_ships,',
+            // $table->string('type')->nullable();
+            // $table->string('disinger')->nullable();
+            // $table->enum('hull_material', ['ACERO', 'ALUMINIO', 'MATERIALES COMPUESTOS'])->nullable(); //material del casco
+            // $table->double('length')->nullable(); //eslra
+            // $table->double('breadth')->nullable(); //Manga
+            // $table->double('draught')->nullable(); //calado de diseño
+            // $table->double('depth')->nullable(); //punta
+            // $table->double('full_load')->nullable();
+            // $table->double('light_ship')->nullable();
+            // $table->double('power_total')->nullable();
+            // $table->string('propulsion_type')->nullable();
+            // $table->string('velocity')->nullable();
+            // $table->double('autonomias')->nullable();
+            // $table->double('autonomy')->nullable();
+            // $table->double('crew')->nullable();
+            // $table->double('GT')->nullable();
+            // $table->double('CGT')->nullable();
+            // $table->double('bollard_pull')->nullable();
+            // $table->string('clasification')->nullable();
+            // $table->string('render')->nullable();
         ]);
 
         try {
