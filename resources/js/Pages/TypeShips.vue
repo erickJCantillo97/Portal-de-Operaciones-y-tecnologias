@@ -8,6 +8,19 @@ import { ref, onMounted } from 'vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import TextInput from '@/Components/TextInput.vue';
+import FileUpload from 'primevue/fileupload';
+
+
+const props = defineProps({
+    typeShips: Object
+})
+
+const typeShip= useForm(
+    {
+        name:'',
+        type:''
+    }
+)
 
 const visible = ref(false)
 
@@ -20,15 +33,11 @@ const columns = ref([
 ]);
 const selectedColumns = ref(columns.value);
 
-const onToggle = (val) => {
-    selectedColumns.value = columns.value.filter(col => val.includes(col));
-};
-
 </script>
 
 <template>
     <AppLayout>
-        <DataTable :value="typeShips" tableStyle="min-width: 50rem">
+        <DataTable :value="props.typeShips" tableStyle="min-width: 50rem">
             <template #header>
                 <div class="flex items-center justify-between">
                     <h class="text-base font-bold">Clases de buque</h>
@@ -77,13 +86,29 @@ const onToggle = (val) => {
                     <span class="font-bold white-space-nowrap text-success">Nueva clase</span>
                 </div>
             </template>
-            <div class="grid grid-cols-3 gap-3">
+            <div class="grid grid-cols-3 gap-2 p-1">
 
-                <TextInput label="Nombre" type="text" v-model="value" />
-                <TextInput label="Nombre" type="text" v-model="value" />
-                <TextInput label="Nombre" type="text" v-model="value" />
-                <TextInput label="Nombre" type="text" v-model="value" />
-                <TextInput label="Nombre" type="text" v-model="value" />
+                <TextInput label="Nombre" type="text" showSup="True" v-model="value" />
+                <TextInput label="Tipo de buque" type="text" v-model="value" />
+                <TextInput label="Empresa diseñadora" type="text" v-model="value" />
+                <TextInput label="Material Casco" type="text" v-model="value" />
+                <TextInput label="Eslora" type="text" v-model="value" />
+                <TextInput label="Manga" type="text" v-model="value" />
+                <TextInput label="Calado de diseño" type="text" v-model="value" />
+                <TextInput label="Puntal" type="text" v-model="value" />
+                <TextInput label="Full Load" type="text" v-model="value" />
+                <TextInput label="Ligth Ship" type="text" v-model="value" />
+                <TextInput label="Potencia" type="text" v-model="value" />
+                <TextInput label="Alcance" type="text" v-model="value" />
+                <TextInput label="Tripulacion maxima" type="text" v-model="value" />
+                <TextInput label="GT" type="text" v-model="value" />
+                <TextInput label="CGT" type="text" v-model="value" />
+                <TextInput label="Bollard pull" type="text" v-model="value" />
+                <TextInput label="Clasificacion" type="text" v-model="value" />
+                <div class="flex items-center justify-center w-full h-full">
+                    <FileUpload mode="basic" accept="image/*" :maxFileSize="1000000" v-model="value"/>
+                </div>
+
 
             </div>
             <template #footer>
@@ -95,4 +120,5 @@ const onToggle = (val) => {
                 </button>
             </template>
         </Dialog>
-    </AppLayout></template>
+    </AppLayout>
+</template>

@@ -58,7 +58,7 @@ defineEmits(['update:modelValue']);
             <input :type="type != 'password' ? type : (showPassword ? 'text' : 'password')" :name="name"
                 :showPassword="showPassword" autocomplete="current-password"
                 :class="[error != null ? 'text-red-900 ring-1 ring-inset ring-red-300 focus:ring-2 focus:ring-inset focus:ring-red-500' : '']"
-                required="" :placeholder="placeholder" :disabled="!enabled"
+                :required="showSup" :placeholder="placeholder" :disabled="!enabled"
                 class="block w-full py-2 -mt-1 border-0 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 placeholder:italic focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" />
             <div v-if="showEmailDomain" class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
