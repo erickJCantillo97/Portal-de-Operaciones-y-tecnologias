@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Personal;
+namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
-use App\Models\Personal\Personal;
+use App\Models\Projects\TypeShip;
 use Exception;
 use Illuminate\Http\Request;
 
-class PersonalController extends Controller
+class TypeShipController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -35,7 +35,7 @@ class PersonalController extends Controller
         ]);
 
         try {
-            Personal::create($validateData);
+            TypeShip::create($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
@@ -44,7 +44,7 @@ class PersonalController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Personal $personal)
+    public function show(TypeShip $typeShip)
     {
         //
     }
@@ -52,7 +52,7 @@ class PersonalController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Personal $personal)
+    public function edit(TypeShip $typeShip)
     {
         //
     }
@@ -60,14 +60,14 @@ class PersonalController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Personal $personal)
+    public function update(Request $request, TypeShip $typeShip)
     {
         $validateData = $request->validate([
             //
         ]);
 
         try {
-            $personal->update($validateData);
+            $typeShip->update($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
@@ -76,10 +76,10 @@ class PersonalController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Personal $personal)
+    public function destroy(TypeShip $typeShip)
     {
         try {
-            $personal->delete();
+            $typeShip->delete();
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }

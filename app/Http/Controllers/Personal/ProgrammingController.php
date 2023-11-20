@@ -16,8 +16,9 @@ class ProgrammingController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Programming/Index',[
-            'hours' => Shift::get()]);
+        return Inertia::render('Programming/Index', [
+            'hours' => Shift::get()
+        ]);
     }
 
     /**
@@ -51,7 +52,7 @@ class ProgrammingController extends Controller
                     'hora_fin' => '16:30',
                 ]);
                 $status = true;
-                $codigo = 0; 
+                $codigo = 0;
                 $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
             }
 
@@ -65,11 +66,11 @@ class ProgrammingController extends Controller
         } catch (Exception $e) {
             return $e;
         }
-
     }
 
-    public function update(ScheduleTime $scheduleTime, Request $request){
-        
+    public function update(ScheduleTime $scheduleTime, Request $request)
+    {
+
         $scheduleTime->update([
             'hora_inicio' => $request->hora_inicio,
             'hora_fin' => $request->hora_fin,
@@ -191,15 +192,13 @@ class ProgrammingController extends Controller
     public function getTimesSchedulesEmployee(Request $request)
     {
         $date = Carbon::parse($request->date)->format('Y-m-d');
-
         $schedulesIds = Schedule::where('fecha', $date)->with('scheduleTimes')->where('employee_id', $request->employee_id)->pluck('id')->toArray();
-
         $times = ScheduleTime::whereIn('schedule_id', $schedulesIds)->with('schedule', 'schedule.task', 'schedule.task.project')->get()->map(function ($time) use ($date) {
             return [
                 'id' => $time['id'],
-                'start' => $date.'T'.Carbon::parse($time['hora_inicio'])->format('H:i:s'),
-                'end' => $date.'T'.Carbon::parse($time['hora_fin'])->format('H:i:s'),
-                'title' => $time['schedule']['task']['name'].' - ('.$time['schedule']['task']['project']['name'].')',
+                'start' => $date . 'T' . Carbon::parse($time['hora_inicio'])->format('H:i:s'),
+                'end' => $date . 'T' . Carbon::parse($time['hora_fin'])->format('H:i:s'),
+                'title' => $time['schedule']['task']['name'] . ' - (' . $time['schedule']['task']['project']['name'] . ')',
                 'project' => $time['schedule']['task']['project']['name'],
             ];
         });
