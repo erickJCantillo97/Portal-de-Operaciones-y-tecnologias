@@ -42,7 +42,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
                 'project_id' => $item->project->id,
                 'avance' => number_format($item['percentDone'], 2),
                 'name' => $item['name'],
-                'file' => $item->project->contract->ship->file,
+                // 'file' => $item->project->contract->ship->file,
                 'contrato' => $item->project->contract->name,
                 'duracion' => $item->duration,
                 'fechaI'=>$item->startDate,

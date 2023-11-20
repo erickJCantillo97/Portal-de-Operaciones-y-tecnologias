@@ -13,15 +13,18 @@ return new class extends Migration
     {
         Schema::create('contracts', function (Blueprint $table) {
             $table->id();
+            $table->string('contract_id')->unique();
+            $table->string('subject')->unique();
             $table->unsignedBigInteger('customer_id')->index();
-            $table->unsignedBigInteger('ship_id')->index()->nullable();
-            $table->string('name')->unique();
-            $table->string('gerencia');
-            $table->double('cost');
+            $table->bigInteger('manager_id')->nullable();
+            $table->enum('type_of_sale', ['VENTA DIRECTA', 'FINANCIADA', 'LEASING'])->nullable();
+            $table->string('supervisor')->nullable();
             $table->date('start_date');
             $table->date('end_date');
+            $table->enum('currency', ['COP', 'USD', 'EUR'])->nullable();
+            $table->double('cost');
+            $table->enum('state', ['LIQUIDADO', 'EN EJECUCIÓN']);
             $table->foreign('customer_id')->references('id')->on('customers');
-            $table->foreign('ship_id')->references('id')->on('ships');
             $table->string('file')->nullable();
             $table->timestamps();
             $table->softDeletes();

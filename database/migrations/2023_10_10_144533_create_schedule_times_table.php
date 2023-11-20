@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('schedule_id')->unsigned();
             $table->time('hora_inicio');
-         
             $table->time('hora_fin');
             $table->timestamps();
             $table->softDeletes();
