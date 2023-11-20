@@ -88,6 +88,13 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::resource('suggestion', SuggestionController::class);
 
+    Route::get('TypeShips',function () {
+
+        return Inertia::render('TypeShips', [
+            'canLogin' => Route::has('login'),
+        ]);
+
+    });
 });
 
 Route::get('recuperarDatos', function () {
