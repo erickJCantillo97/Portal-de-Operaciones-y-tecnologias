@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Personal;
 
 use App\Http\Controllers\Controller;
 use App\Ldap\User;
+use App\Models\Labor;
 use App\Models\Personal\Personal;
 use Exception;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class PersonalController extends Controller
      */
     public function index()
     {
-        //
+        return inertia('Personal/Index', ['personal' => getPersonalGerenciaOficina()]);
     }
 
     /**
@@ -32,10 +33,7 @@ class PersonalController extends Controller
      */
     public function store(Request $request)
     {
-        $validateData = $request->validate([
-            //
-        ]);
-
+        $validateData = $request->validate([]);
         try {
             Personal::create($validateData);
         } catch (Exception $e) {

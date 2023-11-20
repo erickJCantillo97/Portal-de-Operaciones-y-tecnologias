@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
@@ -16,135 +16,36 @@ import axios from 'axios';
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
 
-const confirm = useConfirm();
-const { toast } = useSweetalert();
-const loading = ref(false);
-const { confirmDelete } = useSweetalert();
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-})
-const open = ref(false)
 
 
 const props = defineProps({
-    customers: Array,
+    personal: Array
 })
 
-//#region UseForm
-const formData = useForm({
-    customer: {},
-});
-//#endregion
-
-onMounted(() => {
-    initFilters();
-    getElements();
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 
-/* SUBMIT*/
-const submit = () => {
-    loading.value = true;
-
-    if (formData.customer.id == null) {
-        router.post(route('customers.store'), formData.customer, {
-            preserveScroll: true,
-            onSuccess: (res) => {
-                open.value = false;
-                toast(' Cliente creado exitosamente', 'success');
-            },
-            onError: (errors) => {
-                toast('Por favor diligencie todos los campos', 'error');
-            },
-            onFinish: visit => {
-                loading.value = false;
-            }
-        })
-        return 'creado';
-    }
-
-    router.put(route('customers.update', formData.customer.id), formData.customer, {
-        preserveScroll: true,
-        onSuccess: (res) => {
-            open.value = false;
-            toast('¡Cliente actualizado exitosamente!', 'success');
-        },
-        onError: (errors) => {
-            toast('¡Ups! Ha surgido un error', 'error');
-        },
-        onFinish: visit => {
-            loading.value = false;
-        }
-    })
-
-}
+const open = ref(false)
 
 const addItem = () => {
-    formData.reset();
-    clearErrors();
     open.value = true;
 }
-
-const editItem = (customer) => {
-    clearErrors();
-
-    formData.customer = customer;
-    open.value = true;
-};
-
-
-const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    }
-};
-
-const getElements = () => {
-    loading.value = true
-    if (props.url) {
-        axios.get(route(props.url + '.index'))
-            .then((res) => {
-                elementos.value = res.data[0];
-                loading.value = false;
-            })
-    }
-}
-
-const clearFilter = () => {
-    initFilters();
-};
-
-const clearErrors = () => {
-    router.page.props.errors = {};
-};
-
-const formatDate = (value) => {
-    return value.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
+const formatCurrency = (value) => {
+    return parseFloat(value).toLocaleString('es-CO', {
+        style: 'currency',
+        currency: 'COP',
     });
 };
 
-const exportarExcel = () => {
-    //console.log(dt.value)
-    // Acquire Data (reference to the HTML table)
-    var table_elt = document.getElementById("tabla");
+function formatDate(date) {
+    // Extraer año, mes y día
+    var anho = date.slice(0, 4);
+    var mes = date.slice(4, 6);
+    var dia = date.slice(6, 8);
 
-    var workbook = XLSX.utils.table_to_book(table_elt);
-
-    var ws = workbook.Sheets["Sheet1"];
-    XLSX.utils.sheet_add_aoa(ws, [
-        ["Creado " + new Date().toISOString()]
-    ], { origin: -1 });
-
-    // Package and Release Data (`writeFile` tries to write and save an XLSB file)
-    XLSX.writeFile(workbook, 'Lista de Clientes_' + customers.nit + '_' + customers.name + ".xlsb");
-};
-
-const showShips = (selectCustomer) => {
-
-    router.get(route('ships.index'), { id: selectCustomer.id })
+    // Formato de salida: dd/mm/aaaa
+    return `${dia}/${mes}/${anho}`;
 }
 
 </script>
@@ -155,7 +56,7 @@ const showShips = (selectCustomer) => {
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
-                        Clientes
+                        Mi Personal
                     </h1>
                 </div>
 
@@ -167,9 +68,8 @@ const showShips = (selectCustomer) => {
                 </div>
             </div>
             <!--DATATABLE-->
-            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="customers" v-model:filters="filters"
-                dataKey="id" filterDisplay="menu" :loading="props.loading"
-                :globalFilterFields="['NIT', 'name', 'type', 'email']"
+            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="personal" v-model:filters="filters"
+                dataKey="id" filterDisplay="menu" :globalFilterFields="['Nombres_Apellidos', 'name', 'type', 'email']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -179,7 +79,7 @@ const showShips = (selectCustomer) => {
                         <div class="flex space-x-4">
                             <div class="w-8" title="Filtrar Clientes">
                                 <Button @click="clearFilter()" type="button" severity="primary" class="hover:bg-primary ">
-                                    <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
+                                    <i class="pi pi-filter-slash" style="color: 'var(--primary-color);'"></i>
                                 </Button>
                             </div>
 
@@ -196,10 +96,23 @@ const showShips = (selectCustomer) => {
                 </template>
 
                 <!--COLUMNAS-->
-                <Column field="NIT" header="NIT"></Column>
-                <Column field="name" header="Nombre"></Column>
-                <Column field="type" header="Tipo"></Column>
-                <Column field="email" header="Correo"></Column>
+                <Column field="Nombres_Apellidos" header="Nombre"></Column>
+                <Column field="Cargo" header="Cargo"></Column>
+                <Column field="Fecha_Final" header="Fin Contrato">
+                    <template #body="slotProps">
+                        {{ formatDate(slotProps.data.Fecha_Final) }}
+                    </template>
+                </Column>
+                <Column field="Costo_Hora" header="Costo Hora">
+                    <template #body="slotProps">
+                        {{ formatCurrency(slotProps.data.Costo_Hora) }}
+                    </template>
+                </Column>
+                <Column field="Costo_Mes" header="Costo Mes">
+                    <template #body="slotProps">
+                        {{ formatCurrency(slotProps.data.Costo_Mes) }}
+                    </template>
+                </Column>
 
                 <!--ACCIONES-->
                 <Column header="Acciones" class="space-x-3">
@@ -231,7 +144,6 @@ const showShips = (selectCustomer) => {
             </DataTable>
         </div>
 
-        <!--MODAL DE FORMULARIO-->
         <TransitionRoot as="template" :show="open">
             <Dialog as="div" class="relative z-30" @close="open = false">
                 <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
@@ -246,36 +158,16 @@ const showShips = (selectCustomer) => {
                             enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
                             leave-from="opacity-100 translate-y-0 sm:scale-100"
                             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                            <DialogPanel :class="props.heigthDialog"
+                            <DialogPanel
                                 class="relative px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg ">
                                 <div>
                                     <div class="px-2 mt-2 text-center">
-                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">{{
-                                            formData.customer.id !=
-                                            null ? 'Editar ' : 'Crear' }} Cliente
+                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">
+                                            Añadir Personal
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
-                                            <TextInput class="mt-2 text-left" label="NIT" placeholder="e.g. 9234232988-0"
-                                                v-model="formData.customer.NIT" :error="router.page.props.errors.nit">
-                                            </TextInput>
-                                            <TextInput class="mt-2 text-left" label="Nombre Completo"
-                                                placeholder="Escriba su nombre completo" v-model="formData.customer.name"
-                                                :error="router.page.props.errors.name"></TextInput>
-                                            <!-- <div class="mt-2">
-                                                            <label for="type"
-                                                                class="block text-sm text-left text-gray-900 capitalize">Tipo de
-                                                                Cliente</label>
-                                                            <Dropdown v-model="form.type" :options="types" filter optionLabel="name"
-                                                                placeholder="Selecccionar" class="w-full md:w-14rem">
-                                                            </Dropdown>
-                                                        </div> -->
-                                            <TextInput class="mt-2 text-left" label="Tipo de Cliente"
-                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.customer.type"
-                                                :error="router.page.props.errors.type"></TextInput>
-                                            <TextInput class="mt-2 text-left" label="Correo"
-                                                placeholder="Escriba su correo electronico"
-                                                v-model="formData.customer.email" :error="router.page.props.errors.email">
-                                            </TextInput>
+
+
                                         </div>
                                     </div>
                                 </div>
@@ -284,7 +176,7 @@ const showShips = (selectCustomer) => {
                                         @click="open = false">Cancelar</Button>
                                     <Button severity="success" :loading="false"
                                         class="text-success hover:bg-success border-success" @click="submit()">
-                                        {{ formData.customer.id != null ? 'Actualizar ' : 'Guardar' }}
+                                        Agregar
                                     </Button>
                                 </div>
                             </DialogPanel>
@@ -293,6 +185,5 @@ const showShips = (selectCustomer) => {
                 </div>
             </Dialog>
         </TransitionRoot>
-
     </AppLayout>
 </template>
