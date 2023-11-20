@@ -23,7 +23,7 @@ const filters = ref({
 const { contractNotification } = webNotifications();
 
 const customerSelect = ref({});
-// const managerSelect = ref({});
+const managerSelect = ref({});
 
 const typeOfSaleSelect = ref([
     'VENTA DIRECTA',
@@ -49,7 +49,6 @@ const query = ref('')
 const props = defineProps({
     contracts: Array,
     customers: Array,
-    managers: Array
 })
 
 //#region UseForm
@@ -97,13 +96,25 @@ onMounted(() => {
     initFilters();
 })
 
-const getManagers = (key, value) => {
-    axios.get(route('reuniones.agregarUsuariosAReunion', key, value), {
-    }).then((res) => {
-        toast('El usuario se ha agregado a la reunión satisfactoriamente.', 'success');
-    }).catch(error => {
-        toast('Por favor seleccione un usuario para agregar a la reunión.', 'success');
-    });
+const getManagers = () => {
+    try {
+        const manager = {
+            key: 'Cargo',
+            value: 'GERENTE'
+        }
+        axios.get(route('search.personal', manager) )
+            .then((res) => {
+                // Acciones a realizar en caso de éxito
+                managerSelect.value = res.data.personal
+                toast('Éxito', 'success')
+            })
+            .catch((error) => {
+                // Acciones a realizar en caso de error
+                toast('Error', 'error')
+            })
+    } catch (error) {
+        console.error('Error al obtener empleados:', error)
+    }
 }
 
 /* SUBMIT*/
@@ -372,8 +383,7 @@ const excelExport = () => {
 
                                             <!--CAMPO TIPO DE VENTA-->
                                             <Combobox class="mt-2 text-left" label="Tipo de Venta"
-                                                placeholder="Seleccione un Tipo de Venta"
-                                                v-model="typeOfSaleSelect">
+                                                placeholder="Seleccione un Tipo de Venta" v-model="typeOfSaleSelect">
                                             </Combobox>
 
                                             <!--CAMPO SUPERVISOR-->
@@ -407,8 +417,7 @@ const excelExport = () => {
 
                                             <!--CAMPO ESTADO DE VENTA-->
                                             <Combobox class="mt-2 text-left" label="Estado del Contrato"
-                                                placeholder="Seleccione un Tipo de Venta"
-                                                v-model="stateSelect">
+                                                placeholder="Seleccione un Tipo de Venta" v-model="stateSelect">
                                             </Combobox>
 
                                             <!--CAMPO SUBIR ARCHIVO-->
