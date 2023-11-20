@@ -10,8 +10,8 @@ import ProjectCardMinimal from "@/Components/ProjectCardMinimal.vue";
 import DataTable from "primevue/datatable";
 import { FilterMatchMode, FilterOperator } from "primevue/api";
 import Column from "primevue/column";
-import Tag from "primevue/tag";
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon } from "@heroicons/vue/20/solid";
+// import Tag from "primevue/tag";
+// import { MagnifyingGlassIcon, PencilIcon, TrashIcon } from "@heroicons/vue/20/solid";
 import Button from "@/Components/Button.vue";
 import ProgressBar from "primevue/progressbar";
 import DataChart from "./DataChart.vue";
@@ -49,17 +49,17 @@ const filters = ref({
 const chartOptions = ref();
 onMounted(() => {
     initFilters();
-    // axios.get(route('get.empleados.gerencia')).then((res) => {
-    //     for (var gerencia of Object.values(res.data)) {
-    //         personal.value.push({
-    //             title: hasRole('Super Admin') ? gerencia[0].Gerencia : gerencia[0].Oficina,
-    //             initials: gerencia.length,
-    //             totalMembers: gerencia.length,
-    //             bgColorClass: gerencia[0].Gerencia != 'GECON' ? colors[gerencia[0].Gerencia] : 'bg-' + gerencia[0].Gerencia,
-    //         },)
-    //         totalMembers.value += gerencia.length
-    //     }
-    // })
+    axios.get(route('get.empleados.gerencia')).then((res) => {
+        for (var gerencia of Object.values(res.data)) {
+            personal.value.push({
+                title: hasRole('Super Admin') ? gerencia[0].Gerencia : gerencia[0].Oficina,
+                initials: gerencia.length,
+                totalMembers: gerencia.length,
+                bgColorClass: gerencia[0].Gerencia != 'GECON' ? colors[gerencia[0].Gerencia] : 'bg-' + gerencia[0].Gerencia,
+            },)
+            totalMembers.value += gerencia.length
+        }
+    })
     // getTask();
 }
 );
@@ -71,11 +71,11 @@ const formatCurrency = (value) => {
     });
 };
 
-const getTask = () => {
-    axios.get(route("actividadesDeultimonivel")).then((res) => {
-        tasks.value = res.data;
-    });
-};
+// const getTask = () => {
+//     axios.get(route("actividadesDeultimonivel")).then((res) => {
+//         tasks.value = res.data;
+//     });
+// };
 
 const initFilters = () => {
     filters.value = {
@@ -104,15 +104,9 @@ const clearFilter = () => {
 <template>
     <AppLayout>
         <div class="space-y-5 overflow-y-scroll custom-scroll">
-            <!-- <div class="max-w-full p-3 border-2 border-blue-100 rounded-xl">
-                            <dl class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                                <ProjectCard v-for="project of projects" :project="project" :activo="false" />
-                            </dl>
-                        </div> -->
-            <!-- <OurTeam /> -->
+
             <div class="flex justify-between">
                 <UserHeader />
-                <!-- <DolarTRM /> -->
             </div>
             <!--DATATABLE PROYECTOS-->
             <div class="p-3 m-1 shadow-md rounded-xl">
@@ -191,7 +185,6 @@ const clearFilter = () => {
                     class="w-full p-4 font-extrabold text-center text-black rounded-xl bg-gradient-to-b from-gray-400 to-slate-50">
                     <h2 class="text-xl font-extrabold">Personal</h2>
                 </div>
-
                 <div role="list"
                     class="grid h-64 grid-cols-1 gap-2 px-2 my-6 mt-3 overflow-y-auto sm:grid-cols-2 sm:gap-2 lg:grid-cols-2 custom-scroll snap-y snap-proximity">
                     <div v-for="project in personal" :key="project.title"
@@ -229,5 +222,6 @@ const clearFilter = () => {
                 </div>
             </div>
         </div> -->
+
     </AppLayout>
 </template>

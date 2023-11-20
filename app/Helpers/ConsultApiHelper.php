@@ -53,7 +53,7 @@ function login(): bool
 
         return false;
     } catch (Exception $e) {
-        return false;
+        dd($e);
     }
 }
 

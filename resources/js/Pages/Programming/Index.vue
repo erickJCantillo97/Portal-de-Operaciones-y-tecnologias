@@ -2,24 +2,30 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import '../../../sass/dataTableCustomized.scss';
 import { Container, Draggable } from "vue-dndrop";
-import { XMarkIcon, PencilIcon } from "@heroicons/vue/20/solid";
+import { XMarkIcon, PencilIcon, TrashIcon } from "@heroicons/vue/20/solid";
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import Button from '@/Components/Button.vue';
 import { useSweetalert } from '@/composable/sweetAlert';
 import Knob from 'primevue/knob';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import Combobox from '@/Components/Combobox.vue';
-import TextInput from '@/Components/TextInput.vue';
 import FullCalendar from '@/Components/FullCalendar.vue'
+import OverlayPanel from 'primevue/overlaypanel';
+import Dropdown from 'primevue/dropdown';
+import SelectButton from 'primevue/selectbutton';
+import Calendar from 'primevue/calendar';
+import Loading from '@/Components/Loading.vue';
+
 const { toast } = useSweetalert();
+
+const props = defineProps({
+    hours: Object
+})
 
 //#region Draggable
 const listaDatos = ref({})
 const date = ref(new Date().toISOString().split("T")[0])
 const personal = ref()
-
+const op = ref()
 const tasks = ref([]);
 const loadingProgram = ref(true);
 const loadingPerson = ref(true);
@@ -112,6 +118,10 @@ function format24h(hora) {
     return new Date("1970-01-01T" + hora).toLocaleString('es-CO',
         { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 }
+function formatdatetime24h(date) {
+    return new Date(date).toLocaleString('es-CO',
+        { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+}
 //#region
 
 // El código anterior define una función llamada "quitar" que toma tres parámetros: "tarea", "índice" y
@@ -120,6 +130,7 @@ function format24h(hora) {
 // la solicitud tiene éxito, registra la respuesta en la consola, elimina un elemento de la matriz
 // "listaDatos.value[task.id]" en el índice especificado y muestra un mensaje de notificación de éxito.
 // También hay definida una función "editar" vacía.
+
 const deleteSchedule = async (task, index, schedule) => {
 
     await axios.post(route('programming.delete', schedule.id)).then((res) => {
@@ -129,9 +140,6 @@ const deleteSchedule = async (task, index, schedule) => {
     })
 }
 
-const editar = () => {
-
-}
 //#endregion
 
 //#region Modal Persona
@@ -161,6 +169,15 @@ const employeeDialog = (item) => {
 const submit = () => {
     console.log('Hello!');
 }
+
+const editHorario = ref()
+const nuevoHorario = ref()
+const optionSelectHours = ref('select')
+const toggle = (event, horario) => {
+    editHorario.value = horario
+    nuevoHorario.value = null
+    op.value.toggle(event);
+}
 //#endregion
 </script>
 <style scoped>
@@ -179,35 +196,6 @@ const submit = () => {
     opacity: .5;
 }
 
-.loader {
-    position: relative;
-    width: 100px;
-    height: 100px;
-}
-
-.loader:before,
-.loader:after {
-    content: '';
-    border-radius: 50%;
-    position: absolute;
-    inset: 0;
-    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.3) inset;
-}
-
-.loader:after {
-    box-shadow: 0 2px 0 rgb(46 48 146) inset;
-    animation: rotate 2s linear infinite;
-}
-
-@keyframes rotate {
-    0% {
-        transform: rotate(0)
-    }
-
-    100% {
-        transform: rotate(360deg)
-    }
-}
 </style>
 
 <template>
@@ -237,15 +225,12 @@ const submit = () => {
             <div class="grid grid-cols-3">
                 <!--LISTA PROGRAMACIÓN DE ACTIVIDADES-->
                 <div v-if="loadingProgram" class="h-[50vh] w-[60vw] flex flex-col justify-center items-center col-span-2">
-                    <span class="flex items-center justify-center w-full h-full loader">
-                        <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
-                    </span>
-                    <p class="font-bold animate-pulse text-primary"> Cargando actividades</p>
+                    <Loading message="Cargando actividades"/>
                 </div>
                 <div v-else
-                    class="h-full col-span-2 col-start-1 p-1 space-y-1 overflow-y-auto custom-scroll snap-y snap-proximity rounded-xl">
+                    class="h-full col-span-2 col-start-1 p-1 space-y-1 overflow-y-auto custom-scroll snap-y snap-mandatory rounded-xl">
                     <div v-for="task in tasks"
-                        class="flex flex-col justify-between p-2 border rounded-md shadow-md h-1/2 sm:h-1/2 snap-start">
+                        class="flex flex-col justify-between h-full p-2 border rounded-md shadow-md snap-start">
                         <div class="grid grid-rows-2">
                             <div class="">
                                 <p class="block overflow-hidden">{{ task.name }}
@@ -290,11 +275,7 @@ const submit = () => {
 
                         <div v-if="loadingTasks ? true : loadingTask[task.id] ? true : false"
                             class="flex flex-col items-center justify-center h-full p-2">
-                            <span class="flex items-center justify-center w-full h-full loader">
-                                <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
-                            </span>
-                            <p class="font-bold animate-pulse text-primary">
-                                {{ loadingTasks ? 'Cargando personas asignadas' : 'Guardando cambios' }}</p>
+                            <Loading message="Cargando"/>
                         </div>
                         <Container v-if="!loadingTask[task.id]"
                             class="h-full p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
@@ -302,7 +283,7 @@ const submit = () => {
                             <div class="grid grid-cols-2 gap-1"
                                 v-if="listaDatos[task.id] !== undefined && listaDatos[task.id].length != 0">
                                 <div v-for="(item, index) in listaDatos[task.id]" class="p-1 mt-1 border-2 rounded-md">
-                                    <div class="flex items-center justify-between w-full">
+                                    <div class="flex items-center justify-between w-full ">
                                         <p class="text-sm font-semibold ">{{ item.name }}</p>
                                         <button v-tooltip.top="'Eliminar de la Actividad'"
                                             @click="deleteSchedule(task, index, item)">
@@ -310,17 +291,32 @@ const submit = () => {
                                                 class="h-4 p-0.5 border rounded-md text-white bg-danger border-danger hover:animate-pulse hover:scale-125" />
                                         </button>
                                     </div>
-                                    <div class="flex items-center justify-between w-full font-mono align-middle">
-                                        <div class="grid grid-cols-3 gap-1">
-                                            <span v-for="horario in item.schedule_times"
-                                                class="inline-flex items-center gap-x-1.5 rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-                                                {{ format24h(horario.hora_inicio) }}-{{ format24h(horario.hora_fin) }}
-                                            </span>
+                                    <div class="flex items-center justify-between w-full font-mono align-middle ">
+                                        <div class="grid w-full grid-cols-3 gap-2">
+                                            <div v-for="horario in item.schedule_times"
+                                                class="flex items-center justify-between px-1 py-1 text-green-900 bg-green-200 rounded-md cursor-default group">
+                                                <button v-tooltip.bottom="'En desarrollo'" class="hidden group-hover:flex"
+                                                    @click="console.log('En desarrollo')"
+                                                    v-if="item.schedule_times.length > 1">
+                                                    <TrashIcon
+                                                        class="h-4 p-0.5 border rounded-md bg-danger text-white border-danger hover:animate-pulse hover:scale-125" />
+                                                </button>
+                                                <button v-tooltip.bottom="'Eliminar'" class="hidden group-hover:flex"
+                                                    @click="deleteSchedule(task, index, item)" v-else>
+                                                    <TrashIcon
+                                                        class="h-4 p-0.5 border rounded-md bg-danger text-white border-danger hover:animate-pulse hover:scale-125" />
+                                                </button>
+                                                <span class="w-full text-xs tracking-tighter text-center">
+                                                    {{ format24h(horario.hora_inicio) }} {{ format24h(horario.hora_fin) }}
+                                                </span>
+                                                <button v-tooltip.bottom="'Cambiar horario'" class="hidden group-hover:flex"
+                                                    @click="optionSelectHours = 'select';toggle($event, horario)">
+                                                    <PencilIcon
+                                                        class="h-4 p-0.5 border rounded-md bg-primary text-white border-primary hover:animate-pulse hover:scale-125" />
+                                                </button>
+                                            </div>
+
                                         </div>
-                                        <button v-tooltip.bottom="'En desarrollo'" @click="console.log('En desarrollo')">
-                                            <PencilIcon
-                                                class="h-4 p-0.5 border rounded-md bg-primary text-white border-primary hover:animate-pulse hover:scale-125" />
-                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -339,14 +335,11 @@ const submit = () => {
                 <!--#endregion -->
                 <!--#region LISTA PERSONAL-->
                 <div v-if="loadingPerson" class="h-[50vh] w-[30vw] flex flex-col justify-center items-center">
-                    <span class="flex items-center justify-center w-full h-full loader">
-                        <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
-                    </span>
-                    <p class="font-bold animate-pulse text-primary"> Cargando personas</p>
+                    <Loading message="Cargando personas"/>
                 </div>
                 <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy" group-name="1"
                     :get-child-payload="getChildPayload"
-                    class="h-full px-3 overflow-y-auto custom-scroll snap-y snap-proximity space-y-1 py-1">
+                    class="h-full px-3 py-1 space-y-1 overflow-y-auto custom-scroll snap-y snap-proximity">
                     <Draggable v-for="item in personal"
                         :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
                         class="rounded-xl p-1 shadow-md cursor-pointer hover:bg-blue-200 hover:scale-[102%] hover:border hover:border-primary ">
@@ -376,6 +369,108 @@ const submit = () => {
                 <!--#endregion -->
             </div>
         </div>
+        <OverlayPanel close class="w-64 text-sm" ref="op" :pt="{
+            content: { class: 'p-3' }
+        }">
+            <div class="grid grid-cols-3 gap-1">
+                <div class="flex items-center justify-between col-span-3 ">
+                    <p>Horario actual:</p>
+                    <p class="px-1 py-1 text-green-900 bg-green-200 rounded-md">
+                        {{ format24h(editHorario.hora_inicio) }} {{ format24h(editHorario.hora_fin) }}
+                    </p>
+                </div>
+                <span class="grid grid-cols-2 col-span-3">
+                    <button type="button"
+                        :class="optionSelectHours == 'select' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+                        @click="optionSelectHours = 'select'; nuevoHorario=null;"
+                        class="px-3 py-2 text-sm font-semibold shadow-md alturah8 rounded-l-md 0 ring-1 ring-inset ring-gray-300 focus:z-10">Seleccionar</button>
+                    <button type="button"
+                        :class="optionSelectHours == 'new' ? 'bg-primary text-white' : 'bg-white hover:bg-sky-200 text-gray-90'"
+                        @click="optionSelectHours = 'new';nuevoHorario=null;nuevoHorario={}; nuevoHorario.name=null;nuevoHorario.startShift=null;nuevoHorario.endShift"
+                        class="px-3 py-2 -ml-px text-sm font-semibold shadow-md alturah8 rounded-r-md ring-1 ring-inset ring-gray-300 focus:z-10">Nuevo</button>
+                </span>
+                <div v-if="optionSelectHours == 'select'" class="col-span-3">
+                    <Dropdown v-model="nuevoHorario" :options="props.hours" optionLabel="name"
+                        placeholder="Selecciona horario" class="w-full md:w-14rem">
+                        <template #value="slotProps">
+                            <div v-if="slotProps.value" class="flex align-items-center">
+                                <p class="w-full text-sm font-bold text-center">{{ slotProps.value.name }}</p>
+                            </div>
+                            <span v-else>
+                                {{ slotProps.placeholder }}
+                            </span>
+                        </template>
+                        <template #option="slotProps">
+                            <div class="grid grid-cols-3 align-items-center">
+                                <p class="col-span-2 text-xs font-bold">{{ slotProps.option.name }}</p>
+                                <p class="text-xs">
+                                    {{ formatdatetime24h(slotProps.option.startShift) }}
+                                    {{ formatdatetime24h(slotProps.option.endShift) }}
+                                </p>
+                            </div>
+                        </template>
+                    </Dropdown>
+                    <div v-if="nuevoHorario">
+                        <p class="w-full font-bold text-center">Detalle de horario seleccionado</p>
+                        <div class="grid items-center justify-between grid-cols-7 gap-1">
+                            <p class="col-span-7 px-1 py-1 text-center text-green-900 bg-green-100 rounded-md">
+                                {{ nuevoHorario.name }}
+                            </p>
+                            <p class="col-span-4">Horario:</p>
+                            <p class="col-span-3 px-1 py-1 text-center text-green-900 bg-green-200 rounded-md">
+                                {{ formatdatetime24h(nuevoHorario.startShift) }} {{ formatdatetime24h(nuevoHorario.endShift)
+                                }}
+                            </p>
+                            <p v-if="nuevoHorario.startBreak" class="col-span-4">Descanso:</p>
+                            <p v-if="nuevoHorario.startBreak"
+                                class="col-span-3 px-1 py-1 text-center text-green-900 bg-green-200 rounded-md">
+                                {{ formatdatetime24h(nuevoHorario.startBreak) }} {{ formatdatetime24h(nuevoHorario.endBreak)
+                                }}
+                            </p>
+                            <p class="col-span-4">Horas laboradas:</p>
+                            <p class="col-span-3 px-1 py-1 text-center text-green-900 bg-green-200 rounded-md">
+                                {{ parseFloat(nuevoHorario.hours).toFixed(2) }}
+                            </p>
+                            <p v-if="nuevoHorario.hours.description" class="w-full col-span-7 text-center">Descripcion</p>
+                            <p v-if="nuevoHorario.hours.description"
+                                class="col-span-7 px-1 py-1 text-center text-green-900 bg-green-100 rounded-md">
+                                {{ nuevoHorario.hours.description }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="optionSelectHours == 'new'" class="col-span-3 p-2 space-y-3">
+                    <p class="w-full font-bold text-center">Nuevo horario temporal</p>
+                    <div class="relative">
+                        <label for="name"
+                        class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Nombre</label>
+                    <input v-model="nuevoHorario.name" name="name" id="name" class="text-center border-0 rounded-md alturah8 ring-1 ring-inset ring-gray-300">
+                    </div>
+
+                    <div class="relative">
+                        <label for="startShift"
+                        class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Hora inicio</label>
+                    <Calendar  v-model="nuevoHorario.startShift" name="startShift" id="startShift" timeOnly hourFormat="24" class="alturah8" :pt="{
+                        input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
+                    }" />
+                    </div>
+                    <div class="relative">
+                        <label for="endShift"
+                        class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Hora fin</label>
+                    <Calendar v-model="nuevoHorario.endShift" name="endShift" id="endShift" timeOnly hourFormat="24" class="alturah8" :pt="{
+                        input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
+                    }" />
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 col-span-3 gap-1">
+                    <button @click="console.log('hace algo'); nuevoHorario = null; op.hide()"
+                        class="col-start-2 p-2 font-bold border rounded-md border-primary text-primary">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Guardar
+                    </button>
+                </div>
+            </div>
+        </OverlayPanel>
         <!--#region MODAL DE PERSONAS -->
         <TransitionRoot as="template" :show="open">
             <Dialog as="div" class="relative z-30" @close="open = false">
@@ -442,10 +537,10 @@ const submit = () => {
                                         </div>
                                         <!--COLUMNA 2 - (FullCalendar)-->
                                         <div class="flex col-span-3 flex-nowrap custom-scroll">
-                                                <FullCalendar :initialEvents="events" :tasks="tasks" :date="date" :employee="employee" :project="project"
-                                                    :key="rendersCalendars" />
+                                            <FullCalendar :initialEvents="events" :tasks="tasks" :date="date"
+                                                :employee="employee" :project="project" :key="rendersCalendars" />
 
-                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </DialogPanel>
