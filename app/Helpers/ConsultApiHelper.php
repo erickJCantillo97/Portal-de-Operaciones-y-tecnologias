@@ -77,7 +77,7 @@ function UpdateCargos()
                 Labor::firstOrCreate([
                     'name' => $cargo['Cargo'],
                     'gerencia' => $cargo['Gerencia'],
-                    'w' => $cargo['Costo_Mes'],
+                    'costo_mes' => $cargo['Costo_Mes'],
                     'costo_dia' => $cargo['Costo_Dia'],
                     'costo_hora' => $cargo['Costo_Hora'],
                 ]);

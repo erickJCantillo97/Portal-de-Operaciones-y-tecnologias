@@ -4,7 +4,8 @@
         <div class="h-full bg-white">
             <div class="flex items-center justify-center px-2 py-3">
                 <div class="flex items-center main-logo shrink-0">
-                    <ApplicationLogo class="justify-center" :letras="true" :width-logo="50" :height-logo="50"></ApplicationLogo>
+                    <ApplicationLogo class="justify-center" :letras="true" :width-logo="50" :height-logo="50">
+                    </ApplicationLogo>
                     <!-- <span
                         class="ml-2 text-2xl font-semibold align-middle lg:inline dark:text-white-light text-primary">COTECMAR</span> -->
                 </div>
@@ -93,7 +94,7 @@ const navigation = [
         icon: UsersIcon,
         current: false,
         children: [
-            // { name: 'Planilla', href: '#' },
+            { name: 'Mi Personal', href: 'personal.index' },
             // { name: 'Programación', href: '#' },
             // { name: 'Parte Diario', href: '#' },
             // { name: 'Informes', href: '#' },
@@ -126,7 +127,7 @@ const navigation = [
         name: 'Sugerencias',
         icon: CalendarIcon,
         children: [
-            { name: 'Ver sugerencias', href:'suggestion.index' },
+            { name: 'Ver sugerencias', href: 'suggestion.index' },
         ],
     },
     // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon, current: false },
