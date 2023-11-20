@@ -322,32 +322,37 @@ const excelExport = () => {
                                             Contrato
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-2 border border-gray-200 rounded-lg">
-                                            <!--CAMPO FECHA FINALIZACIÓN-->
+                                            <!--CAMPO CONTRATO ID-->
                                             <TextInput class="mt-2 text-left" label="Contrato ID"
                                                 placeholder="Escriba ID del Contrato" v-model="formData.contract_id"
                                                 :error="$page.props.errors.contract_id">
                                             </TextInput>
 
+                                            <!--CAMPO OBJETO DEL CONTRATO-->
                                             <TextInput class="mt-2 text-left" label="Objeto del Contrato"
                                                 placeholder="Escriba Objeto del Contrato" v-model="formData.subject"
                                                 :error="$page.props.errors.subject">
                                             </TextInput>
 
+                                            <!--CAMPO CLIENTE-->
                                             <Combobox class="mt-2 text-left" label="Cliente"
                                                 placeholder="Seleccione Cliente" :options="customers"
                                                 v-model="customerSelect">
                                             </Combobox>
 
+                                            <!--CAMPO GERENTE-->
                                             <Combobox class="mt-2 text-left" label="Gerente"
                                                 placeholder="Seleccione Gerente" :options="managers"
                                                 v-model="managerSelect">
                                             </Combobox>
 
+                                            <!--CAMPO TIPO DE VENTA-->
                                             <Combobox class="mt-2 text-left" label="Tipo de Venta"
                                                 placeholder="Seleccione un Tipo de Venta" :options="type_of_sale"
                                                 v-model="typeOfSaleSelect">
                                             </Combobox>
 
+                                            <!--CAMPO SUPERVISOR-->
                                             <TextInput class="mt-2 text-left" label="Supervisor"
                                                 placeholder="Escriba nombre del supervisor" v-model="formData.supervisor"
                                                 :error="$page.props.errors.supervisor">
@@ -365,26 +370,28 @@ const excelExport = () => {
                                                 :error="$page.props.errors.end_date">
                                             </TextInput>
 
-                                            <Combobox class="mt-2 text-left" label="Estado del Contrato"
-                                                placeholder="Seleccione un Tipo de Venta" :options="currency"
-                                                v-model="currencySelect">
+                                            <!--CAMPO MONEDA-->
+                                            <Combobox class="mt-2 text-left" label="Moneda" placeholder="Ej: COP"
+                                                :options="currency" v-model="currencySelect">
                                             </Combobox>
 
+                                            <!--CAMPO PRECIO DE VENTA (cost)-->
                                             <TextInput class="text-left" label="Precio de Venta" type="number"
                                                 :placeholder="'Escriba el valor total estimado'" v-model="formData.cost"
                                                 :error="router.page.props.errors.cost">
                                             </TextInput>
 
+                                            <!--CAMPO ESTADO DE VENTA-->
                                             <Combobox class="mt-2 text-left" label="Estado del Contrato"
                                                 placeholder="Seleccione un Tipo de Venta" :options="state"
                                                 v-model="stateSelect">
                                             </Combobox>
 
+                                            <!--CAMPO SUBIR ARCHIVO-->
                                             <FileUpload chooseLabel="Adjuntar PDF" mode="basic" name="demo[]"
                                                 :multiple="false" accept=".pdf" :maxFileSize="1000000"
                                                 @input="formData.pdf = $event.target.files[0]">
                                             </FileUpload>
-
                                         </div>
                                     </div>
                                 </div>
