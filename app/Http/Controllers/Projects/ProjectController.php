@@ -23,11 +23,12 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::with('contract', 'ship', 'customer')->orderBy('name')->get();
+        $projects = Project::with('contract', 'customer')->orderBy('name')->get();
         $ships = Ship::orderBy('name')->get();
-        $contracts = Contract::orderBy('name')->get();
+        $contracts = Contract::get();
 
-        return Inertia::render('Project/Projects',
+        return Inertia::render(
+            'Project/Projects',
             [
                 'projects' => $projects,
                 'ships' => $ships,
@@ -41,7 +42,7 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        $contracts = Contract::has('ship')->orderBy('name')->get();
+        $contracts = Contract::orderBy('contract_id')->get();
         $authorizations = Authorization::orderBy('contract_id')->get();
         $quotes = Quote::orderBy('ship_id')->get();
         $ships = Ship::orderBy('id')->get();
@@ -92,7 +93,7 @@ class ProjectController extends Controller
                 $buque = Ship::find($validateData['ship_id']);
             }
 
-            if (! isset($buque)) {
+            if (!isset($buque)) {
                 return back()->withErrors(['message' => 'Ocurrió un error al crear el proyecto: No se seleccionó un Buque'], 500);
             }
 
@@ -135,7 +136,7 @@ class ProjectController extends Controller
             $countProject = count(Project::where('ship_id', $buque->id)->get()) + 1;
 
             $validateData['ship_id'] = $buque->id;
-            $validateData['name'] = $buque->name.'-'.Carbon::now()->format('Y').'-'.str_pad($countProject, 3, '0', STR_PAD_LEFT);
+            $validateData['name'] = $buque->name . '-' . Carbon::now()->format('Y') . '-' . str_pad($countProject, 3, '0', STR_PAD_LEFT);
             $validateData['gerencia'] = auth()->user()->gerencia;
 
             //Guardar archivo pdf de Comunicación Interna
@@ -143,7 +144,7 @@ class ProjectController extends Controller
                 $validateData['file'] = Storage::putFileAs(
                     'public/Interns_Communications/',
                     $request->pdf,
-                    $validateData['name'].'.'.$request->pdf->getClientOriginalExtension()
+                    $validateData['name'] . '.' . $request->pdf->getClientOriginalExtension()
                 );
             }
 
@@ -151,7 +152,7 @@ class ProjectController extends Controller
 
             return back()->with(['message' => 'Proyecto creado correctamente'], 200);
         } catch (Exception $e) {
-            return back()->withErrors(['message' => 'Ocurrió un error al crear el proyecto: '.$e->getMessage()], 500);
+            return back()->withErrors(['message' => 'Ocurrió un error al crear el proyecto: ' . $e->getMessage()], 500);
         }
 
         return redirect('projects.index');
@@ -186,7 +187,8 @@ class ProjectController extends Controller
         $quotes = Quote::orderBy('ship_id')->get();
         $ships = Ship::orderBy('id')->get();
 
-        return Inertia::render('Project/CreateProjects',
+        return Inertia::render(
+            'Project/CreateProjects',
             [
                 'projects' => $projects,
                 'contracts' => $contracts,
@@ -213,7 +215,7 @@ class ProjectController extends Controller
         try {
             $project->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -225,7 +227,7 @@ class ProjectController extends Controller
         try {
             $project->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }

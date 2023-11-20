@@ -60,9 +60,8 @@ function login(): bool
 
 function searchEmpleados(string $clave, string $valor)
 {
-
     return getEmpleadosAPI()->filter(function ($employee) use ($clave, $valor) {
-        return $employee[$clave] == $valor;
+        return strpos($employee[$clave], $valor) !== false;
     });
 }
 

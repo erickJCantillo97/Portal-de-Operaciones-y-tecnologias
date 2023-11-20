@@ -24,8 +24,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('getPersonalCargo/', [PersonalController::class, 'getPersonalCargo'])->name('get.personal.cargo');
 
     Route::get('getCargos', [PersonalController::class, 'getCargos'])->name('get.cargos');
-
-    Route::get('getPersonal', [PersonalController::class, 'getPersonal'])->name('get.personal');
+    Route::get('searchPersonal', [PersonalController::class, 'searchPersonal'])->name('search.personal');
+    Route::get('getPersonalGerenicaOcifina', [PersonalController::class, 'getPersonalGerenicaOcifina'])->name('get.personal.gerecia.oficia');
 
     Route::get('getAssignmentHour/{fecha}/{userId}', [ProgrammingController::class, 'getAssignmentHour'])->name('get.assignment.hours');
 
