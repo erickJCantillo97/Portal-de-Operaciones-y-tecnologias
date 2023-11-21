@@ -31,30 +31,30 @@ const props = defineProps({
 
 //#region v-models (ref())
 const customerSelect = ref({});
-const managerSelect = ref([]);
+const managerSelect = ref();
 const managerOptions = ref([]);
 
 //Tipo de Venta
-const typeOfSaleSelect = ref([])
+const typeOfSaleSelect = ref()
 const typeOfSaleOptions = ref([
-    { name: 'VENTA DIRECTA' },
-    { name: 'FINANCIADA' },
-    { name: 'LEASING' }
+    { id:1, name: 'VENTA DIRECTA' },
+    { id:2, name: 'FINANCIADA' },
+    { id:3, name: 'LEASING' }
 ]);
 
 //Moneda
-const currencySelect = ref([]);
+const currencySelect = ref();
 const currencyOptions = ref([
-    { name: 'COP' },
-    { name: 'USD' },
-    { name: 'EUR' }
+    { id:1, name: 'COP' },
+    { id:2, name: 'USD' },
+    { id:3, name: 'EUR' }
 ]);
 
 //Estado de la venta
-const stateSelect = ref([]);
+const stateSelect = ref();
 const stateOptions = ref([
-    { name: 'LIQUIDADO' },
-    { name: 'EN EJECUCIÓN' }
+    { id:1, name: 'LIQUIDADO' },
+    { id:2, name: 'EN EJECUCIÓN' }
 ]);
 
 //Abrir Modal
@@ -73,7 +73,7 @@ const formData = useForm({
     start_date: props.contracts?.start_date ?? '',
     end_date: props.contracts?.end_date ?? '',
     currency: props.contracts?.currency ?? '',
-    cost: props.contracts?.cost ?? '',
+    cost: props.contracts?.cost ?? '0',
     state: props.contracts?.state ?? '',
     pdf: null
 });
@@ -135,7 +135,7 @@ const submit = () => {
     }
 
     if (!managerSelect.value) {
-        toast('Por favor seleccione un buque.', 'error')
+        toast('Por favor seleccione un gerente.', 'error')
         return;
     }
 

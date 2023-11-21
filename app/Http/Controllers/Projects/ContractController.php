@@ -39,12 +39,18 @@ class ContractController extends Controller
     {
         // dd($request);
         $validateData = $request->validate([
+            'contract_id' => 'required',
+            'subject' => 'nullable',
             'customer_id' => 'nullable',
-            'ship_id' => 'nullable',
-            'name' => 'required',
-            'cost' => 'required|numeric|gt:0',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
+            'manager_id' => 'nullable',
+            'type_of_sale' => 'nullable',
+            'supervisor' => 'nullable',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+            'currency' => 'nullable',
+            'cost' => 'nullable|numeric',
+            'state' => 'nullable',
+            'file' => 'nullable',
         ]);
 
         try {
@@ -56,8 +62,9 @@ class ContractController extends Controller
                     $validateData['name'].'.'.$request->pdf->getClientOriginalExtension()
                 );
             }
-            $contract = Contract::create($validateData);
-            event(new ContractEvent($contract, 'created'));
+            Contract::create($validateData);
+            // $contract = Contract::create($validateData);
+            // event(new ContractEvent($contract, 'created'));
 
             return back()->with(['message' => 'Contrato creado correctamente'], 200);
         } catch (Exception $e) {
