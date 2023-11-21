@@ -18,10 +18,9 @@ class PersonalController extends Controller
     public function index()
     {
         $personal = searchEmpleados('JI_Num_SAP', '00000261')->values(); //Se debe cambiar el num Sap por el del usuario logueado
+
         return inertia('Personal/Index', ['personal' => $personal]);
     }
-
-
 
     /**
      * Store a newly created resource in storage.
@@ -32,11 +31,9 @@ class PersonalController extends Controller
         try {
             Personal::create($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
     }
-
-
 
     /**
      * Update the specified resource in storage.
@@ -50,7 +47,7 @@ class PersonalController extends Controller
         try {
             $personal->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
 
@@ -62,10 +59,9 @@ class PersonalController extends Controller
         try {
             $personal->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }
-
 
     /* Con esta  función podemos listar los usuario que estan activos en el DA */
     public function getPersonalActivo()
@@ -89,10 +85,10 @@ class PersonalController extends Controller
         ]);
     }
 
-
     public function getPersonalCargo()
     {
         $personal = getPersonalGerenciaOficina(auth()->user()->gerencia)->groupBy('Cargo');
+
         return response()->json([
             'personal' => $personal,
         ]);
@@ -104,7 +100,7 @@ class PersonalController extends Controller
             return [
                 'id' => $cargo->id,
                 'name' => $cargo->name,
-                'costo_hora' => '$ ' . number_format($cargo->costo_hora, 0),
+                'costo_hora' => '$ '.number_format($cargo->costo_hora, 0),
             ];
         });
 
@@ -145,7 +141,7 @@ class PersonalController extends Controller
         $value = $request->value;
         if (!isset($request->all)) {
             return response()->json([
-                'employees' => searchEmpleados($key, $value)->all(function ($employee) { //TODO Cambiar el all() por filter()
+                'employees' => searchEmpleados($key, $value)->filter(function ($employee) { //TODO Cambiar el all() por filter()
                     return $employee['Gerencia'] == Auth::user()->gerencia;
                 }),
             ]);

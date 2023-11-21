@@ -13,6 +13,7 @@ import { webNotifications } from '@/composable/webNotifications';
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
 import Combobox from '@/Components/Combobox.vue';
+import ComboboxPersonalData from '@/Components/ComboboxPersonalData.vue';
 import FileUpload from 'primevue/fileupload';
 const { toast } = useSweetalert();
 const loading = ref(false);
@@ -31,6 +32,7 @@ const props = defineProps({
 //#region v-models (ref())
 const customerSelect = ref({});
 const managerSelect = ref([]);
+const managerOptions = ref([]);
 
 //Tipo de Venta
 const typeOfSaleSelect = ref([])
@@ -70,8 +72,8 @@ const formData = useForm({
     supervisor: props.contracts?.supervisor ?? '',
     start_date: props.contracts?.start_date ?? '',
     end_date: props.contracts?.end_date ?? '',
-    currency: props.contracts?.currency ?? '0',
-    cost: props.contracts?.cost ?? '0',
+    currency: props.contracts?.currency ?? '',
+    cost: props.contracts?.cost ?? '',
     state: props.contracts?.state ?? '',
     pdf: null
 });
@@ -108,16 +110,15 @@ const getManagers = () => {
     try {
         const manager = {
             key: 'Cargo',
-            value: 'Gerente'
+            value: 'Gerente',
+            all: true
         }
         axios.get(route('search.personal', manager))
             .then((res) => {
-                // Acciones a realizar en caso de éxito
-                managerSelect.value = Object.values(res.data.employees)
+                managerOptions.value = res.data.employees
                 toast('Éxito', 'success')
             })
             .catch((error) => {
-                // Acciones a realizar en caso de error
                 toast('Error', 'error')
             })
     } catch (error) {
@@ -365,78 +366,75 @@ const excelExport = () => {
                                             Contrato
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="grid grid-cols-1 gap-4 p-2 md:grid-cols-2 space-y-2 rounded-lg">
-                                            <div class="col-span-1 p-2 mt-2">
+                                            <div class="col-span-1 p-2 mt-2 space-y-2 text-left">
                                                 <!--CAMPO CONTRATO ID-->
-                                                <TextInput class="mt-2 text-left" label="Contrato ID"
-                                                    placeholder="Escriba ID del Contrato" v-model="formData.contract_id"
-                                                    :error="$page.props.errors.contract_id">
+                                                <TextInput label="Contrato ID" placeholder="Escriba ID del Contrato"
+                                                    v-model="formData.contract_id" :error="$page.props.errors.contract_id">
                                                 </TextInput>
 
                                                 <!--CAMPO OBJETO DEL CONTRATO ()-->
-                                                <TextInput class="mt-2 text-left" label="Objeto del Contrato"
+                                                <TextInput label="Objeto del Contrato"
                                                     placeholder="Escriba Objeto del Contrato" v-model="formData.subject"
                                                     :error="$page.props.errors.subject">
                                                 </TextInput>
 
                                                 <!--CAMPO CLIENTE (customer)-->
-                                                <Combobox class="mt-2 text-left" label="Cliente"
-                                                    placeholder="Seleccione Cliente" :options="customers"
-                                                    v-model="customerSelect">
+                                                <Combobox label="Cliente" placeholder="Seleccione Cliente"
+                                                    :options="customers" v-model="customerSelect">
                                                 </Combobox>
 
                                                 <!--CAMPO GERENTE (manager)-->
-                                                <Combobox class="mt-2 text-left" label="Gerente" :options="managerSelect"
+                                                <ComboboxPersonalData label="Gerente" :options="managerOptions"
                                                     placeholder="Seleccione Gerente" v-model="managerSelect">
-                                                </Combobox>
+                                                </ComboboxPersonalData>
 
                                                 <!--CAMPO TIPO DE VENTA (type_of_sale)-->
-                                                <Combobox class="mt-2 text-left" label="Tipo de Venta"
-                                                    :options="typeOfSaleOptions" placeholder="Seleccione un Tipo de Venta"
-                                                    v-model="typeOfSaleSelect">
+                                                <Combobox label="Tipo de Venta" :options="typeOfSaleOptions"
+                                                    placeholder="Seleccione un Tipo de Venta" v-model="typeOfSaleSelect">
                                                 </Combobox>
 
                                                 <!--CAMPO SUPERVISOR-->
-                                                <TextInput class="mt-2 text-left" label="Supervisor"
-                                                    placeholder="Escriba nombre del supervisor"
+                                                <TextInput label="Supervisor" placeholder="Escriba nombre del supervisor"
                                                     v-model="formData.supervisor" :error="$page.props.errors.supervisor">
                                                 </TextInput>
                                             </div>
 
-                                            <div class="col-span-1 p-2 mt-2">
+                                            <div class="col-span-1 p-2 mt-2 space-y-2 text-left">
                                                 <!--CAMPO FECHA INICIO-->
-                                                <TextInput class="mt-2 text-left" type="date" label="Fecha de inicio"
+                                                <TextInput type="date" label="Fecha de inicio"
                                                     :placeholder="'Escriba el Tipo de Cliente'"
                                                     v-model="formData.start_date" :error="$page.props.errors.start_date">
                                                 </TextInput>
 
                                                 <!--CAMPO FECHA FINALIZACIÓN-->
-                                                <TextInput class="mt-2 text-left" type="date" label="Fecha de Finalización"
+                                                <TextInput type="date" label="Fecha de Finalización"
                                                     :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
                                                     :error="$page.props.errors.end_date">
                                                 </TextInput>
 
                                                 <!--CAMPO MONEDA-->
-                                                <Combobox class="mt-2 text-left" label="Moneda" placeholder="Ej: COP"
+                                                <Combobox label="Moneda" placeholder="Seleccione Tipo de Moneda"
                                                     v-model="currencySelect" :options="currencyOptions">
                                                 </Combobox>
 
                                                 <!--CAMPO PRECIO DE VENTA (cost)-->
-                                                <TextInput class="text-left" label="Precio de Venta" type="number"
+                                                <TextInput label="Precio de Venta" type="number"
                                                     :placeholder="'Escriba el valor total estimado'" v-model="formData.cost"
                                                     :error="router.page.props.errors.cost">
                                                 </TextInput>
 
-                                                <!--CAMPO ESTADO DE VENTA (state)-->
-                                                <Combobox class="mt-2 text-left" label="Estado del Contrato"
-                                                    :options="stateOptions" placeholder="Seleccione un Tipo de Venta"
-                                                    v-model="stateSelect">
+                                                <!--CAMPO ESTADO DEL CONTRATO (state)-->
+                                                <Combobox label="Estado del Contrato" :options="stateOptions"
+                                                    placeholder="Seleccione un Tipo de Venta" v-model="stateSelect">
                                                 </Combobox>
 
-                                                <!--CAMPO SUBIR ARCHIVO-->
-                                                <FileUpload class="mt-10" chooseLabel="Adjuntar PDF" mode="basic" name="demo[]"
-                                                    :multiple="false" accept=".pdf" :maxFileSize="1000000"
-                                                    @input="formData.pdf = $event.target.files[0]">
-                                                </FileUpload>
+                                                <div class="flex justify-center align-content-center pt-6">
+                                                    <!--CAMPO SUBIR ARCHIVO-->
+                                                    <FileUpload chooseLabel="Adjuntar PDF" mode="basic" name="demo[]"
+                                                        :multiple="false" accept=".pdf" :maxFileSize="1000000"
+                                                        @input="formData.pdf = $event.target.files[0]">
+                                                    </FileUpload>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="">
