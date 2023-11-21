@@ -35,27 +35,27 @@ class TypeShipController extends Controller
     public function store(Request $request)
     {
         $validateData = $request->validate([
-            'name' => 'required|string|unique:type_ships,',
-            // $table->string('type')->nullable();
-            // $table->string('disinger')->nullable();
-            // $table->enum('hull_material', ['ACERO', 'ALUMINIO', 'MATERIALES COMPUESTOS'])->nullable(); //material del casco
-            // $table->double('length')->nullable(); //eslra
-            // $table->double('breadth')->nullable(); //Manga
-            // $table->double('draught')->nullable(); //calado de diseño
-            // $table->double('depth')->nullable(); //punta
-            // $table->double('full_load')->nullable();
-            // $table->double('light_ship')->nullable();
-            // $table->double('power_total')->nullable();
-            // $table->string('propulsion_type')->nullable();
-            // $table->string('velocity')->nullable();
-            // $table->double('autonomias')->nullable();
-            // $table->double('autonomy')->nullable();
-            // $table->double('crew')->nullable();
-            // $table->double('GT')->nullable();
-            // $table->double('CGT')->nullable();
-            // $table->double('bollard_pull')->nullable();
-            // $table->string('clasification')->nullable();
-            // $table->string('render')->nullable();
+            'name' => 'required|string|unique:type_ships,name',
+            'type' => 'nullable|string',
+            'disinger' => 'nullable|string',
+            'hull_material' => 'nullable', //material del casco
+            'length' => 'nullable', //eslra
+            'breadth' => 'nullable', //Manga
+            'draught' => 'nullable', //calado de diseño
+            'depth' => 'nullable', //punta
+            'full_load' => 'nullable',
+            'light_ship' => 'nullable',
+            'power_total' => 'nullable',
+            'propulsion_type' => 'nullable',
+            'velocity' => 'nullable',
+            'autonomias' => 'nullable',
+            'autonomy' => 'nullable',
+            'crew' => 'nullable',
+            'GT' => 'nullable',
+            'CGT' => 'nullable',
+            'bollard_pull' => 'nullable',
+            'clasification' => 'nullable',
+            'render' => 'nullable',
         ]);
 
         try {
@@ -87,7 +87,27 @@ class TypeShipController extends Controller
     public function update(Request $request, TypeShip $typeShip)
     {
         $validateData = $request->validate([
-            //
+            'name' => 'required|string|unique:type_ships,name,' . $typeShip->id,
+            'type' => 'nullable|string',
+            'disinger' => 'nullable|string',
+            'hull_material' => 'nullable', //material del casco
+            'length' => 'nullable', //eslra
+            'breadth' => 'nullable', //Manga
+            'draught' => 'nullable', //calado de diseño
+            'depth' => 'nullable', //punta
+            'full_load' => 'nullable',
+            'light_ship' => 'nullable',
+            'power_total' => 'nullable',
+            'propulsion_type' => 'nullable',
+            'velocity' => 'nullable',
+            'autonomias' => 'nullable',
+            'autonomy' => 'nullable',
+            'crew' => 'nullable',
+            'GT' => 'nullable',
+            'CGT' => 'nullable',
+            'bollard_pull' => 'nullable',
+            'clasification' => 'nullable',
+            'render' => 'nullable',
         ]);
 
         try {
