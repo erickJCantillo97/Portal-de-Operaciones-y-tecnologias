@@ -302,10 +302,10 @@ const excelExport = () => {
                 <Column field="start_date" header="Fecha Inicio"></Column>
                 <Column field="end_date" header="Fecha Finalización"></Column>
                 <!-- <Column field="currency" header="Moneda">
-                    <template #body="slotProps">
-                        {{ formatCurrency(slotProps.data.cost) }}
-                    </template>
-                </Column> -->
+                        <template #body="slotProps">
+                            {{ formatCurrency(slotProps.data.cost) }}
+                        </template>
+                    </Column> -->
                 <Column field="cost" header="Costo">
                     <template #body="slotProps">
                         {{ formatCurrency(slotProps.data.cost) }}
@@ -313,10 +313,10 @@ const excelExport = () => {
                 </Column>
                 <!-- <Column field="state" header="Estado del Contrato"></Column> -->
                 <!-- <Column field="status" header="Estado" sortable>
-                    <template #body="slotProps">
-                        <Tag :value="slotProps.data.status" :severity="getContractStatusSeverity(slotProps.data)" />
-                    </template>
-                </Column> -->
+                        <template #body="slotProps">
+                            <Tag :value="slotProps.data.status" :severity="getContractStatusSeverity(slotProps.data)" />
+                        </template>
+                    </Column> -->
 
                 <!--ACCIONES-->
                 <Column header="Acciones" class="space-x-3">
