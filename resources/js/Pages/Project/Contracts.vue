@@ -23,23 +23,23 @@ const filters = ref({
 const { contractNotification } = webNotifications();
 
 const customerSelect = ref({});
-const managerSelect = ref({});
+const managerSelect = ref([]);
 
 const typeOfSaleSelect = ref([
-    'VENTA DIRECTA',
-    'FINANCIADA',
-    'LEASING'
+    { name: 'VENTA DIRECTA' },
+    { name: 'FINANCIADA' },
+    { name: 'LEASING' }
 ]);
 
 const currencySelect = ref([
-    'COP',
-    'USD',
-    'EUR'
+    { name: 'COP' },
+    { name: 'USD' },
+    { name: 'EUR' }
 ]);
 
 const stateSelect = ref([
-    'LIQUIDADO',
-    'EN EJECUCIÓN'
+    { name: 'LIQUIDADO' },
+    { name: 'EN EJECUCIÓN' }
 ]);
 
 const open = ref(false)
@@ -54,7 +54,7 @@ const props = defineProps({
 //#region UseForm
 const formData = useForm({
     id: props.contracts?.id ?? '0',
-    contract_id: props.contracts?.contract_id ?? '0',
+    contract_id: props.contracts?.contract_id ?? '',
     subject: props.contracts?.subject ?? '',
     customer_id: props.contracts?.customer_id ?? '0',
     manager_id: props.contracts?.manager_id ?? '0',
@@ -105,7 +105,7 @@ const getManagers = () => {
         axios.get(route('search.personal', manager))
             .then((res) => {
                 // Acciones a realizar en caso de éxito
-                managerSelect.value = res.data.personal
+                managerSelect.value = Object.values(res.data.employees)
                 toast('Éxito', 'success')
             })
             .catch((error) => {
@@ -258,7 +258,7 @@ const excelExport = () => {
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="contracts" v-model:filters="filters"
                 dataKey="id" filterDisplay="menu" :loading="loading"
-                :globalFilterFields="['name', 'customer.name', 'manager.name', 'gerencia', 'cost', 'start_date', 'end_date']"
+                :globalFilterFields="['contract_id', 'customer.name', 'start_date', 'end_date', 'cost']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -349,7 +349,7 @@ const excelExport = () => {
                             leave-from="opacity-100 translate-y-0 sm:scale-100"
                             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                             <DialogPanel
-                                class="relative px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg ">
+                                class="grid grid-col px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg ">
                                 <div>
                                     <div class="px-2 mt-2 text-center">
                                         <DialogTitle as="h3" class="text-xl font-semibold text-center text-primary">
@@ -376,14 +376,14 @@ const excelExport = () => {
                                             </Combobox>
 
                                             <!--CAMPO GERENTE-->
-                                            <Combobox class="mt-2 text-left" label="Gerente"
-                                                placeholder="Seleccione Gerente" :options="managers"
-                                                v-model="managerSelect">
+                                            <Combobox class="mt-2 text-left" label="Gerente" :options="managerSelect"
+                                                placeholder="Seleccione Gerente" v-model="managerSelect">
                                             </Combobox>
 
                                             <!--CAMPO TIPO DE VENTA-->
                                             <Combobox class="mt-2 text-left" label="Tipo de Venta"
-                                                placeholder="Seleccione un Tipo de Venta" v-model="typeOfSaleSelect">
+                                                :options="typeOfSaleSelect" placeholder="Seleccione un Tipo de Venta"
+                                                v-model="typeOfSaleSelect">
                                             </Combobox>
 
                                             <!--CAMPO SUPERVISOR-->
@@ -406,7 +406,7 @@ const excelExport = () => {
 
                                             <!--CAMPO MONEDA-->
                                             <Combobox class="mt-2 text-left" label="Moneda" placeholder="Ej: COP"
-                                                :options="currency" v-model="currencySelect">
+                                                v-model="currencySelect" :options="currencySelect">
                                             </Combobox>
 
                                             <!--CAMPO PRECIO DE VENTA (cost)-->
@@ -417,7 +417,8 @@ const excelExport = () => {
 
                                             <!--CAMPO ESTADO DE VENTA-->
                                             <Combobox class="mt-2 text-left" label="Estado del Contrato"
-                                                placeholder="Seleccione un Tipo de Venta" v-model="stateSelect">
+                                                :options="stateSelect" placeholder="Seleccione un Tipo de Venta"
+                                                v-model="stateSelect">
                                             </Combobox>
 
                                             <!--CAMPO SUBIR ARCHIVO-->
@@ -425,6 +426,9 @@ const excelExport = () => {
                                                 :multiple="false" accept=".pdf" :maxFileSize="1000000"
                                                 @input="formData.pdf = $event.target.files[0]">
                                             </FileUpload>
+                                        </div>
+                                        <div class="">
+
                                         </div>
                                     </div>
                                 </div>

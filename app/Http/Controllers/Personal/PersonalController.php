@@ -100,13 +100,14 @@ class PersonalController extends Controller
 
     public function getCargos()
     {
-        $cargos  = Labor::get()->map(function ($cargo) {
+        $cargos = Labor::get()->map(function ($cargo) {
             return [
                 'id' => $cargo->id,
                 'name' => $cargo->name,
                 'costo_hora' => '$ ' . number_format($cargo->costo_hora, 0),
             ];
         });
+
         return response()->json([
             'cargos' => $cargos,
         ]);
@@ -114,7 +115,7 @@ class PersonalController extends Controller
 
     /*
         Esta funcion permite devolver las personas de una oficiana
-        permite buscarlas con el request de gerencia y oficina 
+        permite buscarlas con el request de gerencia y oficina
         o devolverá el personal de la Oficina de la persona logueada
     */
     public function getPersonalGerenicaOcifina(Request $request)
@@ -144,11 +145,12 @@ class PersonalController extends Controller
         $value = $request->value;
         if (!isset($request->all)) {
             return response()->json([
-                'employees' => searchEmpleados($key, $value)->filter(function ($employee) {
+                'employees' => searchEmpleados($key, $value)->all(function ($employee) { //TODO Cambiar el all() por filter()
                     return $employee['Gerencia'] == Auth::user()->gerencia;
                 }),
             ]);
         }
+
         return response()->json([
             'employees' => searchEmpleados($key, $value),
         ]);
