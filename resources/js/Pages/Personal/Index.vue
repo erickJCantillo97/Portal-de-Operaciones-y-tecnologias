@@ -120,19 +120,8 @@ function formatDate(date) {
                         <!--BOTÓN UNIDADES-->
                         <div
                             class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
-                            <div title="Unidades del Cliente">
-                                <Button severity="primary" @click="showShips(slotProps.data)" class="hover:bg-primary">
-                                    <i class="w-4 h-4 fa fa-ship"></i>
-                                </Button>
-                            </div>
-                            <!--BOTÓN EDITAR-->
-                            <div title="Editar Cliente">
-                                <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
-                                    <PencilIcon class="w-4 h-4 " aria-hidden="true" />
-                                </Button>
-                            </div>
                             <!--BOTÓN ELIMINAR-->
-                            <div title="Eliminar Cliente">
+                            <div title="Eliminar de mi Personal">
                                 <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Cliente?', 'customers')"
                                     class="hover:bg-danger">
                                     <TrashIcon class="w-4 h-4 " aria-hidden="true" />

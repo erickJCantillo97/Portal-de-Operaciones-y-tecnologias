@@ -75,6 +75,7 @@ import {
     CalendarIcon,
     CreditCardIcon,
     DocumentDuplicateIcon,
+    IdentificationIcon,
     FolderIcon,
     HomeIcon,
     UsersIcon,
@@ -95,6 +96,23 @@ const navigation = [
         current: false,
         children: [
             { name: 'Mi Personal', href: 'personal.index' },
+            { name: 'Programacion', href: 'programming' },
+            { name: 'Parte Actual', href: 'personal.index' },
+            { name: 'Solicitudes', href: 'personal.index' },
+            { name: 'Personal Activo', href: 'personal.activos' },
+            // { name: 'Programación', href: '#' },
+            // { name: 'Parte Diario', href: '#' },
+            // { name: 'Informes', href: '#' },
+        ],
+    },
+    {
+        name: 'Planillación',
+        icon: IdentificationIcon,
+        current: false,
+        children: [
+            { name: 'Parte', href: 'dashboard' },
+            { name: 'Planilla', href: 'programming' },
+            { name: 'Novedades', href: 'personal.index' },
             // { name: 'Programación', href: '#' },
             // { name: 'Parte Diario', href: '#' },
             // { name: 'Informes', href: '#' },
@@ -108,7 +126,7 @@ const navigation = [
             { name: 'Proyectos', href: 'projects.index' }, //gerencia (auth()->user()gerencia)
             // { name: 'Informes', href: '#' },
             // { name: 'Cronograma', href: 'showGantt' },
-            { name: 'Programacion', href: 'programming' },
+
             { name: 'Unidades', href: 'ships.index' },
         ],
     },

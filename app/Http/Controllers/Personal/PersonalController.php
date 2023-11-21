@@ -17,16 +17,11 @@ class PersonalController extends Controller
      */
     public function index()
     {
-        return inertia('Personal/Index', ['personal' => getPersonalGerenciaOficina()]);
+        $personal = searchEmpleados('JI_Num_SAP', '00000261')->values(); //Se debe cambiar el num Sap por el del usuario logueado
+        return inertia('Personal/Index', ['personal' => $personal]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -41,21 +36,7 @@ class PersonalController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Personal $personal)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Personal $personal)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -86,11 +67,32 @@ class PersonalController extends Controller
     }
 
 
+    /* Con esta  función podemos listar los usuario que estan activos en el DA */
+    public function getPersonalActivo()
+    {
+        //Validar para usuario de tipo administrador, puedan ver todo el personal cotecmar
+        $personal = getPersonalGerenciaOficina(auth()->user()->gerencia)->values()->map(function ($person) {
+            return [
+                'Num_SAP' => (int) $person['Num_SAP'],
+                'Fecha_Final' => $person['Fecha_Final'],
+                'Costo_Hora' => $person['Costo_Hora'],
+                'Costo_Mes' => $person['Costo_Mes'],
+                'Oficina' => $person['Oficina'],
+                'Nombres_Apellidos' => $person['Nombres_Apellidos'],
+                'Cargo' => $person['Cargo'],
+                'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
+            ];
+        });
+
+        return inertia('Personal/Activos', [
+            'personal' => $personal,
+        ]);
+    }
+
+
     public function getPersonalCargo()
     {
-
         $personal = getPersonalGerenciaOficina(auth()->user()->gerencia)->groupBy('Cargo');
-
         return response()->json([
             'personal' => $personal,
         ]);
