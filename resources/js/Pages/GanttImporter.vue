@@ -3,7 +3,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { onMounted } from 'vue';
 import "@bryntum/gantt/gantt.material.css";
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
-import { AjaxHelper, Gantt, LocaleManager, Toast } from '@bryntum/gantt-trial/gantt.module.js';
+import { AjaxHelper, Gantt, LocaleManager, Toast } from '@bryntum/gantt/gantt.module.js';
 
 //#region importar gantt
 

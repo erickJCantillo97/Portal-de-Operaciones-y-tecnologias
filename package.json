@@ -21,6 +21,7 @@
     },
     "dependencies": {
         "@bryntum/gantt": "^5.6.1",
+        "@bryntum/gantt-vue-3": "^5.6.1",
         "@fullcalendar/core": "^6.1.9",
         "@fullcalendar/daygrid": "^6.1.9",
         "@fullcalendar/interaction": "^6.1.9",
