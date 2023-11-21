@@ -152,7 +152,18 @@ class PersonalController extends Controller
         }
 
         return response()->json([
-            'employees' => searchEmpleados($key, $value),
+            'employees' => searchEmpleados($key, $value)->values()->map(function ($person) {
+                return [
+                    'id' => (int) $person['Num_SAP'],
+                    'Fecha_Final' => $person['Fecha_Final'],
+                    'Costo_Hora' => $person['Costo_Hora'],
+                    'Costo_Mes' => $person['Costo_Mes'],
+                    'Oficina' => $person['Oficina'],
+                    'name' => $person['Nombres_Apellidos'],
+                    'Cargo' => $person['Cargo'],
+                    'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
+                ];
+            }),
         ]);
     }
 }
