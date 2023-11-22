@@ -165,7 +165,6 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        $projects = Project::orderBy('name')->get();
         $contracts = Contract::orderBy('name')->get();
         $authorizations = Authorization::orderBy('contract_id')->get();
         $quotes = Quote::orderBy('ship_id')->get();
@@ -173,7 +172,7 @@ class ProjectController extends Controller
         return Inertia::render(
             'Project/CreateProjects',
             [
-                'projects' => $projects,
+                'project' => $project,
                 'contracts' => $contracts,
                 'authorizations' => $authorizations,
                 'quotes' => $quotes,
