@@ -144,7 +144,18 @@ class PersonalController extends Controller
                 'employees' => searchEmpleados($key, $value)->filter(function ($employee) { //TODO Cambiar el all() por filter()
                     return $employee['Gerencia'] == Auth::user()->gerencia;
                 }),
-            ]);
+            ])->values()->map(function ($person) {
+                return [
+                    'id' => (int) $person['Num_SAP'],
+                    'Fecha_Final' => $person['Fecha_Final'],
+                    'Costo_Hora' => $person['Costo_Hora'],
+                    'Costo_Mes' => $person['Costo_Mes'],
+                    'Oficina' => $person['Oficina'],
+                    'name' => $person['Nombres_Apellidos'],
+                    'Cargo' => $person['Cargo'],
+                    'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
+                ];
+            });
         }
 
         return response()->json([

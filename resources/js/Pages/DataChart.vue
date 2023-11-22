@@ -4,7 +4,7 @@ import axios from 'axios';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import { MagnifyingGlassIcon} from '@heroicons/vue/20/solid';
+import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid';
 import Button from '@/Components/Button.vue';
 import PieChart from './PieChart.vue';
 import '../../sass/dataTableCustomized.scss';
@@ -147,7 +147,7 @@ const contractsList = () => {
         radius: '70%',
         center: ['50%', '55%'],
         selectedMode: 'single',
-        is3D:true,
+        is3D: true,
         data: datos.value
     })
 }
@@ -186,7 +186,7 @@ const contractsList = () => {
 
             <!--COLUMNAS-->
             <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-            <Column field="name" header="Contrato"></Column>
+            <Column field="contract_id" header="Contrato"></Column>
             <Column header="Porcentaje">
                 <template #body="slotProps">
                     {{ ((slotProps.data.cost / suma) * 100).toFixed(2) }} %
