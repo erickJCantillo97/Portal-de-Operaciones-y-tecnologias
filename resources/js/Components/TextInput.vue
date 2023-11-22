@@ -50,7 +50,7 @@ defineEmits(['update:modelValue']);
 
 <template>
     <div>
-        <label for="password" class="block text-sm capitalize font-mediumtext-gray-900">
+        <label for="password" class="block text-sm font-medium text-gray-900 capitalize">
             {{ label }}
             <sup v-if="showSup" class="text-danger">*</sup>
         </label>

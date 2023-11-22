@@ -17,7 +17,7 @@ defineProps({
 
 <template>
     <button :type="type" :class="'text-' + severity, 'border-' + severity, 'hover:bg-' + severity"
-        class="border inline-flex w-full items-center p-2 rounded-md font-semibold justify-center text-xs bg-white hover:text-white uppercase tracking-widest  dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+        class="inline-flex items-center justify-center w-full p-2 font-sans text-xs font-semibold tracking-widest capitalize transition duration-150 ease-in-out bg-white border rounded-md hover:text-white dark:focus:ring-offset-gray-800">
         <transition name="slide-fade" v-if="loading">
             <svg aria-hidden="true" class="w-6 h-6 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-primary"
                 viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -29,7 +29,9 @@ defineProps({
                     fill="currentFill" />
             </svg>
         </transition>
-        <slot />
+        <div class="flex items-center space-x-1">
+            <slot />
+        </div>
     </button>
 </template>
 <style>

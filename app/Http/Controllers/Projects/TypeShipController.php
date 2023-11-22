@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Projects\TypeShip;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class TypeShipController extends Controller
@@ -59,6 +60,13 @@ class TypeShipController extends Controller
         ]);
 
         try {
+            if ($request->render != null) {
+                $validateData['render'] = Storage::putFileAs(
+                    'public/TypeShips/',
+                    $request->render,
+                    $validateData['name'].'.'.$request->render->getClientOriginalExtension()
+                );
+            }
             TypeShip::create($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);

@@ -1,36 +1,76 @@
 <script setup>
+import { useForm } from '@inertiajs/vue3';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import AppLayout from "@/Layouts/AppLayout.vue";
 import MultiSelect from 'primevue/multiselect';
+import SelectButton from 'primevue/selectbutton';
+import Dropdown from 'primevue/dropdown';
 import "../../sass/dataTableCustomized.scss";
 import { ref, onMounted } from 'vue';
-import Button from 'primevue/button';
+import Button from '@/Components/Button.vue';
 import Dialog from 'primevue/dialog';
 import TextInput from '@/Components/TextInput.vue';
+import CustomModal from '@/Components/CustomModal.vue';
+import Combobox from '@/Components/Combobox.vue';
 import FileUpload from 'primevue/fileupload';
-
+import Badge from 'primevue/badge';
+import Image from 'primevue/image';
 
 const props = defineProps({
     typeShips: Object
 })
+const verfoto = (foto) => {
+    console.log(foto)
+    return URL.createObjectURL(foto)
+}
 
-const typeShip= useForm(
+const typeShip = useForm(
     {
-        name:'',
-        type:''
+        name: '',
+        type: '',
+        disinger: '',
+        hull_material: '', //material del casco
+        length: '', //eslra
+        breadth: '', //Manga
+        draught: '', //calado de diseño
+        depth: '', //punta
+        full_load: '',
+        light_ship: '',
+        power_total: '',
+        propulsion_type: '',
+        velocity: '',
+        autonomias: '',
+        autonomy: '',
+        crew: '',
+        GT: '',
+        CGT: '',
+        bollard_pull: '',
+        clasification: '',
+        render: null,
     }
 )
 
-const visible = ref(false)
+const save = () => {
+    typeShip.transform((data) => ({
+        ...data,
+        hull_material: data.hull_material.name
+    })).post(route('typeShips.store'), {
+        onSuccess: (response) => {
+            console.log(response)
+        }
+    })
+}
 
 const columns = ref([
     { field: 'name', header: 'Nombre' },
     { field: 'projects', header: 'Proyectos' },
     { field: 'type', header: 'Tipo' },
-    { field: 'hullMaterial', header: 'Material del casco' },
+    { field: 'hull_material', header: 'Material del casco' },
     { field: 'length', header: 'Eslora' },
+    { field: 'breadth', header: 'Manga' },
 ]);
+const hull_materials = ref([{ name: 'ACERO' }, { name: 'ALUMINIO' }, { name: 'MATERIALES COMPUESTOS' }])
 const selectedColumns = ref(columns.value);
 
 </script>
@@ -41,11 +81,81 @@ const selectedColumns = ref(columns.value);
             <template #header>
                 <div class="flex items-center justify-between">
                     <h class="text-base font-bold">Clases de buque</h>
-                    <button @click="visible = true"
+                    <CustomModal>
+                        <template #button>
+                            <Button severity="primary" type="button">
+                                <i class="fa-solid fa-plus"></i>
+                            </Button>
+                        </template>
+                        <template #icon>
+                            <i class="text-white fa-solid fa-ship"></i>
+                        </template>
+                        <template #titulo>
+                            <span class="text-xl font-bold text-white white-space-nowrap">Nueva clase</span>
+                        </template>
+                        <template #body>
+                            <div class="grid grid-cols-4 gap-2 px-1 pt-4">
+                                <TextInput label="Nombre" type="text" :showSup="true" v-model="typeShip.name" />
+                                <TextInput label="Tipo de buque" type="text" v-model="typeShip.type" />
+                                <TextInput label="Empresa diseñadora" type="text" v-model="typeShip.disinger" />
+                                <div>
+                                    <label class="block mb-1 text-sm font-medium text-gray-900 capitalize"
+                                        for="hull_material">
+                                        Material Casco</label>
+                                    <Dropdown id="hull_material" v-model="typeShip.hull_material" :options="hull_materials"
+                                        optionLabel="name" placeholder="Selecciona un material"
+                                        class="w-full rounded-md md:w-14rem" :pt="{
+                                            root: {
+                                                class: 'h-10 !ring-gray-300 !ring-inset ring-1 !border-0 !shadow-sm '
+                                            },
+                                            input: {
+                                                class: '!text-sm pt-3 pl-2'
+                                            },
+                                            item: {
+                                                class: '!text-sm'
+                                            }
+                                        }" />
+                                </div>
+                                <TextInput label="Eslora" type="number" v-model="typeShip.length" />
+                                <TextInput label="Manga" type="number" v-model="typeShip.breadth" />
+                                <TextInput label="Calado de diseño" type="number" v-model="typeShip.draught" />
+                                <TextInput label="Puntal" type="number" v-model="typeShip.depth" />
+                                <TextInput label="Full Load" type="number" v-model="typeShip.full_load" />
+                                <TextInput label="Ligth Ship" type="number" v-model="typeShip.light_ship" />
+                                <TextInput label="Potencia" type="number" v-model="typeShip.power_total" />
+                                <TextInput label="Tipo de propulsion" type="text" v-model="typeShip.propulsion_type" />
+                                <TextInput label="Velocidad maxima" type="text" v-model="typeShip.velocity" />
+                                <TextInput label="Autonomia" type="number" v-model="typeShip.autonomias" />
+                                <TextInput label="Alcance" type="number" v-model="typeShip.autonomy" />
+                                <TextInput label="Tripulacion maxima" type="number" v-model="typeShip.crew" />
+                                <TextInput label="GT" type="number" v-model="typeShip.GT" />
+                                <TextInput label="CGT" type="number" v-model="typeShip.CGT" />
+                                <TextInput label="Bollard pull" type="number" v-model="typeShip.bollard_pull" />
+                                <TextInput label="Clasificacion" type="text" v-model="typeShip.clasification" />
+                                <FileUpload mode="basic" :multiple="false" accept="image/*" class="w-full"
+                                    :maxFileSize="1000000" @select="typeShip.render = $event.files[0]"
+                                    @removeUploadedFile="typeShip.render = null" v-model="typeShip.render"
+                                    :showCancelButton="false" :showUploadButton="false" chooseLabel="Agregar imagen" :pt="{
+                                        root: { class: '' }
+                                    }">
+                                </FileUpload>
+                                <Image v-if="typeShip.render != null" id="verFoto" alt="imagen"
+                                    :src="verfoto(typeShip.render)" preview height="170" width="190" />
+
+                            </div>
+                        </template>
+                        <template #footer>
+                            <Button severity="primary" @click="save()" class="hover:bg-danger">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <p>Guardar</p>
+                            </Button>
+                        </template>
+                    </CustomModal>
+                    <!-- <button @click="visible = true"
                         class="p-2 border rounded-md border-success text-success hover:bg-primary hover:text-white hover:border-primary">
                         <i class="fa-solid fa-plus"></i>
                         Agregar
-                    </button>
+                    </button> -->
                 </div>
                 <!-- <div style="text-align:left">
                     <MultiSelect :modelValue="selectedColumns" :options="columns" optionLabel="header"
@@ -61,64 +171,20 @@ const selectedColumns = ref(columns.value);
                     <div
                         class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8">
                         <div title="Ver programacion">
-                            <Button severity="primary" @click="console.log(slotProps)" class="hover:bg-primary">
-                                <i class="fa-solid fa-list-check" />
+                            <Button severity="success" @click="console.log(slotProps)" class="hover:bg-primary">
+                                <i class="fa-solid fa-pen-to-square"></i>
                             </Button>
                         </div>
-                        <div title="Ver cronograma">
-                            <Button severity="success" @click="console.log(slotProps)" class="hover:bg-danger">
-                                <i class="fa-solid fa-chart-gantt" />
-                            </Button>
+                        <div>
+                            <div title="Ver programacion">
+                                <Button severity="danger" @click="console.log(slotProps)" class="hover:bg-primary">
+                                    <i class="fa-solid fa-trash"></i>
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </template>
             </Column>
         </DataTable>
-        <Dialog v-model:visible="visible" modal header="Header" :closable="false" closeOnEscape :style="{ width: '60rem' }"
-            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <template #header>
-                <div class="flex flex-col items-center w-full space-y-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="3em" viewBox="0 0 576 512" class="fill-success">
-                        <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
-                        <path
-                            d="M192 32c0-17.7 14.3-32 32-32H352c17.7 0 32 14.3 32 32V64h48c26.5 0 48 21.5 48 48V240l44.4 14.8c23.1 7.7 29.5 37.5 11.5 53.9l-101 92.6c-16.2 9.4-34.7 15.1-50.9 15.1c-19.6 0-40.8-7.7-59.2-20.3c-22.1-15.5-51.6-15.5-73.7 0c-17.1 11.8-38 20.3-59.2 20.3c-16.2 0-34.7-5.7-50.9-15.1l-101-92.6c-18-16.5-11.6-46.2 11.5-53.9L96 240V112c0-26.5 21.5-48 48-48h48V32zM160 218.7l107.8-35.9c13.1-4.4 27.3-4.4 40.5 0L416 218.7V128H160v90.7zM306.5 421.9C329 437.4 356.5 448 384 448c26.9 0 55.4-10.8 77.4-26.1l0 0c11.9-8.5 28.1-7.8 39.2 1.7c14.4 11.9 32.5 21 50.6 25.2c17.2 4 27.9 21.2 23.9 38.4s-21.2 27.9-38.4 23.9c-24.5-5.7-44.9-16.5-58.2-25C449.5 501.7 417 512 384 512c-31.9 0-60.6-9.9-80.4-18.9c-5.8-2.7-11.1-5.3-15.6-7.7c-4.5 2.4-9.7 5.1-15.6 7.7c-19.8 9-48.5 18.9-80.4 18.9c-33 0-65.5-10.3-94.5-25.8c-13.4 8.4-33.7 19.3-58.2 25c-17.2 4-34.4-6.7-38.4-23.9s6.7-34.4 23.9-38.4c18.1-4.2 36.2-13.3 50.6-25.2c11.1-9.4 27.3-10.1 39.2-1.7l0 0C136.7 437.2 165.1 448 192 448c27.5 0 55-10.6 77.5-26.1c11.1-7.9 25.9-7.9 37 0z" />
-                    </svg>
-                    <span class="font-bold white-space-nowrap text-success">Nueva clase</span>
-                </div>
-            </template>
-            <div class="grid grid-cols-3 gap-2 p-1">
-
-                <TextInput label="Nombre" type="text" showSup="True" v-model="value" />
-                <TextInput label="Tipo de buque" type="text" v-model="value" />
-                <TextInput label="Empresa diseñadora" type="text" v-model="value" />
-                <TextInput label="Material Casco" type="text" v-model="value" />
-                <TextInput label="Eslora" type="text" v-model="value" />
-                <TextInput label="Manga" type="text" v-model="value" />
-                <TextInput label="Calado de diseño" type="text" v-model="value" />
-                <TextInput label="Puntal" type="text" v-model="value" />
-                <TextInput label="Full Load" type="text" v-model="value" />
-                <TextInput label="Ligth Ship" type="text" v-model="value" />
-                <TextInput label="Potencia" type="text" v-model="value" />
-                <TextInput label="Alcance" type="text" v-model="value" />
-                <TextInput label="Tripulacion maxima" type="text" v-model="value" />
-                <TextInput label="GT" type="text" v-model="value" />
-                <TextInput label="CGT" type="text" v-model="value" />
-                <TextInput label="Bollard pull" type="text" v-model="value" />
-                <TextInput label="Clasificacion" type="text" v-model="value" />
-                <div class="flex items-center justify-center w-full h-full">
-                    <FileUpload mode="basic" accept="image/*" :maxFileSize="1000000" v-model="value"/>
-                </div>
-
-
-            </div>
-            <template #footer>
-                <button
-                    class="p-2 border rounded-md border-success text-success hover:border-primary hover:bg-primary hover:text-white"
-                    @click="visible = false" autofocus>
-                    <i class="fa-regular fa-circle-check"></i>
-                    Guardar
-                </button>
-            </template>
-        </Dialog>
     </AppLayout>
 </template>
