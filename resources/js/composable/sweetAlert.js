@@ -34,8 +34,14 @@ export function useSweetalert() {
                             icon: "success",
                             title: title + " Eliminado",
                         });
-
                     },
+                    onError: (error) => {
+                        console.log(error)
+                        Toast.fire({
+                            icon: "error",
+                            title: error.message,
+                        });
+                    }
                 });
             },
             allowOutsideClick: () => !Swal.isLoading(),

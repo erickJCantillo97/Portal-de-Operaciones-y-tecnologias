@@ -38,10 +38,11 @@ class CustomerController extends Controller
     {
         // dd($request);
         $validateData = $request->validate([
-            'NIT' => 'required',
+            'NIT' => 'nullable',
             'name' => 'required',
-            'type' => 'required',
-            'email' => 'required|email',
+            'country' => 'nullable',
+            'type' => 'nullable',
+            'email' => 'nullable|email',
         ]);
 
         try {
@@ -49,7 +50,7 @@ class CustomerController extends Controller
 
             return back()->with(['message' => 'Cliente creado correctamente'], 200);
         } catch (Exception $e) {
-            return back()->withErrors(['message' => 'Ocurrió un error al crear el cliente: '.$e->getMessage()], 500);
+            return back()->withErrors(['message' => 'Ocurrió un error al crear el cliente: ' . $e->getMessage()], 500);
         }
     }
 
@@ -77,6 +78,7 @@ class CustomerController extends Controller
         $validateData = $request->validate([
             'NIT' => 'required',
             'name' => 'required',
+            'country' => 'nullable',
             'type' => 'required',
             'email' => 'required|email',
         ]);
@@ -84,7 +86,7 @@ class CustomerController extends Controller
         try {
             $customer->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -94,11 +96,13 @@ class CustomerController extends Controller
     public function destroy(Customer $customer)
     {
         try {
-            $customer->delete();
-
-            return back()->with(['message' => 'Usuario eliminado de la reunión']);
+            if ($customer->contract->count() == 0) {
+                $customer->delete();
+                return back()->with(['message' => 'Cliente eliminado']);
+            }
+            return back()->withErrors(['message' =>  'No se Puede Eliminar un Cliente con Contratos']);
         } catch (Exception $e) {
-            return back()->with('message', 'Ocurrio un error el eliminar : '.$e);
+            return back()->with('message', 'Ocurrio un error el eliminar : ' . $e);
         }
 
         return redirect('customers.index');
