@@ -43,6 +43,7 @@ const props = defineProps({
     'contracts': Array,
     'authorizations': Array,
     'quotes': Array,
+    'ships': Array,
 })
 
 //#region UseForm
@@ -64,7 +65,7 @@ const formData = useForm({
     hoursPerDay: props.project?.hoursPerDay ?? '8.5',
     daysPerWeek: props.project?.daysPerWeek ?? '5',
     daysPerMonth: props.project?.daysPerMonth ?? '20',
-    shift: props.project != null ? props.project[shift] : '0'
+    shift: props.project != null ? props.project.shift : '0'
 });
 //#endregion
 
@@ -155,8 +156,6 @@ const submit = () => {
 //         loading.value = false;
 //     }
 // })
-
-
 
 const loadContractDates = () => {
 
@@ -356,7 +355,6 @@ const exportarExcel = () => {
                             <Combobox class="text-left" label="Cliente" placeholder="Seleccione Cliente"
                                 :options="customers" v-model="customerSelect">
                             </Combobox>
-
                         </div>
 
                         <!--CAMPO FECHA INICIO-->
@@ -369,11 +367,6 @@ const exportarExcel = () => {
                         <TextInput class="p-1 pb-1 text-left" type="date" label="Fecha de Finalización"
                             v-model="formData.end_date" :error="$page.props.errors.end_date" :disabled="!contractSelect">
                         </TextInput>
-
-                        <!--ADJUNTAR ARCHIVO PDF-->
-                        <!-- <FileUpload chooseLabel="Adjuntar PDF" mode="basic" name="demo[]" :multiple="false" accept=".pdf"
-                            :maxFileSize="1000000" @input="formData.pdf = $event.target.files[0]">
-                        </FileUpload> -->
                     </div>
                 </div>
 
