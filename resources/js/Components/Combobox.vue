@@ -41,7 +41,7 @@ const filtered = computed(() =>
         </ComboboxLabel>
         <div class="relative">
             <ComboboxInput
-                class="w-full rounded-md border-0 bg-white placeholder:italic py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                class="w-full rounded-md border-0 bg-white h-10 placeholder:italic py-2 -mt-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 @change="query = $event.target.value" :display-value="(customer) => customer?.name"
                 :placeholder="placeholder" :disabled="!enabled" />
             <ComboboxButton :disabled="!enabled"

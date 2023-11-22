@@ -124,10 +124,8 @@ const navigation = [
         current: false,
         children: [
             { name: 'Proyectos', href: 'projects.index' }, //gerencia (auth()->user()gerencia)
-            // { name: 'Informes', href: '#' },
-            // { name: 'Cronograma', href: 'showGantt' },
-
-            { name: 'Unidades', href: 'ships.index' },
+            { name: 'Unidades', href: 'ships.index', },
+            { name: 'Clases', href: 'typeShips.index' },
         ],
     },
     {

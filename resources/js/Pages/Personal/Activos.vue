@@ -4,9 +4,10 @@ import { ref } from 'vue';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon } from '@heroicons/vue/24/outline';
+import { FilterMatchMode } from 'primevue/api';
+import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
 import Button from '../../Components/Button.vue';
+import UserTable from '@/Components/UserTable.vue';
 
 const props = defineProps({
     personal: Array
@@ -30,9 +31,8 @@ function formatDate(date) {
     var dia = date.slice(6, 8);
 
     // Formato de salida: dd/mm/aaaa
-    return `${dia}/${mes}/${anho}`;
+    return dia === '00' ? 'Indefinido' : `${dia}/${mes}/${anho}`;
 }
-
 </script>
 
 <template>
@@ -78,8 +78,11 @@ function formatDate(date) {
                 </template>
 
                 <!--COLUMNAS-->
-                <Column field="Nombres_Apellidos" header="Nombre" sortable></Column>
-                <Column field="Cargo" header="Cargo" sortable></Column>
+                <Column field="Nombres_Apellidos" header="Nombre" sortable>
+                    <template #body="slotProps">
+                        <UserTable :user="slotProps.data"></UserTable>
+                    </template>
+                </Column>
                 <Column field="Oficina" header="Departamento" sortable></Column>
                 <Column field="Fecha_Final" header="Fin Contrato" sortable>
                     <template #body="slotProps">

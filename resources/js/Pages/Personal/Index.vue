@@ -15,6 +15,7 @@ import { useConfirm } from "primevue/useconfirm";
 import axios from 'axios';
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
+import UserTable from '@/Components/UserTable.vue';
 
 
 
@@ -45,7 +46,7 @@ function formatDate(date) {
     var dia = date.slice(6, 8);
 
     // Formato de salida: dd/mm/aaaa
-    return `${dia}/${mes}/${anho}`;
+    return dia === '00' ? 'Indefinido' : `${dia}/${mes}/${anho}`;
 }
 
 </script>
@@ -96,8 +97,11 @@ function formatDate(date) {
                 </template>
 
                 <!--COLUMNAS-->
-                <Column field="Nombres_Apellidos" header="Nombre"></Column>
-                <Column field="Cargo" header="Cargo"></Column>
+                <Column field="Nombres_Apellidos" header="Nombre">
+                    <template #body="slotProps">
+                        <UserTable :user="slotProps.data"></UserTable>
+                    </template>
+                </Column>
                 <Column field="Fecha_Final" header="Fin Contrato">
                     <template #body="slotProps">
                         {{ formatDate(slotProps.data.Fecha_Final) }}
