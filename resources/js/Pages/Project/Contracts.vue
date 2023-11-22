@@ -13,6 +13,7 @@ import { webNotifications } from '@/composable/webNotifications';
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
 import Combobox from '@/Components/Combobox.vue';
+import ComboboxPersonalData from '@/Components/ComboboxPersonalData.vue';
 import FileUpload from 'primevue/fileupload';
 const { toast } = useSweetalert();
 const loading = ref(false);
@@ -22,34 +23,43 @@ const filters = ref({
 })
 const { contractNotification } = webNotifications();
 
-const customerSelect = ref({});
-const managerSelect = ref([]);
-
-const typeOfSaleSelect = ref([
-    { name: 'VENTA DIRECTA' },
-    { name: 'FINANCIADA' },
-    { name: 'LEASING' }
-]);
-
-const currencySelect = ref([
-    { name: 'COP' },
-    { name: 'USD' },
-    { name: 'EUR' }
-]);
-
-const stateSelect = ref([
-    { name: 'LIQUIDADO' },
-    { name: 'EN EJECUCIÓN' }
-]);
-
-const open = ref(false)
-const query = ref('')
-
-
+//Props
 const props = defineProps({
     contracts: Array,
-    customers: Array,
+    customers: Array
 })
+
+//#region v-models (ref())
+const customerSelect = ref({});
+const managerSelect = ref();
+const managerOptions = ref([]);
+
+//Tipo de Venta
+const typeOfSaleSelect = ref()
+const typeOfSaleOptions = ref([
+    { id:1, name: 'VENTA DIRECTA' },
+    { id:2, name: 'FINANCIADA' },
+    { id:3, name: 'LEASING' }
+]);
+
+//Moneda
+const currencySelect = ref();
+const currencyOptions = ref([
+    { id:1, name: 'COP' },
+    { id:2, name: 'USD' },
+    { id:3, name: 'EUR' }
+]);
+
+//Estado de la venta
+const stateSelect = ref();
+const stateOptions = ref([
+    { id:1, name: 'LIQUIDADO' },
+    { id:2, name: 'EN EJECUCIÓN' }
+]);
+
+//Abrir Modal
+const open = ref(false)
+//#endregion
 
 //#region UseForm
 const formData = useForm({
@@ -62,7 +72,7 @@ const formData = useForm({
     supervisor: props.contracts?.supervisor ?? '',
     start_date: props.contracts?.start_date ?? '',
     end_date: props.contracts?.end_date ?? '',
-    currency: props.contracts?.currency ?? '0',
+    currency: props.contracts?.currency ?? '',
     cost: props.contracts?.cost ?? '0',
     state: props.contracts?.state ?? '',
     pdf: null
@@ -100,16 +110,15 @@ const getManagers = () => {
     try {
         const manager = {
             key: 'Cargo',
-            value: 'Gerente'
+            value: 'Gerente',
+            all: true
         }
         axios.get(route('search.personal', manager))
             .then((res) => {
-                // Acciones a realizar en caso de éxito
-                managerSelect.value = Object.values(res.data.employees)
+                managerOptions.value = res.data.employees
                 toast('Éxito', 'success')
             })
             .catch((error) => {
-                // Acciones a realizar en caso de error
                 toast('Error', 'error')
             })
     } catch (error) {
@@ -126,7 +135,7 @@ const submit = () => {
     }
 
     if (!managerSelect.value) {
-        toast('Por favor seleccione un buque.', 'error')
+        toast('Por favor seleccione un gerente.', 'error')
         return;
     }
 
@@ -349,86 +358,86 @@ const excelExport = () => {
                             leave-from="opacity-100 translate-y-0 sm:scale-100"
                             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                             <DialogPanel
-                                class="grid grid-col px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg ">
+                                class="w-full px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-[800px]">
                                 <div>
                                     <div class="px-2 mt-2 text-center">
                                         <DialogTitle as="h3" class="text-xl font-semibold text-center text-primary">
                                             {{ formData.id != 0 ? 'Editar ' : 'Crear' }}
                                             Contrato
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
-                                        <div class="p-2 mt-2 space-y-2 border border-gray-200 rounded-lg">
-                                            <!--CAMPO CONTRATO ID-->
-                                            <TextInput class="mt-2 text-left" label="Contrato ID"
-                                                placeholder="Escriba ID del Contrato" v-model="formData.contract_id"
-                                                :error="$page.props.errors.contract_id">
-                                            </TextInput>
+                                        <div class="grid grid-cols-1 gap-4 p-2 md:grid-cols-2 space-y-2 rounded-lg">
+                                            <div class="col-span-1 p-2 mt-2 space-y-2 text-left">
+                                                <!--CAMPO CONTRATO ID-->
+                                                <TextInput label="Contrato ID" placeholder="Escriba ID del Contrato"
+                                                    v-model="formData.contract_id" :error="$page.props.errors.contract_id">
+                                                </TextInput>
 
-                                            <!--CAMPO OBJETO DEL CONTRATO-->
-                                            <TextInput class="mt-2 text-left" label="Objeto del Contrato"
-                                                placeholder="Escriba Objeto del Contrato" v-model="formData.subject"
-                                                :error="$page.props.errors.subject">
-                                            </TextInput>
+                                                <!--CAMPO OBJETO DEL CONTRATO ()-->
+                                                <TextInput label="Objeto del Contrato"
+                                                    placeholder="Escriba Objeto del Contrato" v-model="formData.subject"
+                                                    :error="$page.props.errors.subject">
+                                                </TextInput>
 
-                                            <!--CAMPO CLIENTE-->
-                                            <Combobox class="mt-2 text-left" label="Cliente"
-                                                placeholder="Seleccione Cliente" :options="customers"
-                                                v-model="customerSelect">
-                                            </Combobox>
+                                                <!--CAMPO CLIENTE (customer)-->
+                                                <Combobox label="Cliente" placeholder="Seleccione Cliente"
+                                                    :options="customers" v-model="customerSelect">
+                                                </Combobox>
 
-                                            <!--CAMPO GERENTE-->
-                                            <Combobox class="mt-2 text-left" label="Gerente" :options="managerSelect"
-                                                placeholder="Seleccione Gerente" v-model="managerSelect">
-                                            </Combobox>
+                                                <!--CAMPO GERENTE (manager)-->
+                                                <ComboboxPersonalData label="Gerente" :options="managerOptions"
+                                                    placeholder="Seleccione Gerente" v-model="managerSelect">
+                                                </ComboboxPersonalData>
 
-                                            <!--CAMPO TIPO DE VENTA-->
-                                            <Combobox class="mt-2 text-left" label="Tipo de Venta"
-                                                :options="typeOfSaleSelect" placeholder="Seleccione un Tipo de Venta"
-                                                v-model="typeOfSaleSelect">
-                                            </Combobox>
+                                                <!--CAMPO TIPO DE VENTA (type_of_sale)-->
+                                                <Combobox label="Tipo de Venta" :options="typeOfSaleOptions"
+                                                    placeholder="Seleccione un Tipo de Venta" v-model="typeOfSaleSelect">
+                                                </Combobox>
 
-                                            <!--CAMPO SUPERVISOR-->
-                                            <TextInput class="mt-2 text-left" label="Supervisor"
-                                                placeholder="Escriba nombre del supervisor" v-model="formData.supervisor"
-                                                :error="$page.props.errors.supervisor">
-                                            </TextInput>
+                                                <!--CAMPO SUPERVISOR-->
+                                                <TextInput label="Supervisor" placeholder="Escriba nombre del supervisor"
+                                                    v-model="formData.supervisor" :error="$page.props.errors.supervisor">
+                                                </TextInput>
+                                            </div>
 
-                                            <!--CAMPO FECHA INICIO-->
-                                            <TextInput class="mt-2 text-left" type="date" label="Fecha de inicio"
-                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.start_date"
-                                                :error="$page.props.errors.start_date">
-                                            </TextInput>
+                                            <div class="col-span-1 p-2 mt-2 space-y-2 text-left">
+                                                <!--CAMPO FECHA INICIO-->
+                                                <TextInput type="date" label="Fecha de inicio"
+                                                    :placeholder="'Escriba el Tipo de Cliente'"
+                                                    v-model="formData.start_date" :error="$page.props.errors.start_date">
+                                                </TextInput>
 
-                                            <!--CAMPO FECHA FINALIZACIÓN-->
-                                            <TextInput class="mt-2 text-left" type="date" label="Fecha de Finalización"
-                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
-                                                :error="$page.props.errors.end_date">
-                                            </TextInput>
+                                                <!--CAMPO FECHA FINALIZACIÓN-->
+                                                <TextInput type="date" label="Fecha de Finalización"
+                                                    :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
+                                                    :error="$page.props.errors.end_date">
+                                                </TextInput>
 
-                                            <!--CAMPO MONEDA-->
-                                            <Combobox class="mt-2 text-left" label="Moneda" placeholder="Ej: COP"
-                                                v-model="currencySelect" :options="currencySelect">
-                                            </Combobox>
+                                                <!--CAMPO MONEDA-->
+                                                <Combobox label="Moneda" placeholder="Seleccione Tipo de Moneda"
+                                                    v-model="currencySelect" :options="currencyOptions">
+                                                </Combobox>
 
-                                            <!--CAMPO PRECIO DE VENTA (cost)-->
-                                            <TextInput class="text-left" label="Precio de Venta" type="number"
-                                                :placeholder="'Escriba el valor total estimado'" v-model="formData.cost"
-                                                :error="router.page.props.errors.cost">
-                                            </TextInput>
+                                                <!--CAMPO PRECIO DE VENTA (cost)-->
+                                                <TextInput label="Precio de Venta" type="number"
+                                                    :placeholder="'Escriba el valor total estimado'" v-model="formData.cost"
+                                                    :error="router.page.props.errors.cost">
+                                                </TextInput>
 
-                                            <!--CAMPO ESTADO DE VENTA-->
-                                            <Combobox class="mt-2 text-left" label="Estado del Contrato"
-                                                :options="stateSelect" placeholder="Seleccione un Tipo de Venta"
-                                                v-model="stateSelect">
-                                            </Combobox>
+                                                <!--CAMPO ESTADO DEL CONTRATO (state)-->
+                                                <Combobox label="Estado del Contrato" :options="stateOptions"
+                                                    placeholder="Seleccione un Tipo de Venta" v-model="stateSelect">
+                                                </Combobox>
 
-                                            <!--CAMPO SUBIR ARCHIVO-->
-                                            <FileUpload chooseLabel="Adjuntar PDF" mode="basic" name="demo[]"
-                                                :multiple="false" accept=".pdf" :maxFileSize="1000000"
-                                                @input="formData.pdf = $event.target.files[0]">
-                                            </FileUpload>
+                                                <div class="flex justify-center align-content-center pt-6">
+                                                    <!--CAMPO SUBIR ARCHIVO-->
+                                                    <FileUpload chooseLabel="Adjuntar PDF" mode="basic" name="demo[]"
+                                                        :multiple="false" accept=".pdf" :maxFileSize="1000000"
+                                                        @input="formData.pdf = $event.target.files[0]">
+                                                    </FileUpload>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="">
-
                                         </div>
                                     </div>
                                 </div>
