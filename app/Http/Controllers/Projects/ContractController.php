@@ -9,6 +9,7 @@ use App\Models\Projects\Customer;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class ContractController extends Controller
@@ -39,7 +40,7 @@ class ContractController extends Controller
     {
         // dd($request);
         $validateData = $request->validate([
-            'contract_id' => 'required',
+            'contract_id' => 'required|unique:contracts,contract_id',
             'subject' => 'nullable',
             'customer_id' => 'nullable',
             'manager_id' => 'nullable',
@@ -96,12 +97,18 @@ class ContractController extends Controller
     public function update(Request $request, Contract $contract)
     {
         $validateData = $request->validate([
+            'contract_id' => 'required|unique:contracts,contract_id,'.$contract->id,
+            'subject' => 'nullable',
             'customer_id' => 'nullable',
-            'ship_id' => 'nullable',
-            'name' => 'required',
-            'cost' => 'required',
-            'start_date' => 'required',
-            'end_date' => 'required',
+            'manager_id' => 'nullable',
+            'type_of_sale' => 'nullable',
+            'supervisor' => 'nullable',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+            'currency' => 'nullable',
+            'cost' => 'nullable|numeric',
+            'state' => 'nullable',
+            'file' => 'nullable',
         ]);
 
         try {

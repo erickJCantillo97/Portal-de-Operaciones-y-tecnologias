@@ -37,24 +37,24 @@ const managerOptions = ref([]);
 //Tipo de Venta
 const typeOfSaleSelect = ref()
 const typeOfSaleOptions = ref([
-    { id:1, name: 'VENTA DIRECTA' },
-    { id:2, name: 'FINANCIADA' },
-    { id:3, name: 'LEASING' }
+    { name: 'VENTA DIRECTA' },
+    { name: 'FINANCIADA' },
+    { name: 'LEASING' }
 ]);
 
 //Moneda
 const currencySelect = ref();
 const currencyOptions = ref([
-    { id:1, name: 'COP' },
-    { id:2, name: 'USD' },
-    { id:3, name: 'EUR' }
+    { name: 'COP' },
+    { name: 'USD' },
+    { name: 'EUR' }
 ]);
 
 //Estado de la venta
 const stateSelect = ref();
 const stateOptions = ref([
-    { id:1, name: 'LIQUIDADO' },
-    { id:2, name: 'EN EJECUCIÓN' }
+    { name: 'LIQUIDADO' },
+    { name: 'EN EJECUCIÓN' }
 ]);
 
 //Abrir Modal
@@ -126,21 +126,15 @@ const getManagers = () => {
     }
 }
 
-/* SUBMIT*/
+/*SUBMIT*/
 const submit = () => {
     loading.value = true;
-    if (!customerSelect.value) {
-        toast('Por favor seleccione un cliente.', 'error')
-        return;
-    }
 
-    if (!managerSelect.value) {
-        toast('Por favor seleccione un gerente.', 'error')
-        return;
-    }
-
-    formData.customer_id = customerSelect.value.id
-    formData.manager_id = managerSelect.value.id
+    formData.customer_id = customerSelect.value ? customerSelect.value.id : null;
+    formData.manager_id = managerSelect.value ? managerSelect.value.id : null;
+    formData.type_of_sale = typeOfSaleSelect.value ? typeOfSaleSelect.value['name'] : null
+    formData.currency = currencySelect.value ? currencySelect.value['name'] : null
+    formData.state = stateSelect.value ? stateSelect.value['name'] : null
 
     if (formData.id == 0) {
         router.post(route('contracts.store'), formData, {
@@ -178,6 +172,9 @@ const addItem = () => {
     clearErrors();
     customerSelect.value = {}; //Resetear los datos
     managerSelect.value = {}; //Resetear los datos
+    typeOfSaleSelect.value = {}; //Resetear los datos
+    currencySelect.value = {}; //Resetear los datos
+    stateSelect.value = {}; //Resetear los datos
     open.value = true;
 }
 
@@ -188,14 +185,20 @@ const editItem = (contract) => {
     formData.contract_id = contract.contract_id;
     formData.subject = contract.subject;
     customerSelect.value = contract.customer; //Este dato viene del Contract::with('customer')
-    managerSelect.value = contract.manager; //Este dato viene del Contract::with('manager')
-    formData.type_of_sale = contract.type_of_sale;
+    managerSelect.value = managerOptions.value.filter(
+        manager => manager.id == contract.manager_id
+    )[0]; //Este dato viene del Contract::with('manager')
+    typeOfSaleSelect.value = typeOfSaleOptions.value.filter(
+        sale => sale.name == contract.type_of_sale
+    )[0];
     formData.supervisor = contract.supervisor;
     formData.start_date = contract.start_date;
     formData.end_date = contract.end_date;
-    formData.currency = contract.currency;
+    currencySelect.value = currencyOptions.value.filter(
+        currency => currency.name == contract.currency
+    )[0];
     formData.cost = contract.cost;
-    formData.state = contract.state;
+    stateSelect.value = stateOptions.value.filter(state => state.name == contract.state)[0];
     formData.pdf = contract.pdf;
     open.value = true;
 };
