@@ -43,19 +43,16 @@ const props = defineProps({
     'contracts': Array,
     'authorizations': Array,
     'quotes': Array,
-    'ships': Array,
-    'customers': Array
 })
 
 //#region UseForm
 const formData = useForm({
     id: props.projects?.id ?? '0',
+    name: props.projects?.name ?? '0',
     contract_id: props.projects?.contract_id ?? '0',
     authorization_id: props.projects?.authorization_id ?? '0',
     quote_id: props.projects?.quote_id ?? '0',
-    ship_id: props.projects?.ship_id ?? '0',
     customer_id: props.projects?.customer_id ?? '0',
-    intern_communications: props.projects?.intern_communications ?? '0',
     name: props.projects?.name ?? '',
     start_date: props.projects?.start_date ?? '',
     end_date: props.projects?.end_date ?? '',

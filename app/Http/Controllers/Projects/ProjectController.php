@@ -5,10 +5,8 @@ namespace App\Http\Controllers\Projects;
 use App\Http\Controllers\Controller;
 use App\Models\Projects\Authorization;
 use App\Models\Projects\Contract;
-use App\Models\Projects\Customer;
 use App\Models\Projects\Project;
 use App\Models\Projects\Quote;
-use App\Models\Projects\Ship;
 use App\Models\VirtualTask;
 use Carbon\Carbon;
 use Exception;
@@ -23,18 +21,10 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::with('contract', 'customer')->orderBy('name')->get();
-        $ships = Ship::orderBy('name')->get();
+        $projects = Project::all('contract')->orderBy('name')->get();
         $contracts = Contract::get();
 
-        return Inertia::render(
-            'Project/Projects',
-            [
-                'projects' => $projects,
-                'ships' => $ships,
-                'contracts' => $contracts,
-            ]
-        );
+        return Inertia::render('Project/Projects', compact('projects, contracts'));
     }
 
     /**
@@ -45,10 +35,8 @@ class ProjectController extends Controller
         $contracts = Contract::orderBy('contract_id')->get();
         $authorizations = Authorization::orderBy('contract_id')->get();
         $quotes = Quote::orderBy('ship_id')->get();
-        $ships = Ship::orderBy('id')->get();
-        $customers = Customer::orderBy('name')->get();
 
-        return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes', 'ships', 'customers'));
+        return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes'));
     }
 
     /**
@@ -58,18 +46,24 @@ class ProjectController extends Controller
     {
         // dd($request);
         $validateData = $request->validate([
+            'name' => 'required',
             'contract_id' => 'nullable',
             'authorization_id' => 'nullable',
             'quote_id' => 'nullable',
-            'ship_id' => 'nullable',
-            'customer_id' => 'nullable',
-            'intern_communications' => 'nullable',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
-            'hoursPerDay' => 'required',
-            'daysPerWeek' => 'required',
-            'daysPerMonth' => 'required',
-            'file' => 'nullable',
+            'type' => 'nullable',
+            'SAP_code' => 'nullable',
+            'status' => 'nullable',
+            'scope' => 'nullable',
+            'supervisor' => 'nullable',
+            'cost_sale' => 'nullable',
+            'description' => 'nullable',
+            'gerencia' => 'nullable',
+            'start_date' => 'nullable',
+            'end_date' => 'nullable',
+            'hoursPerDay' => 'nullable',
+            'daysPerWeek' => 'nullable',
+            'daysPerMonth' => 'nullable',
+            'shift' => 'nullable'
         ]);
 
         try {
@@ -124,18 +118,8 @@ class ProjectController extends Controller
                 return back()->withErrors(['message' => 'Ya existe un proyecto con la misma estimación y buque'], 500);
             }
 
-            // Verificar si ya existe un proyecto con la misma Estimación
-            $existingProjectWithInternCommunications = Project::where('intern_communications', $validateData['intern_communications'])
-                ->where('intern_communications', $buque->id)
-                ->first();
-
-            if ($existingProjectWithInternCommunications) {
-                return back()->withErrors(['message' => 'Ya existe un proyecto asociado con este consecutivo.'], 500);
-            }
-
             $countProject = count(Project::where('ship_id', $buque->id)->get()) + 1;
 
-            $validateData['ship_id'] = $buque->id;
             $validateData['name'] = $buque->name . '-' . Carbon::now()->format('Y') . '-' . str_pad($countProject, 3, '0', STR_PAD_LEFT);
             $validateData['gerencia'] = auth()->user()->gerencia;
 
@@ -185,7 +169,6 @@ class ProjectController extends Controller
         $contracts = Contract::orderBy('name')->get();
         $authorizations = Authorization::orderBy('contract_id')->get();
         $quotes = Quote::orderBy('ship_id')->get();
-        $ships = Ship::orderBy('id')->get();
 
         return Inertia::render(
             'Project/CreateProjects',
@@ -194,7 +177,6 @@ class ProjectController extends Controller
                 'contracts' => $contracts,
                 'authorizations' => $authorizations,
                 'quotes' => $quotes,
-                'ships' => $ships,
             ]
         );
     }
@@ -206,16 +188,30 @@ class ProjectController extends Controller
     {
         $validateData = $request->validate([
             'name' => 'required',
-            'gerencia' => 'required',
-            'cost' => 'nullable',
-            'start_date' => 'required',
-            'end_date' => 'required',
+            'contract_id' => 'nullable',
+            'authorization_id' => 'nullable',
+            'quote_id' => 'nullable',
+            'type' => 'nullable',
+            'SAP_code' => 'nullable',
+            'status' => 'nullable',
+            'scope' => 'nullable',
+            'supervisor' => 'nullable',
+            'cost_sale' => 'nullable',
+            'description' => 'nullable',
+            'gerencia' => 'nullable',
+            'start_date' => 'nullable',
+            'end_date' => 'nullable',
+            'hoursPerDay' => 'nullable',
+            'daysPerWeek' => 'nullable',
+            'daysPerMonth' => 'nullable',
+            'shift' => 'nullable',
+            'file' => 'nullable',
         ]);
 
         try {
             $project->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
+            return back()->withErrors('message', 'Ocurrió un Error Al Actualizar : ' . $e);
         }
     }
 

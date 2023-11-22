@@ -26,9 +26,9 @@ class Ship extends Model implements Auditable
         return $this->belongsTo(Ship::class);
     }
 
-    public function project()
+    public function projectShip()
     {
-        return $this->belongsTo(Project::class);
+        return $this->hasMany(ProjectShip::class);
     }
 
     protected function file(): Attribute

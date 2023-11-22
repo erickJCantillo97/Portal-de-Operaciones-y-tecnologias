@@ -1,27 +1,27 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref, onMounted } from 'vue';
-import { router, useForm } from '@inertiajs/vue3';
-import '../../../sass/dataTableCustomized.scss';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline';
-import { useSweetalert } from '@/composable/sweetAlert';
-import { webNotifications } from '@/composable/webNotifications';
-import TextInput from '../../Components/TextInput.vue';
-import Button from '../../Components/Button.vue';
-import Combobox from '@/Components/Combobox.vue';
-import ComboboxPersonalData from '@/Components/ComboboxPersonalData.vue';
-import FileUpload from 'primevue/fileupload';
-const { toast } = useSweetalert();
-const loading = ref(false);
-const { confirmDelete } = useSweetalert();
+import AppLayout from '@/Layouts/AppLayout.vue'
+import { ref, onMounted } from 'vue'
+import { router, useForm } from '@inertiajs/vue3'
+import '../../../sass/dataTableCustomized.scss'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import { FilterMatchMode, FilterOperator } from 'primevue/api'
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline'
+import { useSweetalert } from '@/composable/sweetAlert'
+import { webNotifications } from '@/composable/webNotifications'
+import TextInput from '../../Components/TextInput.vue'
+import Button from '../../Components/Button.vue'
+import Combobox from '@/Components/Combobox.vue'
+import ComboboxPersonalData from '@/Components/ComboboxPersonalData.vue'
+import FileUpload from 'primevue/fileupload'
+const { toast } = useSweetalert()
+const loading = ref(false)
+const { confirmDelete } = useSweetalert()
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
-const { contractNotification } = webNotifications();
+const { contractNotification } = webNotifications()
 
 //Props
 const props = defineProps({
@@ -30,9 +30,9 @@ const props = defineProps({
 })
 
 //#region v-models (ref())
-const customerSelect = ref({});
-const managerSelect = ref();
-const managerOptions = ref([]);
+const customerSelect = ref({})
+const managerSelect = ref()
+const managerOptions = ref([])
 
 //Tipo de Venta
 const typeOfSaleSelect = ref()
@@ -40,22 +40,22 @@ const typeOfSaleOptions = ref([
     { name: 'VENTA DIRECTA' },
     { name: 'FINANCIADA' },
     { name: 'LEASING' }
-]);
+])
 
 //Moneda
-const currencySelect = ref();
+const currencySelect = ref()
 const currencyOptions = ref([
     { name: 'COP' },
     { name: 'USD' },
     { name: 'EUR' }
-]);
+])
 
 //Estado de la venta
-const stateSelect = ref();
+const stateSelect = ref()
 const stateOptions = ref([
     { name: 'LIQUIDADO' },
     { name: 'EN EJECUCIÓN' }
-]);
+])
 
 //Abrir Modal
 const open = ref(false)
@@ -76,19 +76,19 @@ const formData = useForm({
     cost: props.contracts?.cost ?? '0',
     state: props.contracts?.state ?? '',
     pdf: null
-});
+})
 //#endregion
 
 onMounted(() => {
     getManagers()
     // window.Echo.private("contracts").listen(".ContractsEvent", (e) => {
-    //     // Push.Permission.get();
+    //     // Push.Permission.get()
     //     const customerName = customerSelect.value
     //         ? customerSelect.value.name
-    //         : "Cliente no seleccionado";
+    //         : "Cliente no seleccionado"
     //     const managerName = managerSelect.value
     //         ? managerSelect.value.name
-    //         : "Buque no seleccionado";
+    //         : "Buque no seleccionado"
     //     Push.create(e.message, {
     //         body: `Cliente: ${customerName},
     //                 \nBuque: ${managerName},
@@ -97,13 +97,13 @@ onMounted(() => {
     //         requireInteraction: true,
     //         // timeout: 5000,
     //         onClick: function () {
-    //             window.open("https://www.cotecmar.com/", "_blank");
-    //             this.close();
+    //             window.open("https://www.cotecmar.com/", "_blank")
+    //             this.close()
     //         },
-    //     });
-    // });
-    // contractNotification(customerSelect, managerSelect, formData.cost);
-    initFilters();
+    //     })
+    // })
+    // contractNotification(customerSelect, managerSelect, formData.cost)
+    initFilters()
 })
 
 const getManagers = () => {
@@ -116,10 +116,10 @@ const getManagers = () => {
         axios.get(route('search.personal', manager))
             .then((res) => {
                 managerOptions.value = res.data.employees
-                toast('Éxito', 'success')
+                // toast('Éxito', 'success')
             })
             .catch((error) => {
-                toast('Error', 'error')
+                // toast('Error', 'error')
             })
     } catch (error) {
         console.error('Error al obtener empleados:', error)
@@ -128,10 +128,10 @@ const getManagers = () => {
 
 /*SUBMIT*/
 const submit = () => {
-    loading.value = true;
+    loading.value = true
 
-    formData.customer_id = customerSelect.value ? customerSelect.value.id : null;
-    formData.manager_id = managerSelect.value ? managerSelect.value.id : null;
+    formData.customer_id = customerSelect.value ? customerSelect.value.id : null
+    formData.manager_id = managerSelect.value ? managerSelect.value.id : null
     formData.type_of_sale = typeOfSaleSelect.value ? typeOfSaleSelect.value['name'] : null
     formData.currency = currencySelect.value ? currencySelect.value['name'] : null
     formData.state = stateSelect.value ? stateSelect.value['name'] : null
@@ -140,115 +140,115 @@ const submit = () => {
         router.post(route('contracts.store'), formData, {
             preserveScroll: true,
             onSuccess: (res) => {
-                open.value = false;
-                toast(' Contrato creado exitosamente', 'success');
+                open.value = false
+                toast(' Contrato creado exitosamente', 'success')
             },
             onError: (errors) => {
-                toast('Por favor diligencie todos los campos', 'error');
+                toast('Por favor diligencie todos los campos', 'error')
             },
             onFinish: visit => {
-                loading.value = false;
+                loading.value = false
             }
         })
-        return 'creado';
+        return 'creado'
     }
     router.put(route('contracts.update', formData.id), formData, {
         preserveScroll: true,
         onSuccess: (res) => {
-            open.value = false;
-            toast('Contrato actualizado exitosamente!', 'success');
+            open.value = false
+            toast('Contrato actualizado exitosamente!', 'success')
         },
         onError: (errors) => {
-            toast('¡Ups! Ha surgido un error', 'error');
+            toast('¡Ups! Ha surgido un error', 'error')
         },
         onFinish: visit => {
-            loading.value = false;
+            loading.value = false
         }
     })
 }
 
 const addItem = () => {
-    formData.reset();
-    clearErrors();
-    customerSelect.value = {}; //Resetear los datos
-    managerSelect.value = {}; //Resetear los datos
-    typeOfSaleSelect.value = {}; //Resetear los datos
-    currencySelect.value = {}; //Resetear los datos
-    stateSelect.value = {}; //Resetear los datos
-    open.value = true;
+    formData.reset()
+    clearErrors()
+    customerSelect.value = {} //Resetear los datos
+    managerSelect.value = {} //Resetear los datos
+    typeOfSaleSelect.value = {} //Resetear los datos
+    currencySelect.value = {} //Resetear los datos
+    stateSelect.value = {} //Resetear los datos
+    open.value = true
 }
 
 const editItem = (contract) => {
-    clearErrors();
+    clearErrors()
 
-    formData.id = contract.id;
-    formData.contract_id = contract.contract_id;
-    formData.subject = contract.subject;
-    customerSelect.value = contract.customer; //Este dato viene del Contract::with('customer')
+    formData.id = contract.id
+    formData.contract_id = contract.contract_id
+    formData.subject = contract.subject
+    customerSelect.value = contract.customer //Este dato viene del Contract::with('customer')
     managerSelect.value = managerOptions.value.filter(
         manager => manager.id == contract.manager_id
-    )[0]; //Este dato viene del Contract::with('manager')
+    )[0] //Este dato viene del Contract::with('manager')
     typeOfSaleSelect.value = typeOfSaleOptions.value.filter(
         sale => sale.name == contract.type_of_sale
-    )[0];
-    formData.supervisor = contract.supervisor;
-    formData.start_date = contract.start_date;
-    formData.end_date = contract.end_date;
+    )[0]
+    formData.supervisor = contract.supervisor
+    formData.start_date = contract.start_date
+    formData.end_date = contract.end_date
     currencySelect.value = currencyOptions.value.filter(
         currency => currency.name == contract.currency
-    )[0];
-    formData.cost = contract.cost;
-    stateSelect.value = stateOptions.value.filter(state => state.name == contract.state)[0];
-    formData.pdf = contract.pdf;
-    open.value = true;
-};
+    )[0]
+    formData.cost = contract.cost
+    stateSelect.value = stateOptions.value.filter(state => state.name == contract.state)[0]
+    formData.pdf = contract.pdf
+    open.value = true
+}
 
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
     }
-};
+}
 
 const clearFilter = () => {
-    initFilters();
-};
+    initFilters()
+}
 
 const clearErrors = () => {
-    router.page.props.errors = {};
-};
+    router.page.props.errors = {}
+}
 
 const formatDate = (value) => {
     return value.toLocaleDateString('es-ES', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
-    });
-};
+    })
+}
 
 // Formatear el número en moneda (USD)
 const formatCurrency = (value) => {
     return parseFloat(value).toLocaleString('es-CO', {
         style: 'currency',
         currency: 'COP',
-    });
-};
+    })
+}
 
 const excelExport = () => {
     //console.log(dt.value)
     // Acquire Data (reference to the HTML table)
-    var table_elt = document.getElementById("tabla");
+    var table_elt = document.getElementById("tabla")
 
-    var workbook = XLSX.utils.table_to_book(table_elt);
+    var workbook = XLSX.utils.table_to_book(table_elt)
 
-    var ws = workbook.Sheets["Sheet1"];
+    var ws = workbook.Sheets["Sheet1"]
     XLSX.utils.sheet_add_aoa(ws, [
         ["Creado " + new Date().toISOString()]
-    ], { origin: -1 });
+    ], { origin: -1 })
 
     // Package and Release Data (`writeFile` tries to write and save an XLSB file)
-    XLSX.writeFile(workbook, 'Lista de Contratos_' + contract.nit + '_' + contract.name + ".xlsb");
-};
+    XLSX.writeFile(workbook, 'Lista de Contratos_' + contract.nit + '_' + contract.name + ".xlsb")
+}
 </script>
 
 <template>
