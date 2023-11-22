@@ -11,15 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('customers', function (Blueprint $table) {
-            $table->id();
-            $table->string('NIT')->unique()->nullable();
+        Schema::table('customers', function (Blueprint $table) {
             $table->string('country')->nullable();
-            $table->string('name');
-            $table->string('type')->nullable();
-            $table->string('email')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -28,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('customers');
+        Schema::table('customers', function (Blueprint $table) {
+            //
+        });
     }
 };

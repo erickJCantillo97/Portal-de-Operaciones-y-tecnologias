@@ -110,7 +110,7 @@ const navigation = [
         icon: IdentificationIcon,
         current: false,
         children: [
-            { name: 'Parte', href: 'dashboard' },
+            { name: 'Parte de Personal', href: 'dashboard' },
             { name: 'Planilla', href: 'programming' },
             { name: 'Novedades', href: 'personal.index' },
             // { name: 'Programación', href: '#' },

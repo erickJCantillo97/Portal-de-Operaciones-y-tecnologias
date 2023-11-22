@@ -86,7 +86,6 @@ const addItem = () => {
 
 const editItem = (customer) => {
     clearErrors();
-
     formData.customer = customer;
     open.value = true;
 };
@@ -198,6 +197,7 @@ const showShips = (selectCustomer) => {
                 <!--COLUMNAS-->
                 <Column field="NIT" header="NIT"></Column>
                 <Column field="name" header="Nombre"></Column>
+                <Column field="country" header="Pais"></Column>
                 <Column field="type" header="Tipo"></Column>
                 <Column field="email" header="Correo"></Column>
 
@@ -258,17 +258,13 @@ const showShips = (selectCustomer) => {
                                             <TextInput class="mt-2 text-left" label="NIT" placeholder="e.g. 9234232988-0"
                                                 v-model="formData.customer.NIT" :error="router.page.props.errors.nit">
                                             </TextInput>
-                                            <TextInput class="mt-2 text-left" label="Nombre Completo"
-                                                placeholder="Escriba su nombre completo" v-model="formData.customer.name"
+                                            <TextInput class="mt-2 text-left" label="Nombre del Cliente"
+                                                placeholder="Escriba el nombre del CLiente" v-model="formData.customer.name"
                                                 :error="router.page.props.errors.name"></TextInput>
-                                            <!-- <div class="mt-2">
-                                                            <label for="type"
-                                                                class="block text-sm text-left text-gray-900 capitalize">Tipo de
-                                                                Cliente</label>
-                                                            <Dropdown v-model="form.type" :options="types" filter optionLabel="name"
-                                                                placeholder="Selecccionar" class="w-full md:w-14rem">
-                                                            </Dropdown>
-                                                        </div> -->
+                                            <TextInput class="mt-2 text-left" label="Pais" placeholder="Escriba el Pais"
+                                                v-model="formData.customer.country"
+                                                :error="router.page.props.errors.country">
+                                            </TextInput>
                                             <TextInput class="mt-2 text-left" label="Tipo de Cliente"
                                                 :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.customer.type"
                                                 :error="router.page.props.errors.type"></TextInput>
