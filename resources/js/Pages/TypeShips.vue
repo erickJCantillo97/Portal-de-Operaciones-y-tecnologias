@@ -13,6 +13,9 @@ import TextInput from '@/Components/TextInput.vue';
 import CustomModal from '@/Components/CustomModal.vue';
 import FileUpload from 'primevue/fileupload';
 import Image from 'primevue/image';
+import { useSweetalert } from '@/composable/sweetAlert';
+const { toast } = useSweetalert();
+const { confirmDelete } = useSweetalert();
 
 const props = defineProps({
     typeShips: Object
@@ -68,6 +71,11 @@ const save = () => {
     })).post(route('typeShips.store'), {
         onSuccess: (response) => {
             modalVisible.value = false
+            toast('Clase creada correctamente', 'success');
+        },
+        onError:(response)=>{
+            console.table(response)
+            toast('Ocurrio un error', 'warning');
         }
     })
 }
@@ -106,9 +114,11 @@ const edit = () => {
     router.post(route('typeShips.update', typeShip.id), typeShip, {
         onSuccess: (response) => {
             modalVisible.value = false
+            toast('Cambios guardados', 'success');
             console.table(response)
         },
         onError: (response) => {
+            toast('Ocurrio un error', 'warning');
             console.table(response)
         }
     })
@@ -165,7 +175,7 @@ const selectedColumns = ref(columns.value);
                         </div>
                         <div>
                             <div title="Eliminar">
-                                <Button severity="danger" @click="console.log(slotProps)" class="hover:bg-primary">
+                                <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Clase', 'typeShips')" class="hover:bg-primary">
                                     <i class="fa-solid fa-trash"></i>
                                 </Button>
                             </div>
