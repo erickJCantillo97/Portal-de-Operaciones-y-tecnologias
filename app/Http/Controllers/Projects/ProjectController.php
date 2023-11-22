@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Projects\Authorization;
 use App\Models\Projects\Contract;
 use App\Models\Projects\Project;
+use App\Models\Projects\ProjectsShip;
 use App\Models\Projects\Quote;
+use App\Models\Projects\Ship;
 use App\Models\VirtualTask;
 use Carbon\Carbon;
 use Exception;
@@ -22,9 +24,8 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::all('contract')->orderBy('name')->get();
-        $contracts = Contract::get();
 
-        return Inertia::render('Project/Projects', compact('projects, contracts'));
+        return Inertia::render('Project/Projects', compact('projects'));
     }
 
     /**
@@ -35,8 +36,9 @@ class ProjectController extends Controller
         $contracts = Contract::orderBy('contract_id')->get();
         $authorizations = Authorization::orderBy('contract_id')->get();
         $quotes = Quote::orderBy('ship_id')->get();
+        $ships = Ship::doesnthave('projectShip')->get();
 
-        return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes'));
+        return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes', 'ships'));
     }
 
     /**
@@ -57,7 +59,6 @@ class ProjectController extends Controller
             'supervisor' => 'nullable',
             'cost_sale' => 'nullable',
             'description' => 'nullable',
-            'gerencia' => 'nullable',
             'start_date' => 'nullable',
             'end_date' => 'nullable',
             'hoursPerDay' => 'nullable',
@@ -67,72 +68,14 @@ class ProjectController extends Controller
         ]);
 
         try {
-            if (($validateData['contract_id']) != 0) {
-                $buque = Contract::find($validateData['contract_id'])->ship;
+
+            $id = Project::create($validateData)->id;
+            foreach ($request->ships as $ship) {
+                ProjectsShip::create([
+                    'project_id' => $id,
+                    'ship_id' => $ship['id'],
+                ]);
             }
-
-            if ($validateData['authorization_id'] != 0) {
-                $buque = Authorization::find($validateData['authorization_id'])->first()->quote->ship;
-            }
-
-            if ($validateData['quote_id'] != 0) {
-                $buque = Quote::find($validateData['quote_id'])->ship;
-            }
-
-            if (isset($buque) && $validateData['ship_id'] != 0) {
-                $buque = Ship::find($validateData['ship_id']);
-            }
-
-            if (isset($buque) && $validateData['intern_communications'] != 0) {
-                $buque = Ship::find($validateData['ship_id']);
-            }
-
-            if (!isset($buque)) {
-                return back()->withErrors(['message' => 'Ocurrió un error al crear el proyecto: No se seleccionó un Buque'], 500);
-            }
-
-            // Verificar si ya existe un proyecto con el mismo contract_id y ship_id
-            $existingProjectWithContract = Project::where('contract_id', $validateData['contract_id'])
-                ->where('ship_id', $buque->id)
-                ->first();
-
-            if ($existingProjectWithContract) {
-                return back()->withErrors(['message' => 'Ya existe un proyecto con el mismo contrato y buque'], 500);
-            }
-
-            // Verificar si ya existe un proyecto con el mismo authorization_id y ship_id
-            $existingProjectWithAuthorization = Project::where('authorization_id', $validateData['authorization_id'])
-                ->where('quote_id', $buque->id)
-                ->first();
-
-            if ($existingProjectWithAuthorization) {
-                return back()->withErrors(['message' => 'Ya existe un proyecto con la misma autorización y buque'], 500);
-            }
-
-            // Verificar si ya existe un proyecto con la misma Estimación
-            $existingProjectWithQuote = Project::where('quote_id', $validateData['quote_id'])
-                ->where('quote_id', $buque->id)
-                ->first();
-
-            if ($existingProjectWithQuote) {
-                return back()->withErrors(['message' => 'Ya existe un proyecto con la misma estimación y buque'], 500);
-            }
-
-            $countProject = count(Project::where('ship_id', $buque->id)->get()) + 1;
-
-            $validateData['name'] = $buque->name . '-' . Carbon::now()->format('Y') . '-' . str_pad($countProject, 3, '0', STR_PAD_LEFT);
-            $validateData['gerencia'] = auth()->user()->gerencia;
-
-            //Guardar archivo pdf de Comunicación Interna
-            if ($request->pdf != null) {
-                $validateData['file'] = Storage::putFileAs(
-                    'public/Interns_Communications/',
-                    $request->pdf,
-                    $validateData['name'] . '.' . $request->pdf->getClientOriginalExtension()
-                );
-            }
-
-            Project::create($validateData);
 
             return back()->with(['message' => 'Proyecto creado correctamente'], 200);
         } catch (Exception $e) {

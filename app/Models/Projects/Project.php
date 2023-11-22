@@ -24,9 +24,4 @@ class Project extends Model implements Auditable
     {
         return $this->belongsTo(Ship::class);
     }
-
-    public function customer()
-    {
-        return $this->belongsTo(Customer::class);
-    }
 }
