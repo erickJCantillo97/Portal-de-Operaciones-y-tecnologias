@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, defineProps, defineEmits } from 'vue';
+import { computed, ref } from 'vue';
 import { EyeIcon, EyeSlashIcon, ExclamationCircleIcon } from '@heroicons/vue/24/outline'
 
 const input = ref(null);

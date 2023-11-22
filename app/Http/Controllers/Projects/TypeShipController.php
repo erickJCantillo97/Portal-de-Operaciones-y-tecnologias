@@ -60,11 +60,11 @@ class TypeShipController extends Controller
         ]);
 
         try {
-            if ($request->render != null) {
+            if ($request->image != null) {
                 $validateData['render'] = Storage::putFileAs(
                     'public/TypeShips/',
-                    $request->render,
-                    $validateData['name'].'.'.$request->render->getClientOriginalExtension()
+                    $request->image,
+                    $validateData['name'].'.'.$request->image->getClientOriginalExtension()
                 );
             }
             TypeShip::create($validateData);
@@ -93,6 +93,7 @@ class TypeShipController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, TypeShip $typeShip)
+
     {
         $validateData = $request->validate([
             'name' => 'required|string|unique:type_ships,name,' . $typeShip->id,
@@ -119,6 +120,13 @@ class TypeShipController extends Controller
         ]);
 
         try {
+            if ($request->image != null) {
+                $validateData['render'] = Storage::putFileAs(
+                    'public/TypeShips/',
+                    $request->image,
+                    $validateData['name'].'.'.$request->image->getClientOriginalExtension()
+                );
+            }
             $typeShip->update($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
