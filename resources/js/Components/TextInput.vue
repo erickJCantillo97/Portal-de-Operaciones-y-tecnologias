@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, defineProps, defineEmits } from 'vue';
+import { computed, ref } from 'vue';
 import { EyeIcon, EyeSlashIcon, ExclamationCircleIcon } from '@heroicons/vue/24/outline'
 
 const input = ref(null);
@@ -50,7 +50,7 @@ defineEmits(['update:modelValue']);
 
 <template>
     <div>
-        <label for="password" class="block text-sm capitalize font-medium text-gray-900">
+        <label for="password" class="block text-sm font-medium text-gray-900 capitalize">
             {{ label }}
             <sup v-if="showSup" class="text-danger">*</sup>
         </label>

@@ -4,22 +4,8 @@ use App\Models\Labor;
 use Illuminate\Support\Facades\Http;
 
 define('ROUTE_API', 'https://servicioapi.cotecmar.com');
-function getEmpleadosAPI(): mixed
-{
-    try {
-        if (getToken()) {
-            $json = Http::acceptJson()->withToken(session()->get('token'))
-                ->get(
-                    ROUTE_API . '/listado_personal_cargo_costo_da_view'
-                )->json();
 
-            return collect($json);
-        }
-        dd('Sin token');
-    } catch (\Throwable $th) {
-        dd($th);
-    }
-}
+
 
 function getToken(): bool
 {
@@ -105,4 +91,21 @@ function getPersonalGerenciaOficina(string $gerencia = null, string $oficina = n
     }
 
     return $personal;
+}
+
+function getEmpleadosAPI(): mixed
+{
+    try {
+        if (getToken()) {
+            $json = Http::acceptJson()->withToken(session()->get('token'))
+                ->get(
+                    ROUTE_API . '/listado_personal_cargo_costo_da_view'
+                )->json();
+
+            return collect($json);
+        }
+        dd('Sin token');
+    } catch (\Throwable $th) {
+        dd($th);
+    }
 }

@@ -17,7 +17,18 @@ class PersonalController extends Controller
      */
     public function index()
     {
-        $personal = searchEmpleados('JI_Num_SAP', '00000261')->values(); //Se debe cambiar el num Sap por el del usuario logueado
+        $personal = searchEmpleados('JI_Num_SAP', '00000261')->values()->map(function ($person) {
+            return [
+                'Num_SAP' => (int) $person['Num_SAP'],
+                'Fecha_Final' => $person['Fecha_Final'],
+                'Costo_Hora' => $person['Costo_Hora'],
+                'Costo_Mes' => $person['Costo_Mes'],
+                'Oficina' => $person['Oficina'],
+                'Nombres_Apellidos' => $person['Nombres_Apellidos'],
+                'Cargo' => $person['Cargo'],
+                'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
+            ];
+        });; //Se debe cambiar el num Sap por el del usuario logueado
 
         return inertia('Personal/Index', ['personal' => $personal]);
     }
@@ -31,7 +42,7 @@ class PersonalController extends Controller
         try {
             Personal::create($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
     }
 
@@ -47,7 +58,7 @@ class PersonalController extends Controller
         try {
             $personal->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -59,7 +70,7 @@ class PersonalController extends Controller
         try {
             $personal->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 
@@ -100,7 +111,7 @@ class PersonalController extends Controller
             return [
                 'id' => $cargo->id,
                 'name' => $cargo->name,
-                'costo_hora' => '$ '.number_format($cargo->costo_hora, 0),
+                'costo_hora' => '$ ' . number_format($cargo->costo_hora, 0),
             ];
         });
 

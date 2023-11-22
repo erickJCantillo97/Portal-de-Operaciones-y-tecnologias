@@ -41,16 +41,16 @@ const filtered = computed(() =>
         </ComboboxLabel>
         <div class="relative">
             <ComboboxInput
-                class="w-full rounded-md border-0 bg-white placeholder:italic py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                class="w-full rounded-md border-0 bg-white h-10 placeholder:italic py-2 -mt-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 @change="query = $event.target.value" :display-value="(customer) => customer?.name"
                 :placeholder="placeholder" :disabled="!enabled" />
             <ComboboxButton :disabled="!enabled"
-                class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
-                <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                class="absolute inset-y-0 right-0 flex items-center px-2 rounded-r-md focus:outline-none">
+                <ChevronUpDownIcon class="w-5 h-5 text-gray-400" aria-hidden="true" />
             </ComboboxButton>
 
             <ComboboxOptions v-if="filtered.length > 0"
-                class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                class="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                 <ComboboxOption v-for="item in filtered" :key="item.name" :value="item" as="template"
                     v-slot="{ active, selected }">
                     <li
@@ -63,7 +63,7 @@ const filtered = computed(() =>
 
                         <span v-if="selected"
                             :class="['absolute inset-y-0 right-0 flex items-center pr-4', active ? 'text-white' : 'text-indigo-600']">
-                            <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                            <CheckIcon class="w-5 h-5" aria-hidden="true" />
                         </span>
                     </li>
                 </ComboboxOption>

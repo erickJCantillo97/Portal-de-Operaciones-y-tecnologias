@@ -181,7 +181,7 @@ const formatMeters = (value) => {
                         <div class="" title="Agregar Unidad">
                             <Button @click="addItem()" severity="success">
                                 <PlusIcon class="w-5" aria-hidden="true" />
-                                </Button>
+                            </Button>
                         </div>
                     </div>
                 </template>
@@ -196,7 +196,6 @@ const formatMeters = (value) => {
                         </div>
                     </template>
                 </Column>
-                <Column field="customer.name" header="Cliente" class="w-1/12 p-1"></Column>
                 <Column field="type" header="Tipo" class="w-1/12 p-1"></Column>
                 <Column field="quilla" header="Quillas" class="w-1/12 p-1"></Column>
                 <Column field="pantoque" header="Pantoque" class="w-1/12 p-1"></Column>
@@ -216,18 +215,18 @@ const formatMeters = (value) => {
                 <Column header="Acciones" class="space-x-1 w-1/12 p-1 flex ">
                     <template #body="slotProps">
                         <!--BOTÓN EDITAR-->
-                            <div title="Editar Unidad">
-                                <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
-                                    <PencilIcon class="w-4 h-4 " aria-hidden="true" />
-                                </Button>
-                            </div>
-                            <!--BOTÓN ELIMINAR-->
-                            <div title="Eliminar Unidad">
-                                <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Buque', 'ships')"
-                                    class="hover:bg-danger">
-                                    <TrashIcon class="w-4 h-4 " aria-hidden="true" />
-                                </Button>
-                            </div>
+                        <div title="Editar Unidad">
+                            <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
+                                <PencilIcon class="w-4 h-4 " aria-hidden="true" />
+                            </Button>
+                        </div>
+                        <!--BOTÓN ELIMINAR-->
+                        <div title="Eliminar Unidad">
+                            <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Buque', 'ships')"
+                                class="hover:bg-danger">
+                                <TrashIcon class="w-4 h-4 " aria-hidden="true" />
+                            </Button>
+                        </div>
                     </template>
                 </Column>
             </DataTable>
@@ -247,14 +246,14 @@ const formatMeters = (value) => {
                             leave-from="opacity-100 translate-y-0 sm:scale-100"
                             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                             <DialogPanel :class="props.heigthDialog"
-                                class="relative px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg ">
+                                class="relative px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-4xl">
                                 <div>
                                     <div class="px-2 mt-2 text-center">
                                         <DialogTitle as="h3" class="text-xl font-semibold text-primary ">
                                             {{ formData.id != 0 ? 'Editar ' : 'Crear' }}
                                             Unidad {{ customer != null ? ' para ' + customer.name : '' }}
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
-                                        <div class="p-2 mt-2 space-y-2  rounded-lg">
+                                        <div class="p-2 mt-2 space-y-2 grid grid-cols-2 gap-2 rounded-lg">
                                             <Combobox v-if="customers" class="mt-2 text-left" label="Cliente"
                                                 placeholder="Seleccione Cliente" :options="customers"
                                                 v-model="customerSelect">
@@ -294,9 +293,7 @@ const formatMeters = (value) => {
                                                 invalidFileTypeMessage="Archivo Inválido: solo se permite imagen."
                                                 invalidFileSizeMessage="Este archivo supera el tamaño permitido: "
                                                 @input="formData.image = $event.target.files[0]">
-                                                <template #empty>
-                                                    <p>Arrastre aquí una imagen del buque</p>
-                                                </template>
+
                                             </FileUpload>
                                         </div>
                                     </div>
