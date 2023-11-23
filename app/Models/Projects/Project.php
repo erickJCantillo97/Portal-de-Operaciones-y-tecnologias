@@ -20,8 +20,8 @@ class Project extends Model implements Auditable
         return $this->belongsTo(Contract::class);
     }
 
-    public function ship()
+    public function projectShip()
     {
-        return $this->belongsTo(Ship::class);
+        return $this->hasMany(ProjectShip::class);
     }
 }
