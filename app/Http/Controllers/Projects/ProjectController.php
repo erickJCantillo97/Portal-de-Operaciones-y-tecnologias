@@ -47,7 +47,7 @@ class ProjectController extends Controller
     {
         // dd($request);
         $validateData = $request->validate([
-            'name' => 'required',
+            'name' => 'required|unique:projects,name',
             'contract_id' => 'nullable',
             'authorization_id' => 'nullable',
             'quote_id' => 'nullable',
@@ -56,7 +56,7 @@ class ProjectController extends Controller
             'status' => 'nullable',
             'scope' => 'nullable',
             'supervisor' => 'nullable',
-            'cost_sale' => 'nullable',
+            'cost_sale' => 'nullable|numeric|gt:0',
             'description' => 'nullable',
             'start_date' => 'nullable',
             'end_date' => 'nullable',

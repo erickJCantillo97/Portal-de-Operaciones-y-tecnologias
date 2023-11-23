@@ -52,6 +52,7 @@
         "vue-echarts": "^6.6.1",
         "vue-google-charts": "^1.1.0",
         "vue-height-collapsible": "^0.1.1",
-        "vue3-apexcharts": "^1.4.4"
+        "vue3-apexcharts": "^1.4.4",
+        "vue3-form-wizard": "^0.2.1"
     }
 }
