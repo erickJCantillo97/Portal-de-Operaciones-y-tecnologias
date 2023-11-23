@@ -39,30 +39,33 @@ const customerSelect = ref()
 const shipSelect = ref()
 
 const props = defineProps({
-    'projects': Array,
+    'project': Object,
     'contracts': Array,
     'authorizations': Array,
     'quotes': Array,
     'ships': Array,
-    'customers': Array
 })
 
 //#region UseForm
 const formData = useForm({
-    id: props.projects?.id ?? '0',
-    contract_id: props.projects?.contract_id ?? '0',
-    authorization_id: props.projects?.authorization_id ?? '0',
-    quote_id: props.projects?.quote_id ?? '0',
-    ship_id: props.projects?.ship_id ?? '0',
-    customer_id: props.projects?.customer_id ?? '0',
-    intern_communications: props.projects?.intern_communications ?? '0',
-    name: props.projects?.name ?? '',
-    start_date: props.projects?.start_date ?? '',
-    end_date: props.projects?.end_date ?? '',
-    hoursPerDay: props.projects?.hoursPerDay ?? '8.5',
-    daysPerWeek: props.projects?.daysPerWeek ?? '5',
-    daysPerMonth: props.projects?.daysPerMonth ?? '20',
-    pdf: null
+    id: props.project?.id ?? '0',
+    name: props.project?.name ?? '',
+    contract_id: props.project?.contract_id ?? '0',
+    authorization_id: props.project?.authorization_id ?? '0',
+    quote_id: props.project?.quote_id ?? '0',
+    type: props.project?.type ?? '0',
+    SAP_code: props.project?.SAP_code ?? '0',
+    status: props.project?.status ?? '0',
+    scope: props.project?.scope ?? '0',
+    supervisor: props.project?.supervisor ?? '0',
+    cost_sale: props.project?.cost_sale ?? '0',
+    description: props.project?.description ?? '0',
+    start_date: props.project?.start_date ?? '',
+    end_date: props.project?.end_date ?? '',
+    hoursPerDay: props.project?.hoursPerDay ?? '8.5',
+    daysPerWeek: props.project?.daysPerWeek ?? '5',
+    daysPerMonth: props.project?.daysPerMonth ?? '20',
+    shift: props.project != null ? props.project.shift : '0'
 });
 //#endregion
 
@@ -153,19 +156,6 @@ const submit = () => {
 //         loading.value = false;
 //     }
 // })
-
-const editItem = (project) => {
-    formData.id = project.id;
-    formData.name = project.name;
-    formData.gerencia = project.gerencia;
-    formData.start_date = project.start_date;
-    formData.end_date = project.end_date;
-    formData.hoursPerDay = project.hoursPerDay;
-    formData.daysPerWeek = project.daysPerWeek;
-    formData.daysPerMonth = project.daysPerMonth;
-    formData.pdf = project.pdf
-    open.value = true;
-};
 
 const loadContractDates = () => {
 
@@ -365,7 +355,6 @@ const exportarExcel = () => {
                             <Combobox class="text-left" label="Cliente" placeholder="Seleccione Cliente"
                                 :options="customers" v-model="customerSelect">
                             </Combobox>
-
                         </div>
 
                         <!--CAMPO FECHA INICIO-->
@@ -378,11 +367,6 @@ const exportarExcel = () => {
                         <TextInput class="p-1 pb-1 text-left" type="date" label="Fecha de Finalización"
                             v-model="formData.end_date" :error="$page.props.errors.end_date" :disabled="!contractSelect">
                         </TextInput>
-
-                        <!--ADJUNTAR ARCHIVO PDF-->
-                        <!-- <FileUpload chooseLabel="Adjuntar PDF" mode="basic" name="demo[]" :multiple="false" accept=".pdf"
-                            :maxFileSize="1000000" @input="formData.pdf = $event.target.files[0]">
-                        </FileUpload> -->
                     </div>
                 </div>
 

@@ -15,6 +15,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         return $sum;
     });
     Route::get('personal', [PersonalController::class, 'index'])->name('personal.index');
+    Route::post('personal', [PersonalController::class, 'store'])->name('personal.store');
     Route::get('personalActivos', [PersonalController::class, 'getPersonalActivo'])->name('personal.activos');
     Route::get('updateCargo', function () {
         updateCargos();

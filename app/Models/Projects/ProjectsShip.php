@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
-class Project extends Model implements Auditable
+class ProjectsShip extends Model implements Auditable
 {
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
@@ -15,13 +15,18 @@ class Project extends Model implements Auditable
 
     protected $guarded = [];
 
-    public function contract()
+    public function project()
     {
-        return $this->belongsTo(Contract::class);
+        return $this->belongsTo(Project::class());
     }
 
-    public function projectShip()
+    public function customer()
     {
-        return $this->hasMany(ProjectShip::class);
+        return $this->belongsTo(Customer::class());
+    }
+
+    public function ship()
+    {
+        return $this->belongsTo(Ship::class());
     }
 }

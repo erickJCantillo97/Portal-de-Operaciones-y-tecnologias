@@ -5,39 +5,52 @@ import { router, useForm } from '@inertiajs/vue3';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import Dropdown from 'primevue/dropdown';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline';
+import { MagnifyingGlassIcon, TrashIcon, } from '@heroicons/vue/24/outline';
 import { useSweetalert } from '@/composable/sweetAlert';
-import { useConfirm } from "primevue/useconfirm";
-import axios from 'axios';
-import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
 import UserTable from '@/Components/UserTable.vue';
-
-
+import Calendar from 'primevue/calendar';
+import MultiSelect from 'primevue/multiselect';
+import CustomModal from '@/Components/CustomModal.vue';
+const { toast } = useSweetalert()
 
 const props = defineProps({
-    personal: Array
+    personal: Array,
+    miPersonal: Array,
 })
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 
-const open = ref(false)
+var form = useForm({
+    users: [],
+    fecha_devolucion: null
+});
 
-const addItem = () => {
-    open.value = true;
+const submit = () => {
+    router.post(route('personal.store'), form, {
+        onSuccess: () => {
+            modalVisible.value = false
+            toast('personal añadido exitosamente', 'success')
+        }
+    });
 }
+
+
 const formatCurrency = (value) => {
     return parseFloat(value).toLocaleString('es-CO', {
         style: 'currency',
         currency: 'COP',
     });
 };
+
+
+const modalVisible = ref(false)
+const showNew = () => {
+    modalVisible.value = true
+}
 
 function formatDate(date) {
     // Extraer año, mes y día
@@ -47,6 +60,9 @@ function formatDate(date) {
 
     // Formato de salida: dd/mm/aaaa
     return dia === '00' ? 'Indefinido' : `${dia}/${mes}/${anho}`;
+}
+const quitar = (persona) => {
+    form.users = form.users.filter(object => object.Num_SAP !== persona.Num_SAP);
 }
 
 </script>
@@ -62,14 +78,13 @@ function formatDate(date) {
                 </div>
 
                 <div title="Agregar Cliente" class="">
-                    <Button @click="addItem()" severity="success">
-                        <PlusIcon class="w-6 h-6" aria-hidden="true" />
-                        Agregar
+                    <Button severity="primary" type="button" @click="showNew()">
+                        <i class="fa-solid fa-plus" />
                     </Button>
                 </div>
             </div>
             <!--DATATABLE-->
-            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="personal" v-model:filters="filters"
+            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="miPersonal" v-model:filters="filters"
                 dataKey="id" filterDisplay="menu" :globalFilterFields="['Nombres_Apellidos', 'name', 'type', 'email']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
@@ -80,7 +95,7 @@ function formatDate(date) {
                         <div class="flex space-x-4">
                             <div class="w-8" title="Filtrar Clientes">
                                 <Button @click="clearFilter()" type="button" severity="primary" class="hover:bg-primary ">
-                                    <i class="pi pi-filter-slash" style="color: 'var(--primary-color);'"></i>
+                                    <i class="pi pi-filter-slash"></i>
                                 </Button>
                             </div>
 
@@ -99,7 +114,7 @@ function formatDate(date) {
                 <!--COLUMNAS-->
                 <Column field="Nombres_Apellidos" header="Nombre">
                     <template #body="slotProps">
-                        <UserTable :user="slotProps.data"></UserTable>
+                        <UserTable :user="slotProps.data" :photo="true"></UserTable>
                     </template>
                 </Column>
                 <Column field="Fecha_Final" header="Fin Contrato">
@@ -125,7 +140,7 @@ function formatDate(date) {
                         <div
                             class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
                             <!--BOTÓN ELIMINAR-->
-                            <div title="Eliminar de mi Personal">
+                            <div title="Eliminar de mi Personal" v-if="slotProps.data.canDelete">
                                 <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Cliente?', 'customers')"
                                     class="hover:bg-danger">
                                     <TrashIcon class="w-4 h-4 " aria-hidden="true" />
@@ -137,46 +152,71 @@ function formatDate(date) {
             </DataTable>
         </div>
 
-        <TransitionRoot as="template" :show="open">
-            <Dialog as="div" class="relative z-30" @close="open = false">
-                <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
-                    leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-                    <div class="fixed inset-0 z-30 w-screen h-screen transition-opacity bg-gray-500 bg-opacity-75" />
-                </TransitionChild>
+        <CustomModal :visible="modalVisible">
+            <template #icon>
+                <i class="text-white fa-solid fa-ship"></i>
+            </template>
+            <template #titulo>
+                <span class="text-xl font-bold text-white white-space-nowrap">Añadir Personal</span>
+            </template>
+            <template #body>
+                <div class="flex py-6 space-x-4">
+                    <div class="w-1/2 space-y-8">
+                        <div class="p-fluid border-0 p-2 ">
+                            <label for="">Seleccionar Personal</label>
+                            <MultiSelect v-model="form.users"
+                                :filterFields="['Nombres_Apellidos', 'Cargo', 'Identificacion', 'Oficina']" :filter="true"
+                                :options="props.personal" optionLabel="Nombres_Apellidos" placeholder="Seleccionar Personas"
+                                display="chip" class="multiselect-custom w-full rounded-md md:w-14rem" :pt="{
+                                    root: {
+                                        class: 'h-10 !ring-gray-300 !ring-inset ring-1 !border-0 !shadow-sm '
+                                    },
+                                    input: {
+                                        class: '!text-sm pt-3 pl-2'
+                                    },
+                                    item: {
+                                        class: '!text-sm'
+                                    }
+                                }">
+                                <template #option="slotProps">
+                                    <UserTable :user="slotProps.option"></UserTable>
 
-                <div class="fixed inset-0 z-50 h-screen overflow-y-auto">
-                    <div class="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
-                        <TransitionChild as="template" enter="ease-out duration-300"
-                            enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                            enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
-                            leave-from="opacity-100 translate-y-0 sm:scale-100"
-                            leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                            <DialogPanel
-                                class="relative px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg ">
+                                </template>
+                            </MultiSelect>
+                        </div>
+                        <div class="p-fluid border-0 ">
+                            <label for="">Fecha de devolución</label>
+                            <Calendar inputId="icon" v-model="form.fecha_devolucion" :min-date="new Date()"
+                                dateFormat="dd/mm/yy" :showIcon="true" />
+                        </div>
+                    </div>
+                    <div class="w-1/2 h-72 custom-scroll overflow-y-auto shadow-lg rounded-lg p-2">
+                        <h3 class="text-center font-bold text-lg">Personal Seleccionado</h3>
+                        <div class="block space-y-4">
+                            <div v-for="persona of form.users" class="flex justify-between">
+                                <UserTable :user="persona" :photo="true">
+                                </UserTable>
                                 <div>
-                                    <div class="px-2 mt-2 text-center">
-                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">
-                                            Añadir Personal
-                                        </DialogTitle> <!--Se puede usar {{ tittle }}-->
-                                        <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
-
-
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex px-2 mt-2 space-x-4">
-                                    <Button class="hover:bg-danger text-danger border-danger" severity="danger"
-                                        @click="open = false">Cancelar</Button>
-                                    <Button severity="success" :loading="false"
-                                        class="text-success hover:bg-success border-success" @click="submit()">
-                                        Agregar
+                                    <Button severity="danger" @click="quitar(persona)" class="hover:bg-danger">
+                                        <i class="fa-regular fa-circle-xmark"></i>
                                     </Button>
                                 </div>
-                            </DialogPanel>
-                        </TransitionChild>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
-            </Dialog>
-        </TransitionRoot>
+            </template>
+            <template #footer>
+                <Button severity="success" @click="submit()">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <p>Guardar</p>
+                </Button>
+                <Button severity="danger" @click="modalVisible = false" class="hover:bg-danger">
+                    <i class="fa-regular fa-circle-xmark"></i>
+                    <p>Cancelar</p>
+                </Button>
+            </template>
+        </CustomModal>
     </AppLayout>
 </template>
