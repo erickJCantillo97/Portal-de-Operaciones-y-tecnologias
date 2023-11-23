@@ -21,7 +21,7 @@ class ShipController extends Controller
 
         if (isset($request->id)) {
 
-            $ships = Ship::with('customer')->where('customer_id', $request->id)->get();
+            $ships = Ship::with('customer', 'typeShip')->where('customer_id', $request->id)->get();
 
             // dd($ships);
             return Inertia::render(
@@ -33,7 +33,7 @@ class ShipController extends Controller
                 ]
             );
         } else {
-            $ships = Ship::with('customer')->orderBy('name')->get();
+            $ships = Ship::with('customer', 'typeShip')->orderBy('name')->get();
             $customers = Customer::orderBy('name')->get();
             $typeShips = TypeShip::get();
             return Inertia::render('Project/Ships', compact('ships', 'customers', 'typeShips'));
@@ -53,7 +53,6 @@ class ShipController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request);
         $validateData = $request->validate([
             'customer_id' => 'nullable',
             'name' => 'required',
@@ -101,6 +100,7 @@ class ShipController extends Controller
      */
     public function update(Request $request, Ship $ship)
     {
+        // dd($request);
         $validateData = $request->validate([
             'customer_id' => 'nullable',
             'name' => 'required',

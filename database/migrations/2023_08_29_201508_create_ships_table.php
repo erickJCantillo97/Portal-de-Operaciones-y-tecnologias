@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('quilla')->nullable();
             $table->string('pantoque')->nullable();
             $table->double('eslora')->nullable();
+            $table->string('acronyms')->nullable();
             $table->string('file')->nullable();
             $table->timestamps();
             $table->softDeletes();
