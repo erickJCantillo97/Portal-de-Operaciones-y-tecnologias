@@ -104,11 +104,11 @@ class ShipController extends Controller
         $validateData = $request->validate([
             'customer_id' => 'nullable',
             'name' => 'required',
-            'type' => 'nullable',
+            'type_ship_id' => 'nullable',
             'quilla' => 'nullable|numeric|gt:0',
             'pantoque' => 'nullable|numeric|gt:0',
-            'eslora' => 'nullable|numeric|gt:0',
-            'details' => 'nullable',
+            'acronyms'=>'nullable',
+            'idHull'=>'nullable',
         ]);
         // dd($validateData);
 

@@ -199,21 +199,18 @@ const formatMeters = (value) => {
                         </div>
                     </template>
                 </Column>
+                <Column field="idHull" header="N° Casco" class="w-1/12 p-1"></Column>
                 <Column field="type" header="Tipo" class="w-1/12 p-1"></Column>
                 <Column field="quilla" header="Quillas" class="w-1/12 p-1"></Column>
                 <Column field="pantoque" header="Pantoque" class="w-1/12 p-1"></Column>
-                <Column field="eslora" header="Eslora" class="w-1/12 p-1">
-                    <template #body="slotProps">
-                        {{ formatMeters(slotProps.data.eslora) }}
-                    </template>
-                </Column>
+                <Column field="acronyms" header="Siglas" class="w-1/12 p-1"></Column>
+
                 <Column header="Cliente" class="w-1/12 p-1">
                     <template #body="slotProps">
                         <p v-if=slotProps.data.customer>{{ slotProps.data.customer.name }}</p>
                         <p v-else> Sin asignar cliente</p>
                     </template>
                 </Column>
-                <Column field="details" header="Detalles" class="w-1/6 p-1"></Column>
                 <!--ACCIONES-->
                 <Column header="Acciones" class="flex w-1/12 p-1 space-x-1 ">
                     <template #body="slotProps">
