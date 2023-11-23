@@ -5,40 +5,43 @@ import { router, useForm } from '@inertiajs/vue3';
 import '../../../sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import Combobox from '@/Components/Combobox.vue';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline';
+import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, DocumentDuplicateIcon } from '@heroicons/vue/24/outline';
 import { useSweetalert } from '@/composable/sweetAlert';
 import TextInput from '../../Components/TextInput.vue';
 import Button from '../../Components/Button.vue';
 import FileUpload from 'primevue/fileupload';
+import CustomModal from '@/Components/CustomModal.vue';
+import Dropdown from 'primevue/dropdown';
 
+const modalType = ref('Nueva unidad')
 const customerSelect = ref();
+const typeSelect = ref();
 const { toast } = useSweetalert();
 const loading = ref(false);
 const { confirmDelete } = useSweetalert();
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
-const open = ref(false)
+const modalVisible = ref(false)
 
 const props = defineProps({
     ships: Array,
+    typeShips: Object,
     customers: Array,
     customer: Object
 })
 
 //#region UseForm
 const formData = useForm({
-    id: '0',
-    customer_id: '0',
-    name: '',
-    type: '',
-    quilla: '',
-    pantoque: '',
-    eslora: '',
-    details: '',
+    id: null,
+    name: null,
+    idHull: null,
+    customer_id: null,
+    type_ship_id: null,
+    quilla: null,
+    pantoque: null,
+    acronyms: null,
     image: null
 });
 //#endregion
@@ -56,15 +59,16 @@ const submit = () => {
     } else if (customerSelect.value != null) {
         formData.customer_id = customerSelect.value.id;
     }
-
-    if (formData.id == 0) {
+    formData.type_ship_id = typeSelect.value ? typeSelect.value.id : null
+    if (formData.id == null) {
         router.post(route('ships.store'), formData, {
             preserveScroll: true,
             onSuccess: (res) => {
-                open.value = false;
+                modalVisible.value = false;
                 toast(' Buque creado exitosamente', 'success');
             },
             onError: (errors) => {
+                console.table(errors);
                 toast('Por favor diligencie todos los campos.', 'error');
             },
             onFinish: visit => {
@@ -76,7 +80,7 @@ const submit = () => {
     router.post(route('ships.update', formData.id), formData, {
         preserveScroll: true,
         onSuccess: (res) => {
-            open.value = false;
+            modalVisible.value = false;
             toast('¡Buque actualizado exitosamente!', 'success');
         },
         onError: (errors) => {
@@ -93,22 +97,40 @@ const submit = () => {
 const addItem = () => {
     formData.reset();
     clearErrors();
-    open.value = true;
+    modalType.value = "Nueva unidad"
+    modalVisible.value = true;
 }
 
 const editItem = (ship) => {
     clearErrors();
-
+    modalType.value = "Editar unidad"
+    typeSelect.value = ship.type_ship
     formData.id = ship.id;
-    formData.customer_id = ship.customer_id;
     formData.name = ship.name;
-    formData.type = ship.type;
+    formData.idHull = ship.idHull;
+    formData.customer_id = ship.customer_id;
+    formData.type_ship_id = ship.type_ship_id;
     formData.quilla = ship.quilla;
     formData.pantoque = ship.pantoque;
-    formData.eslora = ship.eslora;
-    formData.details = ship.details;
+    formData.acronyms = ship.acronyms;
     formData.image = ship.image;
-    open.value = true;
+    modalVisible.value = true;
+};
+
+const cloneItem = (ship) => {
+    clearErrors();
+    modalType.value = "Clonar unidad"
+    typeSelect.value = ship.type_ship
+    formData.id = null;
+    formData.name = ship.name;
+    formData.idHull = null;
+    formData.customer_id = ship.customer_id;
+    formData.type_ship_id = ship.type_ship_id;
+    formData.quilla = ship.quilla;
+    formData.pantoque = ship.pantoque;
+    formData.acronyms = ship.acronyms;
+    formData.image = ship.image;
+    modalVisible.value = true;
 };
 
 
@@ -146,7 +168,7 @@ const formatMeters = (value) => {
 
 <template>
     <AppLayout>
-        <div class="h-full custom-scroll overflow-y-auto">
+        <div class="h-full overflow-y-auto custom-scroll">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 text-primary">
@@ -187,41 +209,46 @@ const formatMeters = (value) => {
                 </template>
 
                 <!--COLUMNAS-->
-                <Column field="name" header="Nombre" class="w-3/12 p-1">
+                <Column field="name" header="Nombre" class="p-1">
                     <template #body="slotProps">
-                        <div class="flex space-x-2 items-center">
+                        <div class="flex items-center space-x-2">
                             <img :src="slotProps.data.file" onerror="this.src='/images/generic-boat.png'" alt="Image"
                                 class="h-0 mr-1 rounded-lg sm:h-12 sm:w-16" />
-                            <p>{{ slotProps.data.name }} </p>
+                            <div>
+                                <p class="font-bold">{{ slotProps.data.name }} </p>
+                                <p class="text-xs italic">{{ slotProps.data.type_ship.name }} </p>
+                            </div>
+
                         </div>
                     </template>
                 </Column>
-                <Column field="type" header="Tipo" class="w-1/12 p-1"></Column>
-                <Column field="quilla" header="Quillas" class="w-1/12 p-1"></Column>
-                <Column field="pantoque" header="Pantoque" class="w-1/12 p-1"></Column>
-                <Column field="eslora" header="Eslora" class="w-1/12 p-1">
-                    <template #body="slotProps">
-                        {{ formatMeters(slotProps.data.eslora) }}
-                    </template>
-                </Column>
-                <Column header="Cliente" class="w-1/12 p-1">
+                <Column field="idHull" header="N° Casco" class=""></Column>
+                <Column field="quilla" header="Quillas" class=""></Column>
+                <Column field="pantoque" header="Pantoque" class=""></Column>
+                <Column field="acronyms" header="Siglas" class=""></Column>
+
+                <Column header="Cliente" class="">
                     <template #body="slotProps">
                         <p v-if=slotProps.data.customer>{{ slotProps.data.customer.name }}</p>
                         <p v-else> Sin asignar cliente</p>
                     </template>
                 </Column>
-                <Column field="details" header="Detalles" class="w-1/6 p-1"></Column>
                 <!--ACCIONES-->
-                <Column header="Acciones" class="space-x-1 w-1/12 p-1 flex ">
+                <Column header="Acciones" class="flex justify-center space-x-1 ">
                     <template #body="slotProps">
                         <!--BOTÓN EDITAR-->
-                        <div title="Editar Unidad">
+                        <div title="Editar Unidad" class="py-1">
                             <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
                                 <PencilIcon class="w-4 h-4 " aria-hidden="true" />
                             </Button>
                         </div>
+                        <div title="Clonar Unidad" class="py-1">
+                            <Button severity="primary" @click="cloneItem(slotProps.data)" class="hover:bg-primary">
+                                <DocumentDuplicateIcon class="w-4 h-4 " aria-hidden="true" />
+                            </Button>
+                        </div>
                         <!--BOTÓN ELIMINAR-->
-                        <div title="Eliminar Unidad">
+                        <div title="Eliminar Unidad" class="py-1">
                             <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Buque', 'ships')"
                                 class="hover:bg-danger">
                                 <TrashIcon class="w-4 h-4 " aria-hidden="true" />
@@ -231,86 +258,106 @@ const formatMeters = (value) => {
                 </Column>
             </DataTable>
         </div>
-        <!--MODAL DE FORMULARIO-->
-        <TransitionRoot as="template" :show="open">
-            <Dialog as="div" class="relative z-30" @close="open = false">
-                <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
-                    leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-                    <div class="fixed inset-0 z-30 w-screen h-screen transition-opacity bg-gray-500 bg-opacity-75" />
-                </TransitionChild>
-                <div class="fixed inset-0 z-50 h-screen overflow-y-auto">
-                    <div class="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
-                        <TransitionChild as="template" enter="ease-out duration-300"
-                            enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                            enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
-                            leave-from="opacity-100 translate-y-0 sm:scale-100"
-                            leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                            <DialogPanel :class="props.heigthDialog"
-                                class="relative px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-4xl">
-                                <div>
-                                    <div class="px-2 mt-2 text-center">
-                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">
-                                            {{ formData.id != 0 ? 'Editar ' : 'Crear' }}
-                                            Unidad {{ customer != null ? ' para ' + customer.name : '' }}
-                                        </DialogTitle> <!--Se puede usar {{ tittle }}-->
-                                        <div class="p-2 mt-2 space-y-2 grid grid-cols-2 gap-2 rounded-lg">
-                                            <Combobox v-if="customers" class="mt-2 text-left" label="Cliente"
-                                                placeholder="Seleccione Cliente" :options="customers"
-                                                v-model="customerSelect">
-                                            </Combobox>
 
-                                            <TextInput class="mt-2 text-left" label="Nombre del Buque"
-                                                :placeholder="'Nombre del Buque'" v-model="formData.name"
-                                                :error="router.page.props.errors.name"></TextInput>
-
-                                            <TextInput class="mt-2 text-left" label="Tipo de Buque"
-                                                :placeholder="'Escriba el Tipo de Buque'" v-model="formData.type"
-                                                :error="router.page.props.errors.type"></TextInput>
-
-                                            <TextInput class="mt-2 text-left" label="Carros Quillas" type="number"
-                                                :placeholder="'Números de carros de Quillas necesarios'"
-                                                v-model="formData.quilla" :error="router.page.props.errors.quilla">
-                                            </TextInput>
-
-                                            <TextInput class="mt-2 text-left" label="Carros de Pantoques" type="number"
-                                                :placeholder="'Números carros de Pantoques necesarios'"
-                                                v-model="formData.pantoque" :error="router.page.props.errors.pantoque">
-                                            </TextInput>
-
-                                            <TextInput class="mt-2 text-left" label="Longitud de Eslora" type="number"
-                                                :placeholder="'Longitud de Eslora'" v-model="formData.eslora"
-                                                :error="router.page.props.errors.eslora">
-                                            </TextInput>
-
-                                            <TextInput class="mt-2 text-left" label="Detalles"
-                                                :placeholder="'Escriba los detalles del Buque'" v-model="formData.details"
-                                                :error="router.page.props.errors.details"></TextInput>
-
-                                            <!--maxFileSize = 10MB, la expresión viene dada en Bytes-->
-                                            <FileUpload chooseLabel="Adjuntar foto" cancelLabel="Cancelar"
-                                                :show-upload-button=false name="demo[]" :multiple="false" :fileLimit=1
-                                                :show-cancel-button=false accept="image/*" :maxFileSize="10000000"
-                                                invalidFileTypeMessage="Archivo Inválido: solo se permite imagen."
-                                                invalidFileSizeMessage="Este archivo supera el tamaño permitido: "
-                                                @input="formData.image = $event.target.files[0]">
-
-                                            </FileUpload>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex px-2 mt-2 space-x-4">
-                                    <Button class="hover:bg-danger text-danger border-danger" severity="danger"
-                                        @click="open = false">Cancelar</Button>
-                                    <Button severity="success" :loading="false"
-                                        class="text-success hover:bg-success border-success" @click="submit()">
-                                        {{ formData.id != 0 ? 'Actualizar ' : 'Guardar' }}
-                                    </Button>
-                                </div>
-                            </DialogPanel>
-                        </TransitionChild>
-                    </div>
-                </div>
-            </Dialog>
-        </TransitionRoot>
     </AppLayout>
+
+    <CustomModal :visible="modalVisible">
+        <template #icon>
+            <i class="text-white fa-solid fa-ship"></i>
+        </template>
+        <template #titulo>
+            <span class="text-xl font-bold text-white white-space-nowrap">
+                {{ modalType }}</span>
+        </template>
+        <template #body>
+            <div class="grid grid-cols-4 gap-2 px-1 pt-4">
+                <TextInput label="Numero del casco" type="text" :placeholder="'Numero del casco'" v-model="formData.idHull"
+                    :error="router.page.props.errors.idHull"></TextInput>
+
+                <TextInput label="Nombre del Buque" type="text" :placeholder="'Nombre del Buque'" v-model="formData.name"
+                    :error="router.page.props.errors.name"></TextInput>
+
+                <div>
+                    <label class="block mb-1 text-sm font-medium text-gray-900 capitalize" for="customer">
+                        Cliente</label>
+                    <Dropdown id="customer" filter v-model="customerSelect" :options="customers" v-if="customers"
+                        @change="formData.customer_id = $event.value.id" optionLabel="name" placeholder="Seleccione Cliente"
+                        class="w-full rounded-md md:w-14rem" :pt="{
+                            root: {
+                                class: 'h-10 !ring-gray-300 !ring-inset ring-1 !border-0 !shadow-sm '
+                            },
+                            input: {
+                                class: '!text-sm pt-3 pl-2'
+                            },
+                            header: {
+                                class: '!p-2'
+                            },
+                            filterInput: {
+                                class: '!p-1'
+                            },
+                            item: {
+                                class: '!text-sm'
+                            },
+                            emptyMessage: {
+                                class: '!text-sm'
+                            }
+                        }" />
+                </div>
+
+                <div>
+                    <label class="block mb-1 text-sm font-medium text-gray-900 capitalize" for="hull_material">
+                        Clase de buque</label>
+                    <Dropdown id="hull_material" filter v-model="typeSelect" clearIcon :options="typeShips" v-if="customers"
+                        optionLabel="name" placeholder="Seleccione tipo" class="w-full rounded-md md:w-14rem" :pt="{
+                            root: {
+                                class: 'h-10 !ring-gray-300 !ring-inset ring-1 !border-0 !shadow-sm '
+                            },
+                            input: {
+                                class: '!text-sm pt-3 pl-2'
+                            },
+                            header: {
+                                class: '!p-2'
+                            },
+                            filterInput: {
+                                class: '!p-1'
+                            },
+                            item: {
+                                class: '!text-sm'
+                            },
+                            emptyMessage: {
+                                class: '!text-sm'
+                            }
+                        }" />
+                </div>
+
+                <TextInput label="Siglas" type="text" :placeholder="'Digite las siglas'" v-model="formData.acronyms"
+                    :error="router.page.props.errors.acronyms">
+                </TextInput>
+
+                <TextInput label="Carros Quillas" type="number" :placeholder="'Números de carros de Quillas necesarios'"
+                    v-model="formData.quilla" :error="router.page.props.errors.quilla">
+                </TextInput>
+
+                <TextInput label="Carros de Pantoques" type="number" :placeholder="'Números carros de Pantoques necesarios'"
+                    v-model="formData.pantoque" :error="router.page.props.errors.pantoque">
+                </TextInput>
+                <div class="flex items-end">
+                    <FileUpload mode="basic" chooseLabel="Adjuntar foto" :show-upload-button=false name="demo[]"
+                        :multiple="false" :show-cancel-button=false accept="image/*" :maxFileSize="10000000"
+                        invalidFileTypeMessage="Archivo Inválido: solo se permite imagen."
+                        invalidFileSizeMessage="Este archivo supera el tamaño permitido: "
+                        @input="formData.image = $event.target.files[0]">
+                    </FileUpload>
+                </div>
+            </div>
+        </template>
+        <template #footer>
+            <Button severity="success" :loading="loading" class="text-success hover:bg-success border-success"
+                @click="submit()">
+                {{ formData.id != null ? 'Actualizar ' : 'Guardar' }}
+            </Button>
+            <Button class="hover:bg-danger text-danger border-danger" severity="danger"
+                @click="modalVisible = false">Cancelar</Button>
+        </template>
+    </CustomModal>
 </template>

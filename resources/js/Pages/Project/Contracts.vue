@@ -8,13 +8,13 @@ import Column from 'primevue/column'
 import { FilterMatchMode, FilterOperator } from 'primevue/api'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline'
-import { useSweetalert } from '@/composable/sweetAlert'
 import { webNotifications } from '@/composable/webNotifications'
 import TextInput from '../../Components/TextInput.vue'
 import Button from '../../Components/Button.vue'
 import Combobox from '@/Components/Combobox.vue'
 import ComboboxPersonalData from '@/Components/ComboboxPersonalData.vue'
 import FileUpload from 'primevue/fileupload'
+import { useSweetalert } from '@/composable/sweetAlert'
 const { toast } = useSweetalert()
 const loading = ref(false)
 const { confirmDelete } = useSweetalert()
@@ -81,28 +81,7 @@ const formData = useForm({
 
 onMounted(() => {
     getManagers()
-    // window.Echo.private("contracts").listen(".ContractsEvent", (e) => {
-    //     // Push.Permission.get()
-    //     const customerName = customerSelect.value
-    //         ? customerSelect.value.name
-    //         : "Cliente no seleccionado"
-    //     const managerName = managerSelect.value
-    //         ? managerSelect.value.name
-    //         : "Buque no seleccionado"
-    //     Push.create(e.message, {
-    //         body: `Cliente: ${customerName},
-    //                 \nBuque: ${managerName},
-    //                 \nCosto: ${formatCurrency(formData.cost)}`,
-    //         icon: "/images/cotecmar-logo-bg-white.png",
-    //         requireInteraction: true,
-    //         // timeout: 5000,
-    //         onClick: function () {
-    //             window.open("https://www.cotecmar.com/", "_blank")
-    //             this.close()
-    //         },
-    //     })
-    // })
-    // contractNotification(customerSelect, managerSelect, formData.cost)
+    
     initFilters()
 })
 
