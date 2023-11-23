@@ -23,8 +23,7 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::all('contract')->orderBy('name')->get();
-
+        $projects = Project::with('contract', 'ship', 'customer')->orderBy('name')->get();
         return Inertia::render('Project/Projects', compact('projects'));
     }
 
@@ -36,7 +35,7 @@ class ProjectController extends Controller
         $contracts = Contract::orderBy('contract_id')->get();
         $authorizations = Authorization::orderBy('contract_id')->get();
         $quotes = Quote::orderBy('ship_id')->get();
-        $ships = Ship::doesnthave('projectShip')->get();
+        $ships = Ship::doesnthave('projectsShip')->get();
 
         return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes', 'ships'));
     }
