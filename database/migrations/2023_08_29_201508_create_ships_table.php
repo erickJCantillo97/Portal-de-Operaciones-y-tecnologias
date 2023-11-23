@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('ships', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('customer_id')->index();
+            $table->unsignedBigInteger('customer_id')->index()->nullable();
+            $table->unsignedBigInteger('type_ship_id')->nullable();
             $table->string('name');
-            $table->string('type');
-            $table->string('quilla');
-            $table->string('pantoque');
-            $table->double('eslora');
-            $table->string('details')->nullable();
+            $table->string('idHull')->nullable();
+            $table->string('quilla')->nullable();
+            $table->string('pantoque')->nullable();
+            $table->double('eslora')->nullable();
             $table->string('file')->nullable();
             $table->timestamps();
             $table->softDeletes();
