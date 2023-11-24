@@ -35,15 +35,15 @@ if (props.ship) {
 } else {
   axios.get(route('ships.index'))
     .then(response => {
-      ship.value = response.data[0]
-      cargando.value = false
+      ship.value = response.data
+      // cargando.value = false
     })
 }
 </script>
 
 <template>
   <div :class="clases" class="flex items-center rounded-md text-gray-90 h-14 min-w-max">
-    <img :src="ship.file" onerror="this.src='/public/images/generic-boat.png'"
+    <img :src="ship.file" onerror="this.src='/images/generic-boat.png'"
       class="h-0 mr-1 rounded-lg sm:h-12 sm:w-16" />
     <div class="flex-col">
       <p class="text-xs font-bold">{{ ship.name }}</p>

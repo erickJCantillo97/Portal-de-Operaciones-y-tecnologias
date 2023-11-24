@@ -41,7 +41,7 @@ const contractSelect = ref()
 const authorizationSelect = ref()
 const quoteSelect = ref()
 const shiftSelect = ref([])
-// const shipSelect = ref()
+const selectedShips = ref([])
 //#endregion
 
 //#region ENUMS
@@ -83,6 +83,8 @@ const props = defineProps({
     'contracts': Array,
     'authorizations': Array,
     'quotes': Array,
+    'ships': Array,
+    // 'typeShips': Array,
 })
 
 //#region UseForm
@@ -109,9 +111,17 @@ const formData = useForm({
 //#endregion
 
 onMounted(() => {
-    getShift()
+    // getShift()
     initFilters()
 })
+
+const toggleSelectShip = (shipId) => {
+    if (selectedShips.value.includes(shipId)) {
+        selectedShips.value = selectedShips.value.filter(id => id !== shipId);
+    } else {
+        selectedShips.value = [...selectedShips.value, shipId];
+    }
+};
 
 //Cancelar Creación de Proyectos
 const cancelCreateProject = () => {
@@ -309,7 +319,6 @@ const exportarExcel = () => {
 }
 //#endregion
 </script>
-
 <template>
     <AppLayout>
         <main class="px-8 min-h-full overflow-y-scroll custom-scroll">
@@ -437,11 +446,9 @@ const exportarExcel = () => {
                                 <!--CAMPO TURNO (shift)-->
                                 <div class="col-span-3">
                                     <label class="text-sm font-bold text-gray-900">Turno</label>
-                                    <div class="card flex justify-content-center">
-                                        <Listbox v-model="shiftSelect" :options="shiftOptions" optionLabel="name"
-                                            :virtualScrollerOptions="{ itemSize: 38 }" class="w-full md:w-14rem"
-                                            listStyle="height:182px" />
-                                    </div>
+                                    <Listbox v-model="shiftSelect" :options="typeOptions" optionLabel="name"
+                                        :virtualScrollerOptions="{ itemSize: 38 }" class="w-full md:w-14rem"
+                                        listStyle="height:182px" />
                                 </div>
                             </div>
                         </section>
@@ -450,24 +457,28 @@ const exportarExcel = () => {
                     <!--BUQUES-->
                     <tab-content title="Buques" icon="fa-solid fa-ship">
                         <section
-                            class="sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2 grid grid-cols-2">
-                            <!--CAMPO TIPO DE PROYECTO (type)-->
-                            <Combobox class="text-left text-gray-900" label="Tipo de Proyecto"
-                                placeholder="Seleccione Tipo de Proyecto" :options="typeOptions" v-model="typeSelect">
-                            </Combobox>
-
-                            <ShipCardMinimal :ship="ships" :activo="false" :menu="false" :avance="false" />
-                            <!-- <Card>
-                                <template #title> Simple Card </template>
-                                <template #content>
-                                    <p class="m-0">
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur
-                                        error repudiandae numquam deserunt quisquam repellat libero asperiores earum nam
-                                        nobis, culpa ratione quam perferendis esse, cupiditate neque
-                                        quas!
-                                    </p>
-                                </template>
-                            </Card> -->
+                            class="grid grid-cols-4 h-64 overflow-y-auto custom-scroll snap-mandatory sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2">
+                            <ul v-for="ship in ships" :key="ship.id">
+                                <div @click="toggleSelectShip(ship.id)"
+                                    :class="{ 'bg-blue-900 text-white': selectedShips.includes(ship.id) }"
+                                    class="flex space-x-4 border border-gray-500 rounded-lg p-2 cursor-pointer transition-all duration-200 hover:scale-[105%] hover:shadow-md">
+                                    <div class="w-16">
+                                        <img :src="ship.file" onerror="this.src='/images/generic-boat.png'"
+                                            class="h-10 w-full mr-1 rounded-lg sm:h-12 sm:w-16" />
+                                    </div>
+                                    <div class="w-full">
+                                        <div class="flex w-full">
+                                            <li><p>Nombre: </p>{{ ship.name }}</li>
+                                        </div>
+                                        <div>
+                                            <li><p>Casco: </p>{{ ship.idHull }}</li>
+                                        </div>
+                                        <div>
+                                            <li><p>Clase: </p>{{ ship.type_ship ? ship.type_ship.name : '' }}</li>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ul>
                         </section>
                     </tab-content>
                 </form-wizard>

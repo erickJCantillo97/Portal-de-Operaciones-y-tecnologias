@@ -10,7 +10,6 @@ use App\Models\Projects\ProjectsShip;
 use App\Models\Projects\Quote;
 use App\Models\Projects\Ship;
 use App\Models\VirtualTask;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -24,6 +23,7 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::with('contract', 'ship', 'customer')->orderBy('name')->get();
+
         return Inertia::render('Project/Projects', compact('projects'));
     }
 
@@ -35,7 +35,7 @@ class ProjectController extends Controller
         $contracts = Contract::orderBy('contract_id')->get();
         $authorizations = Authorization::orderBy('contract_id')->get();
         $quotes = Quote::orderBy('ship_id')->get();
-        $ships = Ship::doesnthave('projectsShip')->get();
+        $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
 
         return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes', 'ships'));
     }
@@ -63,7 +63,7 @@ class ProjectController extends Controller
             'hoursPerDay' => 'nullable',
             'daysPerWeek' => 'nullable',
             'daysPerMonth' => 'nullable',
-            'shift' => 'nullable'
+            'shift' => 'nullable',
         ]);
 
         try {
@@ -78,7 +78,7 @@ class ProjectController extends Controller
 
             return back()->with(['message' => 'Proyecto creado correctamente'], 200);
         } catch (Exception $e) {
-            return back()->withErrors(['message' => 'Ocurrió un error al crear el proyecto: ' . $e->getMessage()], 500);
+            return back()->withErrors(['message' => 'Ocurrió un error al crear el proyecto: '.$e->getMessage()], 500);
         }
 
         return redirect('projects.index');
@@ -152,7 +152,7 @@ class ProjectController extends Controller
         try {
             $project->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrió un Error Al Actualizar : ' . $e);
+            return back()->withErrors('message', 'Ocurrió un Error Al Actualizar : '.$e);
         }
     }
 
@@ -164,7 +164,7 @@ class ProjectController extends Controller
         try {
             $project->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }
 }
