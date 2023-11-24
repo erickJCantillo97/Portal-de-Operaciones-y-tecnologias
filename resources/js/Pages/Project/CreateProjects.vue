@@ -19,6 +19,9 @@ import axios from 'axios'
 import TextInput from '../../Components/TextInput.vue'
 import Textarea from 'primevue/textarea'
 import Button from '../../Components/Button.vue'
+import ShipCardMinimal from "@/Components/ShipCardMinimal.vue"
+import Listbox from 'primevue/listbox'
+import Card from 'primevue/card'
 import { FormWizard, TabContent } from 'vue3-form-wizard'
 import 'vue3-form-wizard/dist/style.css'
 import FileUpload from 'primevue/fileupload'
@@ -37,7 +40,7 @@ const open = ref(false)
 const contractSelect = ref()
 const authorizationSelect = ref()
 const quoteSelect = ref()
-// const shiftSelect = ref()
+const shiftSelect = ref([])
 // const shipSelect = ref()
 //#endregion
 
@@ -80,8 +83,6 @@ const props = defineProps({
     'contracts': Array,
     'authorizations': Array,
     'quotes': Array,
-    'ships': Array,
-    // 'shift': Array
 })
 
 //#region UseForm
@@ -108,6 +109,7 @@ const formData = useForm({
 //#endregion
 
 onMounted(() => {
+    getShift()
     initFilters()
 })
 
@@ -188,6 +190,14 @@ const submit = () => {
         toast(error.message)
     }
     return 'creado'
+}
+
+const shiftOptions = ref()
+const getShift = () => {
+    axios.get(route('shift.index'))
+        .then(response => {
+            shiftOptions.value = response.data.name
+        })
 }
 
 // router.put(route('projects.update', formData.id), formData, {
@@ -313,59 +323,20 @@ const exportarExcel = () => {
                 <!-- AQUÍ VA EL CONTENIDO DEL FORMULARIO-->
                 <form-wizard @on-complete="submit()" stepSize="md" color="#2E3092" nextButtonText="Siguiente"
                     backButtonText="Regresar" finishButtonText="Guardar">
-                    <!--DATOS DEL PROYECTO-->
-                    <tab-content title="Datos del Proyecto" icon="fa-solid fa-ship">
-                        <section
-                            class="sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2 grid grid-cols-2">
-                            <!--CAMPO TIPO DE PROYECTO (type)-->
-                            <Combobox class="text-left text-gray-900" label="Tipo de Proyecto"
-                                placeholder="Seleccione Tipo de Proyecto" :options="typeOptions" v-model="typeSelect">
-                            </Combobox>
-
-                            <!--CAMPO ESTADO DEL PROYECTO (state)-->
-                            <Combobox class="text-left text-gray-900" label="Estado del Proyecto"
-                                placeholder="Seleccione Estado del Proyecto" :options="statusOptions"
-                                v-model="statusSelect">
-                            </Combobox>
-
-                            <!--CAMPO ALCANCE DEL PROYECTO (scope)-->
-                            <Combobox class="text-left text-gray-900" label="Alcance del Proyecto"
-                                placeholder="Seleccione Alcance del Proyecto" :options="scopeOptions" v-model="scopeSelect">
-                            </Combobox>
-
-                            <!--CAMPO COSTO DE VENTA (cost_sale)-->
-                            <TextInput label="Costo de Venta" type="number" :placeholder="'Escriba el costo de venta'"
-                                v-model="formData.cost_sale" :error="router.page.props.errors.cost_sale">
-                            </TextInput>
-
-                            <!--CAMPO SUPERVISOR (supervisor)-->
-                            <TextInput label="Supervisor" type="text" :placeholder="'Nombre del supervisor'"
-                                v-model="formData.supervisor" :error="router.page.props.errors.supervisor">
-                            </TextInput>
-
-                            <!--CAMPO DESCRIPCIÓN (description)-->
-                            <div>
-                                <label class="text-sm font-bold text-gray-900">Descripción</label>
-                                <Textarea class="text-sm text-gray-500 placeholder:text-sm italic"
-                                    placeholder="Descripción del proyecto..." v-model="formData.description" autoResize
-                                    rows="2" cols="67" />
-                            </div>
-                        </section>
-                    </tab-content>
-
                     <!--DOCUMENTOS CONTRACTUALES-->
-                    <tab-content title="Información Contractual" icon="fa-solid fa-file">
+                    <tab-content title="Información Contractual" icon="fa-solid fa-file-signature">
                         <section
                             class="sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 grid grid-cols-2">
-                            <!--CAMPO NOMBRE DEL PROYECTO (name)-->
-                            <TextInput type="text" label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
-                                v-model="formData.name" :error="$page.props.errors.name">
-                            </TextInput>
 
                             <!--CAMPO CÓDIGO DE SAP (SAP_code)-->
                             <TextInput type="text" label="Código SAP" placeholder="Escriba el código de SAP"
                                 v-model="formData.SAP_code" :error="$page.props.errors.SAP_code">
                             </TextInput>
+
+                            <!--CAMPO ALCANCE DEL PROYECTO (scope)-->
+                            <Combobox class="text-left text-gray-900" label="Alcance del Proyecto"
+                                placeholder="Seleccione Alcance del Proyecto" :options="scopeOptions" v-model="scopeSelect">
+                            </Combobox>
 
                             <!--CAMPO CONTRATO (contract)-->
                             <Combobox class="text-left text-gray-900" label="Contrato" placeholder="Seleccione Contrato"
@@ -385,43 +356,118 @@ const exportarExcel = () => {
                         </section>
                     </tab-content>
 
+                    <!--DATOS DEL PROYECTO-->
+                    <tab-content title="Datos del Proyecto" icon="fa-solid fa-diagram-project">
+                        <section
+                            class="grid grid-cols-2 sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2">
+                            <!--CAMPO NOMBRE DEL PROYECTO (name)-->
+                            <TextInput type="text" label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
+                                v-model="formData.name" :error="$page.props.errors.name">
+                            </TextInput>
+
+                            <!--CAMPO SUPERVISOR (supervisor)-->
+                            <TextInput label="Supervisor" type="text" :placeholder="'Nombre del supervisor'"
+                                v-model="formData.supervisor" :error="router.page.props.errors.supervisor">
+                            </TextInput>
+
+                            <!--CAMPO TIPO DE PROYECTO (type)-->
+                            <Combobox class="text-left text-gray-900" label="Tipo de Proyecto"
+                                placeholder="Seleccione Tipo de Proyecto" :options="typeOptions" v-model="typeSelect">
+                            </Combobox>
+
+                            <!--CAMPO ESTADO DEL PROYECTO (state)-->
+                            <Combobox class="text-left text-gray-900" label="Estado del Proyecto"
+                                placeholder="Seleccione Estado del Proyecto" :options="statusOptions"
+                                v-model="statusSelect">
+                            </Combobox>
+
+                            <!--CAMPO COSTO DE VENTA (cost_sale)-->
+                            <TextInput label="Costo de Venta" type="number" :placeholder="'Escriba el costo de venta'"
+                                v-model="formData.cost_sale" :error="router.page.props.errors.cost_sale">
+                            </TextInput>
+
+                            <!--CAMPO DESCRIPCIÓN (description)-->
+                            <div class="">
+                                <label class="text-sm font-bold text-gray-900">Descripción</label>
+                                <Textarea class="col-span-2 text-sm text-gray-500 placeholder:text-sm italic"
+                                    placeholder="Descripción del proyecto..." v-model="formData.description" autoResize
+                                    rows="2" cols="67" />
+                            </div>
+                        </section>
+                    </tab-content>
+
                     <!--PLANEACIÓN DEL PROYECTO-->
                     <tab-content title="Planeación del Proyecto" icon="fa-solid fa-calendar-check">
+                        <section class="flex sm:col-span-1 md:col-span-1 border gap-6 border-gray-200 rounded-lg p-4">
+                            <div class="grid grid-cols-6 gap-6">
+                                <div class="col-span-3">
+                                    <!--CAMPO FECHA INICIO-->
+                                    <TextInput class="text-left" type="date" label="Fecha De Inicio"
+                                        v-model="formData.start_date" :error="$page.props.errors.start_date"
+                                        :disabled="!contractSelect">
+                                    </TextInput>
+
+                                    <!--CAMPO FECHA FINALIZACIÓN-->
+                                    <TextInput class="text-left" type="date" label="Fecha de Finalización"
+                                        v-model="formData.end_date" :error="$page.props.errors.end_date"
+                                        :disabled="!contractSelect">
+                                    </TextInput>
+
+                                    <div class="flex col-span-3 gap-6">
+                                        <!--CAMPO HORAS POR DÍA (hoursPerDay)-->
+                                        <TextInput class="text-left" label="Horas por Dia"
+                                            :placeholder="'Escriba Número de Horas por Dia'" v-model="formData.hoursPerDay"
+                                            :error="router.page.props.errors.hoursPerDay">
+                                        </TextInput>
+
+                                        <!--CAMPO DIAS POR SEMANA (daysPerWeek)-->
+                                        <TextInput class="text-left" label="Dias por Semana"
+                                            :placeholder="'Escriba Numero de Horas por Dia'" v-model="formData.daysPerWeek"
+                                            :error="router.page.props.errors.daysPerWeek">
+                                        </TextInput>
+
+                                        <!--CAMPO DIAS POR MES (daysPerMonth)-->
+                                        <TextInput class="text-left" label="Dias por Mes"
+                                            :placeholder="'Escriba Número de Horas por Dia'" v-model="formData.daysPerMonth"
+                                            :error="router.page.props.errors.daysPerMonth">
+                                        </TextInput>
+                                    </div>
+                                </div>
+
+                                <!--CAMPO TURNO (shift)-->
+                                <div class="col-span-3">
+                                    <label class="text-sm font-bold text-gray-900">Turno</label>
+                                    <div class="card flex justify-content-center">
+                                        <Listbox v-model="shiftSelect" :options="shiftOptions" optionLabel="name"
+                                            :virtualScrollerOptions="{ itemSize: 38 }" class="w-full md:w-14rem"
+                                            listStyle="height:182px" />
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </tab-content>
+
+                    <!--BUQUES-->
+                    <tab-content title="Buques" icon="fa-solid fa-ship">
                         <section
                             class="sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2 grid grid-cols-2">
-                            <!--CAMPO FECHA INICIO-->
-                            <TextInput class="text-left" type="date" label="Fecha De Inicio" v-model="formData.start_date"
-                                :error="$page.props.errors.start_date" :disabled="!contractSelect">
-                            </TextInput>
+                            <!--CAMPO TIPO DE PROYECTO (type)-->
+                            <Combobox class="text-left text-gray-900" label="Tipo de Proyecto"
+                                placeholder="Seleccione Tipo de Proyecto" :options="typeOptions" v-model="typeSelect">
+                            </Combobox>
 
-                            <!--CAMPO FECHA FINALIZACIÓN-->
-                            <TextInput class="text-left" type="date" label="Fecha de Finalización"
-                                v-model="formData.end_date" :error="$page.props.errors.end_date"
-                                :disabled="!contractSelect">
-                            </TextInput>
-
-                            <!--CAMPO HORAS POR DÍA (hoursPerDay)-->
-                            <TextInput class="mt-2 text-left" label="Horas por Dia"
-                                :placeholder="'Escriba Número de Horas por Dia'" v-model="formData.hoursPerDay"
-                                :error="router.page.props.errors.hoursPerDay">
-                            </TextInput>
-
-                            <!--CAMPO DIAS POR SEMANA (daysPerWeek)-->
-                            <TextInput class="mt-2 text-left" label="Dias por Semana"
-                                :placeholder="'Escriba Numero de Horas por Dia'" v-model="formData.daysPerWeek"
-                                :error="router.page.props.errors.daysPerWeek">
-                            </TextInput>
-
-                            <!--CAMPO DIAS POR MES (daysPerMonth)-->
-                            <TextInput class="mt-2 text-left" label="Dias por Mes"
-                                :placeholder="'Escriba Número de Horas por Dia'" v-model="formData.daysPerMonth"
-                                :error="router.page.props.errors.daysPerMonth">
-                            </TextInput>
-
-                            <!--CAMPO SHIFT (shift)-->
-                            <!-- <Combobox class="text-left text-gray-900" label="Turno"
-                        placeholder="Seleccione el turno" :options="shift" v-model="shiftSelect">
-                    </Combobox> -->
+                            <ShipCardMinimal :ship="ships" :activo="false" :menu="false" :avance="false" />
+                            <!-- <Card>
+                                <template #title> Simple Card </template>
+                                <template #content>
+                                    <p class="m-0">
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur
+                                        error repudiandae numquam deserunt quisquam repellat libero asperiores earum nam
+                                        nobis, culpa ratione quam perferendis esse, cupiditate neque
+                                        quas!
+                                    </p>
+                                </template>
+                            </Card> -->
                         </section>
                     </tab-content>
                 </form-wizard>
