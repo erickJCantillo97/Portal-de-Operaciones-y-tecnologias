@@ -10,6 +10,7 @@ import ConfirmationService from "primevue/confirmationservice";
 import ToastService from "primevue/toastservice";
 import "primevue/resources/themes/mdc-light-indigo/theme.css";
 import "primeicons/primeicons.css";
+import 'material-icons/iconfont/material-icons.css';
 import Tooltip from "primevue/tooltip";
 import VueApexCharts from "vue3-apexcharts";
 const appName =

@@ -18,19 +18,27 @@ class ShipController extends Controller
     public function index(Request $request)
     {
 
+
         if (isset($request->id)) {
 
             $ships = Ship::with('customer')->where('customer_id', $request->id)->get();
-
             // dd($ships);
-            return Inertia::render('Project/Ships',
+            return Inertia::render(
+                'Project/Ships',
                 [
                     'ships' => $ships,
                     'customer' => Customer::find($request->id),
                 ]
             );
-        } else {
+
             $ships = Ship::with('customer')->orderBy('name')->get();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'ships' => Ship::orderBy('name')->get()
+                ]);
+            }
+
             $customers = Customer::orderBy('name')->get();
 
             return Inertia::render('Project/Ships', compact('ships', 'customers'));
@@ -66,14 +74,14 @@ class ShipController extends Controller
                 $validateData['file'] = Storage::putFileAs(
                     'public/Ship/',
                     $request->image,
-                    $validateData['name'].'.'.$request->image->getClientOriginalExtension()
+                    $validateData['name'] . '.' . $request->image->getClientOriginalExtension()
                 );
             }
             Ship::create($validateData);
 
             return back()->with(['message' => 'Unidad creada correctamente'], 200);
         } catch (Exception $e) {
-            return back()->withErrors(['message' => 'Ocurrió un error al crear el Buque: '.$e->getMessage()], 500);
+            return back()->withErrors(['message' => 'Ocurrió un error al crear el Buque: ' . $e->getMessage()], 500);
         }
     }
 
@@ -114,12 +122,12 @@ class ShipController extends Controller
                 $validateData['file'] = Storage::putFileAs(
                     'public/Ship/',
                     $request->image,
-                    $validateData['name'].'.'.$request->image->getClientOriginalExtension()
+                    $validateData['name'] . '.' . $request->image->getClientOriginalExtension()
                 );
             }
             $ship->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -131,7 +139,7 @@ class ShipController extends Controller
         try {
             $ship->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }
