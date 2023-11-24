@@ -96,10 +96,19 @@ class PersonalController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Personal $personal)
+    public function destroy($personal)
     {
         try {
-            $personal->delete();
+            $persona = Personal::whereUserId($personal)->first();
+            if ($persona->boss_last_id != 0) {
+                $persona->boss_last_id = null;
+                $persona->boss_id = $persona->boss_last_id ?? 0;
+                $persona->save();
+            } else {
+                $persona->delete();
+            }
+
+            return back()->with(['message' => 'Personal Eliminado correctamente'], 200);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }

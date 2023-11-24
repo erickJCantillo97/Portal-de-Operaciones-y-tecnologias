@@ -39,6 +39,7 @@
         "html2canvas": "^1.4.1",
         "inflected": "^2.1.0",
         "laravel-echo": "^1.15.3",
+        "material-icons": "^1.13.12",
         "moment": "^2.29.4",
         "pluralize": "^8.0.0",
         "pluralize-es": "^1.0.0",

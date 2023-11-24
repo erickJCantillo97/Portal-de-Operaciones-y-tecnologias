@@ -136,9 +136,11 @@ const shiftSave = (status, shift) => {
 }
 
 const calcularDiferencia = (start, end) => {
+    if (!start || !end) {
+        return 0
+    }
     var horaInicio = String(start).length > 5 ? format24h(start) : start
     var horaFinal = String(end).length > 5 ? format24h(end) : end
-    console.log(horaInicio + '---' + horaFinal + '---' + start + '---' + end)
     // Expresión regular para comprobar el formato de las horas
     var formatoHora = /^([01]?[0-9]|2[0-3]):[0-5][0-9]/;
 
@@ -297,7 +299,7 @@ const calcularDiferencia = (start, end) => {
                                                     <div class="relative">
                                                         <label for="startShift"
                                                             class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Inicio</label>
-                                                            <Calendar name="start" id="start" timeOnly hourFormat="24"
+                                                        <Calendar name="start" id="start" timeOnly hourFormat="24"
                                                             v-model="shift.startShift" class="alturah8" :pt="{
                                                                 input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
                                                             }" />
@@ -336,12 +338,14 @@ const calcularDiferencia = (start, end) => {
                                                     </div>
                                                 </div>
                                             </div>
+
                                             <div class="relative">
                                                 <p>
                                                     Tiempo laborado
                                                 </p>
                                                 <p>{{ calcularDiferencia(shift.startShift,
-                                                    shift.endShift).toFixed(2) - calcularDiferencia(shift.startBreak, shift.endBreak).toFixed(2)
+                                                    shift.endShift).toFixed(2) - calcularDiferencia(shift.startBreak,
+                                                        shift.endBreak).toFixed(2)
                                                 }}
                                                     Horas</p>
                                             </div>

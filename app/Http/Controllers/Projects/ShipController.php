@@ -19,6 +19,7 @@ class ShipController extends Controller
     public function index(Request $request)
     {
 
+
         if (isset($request->id)) {
 
             $ships = Ship::with('customer', 'typeShip')->where('customer_id', $request->id)->get();
@@ -32,12 +33,18 @@ class ShipController extends Controller
                     'typeShips' => TypeShip::get(),
                 ]
             );
-        } else {
+
             $ships = Ship::with('customer', 'typeShip')->orderBy('name')->get();
-            $customers = Customer::orderBy('name')->get();
-            $typeShips = TypeShip::get();
-            return Inertia::render('Project/Ships', compact('ships', 'customers', 'typeShips'));
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'ships' => Ship::orderBy('name')->get()
+                ]);
+            }
         }
+        $customers = Customer::orderBy('name')->get();
+        $typeShips = TypeShip::get();
+        return Inertia::render('Project/Ships', compact('ships', 'customers', 'typeShips'));
     }
 
     /**
@@ -59,8 +66,8 @@ class ShipController extends Controller
             'type_ship_id' => 'nullable',
             'quilla' => 'nullable|numeric|gt:0',
             'pantoque' => 'nullable|numeric|gt:0',
-            'acronyms'=>'nullable',
-            'idHull'=>'nullable',
+            'acronyms' => 'nullable',
+            'idHull' => 'nullable',
         ]);
 
         try {
@@ -107,8 +114,8 @@ class ShipController extends Controller
             'type_ship_id' => 'nullable',
             'quilla' => 'nullable|numeric|gt:0',
             'pantoque' => 'nullable|numeric|gt:0',
-            'acronyms'=>'nullable',
-            'idHull'=>'nullable',
+            'acronyms' => 'nullable',
+            'idHull' => 'nullable',
         ]);
         // dd($validateData);
 

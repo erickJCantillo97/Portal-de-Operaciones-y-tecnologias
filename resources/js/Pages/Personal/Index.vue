@@ -11,9 +11,11 @@ import { useSweetalert } from '@/composable/sweetAlert';
 import Button from '../../Components/Button.vue';
 import UserTable from '@/Components/UserTable.vue';
 import Calendar from 'primevue/calendar';
-import MultiSelect from 'primevue/multiselect';
+import Listbox from 'primevue/listbox';
+// import MultiSelect from 'primevue/multiselect';
 import CustomModal from '@/Components/CustomModal.vue';
 const { toast } = useSweetalert()
+const { confirmDelete } = useSweetalert()
 
 const props = defineProps({
     personal: Array,
@@ -141,8 +143,8 @@ const quitar = (persona) => {
                             class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
                             <!--BOTÓN ELIMINAR-->
                             <div title="Eliminar de mi Personal" v-if="slotProps.data.canDelete">
-                                <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Cliente?', 'customers')"
-                                    class="hover:bg-danger">
+                                <Button severity="danger" @click="confirmDelete(slotProps.data.Num_SAP
+                                    , 'Empleado', 'personal')" class="hover:bg-danger">
                                     <TrashIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
                             </div>
@@ -154,45 +156,30 @@ const quitar = (persona) => {
 
         <CustomModal :visible="modalVisible">
             <template #icon>
-                <i class="text-white fa-solid fa-ship"></i>
+                <span class="text-white material-symbols-outlined text-4xl">
+                    engineering
+                </span>
             </template>
             <template #titulo>
                 <span class="text-xl font-bold text-white white-space-nowrap">Añadir Personal</span>
             </template>
             <template #body>
-                <div class="flex py-6 space-x-4">
+                <div class="flex py-2 space-x-4">
                     <div class="w-1/2 space-y-8">
                         <div class="p-fluid border-0 p-2 ">
                             <label for="">Seleccionar Personal</label>
-                            <MultiSelect v-model="form.users"
+                            <Listbox multiple v-model="form.users" listStyle="height:230px"
                                 :filterFields="['Nombres_Apellidos', 'Cargo', 'Identificacion', 'Oficina']" :filter="true"
-                                :options="props.personal" optionLabel="Nombres_Apellidos" placeholder="Seleccionar Personas"
-                                display="chip" class="multiselect-custom w-full rounded-md md:w-14rem" :pt="{
-                                    root: {
-                                        class: 'h-10 !ring-gray-300 !ring-inset ring-1 !border-0 !shadow-sm '
-                                    },
-                                    input: {
-                                        class: '!text-sm pt-3 pl-2'
-                                    },
-                                    item: {
-                                        class: '!text-sm'
-                                    }
-                                }">
+                                :options="props.personal" filter optionLabel="name" class="w-full md:w-14rem">
                                 <template #option="slotProps">
                                     <UserTable :user="slotProps.option"></UserTable>
-
                                 </template>
-                            </MultiSelect>
-                        </div>
-                        <div class="p-fluid border-0 ">
-                            <label for="">Fecha de devolución</label>
-                            <Calendar inputId="icon" v-model="form.fecha_devolucion" :min-date="new Date()"
-                                dateFormat="dd/mm/yy" :showIcon="true" />
+                            </Listbox>
                         </div>
                     </div>
-                    <div class="w-1/2 h-72 custom-scroll overflow-y-auto shadow-lg rounded-lg p-2">
+                    <div class="w-1/2 ">
                         <h3 class="text-center font-bold text-lg">Personal Seleccionado</h3>
-                        <div class="block space-y-4">
+                        <div class="block space-y-4 h-[320px] custom-scroll overflow-y-auto shadow-lg rounded-lg p-2">
                             <div v-for="persona of form.users" class="flex justify-between">
                                 <UserTable :user="persona" :photo="true">
                                 </UserTable>
@@ -208,7 +195,7 @@ const quitar = (persona) => {
                 </div>
             </template>
             <template #footer>
-                <Button severity="success" @click="submit()">
+                <Button severity="success" v-if="form.users.length > 0" @click="submit()">
                     <i class="fa-solid fa-floppy-disk"></i>
                     <p>Guardar</p>
                 </Button>
