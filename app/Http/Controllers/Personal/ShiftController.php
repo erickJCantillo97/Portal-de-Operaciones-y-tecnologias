@@ -23,8 +23,7 @@ class ShiftController extends Controller
                     'name' => $shift['name'],
                     'startShift' => $shift['startShift'],
                     'endShift' => $shift['endShift'],
-                    'startBreak' => $shift['startBreak'],
-                    'endBreak' => $shift['endBreak'],
+                    'timeBreak'=>$shift['timeBreak'],
                     'hours' => $shift['hours'],
                     'status' => $shift['status'],
                     'description' => $shift['description']
@@ -51,8 +50,7 @@ class ShiftController extends Controller
                 'name' => 'required',
                 'startShift' => 'date_format:"H:i"|required',
                 'endShift' => 'date_format:"H:i"|required',
-                'startBreak' => 'nullable|date_format:"H:i"',
-                'endBreak' => 'nullable|date_format:"H:i"',
+                'timeBreak' => 'nullable|numeric',
                 'status' => 'nullable|boolean',
                 'description' => 'nullable',
             ]);
@@ -62,14 +60,7 @@ class ShiftController extends Controller
             if ($validateData['startShift'] > $validateData['endShift']) {
                 $validateData['endShift']->modify('+1 day');
             };
-            $validateData['startBreak'] = new DateTime("1970-01-01T" . $validateData['startBreak'] . ":00");
-            $validateData['endBreak'] = new DateTime("1970-01-01T" . $validateData['endBreak'] . ":00");
-            if ($validateData['startBreak'] ==  $validateData['endBreak']) {
-                $validateData['endBreak']=null;
-                $validateData['startBreak']=null;
-            }elseif ($validateData['startBreak'] >  $validateData['endBreak']) {
-                $validateData['endBreak']->modify('+1 day');
-            };
+
 
             // dd($validateData);
             Shift::create($validateData);
@@ -80,8 +71,7 @@ class ShiftController extends Controller
                         'name' => $shift['name'],
                         'startShift' => $shift['startShift'],
                         'endShift' => $shift['endShift'],
-                        'startBreak' => $shift['startBreak'],
-                        'endBreak' => $shift['endBreak'],
+                        'timeBreak'=>$shift['timeBreak'],
                         'hours' => $shift['hours'],
                         'status' => $shift['status'],
                         'description' => $shift['description']
@@ -89,6 +79,7 @@ class ShiftController extends Controller
                 })
             ], 200);
         } catch (Exception $e) {
+            dd($e);
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
     }
@@ -118,8 +109,7 @@ class ShiftController extends Controller
             'name' => 'required',
             'startShift' => 'date_format:"H:i"|required',
             'endShift' => 'date_format:"H:i"|required',
-            'startBreak' => 'nullable|date_format:"H:i"',
-            'endBreak' => 'nullable|date_format:"H:i"',
+            'timeBreak' => 'nullable|numeric',
             'status' => 'nullable|boolean',
             'description' => 'nullable',
         ]);
@@ -128,15 +118,7 @@ class ShiftController extends Controller
         if ($validateData['startShift'] > $validateData['endShift']) {
             $validateData['endShift']->modify('+1 day');
         };
-        $validateData['startBreak'] = new DateTime("1970-01-01T" . $validateData['startBreak'] . ":00");
-        $validateData['endBreak'] = new DateTime("1970-01-01T" . $validateData['endBreak'] . ":00");
 
-        if ($validateData['startBreak'] ==  $validateData['endBreak']) {
-            $validateData['endBreak']=null;
-            $validateData['startBreak']=null;
-        }elseif ($validateData['startBreak'] >  $validateData['endBreak']) {
-            $validateData['endBreak']->modify('+1 day');
-        };
         try {
             $shift->update($validateData);
             return response()->json([
@@ -146,8 +128,7 @@ class ShiftController extends Controller
                         'name' => $shift['name'],
                         'startShift' => $shift['startShift'],
                         'endShift' => $shift['endShift'],
-                        'startBreak' => $shift['startBreak'],
-                        'endBreak' => $shift['endBreak'],
+                        'timeBreak'=>$shift['timeBreak'],
                         'hours' => $shift['hours'],
                         'status' => $shift['status'],
                         'description' => $shift['description']
