@@ -1,12 +1,7 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
-import '../../../sass/dataTableCustomized.scss'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Calendar from 'primevue/calendar'
-import Tag from 'primevue/tag'
 import Combobox from '@/Components/Combobox.vue'
 import { FilterMatchMode, FilterOperator } from 'primevue/api'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
@@ -21,7 +16,6 @@ import Textarea from 'primevue/textarea'
 import Button from '../../Components/Button.vue'
 import ShipCardMinimal from "@/Components/ShipCardMinimal.vue"
 import Listbox from 'primevue/listbox'
-import Card from 'primevue/card'
 import { FormWizard, TabContent } from 'vue3-form-wizard'
 import 'vue3-form-wizard/dist/style.css'
 import FileUpload from 'primevue/fileupload'
@@ -35,6 +29,15 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 
+const props = defineProps({
+    'project': Object,
+    'contracts': Array,
+    'authorizations': Array,
+    'quotes': Array,
+    'ships': Array,
+    // 'typeShips': Array,
+})
+
 //#region Referencias (v-model)
 const open = ref(false)
 const contractSelect = ref()
@@ -42,9 +45,23 @@ const authorizationSelect = ref()
 const quoteSelect = ref()
 const shiftSelect = ref([])
 const selectedShips = ref([])
+const API_Ships = ref(props.ships)
+const filteredShips = ref(props.ships)
+const keyword = ref('')
 //#endregion
 
+const searchShips = () => {
+    const searchWord = keyword.value.toLowerCase().trim()
+
+    filteredShips.value = API_Ships.value.filter(ship =>
+        ship.name.toLowerCase().includes(searchWord) ||
+        ship.idHull.toLowerCase().includes(searchWord) ||
+        ship.type_ship.name.toLowerCase().includes(searchWord)
+    )
+}
+
 //#region ENUMS
+
 //Tipo de Proyecto
 const typeSelect = ref()
 const typeOptions = ref([
@@ -78,14 +95,6 @@ const scopeOptions = ref([
 ])
 //#endregion
 
-const props = defineProps({
-    'project': Object,
-    'contracts': Array,
-    'authorizations': Array,
-    'quotes': Array,
-    'ships': Array,
-    // 'typeShips': Array,
-})
 
 //#region UseForm
 const formData = useForm({
@@ -117,11 +126,11 @@ onMounted(() => {
 
 const toggleSelectShip = (shipId) => {
     if (selectedShips.value.includes(shipId)) {
-        selectedShips.value = selectedShips.value.filter(id => id !== shipId);
+        selectedShips.value = selectedShips.value.filter(id => id !== shipId)
     } else {
-        selectedShips.value = [...selectedShips.value, shipId];
+        selectedShips.value = [...selectedShips.value, shipId]
     }
-};
+}
 
 //Cancelar Creación de Proyectos
 const cancelCreateProject = () => {
@@ -456,26 +465,33 @@ const exportarExcel = () => {
 
                     <!--BUQUES-->
                     <tab-content title="Buques" icon="fa-solid fa-ship">
+                        <div class="p-6">
+                            <input type="text" v-model="keyword" @input="searchShips()"
+                                class="rounded-lg border-2 border-gray-200 w-full placeholder:italic"
+                                placeholder="Buscar Buques" />
+                            <!-- <MagnifyingGlassIcon class="absolute w-7 h-7"/> -->
+                        </div>
                         <section
-                            class="grid grid-cols-4 h-64 overflow-y-auto custom-scroll snap-mandatory sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2">
-                            <ul v-for="ship in ships" :key="ship.id">
+                            class="grid grid-cols-4 h-44 overflow-y-auto custom-scroll snap-y snap-mandatory sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2">
+                            <ul v-for="ship in filteredShips" :key="ship.id"
+                                class="text-sm italic [&>li>p]:font-semibold snap-start">
                                 <div @click="toggleSelectShip(ship.id)"
-                                    :class="{ 'bg-blue-900 text-white': selectedShips.includes(ship.id) }"
-                                    class="flex space-x-4 border border-gray-500 rounded-lg p-2 cursor-pointer transition-all duration-200 hover:scale-[105%] hover:shadow-md">
-                                    <div class="w-16">
+                                    :class="selectedShips.includes(ship.id) ? 'bg-blue-900 text-white' : 'hover:bg-blue-300'"
+                                    class="flex space-x-4 shadow-sm rounded-lg cursor-pointer transition-all duration-200 hover:scale-[1.01] ease-in-out hover:shadow-md">
+                                    <div class="w-28">
                                         <img :src="ship.file" onerror="this.src='/images/generic-boat.png'"
-                                            class="h-10 w-full mr-1 rounded-lg sm:h-12 sm:w-16" />
+                                            class="object-cover object-center w-full h-16 mr-1 rounded-lg " />
                                     </div>
-                                    <div class="w-full">
-                                        <div class="flex w-full">
-                                            <li><p>Nombre: </p>{{ ship.name }}</li>
-                                        </div>
-                                        <div>
-                                            <li><p>Casco: </p>{{ ship.idHull }}</li>
-                                        </div>
-                                        <div>
-                                            <li><p>Clase: </p>{{ ship.type_ship ? ship.type_ship.name : '' }}</li>
-                                        </div>
+                                    <div class="">
+                                        <li>
+                                            <p><span class="font-semibold">Nombre:</span> {{ ship.name }}</p>
+                                        </li>
+                                        <li>
+                                            <p><span class="font-semibold">Casco:</span> {{ ship.idHull }}</p>
+                                        </li>
+                                        <li>
+                                            <p><span class="font-semibold">Clase:</span> {{ ship.type_ship.name }}</p>
+                                        </li>
                                     </div>
                                 </div>
                             </ul>
