@@ -6,11 +6,15 @@ const props =defineProps({
         type: Boolean,
         default: false
     },
+    width: {
+        type: String,
+        default:'60rem'
+    }
 })
 </script>
 
 <template>
-    <Dialog v-model:visible="props.visible" modal :closable="false" class="" :style="{ width: '60rem' }"
+    <Dialog v-model:visible="props.visible" modal :closable="false" class="" :style="{ width: props.width }"
             :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :pt="{
                 header: { class: '!bg-primary' },
                 closeButtonIcon: { class: 'text-white' }
