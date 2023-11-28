@@ -13,7 +13,8 @@ import axios from 'axios'
 // import plural from 'pluralize-es'
 import TextInput from '../../Components/TextInput.vue'
 import Textarea from 'primevue/textarea'
-import Button from '../../Components/Button.vue'
+import Button from 'primevue/button'
+// import Button from '../../Components/Button.vue'
 import ShipCardMinimal from "@/Components/ShipCardMinimal.vue"
 import Listbox from 'primevue/listbox'
 import { FormWizard, TabContent } from 'vue3-form-wizard'
@@ -61,7 +62,6 @@ const searchShips = () => {
 }
 
 //#region ENUMS
-
 //Tipo de Proyecto
 const typeSelect = ref()
 const typeOptions = ref([
@@ -270,9 +270,13 @@ const initFilters = () => {
     }
 }
 
-
 const clearFilter = () => {
     initFilters()
+}
+
+const clearCustomFilter = () => {
+    keyword.value = ''
+    filteredShips.value = API_Ships.value
 }
 
 const formatDate = (value) => {
@@ -465,22 +469,21 @@ const exportarExcel = () => {
 
                     <!--BUQUES-->
                     <tab-content title="Buques" icon="fa-solid fa-ship">
-                        <div class="p-6">
-                            <input type="text" v-model="keyword" @input="searchShips()"
+                        <div class="flex w-full gap-2 pb-4">
+                            <input type="search" v-model="keyword" @input="searchShips()"
                                 class="rounded-lg border-2 border-gray-200 w-full placeholder:italic"
-                                placeholder="Buscar Buques" />
-                            <!-- <MagnifyingGlassIcon class="absolute w-7 h-7"/> -->
+                                placeholder="Filtrar Buques" />
                         </div>
                         <section
-                            class="grid grid-cols-4 h-44 overflow-y-auto custom-scroll snap-y snap-mandatory sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2">
+                            class="grid grid-cols-4 h-60 overflow-y-auto custom-scroll snap-y snap-mandatory sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2">
                             <ul v-for="ship in filteredShips" :key="ship.id"
                                 class="text-sm italic [&>li>p]:font-semibold snap-start">
                                 <div @click="toggleSelectShip(ship.id)"
                                     :class="selectedShips.includes(ship.id) ? 'bg-blue-900 text-white' : 'hover:bg-blue-300'"
-                                    class="flex space-x-4 shadow-sm rounded-lg cursor-pointer transition-all duration-200 hover:scale-[1.01] ease-in-out hover:shadow-md">
+                                    class="flex space-x-4 shadow-md rounded-sm cursor-pointer transition-all duration-200 hover:scale-[1.01] ease-in-out hover:shadow-md">
                                     <div class="w-28">
                                         <img :src="ship.file" onerror="this.src='/images/generic-boat.png'"
-                                            class="object-cover object-center w-full h-16 mr-1 rounded-lg " />
+                                            class="object-cover object-center w-full h-16 mr-1 " />
                                     </div>
                                     <div class="">
                                         <li>
