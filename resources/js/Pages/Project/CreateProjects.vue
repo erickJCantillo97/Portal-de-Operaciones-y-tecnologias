@@ -3,10 +3,11 @@ import AppLayout from '@/Layouts/AppLayout.vue'
 import { ref, onMounted, computed } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
 import Combobox from '@/Components/Combobox.vue'
+import Moment from 'moment'
 import { FilterMatchMode, FilterOperator } from 'primevue/api'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue'
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline'
+import { ClockIcon, CalendarDaysIcon } from '@heroicons/vue/24/outline'
 import { useSweetalert } from '@/composable/sweetAlert'
 import { useConfirm } from "primevue/useconfirm"
 import axios from 'axios'
@@ -44,7 +45,6 @@ const open = ref(false)
 const contractSelect = ref()
 const authorizationSelect = ref()
 const quoteSelect = ref()
-const shiftSelect = ref([])
 const selectedShips = ref([])
 const API_Ships = ref(props.ships)
 const filteredShips = ref(props.ships)
@@ -120,7 +120,8 @@ const formData = useForm({
 //#endregion
 
 onMounted(() => {
-    // getShift()
+    showListbox.value++
+    getShift()
     initFilters()
 })
 
@@ -211,11 +212,13 @@ const submit = () => {
     return 'creado'
 }
 
+const showListbox = ref(0)
+const shiftSelect = ref([])
 const shiftOptions = ref()
 const getShift = () => {
     axios.get(route('shift.index'))
         .then(response => {
-            shiftOptions.value = response.data.name
+            shiftOptions.value = response.data[0]
         })
 }
 
@@ -274,17 +277,9 @@ const clearFilter = () => {
     initFilters()
 }
 
-const clearCustomFilter = () => {
-    keyword.value = ''
-    filteredShips.value = API_Ships.value
-}
-
-const formatDate = (value) => {
-    return value.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    })
+function formatDateTime24h(date) {
+    return new Date(date).toLocaleString('es-CO',
+        { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 }
 
 //#region COMPOSABLES
@@ -412,8 +407,8 @@ const exportarExcel = () => {
                             <div class="">
                                 <label class="text-sm font-bold text-gray-900">Descripción</label>
                                 <Textarea class="col-span-2 text-sm text-gray-500 placeholder:text-sm italic"
-                                    placeholder="Descripción del proyecto..." v-model="formData.description" autoResize
-                                    rows="2" cols="67" />
+                                    placeholder="Descripción del proyecto..." v-model="formData.description"
+                                    rows="2" cols="67" autoResize />
                             </div>
                         </section>
                     </tab-content>
@@ -458,10 +453,26 @@ const exportarExcel = () => {
 
                                 <!--CAMPO TURNO (shift)-->
                                 <div class="col-span-3">
-                                    <label class="text-sm font-bold text-gray-900">Turno</label>
-                                    <Listbox v-model="shiftSelect" :options="typeOptions" optionLabel="name"
-                                        :virtualScrollerOptions="{ itemSize: 38 }" class="w-full md:w-14rem"
-                                        listStyle="height:182px" />
+                                    <label class="text-sm font-bold text-gray-900">Seleccione el Turno</label>
+                                    <Listbox v-if="shiftOptions != null" v-model="shiftSelect" :options="shiftOptions" optionLabel="name"
+                                        :key="showListbox" :virtualScrollerOptions="{ itemSize: 38 }"
+                                        class="w-full md:w-14rem" listStyle="height:182px">
+                                        <template #option="slotProps">
+                                            <div class="grid grid-cols-4 align-items-center">
+                                                <!-- <CalendarDaysIcon class="w-3 h-3" /> -->
+                                                <p class="col-span-1 text-xs font-bold">{{ slotProps.option.name }}</p>
+                                                <p class="col-span-3 text-xs">
+                                                    <div class="flex italic">
+                                                        <ClockIcon class="w-4 h-4" />
+                                                        <p><b>&nbsp Hora Inicio:</b> {{ formatDateTime24h(slotProps.option.startShift) }} - </p>
+                                                        <p>&nbsp <b>Hora Fin:</b> {{ formatDateTime24h(slotProps.option.endShift) }} - </p>
+                                                        <p>&nbsp <b>Descanso:</b> {{ slotProps.option.timeBreak }}h - </p>
+                                                        <p>&nbsp <b>H. Laborales:</b> {{ parseFloat(slotProps.option.hours).toFixed(1) }}</p>
+                                                    </div>
+                                                </p>
+                                            </div>
+                                        </template>
+                                    </Listbox>
                                 </div>
                             </div>
                         </section>
@@ -483,9 +494,9 @@ const exportarExcel = () => {
                                     class="flex space-x-4 shadow-md rounded-sm cursor-pointer transition-all duration-200 hover:scale-[1.01] ease-in-out hover:shadow-md">
                                     <div class="w-28">
                                         <img :src="ship.file" onerror="this.src='/images/generic-boat.png'"
-                                            class="object-cover object-center w-full h-16 mr-1 " />
+                                            class="object-cover object-center w-full h-16 mr-1" />
                                     </div>
-                                    <div class="">
+                                    <div>
                                         <li>
                                             <p><span class="font-semibold">Nombre:</span> {{ ship.name }}</p>
                                         </li>
