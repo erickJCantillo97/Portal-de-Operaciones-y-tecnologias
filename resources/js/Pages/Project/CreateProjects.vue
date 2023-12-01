@@ -133,6 +133,14 @@ const toggleSelectShip = (shipId) => {
     }
 }
 
+const selectShiftList = (shiftId) => {
+    if (shiftSelect.value.length === 1 && shiftSelect.value[0] === shiftId) {
+        shiftSelect.value = [];
+    } else {
+        shiftSelect.value = [shiftId];
+    }
+}
+
 //Cancelar Creación de Proyectos
 const cancelCreateProject = () => {
     router.get(route('projects.index'))
@@ -332,7 +340,7 @@ const exportarExcel = () => {
         <main class="px-8 min-h-full overflow-y-scroll custom-scroll">
             <header class="w-full">
                 <h2 class="text-lg font-semibold mb-4 text-primary text-center lg:text-2xl">
-                    Agregar proyecto
+                    Agregar Proyecto
                 </h2>
             </header>
 
@@ -376,7 +384,7 @@ const exportarExcel = () => {
                     <!--DATOS DEL PROYECTO-->
                     <tab-content title="Datos del Proyecto" icon="fa-solid fa-diagram-project">
                         <section
-                            class="grid grid-cols-2 sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2">
+                            class="grid grid-cols-2 sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4">
                             <!--CAMPO NOMBRE DEL PROYECTO (name)-->
                             <TextInput type="text" label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
                                 v-model="formData.name" :error="$page.props.errors.name">
@@ -407,8 +415,8 @@ const exportarExcel = () => {
                             <div class="">
                                 <label class="text-sm font-bold text-gray-900">Descripción</label>
                                 <Textarea class="col-span-2 text-sm text-gray-500 placeholder:text-sm italic"
-                                    placeholder="Descripción del proyecto..." v-model="formData.description"
-                                    rows="2" cols="67" autoResize />
+                                    placeholder="Descripción del proyecto..." v-model="formData.description" rows="1"
+                                    cols="67" autoResize />
                             </div>
                         </section>
                     </tab-content>
@@ -417,7 +425,7 @@ const exportarExcel = () => {
                     <tab-content title="Planeación del Proyecto" icon="fa-solid fa-calendar-check">
                         <section class="flex sm:col-span-1 md:col-span-1 border gap-6 border-gray-200 rounded-lg p-4">
                             <div class="grid grid-cols-6 gap-6">
-                                <div class="col-span-3">
+                                <div class="col-span-3 space-y-4">
                                     <!--CAMPO FECHA INICIO-->
                                     <TextInput class="text-left" type="date" label="Fecha De Inicio"
                                         v-model="formData.start_date" :error="$page.props.errors.start_date"
@@ -454,12 +462,11 @@ const exportarExcel = () => {
                                 <!--CAMPO TURNO (shift)-->
                                 <div class="col-span-3">
                                     <label class="text-sm font-bold text-gray-900">Seleccione el Turno</label>
-                                    <Listbox v-if="shiftOptions != null" v-model="shiftSelect" :options="shiftOptions" optionLabel="name"
+                                    <!-- <Listbox v-if="shiftOptions != null" v-model="shiftSelect" :options="shiftOptions" optionLabel="name"
                                         :key="showListbox" :virtualScrollerOptions="{ itemSize: 38 }"
                                         class="w-full md:w-14rem" listStyle="height:182px">
                                         <template #option="slotProps">
                                             <div class="grid grid-cols-4 align-items-center">
-                                                <!-- <CalendarDaysIcon class="w-3 h-3" /> -->
                                                 <p class="col-span-1 text-xs font-bold">{{ slotProps.option.name }}</p>
                                                 <p class="col-span-3 text-xs">
                                                     <div class="flex italic">
@@ -472,7 +479,25 @@ const exportarExcel = () => {
                                                 </p>
                                             </div>
                                         </template>
-                                    </Listbox>
+                                    </Listbox> -->
+                                    <div class="w-full h-52 overflow-y-auto custom-scroll border-2 border-gray-300 rounded-lg p-2 focus hover:border-blue-500">
+                                        <ul v-for="shift in shiftOptions" :key="shift.id">
+                                            <div @click="selectShiftList(shift.id)"
+                                                :class="shiftSelect.includes(shift.id) ? 'bg-blue-900 text-white' : 'hover:bg-gray-200'"
+                                                class="flex justify-between items-center text-xs space-x-6 p-2 w-full cursor-pointer rounded-lg">
+                                                <div>
+                                                    <p class=" text-xs font-bold">{{ shift.name }}:</p>
+                                                </div>
+                                                <div class="flex italic">
+                                                    <ClockIcon class="w-4 h-4" />
+                                                    <p><b>&nbsp Hora Inicio:</b> {{ formatDateTime24h(shift.startShift) }} - </p>
+                                                    <p>&nbsp <b>Hora Fin:</b> {{ formatDateTime24h(shift.endShift) }} - </p>
+                                                    <p>&nbsp <b>Descanso:</b> {{ shift.timeBreak }}h - </p>
+                                                    <p>&nbsp <b>H. Laborales:</b> {{ parseFloat(shift.hours).toFixed(1) }}</p>
+                                                </div>
+                                            </div>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </section>
@@ -514,5 +539,4 @@ const exportarExcel = () => {
                 </form-wizard>
             </section>
         </main>
-    </AppLayout>
-</template>
+    </AppLayout></template>
