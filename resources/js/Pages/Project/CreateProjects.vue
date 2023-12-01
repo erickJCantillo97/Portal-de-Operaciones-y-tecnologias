@@ -103,10 +103,10 @@ const formData = useForm({
     contract_id: props.project?.contract_id ?? '0',
     authorization_id: props.project?.authorization_id ?? '0',
     quote_id: props.project?.quote_id ?? '0',
-    type: props.project?.type ?? '0', //ENUMS
+    type: props.project?.type ?? null, //ENUMS
     SAP_code: props.project?.SAP_code ?? '',
-    status: props.project?.status ?? '0', //ENUMS
-    scope: props.project?.scope ?? '0', //ENUMS
+    status: props.project?.status ?? null, //ENUMS
+    scope: props.project?.scope ?? null, //ENUMS
     supervisor: props.project?.supervisor ?? '',
     cost_sale: props.project?.cost_sale ?? '0',
     description: props.project?.description ?? '',
@@ -146,50 +146,6 @@ const cancelCreateProject = () => {
     router.get(route('projects.index'))
 }
 
-//#region if
-// if (formData.id == 0) {
-//     //Validaciones de Formulario de Contratos
-//     if (selectedForm.value == 'form1' && !contractSelect.value) {
-//         toast('Por favor, seleccione un contrato', 'error')
-//         return
-//     }
-
-//     if (selectedForm.value == 'form1') {
-//         formData['contract_id'] = contractSelect.value.id
-//     }
-
-//     //Validaciones de Formulario de Autorizaciones
-//     if (selectedForm.value == 'form2' && !authorizationSelect.value) {
-//         toast('Por favor, seleccione una autorización', 'error')
-//         return
-//     }
-
-//     if (selectedForm.value == 'form2') {
-//         formData['authorization_id'] = authorizationSelect.value.id
-//     }
-
-//     //Validaciones de Formulario de Estimaciones
-//     if (selectedForm.value == 'form3' && !quoteSelect.value) {
-//         toast('Por favor, seleccione una estimación', 'error')
-//         return
-//     }
-
-//     if (selectedForm.value == 'form3') {
-//         formData['quote_id'] = quoteSelect.value.id
-//     }
-
-//     //Validaciones de Formulario de Comunicaciones Internas
-//     if (selectedForm.value == 'form4' && !shipSelect.value && !customerSelect.value) {
-//         toast('Por favor, seleccione un ' ? 'Buque' : 'Cliente', 'error')
-//         return
-//     }
-
-//     if (selectedForm.value == 'form4') {
-//         formData['ship_id'] = ship.value.id
-//         formData['customer_id'] = customer.value.id
-//     }
-// }
-//endregion
 
 /* SUBMIT*/
 const beforeChange = () => {
@@ -198,9 +154,8 @@ const beforeChange = () => {
 }
 
 const submit = () => {
-    alert('Completado!')
-    //Validación de Fechas de Finalización de Documentos Contractuales
     try {
+        formData.ships = selectedShips.value
         router.post(route('projects.store'), formData, {
             preserveScroll: true,
             onSuccess: (res) => {
@@ -208,7 +163,7 @@ const submit = () => {
                 toast('Proyecto creado exitosamente', 'success')
             },
             onError: (errors) => {
-                toast('Ya existe un proyecto con este contrato.', 'error')
+                toast('Ha ocurrido un Error Revise los datos Enviados.', 'error')
             },
             onFinish: () => {
                 loading.value = false
@@ -480,7 +435,8 @@ const exportarExcel = () => {
                                             </div>
                                         </template>
                                     </Listbox> -->
-                                    <div class="w-full h-52 overflow-y-auto custom-scroll border-2 border-gray-300 rounded-lg p-2 focus hover:border-blue-500">
+                                    <div
+                                        class="w-full h-52 overflow-y-auto custom-scroll border-2 border-gray-300 rounded-lg p-2 focus hover:border-blue-500">
                                         <ul v-for="shift in shiftOptions" :key="shift.id">
                                             <div @click="selectShiftList(shift.id)"
                                                 :class="shiftSelect.includes(shift.id) ? 'bg-blue-900 text-white' : 'hover:bg-gray-200'"
@@ -490,10 +446,12 @@ const exportarExcel = () => {
                                                 </div>
                                                 <div class="flex italic">
                                                     <ClockIcon class="w-4 h-4" />
-                                                    <p><b>&nbsp Hora Inicio:</b> {{ formatDateTime24h(shift.startShift) }} - </p>
+                                                    <p><b>&nbsp Hora Inicio:</b> {{ formatDateTime24h(shift.startShift) }} -
+                                                    </p>
                                                     <p>&nbsp <b>Hora Fin:</b> {{ formatDateTime24h(shift.endShift) }} - </p>
                                                     <p>&nbsp <b>Descanso:</b> {{ shift.timeBreak }}h - </p>
-                                                    <p>&nbsp <b>H. Laborales:</b> {{ parseFloat(shift.hours).toFixed(1) }}</p>
+                                                    <p>&nbsp <b>H. Laborales:</b> {{ parseFloat(shift.hours).toFixed(1) }}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </ul>
@@ -539,4 +497,5 @@ const exportarExcel = () => {
                 </form-wizard>
             </section>
         </main>
-    </AppLayout></template>
+    </AppLayout>
+</template>
