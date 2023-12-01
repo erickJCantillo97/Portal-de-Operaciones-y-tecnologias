@@ -98,7 +98,7 @@ const getTask = async (option) => {
             loadingTasks.value = false
         })
     });
-    axios.get(route('get.personal.gerecia.oficia')).then((res) => {
+    axios.get(route('get.personal.user')).then((res) => {
         personal.value = Object.values(res.data.personal)
         personal.value.forEach(
             async element => {

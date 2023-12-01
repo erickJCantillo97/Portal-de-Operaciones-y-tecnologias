@@ -45,7 +45,8 @@
         },
         "files": [
             "app/Helpers/ConsultApiHelper.php",
-            "app/Helpers/CotecmarServices.php"
+            "app/Helpers/CotecmarServices.php",
+            "app/Helpers/PersonalHelper.php"
         ]
     },
     "autoload-dev": {

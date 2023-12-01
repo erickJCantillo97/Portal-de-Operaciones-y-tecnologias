@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('user_id')->index()->unsigned();
             $table->integer('boss_id')->index()->unsigned();
             $table->integer('boss_last_id')->nullable();
+            $table->string('gerencia_lent')->nullable();
+            $table->string('oficina_lent')->nullable();
             $table->date('return_date')->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -18,24 +18,7 @@ class PersonalController extends Controller
      */
     public function index()
     {
-        $NumSAPPersonal = Personal::where('boss_id', auth()->user()->id)->pluck('user_id')->toArray();
-
-        $miPersonal = getEmpleadosAPI()->filter(function ($employee) use ($NumSAPPersonal) {
-            return $employee['JI_Num_SAP'] == auth()->user()->id || in_array($employee['Num_SAP'], $NumSAPPersonal);
-        })->values()->map(function ($person) use ($NumSAPPersonal) {
-            return [
-                'Num_SAP' => (int) $person['Num_SAP'],
-                'Fecha_Final' => $person['Fecha_Final'],
-                'Costo_Hora' => $person['Costo_Hora'],
-                'Costo_Mes' => $person['Costo_Mes'],
-                'Oficina' => $person['Oficina'],
-                'canDelete' => in_array($person['Num_SAP'], $NumSAPPersonal) && $person['JI_Num_SAP'] != auth()->user()->id,
-                'Nombres_Apellidos' => $person['Nombres_Apellidos'],
-                'Cargo' => $person['Cargo'],
-                'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
-            ];
-        }); //Se debe cambiar el num Sap por el del usuario logueado
-
+        $miPersonal = getPersonalUser();
 
         $personal = getPersonalGerenciaOficina(auth()->user()->gerencia)->values()->map(function ($person) {
             return [
@@ -48,6 +31,14 @@ class PersonalController extends Controller
         }); //Se debe cambiar el num Sap por el del usuario logueado;
 
         return inertia('Personal/Index', ['miPersonal' => $miPersonal, 'personal' => $personal]);
+    }
+
+    public function getPersonalUser()
+    {
+
+        return response()->json([
+            'personal' => getPersonalUser(),
+        ]);
     }
 
     /**
@@ -67,6 +58,9 @@ class PersonalController extends Controller
                     'user_id' => $user['Num_SAP'],
                 ]);
                 $persona->boss_last_id = $persona->boss_id ?? null;
+                $persona->gerencia_lent = auth()->user()->gerencia;
+                $persona->oficina_lent = auth()->user()->oficina;
+                $persona->boss_id = auth()->user()->id;
                 $persona->boss_id = auth()->user()->id;
                 $persona->return_date =  Carbon::parse($validateData['fecha_devolucion'])->format('Y-m-d') ?? null;
                 $persona->save();
