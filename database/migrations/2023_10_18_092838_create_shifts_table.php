@@ -17,14 +17,12 @@ return new class extends Migration
             $table->string('name');
             $table->dateTime('startShift');
             $table->dateTime('endShift');
-            $table->dateTime('startBreak')->nullable;
-            $table->dateTime('endBreak')->nullable;
+            $table->integer('timeBreak')->nullable();
             $table->boolean('status')->default(true);
-            $table->string('description')->nullable;
             $table->timestamps();
             $table->softDeletes();
         });
-        DB::statement("ALTER TABLE shifts ADD hours AS (((DATEDIFF(s, startShift, endShift) - DATEDIFF(s, ISNULL(startBreak, 0), ISNULL(endBreak, 0))))/3600.0)");
+        DB::statement("ALTER TABLE shifts ADD hours AS ((((DATEDIFF(s, startShift, endShift)))/3600.0)-ISNULL(timeBreak,0))");
     }
 
     /**

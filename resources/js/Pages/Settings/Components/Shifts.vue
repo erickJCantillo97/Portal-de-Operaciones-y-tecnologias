@@ -7,11 +7,10 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
 import Button from '@/Components/Button.vue';
 import { useSweetalert } from '@/composable/sweetAlert'
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { ClockIcon } from '@heroicons/vue/24/outline'
 import Calendar from 'primevue/calendar';
-
-import InputMask from 'primevue/inputmask';
+import CustomModal from '@/Components/CustomModal.vue';
+import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
 
 
 const { confirmDelete } = useSweetalert();
@@ -22,7 +21,7 @@ const shift = ref({
     name: '',
     startShift: '',
     endShift: '',
-    startBreak: '',
+    timeBreak: 0,
     endBreak: '',
 })
 const shiftDialog = ref(false)
@@ -60,8 +59,14 @@ const clearFilter = () => {
 };
 
 function format24h(hora) {
-    return new Date(hora).toLocaleString('es-CO',
-        { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+    if (hora.length > 5) {
+        return new Date(hora).toLocaleString('es-CO',
+            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+    }
+    else {
+        return new Date("1970-01-01T" + hora).toLocaleString('es-CO',
+            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+    }
 }
 
 const deleteShift = async (s) => {
@@ -76,9 +81,9 @@ const editShift = async (s) => {
         name: s.name,
         startShift: format24h(s.startShift),
         endShift: format24h(s.endShift),
-        startBreak: format24h(s.startBreak),
-        endBreak: format24h(s.endBreak)
+        timeBreak: s.timeBreak ? s.timeBreak : 0
     };
+    console.table(shift.value)
     shiftDialog.value = true;
 }
 const createShift = () => {
@@ -87,8 +92,7 @@ const createShift = () => {
         name: null,
         startShift: null,
         endShift: null,
-        startBreak: null,
-        endBreak: null
+        timeBreak: 0,
     };
     shiftDialog.value = true;
 }
@@ -103,8 +107,7 @@ const shiftSave = (status, shift) => {
                 name: shift.name,
                 startShift: format24h(shift.startShift),
                 endShift: format24h(shift.endShift),
-                startBreak: format24h(shift.startBreak),
-                endBreak: format24h(shift.endBreak),
+                timeBreak: shift.timeBreak,
                 status: status
             }).then(
                 (res) => {
@@ -119,8 +122,7 @@ const shiftSave = (status, shift) => {
                 name: shift.name,
                 startShift: format24h(shift.startShift),
                 endShift: format24h(shift.endShift),
-                startBreak: format24h(shift.startBreak),
-                endBreak: format24h(shift.endBreak),
+                timeBreak: shift.timeBreak,
                 status: status
             }).then((res) => {
                 shifts.value = res.data[0]
@@ -214,10 +216,9 @@ const calcularDiferencia = (start, end) => {
                 </template>
             </Column>
 
-            <Column field="startBreak" header="Descanso" class="">
+            <Column field="timeBreak" header="Descanso" class="">
                 <template #body="slotProps">
-                    {{ slotProps.data.startBreak ? format24h(slotProps.data.startBreak) + ' a ' +
-                        format24h(slotProps.data.endBreak) : 'No aplica' }}
+                    {{ slotProps.data.timeBreak ? slotProps.data.timeBreak + ' hora' : 'No aplica' }}
                 </template>
             </Column>
             <Column header="Horas" class="">
@@ -258,129 +259,68 @@ const calcularDiferencia = (start, end) => {
 
         </DataTable>
     </div>
-    <TransitionRoot as="template" :show="shiftDialog">
-        <Dialog as="div" class="relative z-10" @close="shiftDialog = false">
-            <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
-                leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-                <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" />
-            </TransitionChild>
 
-            <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-                <div class="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
-                    <TransitionChild as="template" enter="ease-out duration-300"
-                        enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                        enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
-                        leave-from="opacity-100 translate-y-0 sm:scale-100"
-                        leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                        <DialogPanel
-                            class="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                            <div>
-                                <div class="flex items-center justify-center w-12 h-12 mx-auto bg-green-100 rounded-full">
-                                    <ClockIcon class="w-6 h-6 text-green-600" aria-hidden="true" />
-                                </div>
-                                <div class="mt-3 text-center sm:mt-5">
-                                    <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">
-                                        {{ shift.id ? 'Editar horario "' + shift.name + '"' : 'Nuevo horario' }}
-                                    </DialogTitle>
-                                    <div class="mt-2">
-                                        <div class="grid grid-cols-2 gap-5">
-                                            <div class="relative col-span-2">
-                                                <label for="name"
-                                                    class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Nombre</label>
-                                                <input type="text" name="name" id="name" v-model="shift.name" required
-                                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                                    placeholder="Nombre para identificar el horario" />
-                                            </div>
-                                            <div class="relative">
-                                                <label
-                                                    class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Horario</label>
-                                                <div
-                                                    class="grid w-full grid-cols-2 gap-3 p-4 text-gray-900 border-0 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 ">
-                                                    <div class="relative">
-                                                        <label for="startShift"
-                                                            class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Inicio</label>
-                                                        <Calendar name="start" id="start" timeOnly hourFormat="24"
-                                                            v-model="shift.startShift" class="alturah8" :pt="{
-                                                                input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
-                                                            }" />
-                                                    </div>
-                                                    <div class="relative">
-                                                        <label for="endShift"
-                                                            class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Fin</label>
-                                                        <Calendar name="endShift" id="endShift" timeOnly
-                                                            v-model="shift.endShift" hourFormat="24" class="alturah8" :pt="{
-                                                                input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
-                                                            }" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="relative">
-                                                <label for="break"
-                                                    class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Descanso</label>
-                                                <div name="break"
-                                                    class="grid w-full grid-cols-2 gap-3 p-4 text-gray-900 border-0 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 ">
+    <CustomModal :visible=shiftDialog width="30rem">
+        <template #icon>
+            <i class="text-white fa-regular fa-clock"></i>
+        </template>
+        <template #titulo>
+            <p class="text-white">{{ shift.id ? 'Editar horario "' + shift.name + '"' : 'Nuevo horario' }}</p>
+        </template>
+        <template #body>
+            <div class="mt-5">
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="space-y-3">
+                        <span class="p-float-label">
+                            <InputText class="alturah8" id="name" v-model="shift.name" />
+                            <label for="name">Nombre</label>
+                        </span>
+                        <span class="p-float-label">
+                            <Calendar name="start" id="start" timeOnly hourFormat="24" v-model="shift.startShift"
+                                class="alturah8" :pt="{
+                                    input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
+                                }" />
+                            <label for="startShift" class="">Hora inicio</label>
+                        </span>
+                        <span class="p-float-label">
+                            <Calendar name="endShift" id="start" timeOnly hourFormat="24" v-model="shift.endShift"
+                                class="alturah8" :pt="{
+                                    input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
+                                }" />
+                            <label for="endShift" class="">Hora fin</label>
+                        </span>
+                        <span class="p-float-label">
+                            <InputNumber class="alturah8" id="timeBreak" v-model="shift.timeBreak" :minFractionDigits="2" />
+                            <label for="timeBreak" class="">Descanso en horas </label>
+                        </span>
+                    </div>
 
-                                                    <div class="relative">
-                                                        <label for="startBreak"
-                                                            class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Inicio</label>
-                                                        <Calendar name="startBreak" id="startBreak" timeOnly hourFormat="24"
-                                                            v-model="shift.startBreak" class="alturah8" :pt="{
-                                                                input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
-                                                            }" />
-                                                    </div>
-                                                    <div class="relative">
-                                                        <label for="endBreak"
-                                                            class="absolute inline-block px-1 text-xs font-medium text-gray-900 bg-white -top-2 left-2">Fin</label>
-                                                        <Calendar name="endBreak" id="endBreak" timeOnly hourFormat="24"
-                                                            v-model="shift.endBreak" class="alturah8" :pt="{
-                                                                input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
-                                                            }" />
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="relative">
-                                                <p>
-                                                    Tiempo laborado
-                                                </p>
-                                                <p>{{ calcularDiferencia(shift.startShift,
-                                                    shift.endShift).toFixed(2) - calcularDiferencia(shift.startBreak,
-                                                        shift.endBreak).toFixed(2)
-                                                }}
-                                                    Horas</p>
-                                            </div>
-                                            <div class="relative">
-                                                <p>
-                                                    Tiempo en descanso
-                                                </p>
-                                                <p>{{ calcularDiferencia(shift.startBreak, shift.endBreak) }} Horas</p>
-                                            </div>
-                                            <div class="relative col-span-2 text-warning"
-                                                v-if="calcularDiferencia(shift.startShift, shift.endShift) - calcularDiferencia(shift.startBreak, shift.endBreak) > 8.5">
-                                                <p>
-                                                    Tiempo adicional
-                                                </p>
-                                                <p>{{ calcularDiferencia(shift.startShift,
-                                                    shift.endShift) - calcularDiferencia(shift.startBreak, shift.endBreak) -
-                                                    8.5 }} Horas
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
-                                <button type="button"
-                                    class="inline-flex justify-center w-full px-3 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"
-                                    @click="shiftSave(true, shift)">Guardar</button>
-                                <button type="button"
-                                    class="inline-flex justify-center w-full px-3 py-2 mt-3 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
-                                    @click="shiftDialog = false" ref="cancelButtonRef">Cancelar</button>
-                            </div>
-                        </DialogPanel>
-                    </TransitionChild>
+                    <div class="flex flex-col justify-center items-center w-full h-full space-y-2">
+                        <div class="flex justify-between w-full">
+                            <p>
+                                Tiempo laborado
+                            </p>
+                            <p>{{ calcularDiferencia(shift.startShift,
+                                shift.endShift).toFixed(2) - shift.timeBreak
+                            }}
+                                Horas</p>
+                        </div>
+                        <div class="flex justify-between w-full text-warning"
+                            v-if="calcularDiferencia(shift.startShift, shift.endShift) - shift.timeBreak > 8.5">
+                            <p>
+                                Tiempo adicional
+                            </p>
+                            <p>{{ calcularDiferencia(shift.startShift,
+                                shift.endShift) - shift.timeBreak - 8.5 }} Horas
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </Dialog>
-    </TransitionRoot>
+        </template>
+        <template #footer>
+            <Button type="button" severity="primary" @click="shiftSave(true, shift)">Guardar</Button>
+            <Button type="button" severity="danger" @click="shiftDialog = false">Cancelar</Button>
+        </template>
+    </CustomModal>
 </template>

@@ -146,9 +146,11 @@ return [
     */
 
     'attributes' => [
-        'name' => 'nombre',
-        'end_date' => 'fecha de fin',
-        'start_date' => 'fecha de inicio',
+        'name' => 'Nombre',
         'contract_id' => 'Contrato ID',
+        'start_date' => 'Fecha De Inicio',
+        'end_date' => 'Fecha De Finalización',
+        'cost' => 'Costo',
+        'cost_sale' => 'Costo De Venta',
     ],
 ];

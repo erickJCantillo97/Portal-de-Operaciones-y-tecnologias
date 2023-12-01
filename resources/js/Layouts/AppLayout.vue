@@ -11,7 +11,7 @@
             <div class="fixed inset-0 bg-[black]/60 z-10" :class="{ hidden: !menu }" @click="menu = !menu"></div>
             <MenuSidebar class="lg:block " :class="{ hidden: !menu }"></MenuSidebar>
             <div
-                class="max-h-[6vh] z-10 flex items-center justify-between h-auto px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 md:ml-16">
+                class="max-h-[6vh] z-10 flex items-center justify-between h-auto p-7 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 md:ml-16">
                 <div class="w-full">
                     <button type="button" class="-ml-7 p-2.5 text-gray-700 lg:hidden" @click="menu = !menu">
                         <span class="sr-only">Open sidebar</span>
