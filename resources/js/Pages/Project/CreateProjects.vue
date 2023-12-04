@@ -1,27 +1,23 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
-import '../../../sass/dataTableCustomized.scss'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Calendar from 'primevue/calendar'
-import Tag from 'primevue/tag'
 import Combobox from '@/Components/Combobox.vue'
+import Moment from 'moment'
 import { FilterMatchMode, FilterOperator } from 'primevue/api'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue'
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline'
+import { ClockIcon, CalendarDaysIcon } from '@heroicons/vue/24/outline'
 import { useSweetalert } from '@/composable/sweetAlert'
 import { useConfirm } from "primevue/useconfirm"
 import axios from 'axios'
 // import plural from 'pluralize-es'
 import TextInput from '../../Components/TextInput.vue'
 import Textarea from 'primevue/textarea'
-import Button from '../../Components/Button.vue'
+import Button from 'primevue/button'
+// import Button from '../../Components/Button.vue'
 import ShipCardMinimal from "@/Components/ShipCardMinimal.vue"
 import Listbox from 'primevue/listbox'
-import Card from 'primevue/card'
 import { FormWizard, TabContent } from 'vue3-form-wizard'
 import 'vue3-form-wizard/dist/style.css'
 import FileUpload from 'primevue/fileupload'
@@ -35,14 +31,35 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 
+const props = defineProps({
+    'project': Object,
+    'contracts': Array,
+    'authorizations': Array,
+    'quotes': Array,
+    'ships': Array,
+    // 'typeShips': Array,
+})
+
 //#region Referencias (v-model)
 const open = ref(false)
 const contractSelect = ref()
 const authorizationSelect = ref()
 const quoteSelect = ref()
-const shiftSelect = ref([])
 const selectedShips = ref([])
+const API_Ships = ref(props.ships)
+const filteredShips = ref(props.ships)
+const keyword = ref('')
 //#endregion
+
+const searchShips = () => {
+    const searchWord = keyword.value.toLowerCase().trim()
+
+    filteredShips.value = API_Ships.value.filter(ship =>
+        ship.name.toLowerCase().includes(searchWord) ||
+        ship.idHull.toLowerCase().includes(searchWord) ||
+        ship.type_ship.name.toLowerCase().includes(searchWord)
+    )
+}
 
 //#region ENUMS
 //Tipo de Proyecto
@@ -78,14 +95,6 @@ const scopeOptions = ref([
 ])
 //#endregion
 
-const props = defineProps({
-    'project': Object,
-    'contracts': Array,
-    'authorizations': Array,
-    'quotes': Array,
-    'ships': Array,
-    // 'typeShips': Array,
-})
 
 //#region UseForm
 const formData = useForm({
@@ -94,10 +103,10 @@ const formData = useForm({
     contract_id: props.project?.contract_id ?? '0',
     authorization_id: props.project?.authorization_id ?? '0',
     quote_id: props.project?.quote_id ?? '0',
-    type: props.project?.type ?? '0', //ENUMS
+    type: props.project?.type ?? null, //ENUMS
     SAP_code: props.project?.SAP_code ?? '',
-    status: props.project?.status ?? '0', //ENUMS
-    scope: props.project?.scope ?? '0', //ENUMS
+    status: props.project?.status ?? null, //ENUMS
+    scope: props.project?.scope ?? null, //ENUMS
     supervisor: props.project?.supervisor ?? '',
     cost_sale: props.project?.cost_sale ?? '0',
     description: props.project?.description ?? '',
@@ -111,67 +120,32 @@ const formData = useForm({
 //#endregion
 
 onMounted(() => {
-    // getShift()
+    showListbox.value++
+    getShift()
     initFilters()
 })
 
 const toggleSelectShip = (shipId) => {
     if (selectedShips.value.includes(shipId)) {
-        selectedShips.value = selectedShips.value.filter(id => id !== shipId);
+        selectedShips.value = selectedShips.value.filter(id => id !== shipId)
     } else {
-        selectedShips.value = [...selectedShips.value, shipId];
+        selectedShips.value = [...selectedShips.value, shipId]
     }
-};
+}
+
+const selectShiftList = (shiftId) => {
+    if (shiftSelect.value.length === 1 && shiftSelect.value[0] === shiftId) {
+        shiftSelect.value = [];
+    } else {
+        shiftSelect.value = [shiftId];
+    }
+}
 
 //Cancelar Creación de Proyectos
 const cancelCreateProject = () => {
     router.get(route('projects.index'))
 }
 
-//#region if
-// if (formData.id == 0) {
-//     //Validaciones de Formulario de Contratos
-//     if (selectedForm.value == 'form1' && !contractSelect.value) {
-//         toast('Por favor, seleccione un contrato', 'error')
-//         return
-//     }
-
-//     if (selectedForm.value == 'form1') {
-//         formData['contract_id'] = contractSelect.value.id
-//     }
-
-//     //Validaciones de Formulario de Autorizaciones
-//     if (selectedForm.value == 'form2' && !authorizationSelect.value) {
-//         toast('Por favor, seleccione una autorización', 'error')
-//         return
-//     }
-
-//     if (selectedForm.value == 'form2') {
-//         formData['authorization_id'] = authorizationSelect.value.id
-//     }
-
-//     //Validaciones de Formulario de Estimaciones
-//     if (selectedForm.value == 'form3' && !quoteSelect.value) {
-//         toast('Por favor, seleccione una estimación', 'error')
-//         return
-//     }
-
-//     if (selectedForm.value == 'form3') {
-//         formData['quote_id'] = quoteSelect.value.id
-//     }
-
-//     //Validaciones de Formulario de Comunicaciones Internas
-//     if (selectedForm.value == 'form4' && !shipSelect.value && !customerSelect.value) {
-//         toast('Por favor, seleccione un ' ? 'Buque' : 'Cliente', 'error')
-//         return
-//     }
-
-//     if (selectedForm.value == 'form4') {
-//         formData['ship_id'] = ship.value.id
-//         formData['customer_id'] = customer.value.id
-//     }
-// }
-//endregion
 
 /* SUBMIT*/
 const beforeChange = () => {
@@ -180,9 +154,8 @@ const beforeChange = () => {
 }
 
 const submit = () => {
-    alert('Completado!')
-    //Validación de Fechas de Finalización de Documentos Contractuales
     try {
+        formData.ships = selectedShips.value
         router.post(route('projects.store'), formData, {
             preserveScroll: true,
             onSuccess: (res) => {
@@ -190,7 +163,7 @@ const submit = () => {
                 toast('Proyecto creado exitosamente', 'success')
             },
             onError: (errors) => {
-                toast('Ya existe un proyecto con este contrato.', 'error')
+                toast('Ha ocurrido un Error Revise los datos Enviados.', 'error')
             },
             onFinish: () => {
                 loading.value = false
@@ -202,11 +175,13 @@ const submit = () => {
     return 'creado'
 }
 
+const showListbox = ref(0)
+const shiftSelect = ref([])
 const shiftOptions = ref()
 const getShift = () => {
     axios.get(route('shift.index'))
         .then(response => {
-            shiftOptions.value = response.data.name
+            shiftOptions.value = response.data[0]
         })
 }
 
@@ -261,17 +236,13 @@ const initFilters = () => {
     }
 }
 
-
 const clearFilter = () => {
     initFilters()
 }
 
-const formatDate = (value) => {
-    return value.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    })
+function formatDateTime24h(date) {
+    return new Date(date).toLocaleString('es-CO',
+        { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 }
 
 //#region COMPOSABLES
@@ -324,7 +295,7 @@ const exportarExcel = () => {
         <main class="px-8 min-h-full overflow-y-scroll custom-scroll">
             <header class="w-full">
                 <h2 class="text-lg font-semibold mb-4 text-primary text-center lg:text-2xl">
-                    Agregar proyecto
+                    Agregar Proyecto
                 </h2>
             </header>
 
@@ -368,7 +339,7 @@ const exportarExcel = () => {
                     <!--DATOS DEL PROYECTO-->
                     <tab-content title="Datos del Proyecto" icon="fa-solid fa-diagram-project">
                         <section
-                            class="grid grid-cols-2 sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2">
+                            class="grid grid-cols-2 sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4">
                             <!--CAMPO NOMBRE DEL PROYECTO (name)-->
                             <TextInput type="text" label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
                                 v-model="formData.name" :error="$page.props.errors.name">
@@ -399,8 +370,8 @@ const exportarExcel = () => {
                             <div class="">
                                 <label class="text-sm font-bold text-gray-900">Descripción</label>
                                 <Textarea class="col-span-2 text-sm text-gray-500 placeholder:text-sm italic"
-                                    placeholder="Descripción del proyecto..." v-model="formData.description" autoResize
-                                    rows="2" cols="67" />
+                                    placeholder="Descripción del proyecto..." v-model="formData.description" rows="1"
+                                    cols="67" autoResize />
                             </div>
                         </section>
                     </tab-content>
@@ -409,7 +380,7 @@ const exportarExcel = () => {
                     <tab-content title="Planeación del Proyecto" icon="fa-solid fa-calendar-check">
                         <section class="flex sm:col-span-1 md:col-span-1 border gap-6 border-gray-200 rounded-lg p-4">
                             <div class="grid grid-cols-6 gap-6">
-                                <div class="col-span-3">
+                                <div class="col-span-3 space-y-4">
                                     <!--CAMPO FECHA INICIO-->
                                     <TextInput class="text-left" type="date" label="Fecha De Inicio"
                                         v-model="formData.start_date" :error="$page.props.errors.start_date"
@@ -445,10 +416,46 @@ const exportarExcel = () => {
 
                                 <!--CAMPO TURNO (shift)-->
                                 <div class="col-span-3">
-                                    <label class="text-sm font-bold text-gray-900">Turno</label>
-                                    <Listbox v-model="shiftSelect" :options="typeOptions" optionLabel="name"
-                                        :virtualScrollerOptions="{ itemSize: 38 }" class="w-full md:w-14rem"
-                                        listStyle="height:182px" />
+                                    <label class="text-sm font-bold text-gray-900">Seleccione el Turno</label>
+                                    <!-- <Listbox v-if="shiftOptions != null" v-model="shiftSelect" :options="shiftOptions" optionLabel="name"
+                                        :key="showListbox" :virtualScrollerOptions="{ itemSize: 38 }"
+                                        class="w-full md:w-14rem" listStyle="height:182px">
+                                        <template #option="slotProps">
+                                            <div class="grid grid-cols-4 align-items-center">
+                                                <p class="col-span-1 text-xs font-bold">{{ slotProps.option.name }}</p>
+                                                <p class="col-span-3 text-xs">
+                                                    <div class="flex italic">
+                                                        <ClockIcon class="w-4 h-4" />
+                                                        <p><b>&nbsp Hora Inicio:</b> {{ formatDateTime24h(slotProps.option.startShift) }} - </p>
+                                                        <p>&nbsp <b>Hora Fin:</b> {{ formatDateTime24h(slotProps.option.endShift) }} - </p>
+                                                        <p>&nbsp <b>Descanso:</b> {{ slotProps.option.timeBreak }}h - </p>
+                                                        <p>&nbsp <b>H. Laborales:</b> {{ parseFloat(slotProps.option.hours).toFixed(1) }}</p>
+                                                    </div>
+                                                </p>
+                                            </div>
+                                        </template>
+                                    </Listbox> -->
+                                    <div
+                                        class="w-full h-52 overflow-y-auto custom-scroll border-2 border-gray-300 rounded-lg p-2 focus hover:border-blue-500">
+                                        <ul v-for="shift in shiftOptions" :key="shift.id">
+                                            <div @click="selectShiftList(shift.id)"
+                                                :class="shiftSelect.includes(shift.id) ? 'bg-blue-900 text-white' : 'hover:bg-gray-200'"
+                                                class="flex justify-between items-center text-xs space-x-6 p-2 w-full cursor-pointer rounded-lg">
+                                                <div>
+                                                    <p class=" text-xs font-bold">{{ shift.name }}:</p>
+                                                </div>
+                                                <div class="flex italic">
+                                                    <ClockIcon class="w-4 h-4" />
+                                                    <p><b>&nbsp Hora Inicio:</b> {{ formatDateTime24h(shift.startShift) }} -
+                                                    </p>
+                                                    <p>&nbsp <b>Hora Fin:</b> {{ formatDateTime24h(shift.endShift) }} - </p>
+                                                    <p>&nbsp <b>Descanso:</b> {{ shift.timeBreak }}h - </p>
+                                                    <p>&nbsp <b>H. Laborales:</b> {{ parseFloat(shift.hours).toFixed(1) }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </section>
@@ -456,26 +463,32 @@ const exportarExcel = () => {
 
                     <!--BUQUES-->
                     <tab-content title="Buques" icon="fa-solid fa-ship">
+                        <div class="flex w-full gap-2 pb-4">
+                            <input type="search" v-model="keyword" @input="searchShips()"
+                                class="rounded-lg border-2 border-gray-200 w-full placeholder:italic"
+                                placeholder="Filtrar Buques" />
+                        </div>
                         <section
-                            class="grid grid-cols-4 h-64 overflow-y-auto custom-scroll snap-mandatory sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2">
-                            <ul v-for="ship in ships" :key="ship.id">
+                            class="grid grid-cols-4 h-60 overflow-y-auto custom-scroll snap-y snap-mandatory sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2">
+                            <ul v-for="ship in filteredShips" :key="ship.id"
+                                class="text-sm italic [&>li>p]:font-semibold snap-start">
                                 <div @click="toggleSelectShip(ship.id)"
-                                    :class="{ 'bg-blue-900 text-white': selectedShips.includes(ship.id) }"
-                                    class="flex space-x-4 border border-gray-500 rounded-lg p-2 cursor-pointer transition-all duration-200 hover:scale-[105%] hover:shadow-md">
-                                    <div class="w-16">
+                                    :class="selectedShips.includes(ship.id) ? 'bg-blue-900 text-white' : 'hover:bg-blue-300'"
+                                    class="flex space-x-4 shadow-md rounded-sm cursor-pointer transition-all duration-200 hover:scale-[1.01] ease-in-out hover:shadow-md">
+                                    <div class="w-28">
                                         <img :src="ship.file" onerror="this.src='/images/generic-boat.png'"
-                                            class="h-10 w-full mr-1 rounded-lg sm:h-12 sm:w-16" />
+                                            class="object-cover object-center w-full h-16 mr-1" />
                                     </div>
-                                    <div class="w-full">
-                                        <div class="flex w-full">
-                                            <li><p>Nombre: </p>{{ ship.name }}</li>
-                                        </div>
-                                        <div>
-                                            <li><p>Casco: </p>{{ ship.idHull }}</li>
-                                        </div>
-                                        <div>
-                                            <li><p>Clase: </p>{{ ship.type_ship ? ship.type_ship.name : '' }}</li>
-                                        </div>
+                                    <div>
+                                        <li>
+                                            <p><span class="font-semibold">Nombre:</span> {{ ship.name }}</p>
+                                        </li>
+                                        <li>
+                                            <p><span class="font-semibold">Casco:</span> {{ ship.idHull }}</p>
+                                        </li>
+                                        <li>
+                                            <p><span class="font-semibold">Clase:</span> {{ ship.type_ship.name }}</p>
+                                        </li>
                                     </div>
                                 </div>
                             </ul>

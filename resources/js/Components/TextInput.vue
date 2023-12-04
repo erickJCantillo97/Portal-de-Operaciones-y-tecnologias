@@ -54,7 +54,7 @@ defineEmits(['update:modelValue']);
             {{ label }}
             <sup v-if="showSup" class="text-danger">*</sup>
         </label>
-        <div class="relative mt-2 rounded-md shadow-sm">
+        <div class="relative rounded-md shadow-sm">
             <input :type="type != 'password' ? type : (showPassword ? 'text' : 'password')" :name="name"
                 :showPassword="showPassword" autocomplete="current-password"
                 :class="[error != null ? 'text-red-900 ring-1 ring-inset ring-red-300 focus:ring-2 focus:ring-inset focus:ring-red-500' : '']"
@@ -72,6 +72,6 @@ defineEmits(['update:modelValue']);
                 <ExclamationCircleIcon class="w-5 h-5 text-red-500" aria-hidden="true" v-if="error != null" />
             </div>
         </div>
-        <p class="mt-2 text-sm text-red-600" id="email-error">{{ error }}</p>
+        <p class="text-sm text-red-600" id="email-error">{{ error }}</p>
     </div>
 </template>

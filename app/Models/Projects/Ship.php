@@ -23,7 +23,10 @@ class Ship extends Model implements Auditable
 
     public function typeShip()
     {
-        return $this->belongsTo(TypeShip::class, 'type_ship_id');
+        return $this->belongsTo(TypeShip::class, 'type_ship_id')
+            ->withDefault(function ($typeShip, $ship) {
+                $typeShip->name = 'Sin Clase';
+            });
     }
 
     public function projectsShip()

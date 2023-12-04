@@ -56,7 +56,7 @@ class ProjectController extends Controller
             'status' => 'nullable',
             'scope' => 'nullable',
             'supervisor' => 'nullable',
-            'cost_sale' => 'nullable|numeric|gt:0',
+            'cost_sale' => 'nullable|numeric',
             'description' => 'nullable',
             'start_date' => 'nullable',
             'end_date' => 'nullable',
@@ -67,18 +67,19 @@ class ProjectController extends Controller
         ]);
 
         try {
+            $validateData['gerencia'] = auth()->user()->gerencia;
 
             $id = Project::create($validateData)->id;
             foreach ($request->ships as $ship) {
                 ProjectsShip::create([
                     'project_id' => $id,
-                    'ship_id' => $ship['id'],
+                    'ship_id' => $ship,
                 ]);
             }
 
             return back()->with(['message' => 'Proyecto creado correctamente'], 200);
         } catch (Exception $e) {
-            return back()->withErrors(['message' => 'Ocurrió un error al crear el proyecto: '.$e->getMessage()], 500);
+            return back()->withErrors(['message' => 'Ocurrió un error al crear el proyecto: ' . $e->getMessage()], 500);
         }
 
         return redirect('projects.index');
@@ -152,7 +153,7 @@ class ProjectController extends Controller
         try {
             $project->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrió un Error Al Actualizar : '.$e);
+            return back()->withErrors('message', 'Ocurrió un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -164,7 +165,7 @@ class ProjectController extends Controller
         try {
             $project->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }
