@@ -104,7 +104,7 @@ const formData = useForm({
     authorization_id: props.project?.authorization_id ?? '0',
     quote_id: props.project?.quote_id ?? '0',
     type: props.project?.type ?? null, //ENUMS
-    SAP_code: props.project?.SAP_code ?? '',
+    SAP_code: props.project?.SAP_code ?? null,
     status: props.project?.status ?? null, //ENUMS
     scope: props.project?.scope ?? null, //ENUMS
     supervisor: props.project?.supervisor ?? '',
@@ -120,7 +120,6 @@ const formData = useForm({
 //#endregion
 
 onMounted(() => {
-    showListbox.value++
     getShift()
     initFilters()
 })
@@ -135,9 +134,9 @@ const toggleSelectShip = (shipId) => {
 
 const selectShiftList = (shiftId) => {
     if (shiftSelect.value.length === 1 && shiftSelect.value[0] === shiftId) {
-        shiftSelect.value = [];
+        shiftSelect.value = []
     } else {
-        shiftSelect.value = [shiftId];
+        shiftSelect.value = [shiftId]
     }
 }
 
@@ -148,36 +147,68 @@ const cancelCreateProject = () => {
 
 
 /* SUBMIT*/
-const beforeChange = () => {
-    alert('Antes de pasar al otro tab')
-    return true
-}
+const isSaved = ref(false)
+const projectIdRef = ref(null)
 
-const submit = () => {
+const beforeChange = async () => {
+    formData.ships = selectedShips.value
+    let switchStates = false
+
     try {
-        formData.ships = selectedShips.value
-        router.post(route('projects.store'), formData, {
-            preserveScroll: true,
-            onSuccess: (res) => {
-                open.value = false
-                toast('Proyecto creado exitosamente', 'success')
-            },
-            onError: (errors) => {
-                toast('Ha ocurrido un Error Revise los datos Enviados.', 'error')
-            },
-            onFinish: () => {
-                loading.value = false
-            }
-        })
+        console.log(projectIdRef.value)
+        if (!projectIdRef.value) {
+            await axios.post(route('projects.store'), formData)
+                .then((res) => {
+                    toast('Proyecto creado exitosamente!', 'success')
+                    projectIdRef.value = res.data.project_id
+                    switchStates = true
+                })
+            return switchStates
+        } else {
+            formData.shift = selectedShift.value
+            await axios.put(route('projects.update', projectIdRef.value), formData)
+                .then((res) => {
+                    toast('Proyecto actualizado exitosamente!', 'success')
+                    switchStates = true
+                })
+            return switchStates
+            // return true
+        }
     } catch (error) {
         toast(error.message)
     }
-    return 'creado'
 }
 
-const showListbox = ref(0)
+const submit = async () => {
+    // TO DO store onComplete()
+    // return false
+    try {
+        formData.ships = selectedShips.value
+        if (!projectIdRef) {
+            await axios.post(route('projects.store', projectIdRef), formData)
+                .then((res) => {
+                    toast('Proyecto creado exitosamente!', 'success')
+                    switchStates = true
+                })
+            return switchStates
+        } else {
+            await axios.put(route('projects.update', projectIdRef), formData)
+                .then((res) => {
+                    toast('Proyecto actualizado exitosamente!', 'success')
+                    switchStates = true
+                })
+            return switchStates
+            // return true
+        }
+    } catch (error) {
+        toast(error.message)
+    }
+    // return false
+}
+
 const shiftSelect = ref([])
 const shiftOptions = ref()
+
 const getShift = () => {
     axios.get(route('shift.index'))
         .then(response => {
@@ -304,9 +335,14 @@ const exportarExcel = () => {
                 <form-wizard @on-complete="submit()" stepSize="md" color="#2E3092" nextButtonText="Siguiente"
                     backButtonText="Regresar" finishButtonText="Guardar">
                     <!--DOCUMENTOS CONTRACTUALES-->
-                    <tab-content title="Información Contractual" icon="fa-solid fa-file-signature">
+                    <tab-content title="Información Contractual" icon="fa-solid fa-file-signature"
+                        :before-change="beforeChange">
                         <section
                             class="sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 grid grid-cols-2">
+                            <!--CAMPO NOMBRE DEL PROYECTO (name)-->
+                            <TextInput type="text" label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
+                                v-model="formData.name" :error="$page.props.errors.name">
+                            </TextInput>
 
                             <!--CAMPO CÓDIGO DE SAP (SAP_code)-->
                             <TextInput type="text" label="Código SAP" placeholder="Escriba el código de SAP"
@@ -337,14 +373,9 @@ const exportarExcel = () => {
                     </tab-content>
 
                     <!--DATOS DEL PROYECTO-->
-                    <tab-content title="Datos del Proyecto" icon="fa-solid fa-diagram-project">
+                    <tab-content title="Datos del Proyecto" icon="fa-solid fa-diagram-project" :before-change="beforeChange" >
                         <section
                             class="grid grid-cols-2 sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4">
-                            <!--CAMPO NOMBRE DEL PROYECTO (name)-->
-                            <TextInput type="text" label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
-                                v-model="formData.name" :error="$page.props.errors.name">
-                            </TextInput>
-
                             <!--CAMPO SUPERVISOR (supervisor)-->
                             <TextInput label="Supervisor" type="text" :placeholder="'Nombre del supervisor'"
                                 v-model="formData.supervisor" :error="router.page.props.errors.supervisor">
@@ -367,17 +398,17 @@ const exportarExcel = () => {
                             </TextInput>
 
                             <!--CAMPO DESCRIPCIÓN (description)-->
-                            <div class="">
+                            <div>
                                 <label class="text-sm font-bold text-gray-900">Descripción</label>
-                                <Textarea class="col-span-2 text-sm text-gray-500 placeholder:text-sm italic"
+                                <Textarea class="col-span-4 text-sm text-gray-500 placeholder:text-sm italic"
                                     placeholder="Descripción del proyecto..." v-model="formData.description" rows="1"
-                                    cols="67" autoResize />
+                                    cols="143" autoResize />
                             </div>
                         </section>
                     </tab-content>
 
                     <!--PLANEACIÓN DEL PROYECTO-->
-                    <tab-content title="Planeación del Proyecto" icon="fa-solid fa-calendar-check">
+                    <tab-content title="Planeación del Proyecto" icon="fa-solid fa-calendar-check" :before-change="beforeChange">
                         <section class="flex sm:col-span-1 md:col-span-1 border gap-6 border-gray-200 rounded-lg p-4">
                             <div class="grid grid-cols-6 gap-6">
                                 <div class="col-span-3 space-y-4">
