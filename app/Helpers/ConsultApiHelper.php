@@ -44,6 +44,19 @@ function login(): bool
     }
 }
 
+function GDTipologias()
+{
+    try {
+        if (getToken()) {
+            $json = Http::acceptJson()->withToken(session()->get('token'))
+                ->get(
+                    ROUTE_API . '/trd_gd_view'
+                )->json();
 
-
-
+            return collect($json);
+        }
+        dd('Sin token');
+    } catch (\Throwable $th) {
+        dd($th);
+    }
+}

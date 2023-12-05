@@ -25,8 +25,8 @@ const contractSelect = ref();
 const shipSelect = ref();
 const op = ref();
 const toggle = (event, p) => {
-    projectSelect.value = p;
-    op.value.toggle(event);
+    projectSelect.value = p
+    op.value.toggle(event)
 }
 
 const props = defineProps({
@@ -50,70 +50,60 @@ const formData = useForm({
     daysPerWeek: props.projects?.daysPerWeek ?? '5',
     daysPerMonth: props.projects?.daysPerMonth ?? '20',
     pdf: null
-});
+})
 //#endregion
 
 onMounted(() => {
-    initFilters();
+    initFilters()
 })
 
 const addItem = () => {
     router.get(route('projects.create'))
-    clearError();
-    // formData.reset();
-    // open.value = true;
+    clearError()
+    // formData.reset()
+    // open.value = true
 }
 
-const editItem = (project) => {
-    clearError();
+const editItem = (project_id) => {
 
-    formData.id = project.id;
-    contractSelect.value = project.contract;
-    shipSelect.value = project.ship;
-    formData.name = project.name;
-    formData.gerencia = project.gerencia;
-    formData.start_date = project.start_date;
-    formData.end_date = project.end_date;
-    formData.hoursPerDay = project.hoursPerDay;
-    formData.daysPerWeek = project.daysPerWeek;
-    formData.daysPerMonth = project.daysPerMonth;
-    formData.pdf = project.pdf
-    open.value = true;
-};
+}
 
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
     }
-};
+}
 
 const clearFilter = () => {
-    initFilters();
-};
+    initFilters()
+}
 
 const clearError = () => {
-    router.page.props.errors = {};
+    router.page.props.errors = {}
 }
 
 const getStatusSeverity = (status) => {
     switch (status) {
         case 'DISEÑO Y CONSTRUCCIÓN':
-            return 'info';
+            return 'info'
 
-        case 'PROCESO':
-            return 'warning';
+        case 'CONSTRUCCIÓN':
+            return 'info'
 
-        case 'PENDIENTE':
-            return 'danger';
+        case 'DISEÑO':
+            return 'warning'
+
+        case 'GARANTIA':
+            return 'info'
 
         case 'SERVICIO POSTVENTA':
-            return 'success';
+            return 'success'
 
         default:
-            return 'danger';
+            return 'danger'
     }
-};
+}
 
 
 const items = [
@@ -216,10 +206,14 @@ const items = [
                 </template>
 
                 <!--COLUMNAS-->
-                <Column field="SAP_code" header="Codigo SAP"></Column>
+                <Column field="SAP_code" header="Código SAP"></Column>
                 <Column field="name" header="Nombre"></Column>
                 <Column field="gerencia" header="Gerencia"></Column>
-                <Column field="cost_sale" header="Costo de Venta"></Column>
+                <Column field="cost_sale" header="Costo de Venta">
+                    <template #body="slotProps">
+                        {{ formatCurrency(slotProps.data.cost_sale) }}
+                    </template>
+                </Column>
                 <Column field="end_date" header="Fecha Finalización"></Column>
                 <Column field="status" header="Estado" sortable>
                     <template #body="slotProps">
@@ -254,12 +248,16 @@ const items = [
                                     </svg>
                                 </Button>
                             </div>
+
                             <!--BOTÓN EDITAR-->
                             <div title="Editar Proyecto">
-                                <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
-                                    <PencilIcon class="w-4 h-4 " aria-hidden="true" />
-                                </Button>
+                                <Link :href="route('projects.edit', slotProps.data.id)">
+                                    <Button severity="primary" class="hover:bg-primary">
+                                        <PencilIcon class="w-4 h-4" aria-hidden="true" />
+                                    </Button>
+                                </Link>
                             </div>
+
                             <!--BOTÓN ELIMINAR-->
                             <div title="Eliminar Proyecto">
                                 <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Proyecto', 'projects')"
@@ -272,7 +270,6 @@ const items = [
                 </Column>
             </DataTable>
         </div>
-
 
         <OverlayPanel ref="op">
             <div>
@@ -292,7 +289,7 @@ const items = [
                                     <a href="#" class="focus:outline-none">
                                         <span class="absolute inset-0" aria-hidden="true" />
                                         <span>{{ item.title }}</span>
-                                        <span aria-hidden="true"> &rarr;</span>
+                                        <span aria-hidden="true"> &rarr</span>
                                     </a>
                                 </h3>
                                 <p class="mt-1 text-sm text-gray-500">{{ item.description }}</p>
@@ -303,7 +300,7 @@ const items = [
                 <!-- <div class="flex mt-4">
                     <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         Or start from an empty project
-                        <span aria-hidden="true"> &rarr;</span>
+                        <span aria-hidden="true"> &rarr</span>
                     </a>
                 </div> -->
             </div>

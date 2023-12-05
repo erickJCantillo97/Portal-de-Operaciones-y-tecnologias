@@ -37,11 +37,11 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/web.php'));
 
             Route::middleware('web')
-                    ->group(base_path('routes/Customs/Personal.php'));
+                ->group(base_path('routes/Customs/Personal.php'));
             Route::middleware('web')
-                    ->group(base_path('routes/Customs/Project.php'));
+                ->group(base_path('routes/Customs/Project.php'));
             Route::middleware('web')
-                    ->group(base_path('routes/Customs/Programming.php'));
+                ->group(base_path('routes/Customs/Programming.php'));
 
             Route::middleware('web')
                 ->prefix('security')
@@ -49,6 +49,9 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('web')
                 ->prefix('settings')
                 ->group(base_path('routes/Customs/Settings.php'));
+            Route::middleware('web')
+                ->prefix('documentManagement')
+                ->group(base_path('routes/Customs/GestionDocumental.php'));
         });
     }
 }
