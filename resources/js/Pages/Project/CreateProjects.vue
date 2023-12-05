@@ -22,11 +22,11 @@ const filters = ref({
 })
 
 const props = defineProps({
-    'project': Object,
-    'contracts': Array,
-    'authorizations': Array,
-    'quotes': Array,
-    'ships': Array,
+    project: Object,
+    contracts: Array,
+    authorizations: Array,
+    quotes: Array,
+    ships: Array,
     // 'typeShips': Array,
 })
 
@@ -113,6 +113,7 @@ const formData = useForm({
 
 onMounted(() => {
     getShift()
+    getProjectsPropsForEdit()
     initFilters()
 })
 
@@ -156,9 +157,8 @@ const beforeChange = async () => {
                 })
             return switchTabsStates
         } else {
-            alert(projectIdRef.value)
             formData.shift = shiftSelect.value
-            await axios.put('/projects/' + projectIdRef.value, formData)
+            await axios.put(route('projects.update', projectIdRef.value), formData)
                 .then((res) => {
                     toast('Proyecto actualizado exitosamente!', 'success')
                     switchTabsStates = true
@@ -203,6 +203,11 @@ const getShift = () => {
         .then(response => {
             shiftOptions.value = response.data[0]
         })
+}
+
+const getProjectsPropsForEdit = () => {
+    projectIdRef.value = props.project?.id ?? null
+    scopeSelect.value = { name: props.project?.scope ?? '' }
 }
 
 // router.put(route('projects.update', formData.id), formData, {
@@ -441,24 +446,6 @@ const exportarExcel = () => {
                                 <!--CAMPO TURNO (shift)-->
                                 <div class="col-span-3">
                                     <label class="text-sm font-bold text-gray-900">Seleccione el Turno</label>
-                                    <!-- <Listbox v-if="shiftOptions != null" v-model="shiftSelect" :options="shiftOptions" optionLabel="name"
-                                        :key="showListbox" :virtualScrollerOptions="{ itemSize: 38 }"
-                                        class="w-full md:w-14rem" listStyle="height:182px">
-                                        <template #option="slotProps">
-                                            <div class="grid grid-cols-4 align-items-center">
-                                                <p class="col-span-1 text-xs font-bold">{{ slotProps.option.name }}</p>
-                                                <p class="col-span-3 text-xs">
-                                                    <div class="flex italic">
-                                                        <ClockIcon class="w-4 h-4" />
-                                                        <p><b>&nbsp Hora Inicio:</b> {{ formatDateTime24h(slotProps.option.startShift) }} - </p>
-                                                        <p>&nbsp <b>Hora Fin:</b> {{ formatDateTime24h(slotProps.option.endShift) }} - </p>
-                                                        <p>&nbsp <b>Descanso:</b> {{ slotProps.option.timeBreak }}h - </p>
-                                                        <p>&nbsp <b>H. Laborales:</b> {{ parseFloat(slotProps.option.hours).toFixed(1) }}</p>
-                                                    </div>
-                                                </p>
-                                            </div>
-                                        </template>
-                                    </Listbox> -->
                                     <div
                                         class="w-full h-52 overflow-y-auto custom-scroll border-2 border-gray-300 rounded-lg p-2 focus hover:border-blue-500">
                                         <ul v-for="shift in shiftOptions" :key="shift.id">
