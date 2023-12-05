@@ -1,43 +1,43 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref, onMounted } from 'vue';
-import { Link, router, useForm } from '@inertiajs/vue3';
-import '../../../sass/dataTableCustomized.scss';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Calendar from 'primevue/calendar';
-import Tag from 'primevue/tag';
-import Combobox from '@/Components/Combobox.vue';
-import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassPlusIcon, SparklesIcon, EyeIcon, PhotoIcon, TableCellsIcon, ArrowUpCircleIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline';
-import { useSweetalert } from '@/composable/sweetAlert';
-import { useConfirm } from "primevue/useconfirm";
+import AppLayout from '@/Layouts/AppLayout.vue'
+import { ref, onMounted } from 'vue'
+import { Link, router, useForm } from '@inertiajs/vue3'
+import '../../../sass/dataTableCustomized.scss'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import Calendar from 'primevue/calendar'
+import Tag from 'primevue/tag'
+import Combobox from '@/Components/Combobox.vue'
+import { FilterMatchMode, FilterOperator } from 'primevue/api'
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue'
+import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassPlusIcon, SparklesIcon, EyeIcon, PhotoIcon, TableCellsIcon, ArrowUpCircleIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline'
+import { useSweetalert } from '@/composable/sweetAlert'
+import { useConfirm } from "primevue/useconfirm"
 
 // import plural from 'pluralize-es'
-import TextInput from '../../Components/TextInput.vue';
-import Button from '../../Components/Button.vue';
-import OverlayPanel from 'primevue/overlaypanel';
+import TextInput from '../../Components/TextInput.vue'
+import Button from '../../Components/Button.vue'
+import OverlayPanel from 'primevue/overlaypanel'
 
-// import Button from 'primevue/button';
+// import Button from 'primevue/button'
 
-const confirm = useConfirm();
-const { toast } = useSweetalert();
-const loading = ref(false);
-const { confirmDelete } = useSweetalert();
+const confirm = useConfirm()
+const { toast } = useSweetalert()
+const loading = ref(false)
+const { confirmDelete } = useSweetalert()
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
-const open = ref(false);
-const project = ref();
-const projectSelect = ref();
-const contractSelect = ref();
-const shipSelect = ref();
-const op = ref();
+const open = ref(false)
+const project = ref()
+const projectSelect = ref()
+const contractSelect = ref()
+const shipSelect = ref()
+const op = ref()
 const toggle = (event, p) => {
-    projectSelect.value = p;
-    op.value.toggle(event);
+    projectSelect.value = p
+    op.value.toggle(event)
 }
 
 const props = defineProps({
@@ -61,11 +61,11 @@ const formData = useForm({
     daysPerWeek: props.projects?.daysPerWeek ?? '5',
     daysPerMonth: props.projects?.daysPerMonth ?? '20',
     pdf: null
-});
+})
 //#endregion
 
 onMounted(() => {
-    initFilters();
+    initFilters()
 })
 
 
@@ -75,70 +75,57 @@ const formFile = useForm({
 })
 //#region SUBMIT
 const submit = () => {
-    loading.value = true;
+    loading.value = true
     if (formData.id == 0) {
         router.post(route('projects.store'), formData, {
             preserveScroll: true,
             onSuccess: (res) => {
-                open.value = false;
-                toast('Proyecto creado exitosamente', 'success');
+                open.value = false
+                toast('Proyecto creado exitosamente', 'success')
             },
             onError: (errors) => {
-                toast('¡Ups! Ha surgido un error', 'error');
+                toast('¡Ups! Ha surgido un error', 'error')
             },
             onFinish: visit => {
-                loading.value = false;
+                loading.value = false
             }
         })
-        return 'creado';
+        return 'creado'
     }
     router.put(route('projects.update', formData.id), formData, {
         preserveScroll: true,
         onSuccess: (res) => {
-            open.value = false;
-            toast('¡Proyecto actualizado exitosamente!', 'success');
+            open.value = false
+            toast('¡Proyecto actualizado exitosamente!', 'success')
         },
         onError: (errors) => {
-            toast('¡Ups! Ha surgido un error', 'error');
+            toast('¡Ups! Ha surgido un error', 'error')
         },
         onFinish: visit => {
-            loading.value = false;
+            loading.value = false
         }
     })
 }
 //#endregion
 
 const addManager = () => {
-    formFile.project_id = projectSelect.value.id;
+    formFile.project_id = projectSelect.value.id
     formFile.post(route('post.excel.import'))
 }
 
 const addItem = () => {
     router.get(route('projects.create'))
-    clearError();
-    // formData.reset();
-    // open.value = true;
+    clearError()
+    // formData.reset()
+    // open.value = true
 }
 
-const editItem = (project) => {
-    clearError();
+const editItem = (project_id) => {
 
-    formData.id = project.id;
-    contractSelect.value = project.contract;
-    shipSelect.value = project.ship;
-    formData.name = project.name;
-    formData.gerencia = project.gerencia;
-    formData.start_date = project.start_date;
-    formData.end_date = project.end_date;
-    formData.hoursPerDay = project.hoursPerDay;
-    formData.daysPerWeek = project.daysPerWeek;
-    formData.daysPerMonth = project.daysPerMonth;
-    formData.pdf = project.pdf
-    open.value = true;
-};
+}
 
 const addTask = (id) => {
-    router.get(route('createSchedule.create', id));
+    router.get(route('createSchedule.create', id))
 }
 
 
@@ -147,14 +134,14 @@ const initFilters = () => {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
     }
-};
+}
 
 const clearFilter = () => {
-    initFilters();
-};
+    initFilters()
+}
 
 const clearError = () => {
-    router.page.props.errors = {};
+    router.page.props.errors = {}
 }
 
 const formatDate = (value) => {
@@ -162,54 +149,54 @@ const formatDate = (value) => {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
-    });
-};
+    })
+}
 
 // Formatear el número en moneda (USD)
 const formatCurrency = (value) => {
     return parseFloat(value).toLocaleString('es-CO', {
         style: 'currency',
         currency: 'COP'
-    });
-};
+    })
+}
 
 const getStatusSeverity = (status) => {
     switch (status) {
         case 'DISEÑO Y CONSTRUCCIÓN':
-            return 'info';
+            return 'info'
 
-        case 'PROCESO':
-            return 'warning';
+        case 'CONSTRUCCIÓN':
+            return 'info'
 
-        case 'PENDIENTE':
-            return 'danger';
+        case 'DISEÑO':
+            return 'warning'
+
+        case 'GARANTIA':
+            return 'info'
 
         case 'SERVICIO POSTVENTA':
-            return 'success';
+            return 'success'
 
         default:
-            return 'danger';
+            return 'danger'
     }
-};
+}
 
 const exportarExcel = () => {
-    //console.log(dt.value)
-    // Acquire Data (reference to the HTML table)
-    var table_elt = document.getElementById("tabla");
+    var table_elt = document.getElementById("tabla")
 
-    var workbook = XLSX.utils.table_to_book(table_elt);
+    var workbook = XLSX.utils.table_to_book(table_elt)
 
-    var ws = workbook.Sheets["Sheet1"];
+    var ws = workbook.Sheets["Sheet1"]
     XLSX.utils.sheet_add_aoa(ws, [
         ["Creado " + new Date().toISOString()]
-    ], { origin: -1 });
+    ], { origin: -1 })
 
     // Package and Release Data (`writeFile` tries to write and save an XLSB file)
-    XLSX.writeFile(workbook, 'Lista de Contratos_' + project.nit + '_' + project.name + ".xlsb");
-};
+    XLSX.writeFile(workbook, 'Lista de Contratos_' + project.nit + '_' + project.name + ".xlsb")
+}
 
-const items = [
-    {
+const items = [{
         title: 'Crear cronograma nuevo',
         description: 'Aqui podra crear un cronograma vacio',
         icon: MagnifyingGlassPlusIcon,
@@ -237,6 +224,9 @@ const items = [
     },
 ]
 
+const createProjectsPage = [
+    { page: 'projects.edit' }
+]
 
 </script>
 
@@ -309,10 +299,14 @@ const items = [
                 </template>
 
                 <!--COLUMNAS-->
-                <Column field="SAP_code" header="Codigo SAP"></Column>
+                <Column field="SAP_code" header="Código SAP"></Column>
                 <Column field="name" header="Nombre"></Column>
                 <Column field="gerencia" header="Gerencia"></Column>
-                <Column field="cost_sale" header="Costo de Venta"></Column>
+                <Column field="cost_sale" header="Costo de Venta">
+                    <template #body="slotProps">
+                        {{ formatCurrency(slotProps.data.cost_sale) }}
+                    </template>
+                </Column>
                 <Column field="end_date" header="Fecha Finalización"></Column>
                 <Column field="status" header="Estado" sortable>
                     <template #body="slotProps">
@@ -327,14 +321,9 @@ const items = [
                         <!--BOTÓN CREAR ACTIVIDADES-->
                         <div
                             class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
-                            <div title="Crear Actividades">
-                                <Button severity="primary" @click="toggle($event, slotProps.data)" class="hover:bg-primary">
-
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" class="w-4 h-4">
-                                        <path
-                                            d="M260-160q-91 0-155.5-63T40-377q0-78 47-139t123-78q25-92 100-149t170-57q117 0 198.5 81.5T760-520q69 8 114.5 59.5T920-340q0 75-52.5 127.5T740-160H520q-33 0-56.5-23.5T440-240v-206l-64 62-56-56 160-160 160 160-56 56-64-62v206h220q42 0 71-29t29-71q0-42-29-71t-71-29h-60v-80q0-83-58.5-141.5T480-720q-83 0-141.5 58.5T280-520h-20q-58 0-99 41t-41 99q0 58 41 99t99 41h100v80H260Zm220-280Z" />
-                                    </svg>
-
+                            <div title="Agregar documentos">
+                                <Button severity="primary" @click="" class="hover:bg-primary">
+                                    <i class="fa-solid fa-cloud-arrow-up h-4 w-4 flex items-center"></i>
                                 </Button>
                             </div>
                             <div title="Crear Actividades">
@@ -352,12 +341,16 @@ const items = [
                                     </svg>
                                 </Button>
                             </div>
+
                             <!--BOTÓN EDITAR-->
                             <div title="Editar Proyecto">
-                                <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
-                                    <PencilIcon class="w-4 h-4 " aria-hidden="true" />
-                                </Button>
+                                <Link :href="route('projects.edit', slotProps.data.id)">
+                                    <Button severity="primary" class="hover:bg-primary">
+                                        <PencilIcon class="w-4 h-4" aria-hidden="true" />
+                                    </Button>
+                                </Link>
                             </div>
+
                             <!--BOTÓN ELIMINAR-->
                             <div title="Eliminar Proyecto">
                                 <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Proyecto', 'projects')"
@@ -370,7 +363,6 @@ const items = [
                 </Column>
             </DataTable>
         </div>
-
 
         <OverlayPanel ref="op">
             <div>
@@ -390,7 +382,7 @@ const items = [
                                     <a href="#" class="focus:outline-none">
                                         <span class="absolute inset-0" aria-hidden="true" />
                                         <span>{{ item.title }}</span>
-                                        <span aria-hidden="true"> &rarr;</span>
+                                        <span aria-hidden="true"> &rarr</span>
                                     </a>
                                 </h3>
                                 <p class="mt-1 text-sm text-gray-500">{{ item.description }}</p>
@@ -401,12 +393,15 @@ const items = [
                 <!-- <div class="flex mt-4">
                     <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         Or start from an empty project
-                        <span aria-hidden="true"> &rarr;</span>
+                        <span aria-hidden="true"> &rarr</span>
                     </a>
                 </div> -->
             </div>
         </OverlayPanel>
 
+        <CustomModal >
+
+        </CustomModal>
 
     </AppLayout>
 </template>
