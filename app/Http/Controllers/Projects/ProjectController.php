@@ -112,8 +112,7 @@ class ProjectController extends Controller
         $authorizations = Authorization::orderBy('contract_id')->get();
         $quotes = Quote::orderBy('ship_id')->get();
 
-        return Inertia::render(
-            'Project/CreateProjects',
+        return Inertia::render('Project/CreateProjects',
             [
                 'project' => $project,
                 'contracts' => $contracts,
@@ -147,13 +146,14 @@ class ProjectController extends Controller
             'daysPerWeek' => 'nullable',
             'daysPerMonth' => 'nullable',
             'shift' => 'nullable',
-            'file' => 'nullable',
+            'file' => 'nullable'
         ]);
 
         try {
             $project->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrió un Error Al Actualizar : ' . $e);
+            dd($e);
+            // return back()->withErrors(['message', 'Ocurrió un Error Al Actualizar El Proyecto: ' . $e->getMessage()], 500);
         }
     }
 

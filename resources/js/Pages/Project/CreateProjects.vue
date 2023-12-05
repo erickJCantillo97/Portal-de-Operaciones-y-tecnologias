@@ -39,6 +39,8 @@ const selectedShips = ref([])
 const API_Ships = ref(props.ships)
 const filteredShips = ref(props.ships)
 const keyword = ref('')
+const shiftSelect = ref('1')
+const shiftOptions = ref()
 //#endregion
 
 const searchShips = () => {
@@ -88,7 +90,7 @@ const scopeOptions = ref([
 
 //#region UseForm
 const formData = useForm({
-    id: props.project?.id ?? '0',
+    id: props.project?.id ?? null,
     name: props.project?.name ?? '',
     contract_id: props.project?.contract_id ?? '0',
     authorization_id: props.project?.authorization_id ?? '0',
@@ -123,11 +125,7 @@ const toggleSelectShip = (shipId) => {
 }
 
 const selectShiftList = (shiftId) => {
-    if (shiftSelect.value.length === 1 && shiftSelect.value[0] === shiftId) {
-        shiftSelect.value = []
-    } else {
-        shiftSelect.value = [shiftId]
-    }
+    shiftSelect.value = shiftId
 }
 
 //Cancelar Creación de Proyectos
@@ -137,31 +135,35 @@ const cancelCreateProject = () => {
 
 
 /* SUBMIT*/
-const isSaved = ref(false)
+// const isSaved = ref(false)
 const projectIdRef = ref(null)
 
 const beforeChange = async () => {
+    formData.type = typeSelect.value?.name ?? null
+    formData.status = statusSelect.value?.name ?? null
+    formData.scope = scopeSelect.value?.name ?? null
     formData.ships = selectedShips.value
-    let switchStates = false
+    let switchTabsStates = false
 
     try {
-        console.log(projectIdRef.value)
         if (!projectIdRef.value) {
+            console.log(projectIdRef.value)
             await axios.post(route('projects.store'), formData)
                 .then((res) => {
-                    toast('Proyecto creado exitosamente!', 'success')
                     projectIdRef.value = res.data.project_id
-                    switchStates = true
+                    toast('Proyecto creado exitosamente!', 'success')
+                    switchTabsStates = true
                 })
-            return switchStates
+            return switchTabsStates
         } else {
-            formData.shift = selectedShift.value
-            await axios.put(route('projects.update', projectIdRef.value), formData)
+            alert(projectIdRef.value)
+            formData.shift = shiftSelect.value
+            await axios.put('/projects/' + projectIdRef.value, formData)
                 .then((res) => {
                     toast('Proyecto actualizado exitosamente!', 'success')
-                    switchStates = true
+                    switchTabsStates = true
                 })
-            return switchStates
+            return switchTabsStates
             // return true
         }
     } catch (error) {
@@ -178,16 +180,16 @@ const submit = async () => {
             await axios.post(route('projects.store', projectIdRef), formData)
                 .then((res) => {
                     toast('Proyecto creado exitosamente!', 'success')
-                    switchStates = true
+                    switchTabsStates = true
                 })
-            return switchStates
+            return switchTabsStates
         } else {
             await axios.put(route('projects.update', projectIdRef), formData)
                 .then((res) => {
                     toast('Proyecto actualizado exitosamente!', 'success')
-                    switchStates = true
+                    switchTabsStates = true
                 })
-            return switchStates
+            return switchTabsStates
             // return true
         }
     } catch (error) {
@@ -195,9 +197,6 @@ const submit = async () => {
     }
     // return false
 }
-
-const shiftSelect = ref([])
-const shiftOptions = ref()
 
 const getShift = () => {
     axios.get(route('shift.index'))
@@ -365,7 +364,8 @@ const exportarExcel = () => {
                     </tab-content>
 
                     <!--DATOS DEL PROYECTO-->
-                    <tab-content title="Datos del Proyecto" icon="fa-solid fa-diagram-project" :before-change="beforeChange" >
+                    <tab-content title="Datos del Proyecto" icon="fa-solid fa-diagram-project"
+                        :before-change="beforeChange">
                         <section
                             class="grid grid-cols-2 sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4">
                             <!--CAMPO SUPERVISOR (supervisor)-->
@@ -400,7 +400,8 @@ const exportarExcel = () => {
                     </tab-content>
 
                     <!--PLANEACIÓN DEL PROYECTO-->
-                    <tab-content title="Planeación del Proyecto" icon="fa-solid fa-calendar-check" :before-change="beforeChange">
+                    <tab-content title="Planeación del Proyecto" icon="fa-solid fa-calendar-check"
+                        :before-change="beforeChange">
                         <section class="flex sm:col-span-1 md:col-span-1 border gap-6 border-gray-200 rounded-lg p-4">
                             <div class="grid grid-cols-6 gap-6">
                                 <div class="col-span-3 space-y-4">
@@ -462,7 +463,7 @@ const exportarExcel = () => {
                                         class="w-full h-52 overflow-y-auto custom-scroll border-2 border-gray-300 rounded-lg p-2 focus hover:border-blue-500">
                                         <ul v-for="shift in shiftOptions" :key="shift.id">
                                             <div @click="selectShiftList(shift.id)"
-                                                :class="shiftSelect.includes(shift.id) ? 'bg-blue-900 text-white' : 'hover:bg-gray-200'"
+                                                :class="shiftSelect == shift.id ? 'bg-blue-900 text-white' : 'hover:bg-gray-200'"
                                                 class="flex justify-between items-center text-xs space-x-6 p-2 w-full cursor-pointer rounded-lg">
                                                 <div>
                                                     <p class=" text-xs font-bold">{{ shift.name }}:</p>
