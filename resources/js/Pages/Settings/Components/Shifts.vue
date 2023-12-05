@@ -59,14 +59,17 @@ const clearFilter = () => {
 };
 
 function format24h(hora) {
-    if (hora.length > 5) {
-        return new Date(hora).toLocaleString('es-CO',
+    let tiempo
+    if (hora.length >5) {
+        tiempo= new Date(hora).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
     }
     else {
-        return new Date("1970-01-01T" + hora).toLocaleString('es-CO',
+        tiempo= new Date("1970-01-01T" + hora).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
     }
+    console.log(tiempo)
+    return tiempo
 }
 
 const deleteShift = async (s) => {
@@ -79,8 +82,8 @@ const editShift = async (s) => {
     shift.value = {
         id: s.id,
         name: s.name,
-        startShift: format24h(s.startShift),
-        endShift: format24h(s.endShift),
+        startShift: format24h(String(s.startShift)),
+        endShift: format24h(String(s.endShift)),
         timeBreak: s.timeBreak ? s.timeBreak : 0
     };
     console.table(shift.value)
@@ -120,8 +123,8 @@ const shiftSave = (status, shift) => {
         } else {
             axios.post(route('shift.store'), {
                 name: shift.name,
-                startShift: format24h(shift.startShift),
-                endShift: format24h(shift.endShift),
+                startShift: format24h(String(shift.startShift)),
+                endShift: format24h(String(shift.endShift)),
                 timeBreak: shift.timeBreak,
                 status: status
             }).then((res) => {
@@ -141,8 +144,8 @@ const calcularDiferencia = (start, end) => {
     if (!start || !end) {
         return 0
     }
-    var horaInicio = String(start).length > 5 ? format24h(start) : start
-    var horaFinal = String(end).length > 5 ? format24h(end) : end
+    var horaInicio = format24h(start)
+    var horaFinal = format24h(end)
     // Expresión regular para comprobar el formato de las horas
     var formatoHora = /^([01]?[0-9]|2[0-3]):[0-5][0-9]/;
 
@@ -300,18 +303,18 @@ const calcularDiferencia = (start, end) => {
                             <p>
                                 Tiempo laborado
                             </p>
-                            <p>{{ calcularDiferencia(shift.startShift,
-                                shift.endShift).toFixed(2) - shift.timeBreak
+                            <p>{{ calcularDiferencia(String(shift.startShift),
+                               String( shift.endShift)) - shift.timeBreak
                             }}
                                 Horas</p>
                         </div>
                         <div class="flex justify-between w-full text-warning"
-                            v-if="calcularDiferencia(shift.startShift, shift.endShift) - shift.timeBreak > 8.5">
+                            v-if="calcularDiferencia(String(shift.startShift),String( shift.endShift)) - shift.timeBreak > 8.5">
                             <p>
                                 Tiempo adicional
                             </p>
-                            <p>{{ calcularDiferencia(shift.startShift,
-                                shift.endShift) - shift.timeBreak - 8.5 }} Horas
+                            <p>{{ calcularDiferencia(String(shift.startShift),
+                                String(shift.endShift) )- shift.timeBreak - 8.5 }} Horas
                             </p>
                         </div>
                     </div>

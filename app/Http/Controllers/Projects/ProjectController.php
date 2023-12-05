@@ -34,7 +34,7 @@ class ProjectController extends Controller
     {
         $contracts = Contract::orderBy('contract_id')->get();
         $authorizations = Authorization::orderBy('contract_id')->get();
-        $quotes = Quote::orderBy('ship_id')->get();
+        $quotes = Quote::get();
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
 
         return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes', 'ships'));
@@ -77,12 +77,12 @@ class ProjectController extends Controller
                 ]);
             }
 
-            return back()->with(['message' => 'Proyecto creado correctamente'], 200);
+            return response()->json([
+                'project_id' => $id
+            ]);
         } catch (Exception $e) {
             return back()->withErrors(['message' => 'Ocurrió un error al crear el proyecto: ' . $e->getMessage()], 500);
         }
-
-        return redirect('projects.index');
     }
 
     /**
@@ -138,7 +138,7 @@ class ProjectController extends Controller
             'status' => 'nullable',
             'scope' => 'nullable',
             'supervisor' => 'nullable',
-            'cost_sale' => 'nullable',
+            'cost_sale' => 'nullable|numeric|gt:-1',
             'description' => 'nullable',
             'gerencia' => 'nullable',
             'start_date' => 'nullable',
