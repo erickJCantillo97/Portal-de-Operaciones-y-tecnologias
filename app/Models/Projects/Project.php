@@ -2,6 +2,7 @@
 
 namespace App\Models\Projects;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -23,5 +24,13 @@ class Project extends Model implements Auditable
     public function projectShip()
     {
         return $this->hasMany(ProjectShip::class);
+    }
+
+    public function status(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $value,
+            get: fn ($value) => $value ?? 'SIN ESTADO',
+        );
     }
 }

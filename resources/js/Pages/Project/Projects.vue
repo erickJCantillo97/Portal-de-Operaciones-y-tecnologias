@@ -173,9 +173,9 @@ const formatCurrency = (value) => {
     });
 };
 
-const getContractStatusSeverity = (project) => {
-    switch (project.status) {
-        case 'INICIADO':
+const getStatusSeverity = (status) => {
+    switch (status) {
+        case 'DISEÑO Y CONSTRUCCIÓN':
             return 'info';
 
         case 'PROCESO':
@@ -184,11 +184,11 @@ const getContractStatusSeverity = (project) => {
         case 'PENDIENTE':
             return 'danger';
 
-        case 'FINALIZADO':
+        case 'SERVICIO POSTVENTA':
             return 'success';
 
         default:
-            return null;
+            return 'danger';
     }
 };
 
@@ -309,16 +309,14 @@ const items = [
                 </template>
 
                 <!--COLUMNAS-->
+                <Column field="SAP_code" header="Codigo SAP"></Column>
                 <Column field="name" header="Nombre"></Column>
                 <Column field="gerencia" header="Gerencia"></Column>
-                <Column field="start_date" header="Fecha Inicio"></Column>
+                <Column field="cost_sale" header="Costo de Venta"></Column>
                 <Column field="end_date" header="Fecha Finalización"></Column>
-                <Column field="hoursPerDay" header="Horas por Dia"></Column>
-                <Column field="daysPerWeek" header="Dias por Semana"></Column>
-                <Column field="daysPerMonth" header="Dias por Mes"></Column>
                 <Column field="status" header="Estado" sortable>
                     <template #body="slotProps">
-                        <Tag :value="'EJECUCIÓN'" :severity="getContractStatusSeverity('EJECUCIÓN')"
+                        <Tag :value="slotProps.data.status" :severity="getStatusSeverity(slotProps.data.status)"
                             class="animate-pulse" />
                     </template>
                 </Column>
@@ -329,6 +327,16 @@ const items = [
                         <!--BOTÓN CREAR ACTIVIDADES-->
                         <div
                             class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
+                            <div title="Crear Actividades">
+                                <Button severity="primary" @click="toggle($event, slotProps.data)" class="hover:bg-primary">
+
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" class="w-4 h-4">
+                                        <path
+                                            d="M260-160q-91 0-155.5-63T40-377q0-78 47-139t123-78q25-92 100-149t170-57q117 0 198.5 81.5T760-520q69 8 114.5 59.5T920-340q0 75-52.5 127.5T740-160H520q-33 0-56.5-23.5T440-240v-206l-64 62-56-56 160-160 160 160-56 56-64-62v206h220q42 0 71-29t29-71q0-42-29-71t-71-29h-60v-80q0-83-58.5-141.5T480-720q-83 0-141.5 58.5T280-520h-20q-58 0-99 41t-41 99q0 58 41 99t99 41h100v80H260Zm220-280Z" />
+                                    </svg>
+
+                                </Button>
+                            </div>
                             <div title="Crear Actividades">
                                 <Button severity="primary" @click="toggle($event, slotProps.data)" class="hover:bg-primary">
                                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -363,95 +371,6 @@ const items = [
             </DataTable>
         </div>
 
-        <!--MODAL DE FORMULARIO-->
-        <TransitionRoot as="template" :show="open">
-            <Dialog as="div" class="relative z-30" @close="open = false">
-                <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
-                    leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-                    <div class="fixed inset-0 z-30 w-screen h-screen transition-opacity bg-gray-500 bg-opacity-75" />
-                </TransitionChild>
-
-                <div class="fixed inset-0 z-50 h-screen overflow-y-auto">
-                    <div class="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
-                        <TransitionChild as="template" enter="ease-out duration-300"
-                            enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                            enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
-                            leave-from="opacity-100 translate-y-0 sm:scale-100"
-                            leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                            <DialogPanel :class="props.heigthDialog"
-                                class="relative px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg ">
-                                <div>
-                                    <div class="px-2 mt-2 text-center">
-                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">{{ formData.id !=
-                                            0 ? 'Editar ' : 'Crear' }} Proyecto
-                                        </DialogTitle> <!--Se puede usar {{ tittle }}-->
-                                        <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
-                                            <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
-                                                <Combobox class="mt-2 text-left text-gray-900" label="Contrato"
-                                                    placeholder="Seleccione Contrato" :options="contracts"
-                                                    :enabled="formData.id == 0" v-model="contractSelect">
-                                                </Combobox>
-
-                                                <Combobox class="mt-2 text-left" label="Buque"
-                                                    placeholder="Seleccione Buque" :options="ships"
-                                                    :enabled="formData.id == 0" v-model="shipSelect">
-                                                </Combobox>
-                                            </div>
-
-                                            <!--CAMPO FECHA INICIO-->
-                                            <TextInput class="mt-2 text-left" type="date" label="Fecha De Inicio"
-                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.start_date"
-                                                :error="$page.props.errors.start_date">
-                                            </TextInput>
-
-                                            <!-- <div class="mt-2">
-                                                <label for="type"
-                                                    class="block text-sm text-left text-gray-900 capitalize">Tipo de
-                                                    Cliente</label>
-                                                <Dropdown v-model="form.type" :options="types" filter optionLabel="name"
-                                                    placeholder="Selecccionar" class="w-full md:w-14rem">
-                                                </Dropdown>
-                                            </div> -->
-
-                                            <!--CAMPO FECHA FINALIZACIÓN-->
-                                            <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">
-                                                <TextInput class="mt-2 text-left" type="date" label="Fecha de Finalización"
-                                                    :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
-                                                    :error="$page.props.errors.end_date">
-                                                </TextInput>
-                                            </div>
-
-                                            <TextInput class="mt-2 text-left" label="Horas por Dia"
-                                                :placeholder="'Escriba Numero de Horas por Dia'"
-                                                v-model="formData.hoursPerDay"
-                                                :error="router.page.props.errors.hoursPerDay"></TextInput>
-
-                                            <TextInput class="mt-2 text-left" label="Dias por Semana"
-                                                :placeholder="'Escriba Numero de Horas por Dia'"
-                                                v-model="formData.daysPerWeek"
-                                                :error="router.page.props.errors.daysPerWeek"></TextInput>
-
-                                            <TextInput class="mt-2 text-left" label="Dias por Mes"
-                                                :placeholder="'Escriba Numero de Horas por Dia'"
-                                                v-model="formData.daysPerMonth"
-                                                :error="router.page.props.errors.daysPerMonth"></TextInput>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex px-2 mt-2 space-x-4">
-                                    <Button class="hover:bg-danger text-danger border-danger" severity="danger"
-                                        @click="open = false">Cancelar</Button>
-                                    <Button severity="success" :loading="false"
-                                        class="text-success hover:bg-success border-success" @click="submit()">
-                                        {{ formData.id != 0 ? 'Actualizar ' : 'Guardar' }}
-                                    </Button>
-                                </div>
-                            </DialogPanel>
-                        </TransitionChild>
-                    </div>
-                </div>
-            </Dialog>
-        </TransitionRoot>
 
         <OverlayPanel ref="op">
             <div>
@@ -487,5 +406,7 @@ const items = [
                 </div> -->
             </div>
         </OverlayPanel>
+
+
     </AppLayout>
 </template>

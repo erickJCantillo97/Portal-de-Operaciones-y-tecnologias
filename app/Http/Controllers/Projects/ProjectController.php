@@ -22,7 +22,7 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::with('contract', 'ship', 'customer')->orderBy('name')->get();
+        $projects = Project::with('contract')->orderBy('name')->get();
 
         return Inertia::render('Project/Projects', compact('projects'));
     }

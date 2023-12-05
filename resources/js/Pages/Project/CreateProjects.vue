@@ -3,25 +3,15 @@ import AppLayout from '@/Layouts/AppLayout.vue'
 import { ref, onMounted, computed } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
 import Combobox from '@/Components/Combobox.vue'
-import Moment from 'moment'
 import { FilterMatchMode, FilterOperator } from 'primevue/api'
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue'
-import { ClockIcon, CalendarDaysIcon } from '@heroicons/vue/24/outline'
+import { ClockIcon } from '@heroicons/vue/24/outline'
 import { useSweetalert } from '@/composable/sweetAlert'
 import { useConfirm } from "primevue/useconfirm"
 import axios from 'axios'
-// import plural from 'pluralize-es'
 import TextInput from '../../Components/TextInput.vue'
 import Textarea from 'primevue/textarea'
-import Button from 'primevue/button'
-// import Button from '../../Components/Button.vue'
-import ShipCardMinimal from "@/Components/ShipCardMinimal.vue"
-import Listbox from 'primevue/listbox'
 import { FormWizard, TabContent } from 'vue3-form-wizard'
 import 'vue3-form-wizard/dist/style.css'
-import FileUpload from 'primevue/fileupload'
-// import Button from 'primevue/button'
 
 const confirm = useConfirm()
 const { toast } = useSweetalert()
@@ -322,6 +312,8 @@ const exportarExcel = () => {
 </script>
 <template>
     <AppLayout>
+
+        <Head title="Agregar Proyecto" />
         <main class="px-8 min-h-full overflow-y-scroll custom-scroll">
             <header class="w-full">
                 <h2 class="text-lg font-semibold mb-4 text-primary text-center lg:text-2xl">
