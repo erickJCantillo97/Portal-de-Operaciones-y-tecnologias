@@ -24,12 +24,11 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-
 });
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
-    Route::post('foto/{correo}', function ($correo){
+    Route::post('foto/{correo}', function ($correo) {
         return response()->json([
             'photo' => User::where('userprincipalname', $correo)->first()->photo(),
         ]);
@@ -45,10 +44,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
                 // 'file' => $item->project->contract->ship->file,
                 'contrato' => $item->project->contract->name,
                 'duracion' => $item->duration,
-                'fechaI'=>$item->startDate,
-                'fechaF'=>$item->endDate,
-                'unidadDuracion'=>$item->durationUnit,
-                'costo'=>$item->project->contract->cost
+                'fechaI' => $item->startDate,
+                'fechaF' => $item->endDate,
+                'unidadDuracion' => $item->durationUnit,
+                'costo' => $item->project->contract->cost
             ];
         });
 
@@ -87,7 +86,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     });
 
     Route::resource('suggestion', SuggestionController::class);
-
 });
 
 Route::get('recuperarDatos', function () {
@@ -154,6 +152,3 @@ Route::get('/timeline', function () {
         'projects' => $taskProject,
     ]);
 })->name('timeline');
-
-
-

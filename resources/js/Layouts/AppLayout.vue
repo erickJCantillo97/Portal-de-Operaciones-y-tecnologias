@@ -11,7 +11,7 @@
             <div class="fixed inset-0 bg-[black]/60 z-10" :class="{ hidden: !menu }" @click="menu = !menu"></div>
             <MenuSidebar class="lg:block " :class="{ hidden: !menu }"></MenuSidebar>
             <div
-                class="max-h-[6vh] z-10 flex items-center justify-between h-auto p-7 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 md:ml-16">
+                class="max-h-[6vh] z-10 flex items-center justify-between h-auto px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 md:ml-16">
                 <div class="w-full">
                     <button type="button" class="-ml-7 p-2.5 text-gray-700 lg:hidden" @click="menu = !menu">
                         <span class="sr-only">Open sidebar</span>
@@ -29,8 +29,7 @@
                         <div class="relative w-6 h-6" title="Notificaciones">
                             <BellIcon aria-hidden="true" />
                             <span class="flex w-3 h-3">
-                                <span
-                                    class="absolute inline-flex w-3 h-3 ml-3 bg-red-500 rounded-full -mt-7"></span>
+                                <span class="absolute inline-flex w-3 h-3 ml-3 bg-red-500 rounded-full -mt-7"></span>
                             </span>
                         </div>
                     </button>
@@ -73,7 +72,8 @@
                     </Menu>
                 </div>
             </div>
-            <div class="max-h-[90vh] flex flex-col min-h-[90vh] p-1 gap-1 border border-gray-200 bg-white rounded-lg shadow-2xl g-white sm:ml-20 sm:mr-1">
+            <div
+                class="max-h-[90vh] flex flex-col min-h-[90vh] p-1 gap-1 border border-gray-200 bg-white rounded-lg shadow-2xl g-white sm:ml-20 sm:mr-1">
                 <slot />
             </div>
             <div class="fixed right-[-5px] z-50 w-10 top-1/4 animate-pulse" data-html2canvas-ignore>
@@ -133,20 +133,21 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div
-                                                    class="h-full p-4 space-y-2 overflow-y-auto shadow-sm custom-scroll">
+                                                <div class="h-full p-4 space-y-2 overflow-y-auto shadow-sm custom-scroll">
                                                     <div v-for="suggestion in suggestions"
                                                         :class="suggestion.type == 'Error' ? 'border-danger' : 'border-primary'"
                                                         class="w-full p-2 border rounded-md shadow-lg">
                                                         <div class="grid grid-cols-10">
                                                             <div class="flex items-center justify-center h-full">
-                                                                <svg class="fill-yellow-400" v-if="suggestion.type == 'Sugerencia'" height="2em"
+                                                                <svg class="fill-yellow-400"
+                                                                    v-if="suggestion.type == 'Sugerencia'" height="2em"
                                                                     xmlns="http://www.w3.org/2000/svg"
                                                                     viewBox="0 0 384 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
                                                                     <path
                                                                         d="M297.2 248.9C311.6 228.3 320 203.2 320 176c0-70.7-57.3-128-128-128S64 105.3 64 176c0 27.2 8.4 52.3 22.8 72.9c3.7 5.3 8.1 11.3 12.8 17.7l0 0c12.9 17.7 28.3 38.9 39.8 59.8c10.4 19 15.7 38.8 18.3 57.5H109c-2.2-12-5.9-23.7-11.8-34.5c-9.9-18-22.2-34.9-34.5-51.8l0 0 0 0c-5.2-7.1-10.4-14.2-15.4-21.4C27.6 247.9 16 213.3 16 176C16 78.8 94.8 0 192 0s176 78.8 176 176c0 37.3-11.6 71.9-31.4 100.3c-5 7.2-10.2 14.3-15.4 21.4l0 0 0 0c-12.3 16.8-24.6 33.7-34.5 51.8c-5.9 10.8-9.6 22.5-11.8 34.5H226.4c2.6-18.7 7.9-38.6 18.3-57.5c11.5-20.9 26.9-42.1 39.8-59.8l0 0 0 0 0 0c4.7-6.4 9-12.4 12.7-17.7zM192 128c-26.5 0-48 21.5-48 48c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-44.2 35.8-80 80-80c8.8 0 16 7.2 16 16s-7.2 16-16 16zm0 384c-44.2 0-80-35.8-80-80V416H272v16c0 44.2-35.8 80-80 80z" />
                                                                 </svg>
-                                                                <svg class="fill-primary" v-if="suggestion.type == 'Opinion'" height="2em"
+                                                                <svg class="fill-primary"
+                                                                    v-if="suggestion.type == 'Opinion'" height="2em"
                                                                     xmlns="http://www.w3.org/2000/svg"
                                                                     viewBox="0 0 576 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
                                                                     <path
@@ -175,7 +176,8 @@
 
                                                     </div>
                                                 </div>
-                                                <div class="flex-col justify-end flex-shrink-0 px-2 py-2 space-y-1 shadow-md">
+                                                <div
+                                                    class="flex-col justify-end flex-shrink-0 px-2 py-2 space-y-1 shadow-md">
                                                     <div class="grid grid-cols-1">
                                                         <div class="px-2 divide-y divide-gray-100 sm:px-2">
                                                             <fieldset>
