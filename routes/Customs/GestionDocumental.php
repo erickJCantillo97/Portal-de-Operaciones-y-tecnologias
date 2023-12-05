@@ -12,4 +12,4 @@ Route::get('getTipologias', function () {
     return response()->json([
         'tipologias' => $tipologias
     ]);
-});
+})->name('get.tipologias');
