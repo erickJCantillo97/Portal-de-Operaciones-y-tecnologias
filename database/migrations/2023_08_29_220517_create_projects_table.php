@@ -14,36 +14,43 @@ return new class extends Migration
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
+            $table->unsignedBigInteger('manager_id')->nullable()->index();
             $table->unsignedBigInteger('contract_id')->nullable()->index();
             $table->unsignedBigInteger('authorization_id')->nullable()->index();
             $table->unsignedBigInteger('quote_id')->nullable()->index();
-            $table->enum('type',
+            $table->enum(
+                'type',
                 [
                     'PROYECTO DE VENTA (ARTEFACTO NAVAL)',
                     'PROYECTO DE VENTA (SERV. INDUSTRIA)',
                     'PROYECTO DE VENTA (SUMINISTRO/SERVICIO)',
                     'PROYECTO DE INVERSION INTERNA',
                     'PROYECTO DE INVERSIÓN (ARTEFACTO NAVAL)'
-                ])->nullable();
+                ]
+            )->nullable();
             $table->string('SAP_code')->nullable()->unique();
-            $table->enum('status',
-            [
-                'DISEÑO Y CONSTRUCCIÓN',
-                'CONSTRUCCIÓN',
-                'DISEÑO',
-                'GARANTIA',
-                'SERVICIO POSTVENTA'
-            ])->nullable(); //Estado del proyecto
-            $table->enum('scope',
-            [
-                'ADQUISICIÓN Y ENTREGA',
-                'CO DESARROLLO DISEÑO Y CONSTRUCCIÓN',
-                'CO PRODUCCIÓN',
-                'CONSTRUCCIÓN',
-                'DISEÑO BUQUE',
-                'DISEÑO Y CONSTRUCCIÓN',
-                'SERVICIOS INDUSTRIALES'
-            ])->nullable(); //Alcance del projecto
+            $table->enum(
+                'status',
+                [
+                    'DISEÑO Y CONSTRUCCIÓN',
+                    'CONSTRUCCIÓN',
+                    'DISEÑO',
+                    'GARANTIA',
+                    'SERVICIO POSTVENTA'
+                ]
+            )->nullable(); //Estado del proyecto
+            $table->enum(
+                'scope',
+                [
+                    'ADQUISICIÓN Y ENTREGA',
+                    'CO DESARROLLO DISEÑO Y CONSTRUCCIÓN',
+                    'CO PRODUCCIÓN',
+                    'CONSTRUCCIÓN',
+                    'DISEÑO BUQUE',
+                    'DISEÑO Y CONSTRUCCIÓN',
+                    'SERVICIOS INDUSTRIALES'
+                ]
+            )->nullable(); //Alcance del projecto
             $table->string('supervisor')->nullable();
             $table->double('cost_sale')->nullable();
             $table->string('description')->nullable();

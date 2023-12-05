@@ -13,8 +13,10 @@ import "primeicons/primeicons.css";
 import 'material-icons/iconfont/material-icons.css';
 import Tooltip from "primevue/tooltip";
 import VueApexCharts from "vue3-apexcharts";
+import { Head } from '@inertiajs/vue3';
+import CustomModal from '@/Components/CustomModal.vue'
 const appName =
-    import.meta.env.VITE_APP_NAME || "Portal de Operaciones Tecnológicas";
+    import.meta.env.VITE_APP_NAME || "Portal";
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -34,7 +36,9 @@ createInertiaApp({
                 locale: optionsPrimeVUE,
             })
             .use(VueApexCharts)
+            .component("Head", Head)
             .directive("tooltip", Tooltip)
+            .mixin({ component: { CustomModal } })
             .mount(el);
     },
     progress: {

@@ -29,7 +29,7 @@ defineProps({
                     fill="currentFill" />
             </svg>
         </transition>
-        <div class="flex items-center space-x-1">
+        <div class="flex items-center space-x-1 justify-center">
             <slot />
         </div>
     </button>
