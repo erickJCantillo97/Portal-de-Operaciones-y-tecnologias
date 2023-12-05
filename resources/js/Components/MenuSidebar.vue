@@ -1,7 +1,7 @@
 <template>
     <div
         class="sidebar fixed min-h-screen h-full top-0 bottom-0 w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] z-20 transition-all duration-300">
-        <div class="h-full bg-white">
+        <div class="h-full bg-white dark:bg-dark">
             <div class="flex items-center justify-center px-2 py-3">
                 <div class="flex items-center main-logo shrink-0">
                     <ApplicationLogo class="justify-center" :letras="true" :width-logo="50" :height-logo="50">
@@ -29,15 +29,15 @@
                                     :class="{ active: activeDropdown === item.name }"
                                     @click="activeDropdown === item.name ? (activeDropdown = null) : (activeDropdown = item.name)">
                                     <div class="flex items-center">
-                                        <component :is="item.icon" class="w-6 h-6 text-gray-400 shrink-0"
+                                        <component :is="item.icon" class="w-6 h-6 text-gray-100 shrink-0 dark:text-white"
                                             aria-hidden="true" />
 
-                                        <span
-                                            class="pl-3  text-black dark:text-[#506690] dark:group-hover:text-white-dark">{{
-                                                item.name
-                                            }}</span>
+                                        <span class="pl-3  text-black dark:text-[#506690] dark:group-hover:text-white">{{
+                                            item.name
+                                        }}</span>
                                     </div>
-                                    <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === item.name }">
+                                    <div class="rtl:rotate-180 dark:group-hover:text-white"
+                                        :class="{ '!rotate-90': activeDropdown === item.name }">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
@@ -46,7 +46,7 @@
                                     </div>
                                 </button>
                                 <vue-collapsible :isOpen="activeDropdown === item.name">
-                                    <ul class="text-gray-500 sub-menu" v-for="children of item.children">
+                                    <ul class="text-gray-500 sub-menu dark:text-white" v-for="children of item.children">
                                         <li>
                                             <Link :href="route(children.href)">{{ children.name }}</Link>
                                         </li>

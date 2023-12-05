@@ -103,23 +103,23 @@ const clearFilter = () => {
 
 <template>
     <AppLayout>
-    <div class="space-y-5 overflow-y-scroll custom-scroll">
+        <div class="space-y-5 overflow-y-scroll custom-scroll">
 
-        <div class="flex justify-between">
-            <UserHeader />
-        </div>
-        <!--DATATABLE PROYECTOS-->
-        <div class="p-3 m-1 shadow-md rounded-xl">
-            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
-                dataKey="id" filterDisplay="menu" :loading="loading" :globalFilterFields="[
-                    'name',
-                    'gerencia',
-                    'start_date',
-                    'end_date',
-                    'hoursPerDay',
-                    'daysPerWeek',
-                    'daysPerMonth',
-                ]" currentPageReportTemplate=" {first} al {last} de {totalRecords}"
+            <div class="flex justify-between">
+                <UserHeader />
+            </div>
+            <!--DATATABLE PROYECTOS-->
+            <div class="p-3 m-1 shadow-md rounded-xl">
+                <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
+                    dataKey="id" filterDisplay="menu" :loading="loading" :globalFilterFields="[
+                        'name',
+                        'gerencia',
+                        'start_date',
+                        'end_date',
+                        'hoursPerDay',
+                        'daysPerWeek',
+                        'daysPerMonth',
+                    ]" currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                     :paginator="true" :rows="5" :rowsPerPageOptions="[5, 10, 25, 50, 100]">
                     <!--COLUMNAS-->
@@ -153,7 +153,7 @@ const clearFilter = () => {
                                 <div title="Ver programacion">
                                     <Button severity="primary" @click="
                                         router.get(route('programming'), { id: slotProps.data.project_id })
-                                    " class="hover:bg-primary">
+                                        " class="hover:bg-primary">
                                         <i class="fa-solid fa-list-check" />
                                     </Button>
                                 </div>
@@ -162,7 +162,7 @@ const clearFilter = () => {
                                         router.get(
                                             route('createSchedule.create', slotProps.data.project_id)
                                         )
-                                    " class="hover:bg-danger">
+                                        " class="hover:bg-danger">
                                         <i class="fa-solid fa-chart-gantt" />
                                     </Button>
                                 </div>
