@@ -25,7 +25,9 @@ const props = defineProps({
                 <slot name="titulo" />
             </div>
         </template>
-        <slot name="body" />
+        <div class="pt-3">
+            <slot name="body" />
+        </div>
         <template #footer>
             <slot name="footer" />
         </template>
