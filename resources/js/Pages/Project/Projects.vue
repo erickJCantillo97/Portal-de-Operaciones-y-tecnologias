@@ -5,35 +5,28 @@ import { Link, router, useForm } from '@inertiajs/vue3'
 import '../../../sass/dataTableCustomized.scss'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import Calendar from 'primevue/calendar'
 import Tag from 'primevue/tag'
-import Combobox from '@/Components/Combobox.vue'
 import { FilterMatchMode, FilterOperator } from 'primevue/api'
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue'
 import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassPlusIcon, SparklesIcon, EyeIcon, PhotoIcon, TableCellsIcon, ArrowUpCircleIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline'
 import { useSweetalert } from '@/composable/sweetAlert'
-import { useConfirm } from "primevue/useconfirm"
 
 // import plural from 'pluralize-es'
-import TextInput from '../../Components/TextInput.vue'
 import Button from '../../Components/Button.vue'
 import OverlayPanel from 'primevue/overlaypanel'
+import CustomModal from '@/Components/CustomModal.vue'
+import axios from 'axios'
+import Listbox from 'primevue/listbox'
 
 // import Button from 'primevue/button'
 
-const confirm = useConfirm()
+const modalDocument = ref(false)
 const { toast } = useSweetalert()
 const loading = ref(false)
 const { confirmDelete } = useSweetalert()
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
-const open = ref(false)
-const project = ref()
 const projectSelect = ref()
-const contractSelect = ref()
-const shipSelect = ref()
 const op = ref()
 const toggle = (event, p) => {
     projectSelect.value = p
@@ -42,76 +35,11 @@ const toggle = (event, p) => {
 
 const props = defineProps({
     projects: Array,
-    ships: Array,
-    contracts: Array
 })
-
-//#region UseForm
-const formData = useForm({
-    id: props.projects?.id ?? '0',
-    contract_id: props.projects?.contract_id ?? '0',
-    authorization_id: props.projects?.authorization_id ?? '0',
-    quote_id: props.projects?.quote_id ?? '0',
-    ship_id: props.projects?.ship_id ?? '0',
-    intern_communications: props.projects?.intern_communications ?? '0',
-    name: props.projects?.name ?? '',
-    start_date: props.projects?.start_date ?? '',
-    end_date: props.projects?.end_date ?? '',
-    hoursPerDay: props.projects?.hoursPerDay ?? '8.5',
-    daysPerWeek: props.projects?.daysPerWeek ?? '5',
-    daysPerMonth: props.projects?.daysPerMonth ?? '20',
-    pdf: null
-})
-//#endregion
 
 onMounted(() => {
     initFilters()
 })
-
-
-const formFile = useForm({
-    project_id: '',
-    file: ''
-})
-//#region SUBMIT
-const submit = () => {
-    loading.value = true
-    if (formData.id == 0) {
-        router.post(route('projects.store'), formData, {
-            preserveScroll: true,
-            onSuccess: (res) => {
-                open.value = false
-                toast('Proyecto creado exitosamente', 'success')
-            },
-            onError: (errors) => {
-                toast('¡Ups! Ha surgido un error', 'error')
-            },
-            onFinish: visit => {
-                loading.value = false
-            }
-        })
-        return 'creado'
-    }
-    router.put(route('projects.update', formData.id), formData, {
-        preserveScroll: true,
-        onSuccess: (res) => {
-            open.value = false
-            toast('¡Proyecto actualizado exitosamente!', 'success')
-        },
-        onError: (errors) => {
-            toast('¡Ups! Ha surgido un error', 'error')
-        },
-        onFinish: visit => {
-            loading.value = false
-        }
-    })
-}
-//#endregion
-
-const addManager = () => {
-    formFile.project_id = projectSelect.value.id
-    formFile.post(route('post.excel.import'))
-}
 
 const addItem = () => {
     router.get(route('projects.create'))
@@ -120,12 +48,19 @@ const addItem = () => {
     // open.value = true
 }
 
-const editItem = (project_id) => {
+const tipologias = ref(null)
+const project = ref()
+const tipologia = ref()
+const addDoc = (p) => {
+    tipologia.value = null
+    if (tipologias.value == null) {
+        axios.get(route('get.tipologias')).then((res) => {
+            tipologias.value = Object.values(res.data.tipologias)
+        })
+    }
+    project.value = p
+    modalDocument.value = true
 
-}
-
-const addTask = (id) => {
-    router.get(route('createSchedule.create', id))
 }
 
 
@@ -142,14 +77,6 @@ const clearFilter = () => {
 
 const clearError = () => {
     router.page.props.errors = {}
-}
-
-const formatDate = (value) => {
-    return value.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    })
 }
 
 // Formatear el número en moneda (USD)
@@ -182,51 +109,34 @@ const getStatusSeverity = (status) => {
     }
 }
 
-const exportarExcel = () => {
-    var table_elt = document.getElementById("tabla")
-
-    var workbook = XLSX.utils.table_to_book(table_elt)
-
-    var ws = workbook.Sheets["Sheet1"]
-    XLSX.utils.sheet_add_aoa(ws, [
-        ["Creado " + new Date().toISOString()]
-    ], { origin: -1 })
-
-    // Package and Release Data (`writeFile` tries to write and save an XLSB file)
-    XLSX.writeFile(workbook, 'Lista de Contratos_' + project.nit + '_' + project.name + ".xlsb")
-}
-
 const items = [{
-        title: 'Crear cronograma nuevo',
-        description: 'Aqui podra crear un cronograma vacio',
-        icon: MagnifyingGlassPlusIcon,
-        background: 'bg-pink-500',
-        page: 'createSchedule.create'
-    },
-    {
-        title: 'Crear cronograma con asistente',
-        description: 'Podra crear el proyecto con un asistente inteligente',
-        icon: SparklesIcon,
-        background: 'bg-yellow-500',
-        page: 'wizard'
-    },
-    {
-        title: 'Crear proyecto desde proyecto anterior',
-        description: 'Actualmente en desarollo',
-        icon: PhotoIcon,
-        background: 'bg-green-500',
-    },
-    {
-        title: 'Crear proyecto desde plantilla prediseñada',
-        description: 'Actualmente en desarrollo',
-        icon: ViewColumnsIcon,
-        background: 'bg-blue-500',
-    },
+    title: 'Crear cronograma nuevo',
+    description: 'Aqui podra crear un cronograma vacio',
+    icon: MagnifyingGlassPlusIcon,
+    background: 'bg-pink-500',
+    page: 'createSchedule.create'
+},
+{
+    title: 'Crear cronograma con asistente',
+    description: 'Podra crear el proyecto con un asistente inteligente',
+    icon: SparklesIcon,
+    background: 'bg-yellow-500',
+    page: 'wizard'
+},
+{
+    title: 'Crear proyecto desde proyecto anterior',
+    description: 'Actualmente en desarollo',
+    icon: PhotoIcon,
+    background: 'bg-green-500',
+},
+{
+    title: 'Crear proyecto desde plantilla prediseñada',
+    description: 'Actualmente en desarrollo',
+    icon: ViewColumnsIcon,
+    background: 'bg-blue-500',
+},
 ]
 
-const createProjectsPage = [
-    { page: 'projects.edit' }
-]
 
 </script>
 
@@ -239,30 +149,6 @@ const createProjectsPage = [
                         Proyectos
                     </h1>
                 </div>
-
-
-                <!-- <div class="flex content-between w-full mr-10 pl-96" title="Importar Archivos">
-                    <div class="mr-10 w-96">
-
-                        <Combobox class="mt-2 text-left text-gray-900" label="Proyecto" placeholder="Seleccione Contrato"
-                            :options="projects" :enabled="formData.id == 0" v-model="projectSelect">
-                        </Combobox>
-                    </div>
-                    <div class="w-96">
-
-                        <Button @click="addManager()" severity="primary">
-                            <ArrowUpCircleIcon class="w-6 h-6" aria-hidden="true" />
-                            Importar Excel
-                        </Button>
-                        <div class="mt-4">
-                            <input type="file" @input="formFile.file = $event.target.files[0]" class="pb-4">
-                            <progress v-if="formFile.progress" :value="formFile.progress.percentage" max="100">
-                                {{ formFile.progress.percentage }}%
-                            </progress>
-                        </div>
-                    </div>
-                </div> -->
-
                 <div class="" title="Agregar Proyecto">
                     <Button @click="addItem()" severity="success">
                         <PlusIcon class="w-6 h-6" aria-hidden="true" />
@@ -318,11 +204,10 @@ const createProjectsPage = [
                 <!--ACCIONES-->
                 <Column header="Acciones" class="space-x-3">
                     <template #body="slotProps">
-                        <!--BOTÓN CREAR ACTIVIDADES-->
                         <div
                             class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
                             <div title="Agregar documentos">
-                                <Button severity="primary" @click="" class="hover:bg-primary">
+                                <Button severity="primary" @click="addDoc(slotProps.data)" class="hover:bg-primary">
                                     <i class="fa-solid fa-cloud-arrow-up h-4 w-4 flex items-center"></i>
                                 </Button>
                             </div>
@@ -345,9 +230,9 @@ const createProjectsPage = [
                             <!--BOTÓN EDITAR-->
                             <div title="Editar Proyecto">
                                 <Link :href="route('projects.edit', slotProps.data.id)">
-                                    <Button severity="primary" class="hover:bg-primary">
-                                        <PencilIcon class="w-4 h-4" aria-hidden="true" />
-                                    </Button>
+                                <Button severity="primary" class="hover:bg-primary">
+                                    <PencilIcon class="w-4 h-4" aria-hidden="true" />
+                                </Button>
                                 </Link>
                             </div>
 
@@ -399,8 +284,30 @@ const createProjectsPage = [
             </div>
         </OverlayPanel>
 
-        <CustomModal >
-
+        <CustomModal :visible="modalDocument">
+            <template #icon>
+                <i class="fa-solid fa-cloud-arrow-up text-white text-xl"></i>
+            </template>
+            <template #titulo>
+                <p class="text-white">Agregar archivos al proyecto {{ project.name }}</p>
+            </template>
+            <template #body>
+                <div class="grid grid-cols-5 gap-2">
+                    <div class="col-span-2">
+                        <Listbox v-model="tipologia" :options="tipologias" filter optionLabel="Tipologia"
+                            class="w-full md:w-14rem" listStyle="height:30rem" />
+                    </div>
+                    <div class="col-span-3 grid grid-rows-2">
+                            <div class="border">a </div>
+                            <div class="border">b </div>
+                    </div>
+                </div>
+            </template>
+            <template #footer>
+                <Button severity="danger" @click="modalDocument = false" class="hover:bg-danger">
+                    Cerrar
+                </Button>
+            </template>
         </CustomModal>
 
     </AppLayout>
