@@ -47,7 +47,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
                 'fechaI' => $item->startDate,
                 'fechaF' => $item->endDate,
                 'unidadDuracion' => $item->durationUnit,
-                'costo' => $item->project->contract->cost
+                'costo' => $item->project->cost_sale
             ];
         });
 

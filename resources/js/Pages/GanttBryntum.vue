@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { onMounted} from 'vue';
+import { onMounted } from 'vue';
 import "@bryntum/gantt/gantt.material.css";
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
 import { DateHelper, Gantt, List, LocaleManager, ProjectModel, StringHelper, Widget } from '@bryntum/gantt/gantt.module.js';
@@ -220,6 +220,13 @@ const gantt = new Gantt(({
     },
     features: {
         filter: true,
+        pdfExport: {
+            exportServer: 'https://dev.bryntum.com:8082',
+            // Required for font-awesome icons to display correctly
+
+            // headerTpl,
+            // footerTpl
+        },
         projectLines: false,
         mspExport: true,
         taskEdit: {
@@ -487,6 +494,15 @@ const gantt = new Gantt(({
                     }
                 }]
             },
+            {
+                type: 'button',
+                ref: 'exportButton',
+                icon: 'b-fa-file-export',
+                text: 'Export to PDF',
+                onClick() {
+                    gantt.features.pdfExport.showExportDialog();
+                }
+            }
             // {
             //     type: 'checkbox',
             //     text: 'Mostrar todas',
