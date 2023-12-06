@@ -146,6 +146,13 @@ const navigation = [
             { name: 'Ver sugerencias', href: 'suggestion.index' },
         ],
     },
+    {
+        name: 'DocuFlow',
+        href: 'dashboard',
+        icon: HomeIcon,
+        current: true,
+        show: true
+    },
     // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon, current: false },
     // { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
 ]

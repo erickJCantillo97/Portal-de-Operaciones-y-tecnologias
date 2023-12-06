@@ -208,6 +208,8 @@ const getShift = () => {
 const getProjectsPropsForEdit = () => {
     projectIdRef.value = props.project?.id ?? null
     scopeSelect.value = { name: props.project?.scope ?? '' }
+    statusSelect.value = { name: props.project?.status ?? '' }
+    typeSelect.value = { name: props.project?.type ?? '' }
 }
 
 // router.put(route('projects.update', formData.id), formData, {
