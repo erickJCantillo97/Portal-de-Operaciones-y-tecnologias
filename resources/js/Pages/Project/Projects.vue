@@ -16,6 +16,9 @@ import OverlayPanel from 'primevue/overlaypanel'
 import CustomModal from '@/Components/CustomModal.vue'
 import axios from 'axios'
 import Listbox from 'primevue/listbox'
+import FileUpload from 'primevue/fileupload'
+import DataView from 'primevue/dataview'
+import * as pdfjsLib from "pdfjs-dist/build/pdf";
 
 // import Button from 'primevue/button'
 
@@ -136,6 +139,58 @@ const items = [{
     background: 'bg-blue-500',
 },
 ]
+//#region subida de documentos
+
+const files = ref([])
+const fileup = ref(Math.random() * (10))
+
+const onSelectedFiles = (event) => {
+    files.value = event.files;
+}
+const onRemoveTemplatingFile = (file, removeFileCallback, index) => {
+    removeFileCallback(index);
+};
+
+const formatSize = (bytes) => {
+    const k = 1024;
+    const dm = 1;
+    const sizeType = ['B', 'KB', 'MB', 'GB']
+    if (bytes === 0) {
+        return `0 byte`;
+    }
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
+
+    return `${formattedSize} ${sizeType[i]}`;
+}
+
+const folios = (file) => {
+    const fileReader = new FileReader()
+    let numFolios = 0
+    fileReader.onload = () => {
+        const typedArray = new Uint8Array(fileReader.result);
+        // Cargar el archivo PDF
+        var pdf = pdfjsLib.getDocument(typedArray);
+    pdf.promise.then(function(pdf) {
+        numFolios = pdf.numPages;
+      console.log('El número de páginas del archivo PDF es: ' + numFolios);
+    });
+    };
+    fileReader.readAsArrayBuffer(file);
+    return numFolios
+}
+const uploadForm = useForm()
+const uploadEvent = () => {
+    uploadForm.files=files.value
+    uploadForm.projectId=files.value
+    uploadForm.tipologia=files.value
+    uploadForm.post(route(''), {
+
+    })
+}
+
+//#endregion
 
 
 </script>
@@ -292,14 +347,85 @@ const items = [{
                 <p class="text-white">Agregar archivos al proyecto {{ project.name }}</p>
             </template>
             <template #body>
-                <div class="grid grid-cols-5 gap-2">
-                    <div class="col-span-2">
+                <div class="grid grid-cols-5 gap-2 max-h-full overflow-y-auto">
+                    <div class="col-span-2 max-h-full">
+                        <p v-if="tipologias" class="w-full h-[5%] text-center font-bold text-primary text-lg">{{
+                            tipologias[0].Subserie }}</p>
                         <Listbox v-model="tipologia" :options="tipologias" filter optionLabel="Tipologia"
-                            class="w-full md:w-14rem" listStyle="height:30rem" />
+                            class="w-full md:w-14rem h-[95%]" listStyle="height:40vh" :pt="{
+                                filterInput: { class: 'rounded-md border border-gray-200' },
+                                root: { class: 'rounded-md border' },
+                                item: { class: 'hover:bg-blue-100 text-md' }
+
+                            }">
+                            <template #option="slotProps">
+                                <div class="grid grid-cols-7">
+                                    <p class="col-span-6">{{ slotProps.option.Tipologia }}</p>
+                                    <div class="flex space-x-1 rounded-md p-1 justify-end text-right items-center">
+                                        <p class="text-sm">10</p>
+                                        <i
+                                            class="fa-regular fa-file-pdf text-danger border p-1 rounded-md border-danger"></i>
+                                    </div>
+                                </div>
+                            </template>
+                        </Listbox>
                     </div>
-                    <div class="col-span-3 grid grid-rows-2">
-                            <div class="border">a </div>
-                            <div class="border">b </div>
+                    <div class="col-span-3">
+                        <div v-if="tipologia" class="h-1/2 p-1">{{ tipologia }}</div>
+                        <div v-if="tipologia" class="h-1/2 items-end grid">
+                            <FileUpload ref="fileUp" :multiple="true" accept="image/*,application/pdf" :key="fileup"
+                                :maxFileSize="10000000" @select="onSelectedFiles" class="">
+                                <template #header="{ chooseCallback, clearCallback, files }">
+                                    <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">
+                                        <div class="flex gap-2">
+                                            <Button @click="chooseCallback()" class="!h-8" severity="primary">
+                                                <i class="fa-solid fa-images"> </i>
+                                                <p>Seleccionar</p>
+                                            </Button>
+                                            <Button @click="uploadEvent()" severity="success"
+                                                :disabled="!files || files.length === 0">
+                                                <i class="fa-solid fa-cloud-arrow-up" />
+                                                <p>Subir</p>
+                                            </Button>
+                                            <Button @click="clearCallback()" icon="pi pi-times" class="!h-8"
+                                                severity="danger" :disabled="!files || files.length === 0">
+                                                <i class="pi pi-times"></i>
+                                                <p>Quitar</p>
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template #content="{ files, removeFileCallback }">
+                                    <DataView :value="files" class="w-full">
+                                        <template #list="slotProps">
+                                            <div class="p-1 flex justify-between w-full">
+                                                <div class="flex">
+                                                    <i :class="slotProps.data.type == 'application/pdf' ? 'fa-regular fa-file-pdf' : 'fa-regular fa-image'"
+                                                        class=" text-danger border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center"></i>
+                                                    <div class="px-3">
+                                                        <p class="text-sm">{{ slotProps.data.name }} </p>
+                                                        <p class="text-xs">{{ formatSize(slotProps.data.size) }} </p>
+                                                        <p class="text-xs">{{ folios(slotProps.data) }} </p>
+                                                    </div>
+                                                </div>
+                                                <Button class="!h-4 !w-4"
+                                                    @click="onRemoveTemplatingFile(slotProps.data, removeFileCallback, slotProps.index)"
+                                                    rounded severity="danger">
+                                                    <i class="pi pi-times"></i></Button>
+                                            </div>
+                                        </template>
+                                    </DataView>
+                                </template>
+                                <template #empty>
+                                    <div class="flex items-center flex-col">
+                                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-800" />
+                                        <p class="mt-2 mb-0">Arrastra los archivos a adjuntar en la tipologia</p>
+                                        <p class="text-xs text-gray-700 ">Se aceptan imagenes y PDF</p>
+                                    </div>
+                                </template>
+                            </FileUpload>
+
+                        </div>
                     </div>
                 </div>
             </template>
