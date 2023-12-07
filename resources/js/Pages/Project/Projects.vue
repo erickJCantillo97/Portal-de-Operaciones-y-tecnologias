@@ -164,39 +164,25 @@ const formatSize = (bytes) => {
     return `${formattedSize} ${sizeType[i]}`;
 }
 
-const folios = (file) => {
-    // const fileReader = new FileReader()
-    // let numFolios = 0
-    // fileReader.onload = () => {
-    //     const typedArray = new Uint8Array(fileReader.result);
-    //     // Cargar el archivo PDF
-    //     var pdf = pdfjsLib.getDocument(typedArray);
-    // pdf.promise.then(function(pdf) {
-    //     numFolios = pdf.numPages;
-    //   console.log('El número de páginas del archivo PDF es: ' + numFolios);
-    // });
-    // };
-    // fileReader.readAsArrayBuffer(file);
-    // return numFolios
-}
+
 const uploadForm = useForm({
     files: [],
     project_id: null,
     tipologia_id: null,
-    tipologia_name:null
+    tipologia_name: null
 })
 const uploadEvent = () => {
     uploadForm.files = files.value
     uploadForm.project_id = project.value.id
     uploadForm.tipologia_id = tipologia.value.id_trd_gd
-    uploadForm.tipologia_name=tipologia.value.Tipologia
+    uploadForm.tipologia_name = tipologia.value.Tipologia
     console.log(uploadForm)
     uploadForm.post(route('gestion.documental.store'), {
         onSuccess: (response) => {
-            toast('Se agrego la documentacion','success')
-            fileup.value=Math.random() * (10)
+            toast('Se agrego la documentacion', 'success')
+            fileup.value = Math.random() * (10)
         },
-        onError:(error)=>{
+        onError: (error) => {
             console.log(error)
         }
     })
@@ -394,8 +380,8 @@ const uploadEvent = () => {
                                                 <i class="fa-solid fa-images"> </i>
                                                 <p>Seleccionar</p>
                                             </Button>
-                                            <Button @click="uploadEvent()" severity="success" :loading="uploadForm.processing"
-                                                :disabled="!files || files.length === 0">
+                                            <Button @click="uploadEvent()" severity="success"
+                                                :loading="uploadForm.processing" :disabled="!files || files.length === 0">
                                                 <i class="fa-solid fa-cloud-arrow-up" />
                                                 <p>Subir</p>
                                             </Button>
@@ -417,7 +403,6 @@ const uploadEvent = () => {
                                                     <div class="px-3">
                                                         <p class="text-sm">{{ slotProps.data.name }} </p>
                                                         <p class="text-xs">{{ formatSize(slotProps.data.size) }} </p>
-                                                        <p class="text-xs">{{ folios(slotProps.data) }} </p>
                                                     </div>
                                                 </div>
                                                 <Button class="!h-4 !w-4"
