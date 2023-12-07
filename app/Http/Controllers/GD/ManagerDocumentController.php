@@ -26,31 +26,27 @@ class ManagerDocumentController extends Controller
     {
 
         $validateData = $request->validate([
-            'tipologia_id' => 'requerid|numeric',
+            'tipologia_id' => 'required|numeric',
             'project_id' => 'required|exists:projects,id',
-            'files' => 'requered|array',
-            'files.*' => 'file|mimes:application/pdf|image'
+            'files' => 'required|array',
+            'tipologia_name'=>'required'
         ]);
 
         foreach ($validateData['files'] as $file) {
             $filePath = Storage::putFileAs(
                 'public/GestionDocumental/proyectos/' . $validateData['project_id'],
                 $file,
-                $file->getClientOriginalName() . '_' . Carbon::now()->format('Y-m-d') . '_' . $validateData['tipologia_id'] . FileManagerDocument::count() + 1
+                $file->getClientOriginalName() . '_' . Carbon::now()->format('Y-m-d') . '_' . $validateData['tipologia_id'] .'_'. FileManagerDocument::count() + 1 .'.'. $file->getClientOriginalExtension()
             );
             FileManagerDocument::create([
                 'user_id' => auth()->user()->id,
                 'project_id' => $validateData['project_id'],
                 'tipologia_id' => $validateData['tipologia_id'],
-                'tipologia_name' => $validateData['tipologia_name'],
+                // 'tipologia_name' => $validateData['tipologia_name'],
                 'filePath' => $filePath,
             ]);
             //guardar los Archivos en la base de datos
 
         }
-
-        return response()->json([
-            'message' => 'Archivos Subidos Exitosamente'
-        ]);
     }
 }
