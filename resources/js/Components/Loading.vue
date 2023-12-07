@@ -39,8 +39,10 @@ defineProps({
 </style>
 
 <template>
-    <span class="flex items-center justify-center w-full h-full loader">
-        <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
-    </span>
-    <p class="font-bold animate-pulse text-primary"> {{ message }}</p>
+    <div class="w-full flex flex-col items-center text-center">
+        <span class="grid items-center justify-center loader">
+            <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
+        </span>
+        <p class="font-bold animate-pulse text-primary">{{ message }}</p>
+    </div>
 </template>

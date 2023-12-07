@@ -9,15 +9,16 @@ import Tag from 'primevue/tag'
 import { FilterMatchMode, FilterOperator } from 'primevue/api'
 import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassPlusIcon, SparklesIcon, EyeIcon, PhotoIcon, TableCellsIcon, ArrowUpCircleIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline'
 import { useSweetalert } from '@/composable/sweetAlert'
-
+import Loading from '@/Components/Loading.vue';
 // import plural from 'pluralize-es'
-import Button from '../../Components/Button.vue'
+import CustomButton from '../../Components/Button.vue'
 import OverlayPanel from 'primevue/overlaypanel'
 import CustomModal from '@/Components/CustomModal.vue'
 import axios from 'axios'
 import Listbox from 'primevue/listbox'
 import FileUpload from 'primevue/fileupload'
 import DataView from 'primevue/dataview'
+import Button from 'primevue/button'
 
 // import Button from 'primevue/button'
 
@@ -183,20 +184,20 @@ const uploadForm = useForm({
     files: [],
     project_id: null,
     tipologia_id: null,
-    tipologia_name:null
+    tipologia_name: null
 })
 const uploadEvent = () => {
     uploadForm.files = files.value
     uploadForm.project_id = project.value.id
     uploadForm.tipologia_id = tipologia.value.id_trd_gd
-    uploadForm.tipologia_name=tipologia.value.Tipologia
+    uploadForm.tipologia_name = tipologia.value.Tipologia
     console.log(uploadForm)
     uploadForm.post(route('gestion.documental.store'), {
         onSuccess: (response) => {
-            toast('Se agrego la documentacion','success')
-            fileup.value=Math.random() * (10)
+            toast('Se agrego la documentacion', 'success')
+            fileup.value = Math.random() * (10)
         },
-        onError:(error)=>{
+        onError: (error) => {
             console.log(error)
         }
     })
@@ -217,10 +218,10 @@ const uploadEvent = () => {
                     </h1>
                 </div>
                 <div class="" title="Agregar Proyecto">
-                    <Button @click="addItem()" severity="success">
+                    <CustomButton @click="addItem()" severity="success">
                         <PlusIcon class="w-6 h-6" aria-hidden="true" />
                         Agregar
-                    </Button>
+                    </CustomButton>
                 </div>
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
@@ -234,9 +235,9 @@ const uploadEvent = () => {
                     <div class="flex justify-between w-full h-8 mb-2">
                         <div class="flex space-x-4">
                             <div class="w-8" title="Filtrar Proyectos">
-                                <Button @click="clearFilter()" type="button" severity="primary" class="hover:bg-primary ">
+                                <CustomButton @click="clearFilter()" type="button" severity="primary" class="hover:bg-primary ">
                                     <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
-                                </Button>
+                                </CustomButton>
                             </div>
 
                             <div class="relative flex rounded-md shadow-sm">
@@ -274,12 +275,12 @@ const uploadEvent = () => {
                         <div
                             class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
                             <div title="Agregar documentos">
-                                <Button severity="primary" @click="addDoc(slotProps.data)" class="hover:bg-primary">
+                                <CustomButton severity="primary" @click="addDoc(slotProps.data)" class="hover:bg-primary">
                                     <i class="fa-solid fa-cloud-arrow-up h-4 w-4 flex items-center"></i>
-                                </Button>
+                                </CustomButton>
                             </div>
                             <div title="Crear Actividades">
-                                <Button severity="primary" @click="toggle($event, slotProps.data)" class="hover:bg-primary">
+                                <CustomButton severity="primary" @click="toggle($event, slotProps.data)" class="hover:bg-primary">
                                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M18 16L16 16M16 16L14 16M16 16L16 14M16 16L16 18" stroke="#1C274C"
                                             stroke-width="1.5" stroke-linecap="round" />
@@ -291,24 +292,24 @@ const uploadEvent = () => {
                                             d="M14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V12C2 8.22876 2 6.34315 3.17157 5.17157C4.34315 4 6.22876 4 10 4H14C17.7712 4 19.6569 4 20.8284 5.17157C22 6.34315 22 8.22876 22 12V14C22 17.7712 22 19.6569 20.8284 20.8284C20.1752 21.4816 19.3001 21.7706 18 21.8985"
                                             stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
                                     </svg>
-                                </Button>
+                                </CustomButton>
                             </div>
 
                             <!--BOTÓN EDITAR-->
                             <div title="Editar Proyecto">
                                 <Link :href="route('projects.edit', slotProps.data.id)">
-                                <Button severity="primary" class="hover:bg-primary">
+                                <CustomButton severity="primary" class="hover:bg-primary">
                                     <PencilIcon class="w-4 h-4" aria-hidden="true" />
-                                </Button>
+                                </CustomButton>
                                 </Link>
                             </div>
 
                             <!--BOTÓN ELIMINAR-->
                             <div title="Eliminar Proyecto">
-                                <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Proyecto', 'projects')"
+                                <CustomButton severity="danger" @click="confirmDelete(slotProps.data.id, 'Proyecto', 'projects')"
                                     class="hover:bg-danger">
                                     <TrashIcon class="w-4 h-4 " aria-hidden="true" />
-                                </Button>
+                                </CustomButton>
                             </div>
                         </div>
                     </template>
@@ -359,20 +360,19 @@ const uploadEvent = () => {
                 <p class="text-white">Agregar archivos al proyecto {{ project.name }}</p>
             </template>
             <template #body>
-                <div class="grid grid-cols-5 gap-2 max-h-full overflow-y-auto">
+                <div v-if="tipologias" class="grid grid-cols-5 gap-2 max-h-full overflow-y-auto">
                     <div class="col-span-2 max-h-full">
-                        <p v-if="tipologias" class="w-full h-[5%] text-center font-bold text-primary text-lg">{{
+                        <p class="w-full text-center font-bold text-primary text-lg">{{
                             tipologias[0].Subserie }}</p>
-                        <Listbox v-model="tipologia" :options="tipologias" filter optionLabel="Tipologia"
-                            class="w-full md:w-14rem h-[95%]" listStyle="height:40vh" :pt="{
-                                filterInput: { class: 'rounded-md border border-gray-200' },
-                                root: { class: 'rounded-md border' },
-                                item: { class: 'hover:bg-blue-100 text-md' }
-
+                        <Listbox v-model="tipologia" :options="tipologias" filter optionLabel="Tipologia" @click="fileup.value = Math.random() * (10)"
+                            :virtualScrollerOptions="{ itemSize: 38 }" listStyle="height:47vh" class="w-full md:w-14rem"
+                            :pt="{
+                                filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
+                                item: { class: 'hover:bg-blue-100 text-md !h-min !px-1 !py-0.5' },
                             }">
                             <template #option="slotProps">
                                 <div class="grid grid-cols-7">
-                                    <p class="col-span-6">{{ slotProps.option.Tipologia }}</p>
+                                    <p class="col-span-6 flex items-center">{{ slotProps.option.Tipologia }}</p>
                                     <div class="flex space-x-1 rounded-md p-1 justify-end text-right items-center">
                                         <p class="text-sm">10</p>
                                         <i
@@ -382,35 +382,45 @@ const uploadEvent = () => {
                             </template>
                         </Listbox>
                     </div>
-                    <div class="col-span-3">
-                        <div v-if="tipologia" class="h-1/2 p-1">{{ tipologia }}</div>
-                        <div v-if="tipologia" class="h-1/2 items-end grid">
+                    <div v-if="tipologia" class="col-span-3 gap-1 justify-between flex flex-col">
+                        <div class="p-1 border space-y-2 rounded-md">
+                            <div class="flex space-x-2">
+                                <p class="font-bold">Tipologia:</p>
+                                <p>{{ tipologia.Tipologia }}</p>
+                            </div>
+                        </div>
+                        <div class="border rounded-md w-full h-full overflow-y-auto">
+                                archivos
+                            </div>
+                        <div class="items-end grid">
                             <FileUpload ref="fileUp" :multiple="true" accept="image/*,application/pdf" :key="fileup"
-                                :maxFileSize="10000000" @select="onSelectedFiles" class="">
+                                invalidFileTypeMessage="Solo se aceptan imagenes o pdf" :maxFileSize="10000000"
+                                @select="onSelectedFiles" :pt="{
+                                    content: { class: '!p-0.5' },
+                                    message: { class: 'py-0.5' }
+                                }">
                                 <template #header="{ chooseCallback, clearCallback, files }">
                                     <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">
                                         <div class="flex gap-2">
-                                            <Button @click="chooseCallback()" class="!h-8" severity="primary">
-                                                <i class="fa-solid fa-images"> </i>
-                                                <p>Seleccionar</p>
+                                            <Button @click="chooseCallback()" outlined class="!h-8" severity="primary"
+                                                icon="fa-solid fa-folder-open" label="Seleccionar">
                                             </Button>
-                                            <Button @click="uploadEvent()" severity="success" :loading="uploadForm.processing"
+                                            <Button @click="uploadEvent()" outlined severity="success" class="!h-8"
+                                                label="Subir" icon="fa-solid fa-cloud-arrow-up"
+                                                :loading="uploadForm.processing" :disabled="!files || files.length === 0">
+                                            </Button>
+                                            <Button @click="clearCallback()" outlined icon="fa-regular fa-trash-can"
+                                                class="!h-8" label="Quitar todo" severity="danger"
                                                 :disabled="!files || files.length === 0">
-                                                <i class="fa-solid fa-cloud-arrow-up" />
-                                                <p>Subir</p>
-                                            </Button>
-                                            <Button @click="clearCallback()" icon="pi pi-times" class="!h-8"
-                                                severity="danger" :disabled="!files || files.length === 0">
-                                                <i class="pi pi-times"></i>
-                                                <p>Quitar</p>
                                             </Button>
                                         </div>
                                     </div>
                                 </template>
                                 <template #content="{ files, removeFileCallback }">
-                                    <DataView :value="files" class="w-full">
+                                    <DataView v-if="files.length > 0" :value="files"
+                                        class="w-full max-h-[20vh] overflow-y-auto">
                                         <template #list="slotProps">
-                                            <div class="p-1 flex justify-between w-full">
+                                            <div class="p-1 flex justify-between items-center w-full">
                                                 <div class="flex">
                                                     <i :class="slotProps.data.type == 'application/pdf' ? 'fa-regular fa-file-pdf' : 'fa-regular fa-image'"
                                                         class=" text-danger border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center"></i>
@@ -420,16 +430,16 @@ const uploadEvent = () => {
                                                         <p class="text-xs">{{ folios(slotProps.data) }} </p>
                                                     </div>
                                                 </div>
-                                                <Button class="!h-4 !w-4"
+                                                <Button class="!h-6 !w-6" icon="fa-regular fa-trash-can" outlined
                                                     @click="onRemoveTemplatingFile(slotProps.data, removeFileCallback, slotProps.index)"
                                                     rounded severity="danger">
-                                                    <i class="pi pi-times"></i></Button>
+                                                </Button>
                                             </div>
                                         </template>
                                     </DataView>
                                 </template>
                                 <template #empty>
-                                    <div class="flex items-center flex-col">
+                                    <div class="flex items-center flex-col py-3">
                                         <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-800" />
                                         <p class="mt-2 mb-0">Arrastra los archivos a adjuntar en la tipologia</p>
                                         <p class="text-xs text-gray-700 ">Se aceptan imagenes y PDF</p>
@@ -439,12 +449,14 @@ const uploadEvent = () => {
 
                         </div>
                     </div>
+                    <div v-else class="col-span-3 h-full pt-10">
+                        <Loading message="Seleccione una tipologia" />
+                    </div>
                 </div>
+                <Loading v-else message="Cargando tipologias" />
             </template>
             <template #footer>
-                <Button severity="danger" @click="modalDocument = false" class="hover:bg-danger">
-                    Cerrar
-                </Button>
+                <Button severity="danger" outlined label="Cerrar" icon="fa-solid fa-xmark" @click="modalDocument = false" class="!h-8"></Button>
             </template>
         </CustomModal>
 
