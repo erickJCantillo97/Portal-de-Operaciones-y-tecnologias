@@ -16,6 +16,13 @@ class ManagerDocumentController extends Controller
         $tipologias =  GDTipologias()->filter(function ($t) {
             // $t['Dependencia'] == auth()->user()->gerencia &&
             return ($t['idsubserie'] == 197 || $t['idsubserie'] == 201);
+        })->map(function ($tipologia) {
+            return [
+                'id' => $tipologia['id_trd_gd'],
+                'name' => $tipologia['Tipologia'],
+                'Subserie' => $tipologia['Subserie'],
+                'count' => FileManagerDocument::where('tipologia_id', $tipologia['id_trd_gd'])->count()
+            ];
         });
 
         return response()->json([
@@ -39,8 +46,8 @@ class ManagerDocumentController extends Controller
                 $file,
                 $file->getClientOriginalName() . '_' . Carbon::now()->format('Y-m-d') . '_' . $validateData['tipologia_id'] . '_' . FileManagerDocument::count() + 1 . '.' . $file->getClientOriginalExtension()
             );
-            // Carga el archivo PDF con dompdf
 
+            // Carga el archivo PDF con dompdf
             // Obtiene el número de páginas
             $fileManager = FileManagerDocument::create([
                 'user_id' => auth()->user()->id,
@@ -49,8 +56,10 @@ class ManagerDocumentController extends Controller
                 'tipologia_name' => $validateData['tipologia_name'],
                 'filePath' => $filePath,
             ]);
-            $pdf = Pdf::loadFile($fileManager->filePath);
+
+            $pdf = PDF::loadFile($fileManager->filePath);
             $numPages = $pdf->getDomPDF()->getCanvas()->get_page_count();
+            // Carga el archivo PDF con dompdf
             return $numPages;
             //guardar los Archivos en la base de datos
 

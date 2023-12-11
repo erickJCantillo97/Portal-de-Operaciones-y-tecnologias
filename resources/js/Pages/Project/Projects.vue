@@ -175,8 +175,8 @@ const uploadForm = useForm({
 const uploadEvent = () => {
     uploadForm.files = files.value
     uploadForm.project_id = project.value.id
-    uploadForm.tipologia_id = tipologia.value.id_trd_gd
-    uploadForm.tipologia_name = tipologia.value.Tipologia
+    uploadForm.tipologia_id = tipologia.value.id
+    uploadForm.tipologia_name = tipologia.value.name
     console.log(uploadForm)
     uploadForm.post(route('gestion.documental.store'), {
         onSuccess: (response) => {
@@ -353,7 +353,7 @@ const uploadEvent = () => {
                     <div class="col-span-2 max-h-full">
                         <p class="w-full text-center font-bold text-primary text-lg">{{
                             tipologias[0].Subserie }}</p>
-                        <Listbox v-model="tipologia" :options="tipologias" filter optionLabel="Tipologia"
+                        <Listbox v-model="tipologia" :options="tipologias" filter optionLabel="name"
                             @click="fileup.value = Math.random() * (10)" :virtualScrollerOptions="{ itemSize: 38 }"
                             listStyle="height:47vh" class="w-full md:w-14rem" :pt="{
                                 filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
@@ -361,9 +361,10 @@ const uploadEvent = () => {
                             }">
                             <template #option="slotProps">
                                 <div class="grid grid-cols-7">
-                                    <p class="col-span-6 flex items-center">{{ slotProps.option.Tipologia }}</p>
-                                    <div class="flex space-x-1 rounded-md p-1 justify-end text-right items-center">
-                                        <p class="text-sm">10</p>
+                                    <p class="col-span-6 flex items-center">{{ slotProps.option.name }}</p>
+                                    <div class="flex space-x-1 rounded-md p-1 justify-end text-right items-center"
+                                        v-if="slotProps.option.count != 0">
+                                        <p class="text-sm">{{ slotProps.option.count }}</p>
                                         <i
                                             class="fa-regular fa-file-pdf text-danger border p-1 rounded-md border-danger"></i>
                                     </div>
@@ -375,7 +376,7 @@ const uploadEvent = () => {
                         <div class="p-1 border space-y-2 rounded-md">
                             <div class="flex space-x-2">
                                 <p class="font-bold">Tipologia:</p>
-                                <p>{{ tipologia.Tipologia }}</p>
+                                <p>{{ tipologia.name }}</p>
                             </div>
                         </div>
                         <div class="border rounded-md w-full h-full overflow-y-auto">
@@ -449,4 +450,5 @@ const uploadEvent = () => {
             </template>
         </CustomModal>
 
-</AppLayout></template>
+    </AppLayout>
+</template>
