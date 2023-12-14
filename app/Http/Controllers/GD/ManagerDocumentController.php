@@ -11,17 +11,17 @@ use Illuminate\Support\Facades\Storage;
 
 class ManagerDocumentController extends Controller
 {
-    public function index()
+    public function index($project)
     {
         $tipologias =  GDTipologias()->filter(function ($t) {
             // $t['Dependencia'] == auth()->user()->gerencia &&
             return ($t['idsubserie'] == 197 || $t['idsubserie'] == 201);
-        })->map(function ($tipologia) {
+        })->map(function ($tipologia) use ($project) {
             return [
                 'id' => $tipologia['id_trd_gd'],
                 'name' => $tipologia['Tipologia'],
                 'Subserie' => $tipologia['Subserie'],
-                'count' => FileManagerDocument::where('tipologia_id', $tipologia['id_trd_gd'])->count()
+                'count' => FileManagerDocument::where('tipologia_id', $tipologia['id_trd_gd'])->where('project_id', $project)->count()
             ];
         });
 
@@ -64,5 +64,15 @@ class ManagerDocumentController extends Controller
             //guardar los Archivos en la base de datos
 
         }
+    }
+
+
+    public function getFilesProjectTipologia($projectID, $tipologiaID)
+    {
+        $files = FileManagerDocument::where('tipologia_id', $tipologiaID)->where('project_id', $projectID)->get();
+
+        return response()->json([
+            'files' => $files,
+        ]);
     }
 }
