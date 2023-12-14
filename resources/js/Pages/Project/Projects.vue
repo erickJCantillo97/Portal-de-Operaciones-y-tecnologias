@@ -54,16 +54,15 @@ const addItem = () => {
 const tipologias = ref(null)
 const project = ref()
 const tipologia = ref()
+
 const addDoc = (p) => {
     tipologia.value = null
-    if (tipologias.value == null) {
-        axios.get(route('get.tipologias')).then((res) => {
-            tipologias.value = Object.values(res.data.tipologias)
-        })
-    }
+    tipologias.value = null
+    axios.get(route('get.tipologias', p.id)).then((res) => {
+        tipologias.value = Object.values(res.data.tipologias)
+    })
     project.value = p
     modalDocument.value = true
-
 }
 
 
