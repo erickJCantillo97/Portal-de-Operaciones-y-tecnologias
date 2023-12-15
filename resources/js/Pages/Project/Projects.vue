@@ -188,6 +188,26 @@ const uploadEvent = () => {
     })
 }
 
+function formatDateTime24h(dateTime) {
+    return new Date(dateTime).toLocaleString('es-CO',
+        { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
+}
+
+const tipologiaFiles = ref([])
+const selectTipologia = () => {
+    fileup.value = Math.random() * (10)
+    if (tipologia.value != null) {
+        if (tipologia.value.count > 0) {
+            axios.get(route('get.files.project.tipologia', { porjectID: project.value.id, tipologiaID: tipologia.value.id })).then((response) => {
+                tipologiaFiles.value = response.data.files
+            })
+        } else {
+            tipologiaFiles.value = []
+        }
+    }
+
+}
+
 //#endregion
 
 
@@ -304,150 +324,185 @@ const uploadEvent = () => {
                 </Column>
             </DataTable>
         </div>
+    </AppLayout>
+    <OverlayPanel ref="op">
+        <div>
+            <h2 class="text-base font-semibold leading-6 text-gray-900">Creación o edición de cronograma</h2>
+            <p class="mt-1 text-sm text-gray-500">Aquí podrá escoger como desea crear el cronograma del proyecto.</p>
 
-        <OverlayPanel ref="op">
-            <div>
-                <h2 class="text-base font-semibold leading-6 text-gray-900">Creación o edición de cronograma</h2>
-                <p class="mt-1 text-sm text-gray-500">Aquí podrá escoger como desea crear el cronograma del proyecto.</p>
-
-                <ul role="list" class="grid grid-cols-1 gap-6 py-6 mt-6 border-t border-b border-gray-200 sm:grid-cols-2">
-                    <li v-for="(item, itemIdx) in items" :key="itemIdx" class="flow-root">
-                        <div @click="router.get(route(item.page, projectSelect.id))"
-                            class="relative flex items-center p-2 -m-2 space-x-4 rounded-xl focus-within:ring-2 focus-within:ring-indigo-500 hover:bg-gray-50">
-                            <div
-                                :class="[item.background, 'flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg']">
-                                <component :is="item.icon" class="w-6 h-6 text-white" aria-hidden="true" />
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-medium text-gray-900">
-                                    <a href="#" class="focus:outline-none">
-                                        <span class="absolute inset-0" aria-hidden="true" />
-                                        <span>{{ item.title }}</span>
-                                        <span aria-hidden="true"> &rarr</span>
-                                    </a>
-                                </h3>
-                                <p class="mt-1 text-sm text-gray-500">{{ item.description }}</p>
-                            </div>
+            <ul role="list" class="grid grid-cols-1 gap-6 py-6 mt-6 border-t border-b border-gray-200 sm:grid-cols-2">
+                <li v-for="(item, itemIdx) in items" :key="itemIdx" class="flow-root">
+                    <div @click="router.get(route(item.page, projectSelect.id))"
+                        class="relative flex items-center p-2 -m-2 space-x-4 rounded-xl focus-within:ring-2 focus-within:ring-indigo-500 hover:bg-gray-50">
+                        <div
+                            :class="[item.background, 'flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg']">
+                            <component :is="item.icon" class="w-6 h-6 text-white" aria-hidden="true" />
                         </div>
-                    </li>
-                </ul>
-                <!-- <div class="flex mt-4">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-900">
+                                <a href="#" class="focus:outline-none">
+                                    <span class="absolute inset-0" aria-hidden="true" />
+                                    <span>{{ item.title }}</span>
+                                    <span aria-hidden="true"> &rarr</span>
+                                </a>
+                            </h3>
+                            <p class="mt-1 text-sm text-gray-500">{{ item.description }}</p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <!-- <div class="flex mt-4">
                     <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         Or start from an empty project
                         <span aria-hidden="true"> &rarr</span>
                     </a>
                 </div> -->
-            </div>
-        </OverlayPanel>
+        </div>
+    </OverlayPanel>
 
-        <CustomModal :visible="modalDocument" :maximizable="true">
-            <template #icon>
-                <i class="fa-solid fa-cloud-arrow-up text-white text-xl"></i>
-            </template>
-            <template #titulo>
-                <p class="text-white">Agregar archivos al proyecto {{ project.name }}</p>
-            </template>
-            <template #body>
-                <div v-if="tipologias" class="grid grid-cols-5 gap-2 max-h-full overflow-y-auto">
-                    <div class="col-span-2 max-h-full">
-                        <p class="w-full text-center font-bold text-primary text-lg">{{
-                            tipologias[0].Subserie }}</p>
-                        <Listbox v-model="tipologia" :options="tipologias" filter optionLabel="name"
-                            @click="fileup = Math.random() * (10)" listStyle="max-height:60vh" class="w-full md:w-14rem"
-                            :pt="{
-                                filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
-                                item: { class: 'hover:bg-blue-100 text-md !px-1 !py-0.5' },
+    <CustomModal :visible="modalDocument" :maximizable="true">
+        <template #icon>
+            <i class="fa-solid fa-cloud-arrow-up text-white text-xl"></i>
+        </template>
+        <template #titulo>
+            <p class="text-white">Agregar archivos al proyecto {{ project.name }}</p>
+        </template>
+        <template #body>
+            <div v-if="tipologias" class="grid grid-cols-5 gap-2 max-h-full overflow-y-auto">
+                <div class="col-span-2 max-h-full">
+                    <p class="w-full text-center font-bold text-primary text-lg">{{
+                        tipologias[0].Subserie }}</p>
+                    <Listbox v-model="tipologia" :options="tipologias" filter optionLabel="name" @click="selectTipologia()"
+                        listStyle="max-height:60vh" class="w-full md:w-14rem" :pt="{
+                            filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
+                            item: { class: 'hover:bg-blue-100 text-md !px-1 !py-0.5' },
+                        }">
+                        <template #option="slotProps">
+                            <div class="grid grid-cols-7 h-min">
+                                <p class="col-span-6 flex items-center">{{ slotProps.option.name }}</p>
+                                <div class="flex space-x-1 rounded-md p-1 justify-end text-right items-center"
+                                    v-if="slotProps.option.count != 0">
+                                    <p class="text-sm">{{ slotProps.option.count }}</p>
+                                    <i class="fa-regular fa-file text-danger border p-1 rounded-md border-danger">
+                                    </i>
+                                </div>
+                            </div>
+                        </template>
+                    </Listbox>
+                </div>
+                <div v-if="tipologia" class="col-span-3 gap-1 justify-between flex flex-col">
+                    <div class="p-1 space-y-2 rounded-md flex justify-center">
+                        <div class="flex space-x-2">
+                            <p class="font-bold">Tipologia:</p>
+                            <p>{{ tipologia.name }}</p>
+                            <p class="font-bold">Archivos subidos:</p>
+                            <p>{{ tipologia.count }}</p>
+                        </div>
+                    </div>
+                    <div class="border rounded-md w-full h-full max-h-[35vh] overflow-y-auto">
+                        <DataView v-if="tipologiaFiles.length > 0" :value="tipologiaFiles"
+                            class="w-full max-h-full overflow-y-auto">
+                            <template #list="slotProps">
+                                <div class="p-1 flex justify-between items-center w-full">
+                                    <div class="flex">
+                                        <i :class="String(slotProps.data.filePath).slice(String(slotProps.data.filePath).lastIndexOf('.') + 1) == 'pdf' ? 'fa-file-pdf' : 'fa-image'"
+                                            class=" text-danger fa-regular border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center"></i>
+                                        <div class="px-3">
+                                            <p class="text-sm">{{ (slotProps.index + 1) + '. ' +
+                                                slotProps.data.tipologia_name }}
+                                            </p>
+                                            <p class="text-xs">{{ formatSize(slotProps.data.name) }} </p>
+                                            <p class="text-xs">{{ formatDateTime24h(slotProps.data.created_at) }} </p>
+                                        </div>
+                                    </div>
+                                    <span class="space-x-1">
+                                        <Button class="!h-6 !w-6" icon="fa-regular fa-eye" outlined @click=""
+                                            rounded severity="success">
+                                        </Button>
+                                        <Button class="!h-6 !w-6" icon="fa-regular fa-trash-can" outlined disabled @click=""
+                                            rounded severity="danger">
+                                        </Button>
+                                    </span>
+                                </div>
+                            </template>
+                        </DataView>
+                        <div class="h-full flex justify-center items-center" v-if="tipologia.count == 0">
+                            <span>
+                                <i class=" w-full text-center text-2xl text-danger fa-solid fa-file-circle-exclamation"></i>
+                                <p class="w-full text-center font-bold text-danger">
+                                    Aun no hay archivos
+                                </p>
+                            </span>
+                        </div>
+                        <div class="h-full flex items-center" v-if="tipologia.count > 0 && tipologiaFiles.length == 0">
+                            <Loading message="Cargando archivos" />
+                        </div>
+                    </div>
+                    <div class="items-end grid">
+                        <FileUpload ref="fileUp" :multiple="true" accept="image/*,application/pdf" :key="fileup"
+                            invalidFileTypeMessage="Solo se aceptan imagenes o pdf" :maxFileSize="10000000"
+                            @select="onSelectedFiles" :pt="{
+                                content: { class: '!p-0.5' },
+                                message: { class: 'py-0.5' }
                             }">
-                            <template #option="slotProps">
-                                <div class="grid grid-cols-7 h-min">
-                                    <p class="col-span-6 flex items-center">{{ slotProps.option.name }}</p>
-                                    <div class="flex space-x-1 rounded-md p-1 justify-end text-right items-center"
-                                        v-if="slotProps.option.count != 0">
-                                        <p class="text-sm">{{ slotProps.option.count }}</p>
-                                        <i class="fa-regular fa-file text-danger border p-1 rounded-md border-danger">
-                                        </i>
+                            <template #header="{ chooseCallback, clearCallback, files }">
+                                <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">
+                                    <div class="flex gap-2">
+                                        <Button @click="chooseCallback()" outlined class="!h-8" severity="primary"
+                                            icon="fa-solid fa-folder-open" label="Seleccionar">
+                                        </Button>
+                                        <Button @click="uploadEvent()" outlined severity="success" class="!h-8"
+                                            label="Subir" icon="fa-solid fa-cloud-arrow-up" :loading="uploadForm.processing"
+                                            :disabled="!files || files.length === 0">
+                                        </Button>
+                                        <Button @click="clearCallback()" outlined icon="fa-regular fa-trash-can"
+                                            class="!h-8" label="Quitar todo" severity="danger"
+                                            :disabled="!files || files.length === 0">
+                                        </Button>
                                     </div>
                                 </div>
                             </template>
-                        </Listbox>
-                    </div>
-                    <div v-if="tipologia" class="col-span-3 gap-1 justify-between flex flex-col">
-                        <div class="p-1 border space-y-2 rounded-md">
-                            <div class="flex space-x-2">
-                                <p class="font-bold">Tipologia:</p>
-                                <p>{{ tipologia.name }}</p>
-                            </div>
-                        </div>
-                        <div class="border rounded-md w-full h-full overflow-y-auto">
-                            archivos
-                        </div>
-                        <div class="items-end grid">
-                            <FileUpload ref="fileUp" :multiple="true" accept="image/*,application/pdf" :key="fileup"
-                                invalidFileTypeMessage="Solo se aceptan imagenes o pdf" :maxFileSize="10000000"
-                                @select="onSelectedFiles" :pt="{
-                                    content: { class: '!p-0.5' },
-                                    message: { class: 'py-0.5' }
-                                }">
-                                <template #header="{ chooseCallback, clearCallback, files }">
-                                    <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">
-                                        <div class="flex gap-2">
-                                            <Button @click="chooseCallback()" outlined class="!h-8" severity="primary"
-                                                icon="fa-solid fa-folder-open" label="Seleccionar">
-                                            </Button>
-                                            <Button @click="uploadEvent()" outlined severity="success" class="!h-8"
-                                                label="Subir" icon="fa-solid fa-cloud-arrow-up"
-                                                :loading="uploadForm.processing" :disabled="!files || files.length === 0">
-                                            </Button>
-                                            <Button @click="clearCallback()" outlined icon="fa-regular fa-trash-can"
-                                                class="!h-8" label="Quitar todo" severity="danger"
-                                                :disabled="!files || files.length === 0">
+                            <template #content="{ files, removeFileCallback }">
+                                <DataView v-if="files.length > 0" :value="files"
+                                    class="w-full max-h-[20vh] overflow-y-auto">
+                                    <template #list="slotProps">
+                                        <div class="p-1 flex justify-between items-center w-full">
+                                            <div class="flex">
+                                                <i :class="slotProps.data.type == 'application/pdf' ? 'fa-regular fa-file-pdf' : 'fa-regular fa-image'"
+                                                    class=" text-danger border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center"></i>
+                                                <div class="px-3">
+                                                    <p class="text-sm">{{ slotProps.data.name }} </p>
+                                                    <p class="text-xs">{{ formatSize(slotProps.data.size) }} </p>
+                                                </div>
+                                            </div>
+                                            <Button class="!h-6 !w-6" icon="fa-regular fa-trash-can" outlined
+                                                @click="onRemoveTemplatingFile(slotProps.data, removeFileCallback, slotProps.index)"
+                                                rounded severity="danger">
                                             </Button>
                                         </div>
-                                    </div>
-                                </template>
-                                <template #content="{ files, removeFileCallback }">
-                                    <DataView v-if="files.length > 0" :value="files"
-                                        class="w-full max-h-[20vh] overflow-y-auto">
-                                        <template #list="slotProps">
-                                            <div class="p-1 flex justify-between items-center w-full">
-                                                <div class="flex">
-                                                    <i :class="slotProps.data.type == 'application/pdf' ? 'fa-regular fa-file-pdf' : 'fa-regular fa-image'"
-                                                        class=" text-danger border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center"></i>
-                                                    <div class="px-3">
-                                                        <p class="text-sm">{{ slotProps.data.name }} </p>
-                                                        <p class="text-xs">{{ formatSize(slotProps.data.size) }} </p>
-                                                    </div>
-                                                </div>
-                                                <Button class="!h-6 !w-6" icon="fa-regular fa-trash-can" outlined
-                                                    @click="onRemoveTemplatingFile(slotProps.data, removeFileCallback, slotProps.index)"
-                                                    rounded severity="danger">
-                                                </Button>
-                                            </div>
-                                        </template>
-                                    </DataView>
-                                </template>
-                                <template #empty>
-                                    <div class="flex items-center flex-col py-3">
-                                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-800" />
-                                        <p class="mt-2 mb-0">Arrastra los archivos a adjuntar en la tipologia</p>
-                                        <p class="text-xs text-gray-700 ">Se aceptan imagenes y PDF</p>
-                                    </div>
-                                </template>
-                            </FileUpload>
+                                    </template>
+                                </DataView>
+                            </template>
+                            <template #empty>
+                                <div class="flex items-center flex-col py-3">
+                                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-blue-800" />
+                                    <p class="mt-2 mb-0">Arrastra los archivos a adjuntar en la tipologia</p>
+                                    <p class="text-xs text-gray-700 ">Se aceptan imagenes y PDF</p>
+                                </div>
+                            </template>
+                        </FileUpload>
 
-                        </div>
-                    </div>
-                    <div v-else class="col-span-3 h-full pt-10">
-                        <Loading message="Seleccione una tipologia" />
                     </div>
                 </div>
-                <Loading v-else message="Cargando tipologias" />
-            </template>
-            <template #footer>
-                <Button severity="danger" outlined label="Cerrar" icon="fa-solid fa-xmark" @click="modalDocument = false"
-                    class="!h-8"></Button>
-            </template>
-        </CustomModal>
-
-    </AppLayout>
+                <div v-else class="col-span-3 h-full pt-10">
+                    <Loading message="Seleccione una tipologia" />
+                </div>
+            </div>
+            <Loading v-else message="Cargando tipologias" />
+        </template>
+        <template #footer>
+            <Button severity="danger" outlined label="Cerrar" icon="fa-solid fa-xmark" @click="modalDocument = false"
+                class="!h-8"></Button>
+        </template>
+    </CustomModal>
 </template>
