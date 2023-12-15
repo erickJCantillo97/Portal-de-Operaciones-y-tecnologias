@@ -40,7 +40,7 @@ const props = defineProps({
             <slot name="footer" />
         </template>
         <template #maximizeicon="{ maximized }">
-            <i :class="maximized ? 'fa-minimize' : 'fa-maximize'" class="text-white fa-solid"></i>
+            <i :class="maximized ? 'fa-compress' : 'fa-expand'" class="text-white fa-solid"></i>
         </template>
     </Dialog>
 </template>

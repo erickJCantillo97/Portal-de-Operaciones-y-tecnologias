@@ -16,10 +16,10 @@ class FileManagerDocument extends Model
     protected $guarded = [];
 
 
-    protected function filePath(): Attribute
+    protected function filepath(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => str_replace('//', '/', str_replace('public', 'storage', $value)),
+            get: fn ($value) => str_replace('public', 'storage', $value),
             set: fn ($value) => $value,
         );
     }

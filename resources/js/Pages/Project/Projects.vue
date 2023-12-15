@@ -19,6 +19,7 @@ import Listbox from 'primevue/listbox'
 import FileUpload from 'primevue/fileupload'
 import DataView from 'primevue/dataview'
 import Button from 'primevue/button'
+import Image from 'primevue/image'
 
 // import Button from 'primevue/button'
 
@@ -405,20 +406,43 @@ const selectTipologia = () => {
                             <template #list="slotProps">
                                 <div class="p-1 flex justify-between items-center w-full">
                                     <div class="flex">
-                                        <i :class="String(slotProps.data.filePath).slice(String(slotProps.data.filePath).lastIndexOf('.') + 1) == 'pdf' ? 'fa-file-pdf' : 'fa-image'"
-                                            class=" text-danger fa-regular border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center"></i>
+                                        <i v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'"
+                                            class=" text-danger fa-regular border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center fa-file-pdf"></i>
+                                        <Image v-else :src="slotProps.data.filePath" preview class="w-9">
+                                            <template #image>
+                                                <div class="flex items-center h-full">
+                                                    <img :src="slotProps.data.filePath" alt="image" />
+                                                </div>
+                                            </template>
+                                            <template #preview="slotProps1">
+                                                <img :src="slotProps.data.filePath" class="!max-w-[80vw] !max-h-[80vh]"
+                                                    alt="preview" :style="slotProps1.style"
+                                                    @click="slotProps1.previewCallback" />
+                                            </template>
+                                        </Image>
                                         <div class="px-3">
                                             <p class="text-sm">{{ (slotProps.index + 1) + '. ' +
                                                 slotProps.data.tipologia_name }}
                                             </p>
-                                            <p class="text-xs">{{ formatSize(slotProps.data.name) }} </p>
-                                            <p class="text-xs">{{ formatDateTime24h(slotProps.data.created_at) }} </p>
+                                            <p class="text-xs font-semibold">{{ slotProps.data.name }}</p>
+                                            <span class="flex space-x-2">
+                                                <p class="text-xs">{{ slotProps.data.name_user }} </p>
+                                                <p class="text-xs">{{ formatDateTime24h(slotProps.data.created_at) }} </p>
+                                                <p class="text-xs">{{ formatSize(slotProps.data.file_size) }} </p>
+                                                <p class="text-xs"
+                                                    v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'">
+                                                    {{ slotProps.data.num_folios }} folio(s) </p>
+                                            </span>
                                         </div>
                                     </div>
                                     <span class="space-x-1">
-                                        <Button class="!h-6 !w-6" icon="fa-regular fa-eye" outlined @click=""
-                                            rounded severity="success">
+                                        <a :href="slotProps.data.filePath" target="_blank" noopener noreferrer>
+                                            <Button class="!h-6 !w-6" icon="fa-regular fa-eye" outlined  rounded
+                                            v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'"
+                                            severity="success">
                                         </Button>
+                                        </a>
+
                                         <Button class="!h-6 !w-6" icon="fa-regular fa-trash-can" outlined disabled @click=""
                                             rounded severity="danger">
                                         </Button>

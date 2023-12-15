@@ -55,14 +55,14 @@ class ManagerDocumentController extends Controller
                 'project_id' => $validateData['project_id'],
                 'tipologia_id' => $validateData['tipologia_id'],
                 'tipologia_name' => $validateData['tipologia_name'],
-                'filePath' => $filePath,
-                'fileSize' => $file->getSize(),
+                'filePath' => str_replace('public', 'storage', $filePath),
+                'file_size' => $file->getSize(),
                 'name_user' => auth()->user()->short_name,
                 'num_folios' => $num_page
             ]);
         }
 
-        return response()->json(['message' => 'Archivos Subidos Exitosamente'], 200);
+        // return response()->json(['message' => 'Archivos Subidos Exitosamente'], 200);
     }
 
 
