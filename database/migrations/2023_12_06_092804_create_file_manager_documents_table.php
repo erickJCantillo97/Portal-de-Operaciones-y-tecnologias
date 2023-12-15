@@ -18,6 +18,9 @@ return new class extends Migration
             $table->integer('tipologia_id');
             $table->string('filePath');
             $table->string('tipologia_name');
+            $table->string('name_user');
+            $table->string('num_folios');
+            $table->string('file_size');
             $table->timestamps();
             $table->softDeletes();
         });

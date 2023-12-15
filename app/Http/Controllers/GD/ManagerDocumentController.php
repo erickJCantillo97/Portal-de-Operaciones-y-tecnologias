@@ -47,23 +47,22 @@ class ManagerDocumentController extends Controller
                 $file->getClientOriginalName() . '_' . Carbon::now()->format('Y-m-d') . '_' . $validateData['tipologia_id'] . '_' . FileManagerDocument::count() + 1 . '.' . $file->getClientOriginalExtension()
             );
 
-            // Carga el archivo PDF con dompdf
             // Obtiene el número de páginas
+            $texto_pdf = file_get_contents($file);
+            $num_page = preg_match_all("/\\/Page\\W/", $texto_pdf, $dummy);
             $fileManager = FileManagerDocument::create([
                 'user_id' => auth()->user()->id,
                 'project_id' => $validateData['project_id'],
                 'tipologia_id' => $validateData['tipologia_id'],
                 'tipologia_name' => $validateData['tipologia_name'],
                 'filePath' => $filePath,
+                'fileSize' => $file->getSize(),
+                'name_user' => auth()->user()->short_name,
+                'num_folios' => $num_page
             ]);
-
-            $pdf = PDF::loadFile($fileManager->filePath);
-            $numPages = $pdf->getDomPDF()->getCanvas()->get_page_count();
-            // Carga el archivo PDF con dompdf
-            return $numPages;
-            //guardar los Archivos en la base de datos
-
         }
+
+        return response()->json(['message' => 'Archivos Subidos Exitosamente'], 200);
     }
 
 
