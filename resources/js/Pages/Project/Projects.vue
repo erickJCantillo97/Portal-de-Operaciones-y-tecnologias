@@ -340,7 +340,7 @@ const uploadEvent = () => {
             </div>
         </OverlayPanel>
 
-        <CustomModal :visible="modalDocument">
+        <CustomModal :visible="modalDocument" :maximizable="true">
             <template #icon>
                 <i class="fa-solid fa-cloud-arrow-up text-white text-xl"></i>
             </template>
@@ -353,19 +353,19 @@ const uploadEvent = () => {
                         <p class="w-full text-center font-bold text-primary text-lg">{{
                             tipologias[0].Subserie }}</p>
                         <Listbox v-model="tipologia" :options="tipologias" filter optionLabel="name"
-                            @click="fileup.value = Math.random() * (10)" :virtualScrollerOptions="{ itemSize: 38 }"
-                            listStyle="height:47vh" class="w-full md:w-14rem" :pt="{
+                            @click="fileup = Math.random() * (10)" listStyle="max-height:60vh" class="w-full md:w-14rem"
+                            :pt="{
                                 filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
-                                item: { class: 'hover:bg-blue-100 text-md !h-min !px-1 !py-0.5' },
+                                item: { class: 'hover:bg-blue-100 text-md !px-1 !py-0.5' },
                             }">
                             <template #option="slotProps">
-                                <div class="grid grid-cols-7">
+                                <div class="grid grid-cols-7 h-min">
                                     <p class="col-span-6 flex items-center">{{ slotProps.option.name }}</p>
                                     <div class="flex space-x-1 rounded-md p-1 justify-end text-right items-center"
                                         v-if="slotProps.option.count != 0">
                                         <p class="text-sm">{{ slotProps.option.count }}</p>
-                                        <i
-                                            class="fa-regular fa-file-pdf text-danger border p-1 rounded-md border-danger"></i>
+                                        <i class="fa-regular fa-file text-danger border p-1 rounded-md border-danger">
+                                        </i>
                                     </div>
                                 </div>
                             </template>

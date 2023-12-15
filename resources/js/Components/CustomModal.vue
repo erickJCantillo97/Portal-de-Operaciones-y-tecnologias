@@ -9,27 +9,38 @@ const props = defineProps({
     width: {
         type: String,
         default: '60rem'
+    },
+    maximizable: {
+        type: Boolean,
+        default: false
     }
 })
 </script>
 
 <template>
-    <Dialog v-model:visible="props.visible" modal :closable="false" class="" :style="{ width: props.width }"
-        :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :pt="{
+    <Dialog v-model:visible="props.visible" :maximizable="maximizable" modal :closable="false" class=""
+        :style="{ width: props.width }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :pt="{
             header: { class: '!bg-primary' },
-            closeButtonIcon: { class: 'text-white' }
-        }">
+            closeButtonIcon: { class: 'text-white' },
+
+        }
+            ">
         <template #header>
             <div class="flex items-center space-x-2">
                 <slot name="icon" />
                 <slot name="titulo" />
             </div>
         </template>
-        <div class="pt-3">
-            <slot name="body" />
-        </div>
+        <template #default>
+            <div class="pt-2 h-92">
+                <slot name="body" />
+            </div>
+        </template>
         <template #footer>
             <slot name="footer" />
+        </template>
+        <template #maximizeicon="{ maximized }">
+            <i :class="maximized ? 'fa-minimize' : 'fa-maximize'" class="text-white fa-solid"></i>
         </template>
     </Dialog>
 </template>
