@@ -269,4 +269,11 @@ h4.statusmessage {
     color: #fff;
 }
 
+.swal2-container {
+    display: -webkit-box;
+    display: flex;
+    position: fixed;
+    z-index: 300000;
+}
+
 /*# sourceMappingURL=app.css.map */
