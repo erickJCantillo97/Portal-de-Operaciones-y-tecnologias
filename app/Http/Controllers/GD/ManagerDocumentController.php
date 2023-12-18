@@ -74,4 +74,6 @@ class ManagerDocumentController extends Controller
             'files' => $files,
         ]);
     }
+
+    
 }
