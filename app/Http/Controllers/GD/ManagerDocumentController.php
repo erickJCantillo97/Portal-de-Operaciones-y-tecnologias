@@ -16,7 +16,7 @@ class ManagerDocumentController extends Controller
     {
         $tipologias =  GDTipologias()->filter(function ($t) {
             // $t['Dependencia'] == auth()->user()->gerencia &&
-            return $t['Dependencia'] == auth()->user()->gerencia && ($t['idsubserie'] == 197 || $t['idsubserie'] == 201);
+            return ($t['idsubserie'] == 197 || $t['idsubserie'] == 201);
         })->map(function ($tipologia) use ($project) {
             return [
                 'id' => $tipologia['id_trd_gd'],
