@@ -22,8 +22,7 @@ class ProjectController extends Controller
      */
     public function index(Request $request)
     {
-
-        $projects = Project::with('contract')->orderBy('name')->get();
+        $projects = Project::with('contract')->orderBy('created_at', 'DESC')->get();
         if ($request->expectsJson()) {
             return response()->json([
                 'projects' => $projects

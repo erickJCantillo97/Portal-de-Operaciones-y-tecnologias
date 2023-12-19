@@ -148,7 +148,7 @@ const navigation = [
     },
     {
         name: 'DocuFlow',
-        href: 'dashboard',
+        href: 'get.projectsGD',
         icon: HomeIcon,
         current: true,
         show: true
