@@ -20,9 +20,15 @@ class ProjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+
         $projects = Project::with('contract')->orderBy('name')->get();
+        if ($request->expectsJson()) {
+            return response()->json([
+                'projects' => $projects
+            ]);
+        }
 
         return Inertia::render('Project/Projects', compact('projects'));
     }
@@ -112,7 +118,8 @@ class ProjectController extends Controller
         $authorizations = Authorization::orderBy('contract_id')->get();
         $quotes = Quote::get();
 
-        return Inertia::render('Project/CreateProjects',
+        return Inertia::render(
+            'Project/CreateProjects',
             [
                 'project' => $project,
                 'project_id' => $project->id,

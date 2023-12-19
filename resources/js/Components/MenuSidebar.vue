@@ -148,7 +148,7 @@ const navigation = [
     },
     {
         name: 'DocuFlow',
-        href: 'dashboard',
+        href: 'gesdoc.index',
         icon: HomeIcon,
         current: true,
         show: true
