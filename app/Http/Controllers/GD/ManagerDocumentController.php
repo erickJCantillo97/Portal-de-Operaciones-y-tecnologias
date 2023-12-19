@@ -8,6 +8,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class ManagerDocumentController extends Controller
 {
@@ -75,5 +76,7 @@ class ManagerDocumentController extends Controller
         ]);
     }
 
-    
+    public function getProjectsGD () {
+        return Inertia::render('GesDoc/GesDocView');
+    }
 }
