@@ -20,9 +20,9 @@ const props = defineProps({
 <template>
     <Dialog v-model:visible="props.visible" :maximizable="maximizable" modal :closable="false" class=""
         :style="{ width: props.width }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :pt="{
-            header: { class: '!bg-primary' },
+            header: { class: '!bg-primary !h-[5vh]' },
             closeButtonIcon: { class: 'text-white' },
-
+            footer: { class: '!p-2 !h-[5vh]' }
         }
             ">
         <template #header>
@@ -32,7 +32,7 @@ const props = defineProps({
             </div>
         </template>
         <template #default>
-            <div class="pt-2 h-92">
+            <div class="pt-2 h-full">
                 <slot name="body" />
             </div>
         </template>
