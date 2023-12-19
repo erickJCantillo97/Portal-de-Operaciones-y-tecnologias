@@ -60,7 +60,7 @@ const typeShip = useForm(
 )
 const showNew = () => {
     typeShip.reset()
-    modalType.value='new'
+    modalType.value = 'new'
     modalVisible.value = true
 }
 
@@ -73,7 +73,7 @@ const save = () => {
             modalVisible.value = false
             toast('Clase creada correctamente', 'success');
         },
-        onError:(response)=>{
+        onError: (response) => {
             console.table(response)
             toast('Ocurrio un error', 'warning');
         }
@@ -103,7 +103,7 @@ const showEdit = (dato) => {
     typeShip.bollard_pull = dato.bollard_pull
     typeShip.clasification = dato.clasification
     typeShip.render = dato.render
-    modalType.value='edit'
+    modalType.value = 'edit'
     modalVisible.value = true
 }
 const edit = () => {
@@ -175,7 +175,8 @@ const selectedColumns = ref(columns.value);
                         </div>
                         <div>
                             <div title="Eliminar">
-                                <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Clase', 'typeShips')" class="hover:bg-primary">
+                                <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Clase', 'typeShips')"
+                                    class="hover:bg-primary">
                                     <i class="fa-solid fa-trash"></i>
                                 </Button>
                             </div>
@@ -191,7 +192,8 @@ const selectedColumns = ref(columns.value);
             <i class="text-white fa-solid fa-ship"></i>
         </template>
         <template #titulo>
-            <span class="text-xl font-bold text-white white-space-nowrap">{{modalType=='new'?'Nueva clase':'Editar clase'}}</span>
+            <span class="text-xl font-bold text-white white-space-nowrap">
+                {{ modalType == 'new' ? 'Nueva clase' : 'Editar clase' }}</span>
         </template>
         <template #body>
             <div class="grid grid-cols-4 gap-2 px-1 pt-4">
@@ -242,7 +244,7 @@ const selectedColumns = ref(columns.value);
             </div>
         </template>
         <template #footer>
-            <Button severity="primary" @click="save()" v-if="modalType=='new'" class="hover:bg-danger">
+            <Button severity="primary" @click="save()" v-if="modalType == 'new'" class="hover:bg-danger">
                 <i class="fa-solid fa-floppy-disk"></i>
                 <p>Guardar</p>
             </Button>
