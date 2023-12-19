@@ -209,6 +209,19 @@ const selectTipologia = () => {
 
 }
 
+const pdf = ref()
+const archivo = ref()
+const archivoData = ref()
+const showPdf = (event, data) => {
+    archivoData.value = data
+    pdf.value.toggle(event)
+    fetch(data.filePath).then(response => response.blob()).then(blob => {
+        const file = new File([blob], 'Documento.pdf', { type: 'application/pdf' });
+        archivo.value = URL.createObjectURL(file)
+    })
+}
+
+
 //#endregion
 
 
@@ -374,7 +387,7 @@ const selectTipologia = () => {
                     <p class="w-full text-center font-bold text-primary text-lg">{{
                         tipologias[0].Subserie }}</p>
                     <Listbox v-model="tipologia" :options="tipologias" filter optionLabel="name" @click="selectTipologia()"
-                        listStyle="max-height:60vh" class="w-full md:w-14rem" :pt="{
+                        listStyle="max-height:67vh" class="w-full md:w-14rem" :pt="{
                             filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
                             item: { class: 'hover:bg-blue-100 text-md !px-1 !py-0.5' },
                         }">
@@ -396,11 +409,9 @@ const selectTipologia = () => {
                         <div class="flex space-x-2">
                             <p class="font-bold">Tipologia:</p>
                             <p>{{ tipologia.name }}</p>
-                            <p class="font-bold">Archivos subidos:</p>
-                            <p>{{ tipologia.count }}</p>
                         </div>
                     </div>
-                    <div class="border rounded-md w-full h-full max-h-[35vh] overflow-y-auto">
+                    <div class="border rounded-md w-full h-full overflow-y-auto">
                         <DataView v-if="tipologiaFiles.length > 0" :value="tipologiaFiles"
                             class="w-full max-h-full overflow-y-auto">
                             <template #list="slotProps">
@@ -436,13 +447,11 @@ const selectTipologia = () => {
                                         </div>
                                     </div>
                                     <span class="space-x-1">
-                                        <a :href="slotProps.data.filePath" target="_blank" noopener noreferrer>
-                                            <Button class="!h-6 !w-6" icon="fa-regular fa-eye" outlined  rounded
+                                        <Button class="!h-6 !w-6" icon="fa-regular fa-eye" outlined rounded
+                                            @click="showPdf($event, slotProps.data)"
                                             v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'"
                                             severity="success">
                                         </Button>
-                                        </a>
-
                                         <Button class="!h-6 !w-6" icon="fa-regular fa-trash-can" outlined disabled @click=""
                                             rounded severity="danger">
                                         </Button>
@@ -529,4 +538,25 @@ const selectTipologia = () => {
                 class="!h-8"></Button>
         </template>
     </CustomModal>
+
+    <OverlayPanel ref="pdf">
+        <div class="">
+            <p class="text-sm font-semibold">{{ archivoData.name }}Nombre de archivo quemado</p>
+            <span class="flex space-x-2 p-1 cursor-default">
+                <p title="Fecha subida" class="text-sm border rounded-md px-2">{{ formatDateTime24h(archivoData.created_at)
+                }} </p>
+                <p title="Tamaño" class="text-sm border rounded-md px-2">{{ formatSize(archivoData.file_size) }} </p>
+                <p title="Cantidad de folios" class="text-sm border rounded-md px-2">
+                    {{ archivoData.num_folios }} folio(s) </p>
+            </span>
+        </div>
+        <object id="visorPDF" :data="archivo + '#toolbar=0'" type="application/pdf" style="width:60vw;height:60vh;">
+            <a :href="archivo">Haz clic aquí para ver el archivo PDF</a>
+        </object>
+        <div class="flex justify-end p-2">
+            <a :href="archivo" target="_blank">
+                <Button label="Descargar" icon="fa-solid fa-save" outlined rounded class="!h-8" />
+            </a>
+        </div>
+    </OverlayPanel>
 </template>
