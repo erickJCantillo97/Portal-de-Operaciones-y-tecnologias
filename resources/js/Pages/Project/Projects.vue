@@ -528,9 +528,7 @@ const showPdf = (event, data) => {
 
                     </div>
                 </div>
-                <div v-else class="col-span-3 h-full pt-10">
-                    <Loading message="Seleccione una tipologia" />
-                </div>
+                <Loading v-else class="col-span-3 h-full pt-10" message="Seleccione una tipologia" />
             </div>
             <Loading v-else message="Cargando tipologias" />
         </template>

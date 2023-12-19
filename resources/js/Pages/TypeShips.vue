@@ -1,14 +1,12 @@
 <script setup>
-import { useForm, router } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import AppLayout from "@/Layouts/AppLayout.vue";
-import MultiSelect from 'primevue/multiselect';
-import SelectButton from 'primevue/selectbutton';
 import Dropdown from 'primevue/dropdown';
 import "../../sass/dataTableCustomized.scss";
-import { ref, onMounted } from 'vue';
-import Button from '@/Components/Button.vue';
+import { ref } from 'vue';
+import Button from 'primevue/Button';
 import TextInput from '@/Components/TextInput.vue';
 import CustomModal from '@/Components/CustomModal.vue';
 import FileUpload from 'primevue/fileupload';
@@ -65,16 +63,13 @@ const showNew = () => {
 }
 
 const save = () => {
-    typeShip.transform((data) => ({
-        ...data,
-        hull_material: data.hull_material ? data.hull_material.name : null
-    })).post(route('typeShips.store'), {
+    typeShip.post(route('typeShips.store'), {
         onSuccess: (response) => {
             modalVisible.value = false
+            typeShip.reset()
             toast('Clase creada correctamente', 'success');
         },
         onError: (response) => {
-            console.table(response)
             toast('Ocurrio un error', 'warning');
         }
     })
@@ -107,33 +102,28 @@ const showEdit = (dato) => {
     modalVisible.value = true
 }
 const edit = () => {
-    typeShip.transform((data) => ({
-        ...data,
-        hull_material: data.hull_material ? data.hull_material.name : null
-    }))
-    router.post(route('typeShips.update', typeShip.id), typeShip, {
+    typeShip.post(route('typeShips.update', typeShip.id), {
         onSuccess: (response) => {
             modalVisible.value = false
+            typeShip.reset()
             toast('Cambios guardados', 'success');
-            console.table(response)
         },
         onError: (response) => {
             toast('Ocurrio un error', 'warning');
-            console.table(response)
         }
     })
 }
 
 const columns = ref([
     { field: 'name', header: 'Nombre' },
-    { field: 'projects', header: 'Proyectos' },
+    { field: 'projects', header: 'Cascos' },
     { field: 'type', header: 'Tipo' },
     { field: 'hull_material', header: 'Material del casco' },
     { field: 'length', header: 'Eslora' },
     { field: 'breadth', header: 'Manga' },
 ]);
 
-const hull_materials = ref([{ name: 'ACERO' }, { name: 'ALUMINIO' }, { name: 'MATERIALES COMPUESTOS' }])
+const hull_materials = ref(['ACERO', 'ALUMINIO', 'MATERIALES COMPUESTOS'])
 const selectedColumns = ref(columns.value);
 
 </script>
@@ -143,44 +133,19 @@ const selectedColumns = ref(columns.value);
         <DataTable :value="props.typeShips" tableStyle="min-width: 50rem">
             <template #header>
                 <div class="flex items-center justify-between">
-                    <h class="text-base font-bold">Clases de buque</h>
-                    <div>
-                        <Button severity="primary" type="button" @click="showNew()">
-                            <i class="fa-solid fa-plus" />
-                        </Button>
-                    </div>
-                    <!-- <button @click="visible = true"
-                        class="p-2 border rounded-md border-success text-success hover:bg-primary hover:text-white hover:border-primary">
-                        <i class="fa-solid fa-plus"></i>
-                        Agregar
-                    </button> -->
+                    <p class="text-base font-bold">Clases de buque</p>
+                    <Button title="Nuevo" severity="primary" text icon="fa-solid fa-plus" @click="showNew()" />
                 </div>
-                <!-- <div style="text-align:left">
-                    <MultiSelect :modelValue="selectedColumns" :options="columns" optionLabel="header"
-                        @update:modelValue="onToggle" display="chip" placeholder="Select Columns" />
-                </div> -->
             </template>
             <Column v-for="(col, index) of selectedColumns" :field="col.field" :header="col.header" :key="col.field + '_' +
-                index">
-
-            </Column>
+                index" />
             <Column header="Acciones" class="space-x-3">
                 <template #body="slotProps">
-                    <div
-                        class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8">
-                        <div title="Editar">
-                            <Button severity="success" @click="showEdit(slotProps.data)" class="hover:bg-primary">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </Button>
-                        </div>
-                        <div>
-                            <div title="Eliminar">
-                                <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Clase', 'typeShips')"
-                                    class="hover:bg-primary">
-                                    <i class="fa-solid fa-trash"></i>
-                                </Button>
-                            </div>
-                        </div>
+                    <div class=" flex justify-center">
+                        <Button title="Editar" severity="success" text @click="showEdit(slotProps.data)" class="!h-8"
+                            icon="fa-solid fa-pen-to-square" />
+                        <Button title="Eliminar" severity="danger" icon="fa-solid fa-trash" text class="!h-8"
+                            @click="confirmDelete(slotProps.data.id, 'Clase', 'typeShips')" />
                     </div>
                 </template>
             </Column>
@@ -201,10 +166,10 @@ const selectedColumns = ref(columns.value);
                 <TextInput label="Tipo de buque" type="text" v-model="typeShip.type" />
                 <TextInput label="Empresa diseñadora" type="text" v-model="typeShip.disinger" />
                 <div>
-                    <label class="block mb-1 text-sm font-medium text-gray-900 capitalize" for="hull_material">
+                    <label class="text-sm font-medium" for="hull_material">
                         Material Casco</label>
                     <Dropdown id="hull_material" v-model="typeShip.hull_material" :options="hull_materials"
-                        optionLabel="name" placeholder="Selecciona un material" class="w-full rounded-md md:w-14rem" :pt="{
+                        placeholder="Selecciona un material" class="w-full -mt-1 rounded-md md:w-14rem" :pt="{
                             root: {
                                 class: 'h-10 !ring-gray-300 !ring-inset ring-1 !border-0 !shadow-sm '
                             },
@@ -232,30 +197,39 @@ const selectedColumns = ref(columns.value);
                 <TextInput label="CGT" type="number" v-model="typeShip.CGT" />
                 <TextInput label="Bollard pull" type="number" v-model="typeShip.bollard_pull" />
                 <TextInput label="Clasificacion" type="text" v-model="typeShip.clasification" />
-                <FileUpload mode="basic" :multiple="false" accept="image/*" class="w-full" :maxFileSize="1000000"
-                    @select="typeShip.image = $event.files[0]" v-model="typeShip.image" :showCancelButton="false"
-                    :showUploadButton="false" chooseLabel="Agregar imagen" :pt="{
-                        root: { class: '' }
-                    }">
-                </FileUpload>
-                <Image v-if="typeShip.image != null" id="verFoto" alt="imagen" :src="verfoto(typeShip.image)" preview
-                    height="170" width="190" />
+                <span class="flex items-center justify-center">
+                    <FileUpload mode="basic" :multiple="false" accept="image/*" class="w-full" :maxFileSize="1000000"
+                        @select="typeShip.image = $event.files[0]" v-model="typeShip.image" :showCancelButton="false"
+                        :showUploadButton="false" chooseLabel="Agregar imagen" :pt="{
+                            root: { class: '' }
+                        }">
+                    </FileUpload>
+                </span>
+                <span class="flex items-center justify-center">
+                    <Image v-if="typeShip.image != null || typeShip.render != null" id="verFoto" alt="imagen" preview
+                        height="50" width="50" :pt="{
+                        }">
+                        <template #image>
+                            <div class="flex items-center justify-center w-full">
+                                <img :src="typeShip.image ? verfoto(typeShip.image) : typeShip.render" alt="image"
+                                    class="h-12" />
+                            </div>
+                        </template>
+                        <template #preview="slotProps">
+                            <img :src="typeShip.image ? verfoto(typeShip.image) : typeShip.render"
+                                class="!max-w-[80vw] !max-h-[80vh]" alt="preview" :style="slotProps.style"
+                                @click="slotProps.previewCallback" />
+                        </template>
+                    </Image>
+                </span>
 
             </div>
         </template>
         <template #footer>
-            <Button severity="primary" @click="save()" v-if="modalType == 'new'" class="hover:bg-danger">
-                <i class="fa-solid fa-floppy-disk"></i>
-                <p>Guardar</p>
-            </Button>
-            <Button severity="primary" @click="edit()" v-else class="hover:bg-danger">
-                <i class="fa-solid fa-floppy-disk"></i>
-                <p>Guardar</p>
-            </Button>
-            <Button severity="danger" @click="modalVisible = false" class="hover:bg-danger">
-                <i class="fa-regular fa-circle-xmark"></i>
-                <p>Cancelar</p>
-            </Button>
+            <Button severity="primary" outlined label="Guardar" icon="fa-solid fa-floppy-disk"
+                @click="modalType == 'new' ? save() : edit()" />
+            <Button severity="danger" outlined label="Cancelar" icon="fa-regular fa-circle-xmark"
+                @click="modalVisible = false;typeShip.reset()" />
         </template>
     </CustomModal>
 </template>
