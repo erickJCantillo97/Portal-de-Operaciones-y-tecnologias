@@ -5,12 +5,19 @@ onMounted(() => {
   getProjects()
 })
 
-// const props = defineProps ({
-//   projects: Array
-// })
+defineProps(
+  {
+    name: String,
+    default: ''
+  },
+  {
+    sap: String,
+    default: ''
+  },
+)
 
 const keyword = ref('')
-const selecteditems = ref([])
+const selectedItems = ref([])
 const filteredProjects = ref()
 const projectsOptions = ref([])
 
@@ -51,12 +58,10 @@ const selectItemList = () => {
     class="grid grid-cols-4 h-96 overflow-y-auto custom-scroll snap-y snap-mandatory sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg m-8 p-4 mb-2">
     <ul v-for="project in filteredProjects" :key="project.id" class="text-sm italic [&>li>p]:font-semibold snap-start">
       <div @click="toggleSelectItem(project.id)"
-        :class="selecteditems.includes(project.id) ? 'bg-blue-900 text-white' : 'hover:border-2 hover:border-blue-900'"
-        class="flex flex-wrap p-2 space-x-4 shadow-md rounded-md cursor-pointer hover:shadow-md">
-        <div class="w-full">
-          <img :src="project.file" onerror="this.src='public/images/generic-boat.png'"
-            class="rounded-t-2xl h-32 w-full object-cover object-center" />
-        </div>
+        :class="selectedItems.includes(project.id) ? 'bg-blue-900 text-white' : 'hover:border-2 hover:border-blue-900'"
+        class="flex flex-wrap p-2 space-x-4 shadow-md rounded-md cursor-pointer">
+        <img src="https://www.cotecmar.com/sites/default/files/media/imagenes/2021-12/CotecmarLogo.png"
+          onerror="this.src='images/generic-boat.png'" class="rounded-t-2xl h-32 w-full object-center object-contain" />
         <div>
           <li>
             <p class="text-blue-800 text-xl pt-2 pb-2 font-semibold">
@@ -72,8 +77,8 @@ const selectItemList = () => {
             }}</p>
           </li>
           <li>
-            <p><span class="font-semibold">Fecha Finalización:</span> {{ project.end_date == null ? 'N/A' :
-              project.end_date }}</p>
+            <p><span class="font-semibold">Fecha Finalización:</span>
+              {{ project.end_date == null ? 'N/A' : project.end_date }}</p>
           </li>
           <li>
             <p><span class="font-semibold">Gerencia:</span> {{ project.gerencia }}</p>
