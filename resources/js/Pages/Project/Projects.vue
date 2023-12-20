@@ -7,11 +7,9 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Tag from 'primevue/tag'
 import { FilterMatchMode, FilterOperator } from 'primevue/api'
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassPlusIcon, SparklesIcon, EyeIcon, PhotoIcon, TableCellsIcon, ArrowUpCircleIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline'
+import { MagnifyingGlassPlusIcon, SparklesIcon, PhotoIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline'
 import { useSweetalert } from '@/composable/sweetAlert'
 import Loading from '@/Components/Loading.vue';
-// import plural from 'pluralize-es'
-import CustomButton from '../../Components/Button.vue'
 import OverlayPanel from 'primevue/overlaypanel'
 import CustomModal from '@/Components/CustomModal.vue'
 import axios from 'axios'
@@ -20,8 +18,7 @@ import FileUpload from 'primevue/fileupload'
 import DataView from 'primevue/dataview'
 import Button from 'primevue/button'
 import Image from 'primevue/image'
-
-// import Button from 'primevue/button'
+import InputText from 'primevue/inputtext'
 
 const modalDocument = ref(false)
 const { toast } = useSweetalert()
@@ -229,7 +226,7 @@ const showPdf = (event, data) => {
 
 <template>
     <AppLayout>
-        <div class="w-full overflow-y-auto custom-scroll">
+        <div class="w-full overflow-y-auto">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
@@ -237,10 +234,8 @@ const showPdf = (event, data) => {
                     </h1>
                 </div>
                 <div class="" title="Agregar Proyecto">
-                    <CustomButton @click="addItem()" severity="success">
-                        <PlusIcon class="w-6 h-6" aria-hidden="true" />
-                        Agregar
-                    </CustomButton>
+                    <Button @click="addItem()" severity="success" icon="fa-solid fa-plus" label="Agregar" outlined
+                        class="!h-8" />
                 </div>
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
@@ -254,20 +249,15 @@ const showPdf = (event, data) => {
                     <div class="flex justify-between w-full h-8 mb-2">
                         <div class="flex space-x-4">
                             <div class="w-8" title="Filtrar Proyectos">
-                                <CustomButton @click="clearFilter()" type="button" severity="primary"
-                                    class="hover:bg-primary ">
-                                    <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
-                                </CustomButton>
+                                <Button @click="clearFilter()" outlined severity="primary" icon="pi pi-filter-slash"
+                                    class="!h-8">
+                                </Button>
                             </div>
-
-                            <div class="relative flex rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <MagnifyingGlassIcon class="w-5 h-4 text-gray-400" aria-hidden="true" />
-                                </div>
-                                <input type="search" title="Buscar Proyectos"
-                                    class="block w-10/12 py-4 pl-10 text-gray-900 border-0 rounded-md ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            <span class="p-input-icon-left">
+                                <i class="pi pi-search" />
+                                <InputText size="small" class="!h-8" type="search" title="Buscar Proyectos"
                                     v-model="filters.global.value" placeholder="Buscar..." />
-                            </div>
+                            </span>
                         </div>
                     </div>
                 </template>
@@ -292,47 +282,26 @@ const showPdf = (event, data) => {
                 <!--ACCIONES-->
                 <Column header="Acciones" class="space-x-3">
                     <template #body="slotProps">
-                        <div
-                            class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
-                            <div title="Agregar documentos">
-                                <CustomButton severity="primary" @click="addDoc(slotProps.data)" class="hover:bg-primary">
-                                    <i class="fa-solid fa-cloud-arrow-up h-4 w-4 flex items-center"></i>
-                                </CustomButton>
-                            </div>
-                            <div title="Crear Actividades">
-                                <CustomButton severity="primary" @click="toggle($event, slotProps.data)"
-                                    class="hover:bg-primary">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M18 16L16 16M16 16L14 16M16 16L16 14M16 16L16 18" stroke="#1C274C"
-                                            stroke-width="1.5" stroke-linecap="round" />
-                                        <path d="M7 4V2.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
-                                        <path d="M17 4V2.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
-                                        <path d="M21.5 9H16.625H10.75M2 9H5.875" stroke="#1C274C" stroke-width="1.5"
-                                            stroke-linecap="round" />
-                                        <path
-                                            d="M14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V12C2 8.22876 2 6.34315 3.17157 5.17157C4.34315 4 6.22876 4 10 4H14C17.7712 4 19.6569 4 20.8284 5.17157C22 6.34315 22 8.22876 22 12V14C22 17.7712 22 19.6569 20.8284 20.8284C20.1752 21.4816 19.3001 21.7706 18 21.8985"
-                                            stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
-                                    </svg>
-                                </CustomButton>
-                            </div>
+                        <div class="flex text-sm font-medium whitespace-normal">
 
+                            <Button title="Agregar documentos" rounded text severity="primary"
+                                @click="addDoc(slotProps.data)" class="hover:bg-primary"
+                                icon="fa-solid fa-cloud-arrow-up" />
+
+                            <Button title="Crear Actividades" rounded severity="primary" text
+                                @click="toggle($event, slotProps.data)" icon="fa-regular fa-calendar-plus" />
                             <!--BOTÓN EDITAR-->
-                            <div title="Editar Proyecto">
-                                <Link :href="route('projects.edit', slotProps.data.id)">
-                                <CustomButton severity="primary" class="hover:bg-primary">
-                                    <PencilIcon class="w-4 h-4" aria-hidden="true" />
-                                </CustomButton>
-                                </Link>
-                            </div>
+
+                            <Link :href="route('projects.edit', slotProps.data.id)">
+                            <Button title="Editar Proyecto" severity="primary" text class="hover:bg-primary" rounded
+                                icon="fa-solid fa-pencil" />
+                            </Link>
 
                             <!--BOTÓN ELIMINAR-->
-                            <div title="Eliminar Proyecto">
-                                <CustomButton severity="danger"
-                                    @click="confirmDelete(slotProps.data.id, 'Proyecto', 'projects')"
-                                    class="hover:bg-danger">
-                                    <TrashIcon class="w-4 h-4 " aria-hidden="true" />
-                                </CustomButton>
-                            </div>
+
+                            <Button title="Eliminar Proyecto" rounded severity="danger" text
+                                @click="confirmDelete(slotProps.data.id, 'Proyecto', 'projects')"
+                                icon="fa-regular fa-trash-can" />
                         </div>
                     </template>
                 </Column>
@@ -530,7 +499,7 @@ const showPdf = (event, data) => {
                 </div>
                 <Loading v-else class="col-span-3 h-full pt-10" message="Seleccione una tipologia" />
             </div>
-            <Loading v-else message="Cargando tipologias" />
+            <Loading class="mt-5" v-else message="Cargando tipologias" />
         </template>
         <template #footer>
             <Button severity="danger" outlined label="Cerrar" icon="fa-solid fa-xmark" @click="modalDocument = false"
