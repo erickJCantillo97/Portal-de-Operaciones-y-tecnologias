@@ -149,7 +149,7 @@ class ProjectController extends Controller
             'gerencia' => 'nullable',
             'start_date' => 'nullable',
             'end_date' => 'nullable',
-            'hoursPerDay' => 'nullable',
+            'hoursPerDay' => 'nufllable',
             'daysPerWeek' => 'nullable',
             'daysPerMonth' => 'nullable',
             'shift' => 'nullable',

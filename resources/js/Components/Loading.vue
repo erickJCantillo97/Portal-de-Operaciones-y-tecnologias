@@ -43,6 +43,6 @@ defineProps({
         <span class="grid items-center justify-center loader">
             <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
         </span>
-        <p class="font-bold animate-pulse text-primary">{{ message }}</p>
+        <p class="font-bold pt-4 animate-pulse text-primary">{{ message }}</p>
     </div>
 </template>
