@@ -19,6 +19,7 @@ import DataView from 'primevue/dataview'
 import Button from 'primevue/button'
 import Image from 'primevue/image'
 import InputText from 'primevue/inputtext'
+import Divider from 'primevue/divider'
 
 const modalDocument = ref(false)
 const { toast } = useSweetalert()
@@ -373,13 +374,13 @@ const showPdf = (event, data) => {
                 </div>
                 <div v-if="tipologia" class="col-span-3 h-[60vh] space-y-2">
                     <div class="border rounded-md">
-                        <span class="flex space-x-2">
+                        <span class="flex space-x-2 p-2">
                             <p class="font-bold">Tipologia:</p>
                             <p>{{ tipologia.name }}</p>
                         </span>
-                        <div class="overflow-y-auto h-[40vh]">
-                            <DataView v-if="tipologiaFiles.length > 0" :value="tipologiaFiles"
-                                class="w-full overflow-y-auto">
+                        <Divider />
+                        <div v-if="tipologiaFiles.length > 0" class="overflow-y-auto h-[40vh]">
+                            <DataView :value="tipologiaFiles" class="w-full overflow-y-auto">
                                 <template #list="slotProps">
                                     <div class="p-1 flex justify-between items-center w-full">
                                         <div class="flex">
@@ -427,9 +428,9 @@ const showPdf = (event, data) => {
                                 </template>
                             </DataView>
                         </div>
-                        <div class="h-full flex justify-center items-center" v-if="tipologia.count == 0">
+                        <div class="flex items-center justify-center h-[30vh]" v-if="tipologia.count == 0">
                             <span>
-                                <i class=" w-full text-center text-2xl text-danger fa-solid fa-file-circle-exclamation"></i>
+                                <i class="w-full text-center text-2xl text-danger fa-solid fa-file-circle-exclamation"></i>
                                 <p class="w-full text-center font-bold text-danger">
                                     Aun no hay archivos
                                 </p>
