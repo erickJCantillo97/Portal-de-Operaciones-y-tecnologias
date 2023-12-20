@@ -248,11 +248,9 @@ const showPdf = (event, data) => {
                 <template #header>
                     <div class="flex justify-between w-full h-8 mb-2">
                         <div class="flex space-x-4">
-                            <div class="w-8" title="Filtrar Proyectos">
-                                <Button @click="clearFilter()" outlined severity="primary" icon="pi pi-filter-slash"
-                                    class="!h-8">
-                                </Button>
-                            </div>
+                            <Button title="Quitar filtros" @click="clearFilter()" outlined severity="primary"
+                                icon="pi pi-filter-slash" class="!h-8">
+                            </Button>
                             <span class="p-input-icon-left">
                                 <i class="pi pi-search" />
                                 <InputText size="small" class="!h-8" type="search" title="Buscar Proyectos"

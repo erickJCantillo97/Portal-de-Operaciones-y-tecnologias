@@ -4,14 +4,12 @@ import '/resources/sass/dataTableCustomized.scss';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
-import Button from '@/Components/Button.vue';
 import { useSweetalert } from '@/composable/sweetAlert'
 import Calendar from 'primevue/calendar';
 import CustomModal from '@/Components/CustomModal.vue';
 import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
-
+import Button from 'primevue/button';
 
 const { confirmDelete } = useSweetalert();
 const { toast } = useSweetalert();
@@ -60,12 +58,12 @@ const clearFilter = () => {
 
 function format24h(hora) {
     let tiempo
-    if (hora.length >5) {
-        tiempo= new Date(hora).toLocaleString('es-CO',
+    if (hora.length > 5) {
+        tiempo = new Date(hora).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
     }
     else {
-        tiempo= new Date("1970-01-01T" + hora).toLocaleString('es-CO',
+        tiempo = new Date("1970-01-01T" + hora).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
     }
     console.log(tiempo)
@@ -189,23 +187,18 @@ const calcularDiferencia = (start, end) => {
                 <div class="flex justify-between w-full h-8 mb-2 align-middle">
                     <div class="flex space-x-4">
                         <div class="w-8">
-                            <Button @click="clearFilter()" type="button" severity="primary" class="hover:bg-primary ">
-                                <i class="pi pi-filter-slash"></i>
-                            </Button>
+                            <Button @click="clearFilter()" type="button" severity="primary" icon="pi pi-filter-slash"
+                                outlined class="!h-8" />
                         </div>
-
-                        <div class="relative flex rounded-md shadow-sm">
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <MagnifyingGlassIcon class="w-5 h-4 text-gray-400" aria-hidden="true" />
-                            </div>
-                            <input type="search"
-                                class="block w-10/12 py-4 pl-10 text-gray-900 border-0 rounded-md ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search" />
+                            <InputText size="small" class="!h-8" type="search" title="Buscar horarios"
                                 v-model="filters.global.value" placeholder="Buscar..." />
-                        </div>
+                        </span>
                     </div>
                     <div>
-                        <Button @click="createShift()" type="button" severity="success" class="hover:bg-primary ">
-                            <i class="pi pi-plus"></i>
+                        <Button @click="createShift()" title="Crear horario" outlined icon="pi pi-plus" type="button" severity="success" class="!h-8">
+
                         </Button>
                     </div>
                 </div>
@@ -304,17 +297,17 @@ const calcularDiferencia = (start, end) => {
                                 Tiempo laborado
                             </p>
                             <p>{{ calcularDiferencia(String(shift.startShift),
-                               String( shift.endShift)) - shift.timeBreak
+                                String(shift.endShift)) - shift.timeBreak
                             }}
                                 Horas</p>
                         </div>
                         <div class="flex justify-between w-full text-warning"
-                            v-if="calcularDiferencia(String(shift.startShift),String( shift.endShift)) - shift.timeBreak > 8.5">
+                            v-if="calcularDiferencia(String(shift.startShift), String(shift.endShift)) - shift.timeBreak > 8.5">
                             <p>
                                 Tiempo adicional
                             </p>
                             <p>{{ calcularDiferencia(String(shift.startShift),
-                                String(shift.endShift) )- shift.timeBreak - 8.5 }} Horas
+                                String(shift.endShift)) - shift.timeBreak - 8.5 }} Horas
                             </p>
                         </div>
                     </div>
@@ -322,8 +315,8 @@ const calcularDiferencia = (start, end) => {
             </div>
         </template>
         <template #footer>
-            <Button type="button" severity="primary" @click="shiftSave(true, shift)">Guardar</Button>
-            <Button type="button" severity="danger" @click="shiftDialog = false">Cancelar</Button>
+            <Button type="button" severity="primary" icon="fa-solid fa-floppy-disk" @click="shiftSave(true, shift)" outline label="Guardar"/>
+            <Button type="button" severity="danger" icon="fa-solid fa-xmark" @click="shiftDialog = false" outline label="Cancelar"/>
         </template>
     </CustomModal>
 </template>

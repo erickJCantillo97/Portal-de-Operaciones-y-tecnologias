@@ -12,7 +12,7 @@ import { FilterMatchMode, FilterOperator } from "primevue/api";
 import Column from "primevue/column";
 // import Tag from "primevue/tag";
 // import { MagnifyingGlassIcon, PencilIcon, TrashIcon } from "@heroicons/vue/20/solid";
-import Button from "@/Components/Button.vue";
+import Button from "primevue/button";
 import ProgressBar from "primevue/progressbar";
 import DataChart from "./DataChart.vue";
 // import OurTeam from "@/Components/OurTeam.vue";
@@ -148,24 +148,17 @@ const clearFilter = () => {
                     <!--ACCIONES-->
                     <Column header="Acciones" class="space-x-3">
                         <template #body="slotProps">
-                            <div
-                                class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8">
-                                <div title="Ver programacion">
-                                    <Button severity="primary" @click="
+                            <div class="flex justify-center space-x-1">
+                                <Button title="Ver programacion" severity="primary" rounded text
+                                    icon="fa-solid fa-list-check" @click="
                                         router.get(route('programming'), { id: slotProps.data.project_id })
-                                        " class="hover:bg-primary">
-                                        <i class="fa-solid fa-list-check" />
-                                    </Button>
-                                </div>
-                                <div title="Ver cronograma">
-                                    <Button severity="success" @click="
-                                        router.get(
-                                            route('createSchedule.create', slotProps.data.project_id)
-                                        )
-                                        " class="hover:bg-danger">
-                                        <i class="fa-solid fa-chart-gantt" />
-                                    </Button>
-                                </div>
+                                        " class="!h-8" />
+                                <Button title="Ver cronograma" severity="success" rounded text
+                                    icon="fa-solid fa-chart-gantt" @click="                                        router.get(
+                                        route('createSchedule.create', slotProps.data.project_id)
+                                    )
+                                        " class="!h-8" />
+
                             </div>
                         </template>
                     </Column>
