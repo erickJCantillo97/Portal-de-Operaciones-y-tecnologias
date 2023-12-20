@@ -22,6 +22,10 @@ const props = defineProps({
     enabled: {
         type: Boolean,
         default: true
+    },
+    showSup: {
+        type: Boolean,
+        default: false
     }
 })
 const filtered = computed(() =>
@@ -37,7 +41,7 @@ const filtered = computed(() =>
     <Combobox as="div" :modelValue="modelValue" @update:modelValue="value => emit('update:modelValue', value)">
         <ComboboxLabel class="block text-sm font-medium leading-6 text-gray-900">
             {{ label }}
-            <sup class="text-danger">*</sup>
+            <sup v-if="showSup" class="text-danger">*</sup>
         </ComboboxLabel>
         <div class="relative">
             <ComboboxInput
