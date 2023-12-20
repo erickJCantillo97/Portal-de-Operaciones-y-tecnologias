@@ -6,7 +6,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import Dropdown from 'primevue/dropdown';
 import "../../sass/dataTableCustomized.scss";
 import { ref } from 'vue';
-import Button from 'primevue/Button';
+import Button from 'primevue/button';
 import TextInput from '@/Components/TextInput.vue';
 import CustomModal from '@/Components/CustomModal.vue';
 import FileUpload from 'primevue/fileupload';
@@ -229,7 +229,7 @@ const selectedColumns = ref(columns.value);
             <Button severity="primary" outlined label="Guardar" icon="fa-solid fa-floppy-disk"
                 @click="modalType == 'new' ? save() : edit()" />
             <Button severity="danger" outlined label="Cancelar" icon="fa-regular fa-circle-xmark"
-                @click="modalVisible = false;typeShip.reset()" />
+                @click="modalVisible = false; typeShip.reset()" />
         </template>
     </CustomModal>
 </template>
