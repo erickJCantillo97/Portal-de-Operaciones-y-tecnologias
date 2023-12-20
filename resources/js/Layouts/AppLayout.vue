@@ -241,7 +241,7 @@
 
 <script setup>
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { Menu, MenuButton, MenuItems, MenuItem, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { router } from '@inertiajs/vue3'
 import {
@@ -306,7 +306,6 @@ const loadSuggestions = () => {
     axios.get(route('suggestion.create')).then((res) => {
         suggestions.value = res.data[0]
     })
-
 }
 
 function formatDateTime24h(dateTime) {

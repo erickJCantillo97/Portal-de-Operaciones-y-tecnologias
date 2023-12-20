@@ -25,7 +25,7 @@ class Project extends Model implements Auditable
 
     public function projectShip()
     {
-        return $this->hasMany(ProjectShip::class);
+        return $this->hasMany(projectShip::class);
     }
 
     public function status(): Attribute

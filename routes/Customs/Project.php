@@ -35,7 +35,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     //CRUD Projects
     Route::resource('projects', ProjectController::class);
     Route::resource('tasks', TaskController::class);
-    Route::resource('typeShips', TypeShipController::class);
+    Route::post('typeShips/{project}/update', [TypeShipController::class, 'update'])->name('typeShips.update');
+    Route::resource('typeShips', TypeShipController::class)->except('update');
 
     //CRUD Authorizations
     Route::resource('authorizations', AuthorizationController::class);

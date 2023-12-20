@@ -76,7 +76,8 @@ class ManagerDocumentController extends Controller
         ]);
     }
 
-    public function getProjectsGD () {
+    public function getProjectsGD()
+    {
         return Inertia::render('GesDoc/GesDocView');
     }
 }

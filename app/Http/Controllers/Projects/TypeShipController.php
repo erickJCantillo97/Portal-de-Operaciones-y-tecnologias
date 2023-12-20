@@ -64,7 +64,7 @@ class TypeShipController extends Controller
                 $validateData['render'] = Storage::putFileAs(
                     'public/TypeShips/',
                     $request->image,
-                    $validateData['name'].'.'.$request->image->getClientOriginalExtension()
+                    $validateData['name'] . '.' . $request->image->getClientOriginalExtension()
                 );
             }
             TypeShip::create($validateData);
@@ -96,7 +96,7 @@ class TypeShipController extends Controller
 
     {
         $validateData = $request->validate([
-            'name' => 'required|string|unique:type_ships,name,' . $typeShip->id,
+            'name' => 'required|string',
             'type' => 'nullable|string',
             'disinger' => 'nullable|string',
             'hull_material' => 'nullable', //material del casco
@@ -124,7 +124,7 @@ class TypeShipController extends Controller
                 $validateData['render'] = Storage::putFileAs(
                     'public/TypeShips/',
                     $request->image,
-                    $validateData['name'].'.'.$request->image->getClientOriginalExtension()
+                    $validateData['name'] . '.' . $request->image->getClientOriginalExtension()
                 );
             }
             $typeShip->update($validateData);

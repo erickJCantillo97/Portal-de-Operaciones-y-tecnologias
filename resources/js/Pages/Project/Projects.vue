@@ -7,11 +7,9 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Tag from 'primevue/tag'
 import { FilterMatchMode, FilterOperator } from 'primevue/api'
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, MagnifyingGlassPlusIcon, SparklesIcon, EyeIcon, PhotoIcon, TableCellsIcon, ArrowUpCircleIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline'
+import { MagnifyingGlassPlusIcon, SparklesIcon, PhotoIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline'
 import { useSweetalert } from '@/composable/sweetAlert'
 import Loading from '@/Components/Loading.vue';
-// import plural from 'pluralize-es'
-import CustomButton from '../../Components/Button.vue'
 import OverlayPanel from 'primevue/overlaypanel'
 import CustomModal from '@/Components/CustomModal.vue'
 import axios from 'axios'
@@ -20,8 +18,8 @@ import FileUpload from 'primevue/fileupload'
 import DataView from 'primevue/dataview'
 import Button from 'primevue/button'
 import Image from 'primevue/image'
-
-// import Button from 'primevue/button'
+import InputText from 'primevue/inputtext'
+import Divider from 'primevue/divider'
 
 const modalDocument = ref(false)
 const { toast } = useSweetalert()
@@ -229,7 +227,7 @@ const showPdf = (event, data) => {
 
 <template>
     <AppLayout>
-        <div class="w-full overflow-y-auto custom-scroll">
+        <div class="w-full overflow-y-auto">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
@@ -237,10 +235,8 @@ const showPdf = (event, data) => {
                     </h1>
                 </div>
                 <div class="" title="Agregar Proyecto">
-                    <CustomButton @click="addItem()" severity="success">
-                        <PlusIcon class="w-6 h-6" aria-hidden="true" />
-                        Agregar
-                    </CustomButton>
+                    <Button @click="addItem()" severity="success" icon="fa-solid fa-plus" label="Agregar" outlined
+                        class="!h-8" />
                 </div>
             </div>
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
@@ -253,21 +249,14 @@ const showPdf = (event, data) => {
                 <template #header>
                     <div class="flex justify-between w-full h-8 mb-2">
                         <div class="flex space-x-4">
-                            <div class="w-8" title="Filtrar Proyectos">
-                                <CustomButton @click="clearFilter()" type="button" severity="primary"
-                                    class="hover:bg-primary ">
-                                    <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
-                                </CustomButton>
-                            </div>
-
-                            <div class="relative flex rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <MagnifyingGlassIcon class="w-5 h-4 text-gray-400" aria-hidden="true" />
-                                </div>
-                                <input type="search" title="Buscar Proyectos"
-                                    class="block w-10/12 py-4 pl-10 text-gray-900 border-0 rounded-md ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            <Button title="Quitar filtros" @click="clearFilter()" outlined severity="primary"
+                                icon="pi pi-filter-slash" class="!h-8">
+                            </Button>
+                            <span class="p-input-icon-left">
+                                <i class="pi pi-search" />
+                                <InputText size="small" class="!h-8" type="search" title="Buscar Proyectos"
                                     v-model="filters.global.value" placeholder="Buscar..." />
-                            </div>
+                            </span>
                         </div>
                     </div>
                 </template>
@@ -292,47 +281,26 @@ const showPdf = (event, data) => {
                 <!--ACCIONES-->
                 <Column header="Acciones" class="space-x-3">
                     <template #body="slotProps">
-                        <div
-                            class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
-                            <div title="Agregar documentos">
-                                <CustomButton severity="primary" @click="addDoc(slotProps.data)" class="hover:bg-primary">
-                                    <i class="fa-solid fa-cloud-arrow-up h-4 w-4 flex items-center"></i>
-                                </CustomButton>
-                            </div>
-                            <div title="Crear Actividades">
-                                <CustomButton severity="primary" @click="toggle($event, slotProps.data)"
-                                    class="hover:bg-primary">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M18 16L16 16M16 16L14 16M16 16L16 14M16 16L16 18" stroke="#1C274C"
-                                            stroke-width="1.5" stroke-linecap="round" />
-                                        <path d="M7 4V2.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
-                                        <path d="M17 4V2.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
-                                        <path d="M21.5 9H16.625H10.75M2 9H5.875" stroke="#1C274C" stroke-width="1.5"
-                                            stroke-linecap="round" />
-                                        <path
-                                            d="M14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V12C2 8.22876 2 6.34315 3.17157 5.17157C4.34315 4 6.22876 4 10 4H14C17.7712 4 19.6569 4 20.8284 5.17157C22 6.34315 22 8.22876 22 12V14C22 17.7712 22 19.6569 20.8284 20.8284C20.1752 21.4816 19.3001 21.7706 18 21.8985"
-                                            stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />
-                                    </svg>
-                                </CustomButton>
-                            </div>
+                        <div class="flex text-sm font-medium whitespace-normal">
 
+                            <Button title="Agregar documentos" rounded text severity="primary"
+                                @click="addDoc(slotProps.data)" class="hover:bg-primary"
+                                icon="fa-solid fa-cloud-arrow-up" />
+
+                            <Button title="Crear Actividades" rounded severity="primary" text
+                                @click="toggle($event, slotProps.data)" icon="fa-regular fa-calendar-plus" />
                             <!--BOTÓN EDITAR-->
-                            <div title="Editar Proyecto">
-                                <Link :href="route('projects.edit', slotProps.data.id)">
-                                <CustomButton severity="primary" class="hover:bg-primary">
-                                    <PencilIcon class="w-4 h-4" aria-hidden="true" />
-                                </CustomButton>
-                                </Link>
-                            </div>
+
+                            <Link :href="route('projects.edit', slotProps.data.id)">
+                            <Button title="Editar Proyecto" severity="primary" text class="hover:bg-primary" rounded
+                                icon="fa-solid fa-pencil" />
+                            </Link>
 
                             <!--BOTÓN ELIMINAR-->
-                            <div title="Eliminar Proyecto">
-                                <CustomButton severity="danger"
-                                    @click="confirmDelete(slotProps.data.id, 'Proyecto', 'projects')"
-                                    class="hover:bg-danger">
-                                    <TrashIcon class="w-4 h-4 " aria-hidden="true" />
-                                </CustomButton>
-                            </div>
+
+                            <Button title="Eliminar Proyecto" rounded severity="danger" text
+                                @click="confirmDelete(slotProps.data.id, 'Proyecto', 'projects')"
+                                icon="fa-regular fa-trash-can" />
                         </div>
                     </template>
                 </Column>
@@ -374,7 +342,7 @@ const showPdf = (event, data) => {
         </div>
     </OverlayPanel>
 
-    <CustomModal :visible="modalDocument" :maximizable="true">
+    <CustomModal :visible="modalDocument" :maximizable="true" width="95vw">
         <template #icon>
             <i class="fa-solid fa-cloud-arrow-up text-white text-xl"></i>
         </template>
@@ -382,12 +350,12 @@ const showPdf = (event, data) => {
             <p class="text-white">Agregar archivos al proyecto {{ project.name }}</p>
         </template>
         <template #body>
-            <div v-if="tipologias" class="grid grid-cols-5 gap-2 max-h-full overflow-y-auto">
-                <div class="col-span-2 max-h-full">
+            <div v-if="tipologias" class="grid grid-cols-5 gap-2 max-h-full">
+                <div class="col-span-2">
                     <p class="w-full text-center font-bold text-primary text-lg">{{
                         tipologias[0].Subserie }}</p>
                     <Listbox v-model="tipologia" :options="tipologias" filter optionLabel="name" @click="selectTipologia()"
-                        listStyle="max-height:67vh" class="w-full md:w-14rem" :pt="{
+                        listStyle="max-height:60vh" class="w-full md:w-14rem" :pt="{
                             filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
                             item: { class: 'hover:bg-blue-100 text-md !px-1 !py-0.5' },
                         }">
@@ -404,64 +372,65 @@ const showPdf = (event, data) => {
                         </template>
                     </Listbox>
                 </div>
-                <div v-if="tipologia" class="col-span-3 gap-1 justify-between flex flex-col">
-                    <div class="p-1 space-y-2 rounded-md flex justify-center">
-                        <div class="flex space-x-2">
+                <div v-if="tipologia" class="col-span-3 h-[60vh] space-y-2">
+                    <div class="border rounded-md">
+                        <span class="flex space-x-2 p-2">
                             <p class="font-bold">Tipologia:</p>
                             <p>{{ tipologia.name }}</p>
-                        </div>
-                    </div>
-                    <div class="border rounded-md w-full h-full overflow-y-auto">
-                        <DataView v-if="tipologiaFiles.length > 0" :value="tipologiaFiles"
-                            class="w-full max-h-full overflow-y-auto">
-                            <template #list="slotProps">
-                                <div class="p-1 flex justify-between items-center w-full">
-                                    <div class="flex">
-                                        <i v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'"
-                                            class=" text-danger fa-regular border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center fa-file-pdf"></i>
-                                        <Image v-else :src="slotProps.data.filePath" preview class="w-9">
-                                            <template #image>
-                                                <div class="flex items-center h-full">
-                                                    <img :src="slotProps.data.filePath" alt="image" />
-                                                </div>
-                                            </template>
-                                            <template #preview="slotProps1">
-                                                <img :src="slotProps.data.filePath" class="!max-w-[80vw] !max-h-[80vh]"
-                                                    alt="preview" :style="slotProps1.style"
-                                                    @click="slotProps1.previewCallback" />
-                                            </template>
-                                        </Image>
-                                        <div class="px-3">
-                                            <p class="text-sm">{{ (slotProps.index + 1) + '. ' +
-                                                slotProps.data.tipologia_name }}
-                                            </p>
-                                            <p class="text-xs font-semibold">{{ slotProps.data.name }}</p>
-                                            <span class="flex space-x-2">
-                                                <p class="text-xs">{{ slotProps.data.name_user }} </p>
-                                                <p class="text-xs">{{ formatDateTime24h(slotProps.data.created_at) }} </p>
-                                                <p class="text-xs">{{ formatSize(slotProps.data.file_size) }} </p>
-                                                <p class="text-xs"
-                                                    v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'">
-                                                    {{ slotProps.data.num_folios }} folio(s) </p>
-                                            </span>
+                        </span>
+                        <Divider />
+                        <div v-if="tipologiaFiles.length > 0" class="overflow-y-auto h-[40vh]">
+                            <DataView :value="tipologiaFiles" class="w-full overflow-y-auto">
+                                <template #list="slotProps">
+                                    <div class="p-1 flex justify-between items-center w-full">
+                                        <div class="flex">
+                                            <i v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'"
+                                                class=" text-danger fa-regular border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center fa-file-pdf"></i>
+                                            <Image v-else :src="slotProps.data.filePath" preview class="w-9">
+                                                <template #image>
+                                                    <div class="flex items-center h-full">
+                                                        <img :src="slotProps.data.filePath" alt="image" />
+                                                    </div>
+                                                </template>
+                                                <template #preview="slotProps1">
+                                                    <img :src="slotProps.data.filePath" class="!max-w-[80vw] !max-h-[80vh]"
+                                                        alt="preview" :style="slotProps1.style"
+                                                        @click="slotProps1.previewCallback" />
+                                                </template>
+                                            </Image>
+                                            <div class="px-3">
+                                                <p class="text-sm">{{ (slotProps.index + 1) + '. ' +
+                                                    slotProps.data.tipologia_name }}
+                                                </p>
+                                                <p class="text-xs font-semibold">{{ slotProps.data.name }}</p>
+                                                <span class="flex space-x-2">
+                                                    <p class="text-xs">{{ slotProps.data.name_user }} </p>
+                                                    <p class="text-xs">{{ formatDateTime24h(slotProps.data.created_at) }}
+                                                    </p>
+                                                    <p class="text-xs">{{ formatSize(slotProps.data.file_size) }} </p>
+                                                    <p class="text-xs"
+                                                        v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'">
+                                                        {{ slotProps.data.num_folios }} folio(s) </p>
+                                                </span>
+                                            </div>
                                         </div>
+                                        <span class="space-x-1">
+                                            <Button class="!h-6 !w-6" icon="fa-regular fa-eye" outlined rounded
+                                                @click="showPdf($event, slotProps.data)"
+                                                v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'"
+                                                severity="success">
+                                            </Button>
+                                            <Button class="!h-6 !w-6" icon="fa-regular fa-trash-can" outlined disabled
+                                                @click="" rounded severity="danger">
+                                            </Button>
+                                        </span>
                                     </div>
-                                    <span class="space-x-1">
-                                        <Button class="!h-6 !w-6" icon="fa-regular fa-eye" outlined rounded
-                                            @click="showPdf($event, slotProps.data)"
-                                            v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'"
-                                            severity="success">
-                                        </Button>
-                                        <Button class="!h-6 !w-6" icon="fa-regular fa-trash-can" outlined disabled @click=""
-                                            rounded severity="danger">
-                                        </Button>
-                                    </span>
-                                </div>
-                            </template>
-                        </DataView>
-                        <div class="h-full flex justify-center items-center" v-if="tipologia.count == 0">
+                                </template>
+                            </DataView>
+                        </div>
+                        <div class="flex items-center justify-center h-[30vh]" v-if="tipologia.count == 0">
                             <span>
-                                <i class=" w-full text-center text-2xl text-danger fa-solid fa-file-circle-exclamation"></i>
+                                <i class="w-full text-center text-2xl text-danger fa-solid fa-file-circle-exclamation"></i>
                                 <p class="w-full text-center font-bold text-danger">
                                     Aun no hay archivos
                                 </p>
@@ -471,7 +440,7 @@ const showPdf = (event, data) => {
                             <Loading message="Cargando archivos" />
                         </div>
                     </div>
-                    <div class="items-end grid">
+                    <div class="">
                         <FileUpload ref="fileUp" :multiple="true" accept="image/*,application/pdf" :key="fileup"
                             invalidFileTypeMessage="Solo se aceptan imagenes o pdf" :maxFileSize="10000000"
                             @select="onSelectedFiles" :pt="{
@@ -527,11 +496,9 @@ const showPdf = (event, data) => {
 
                     </div>
                 </div>
-                <div v-else class="col-span-3 h-full pt-10">
-                    <Loading message="Seleccione una tipologia" />
-                </div>
+                <Loading v-else class="col-span-3 h-full pt-10" message="Seleccione una tipologia" />
             </div>
-            <Loading v-else message="Cargando tipologias" />
+            <Loading class="mt-5" v-else message="Cargando tipologias" />
         </template>
         <template #footer>
             <Button severity="danger" outlined label="Cerrar" icon="fa-solid fa-xmark" @click="modalDocument = false"
@@ -543,6 +510,7 @@ const showPdf = (event, data) => {
         <div class="">
             <p class="text-sm font-semibold">{{ archivoData.name }}Nombre de archivo quemado</p>
             <span class="flex space-x-2 p-1 cursor-default">
+                <p title="Encargado" class="text-sm border rounded-md px-2">{{ archivoData.name_user }}</p>
                 <p title="Fecha subida" class="text-sm border rounded-md px-2">{{ formatDateTime24h(archivoData.created_at)
                 }} </p>
                 <p title="Tamaño" class="text-sm border rounded-md px-2">{{ formatSize(archivoData.file_size) }} </p>
@@ -550,11 +518,11 @@ const showPdf = (event, data) => {
                     {{ archivoData.num_folios }} folio(s) </p>
             </span>
         </div>
-        <object id="visorPDF" :data="archivo + '#toolbar=0'" type="application/pdf" style="width:60vw;height:60vh;">
+        <object :data="archivo + '#toolbar=0'" type="application/pdf" style="width:60vw;height:60vh;">
             <a :href="archivo">Haz clic aquí para ver el archivo PDF</a>
         </object>
         <div class="flex justify-end p-2">
-            <a :href="archivo" target="_blank">
+            <a :href="archivo" target="_blank" rel="noopener noreferrer">
                 <Button label="Descargar" icon="fa-solid fa-save" outlined rounded class="!h-8" />
             </a>
         </div>
