@@ -6,6 +6,7 @@ import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 import Moment from 'moment'
 import Loading from '@/Components/Loading.vue'
+import NoContentToShow from '@/Components/NoContentToShow.vue'
 import { useSweetalert } from '@/composable/sweetAlert'
 const { toast } = useSweetalert()
 
@@ -33,6 +34,7 @@ const gerenciasOptions = ref([])
 const selectedGerencia = ref()
 const selectedDate = ref()
 const loadingProjects = ref(true)
+const showNoProjects = ref(true)
 
 const getProjects = async () => {
   try {
@@ -40,7 +42,12 @@ const getProjects = async () => {
       .then(res => {
         filteredProjects.value = projectsOptions.value = res.data.projects
         searchProjects()
-        loadingProjects.value = false
+
+        if (res.data.projects != null) {
+          loadingProjects.value = false
+        } else {
+          showNoProjects.value = true
+        }
       })
   } catch (error) {
     console.log('Nada')
@@ -144,9 +151,12 @@ const selectItemList = () => {
   </section>
   <section
     class="grid grid-cols-6 h-96 overflow-y-auto custom-scroll snap-y snap-mandatory sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg m-8 p-4 mb-2">
-    <section v-if="loadingProjects" class="h-[50vh] w-[60vw] flex flex-col justify-center items-center col-span-4">
+    <section v-if="loadingProjects" class="h-[50vh] w-full flex flex-col justify-center items-center col-span-6">
       <Loading message="Cargando Proyectos" />
     </section>
+
+    <NoContentToShow subject="Proyectos" />
+
     <ul v-for="project in filteredProjects" :key="project.id"
       class="col-span-2 text-sm italic [&>li>p]:font-semibold snap-start">
       <div @click="toggleSelectItem(project.id)"
@@ -157,7 +167,7 @@ const selectItemList = () => {
         <div>
           <ApplicationLogo :width-logo="130" :height-logo="130" />
         </div>
-        <div class="w-full mx-8" :title="`{{ $project.name }}`">
+        <div class="w-full mx-8">
           <li>
             <p class="w-full text-blue-800 text-md pt-2 pb-2 font-semibold truncate">
               <i class="fa-solid fa-folder-closed"></i>
