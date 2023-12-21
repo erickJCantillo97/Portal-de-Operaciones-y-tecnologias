@@ -18,12 +18,12 @@ if (date == localStorage.getItem('date')) {
     rateY.value = JSON.parse(localStorage.getItem('rateY'))
     change.value = localStorage.getItem('change')
     datos = JSON.parse(localStorage.getItem('hist'))
-    categories = datos.map(obj => { return obj['vigenciahasta'] }).reverse()
+    categories = datos.map(obj => { return new Date(obj['vigenciahasta']).toDateString() }).reverse()
     data = datos.map(obj => { return obj['valor'] }).reverse()
     rate.value++
 } else {
     axios.get('https://www.datos.gov.co/resource/mcec-87by.json?$limit=10').then((res) => {
-        categories = res.data.map(obj => { return new Date(obj['vigenciahasta']).toLocaleDateString() }).reverse()
+        categories = res.data.map(obj => { return new Date(obj['vigenciahasta']).toDateString() }).reverse()
         data = res.data.map(obj => { return obj['valor'] }).reverse()
         localStorage.setItem('hist', JSON.stringify(res.data))
         rateT.value = res.data[0].valor
@@ -47,25 +47,18 @@ const toggle = (event) => {
     }]
     chartOptions = {
         chart: {
-            height: 50,
-            type: 'line',
+            height: 60,
+            type: 'area',
             toolbar: {
                 show: false
             },
-            dropShadow: {
-                enabled: true,
-                color: '#000',
-                top: 18,
-                left: 7,
-                blur: 10,
-                opacity: 0.2
-              },
         },
         colors: ['#77B6EA', '#545454'],
         dataLabels: {
-            enabled: true,
+            enabled: false,
         },
         stroke: {
+            width: 2,
             curve: 'smooth'
         },
         title: {
@@ -73,11 +66,7 @@ const toggle = (event) => {
             align: 'center'
         },
         grid: {
-            borderColor: '#e7e7e7',
-            row: {
-                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-                opacity: 0.5
-            },
+          show:false
         },
         xaxis: {
             categories: categories,
@@ -94,6 +83,7 @@ const toggle = (event) => {
         },
         yaxis: {
             labels: {
+                show: false,
                 style: {
                     colors: [],
                     fontSize: '8px',
@@ -108,12 +98,22 @@ const toggle = (event) => {
     op.value.toggle(event);
 }
 
-
+onMounted(() => {
+    var elemento = document.getElementById("trmdolar");
+    elemento.addEventListener("mouseenter", function () {
+        // Simular un clic izquierdo sobre el elemento
+        elemento.click();
+    });
+    // elemento.addEventListener("mouseleave", function () {
+    //     // Simular un clic izquierdo sobre el elemento
+    //     elemento.click();
+    // });
+})
 
 
 </script>
 <template>
-    <div v-if="rate > 0" :key="rate" @click="toggle"
+    <div v-if="rate > 0" :key="rate" @click="toggle" id="trmdolar"
         :class="[change > 0 ? 'bg-green-100 text-primary' : 'bg-red-100 text-red-800', 'cursor-pointer inline-flex items-center rounded-full']">
         <div class="flex flex-col items-center justify-center pl-3">
             <p class="text-xs leading-4 text-gray-900">TRM Hoy</p>
@@ -127,6 +127,6 @@ const toggle = (event) => {
     <OverlayPanel ref="op" :pt="{
         content: '!p-1'
     }">
-        <VueApexCharts :key="hist" type="line" height="200" :options="chartOptions" :series="series"></VueApexCharts>
+        <VueApexCharts :key="hist" type="area" height="180" :options="chartOptions" :series="series"></VueApexCharts>
     </OverlayPanel>
 </template>
