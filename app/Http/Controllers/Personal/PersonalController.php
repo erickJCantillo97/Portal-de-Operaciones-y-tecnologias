@@ -19,23 +19,22 @@ class PersonalController extends Controller
     public function index()
     {
         $miPersonal = getPersonalUser();
-
-        $personal = getPersonalGerenciaOficina(auth()->user()->gerencia)->values()->map(function ($person) {
-            return [
-                'Num_SAP' => (int) $person['Num_SAP'],
-                'Nombres_Apellidos' => $person['Nombres_Apellidos'],
-                'Oficina' => $person['Oficina'],
-                'Cargo' => $person['Cargo'],
-                'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
-            ];
-        }); //Se debe cambiar el num Sap por el del usuario logueado;
+        $personal = [];
+        // $personal = getPersonalGerenciaOficina(auth()->user()->gerencia)->values()->map(function ($person) {
+        //     return [
+        //         'Num_SAP' => (int) $person['Num_SAP'],
+        //         'Nombres_Apellidos' => $person['Nombres_Apellidos'],
+        //         'Oficina' => $person['Oficina'],
+        //         'Cargo' => $person['Cargo'],
+        //         'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
+        //     ];
+        // }); //Se debe cambiar el num Sap por el del usuario logueado;
 
         return inertia('Personal/Index', ['miPersonal' => $miPersonal, 'personal' => $personal]);
     }
 
     public function getPersonalUser()
     {
-
         return response()->json([
             'personal' => getPersonalUser(),
         ]);
