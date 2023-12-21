@@ -6,6 +6,7 @@ import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 import Moment from 'moment'
 import Loading from '@/Components/Loading.vue'
+import NoContentToShow from '@/Components/NoContentToShow.vue'
 import { useSweetalert } from '@/composable/sweetAlert'
 const { toast } = useSweetalert()
 
@@ -33,6 +34,7 @@ const gerenciasOptions = ref([])
 const selectedGerencia = ref()
 const selectedDate = ref()
 const loadingProjects = ref(true)
+const showNoProjects = ref(true)
 
 const getProjects = async () => {
   try {
@@ -40,7 +42,12 @@ const getProjects = async () => {
       .then(res => {
         filteredProjects.value = projectsOptions.value = res.data.projects
         searchProjects()
-        loadingProjects.value = false
+
+        if (res.data.projects != null) {
+          loadingProjects.value = false
+        } else {
+          showNoProjects.value = true
+        }
       })
   } catch (error) {
     console.log('Nada')
@@ -92,6 +99,12 @@ const clearFilters = () => {
   filteredProjects.value = projectsOptions.value
 }
 
+const truncateString = (string) => {
+  let maxLength = 20;
+  let truncatedString = string.length > maxLength ? string.substring(0, maxLength) + "..." : string
+  return truncatedString
+}
+
 const selectItemList = () => {
   console.log('Hola Mundo')
 }
@@ -123,8 +136,8 @@ const selectItemList = () => {
         }
       }" />
 
-    <Calendar @date-select="searchProjects()" v-model="selectedDate" showIcon manualInput view="year" dateFormat="yy" placeholder="Fecha"
-      class="rounded-md md:w-14rem" :pt="{
+    <Calendar @date-select="searchProjects()" v-model="selectedDate" showIcon manualInput view="year" dateFormat="yy"
+      placeholder="Fecha" class="rounded-md md:w-14rem" :pt="{
         root: {
           class: '!w-48 h-10 !ring-gray-300 !ring-inset ring-1 !border-0 !shadow-sm '
         },
@@ -138,36 +151,41 @@ const selectItemList = () => {
   </section>
   <section
     class="grid grid-cols-6 h-96 overflow-y-auto custom-scroll snap-y snap-mandatory sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg m-8 p-4 mb-2">
-    <section v-if="loadingProjects" class="h-[50vh] w-[60vw] flex flex-col justify-center items-center col-span-4">
+    <section v-if="loadingProjects" class="h-[50vh] w-full flex flex-col justify-center items-center col-span-6">
       <Loading message="Cargando Proyectos" />
     </section>
+
+    <NoContentToShow subject="Proyectos" />
+
     <ul v-for="project in filteredProjects" :key="project.id"
       class="col-span-2 text-sm italic [&>li>p]:font-semibold snap-start">
       <div @click="toggleSelectItem(project.id)"
         :class="selectedItems.includes(project.id) ? 'bg-blue-900 text-white' : 'hover:border-2 hover:border-blue-900'"
-        class="flex flex-nowrap p-2 space-x-4 shadow-md rounded-md cursor-pointer">
+        class="flex flex-nowrap w-full p-2 shadow-md rounded-md cursor-pointer">
         <!-- <img src="https://www.cotecmar.com/sites/default/files/media/imagenes/2021-12/CotecmarLogo.png"
           onerror="this.src='images/generic-boat.png'" class="rounded-t-2xl h-32 w-full object-center object-contain" /> -->
         <div>
-          <ApplicationLogo :width-logo="50" :height-logo="50" />
+          <ApplicationLogo :width-logo="130" :height-logo="130" />
         </div>
-        <div>
+        <div class="w-full mx-8">
           <li>
-            <p class="text-blue-800 text-md pt-2 pb-2 font-semibold">
+            <p class="w-full text-blue-800 text-md pt-2 pb-2 font-semibold truncate">
               <i class="fa-solid fa-folder-closed"></i>
-              {{ project.name }}
+              {{ truncateString(project.name) }}
             </p>
           </li>
           <li>
             <p><span class="font-semibold">SAP:</span> {{ project.SAP_code }}</p>
           </li>
           <li>
-            <p><span class="font-semibold">Inicio:</span> {{ project.start_date == null ? 'N/A' : project.start_date
-            }}</p>
+            <p><span class="font-semibold">Inicio:</span>
+              {{ project.start_date == null ? 'N/A' : project.start_date }}
+            </p>
           </li>
           <li>
             <p><span class="font-semibold">Fin:</span>
-              {{ project.end_date == null ? 'N/A' : project.end_date }}</p>
+              {{ project.end_date == null ? 'N/A' : project.end_date }}
+            </p>
           </li>
           <li>
             <p><span class="font-semibold">Gerencia:</span> {{ project.gerencia }}</p>
@@ -178,29 +196,36 @@ const selectItemList = () => {
         </div>
       </div>
     </ul>
-    <ul v-for="project in filteredProjects" :key="project.id" class="text-sm italic [&>li>p]:font-semibold snap-start">
+
+    <ul v-for="project in filteredProjects" :key="project.id"
+      class="col-span-2 text-sm italic [&>li>p]:font-semibold snap-start">
       <div @click="toggleSelectItem(project.id)"
         :class="selectedItems.includes(project.id) ? 'bg-blue-900 text-white' : 'hover:border-2 hover:border-blue-900'"
-        class="flex flex-wrap p-2 space-x-4 shadow-md rounded-md cursor-pointer">
-        <img src="https://www.cotecmar.com/sites/default/files/media/imagenes/2021-12/CotecmarLogo.png"
-          onerror="this.src='images/generic-boat.png'" class="rounded-t-2xl h-32 w-full object-center object-contain" />
+        class="flex flex-nowrap w-full p-2 shadow-md rounded-md cursor-pointer">
+        <!-- <img src="https://www.cotecmar.com/sites/default/files/media/imagenes/2021-12/CotecmarLogo.png"
+          onerror="this.src='images/generic-boat.png'" class="rounded-t-2xl h-32 w-full object-center object-contain" /> -->
         <div>
+          <ApplicationLogo :width-logo="130" :height-logo="130" />
+        </div>
+        <div class="w-full mx-8">
           <li>
-            <p class="text-blue-800 text-xl pt-2 pb-2 font-semibold">
+            <p class="w-full text-blue-800 text-md pt-2 pb-2 font-semibold truncate">
               <i class="fa-solid fa-folder-closed"></i>
-              {{ project.name }}
+              {{ truncateString(project.name) }}
             </p>
           </li>
           <li>
-            <p><span class="font-semibold">Código SAP:</span> {{ project.SAP_code }}</p>
+            <p><span class="font-semibold">SAP:</span> {{ project.SAP_code }}</p>
           </li>
           <li>
-            <p><span class="font-semibold">Fecha Inicio:</span> {{ project.start_date == null ? 'N/A' : project.start_date
-            }}</p>
+            <p><span class="font-semibold">Inicio:</span>
+              {{ project.start_date == null ? 'N/A' : project.start_date }}
+            </p>
           </li>
           <li>
-            <p><span class="font-semibold">Fecha Finalización:</span>
-              {{ project.end_date == null ? 'N/A' : project.end_date }}</p>
+            <p><span class="font-semibold">Fin:</span>
+              {{ project.end_date == null ? 'N/A' : project.end_date }}
+            </p>
           </li>
           <li>
             <p><span class="font-semibold">Gerencia:</span> {{ project.gerencia }}</p>
@@ -211,29 +236,35 @@ const selectItemList = () => {
         </div>
       </div>
     </ul>
-    <ul v-for="project in filteredProjects" :key="project.id" class="text-sm italic [&>li>p]:font-semibold snap-start">
+    <ul v-for="project in filteredProjects" :key="project.id"
+      class="col-span-2 text-sm italic [&>li>p]:font-semibold snap-start">
       <div @click="toggleSelectItem(project.id)"
         :class="selectedItems.includes(project.id) ? 'bg-blue-900 text-white' : 'hover:border-2 hover:border-blue-900'"
-        class="flex flex-wrap p-2 space-x-4 shadow-md rounded-md cursor-pointer">
-        <img src="https://www.cotecmar.com/sites/default/files/media/imagenes/2021-12/CotecmarLogo.png"
-          onerror="this.src='images/generic-boat.png'" class="rounded-t-2xl h-32 w-full object-center object-contain" />
+        class="flex flex-nowrap w-full p-2 shadow-md rounded-md cursor-pointer">
+        <!-- <img src="https://www.cotecmar.com/sites/default/files/media/imagenes/2021-12/CotecmarLogo.png"
+          onerror="this.src='images/generic-boat.png'" class="rounded-t-2xl h-32 w-full object-center object-contain" /> -->
         <div>
+          <ApplicationLogo :width-logo="130" :height-logo="130" />
+        </div>
+        <div class="w-full mx-8">
           <li>
-            <p class="text-blue-800 text-xl pt-2 pb-2 font-semibold">
+            <p class="w-full text-blue-800 text-md pt-2 pb-2 font-semibold truncate">
               <i class="fa-solid fa-folder-closed"></i>
-              {{ project.name }}
+              {{ truncateString(project.name) }}
             </p>
           </li>
           <li>
-            <p><span class="font-semibold">Código SAP:</span> {{ project.SAP_code }}</p>
+            <p><span class="font-semibold">SAP:</span> {{ project.SAP_code }}</p>
           </li>
           <li>
-            <p><span class="font-semibold">Fecha Inicio:</span> {{ project.start_date == null ? 'N/A' : project.start_date
-            }}</p>
+            <p><span class="font-semibold">Inicio:</span>
+              {{ project.start_date == null ? 'N/A' : project.start_date }}
+            </p>
           </li>
           <li>
-            <p><span class="font-semibold">Fecha Finalización:</span>
-              {{ project.end_date == null ? 'N/A' : project.end_date }}</p>
+            <p><span class="font-semibold">Fin:</span>
+              {{ project.end_date == null ? 'N/A' : project.end_date }}
+            </p>
           </li>
           <li>
             <p><span class="font-semibold">Gerencia:</span> {{ project.gerencia }}</p>
@@ -244,29 +275,230 @@ const selectItemList = () => {
         </div>
       </div>
     </ul>
-    <ul v-for="project in filteredProjects" :key="project.id" class="text-sm italic [&>li>p]:font-semibold snap-start">
+    <ul v-for="project in filteredProjects" :key="project.id"
+      class="col-span-2 text-sm italic [&>li>p]:font-semibold snap-start">
       <div @click="toggleSelectItem(project.id)"
         :class="selectedItems.includes(project.id) ? 'bg-blue-900 text-white' : 'hover:border-2 hover:border-blue-900'"
-        class="flex flex-wrap p-2 space-x-4 shadow-md rounded-md cursor-pointer">
-        <img src="https://www.cotecmar.com/sites/default/files/media/imagenes/2021-12/CotecmarLogo.png"
-          onerror="this.src='images/generic-boat.png'" class="rounded-t-2xl h-32 w-full object-center object-contain" />
+        class="flex flex-nowrap w-full p-2 shadow-md rounded-md cursor-pointer">
+        <!-- <img src="https://www.cotecmar.com/sites/default/files/media/imagenes/2021-12/CotecmarLogo.png"
+          onerror="this.src='images/generic-boat.png'" class="rounded-t-2xl h-32 w-full object-center object-contain" /> -->
         <div>
+          <ApplicationLogo :width-logo="130" :height-logo="130" />
+        </div>
+        <div class="w-full mx-8">
           <li>
-            <p class="text-blue-800 text-xl pt-2 pb-2 font-semibold">
+            <p class="w-full text-blue-800 text-md pt-2 pb-2 font-semibold truncate">
               <i class="fa-solid fa-folder-closed"></i>
-              {{ project.name }}
+              {{ truncateString(project.name) }}
             </p>
           </li>
           <li>
-            <p><span class="font-semibold">Código SAP:</span> {{ project.SAP_code }}</p>
+            <p><span class="font-semibold">SAP:</span> {{ project.SAP_code }}</p>
           </li>
           <li>
-            <p><span class="font-semibold">Fecha Inicio:</span> {{ project.start_date == null ? 'N/A' : project.start_date
-            }}</p>
+            <p><span class="font-semibold">Inicio:</span>
+              {{ project.start_date == null ? 'N/A' : project.start_date }}
+            </p>
           </li>
           <li>
-            <p><span class="font-semibold">Fecha Finalización:</span>
-              {{ project.end_date == null ? 'N/A' : project.end_date }}</p>
+            <p><span class="font-semibold">Fin:</span>
+              {{ project.end_date == null ? 'N/A' : project.end_date }}
+            </p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Gerencia:</span> {{ project.gerencia }}</p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Estado:</span> {{ project.status }}</p>
+          </li>
+        </div>
+      </div>
+    </ul>
+    <ul v-for="project in filteredProjects" :key="project.id"
+      class="col-span-2 text-sm italic [&>li>p]:font-semibold snap-start">
+      <div @click="toggleSelectItem(project.id)"
+        :class="selectedItems.includes(project.id) ? 'bg-blue-900 text-white' : 'hover:border-2 hover:border-blue-900'"
+        class="flex flex-nowrap w-full p-2 shadow-md rounded-md cursor-pointer">
+        <!-- <img src="https://www.cotecmar.com/sites/default/files/media/imagenes/2021-12/CotecmarLogo.png"
+          onerror="this.src='images/generic-boat.png'" class="rounded-t-2xl h-32 w-full object-center object-contain" /> -->
+        <div>
+          <ApplicationLogo :width-logo="130" :height-logo="130" />
+        </div>
+        <div class="w-full mx-8">
+          <li>
+            <p class="w-full text-blue-800 text-md pt-2 pb-2 font-semibold truncate">
+              <i class="fa-solid fa-folder-closed"></i>
+              {{ truncateString(project.name) }}
+            </p>
+          </li>
+          <li>
+            <p><span class="font-semibold">SAP:</span> {{ project.SAP_code }}</p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Inicio:</span>
+              {{ project.start_date == null ? 'N/A' : project.start_date }}
+            </p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Fin:</span>
+              {{ project.end_date == null ? 'N/A' : project.end_date }}
+            </p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Gerencia:</span> {{ project.gerencia }}</p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Estado:</span> {{ project.status }}</p>
+          </li>
+        </div>
+      </div>
+    </ul>
+    <ul v-for="project in filteredProjects" :key="project.id"
+      class="col-span-2 text-sm italic [&>li>p]:font-semibold snap-start">
+      <div @click="toggleSelectItem(project.id)"
+        :class="selectedItems.includes(project.id) ? 'bg-blue-900 text-white' : 'hover:border-2 hover:border-blue-900'"
+        class="flex flex-nowrap w-full p-2 shadow-md rounded-md cursor-pointer">
+        <!-- <img src="https://www.cotecmar.com/sites/default/files/media/imagenes/2021-12/CotecmarLogo.png"
+          onerror="this.src='images/generic-boat.png'" class="rounded-t-2xl h-32 w-full object-center object-contain" /> -->
+        <div>
+          <ApplicationLogo :width-logo="130" :height-logo="130" />
+        </div>
+        <div class="w-full mx-8">
+          <li>
+            <p class="w-full text-blue-800 text-md pt-2 pb-2 font-semibold truncate">
+              <i class="fa-solid fa-folder-closed"></i>
+              {{ truncateString(project.name) }}
+            </p>
+          </li>
+          <li>
+            <p><span class="font-semibold">SAP:</span> {{ project.SAP_code }}</p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Inicio:</span>
+              {{ project.start_date == null ? 'N/A' : project.start_date }}
+            </p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Fin:</span>
+              {{ project.end_date == null ? 'N/A' : project.end_date }}
+            </p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Gerencia:</span> {{ project.gerencia }}</p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Estado:</span> {{ project.status }}</p>
+          </li>
+        </div>
+      </div>
+    </ul>
+    <ul v-for="project in filteredProjects" :key="project.id"
+      class="col-span-2 text-sm italic [&>li>p]:font-semibold snap-start">
+      <div @click="toggleSelectItem(project.id)"
+        :class="selectedItems.includes(project.id) ? 'bg-blue-900 text-white' : 'hover:border-2 hover:border-blue-900'"
+        class="flex flex-nowrap w-full p-2 shadow-md rounded-md cursor-pointer">
+        <!-- <img src="https://www.cotecmar.com/sites/default/files/media/imagenes/2021-12/CotecmarLogo.png"
+          onerror="this.src='images/generic-boat.png'" class="rounded-t-2xl h-32 w-full object-center object-contain" /> -->
+        <div>
+          <ApplicationLogo :width-logo="130" :height-logo="130" />
+        </div>
+        <div class="w-full mx-8">
+          <li>
+            <p class="w-full text-blue-800 text-md pt-2 pb-2 font-semibold truncate">
+              <i class="fa-solid fa-folder-closed"></i>
+              {{ truncateString(project.name) }}
+            </p>
+          </li>
+          <li>
+            <p><span class="font-semibold">SAP:</span> {{ project.SAP_code }}</p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Inicio:</span>
+              {{ project.start_date == null ? 'N/A' : project.start_date }}
+            </p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Fin:</span>
+              {{ project.end_date == null ? 'N/A' : project.end_date }}
+            </p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Gerencia:</span> {{ project.gerencia }}</p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Estado:</span> {{ project.status }}</p>
+          </li>
+        </div>
+      </div>
+    </ul>
+    <ul v-for="project in filteredProjects" :key="project.id"
+      class="col-span-2 text-sm italic [&>li>p]:font-semibold snap-start">
+      <div @click="toggleSelectItem(project.id)"
+        :class="selectedItems.includes(project.id) ? 'bg-blue-900 text-white' : 'hover:border-2 hover:border-blue-900'"
+        class="flex flex-nowrap w-full p-2 shadow-md rounded-md cursor-pointer">
+        <!-- <img src="https://www.cotecmar.com/sites/default/files/media/imagenes/2021-12/CotecmarLogo.png"
+          onerror="this.src='images/generic-boat.png'" class="rounded-t-2xl h-32 w-full object-center object-contain" /> -->
+        <div>
+          <ApplicationLogo :width-logo="130" :height-logo="130" />
+        </div>
+        <div class="w-full mx-8">
+          <li>
+            <p class="w-full text-blue-800 text-md pt-2 pb-2 font-semibold truncate">
+              <i class="fa-solid fa-folder-closed"></i>
+              {{ truncateString(project.name) }}
+            </p>
+          </li>
+          <li>
+            <p><span class="font-semibold">SAP:</span> {{ project.SAP_code }}</p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Inicio:</span>
+              {{ project.start_date == null ? 'N/A' : project.start_date }}
+            </p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Fin:</span>
+              {{ project.end_date == null ? 'N/A' : project.end_date }}
+            </p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Gerencia:</span> {{ project.gerencia }}</p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Estado:</span> {{ project.status }}</p>
+          </li>
+        </div>
+      </div>
+    </ul>
+    <ul v-for="project in filteredProjects" :key="project.id"
+      class="col-span-2 text-sm italic [&>li>p]:font-semibold snap-start">
+      <div @click="toggleSelectItem(project.id)"
+        :class="selectedItems.includes(project.id) ? 'bg-blue-900 text-white' : 'hover:border-2 hover:border-blue-900'"
+        class="flex flex-nowrap w-full p-2 shadow-md rounded-md cursor-pointer">
+        <!-- <img src="https://www.cotecmar.com/sites/default/files/media/imagenes/2021-12/CotecmarLogo.png"
+          onerror="this.src='images/generic-boat.png'" class="rounded-t-2xl h-32 w-full object-center object-contain" /> -->
+        <div>
+          <ApplicationLogo :width-logo="130" :height-logo="130" />
+        </div>
+        <div class="w-full mx-8">
+          <li>
+            <p class="w-full text-blue-800 text-md pt-2 pb-2 font-semibold truncate">
+              <i class="fa-solid fa-folder-closed"></i>
+              {{ truncateString(project.name) }}
+            </p>
+          </li>
+          <li>
+            <p><span class="font-semibold">SAP:</span> {{ project.SAP_code }}</p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Inicio:</span>
+              {{ project.start_date == null ? 'N/A' : project.start_date }}
+            </p>
+          </li>
+          <li>
+            <p><span class="font-semibold">Fin:</span>
+              {{ project.end_date == null ? 'N/A' : project.end_date }}
+            </p>
           </li>
           <li>
             <p><span class="font-semibold">Gerencia:</span> {{ project.gerencia }}</p>
