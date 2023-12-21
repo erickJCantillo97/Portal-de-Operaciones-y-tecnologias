@@ -53,13 +53,18 @@ const addItem = () => {
 const tipologias = ref(null)
 const project = ref()
 const tipologia = ref()
+const listTipologia =ref(0)
+const getTipologias=(p)=>{
+    axios.get(route('get.tipologias', p.id)).then((res) => {
+        tipologias.value = Object.values(res.data.tipologias)
+        listTipologia.value++
+    })
+}
 
 const addDoc = (p) => {
     tipologia.value = null
-    tipologias.value = null
-    axios.get(route('get.tipologias', p.id)).then((res) => {
-        tipologias.value = Object.values(res.data.tipologias)
-    })
+    tipologias.value = []
+    getTipologias(p)
     project.value = p
     modalDocument.value = true
 }
@@ -175,11 +180,13 @@ const uploadEvent = () => {
     uploadForm.project_id = project.value.id
     uploadForm.tipologia_id = tipologia.value.id
     uploadForm.tipologia_name = tipologia.value.name
-    console.log(uploadForm)
     uploadForm.post(route('gestion.documental.store'), {
         onSuccess: (response) => {
             toast('Se agrego la documentacion', 'success')
             fileup.value = Math.random() * (10)
+            selectTipologia()
+            tipologias.value[tipologias.value.indexOf(tipologia.value)].count=tipologias.value[tipologias.value.indexOf(tipologia.value)].count+files.value.length
+            listTipologia.value++
         },
         onError: (error) => {
             console.log(error)
@@ -195,16 +202,13 @@ function formatDateTime24h(dateTime) {
 const tipologiaFiles = ref([])
 const selectTipologia = () => {
     fileup.value = Math.random() * (10)
-    if (tipologia.value != null) {
-        if (tipologia.value.count > 0) {
+        if (tipologia.value) {
             axios.get(route('get.files.project.tipologia', { porjectID: project.value.id, tipologiaID: tipologia.value.id })).then((response) => {
                 tipologiaFiles.value = response.data.files
             })
         } else {
             tipologiaFiles.value = []
         }
-    }
-
 }
 
 const pdf = ref()
@@ -350,11 +354,11 @@ const showPdf = (event, data) => {
             <p class="text-white">Agregar archivos al proyecto {{ project.name }}</p>
         </template>
         <template #body>
-            <div v-if="tipologias" class="grid grid-cols-5 gap-2 max-h-full">
+            <div v-if="tipologias[0]" class="grid grid-cols-5 gap-2 max-h-full">
                 <div class="col-span-2">
                     <p class="w-full text-center font-bold text-primary text-lg">{{
                         tipologias[0].Subserie }}</p>
-                    <Listbox v-model="tipologia" :options="tipologias" filter optionLabel="name" @click="selectTipologia()"
+                    <Listbox :key="listTipologia" v-model="tipologia" :options="tipologias" filter optionLabel="name" @click="selectTipologia()"
                         listStyle="max-height:60vh" class="w-full md:w-14rem" :pt="{
                             filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
                             item: { class: 'hover:bg-blue-100 text-md !px-1 !py-0.5' },
@@ -428,7 +432,7 @@ const showPdf = (event, data) => {
                                 </template>
                             </DataView>
                         </div>
-                        <div class="flex items-center justify-center h-[30vh]" v-if="tipologia.count == 0">
+                        <div class="flex items-center justify-center h-[30vh]" v-if="tipologiaFiles.length == 0">
                             <span>
                                 <i class="w-full text-center text-2xl text-danger fa-solid fa-file-circle-exclamation"></i>
                                 <p class="w-full text-center font-bold text-danger">
