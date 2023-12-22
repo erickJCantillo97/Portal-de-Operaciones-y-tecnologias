@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Models\Projects;
+namespace App\Models\Quote;
 
+use App\Models\Projects\Authorization;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;

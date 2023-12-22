@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('quote_type_ships', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('quotes_id')->index()->unsigned();
+            $table->bigInteger('quote_version_id')->index()->unsigned();
             $table->bigInteger('type_ship_id')->index()->unsigned();
             $table->string('name');
             $table->string('scope')->nullable();
@@ -30,7 +30,6 @@ return new class extends Migration
             $table->string('no_white_paper')->nullable();
             $table->double('price_before_iva_cop')->nullable();
             $table->double('real_cost')->nullable();
-
             $table->timestamps();
             $table->softDeletes();
         });
