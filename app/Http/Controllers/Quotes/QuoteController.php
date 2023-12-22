@@ -19,7 +19,7 @@ class QuoteController extends Controller
     public function index()
     {
         $quotes = Quote::orderBy('id')->get();
-        return Inertia::render('Project/Quotes', compact('quotes'));
+        return Inertia::render('Quotes/Index', compact('quotes'));
         // return response()->json([
         //     $quote
         // ], 200);
@@ -28,9 +28,9 @@ class QuoteController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        return Inertia::render('Quotes/Form');
     }
 
     /**
