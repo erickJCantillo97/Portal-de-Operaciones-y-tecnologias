@@ -2,25 +2,17 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, onMounted } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
-import '../../../sass/dataTableCustomized.scss';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Calendar from 'primevue/calendar';
-import Tag from 'primevue/tag';
-import Dropdown from 'primevue/dropdown';
 import Combobox from '@/Components/Combobox.vue';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline';
 import { useSweetalert } from '@/composable/sweetAlert';
 import { useConfirm } from "primevue/useconfirm";
-import axios from 'axios';
 // import plural from 'pluralize-es'
-import TextInput from '../../Components/TextInput.vue';
-import Button from '../../Components/Button.vue';
 import FileUpload from 'primevue/fileupload';
-// import Button from 'primevue/button';
+import Button from 'primevue/button';
+import CustomModal from '@/Components/CustomModal.vue';
+import CustomDataTable from '@/Components/CustomDataTable.vue';
+import Column from 'primevue/column';
+import InputText from 'primevue/inputtext';
 
 const confirm = useConfirm();
 const { toast } = useSweetalert();
@@ -126,228 +118,83 @@ const initFilters = () => {
     }
 };
 
-const clearFilter = () => {
-    initFilters();
-};
-
 const clearErrors = () => {
     router.page.props.errors = {};
 };
 
-const formatDate = (value) => {
-    return value.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-};
-
-// Formatear el número en moneda (USD)
-const formatCurrency = (value) => {
-    return parseFloat(value).toLocaleString('es-CO', {
-        style: 'currency',
-        currency: 'COP'
-    });
-};
-
-const getContractStatusSeverity = (quote) => {
-    switch (quote.status) {
-        case 'INICIADO':
-            return 'info';
-
-        case 'PROCESO':
-            return 'warning';
-
-        case 'PENDIENTE':
-            return 'danger';
-
-        case 'FINALIZADO':
-            return 'success';
-
-        default:
-            return null;
-    }
-};
-
-const exportarExcel = () => {
-    //console.log(dt.value)
-    // Acquire Data (reference to the HTML table)
-    var table_elt = document.getElementById("tabla");
-
-    var workbook = XLSX.utils.table_to_book(table_elt);
-
-    var ws = workbook.Sheets["Sheet1"];
-    XLSX.utils.sheet_add_aoa(ws, [
-        ["Creado " + new Date().toISOString()]
-    ], { origin: -1 });
-
-    // Package and Release Data (`writeFile` tries to write and save an XLSB file)
-    XLSX.writeFile(workbook, 'Lista de Contratos_' + quote.nit + '_' + quote.name + ".xlsb");
-};
+//#region DataTable
+const columnas = ref([
+    { field: 'gerencia', header: 'Gerencia', filter: true, sortable:true },
+    { field: 'costumer_id', header: 'Cliente' },
+    { field: 'consecutive', header: 'Consecutivo', filter: false },
+    { field: 'version', header: 'Version', filter: false },
+    { field: 'expeted_answer_date', header: 'Fecha maxima respuesta', type: 'date', filter: true, },
+    { field: 'estimador_anaswer_date', header: 'Fecha respuesta', type: 'date', filter: true },
+    { field: 'route', header: 'Ruta', filter: false },
+    { field: 'file', header: 'Documento', filter: false },
+    { field: 'observation', header: 'Observacion', filter: false },
+    { field: 'created_at', header: 'Fecha creacion', filter: false },
+]);
+//#endregion
 
 
 </script>
 
 <template>
     <AppLayout>
-        <div class="w-full overflow-y-auto custom-scroll">
-            <div class="flex items-center mx-2 mb-2">
-                <div class="flex-auto">
-                    <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
-                        Estimaciones
-                    </h1>
-                </div>
-
-                <div class="" title="Agregar Estimación">
-                    <Button @click="addItem()" severity="success">
-                        <PlusIcon class="w-6 h-6" aria-hidden="true" />
-                        Agregar
-                    </Button>
-                </div>
-            </div>
-            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="quotes" v-model:filters="filters" dataKey="id"
-                filterDisplay="menu" :loading="loading"
-                :globalFilterFields="['name', 'ship.name', 'cost', 'start_date', 'end_date']"
-                currentPageReportTemplate=" {first} al {last} de {totalRecords}"
-                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-                :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
-
-                <template #header>
-                    <div class="flex justify-between w-full h-8 mb-2">
-                        <div class="flex space-x-4">
-                            <div class="w-8" title="Filtrar Estimaciones">
-                                <Button @click="clearFilter()" type="button" severity="primary" class="hover:bg-primary ">
-                                    <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
-                                </Button>
-                            </div>
-
-                            <div class="relative flex rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <MagnifyingGlassIcon class="w-5 h-4 text-gray-400" aria-hidden="true" />
-                                </div>
-                                <input type="search" title="Buscar Estimaciones"
-                                    class="block w-10/12 py-4 pl-10 text-gray-900 border-0 rounded-md ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                    v-model="filters.global.value" placeholder="Buscar..." />
-                            </div>
-                        </div>
-                    </div>
-                </template>
-
-                <!--COLUMNAS-->
-                <!-- <Column field="gerencia" header="Gerencia"></Column> -->
-                <Column field="name" header="Consecutivo">
-                </Column>
-                <Column field="ship.name" header="Buque"></Column>
-                <Column field="cost" header="Costo">
-                    <template #body="slotProps">
-                        {{ formatCurrency(slotProps.data.cost) }}
-                    </template>
-                </Column>
-                <Column field="start_date" header="Fecha Inicio"></Column>
-                <Column field="end_date" header="Fecha Finalización"></Column>
-                <!-- <Column field="status" header="Estado" sortable>
-                    <template #body="slotProps">
-                        <Tag :value="slotProps.data.status" :severity="getContractStatusSeverity(slotProps.data)" />
-                    </template>
-                </Column> -->
-
-                <!--ACCIONES-->
-                <Column header="Acciones" class="space-x-3">
-                    <template #body="slotProps">
-                        <!--BOTÓN EDITAR-->
-                        <div
-                            class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
-                            <div title="Editar Estimación">
-                                <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
-                                    <PencilIcon class="w-4 h-4 " aria-hidden="true" />
-                                </Button>
-                            </div>
-                            <!--BOTÓN ELIMINAR-->
-                            <div title="Eliminar Estimación">
-                                <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Cotización', 'quotes')"
-                                    class="hover:bg-danger">
-                                    <TrashIcon class="w-4 h-4 " aria-hidden="true" />
-                                </Button>
-                            </div>
-                        </div>
-                    </template>
-                </Column>
-            </DataTable>
-        </div>
-
+        <CustomDataTable :data="quotes" :columnas="columnas">
+            <template #header>
+                <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
+                    Estimaciones
+                </h1>
+                <Button title="Agregar Estimación" @click="addItem()" severity="success" label="Agregar" outlined
+                    icon="fa-solid fa-plus" class="!h-8" />
+            </template>
+        </CustomDataTable>
         <!--MODAL DE FORMULARIO-->
-        <TransitionRoot as="template" :show="open">
-            <Dialog as="div" class="relative z-30" @close="open = false">
-                <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
-                    leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-                    <div class="fixed inset-0 z-30 w-screen h-screen transition-opacity bg-gray-500 bg-opacity-75" />
-                </TransitionChild>
-
-                <div class="fixed inset-0 z-50 h-screen overflow-y-auto">
-                    <div class="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
-                        <TransitionChild as="template" enter="ease-out duration-300"
-                            enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                            enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
-                            leave-from="opacity-100 translate-y-0 sm:scale-100"
-                            leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                            <DialogPanel :class="props.heigthDialog"
-                                class="relative px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg ">
-                                <div>
-                                    <div class="px-2 mt-2 text-center">
-                                        <DialogTitle as="h3" class="text-xl font-semibold text-primary ">
-                                            {{ formData.id != 0 ? 'Editar ' : 'Crear' }}
-                                            Estimación
-                                        </DialogTitle> <!--Se puede usar {{ tittle }}-->
-                                        <div class="p-2 mt-2 space-y-2 border border-gray-200 rounded-lg">
-
-                                            <!--formData.id hace referencia si está activo el modal o no (0=activo; 1=inactivo)-->
-                                            <TextInput class="mt-2 text-left" label="Consecutivo"
-                                                :enabled="formData.id == 0"
-                                                :placeholder="'Escriba el consecutivo de la estimacion'"
-                                                v-model="formData.code" :error="router.page.props.errors.code">
-                                            </TextInput>
-
-                                            <Combobox class="text-left text-gray-900" label="Buque"
-                                                placeholder="Seleccione Buque" :options="ships" v-model="shipSelect"
-                                                :error="router.page.props.errors.ship">
-                                            </Combobox>
-
-                                            <TextInput class="text-left" label="Costo" type="number"
-                                                :placeholder="'Escriba el valor total estimado'" v-model="formData.cost"
-                                                :error="router.page.props.errors.cost">
-                                            </TextInput>
-
-                                            <!--CAMPO FECHA INICIO-->
-                                            <TextInput class="text-left" type="date" label="Fecha de inicio"
-                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.start_date"
-                                                :error="$page.props.errors.start_date">
-                                            </TextInput>
-
-                                            <!--CAMPO FECHA FINALIZACIÓN-->
-                                            <TextInput class="mt-2 text-left" type="date" label="Fecha de Finalización"
-                                                :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
-                                                :error="$page.props.errors.end_date">
-                                            </TextInput>
-                                            <FileUpload chooseLabel="Adjuntar PDF" mode="basic" name="demo[]"
-                                                :multiple="false" accept=".pdf" :maxFileSize="1000000"
-                                                @input="formData.pdf = $event.target.files[0]">
-                                            </FileUpload>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex px-2 mt-2 space-x-4">
-                                    <Button class="hover:bg-danger text-danger border-danger" severity="danger"
-                                        @click="open = false">Cancelar</Button>
-                                    <Button severity="success" :loading="false"
-                                        class="text-success hover:bg-success border-success" @click="submit()">
-                                        {{ formData.id != 0 ? 'Actualizar ' : 'Guardar' }}
-                                    </Button>
-                                </div>
-                            </DialogPanel>
-                        </TransitionChild>
-                    </div>
-                </div>
-            </Dialog>
-        </TransitionRoot>
     </AppLayout>
+    <CustomModal :visible="open">
+        <template #titulo>
+            <p class="text-white">{{ formData.id != 0 ? 'Editar ' : 'Crear' }} solicitud de estimación </p>
+        </template>
+        <template #icon>
+            <i class="fa-solid fa-file-circle-question text-white text-xl"></i>
+        </template>
+        <template #body>
+            <div class="grid grid-cols-4 gap-2">
+                <!--formData.id hace referencia si está activo el modal o no (0=activo; 1=inactivo)-->
+                <InputText label="Consecutivo" :enabled="formData.id == 0"
+                    :placeholder="'Escriba el consecutivo de la estimacion'" v-model="formData.code"
+                    :error="router.page.props.errors.code">
+                </InputText>
+
+                <Combobox class="text-left text-gray-900" label="Buque" placeholder="Seleccione Buque" :options="ships"
+                    v-model="shipSelect" :error="router.page.props.errors.ship">
+                </Combobox>
+
+                <InputText class="text-left" label="Costo" type="number" :placeholder="'Escriba el valor total estimado'"
+                    v-model="formData.cost" :error="router.page.props.errors.cost">
+                </InputText>
+
+                <!--CAMPO FECHA INICIO-->
+                <InputText class="text-left" type="date" label="Fecha de inicio" :placeholder="'Escriba el Tipo de Cliente'"
+                    v-model="formData.start_date" :error="$page.props.errors.start_date">
+                </InputText>
+
+                <!--CAMPO FECHA FINALIZACIÓN-->
+                <InputText class="mt-2 text-left" type="date" label="Fecha de Finalización"
+                    :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
+                    :error="$page.props.errors.end_date">
+                </InputText>
+                <FileUpload chooseLabel="Adjuntar PDF" mode="basic" name="demo[]" :multiple="false" accept=".pdf"
+                    :maxFileSize="1000000" @input="formData.pdf = $event.target.files[0]">
+                </FileUpload>
+            </div>
+        </template>
+        <template #footer>
+            <Button severity="danger" label="Cancelar" @click="open = false" class="!h-8" icon="fa-solid fa-floppy-disk" />
+            <Button severity="success" :label="formData.id != 0 ? 'Actualizar ' : 'Guardar'" :loading="false" class="!h-8"
+                @click="submit()" />
+        </template>
+    </CustomModal>
 </template>

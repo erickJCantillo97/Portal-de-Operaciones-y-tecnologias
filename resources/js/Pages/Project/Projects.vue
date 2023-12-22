@@ -53,8 +53,8 @@ const addItem = () => {
 const tipologias = ref(null)
 const project = ref()
 const tipologia = ref()
-const listTipologia =ref(0)
-const getTipologias=(p)=>{
+const listTipologia = ref(0)
+const getTipologias = (p) => {
     axios.get(route('get.tipologias', p.id)).then((res) => {
         tipologias.value = Object.values(res.data.tipologias)
         listTipologia.value++
@@ -185,7 +185,8 @@ const uploadEvent = () => {
             toast('Se agrego la documentacion', 'success')
             fileup.value = Math.random() * (10)
             selectTipologia()
-            tipologias.value[tipologias.value.indexOf(tipologia.value)].count=tipologias.value[tipologias.value.indexOf(tipologia.value)].count+files.value.length
+            var index = tipologias.value.indexOf(tipologia.value)
+            tipologias.value[index].count = tipologias.value[index].count + files.value.length
             listTipologia.value++
         },
         onError: (error) => {
@@ -202,13 +203,13 @@ function formatDateTime24h(dateTime) {
 const tipologiaFiles = ref([])
 const selectTipologia = () => {
     fileup.value = Math.random() * (10)
-        if (tipologia.value) {
-            axios.get(route('get.files.project.tipologia', { porjectID: project.value.id, tipologiaID: tipologia.value.id })).then((response) => {
-                tipologiaFiles.value = response.data.files
-            })
-        } else {
-            tipologiaFiles.value = []
-        }
+    if (tipologia.value) {
+        axios.get(route('get.files.project.tipologia', { porjectID: project.value.id, tipologiaID: tipologia.value.id })).then((response) => {
+            tipologiaFiles.value = response.data.files
+        })
+    } else {
+        tipologiaFiles.value = []
+    }
 }
 
 const pdf = ref()
@@ -358,8 +359,8 @@ const showPdf = (event, data) => {
                 <div class="col-span-2">
                     <p class="w-full text-center font-bold text-primary text-lg">{{
                         tipologias[0].Subserie }}</p>
-                    <Listbox :key="listTipologia" v-model="tipologia" :options="tipologias" filter optionLabel="name" @click="selectTipologia()"
-                        listStyle="max-height:60vh" class="w-full md:w-14rem" :pt="{
+                    <Listbox :key="listTipologia" v-model="tipologia" :options="tipologias" filter optionLabel="name"
+                        @click="selectTipologia()" listStyle="max-height:60vh" class="w-full md:w-14rem" :pt="{
                             filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
                             item: { class: 'hover:bg-blue-100 text-md !px-1 !py-0.5' },
                         }">

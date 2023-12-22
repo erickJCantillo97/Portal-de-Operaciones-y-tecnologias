@@ -22,7 +22,7 @@ if (date == localStorage.getItem('date')) {
     data = datos.map(obj => { return obj['valor'] }).reverse()
     rate.value++
 } else {
-    axios.get('https://www.datos.gov.co/resource/mcec-87by.json?$limit=10').then((res) => {
+    axios.get('https://www.datos.gov.co/resource/mcec-87by.json?$limit=90').then((res) => {
         categories = res.data.map(obj => { return new Date(obj['vigenciahasta']).toDateString() }).reverse()
         data = res.data.map(obj => { return obj['valor'] }).reverse()
         localStorage.setItem('hist', JSON.stringify(res.data))
@@ -59,14 +59,14 @@ const toggle = (event) => {
         },
         stroke: {
             width: 2,
-            curve: 'smooth'
+            curve: 'straight'
         },
         title: {
             text: 'Historial USD',
             align: 'center'
         },
         grid: {
-          show:false
+            show: false
         },
         xaxis: {
             categories: categories,
@@ -104,10 +104,7 @@ onMounted(() => {
         // Simular un clic izquierdo sobre el elemento
         elemento.click();
     });
-    // elemento.addEventListener("mouseleave", function () {
-    //     // Simular un clic izquierdo sobre el elemento
-    //     elemento.click();
-    // });
+    rate.value++
 })
 
 
