@@ -72,36 +72,41 @@ const toggle = (event) => {
     hist.value++
     op.value.toggle(event);
 }
-const consultaTRM=async()=>{
+const consultaTRM = async () => {
     if (date == localStorage.getItem('date')) {
-    var datos
-    rateT.value = JSON.parse(localStorage.getItem('rateT'))
-    rateY.value = JSON.parse(localStorage.getItem('rateY'))
-    change.value = localStorage.getItem('change')
-    datos = JSON.parse(localStorage.getItem('hist'))
-    categories = datos.map(obj => { return new Date(obj['vigenciahasta']).toDateString() }).reverse()
-    data = datos.map(obj => { return obj['valor'] }).reverse()
-    rate.value++
-} else {
-    await axios.get('https://www.datos.gov.co/resource/mcec-87by.json?$limit=90').then((res) => {
-        categories = res.data.map(obj => { return new Date(obj['vigenciahasta']).toDateString() }).reverse()
-        data = res.data.map(obj => { return obj['valor'] }).reverse()
-        localStorage.setItem('hist', JSON.stringify(res.data))
-        rateT.value = res.data[0].valor
-        localStorage.setItem('rateT', JSON.stringify(rateT.value))
-        rateY.value = res.data[1].valor
-        localStorage.setItem('rateY', JSON.stringify(rateY.value))
-        change.value = (rateT.value - rateY.value) / 100
-        localStorage.setItem('change', change.value)
-        localStorage.setItem('date', date)
+        var datos
+        rateT.value = JSON.parse(localStorage.getItem('rateT'))
+        rateY.value = JSON.parse(localStorage.getItem('rateY'))
+        change.value = localStorage.getItem('change')
+        datos = JSON.parse(localStorage.getItem('hist'))
+        categories = datos.map(obj => { return new Date(obj['vigenciahasta']).toDateString() }).reverse()
+        data = datos.map(obj => { return obj['valor'] }).reverse()
         rate.value++
-    })
-};
+    } else {
+        await axios.get('https://www.datos.gov.co/resource/mcec-87by.json?$limit=90').then((res) => {
+            categories = res.data.map(obj => { return new Date(obj['vigenciahasta']).toDateString() }).reverse()
+            data = res.data.map(obj => { return obj['valor'] }).reverse()
+            localStorage.setItem('hist', JSON.stringify(res.data))
+            rateT.value = res.data[0].valor
+            localStorage.setItem('rateT', JSON.stringify(rateT.value))
+            rateY.value = res.data[1].valor
+            localStorage.setItem('rateY', JSON.stringify(rateY.value))
+            change.value = (rateT.value - rateY.value) / 100
+            localStorage.setItem('change', change.value)
+            localStorage.setItem('date', date)
+            rate.value++
+        })
+    };
 }
 
 
 onMounted(() => {
-    consultaTRM()
+    try {
+        consultaTRM()
+    } catch (error) {
+        consultaTRM()
+        console.log(error)
+    }
     var elemento = document.getElementById("trmdolar");
     // elemento.addEventListener("mouseenter", function () {
     //     // Simular un clic izquierdo sobre el elemento
