@@ -33,7 +33,9 @@ const props = defineProps({
 
 //#region Filtros de tabla y visor columnas
 const rows = ref(5)
-const filters = ref();
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+});
 const globalFilterFields = ref([])
 const columnasSelect = ref()
 if (props.columnas.length > 5) {
@@ -43,10 +45,6 @@ if (props.columnas.length > 5) {
 }
 const initFilters = () => {
     globalFilterFields.value = ['id']
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        id: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    };
     for (var columna of props.columnas) {
         if (columna.filter) {
             filters.value[columna.field] = { value: null, matchMode: FilterMatchMode.CONTAINS }
@@ -213,9 +211,12 @@ const exportar = () => {
             </template>
 
             <template #filter="{ filterModel }" v-if="col.filter">
-                <input v-if="col.type=='date'" class="w-full rounded-md" type="date" v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
-                <InputText v-if="col.type=='numeric'" v-model="filterModel.value" type="numeric" class="p-column-filter" placeholder="Numero a buscar" />
-                <InputText v-else v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Escriba algo para buscar" />
+                <input v-if="col.type == 'date'" class="w-full rounded-md" type="date" v-model="filterModel.value"
+                    dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
+                <InputText v-if="col.type == 'numeric'" v-model="filterModel.value" type="numeric" class="p-column-filter"
+                    placeholder="Numero a buscar" />
+                <InputText v-else v-model="filterModel.value" type="text" class="p-column-filter"
+                    placeholder="Escriba algo para buscar" />
             </template>
 
             <template #body="{ data }">
@@ -353,5 +354,4 @@ const exportar = () => {
         </Column> -->
 
         <!-- #endregion -->
-    </DataTable>
-</template>
+</DataTable></template>
