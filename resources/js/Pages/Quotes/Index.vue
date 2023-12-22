@@ -126,7 +126,7 @@ const columnas = ref([
     { field: 'id', header: 'Id', frozen:true, filter: true, sortable: true },
     { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true },
     { field: 'costumer_id', header: 'Cliente' },
-    { field: 'consecutive', header: 'Consecutivo', filter: false },
+    { field: 'consecutive', header: 'Consecutivo' },
     { field: 'version', header: 'Version', filter: false },
     { field: 'expeted_answer_date', header: 'Fecha maxima respuesta', type: 'date', filter: true, },
     { field: 'estimador_anaswer_date', header: 'Fecha respuesta', type: 'date', filter: true },
@@ -143,8 +143,8 @@ const buttons = ref([
 ]);
 //#endregion
 
-const showClic =(event)=>{
-    console.log(event)
+const showClic =(event, data)=>{
+    console.log(data)
 }
 
 const deleteClic =(event)=>{

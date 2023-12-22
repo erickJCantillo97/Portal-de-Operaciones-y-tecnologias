@@ -194,7 +194,7 @@ const exportar = () => {
             <template #filter="{ filterModel }" v-if="col.filter">
                 <input v-if="col.type == 'date'" class="w-full rounded-md" type="date" v-model="filterModel.value"
                     dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
-                <InputText v-if="col.type == 'numeric'" v-model="filterModel.value" type="numeric" class="p-column-filter"
+                <InputText v-else v-if="col.type == 'numeric'" v-model="filterModel.value" type="numeric" class="p-column-filter"
                     placeholder="Numero a buscar" />
                 <InputText v-else v-model="filterModel.value" type="text" class="p-column-filter"
                     placeholder="Escriba algo para buscar" />
@@ -206,7 +206,7 @@ const exportar = () => {
 
         </Column>
 
-        <Column frozen alignFrozen="right" style="width: min-content" v-if="props.actions.length>0">
+        <Column frozen alignFrozen="right" style="width:8%" v-if="props.actions.length>0">
             <template #body="{ data }">
                 <div class="flex items-center justify-center w-min">
                     <Button v-for="button in props.actions" @click="$emit(button.event, $event, data)" :severity="button.severity"
