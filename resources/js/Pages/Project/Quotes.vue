@@ -1,36 +1,41 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref, onMounted } from 'vue';
-import { router, useForm } from '@inertiajs/vue3';
-import '../../../sass/dataTableCustomized.scss';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Calendar from 'primevue/calendar';
-import Tag from 'primevue/tag';
-import Dropdown from 'primevue/dropdown';
-import Combobox from '@/Components/Combobox.vue';
-import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline';
-import { useSweetalert } from '@/composable/sweetAlert';
-import { useConfirm } from "primevue/useconfirm";
-import axios from 'axios';
+import AppLayout from '@/Layouts/AppLayout.vue'
+import { ref, onMounted } from 'vue'
+import { router, useForm } from '@inertiajs/vue3'
+import '../../../sass/dataTableCustomized.scss'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import Calendar from 'primevue/calendar'
+import Tag from 'primevue/tag'
+import Dropdown from 'primevue/dropdown'
+import Combobox from '@/Components/Combobox.vue'
+import { FilterMatchMode, FilterOperator } from 'primevue/api'
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue'
+import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline'
+import { useSweetalert } from '@/composable/sweetAlert'
+import { useConfirm } from "primevue/useconfirm"
+import axios from 'axios'
 // import plural from 'pluralize-es'
-import TextInput from '../../Components/TextInput.vue';
-import Button from '../../Components/Button.vue';
-import FileUpload from 'primevue/fileupload';
-// import Button from 'primevue/button';
+import TextInput from '@/Components/TextInput.vue'
+import Button from '@/Components/Button.vue'
+import QuoteSlideOverDetails from '@/Components/QuoteSlideOverDetails.vue'
+import FileUpload from 'primevue/fileupload'
+// import Button from 'primevue/button'
 
-const confirm = useConfirm();
-const { toast } = useSweetalert();
-const loading = ref(false);
-const { confirmDelete } = useSweetalert();
+const confirm = useConfirm()
+const { toast } = useSweetalert()
+const loading = ref(false)
+const { confirmDelete } = useSweetalert()
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 const open = ref(false)
+const openModal = ref(false)
 const shipSelect = ref()
+const openSlideOver = ref(false)
+
+const openQuoteSlideOver = () => openModal.value = true
 
 const props = defineProps({
     quotes: Array,
@@ -48,16 +53,16 @@ const formData = useForm({
     start_date: props.quotes?.start_date ?? '',
     end_date: props.quotes?.end_date ?? '',
     pdf: null
-});
+})
 //#endregion
 
 onMounted(() => {
-    initFilters();
+    initFilters()
 })
 
 /* SUBMIT*/
 const submit = () => {
-    loading.value = true;
+    loading.value = true
 
     if (!shipSelect.value) {
         toast('Por favor seleccione un buque.', 'error')
@@ -70,53 +75,53 @@ const submit = () => {
         router.post(route('quotes.store'), formData, {
             preserveScroll: true,
             onSuccess: (res) => {
-                open.value = false;
-                toast(' Cotizacion creado exitosamente', 'success');
+                open.value = false
+                toast(' Cotizacion creado exitosamente', 'success')
             },
             onError: (errors) => {
-                toast('Por favor diligencie todos los campos.', 'error');
+                toast('Por favor diligencie todos los campos.', 'error')
             },
             onFinish: visit => {
-                loading.value = false;
+                loading.value = false
             }
         })
-        return 'creado';
+        return 'creado'
     }
     router.put(route('quotes.update', formData.id), formData, {
         preserveScroll: true,
         onSuccess: (res) => {
-            open.value = false;
-            toast('¡Cotización actualizada exitosamente!', 'success');
+            open.value = false
+            toast('¡Cotización actualizada exitosamente!', 'success')
         },
         onError: (errors) => {
-            toast('¡Ups! Ha surgido un error', 'error');
+            toast('¡Ups! Ha surgido un error', 'error')
         },
         onFinish: visit => {
-            loading.value = false;
+            loading.value = false
         }
     })
 
 }
 
 const addItem = () => {
-    formData.reset();
-    clearErrors();
-    shipSelect.value = {};
-    open.value = true;
+    formData.reset()
+    clearErrors()
+    shipSelect.value = {}
+    open.value = true
 }
 
 const editItem = (quote) => {
-    clearErrors();
+    clearErrors()
 
-    formData.id = quote.id;
-    // formData.gerencia = quote.gerencia;
-    shipSelect.value = quote.ship;
-    formData.code = quote.code;
-    formData.cost = quote.cost;
-    formData.start_date = quote.start_date;
-    formData.end_date = quote.end_date;
-    open.value = true;
-};
+    formData.id = quote.id
+    // formData.gerencia = quote.gerencia
+    shipSelect.value = quote.ship
+    formData.code = quote.code
+    formData.cost = quote.cost
+    formData.start_date = quote.start_date
+    formData.end_date = quote.end_date
+    open.value = true
+}
 
 
 const initFilters = () => {
@@ -124,66 +129,66 @@ const initFilters = () => {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
     }
-};
+}
 
 const clearFilter = () => {
-    initFilters();
-};
+    initFilters()
+}
 
 const clearErrors = () => {
-    router.page.props.errors = {};
-};
+    router.page.props.errors = {}
+}
 
 const formatDate = (value) => {
     return value.toLocaleDateString('es-ES', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
-    });
-};
+    })
+}
 
 // Formatear el número en moneda (USD)
 const formatCurrency = (value) => {
     return parseFloat(value).toLocaleString('es-CO', {
         style: 'currency',
         currency: 'COP'
-    });
-};
+    })
+}
 
 const getContractStatusSeverity = (quote) => {
     switch (quote.status) {
         case 'INICIADO':
-            return 'info';
+            return 'info'
 
         case 'PROCESO':
-            return 'warning';
+            return 'warning'
 
         case 'PENDIENTE':
-            return 'danger';
+            return 'danger'
 
         case 'FINALIZADO':
-            return 'success';
+            return 'success'
 
         default:
-            return null;
+            return null
     }
-};
+}
 
 const exportarExcel = () => {
     //console.log(dt.value)
     // Acquire Data (reference to the HTML table)
-    var table_elt = document.getElementById("tabla");
+    var table_elt = document.getElementById("tabla")
 
-    var workbook = XLSX.utils.table_to_book(table_elt);
+    var workbook = XLSX.utils.table_to_book(table_elt)
 
-    var ws = workbook.Sheets["Sheet1"];
+    var ws = workbook.Sheets["Sheet1"]
     XLSX.utils.sheet_add_aoa(ws, [
         ["Creado " + new Date().toISOString()]
-    ], { origin: -1 });
+    ], { origin: -1 })
 
     // Package and Release Data (`writeFile` tries to write and save an XLSB file)
-    XLSX.writeFile(workbook, 'Lista de Contratos_' + quote.nit + '_' + quote.name + ".xlsb");
-};
+    XLSX.writeFile(workbook, 'Lista de Contratos_' + quote.nit + '_' + quote.name + ".xlsb")
+}
 
 
 </script>
@@ -269,6 +274,13 @@ const exportarExcel = () => {
                                     <TrashIcon class="w-4 h-4 " aria-hidden="true" />
                                 </Button>
                             </div>
+                            <!--BOTÓN ELIMINAR-->
+                            <div title="Eliminar Estimación">
+                                <Button severity="danger" @click="openQuoteSlideOver()"
+                                    class="hover:bg-danger">
+                                    <TrashIcon class="w-4 h-4 " aria-hidden="true" />
+                                </Button>
+                            </div>
                         </div>
                     </template>
                 </Column>
@@ -300,7 +312,7 @@ const exportarExcel = () => {
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-2 border border-gray-200 rounded-lg">
 
-                                            <!--formData.id hace referencia si está activo el modal o no (0=activo; 1=inactivo)-->
+                                            <!--formData.id hace referencia si está activo el modal o no (0=activo 1=inactivo)-->
                                             <TextInput class="mt-2 text-left" label="Consecutivo"
                                                 :enabled="formData.id == 0"
                                                 :placeholder="'Escriba el consecutivo de la estimacion'"
@@ -349,5 +361,8 @@ const exportarExcel = () => {
                 </div>
             </Dialog>
         </TransitionRoot>
+
+        <!--QUOTE SLIDE OVER DETAILS-->
+        <QuoteSlideOverDetails :openDialog="openModal" />
     </AppLayout>
 </template>
