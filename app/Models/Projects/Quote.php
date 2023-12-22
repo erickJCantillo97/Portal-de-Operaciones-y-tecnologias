@@ -14,9 +14,4 @@ class Quote extends Model implements Auditable
     use SoftDeletes;
 
     protected $guarded = [];
-
-    public function ship()
-    {
-        return $this->belongsTo(Ship::class);
-    }
 }
