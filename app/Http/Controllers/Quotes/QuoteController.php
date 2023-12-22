@@ -34,7 +34,7 @@ class QuoteController extends Controller
     {
         $typeships = TypeShip::orderBy('name')->get();
         $customers = Customer::orderBy('name')->get();
-        $estimadores = collect(getPersonalGerenciaOficina(auth()->user()->gerencia, 'DEEST'))->map(function ($estimador) {
+        $estimadores = collect(getPersonalGerenciaOficina('GECON', 'DEEST'))->map(function ($estimador) {
             return [
                 'user_id' => $estimador['Num_SAP'],
                 'name' => $estimador['Nombres_Apellidos']
