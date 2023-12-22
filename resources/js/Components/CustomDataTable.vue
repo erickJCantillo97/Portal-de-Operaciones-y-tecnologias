@@ -28,7 +28,11 @@ const props = defineProps({
     exportRute: {
         type: String,
         default: ''
-    }
+    },
+    actions: {
+        type: Array,
+        default: []
+    },
 })
 
 //#region Filtros de tabla y visor columnas
@@ -38,8 +42,8 @@ const filters = ref({
 });
 const globalFilterFields = ref([])
 const columnasSelect = ref()
-if (props.columnas.length > 5) {
-    columnasSelect.value = props.columnas.slice(0, 5)
+if (props.columnas.length > 7) {
+    columnasSelect.value = props.columnas.slice(0, 7)
 } else {
     columnasSelect.value = props.columnas
 }
@@ -171,31 +175,8 @@ const exportar = () => {
 
         <!-- #region Columnas -->
 
-        <Column sortable frozen :filterMenuStyle="{ width: '16rem' }" :show-filter-match-modes="false" field="id" :pt="{
-            headerContent: { class: '!h-8' },
-            headerCell: { class: '!py-0 !px-1' },
-        }">
-            <template #body="{ data }">
-                <div class="text-center">
-                    {{ data.id }}
-                </div>
-            </template>
-            <template #filter="{ filterModel }">
-                <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Numero de caso" />
-            </template>
-            <template #filtericon>
-                <i class="fa-solid fa-filter"></i>
-            </template>
-            <template #sorticon="{ sortOrder, sorted }">
-                <i :class="sorted ? sortOrder == 1 ? 'fa-solid fa-arrow-up-1-9' : 'fa-solid fa-arrow-up-9-1' : 'fa-solid fa-sort'"
-                    class="text-gray-500 flex justify-center items-center ml-1 h-5 w-5"></i>
-            </template>
-            <template #header>
-                <p class="text-sm">Id</p>
-            </template>
-        </Column>
         <Column v-for="col, index in columnasSelect" :field="col.field" :filterField="col.field" :sortable="col.sortable"
-            :show-filter-match-modes="false" :filterMenuStyle="{ width: '16rem' }" :pt="{
+            :show-filter-match-modes="false" :filterMenuStyle="{ width: '16rem' }" :frozen="col.frozen" :pt="{
                 headerContent: { class: '!h-8' },
                 headerCell: { class: '!py-0 !px-1' },
             }">
@@ -224,15 +205,16 @@ const exportar = () => {
             </template>
 
         </Column>
-        <Column frozen alignFrozen="right">
+
+        <Column frozen alignFrozen="right" style="width: min-content" v-if="props.actions.length>0">
             <template #body="{ data }">
-                <div class="flex items-center justify-center w-full">
-                    <Button @click="" severity="success" aria-haspopup="true" aria-controls="overlay_menu" text outlined
-                        rounded icon="fa-solid fa-ellipsis-vertical" class="!h-5 !w-5" />
+                <div class="flex items-center justify-center w-min">
+                    <Button v-for="button in props.actions" @click="$emit(button.event, $event, data)" :severity="button.severity"
+                        :text="button.text" :outlined="button.outlined" :rounded="button.rounded" :icon="button.icon" :label="button.label"
+                        :class="button.class" />
                 </div>
             </template>
         </Column>
-
         <!--
         <Column sortable frozen :filterMenuStyle="{ width: '16rem' }" :show-filter-match-modes="false" field="id" :pt="{
             headerContent: { class: '!h-8' },
@@ -354,4 +336,5 @@ const exportar = () => {
         </Column> -->
 
         <!-- #endregion -->
-</DataTable></template>
+    </DataTable>
+</template>

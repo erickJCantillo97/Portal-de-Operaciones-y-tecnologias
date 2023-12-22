@@ -11,7 +11,6 @@ import FileUpload from 'primevue/fileupload';
 import Button from 'primevue/button';
 import CustomModal from '@/Components/CustomModal.vue';
 import CustomDataTable from '@/Components/CustomDataTable.vue';
-import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 
 const confirm = useConfirm();
@@ -124,7 +123,8 @@ const clearErrors = () => {
 
 //#region DataTable
 const columnas = ref([
-    { field: 'gerencia', header: 'Gerencia', filter: true, sortable:true },
+    { field: 'id', header: 'Id', frozen:true, filter: true, sortable: true },
+    { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true },
     { field: 'costumer_id', header: 'Cliente' },
     { field: 'consecutive', header: 'Consecutivo', filter: false },
     { field: 'version', header: 'Version', filter: false },
@@ -136,13 +136,26 @@ const columnas = ref([
     { field: 'created_at', header: 'Fecha creacion', filter: false },
 ]);
 //#endregion
+//#region BotonesDatatable
+const buttons = ref([
+    { event: 'showClic', severity: 'success', class: '', icon: 'fa-solid fa-eye', text: true, outlined: false, rounded: false },
+    { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
+]);
+//#endregion
 
+const showClic =(event)=>{
+    console.log(event)
+}
+
+const deleteClic =(event)=>{
+    console.log(event)
+}
 
 </script>
 
 <template>
     <AppLayout>
-        <CustomDataTable :data="quotes" :columnas="columnas">
+        <CustomDataTable :data="quotes" :columnas="columnas" :actions="buttons" @showClic="showClic" @deleteClic="deleteClic">
             <template #header>
                 <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
                     Estimaciones
