@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('quotes', function (Blueprint $table) {
             $table->id();
             $table->string('gerencia');
-            $table->bigInteger('type_ship_id')->index()->unsigned()->nullable();
             $table->bigInteger('customer_id')->nullable()->unsigned();
             $table->bigInteger('estimador_id')->unsigned()->index();
             $table->integer('consecutive');
@@ -24,6 +23,8 @@ return new class extends Migration
             $table->string('offer_type')->nullable();
             $table->text('route')->nullable();
             $table->string('file')->nullable();
+            $table->string('estimador_name');
+            $table->text('observation')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

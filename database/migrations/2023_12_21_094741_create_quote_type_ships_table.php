@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('quote_type_ships', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('quotes_id')->nullable()->index()->unsigned();
+            $table->bigInteger('quotes_id')->index()->unsigned();
+            $table->bigInteger('type_ship_id')->index()->unsigned();
             $table->string('name');
             $table->string('scope')->nullable();
             $table->string('project_type')->nullable();
