@@ -18,9 +18,8 @@ class QuoteController extends Controller
      */
     public function index()
     {
-
-        $quotes = Quote::with('ship')->orderBy('id')->get();
-        return Inertia::render('Project/Quotes', compact('quotes', 'ships'));
+        $quotes = Quote::orderBy('id')->get();
+        return Inertia::render('Project/Quotes', compact('quotes'));
         // return response()->json([
         //     $quote
         // ], 200);
@@ -48,10 +47,10 @@ class QuoteController extends Controller
             // 'type_ships' => 'nullable|array',
             'observation' => 'nullable|string',
         ]);
-
+        $empleado = collect(searchEmpleados('Num_SAP', 3156))->first();
         try {
             $validateData['gerencia'] = auth()->user()->gerencia;
-            $validateData['estimador_name'] = 'Nuevo Usuario';
+            $validateData['estimador_name'] = $empleado['Usuario'];
             $validateData['version'] = 1;
             $validateData['consecutive'] = Quote::max('consecutive') + 1;
 
