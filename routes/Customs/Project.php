@@ -41,8 +41,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     //CRUD Authorizations
     Route::resource('authorizations', AuthorizationController::class);
 
-    //CRUD Quotes
-    Route::resource('quotes', QuoteController::class);
+
 
     Route::post('ships/update/{ship}', [ShipController::class, 'update'])->name('ships.update');
     //CRUD Ships

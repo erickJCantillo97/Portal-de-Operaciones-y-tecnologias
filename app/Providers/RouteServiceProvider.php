@@ -50,6 +50,8 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('settings')
                 ->group(base_path('routes/Customs/Settings.php'));
             Route::middleware('web')
+                ->group(base_path('routes/Customs/Quotes.php'));
+            Route::middleware('web')
                 ->prefix('documentManagement')
                 ->group(base_path('routes/Customs/GestionDocumental.php'));
         });

@@ -14,17 +14,9 @@ return new class extends Migration
         Schema::create('quotes', function (Blueprint $table) {
             $table->id();
             $table->string('gerencia');
-            $table->bigInteger('customer_id')->nullable()->unsigned();
-            $table->bigInteger('estimador_id')->unsigned()->index();
             $table->integer('consecutive');
-            $table->integer('version');
-            $table->date('expeted_answer_date');
-            $table->date('estimador_anaswer_date')->nullable();
-            $table->string('offer_type')->nullable();
-            $table->text('route')->nullable();
-            $table->string('file')->nullable();
-            $table->string('estimador_name');
-            $table->text('observation')->nullable();
+            $table->integer('current_version_id')->nullable();
+            $table->integer('user_id');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Projects;
+namespace App\Http\Controllers\Quotes;
 
 use App\Http\Controllers\Controller;
-use App\Models\Projects\Quote;
-use App\Models\Projects\QuoteTypeShip;
 use App\Models\Projects\Ship;
+use App\Models\Quotes\Quote;
+use App\Models\Quotes\QuoteTypeShip;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
