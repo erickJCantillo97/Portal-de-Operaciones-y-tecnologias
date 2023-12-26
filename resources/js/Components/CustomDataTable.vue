@@ -10,7 +10,6 @@ import MultiSelect from 'primevue/multiselect';
 import Swal from 'sweetalert2';
 import ProgressBar from 'primevue/progressbar';
 import Tag from 'primevue/tag';
-import Calendar from 'primevue/calendar';
 
 const props = defineProps({
     data: {
@@ -136,7 +135,7 @@ const exportar = () => {
                 </div>
             </div>
         </template>
-        <!-- #region -->
+        <!-- #region ajustes de tabla -->
         <template #empty>
             <div class="flex justify-center">
                 No hay registros
@@ -194,7 +193,7 @@ const exportar = () => {
             <template #filter="{ filterModel }" v-if="col.filter">
                 <input v-if="col.type == 'date'" class="w-full rounded-md" type="date" v-model="filterModel.value"
                     dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
-                <InputText v-if="col.type == 'numeric'" v-model="filterModel.value" type="numeric" class="p-column-filter"
+                <InputText v-else v-if="col.type == 'numeric'" v-model="filterModel.value" type="numeric" class="p-column-filter"
                     placeholder="Numero a buscar" />
                 <InputText v-else v-model="filterModel.value" type="text" class="p-column-filter"
                     placeholder="Escriba algo para buscar" />
@@ -206,9 +205,9 @@ const exportar = () => {
 
         </Column>
 
-        <Column frozen alignFrozen="right" style="width: min-content" v-if="props.actions.length>0">
+        <Column frozen alignFrozen="right" style="width:8%" v-if="props.actions.length>0">
             <template #body="{ data }">
-                <div class="flex items-center justify-center w-min">
+                <div class="flex items-center justify-center w-full">
                     <Button v-for="button in props.actions" @click="$emit(button.event, $event, data)" :severity="button.severity"
                         :text="button.text" :outlined="button.outlined" :rounded="button.rounded" :icon="button.icon" :label="button.label"
                         :class="button.class" />
