@@ -1,9 +1,10 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref  } from 'vue';
-import Button from 'primevue/button';
-import CustomDataTable from '@/Components/CustomDataTable.vue';
-import { Link } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue'
+import { ref } from 'vue'
+import Button from 'primevue/button'
+import CustomDataTable from '@/Components/CustomDataTable.vue'
+import CustomSlideOver from '@/Components/CustomSlideOver.vue'
+import { Link } from '@inertiajs/vue3'
 
 const props = defineProps({
     quotes: Array,
@@ -11,10 +12,12 @@ const props = defineProps({
     ships: Array
 })
 
+const openSlideOver = ref(false)
+const openCustomSlideOver = () => openSlideOver.value = true
 
 //#region columnas de CustomDataTable
 const columnas = ref([
-    { field: 'id', header: 'Id', frozen:true, filter: true, sortable: true },
+    { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
     { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true },
     { field: 'costumer_id', header: 'Cliente' },
     { field: 'consecutive', header: 'Consecutivo' },
@@ -25,20 +28,20 @@ const columnas = ref([
     { field: 'file', header: 'Documento', filter: false },
     { field: 'observation', header: 'Observacion', filter: false },
     { field: 'created_at', header: 'Fecha creacion', filter: false },
-]);
+])
 //#endregion
 //#region Botones de CustomDatatable
 const buttons = ref([
     { event: 'showClic', severity: 'success', class: '', icon: 'fa-solid fa-eye', text: true, outlined: false, rounded: false },
     { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
-]);
+])
 //#endregion
 
-const showClic =(event, data)=>{
+const showClic = (event, data) => {
     console.log(data)
 }
 
-const deleteClic =(event, data)=>{
+const deleteClic = (event, data) => {
     console.log(event)
 }
 
@@ -46,17 +49,21 @@ const deleteClic =(event, data)=>{
 
 <template>
     <AppLayout>
-        <CustomDataTable :data="quotes" :columnas="columnas" :actions="buttons" @showClic="showClic" @deleteClic="deleteClic">
+        <CustomDataTable :data="quotes" :columnas="columnas" :actions="buttons" @showClic="showClic"
+            @deleteClic="deleteClic">
             <template #header>
                 <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
                     Estimaciones
                 </h1>
                 <Link :href="route('quotes.create')">
-                    <Button title="Agregar Estimación" severity="success" label="Agregar" outlined
-                    icon="fa-solid fa-plus" class="!h-8" />
+                <Button title="Agregar Estimación" severity="success" label="Agregar" outlined icon="fa-solid fa-plus"
+                    class="!h-8" />
                 </Link>
-
+                <Button title="Agregar Estimación" @click="openCustomSlideOver()" severity="success" label="Ver" outlined
+                    icon="fa-solid fa-plus" class="!h-8" />
             </template>
         </CustomDataTable>
+
+        <CustomSlideOver :openSlideOver="openSlideOver" @closeSlideOver="openSlideOver = false" />
     </AppLayout>
 </template>
