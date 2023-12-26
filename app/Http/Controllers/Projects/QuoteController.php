@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
 use App\Models\Projects\Quote;
+use App\Models\Projects\QuoteTypeShip;
 use App\Models\Projects\Ship;
 use Exception;
 use Illuminate\Http\Request;
@@ -17,10 +18,8 @@ class QuoteController extends Controller
      */
     public function index()
     {
-        $quotes = Quote::with('ship')->orderBy('id')->get();
-        $ships = Ship::orderBy('name')->get();
-
-        return Inertia::render('Project/Quotes', compact('quotes', 'ships'));
+        $quotes = Quote::orderBy('id')->get();
+        return Inertia::render('Project/Quotes', compact('quotes'));
         // return response()->json([
         //     $quote
         // ], 200);
@@ -41,29 +40,31 @@ class QuoteController extends Controller
     {
         // dd($request);
         $validateData = $request->validate([
-            'ship_id' => 'nullable',
-            'code' => 'required|unique:quotes,code',
-            'cost' => 'required|numeric|gt:0',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
+            'customer_id' => 'nullable|exists:id',
+            'estimador_id' => 'required|numeric',
+            'expeted_answer_date' => 'required|date',
+            'offer_type' => 'nullable',
+            // 'type_ships' => 'nullable|array',
+            'observation' => 'nullable|string',
         ]);
-
+        $empleado = collect(searchEmpleados('Num_SAP', 3156))->first();
         try {
             $validateData['gerencia'] = auth()->user()->gerencia;
-            $validateData['name'] = $validateData['code'];
+            $validateData['estimador_name'] = $empleado['Usuario'];
+            $validateData['version'] = 1;
+            $validateData['consecutive'] = Quote::max('consecutive') + 1;
 
-            if ($request->pdf != null) {
-                $validateData['file'] = Storage::putFileAs(
-                    'public/Quote/',
-                    $request->pdf,
-                    $validateData['code'].'.'.$request->pdf->getClientOriginalExtension()
-                );
+            $quote = Quote::create($validateData);
+            foreach ($request->type_ships as $typeShip) {
+                QuoteTypeShip::create([
+                    'quote_id' => $quote->id,
+                    'name' => $typeShip,
+                ]);
             }
-            Quote::create($validateData);
 
-            return back()->with(['message' => 'Cotizacion creada correctamente'], 200);
+            return back()->with(['message' => 'Oferta creada correctamente'], 200);
         } catch (Exception $e) {
-            return back()->withErrors(['message' => 'Ocurrió un error al crear la Cotizacion: '.$e->getMessage()], 500);
+            return back()->withErrors(['message' => 'Ocurrió un error al crear la Cotizacion: ' . $e->getMessage()], 500);
         }
 
         return redirect('ships.index');
@@ -102,12 +103,12 @@ class QuoteController extends Controller
                 $validateData['file'] = Storage::putFileAs(
                     'public/Quote/',
                     $request->pdf,
-                    $validateData['code'].'.'.$request->pdf->getClientOriginalExtension()
+                    $validateData['code'] . '.' . $request->pdf->getClientOriginalExtension()
                 );
             }
             $quote->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -119,7 +120,7 @@ class QuoteController extends Controller
         try {
             $quote->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }

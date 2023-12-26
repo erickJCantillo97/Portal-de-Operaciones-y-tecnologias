@@ -14,9 +14,16 @@ class TypeShipController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $typeShips = TypeShip::get();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'typeShips' => $typeShips
+            ]);
+        }
+        
         return Inertia::render('TypeShips', [
             'typeShips' => $typeShips,
         ]);
