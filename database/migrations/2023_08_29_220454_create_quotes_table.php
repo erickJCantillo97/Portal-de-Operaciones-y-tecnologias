@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('quotes', function (Blueprint $table) {
             $table->id();
             $table->string('gerencia');
+            $table->string('name');
             $table->integer('consecutive');
-            $table->integer('current_version_id')->nullable();
+            $table->integer('current_version_id')->default(1);
             $table->integer('user_id');
             $table->timestamps();
             $table->softDeletes();

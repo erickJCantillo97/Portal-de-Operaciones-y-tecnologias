@@ -62,7 +62,19 @@ class QuoteTypeShipController extends Controller
     public function update(Request $request, QuoteTypeShip $quoteTypeShip)
     {
         $validateData = $request->validate([
-            //
+            // 'name' => $typeShip->name,
+            // 'scope' => $request->scope,
+            // 'project_type' => $request->project_type,
+            // 'maturity' => $request->maturity,
+            // 'units' => $request->units,
+            // 'coin' => $request->coin,
+            // 'rate_buy_usd' => $request->rate_buy_usd,
+            // 'rate_buy_eur' => $request->rate_buy_eur,
+            // 'price_before_iva_original' => $request->price_before_iva_original,
+            // 'iva' => $request->iva,
+            // 'margin' => $request->margin,
+            // 'white_paper' => $request->white_paper,
+            // 'white_paper_number' => $request->white_paper_number,
         ]);
 
         try {

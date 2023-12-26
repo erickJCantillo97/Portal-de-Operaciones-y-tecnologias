@@ -8,7 +8,7 @@ use App\Models\Projects\Contract;
 use App\Models\Projects\Project;
 use App\Models\Projects\ProjectsShip;
 use App\Models\Projects\Ship;
-use App\Models\Quote\Quote;
+use App\Models\Quotes\Quote;
 use App\Models\VirtualTask;
 use Exception;
 use Illuminate\Http\Request;
@@ -149,7 +149,7 @@ class ProjectController extends Controller
             'gerencia' => 'nullable',
             'start_date' => 'nullable',
             'end_date' => 'nullable',
-            'hoursPerDay' => 'nufllable',
+            'hoursPerDay' => 'nullable',
             'daysPerWeek' => 'nullable',
             'daysPerMonth' => 'nullable',
             'shift' => 'nullable',
