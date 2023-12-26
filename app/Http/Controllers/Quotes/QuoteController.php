@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Projects;
+namespace App\Http\Controllers\Quotes;
 
 use App\Http\Controllers\Controller;
-use App\Models\Projects\Quote;
-use App\Models\Projects\QuoteTypeShip;
+use App\Models\Projects\Customer;
 use App\Models\Projects\Ship;
+use App\Models\Projects\TypeShip;
+use App\Models\Quotes\Quote;
+use App\Models\Quotes\QuoteTypeShip;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -19,7 +21,7 @@ class QuoteController extends Controller
     public function index()
     {
         $quotes = Quote::orderBy('id')->get();
-        return Inertia::render('Project/Quotes', compact('quotes'));
+        return Inertia::render('Quotes/Index', compact('quotes'));
         // return response()->json([
         //     $quote
         // ], 200);
@@ -28,9 +30,17 @@ class QuoteController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $typeships = TypeShip::orderBy('name')->get();
+        $customers = Customer::orderBy('name')->get();
+        $estimadores = collect(getPersonalGerenciaOficina('GECON', 'DEEST'))->map(function ($estimador) {
+            return [
+                'user_id' => $estimador['Num_SAP'],
+                'name' => $estimador['Nombres_Apellidos']
+            ];
+        });
+        return Inertia::render('Quotes/Form', compact('typeships', 'customers', 'estimadores'));
     }
 
     /**

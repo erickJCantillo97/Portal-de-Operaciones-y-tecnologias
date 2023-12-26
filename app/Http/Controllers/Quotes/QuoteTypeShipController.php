@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Projects\QuoteTypeShip;
+use App\Models\Quotes\QuoteTypeShip;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -33,10 +33,10 @@ class QuoteTypeShipController extends Controller
             //
         ]);
 
-        try{
+        try {
             QuoteTypeShip::create($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
     }
 
@@ -65,10 +65,10 @@ class QuoteTypeShipController extends Controller
             //
         ]);
 
-        try{
+        try {
             $quoteTypeShip->update($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -77,10 +77,10 @@ class QuoteTypeShipController extends Controller
      */
     public function destroy(QuoteTypeShip $quoteTypeShip)
     {
-        try{
+        try {
             $quoteTypeShip->delete();
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }
