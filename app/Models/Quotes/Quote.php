@@ -14,4 +14,10 @@ class Quote extends Model implements Auditable
     use SoftDeletes;
 
     protected $guarded = [];
+
+
+    public function version()
+    {
+        return $this->belongsTo(QuoteVersion::class, 'current_version_id');
+    }
 }

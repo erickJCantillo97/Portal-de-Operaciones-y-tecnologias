@@ -27,9 +27,7 @@ return new class extends Migration
             $table->string('iva')->nullable();
             $table->double('margin')->nullable();
             $table->string('white_paper')->default('PENDIENTE');
-            $table->string('no_white_paper')->nullable();
-            $table->double('price_before_iva_cop')->nullable();
-            $table->double('real_cost')->nullable();
+            $table->string('white_paper_number')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
