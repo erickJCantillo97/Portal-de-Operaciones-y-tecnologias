@@ -14,13 +14,14 @@ import Calendar from 'primevue/calendar';
 import Listbox from 'primevue/listbox';
 // import MultiSelect from 'primevue/multiselect';
 import CustomModal from '@/Components/CustomModal.vue';
+import Loading from '@/Components/Loading.vue';
 const { toast } = useSweetalert()
 const { confirmDelete } = useSweetalert()
 
 const props = defineProps({
-    personal: Array,
     miPersonal: Array,
 })
+const personal = ref([])
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
@@ -34,12 +35,18 @@ var form = useForm({
 const submit = () => {
     router.post(route('personal.store'), form, {
         onSuccess: () => {
+            form.users = []
             modalVisible.value = false
             toast('personal añadido exitosamente', 'success')
         }
     });
 }
 
+const getPersonal = () => {
+    axios.get(route('personal.activos')).then((res) => {
+        personal.value = res.data.personal
+    })
+}
 
 const formatCurrency = (value) => {
     return parseFloat(value).toLocaleString('es-CO', {
@@ -52,6 +59,8 @@ const formatCurrency = (value) => {
 const modalVisible = ref(false)
 const showNew = () => {
     modalVisible.value = true
+    if (personal.value.length == 0)
+        getPersonal()
 }
 
 function formatDate(date) {
@@ -170,9 +179,13 @@ const quitar = (persona) => {
                             <label for="">Seleccionar Personal</label>
                             <Listbox multiple v-model="form.users" listStyle="height:230px"
                                 :filterFields="['Nombres_Apellidos', 'Cargo', 'Identificacion', 'Oficina']" :filter="true"
-                                :options="props.personal" filter optionLabel="name" class="w-full md:w-14rem">
+                                :options="personal" filter optionLabel="name" class="w-full md:w-14rem"
+                                :loading="personal.length == 0">
                                 <template #option="slotProps">
                                     <UserTable :user="slotProps.option"></UserTable>
+                                </template>
+                                <template #empty>
+                                    <Loading message="Cargando Personal" />
                                 </template>
                             </Listbox>
                         </div>

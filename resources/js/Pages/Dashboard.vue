@@ -49,17 +49,7 @@ const filters = ref({
 const chartOptions = ref();
 onMounted(() => {
     initFilters();
-    axios.get(route('get.empleados.gerencia')).then((res) => {
-        for (var gerencia of Object.values(res.data)) {
-            personal.value.push({
-                title: hasRole('Super Admin') ? gerencia[0].Gerencia : gerencia[0].Oficina,
-                initials: gerencia.length,
-                totalMembers: gerencia.length,
-                bgColorClass: gerencia[0].Gerencia != 'GECON' ? colors[gerencia[0].Gerencia] : 'bg-' + gerencia[0].Gerencia,
-            },)
-            totalMembers.value += gerencia.length
-        }
-    })
+
     // getTask();
 }
 );

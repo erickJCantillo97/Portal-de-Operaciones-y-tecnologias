@@ -60,7 +60,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         if (auth()->user()->hasRole('Super Admin')) {
             return getEmpleadosAPI()->groupBy('GERENCIA');
         }
-
         return searchEmpleados('Gerencia', auth()->user()->gerencia)->groupBy('Oficina');
     })->name('get.empleados.gerencia');
 
