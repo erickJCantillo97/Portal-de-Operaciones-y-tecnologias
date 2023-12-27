@@ -34,46 +34,7 @@ const statusOptions = ref([
   'Contratada'
 ])
 
-//#region fakeData
-const listOfVersions = [
-  {
-    id: '1'
-  },
-  {
-    id: '2'
-  },
-  {
-    id: '3'
-  },
-  {
-    id: '4'
-  },
-  {
-    id: '5'
-  },
-  {
-    id: '6'
-  },
-  {
-    id: '7'
-  },
-  {
-    id: '8'
-  },
-  {
-    id: '9'
-  },
-  {
-    id: '10'
-  },
-  {
-    id: '11'
-  },
-  {
-    id: '12'
-  },
-]
-//#endregion
+
 
 const props = defineProps(
   {
@@ -92,7 +53,7 @@ const openStatusModal = () => {
   openStatusDialog.value = true
 }
 
-const closeStatusDialog  = () => {
+const closeStatusDialog = () => {
   openStatusDialog.value = false
 }
 
@@ -167,7 +128,7 @@ const formatCurrency = (value) => {
                 <div class="h-full overflow-y-auto bg-white p-2">
                   <div class="rounded-lg bg-blue-900 text-white uppercase p-2 mb-2">
                     <h2 class="text-md text-center font-bold text-white">{{ quote.name }} {{ quote.consecutive
-                    }}-{{ quote.version }}-2023
+                    }}-{{ quote.version }}
                     </h2>
                   </div>
                   <header class="w-full">
@@ -379,17 +340,16 @@ const formatCurrency = (value) => {
         </div>
         <div>
           <label for="dd-city">Seleccione Fecha</label>
-          <Calendar v-model="dateSelected" showIcon :manualInput="true"
-          placeholder="Fecha Inicio de Reunión" />
+          <Calendar v-model="dateSelected" showIcon :manualInput="true" placeholder="Fecha Inicio de Reunión" />
         </div>
       </div>
       <div class="overflow-y-auto custom-scroll p-4">
-        <Feed />
+        <Feed :quoteId="quote.version_id" />
       </div>
     </template>
-    <template #footer >
-      <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised  />
-      <Button @click="closeStatusDialog()" label="Cerrar" icon="pi pi-save" severity="danger" raised  />
+    <template #footer>
+      <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised />
+      <Button @click="closeStatusDialog()" label="Cerrar" icon="pi pi-save" severity="danger" raised />
     </template>
   </CustomModal>
 
@@ -403,18 +363,18 @@ const formatCurrency = (value) => {
       <span class="text-xl font-bold text-white white-space-nowrap">Cambiar Estado</span>
     </template>
     <template #body>
-      <div >
-          <div class="">
-            <FeedWithComments />
-          </div>
+      <div>
+        <div class="">
+          <FeedWithComments />
+        </div>
         <!-- <div class="h-20">
           <CommentForm class="fixed bottom-8 left-0 right-0 p-6" />
         </div> -->
       </div>
     </template>
-    <template #footer >
-      <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised  />
-      <Button @click="closeCommentsModal()" label="Cerrar" icon="pi pi-save" severity="danger" raised  />
+    <template #footer>
+      <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised />
+      <Button @click="closeCommentsModal()" label="Cerrar" icon="pi pi-save" severity="danger" raised />
     </template>
   </CustomModal>
 </template>
