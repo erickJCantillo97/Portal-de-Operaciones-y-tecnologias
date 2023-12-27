@@ -7,6 +7,10 @@ use App\Models\Gantt\Task;
 use App\Models\Process;
 use App\Models\Projects\Customer;
 use App\Models\Projects\Project;
+use App\Models\Quotes\Quote;
+use App\Models\Quotes\QuoteStatus;
+use App\Models\Quotes\QuoteTypeShip;
+use App\Models\Quotes\QuoteVersion;
 use App\Models\SWBS\SubSystem;
 use App\Models\SWBS\System;
 use App\Models\VirtualTask;
@@ -157,14 +161,18 @@ Route::get('/timeline', function () {
 
 
 Route::get('anterior', function () {
-    $clientes =  DB::connection('sqlsrv_GECON')->table('clientes')->get();
-    foreach ($clientes as $cliente) {
-        Customer::create([
-            'nit' => $cliente->id,
-            'name' => $cliente->nombre_cliente,
-            'type' => $cliente->tipo_cliente,
-            'country' => $cliente->pais,
-        ]);
-    }
-    return Customer::get();
+    QuoteStatus::truncate();
+    QuoteVersion::truncate();
+    QuoteTypeShip::truncate();
+    Quote::truncate();
+    // $clientes =  DB::connection('sqlsrv_GECON')->table('clientes')->get();
+    // foreach ($clientes as $cliente) {
+    //     Customer::create([
+    //         'nit' => $cliente->id,
+    //         'name' => $cliente->nombre_cliente,
+    //         'type' => $cliente->tipo_cliente,
+    //         'country' => $cliente->pais,
+    //     ]);
+    // }
+    // return Customer::get();
 });

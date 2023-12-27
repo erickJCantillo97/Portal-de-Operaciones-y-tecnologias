@@ -18,16 +18,18 @@ const quote = ref({})
 //#region columnas de CustomDataTable
 const columnas = ref([
     // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
-    { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true },
-    { field: 'customer', header: 'Cliente' },
     { field: 'consecutive', header: 'Consecutivo' },
-    { field: 'version', header: 'Version', filter: false },
+    { field: 'name', header: 'Nombre' },
+    { field: 'clases', header: 'Clases' },
+    { field: 'customer', header: 'Cliente' },
+    { field: 'status', header: 'Estado', filter: false },
     { field: 'expeted_answer_date', header: 'Fecha maxima respuesta', type: 'date', filter: true, },
     { field: 'estimador_anaswer_date', header: 'Fecha respuesta', type: 'date', filter: true },
     { field: 'route', header: 'Ruta', filter: false },
     { field: 'file', header: 'Documento', filter: false },
     { field: 'observation', header: 'Observacion', filter: false },
     { field: 'created_at', header: 'Fecha creacion', filter: false },
+    { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true },
 ])
 //#endregion
 

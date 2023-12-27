@@ -26,4 +26,6 @@ class Quote extends Model implements Auditable
     {
         return $this->belongsTo(QuoteVersion::class, 'current_version_id');
     }
+
+    
 }
