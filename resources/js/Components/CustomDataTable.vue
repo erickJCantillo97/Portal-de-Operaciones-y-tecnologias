@@ -10,6 +10,7 @@ import MultiSelect from 'primevue/multiselect';
 import Swal from 'sweetalert2';
 import ProgressBar from 'primevue/progressbar';
 import Tag from 'primevue/tag';
+import InputNumber from 'primevue/inputnumber';
 
 const props = defineProps({
     data: {
@@ -193,7 +194,7 @@ const exportar = () => {
             <template #filter="{ filterModel }" v-if="col.filter">
                 <input v-if="col.type == 'date'" class="w-full rounded-md" type="date" v-model="filterModel.value"
                     dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
-                <InputText v-else v-if="col.type == 'numeric'" v-model="filterModel.value" type="numeric" class="p-column-filter"
+                <InputNumber v-else v-if="col.type == 'number'" v-model="filterModel.value" class="p-column-filter"
                     placeholder="Numero a buscar" />
                 <InputText v-else v-model="filterModel.value" type="text" class="p-column-filter"
                     placeholder="Escriba algo para buscar" />
