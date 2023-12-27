@@ -13,10 +13,7 @@ class QuoteVersion extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected static function booted(): void
-    {
-        static::addGlobalScope(new GerenciaScope);
-    }
+
 
 
     protected $guarded = [];
@@ -26,7 +23,8 @@ class QuoteVersion extends Model
         return $this->belongsTo(Quote::class, 'quote_id');
     }
 
-    public function customer(){
+    public function customer()
+    {
         return $this->belongsTo(Customer::class);
     }
 

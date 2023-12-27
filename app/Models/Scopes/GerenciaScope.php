@@ -13,7 +13,6 @@ class GerenciaScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        if (auth()->user()->hasRole('ADMIN'))
-            $builder->where('gerencia', '<>', auth()->user()->gerencia);
+        $builder->where('gerencia', auth()->user()->gerencia);
     }
 }

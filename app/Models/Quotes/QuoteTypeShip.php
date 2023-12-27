@@ -13,9 +13,4 @@ class QuoteTypeShip extends Model
     use SoftDeletes;
 
     protected $guarded = [];
-
-    protected static function booted(): void
-    {
-        static::addGlobalScope(new GerenciaScope);
-    }
 }
