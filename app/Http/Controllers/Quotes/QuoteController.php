@@ -81,18 +81,21 @@ class QuoteController extends Controller
                 'expeted_answer_date' => $validateData['expeted_answer_date'],
                 'offer_type' => $validateData['offer_type'],
             ]); // Creamos una nueva version 1, con el consecutivo de la variable que se utilizó antes
-            $quotesTypeShips = [];
+
             foreach (TypeShip::whereIn('id', $request->type_ships) as $typeShip) {
-                $quoteTypeShip = QuoteTypeShip::create([
+                QuoteTypeShip::create([
                     'quote_version_id' => $quoteVersion->id,
                     'type_ship_id' => $typeShip->id,
                     'name' => $typeShip->name,
                 ]);
-                array_push($quotesTypeShips, $quoteTypeShip); //se Añaden las relaciones creadas a un array para devolverlos al front una vez sean creados
             }
-            return back()->with(['message' => 'Oferta creada correctamente'], 200);
+            $quote = QuoteVersion::with('quote', 'quoteTypeShips')->where('id', $quoteVersion)->first();
+            return response()->json([
+                'status' => true,
+                'quote' => $quote
+            ]);
         } catch (Exception $e) {
-            return back()->withErrors(['message' => 'Ocurrió un error al crear la Cotizacion: '.$e->getMessage()], 500);
+            return back()->withErrors(['message' => 'Ocurrió un error al crear la Cotizacion: ' . $e->getMessage()], 500);
         }
 
         return redirect('ships.index');
@@ -131,12 +134,12 @@ class QuoteController extends Controller
                 $validateData['file'] = Storage::putFileAs(
                     'public/Quote/',
                     $request->pdf,
-                    $validateData['code'].'.'.$request->pdf->getClientOriginalExtension()
+                    $validateData['code'] . '.' . $request->pdf->getClientOriginalExtension()
                 );
             }
             $quote->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -148,7 +151,7 @@ class QuoteController extends Controller
         try {
             $quote->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }

@@ -66,7 +66,6 @@ const formatCurrency = (value) => {
 //         tasks.value = res.data;
 //     });
 // };
-
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },

@@ -5,6 +5,7 @@ use App\Http\Controllers\Suggestion\SuggestionController;
 use App\Ldap\User;
 use App\Models\Gantt\Task;
 use App\Models\Process;
+use App\Models\Projects\Customer;
 use App\Models\Projects\Project;
 use App\Models\SWBS\SubSystem;
 use App\Models\SWBS\System;
@@ -151,3 +152,17 @@ Route::get('/timeline', function () {
         'projects' => $taskProject,
     ]);
 })->name('timeline');
+
+
+Route::get('anterior', function () {
+    $clientes =  DB::connection('sqlsrv_GECON')->table('clientes')->get();
+    foreach ($clientes as $cliente) {
+        Customer::create([
+            'nit' => $cliente->id,
+            'name' => $cliente->nombre_cliente,
+            'type' => $cliente->tipo_cliente,
+            'country' => $cliente->pais,
+        ]);
+    }
+    return Customer::get();
+});

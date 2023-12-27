@@ -76,11 +76,11 @@ class CustomerController extends Controller
     public function update(Request $request, Customer $customer)
     {
         $validateData = $request->validate([
-            'NIT' => 'required',
+            'NIT' => 'nullable',
             'name' => 'required',
             'country' => 'nullable',
             'type' => 'required',
-            'email' => 'required|email',
+            'email' => 'nullable|email',
         ]);
 
         try {

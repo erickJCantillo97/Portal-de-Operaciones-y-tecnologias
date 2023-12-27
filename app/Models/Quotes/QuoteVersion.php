@@ -12,4 +12,13 @@ class QuoteVersion extends Model
     use SoftDeletes;
 
     protected $guarded = [];
+
+    public function quote()
+    {
+        return $this->belongsTo(Quote::class, 'quote_id');
+    }
+    public function quoteTypeShips()
+    {
+        return $this->hasMany(QuoteTypeShip::class, 'quote_version_id');
+    }
 }

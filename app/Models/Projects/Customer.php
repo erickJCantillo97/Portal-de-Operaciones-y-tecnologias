@@ -2,6 +2,9 @@
 
 namespace App\Models\Projects;
 
+use App\Models\Quote\QuotAuthorization;
+use App\Models\Quotes\Quote;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -43,6 +46,14 @@ class Customer extends Model implements Auditable
     public function quote_authorization()
     {
         return $this->hasMany(QuotAuthorization::class);
+    }
+
+    public function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => strtoupper($value),
+            set: fn ($value) => strtolower($value)
+        );
     }
 
     // public function getKeyName()

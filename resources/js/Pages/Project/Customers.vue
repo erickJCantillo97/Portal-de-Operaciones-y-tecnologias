@@ -270,7 +270,7 @@ const showShips = (selectCustomer) => {
                                                     Cliente</label>
                                                 <Dropdown id="hull_material" v-model="formData.customer.type"
                                                     :options="['GOBIERNO', 'ARMADOR CIVIL', 'FUERZAS ARMADAS']"
-                                                    placeholder="Selecciona un material"
+                                                    placeholder="Selecciona un Tipo de Cliente"
                                                     class="w-full -mt-1 rounded-md md:w-14rem" :pt="{
                                                         root: {
                                                             class: 'h-10 !ring-gray-300 !ring-inset ring-1 !border-0 !shadow-sm '
