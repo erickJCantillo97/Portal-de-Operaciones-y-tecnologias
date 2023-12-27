@@ -26,9 +26,12 @@ class QuoteController extends Controller
                 'name' => $quote['name'],
                 'gerencia' => $quote['gerencia'],
                 'version' => $quote['version']['version'],
+                'estimador' => $quote['version']['estimador_name'],
                 'customer' => $quote['version']['customer']['name'],
+                'created_at' => $quote['version']['created_at'],
                 'expeted_answer_date' => $quote['version']['expeted_answer_date'],
                 'consecutive' => $quote['consecutive'],
+                'products' => $quote['version']['quoteTypeShips']
             ];
         });
 
@@ -117,7 +120,6 @@ class QuoteController extends Controller
      */
     public function show(Quote $quote)
     {
-        //
     }
 
     /**

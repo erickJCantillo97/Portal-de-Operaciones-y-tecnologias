@@ -13,7 +13,8 @@ const props = defineProps({
 })
 
 const openSlideOver = ref(false)
-const openCustomSlideOver = () => openSlideOver.value = true
+const quote = ref({})
+
 
 //#region columnas de CustomDataTable
 const columnas = ref([
@@ -38,7 +39,8 @@ const buttons = ref([
 //#endregion
 
 const showClic = (event, data) => {
-    console.log(data)
+    quote.value = data;
+    openSlideOver.value = true
 }
 
 const deleteClic = (event, data) => {
@@ -59,11 +61,9 @@ const deleteClic = (event, data) => {
                 <Button title="Agregar Estimación" severity="success" label="Agregar" outlined icon="fa-solid fa-plus"
                     class="!h-8" />
                 </Link>
-                <Button title="Agregar Estimación" @click="openCustomSlideOver()" severity="success" label="Ver" outlined
-                    icon="fa-solid fa-plus" class="!h-8" />
             </template>
         </CustomDataTable>
 
-        <CustomSlideOver :openSlideOver="openSlideOver" @closeSlideOver="openSlideOver = false" />
+        <CustomSlideOver :quote="quote" :openSlideOver="openSlideOver" @closeSlideOver="openSlideOver = false" />
     </AppLayout>
 </template>

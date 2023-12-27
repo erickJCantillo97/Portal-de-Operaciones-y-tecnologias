@@ -77,9 +77,9 @@ const props = defineProps(
       type: Boolean,
       default: false
     },
-    qoute: {
+    quote: {
       type: Object,
-      required: true
+      required: false
     }
   }
 )
@@ -143,13 +143,15 @@ const formatCurrency = (value) => {
                 </TransitionChild>
                 <div class="h-full overflow-y-auto bg-white p-2">
                   <div class="rounded-lg bg-blue-900 text-white uppercase p-2 mb-2">
-                    <h2 class="text-md text-center font-bold text-white">Embarcadero Tipo C 698-2-2023</h2>
+                    <h2 class="text-md text-center font-bold text-white">{{ quote.name }} {{ quote.consecutive
+                    }}-{{ quote.version }}-2023
+                    </h2>
                   </div>
                   <header class="w-full">
-                    <div class="flex flex-nowrap text-center justify-center items-center">
+                    <div class="flex flex-nowrap text-center justify-center items-center" v-if="quote.version > 1">
                       <ul class="hover:border-b text-md text-center font-semibold text-blue-900 w-10 cursor-pointer"
-                        v-for="version in listOfVersions" :key="version.id">
-                        <li>{{ version.id }}</li>
+                        v-for="version in quote.version">
+                        <li>{{ version }}</li>
                       </ul>
                     </div>
                     <div class="flex flex-nowrap space-x-2 p-2 justify-center rounded-lg">
@@ -168,19 +170,19 @@ const formatCurrency = (value) => {
                       <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Estimador:</dt>
-                          <dd class="text-gray-900">Giovany Enrique Buelvas Jaspe</dd>
+                          <dd class="text-gray-900 uppercase">{{ quote.estimador }}</dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Cliente:</dt>
-                          <dd class="text-gray-900">Cotecmar</dd>
+                          <dd class="text-gray-900">{{ quote.customer }}</dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Fecha de Solicitud:</dt>
-                          <dd class="text-gray-900">{{ Moment().format('DD/MM/YY') }}</dd>
+                          <dd class="text-gray-900">{{ Moment(quote.created_at).format('DD/MM/YY') }}</dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Fecha Respuesta Esperada:</dt>
-                          <dd class="text-gray-900">{{ Moment().add(4, 'days').format('DD/MM/YY') }}</dd>
+                          <dd class="text-gray-900">{{ Moment(quote.expeted_answer_date).format('DD/MM/YY') }}</dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Estado:</dt>
@@ -192,38 +194,18 @@ const formatCurrency = (value) => {
                     </div>
                   </header>
                   <Accordion :activeIndex="0">
-                    <AccordionTab header="Producto 1" :pt="{
+                    <AccordionTab :header="product.name" :pt="{
                       root: '!border-0 !ring-0',
                       headerAction: '!bg-slate-200',
                       headerTitle: '!font-semibold',
-                    }">
+                    }" v-for="product in quote.products">
                       <div class="space-y-6 pb-16">
-                        <!-- <div>
-                          <div class="aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg">
-                            <img
-                              src="https://images.unsplash.com/photo-1582053433976-25c00369fc93?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=512&q=80"
-                              alt="" class="object-cover" />
-                          </div>
-                          <div class="mt-4 flex items-start justify-between">
-                            <div>
-                              <h2 class="text-base font-semibold leading-6 text-gray-900"><span class="sr-only">Details for
-                                </span>IMG_4985.HEIC</h2>
-                              <p class="text-sm font-medium text-gray-500">3.9 MB</p>
-                            </div>
-                            <button type="button"
-                              class="relative ml-4 flex h-8 w-8 items-center justify-center rounded-full bg-white text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                              <span class="absolute -inset-1.5" />
-                              <HeartIcon class="h-6 w-6" aria-hidden="true" />
-                              <span class="sr-only">Favorite</span>
-                            </button>
-                          </div>
-                        </div> -->
                         <div>
                           <h3 class="font-medium text-gray-900">Información del producto</h3>
                           <dl class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
                             <div class="flex justify-between py-3 text-sm font-medium">
                               <dt class="text-gray-500">Clase:</dt>
-                              <dd class="text-gray-900">Embarcadero BN6</dd>
+                              <dd class="text-gray-900">{{ product.name }}</dd>
                             </div>
                             <div class="flex justify-between py-3 text-sm font-medium">
                               <dt class="text-gray-500">Tipo de proyecto:</dt>
@@ -370,14 +352,14 @@ const formatCurrency = (value) => {
         <div>
           <label for="dd-city">Estado de la Estimación</label>
           <Dropdown v-model="statusSelected" :options="statusOptions" showClear
-          placeholder="Seleccione Estado de la estimación" class="w-full md:w-14rem" />
+            placeholder="Seleccione Estado de la estimación" class="w-full md:w-14rem" />
         </div>
         <div>
           <label for="dd-city">Seleccione Fecha</label>
           <Calendar v-model="dateSelected" showIcon />
         </div>
         <div>
-          <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised  />
+          <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised />
         </div>
       </div>
       <div>
