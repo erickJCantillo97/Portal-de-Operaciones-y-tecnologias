@@ -159,8 +159,8 @@ class ProjectController extends Controller
         try {
             $project->update($validateData);
         } catch (Exception $e) {
-            dd($e);
-            // return back()->withErrors(['message', 'Ocurrió un Error Al Actualizar El Proyecto: ' . $e->getMessage()], 500);
+            // dd($e);
+            return back()->withErrors(['message', 'Ocurrió un Error Al Actualizar El Proyecto: ' . $e->getMessage()], 500);
         }
     }
 
