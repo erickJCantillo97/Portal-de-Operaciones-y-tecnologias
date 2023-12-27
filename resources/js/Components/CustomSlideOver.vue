@@ -2,12 +2,15 @@
 import { ref, onMounted } from 'vue'
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { HeartIcon, XMarkIcon } from '@heroicons/vue/24/outline'
-import { PencilIcon, PlusIcon } from '@heroicons/vue/20/solid'
+import { PencilIcon, PlusIcon, CheckIcon, HandThumbUpIcon, UserIcon } from '@heroicons/vue/20/solid'
 import Moment from 'moment'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
 import Tag from 'primevue/tag'
 import CustomModal from '@/Components/CustomModal.vue'
+import Feed from '@/Components/Feed.vue'
+import FeedWithComments from '@/Components/FeedWithComments.vue'
+import CommentForm from '@/Components/CommentForm.vue'
 import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 import Button from 'primevue/button'
@@ -19,6 +22,7 @@ onMounted(() => {
 const checked = ref(false)
 const dateSelected = ref()
 const openStatusDialog = ref(false)
+const openCommentsDialog = ref(false)
 const showDateResponse = ref(true)
 const statusSelected = ref()
 const statusOptions = ref([
@@ -84,18 +88,37 @@ const props = defineProps(
   }
 )
 
-const openDialog = () => {
+const openStatusModal = () => {
   openStatusDialog.value = true
 }
 
-const saveStatus = () => {
-  console.log('Hello!')
+const closeStatusDialog  = () => {
+  openStatusDialog.value = false
+}
+
+const openCommentsModal = () => {
+  openCommentsDialog.value = true
+}
+
+const closeCommentsModal = () => {
+  openCommentsDialog.value = false
 }
 
 //#region API's
 const getVersions = () => {
   try {
     axios.get(route('get.quotes.versions')
+      .then(res => {
+        console.log('Hello ' + res.data)
+      }))
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const saveStatus = () => {
+  try {
+    axios.post(route('post.quotes.status')
       .then(res => {
         console.log('Hello ' + res.data)
       }))
@@ -153,12 +176,12 @@ const formatCurrency = (value) => {
                       </ul>
                     </div>
                     <div class="flex flex-nowrap space-x-2 p-2 justify-center rounded-lg">
-                      <button type="button" @click="openDialog()"
+                      <button type="button" @click="openStatusModal()"
                         class="flex flex-nowrap justify-center items-center space-x-2 bg-emerald-600 p-2 cursor-pointer rounded-lg hover:bg-emerald-500">
                         <i class="fa-regular fa-rectangle-list fa-xl" style="color: #ffffff;"></i>
                         <p class="text-md text-center font-bold text-white">Estados</p>
                       </button>
-                      <button type="button"
+                      <button type="button" @click="openCommentsModal()"
                         class="flex flex-nowrap justify-center items-center space-x-2 bg-orange-600 p-2 cursor-pointer rounded-lg hover:bg-orange-500">
                         <i class="fa-regular fa-comment-dots fa-xl" style="color: #ffffff;"></i>
                         <p class="text-md text-center font-bold text-white">Comentarios</p>
@@ -356,7 +379,7 @@ const formatCurrency = (value) => {
     </Dialog>
   </TransitionRoot>
 
-  <CustomModal :visible="openStatusDialog" :maximizable="true">
+  <CustomModal :visible="openStatusDialog" :closable="true" :maximizable="true" width="40rem">
     <template #icon>
       <span class="text-white material-symbols-outlined text-4xl">
         engineering
@@ -366,7 +389,7 @@ const formatCurrency = (value) => {
       <span class="text-xl font-bold text-white white-space-nowrap">Cambiar Estado</span>
     </template>
     <template #body>
-      <div class="flex flex-nowrap space-x-2">
+      <div class="flex flex-nowrap p-4 space-x-2 justify-center items-center ">
         <div>
           <label for="dd-city">Estado de la Estimación</label>
           <Dropdown v-model="statusSelected" :options="statusOptions" showClear
@@ -374,17 +397,42 @@ const formatCurrency = (value) => {
         </div>
         <div>
           <label for="dd-city">Seleccione Fecha</label>
-          <Calendar v-model="dateSelected" showIcon />
-        </div>
-        <div>
-          <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised  />
+          <Calendar v-model="dateSelected" showIcon :manualInput="true"
+          placeholder="Fecha Inicio de Reunión" />
         </div>
       </div>
-      <div>
-        <ul>
-          <li>asdasdasdas</li>
-        </ul>
+      <div class="overflow-y-auto custom-scroll p-4">
+        <Feed />
       </div>
+    </template>
+    <template #footer >
+      <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised  />
+      <Button @click="closeStatusDialog()" label="Cerrar" icon="pi pi-save" severity="danger" raised  />
+    </template>
+  </CustomModal>
+
+  <CustomModal :visible="openCommentsDialog" :closable="true" :maximizable="true" width="40rem">
+    <template #icon>
+      <span class="text-white material-symbols-outlined text-4xl">
+        engineering
+      </span>
+    </template>
+    <template #titulo>
+      <span class="text-xl font-bold text-white white-space-nowrap">Cambiar Estado</span>
+    </template>
+    <template #body>
+      <div >
+          <div class="">
+            <FeedWithComments />
+          </div>
+        <!-- <div class="h-20">
+          <CommentForm class="fixed bottom-8 left-0 right-0 p-6" />
+        </div> -->
+      </div>
+    </template>
+    <template #footer >
+      <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised  />
+      <Button @click="closeCommentsModal()" label="Cerrar" icon="pi pi-save" severity="danger" raised  />
     </template>
   </CustomModal>
 </template>
