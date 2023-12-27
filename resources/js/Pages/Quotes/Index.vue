@@ -13,23 +13,26 @@ const props = defineProps({
 })
 
 const openSlideOver = ref(false)
-const openCustomSlideOver = () => openSlideOver.value = true
+const quote = ref({})
 
 //#region columnas de CustomDataTable
 const columnas = ref([
     // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
-    { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true },
-    { field: 'customer', header: 'Cliente' },
     { field: 'consecutive', header: 'Consecutivo' },
-    { field: 'version', header: 'Version', filter: false },
+    { field: 'name', header: 'Nombre' },
+    { field: 'clases', header: 'Clases' },
+    { field: 'customer', header: 'Cliente' },
+    { field: 'status', header: 'Estado', filter: false },
     { field: 'expeted_answer_date', header: 'Fecha maxima respuesta', type: 'date', filter: true, },
     { field: 'estimador_anaswer_date', header: 'Fecha respuesta', type: 'date', filter: true },
     { field: 'route', header: 'Ruta', filter: false },
     { field: 'file', header: 'Documento', filter: false },
     { field: 'observation', header: 'Observacion', filter: false },
     { field: 'created_at', header: 'Fecha creacion', filter: false },
+    { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true },
 ])
 //#endregion
+
 //#region Botones de CustomDatatable
 const buttons = ref([
     { event: 'showClic', severity: 'success', class: '', icon: 'fa-solid fa-eye', text: true, outlined: false, rounded: false },
@@ -38,11 +41,16 @@ const buttons = ref([
 //#endregion
 
 const showClic = (event, data) => {
-    console.log(data)
+    quote.value = data;
+    openSlideOver.value = true
 }
 
 const deleteClic = (event, data) => {
     console.log(event)
+}
+
+const slideOver = () => {
+    openSlideOver.value = true
 }
 
 </script>
@@ -59,11 +67,11 @@ const deleteClic = (event, data) => {
                 <Button title="Agregar Estimación" severity="success" label="Agregar" outlined icon="fa-solid fa-plus"
                     class="!h-8" />
                 </Link>
-                <Button title="Agregar Estimación" @click="openCustomSlideOver()" severity="success" label="Ver" outlined
-                    icon="fa-solid fa-plus" class="!h-8" />
+                <Button @click="slideOver()" title="Agregar Estimación" severity="success" label="Ver" outlined icon="fa-solid fa-plus"
+                    class="!h-8" />
             </template>
         </CustomDataTable>
 
-        <CustomSlideOver :openSlideOver="openSlideOver" @closeSlideOver="openSlideOver = false" />
+        <CustomSlideOver :quote="quote" :openSlideOver="openSlideOver" @closeSlideOver="openSlideOver = false" />
     </AppLayout>
 </template>

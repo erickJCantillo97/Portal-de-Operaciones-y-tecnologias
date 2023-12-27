@@ -7,6 +7,10 @@ use App\Models\Gantt\Task;
 use App\Models\Process;
 use App\Models\Projects\Customer;
 use App\Models\Projects\Project;
+use App\Models\Quotes\Quote;
+use App\Models\Quotes\QuoteStatus;
+use App\Models\Quotes\QuoteTypeShip;
+use App\Models\Quotes\QuoteVersion;
 use App\Models\SWBS\SubSystem;
 use App\Models\SWBS\System;
 use App\Models\VirtualTask;
@@ -36,21 +40,23 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     })->name('get.foto');
 
     Route::get('/dashboard', function () {
-        $taskProject = VirtualTask::whereNull('task_id')->get()->map(function ($item) {
-            return [
-                'id' => $item->id,
-                'project_id' => $item->project->id,
-                'avance' => number_format($item['percentDone'], 2),
-                'name' => $item['name'],
-                // 'file' => $item->project->contract->ship->file,
-                'contrato' => $item->project->contract->name,
-                'duracion' => $item->duration,
-                'fechaI' => $item->startDate,
-                'fechaF' => $item->endDate,
-                'unidadDuracion' => $item->durationUnit,
-                'costo' => $item->project->cost_sale
-            ];
-        });
+        $taskProject = [];
+
+        // VirtualTask::whereNull('task_id')->get()->map(function ($item) {
+        //     return [
+        //         'id' => $item->id,
+        //         'project_id' => $item->project->id,
+        //         'avance' => number_format($item['percentDone'], 2),
+        //         'name' => $item['name'],
+        //         // 'file' => $item->project->contract->ship->file,
+        //         'contrato' => $item->project->contract->name,
+        //         'duracion' => $item->duration,
+        //         'fechaI' => $item->startDate,
+        //         'fechaF' => $item->endDate,
+        //         'unidadDuracion' => $item->durationUnit,
+        //         'costo' => $item->project->cost_sale
+        //     ];
+        // });
 
         return Inertia::render('Dashboard', [
             'projects' => $taskProject,
@@ -155,14 +161,18 @@ Route::get('/timeline', function () {
 
 
 Route::get('anterior', function () {
-    $clientes =  DB::connection('sqlsrv_GECON')->table('clientes')->get();
-    foreach ($clientes as $cliente) {
-        Customer::create([
-            'nit' => $cliente->id,
-            'name' => $cliente->nombre_cliente,
-            'type' => $cliente->tipo_cliente,
-            'country' => $cliente->pais,
-        ]);
-    }
-    return Customer::get();
+    QuoteStatus::truncate();
+    QuoteVersion::truncate();
+    QuoteTypeShip::truncate();
+    Quote::truncate();
+    // $clientes =  DB::connection('sqlsrv_GECON')->table('clientes')->get();
+    // foreach ($clientes as $cliente) {
+    //     Customer::create([
+    //         'nit' => $cliente->id,
+    //         'name' => $cliente->nombre_cliente,
+    //         'type' => $cliente->tipo_cliente,
+    //         'country' => $cliente->pais,
+    //     ]);
+    // }
+    // return Customer::get();
 });

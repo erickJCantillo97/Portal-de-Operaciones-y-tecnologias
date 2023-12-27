@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Projects\Customer;
 use App\Models\Projects\TypeShip;
 use App\Models\Quotes\Quote;
+use App\Models\Quotes\QuoteStatus;
 use App\Models\Quotes\QuoteTypeShip;
 use App\Models\Quotes\QuoteVersion;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -25,17 +27,19 @@ class QuoteController extends Controller
                 'id' => $quote['id'],
                 'name' => $quote['name'],
                 'gerencia' => $quote['gerencia'],
-                'version' => $quote['version']['version'],
+                'status' => $quote['version']['get_status'],
+                'estimador' => $quote['version']['estimador_name'],
                 'customer' => $quote['version']['customer']['name'],
+                'version_id' => $quote['version']['id'],
+                'created_at' => $quote['version']['created_at'],
                 'expeted_answer_date' => $quote['version']['expeted_answer_date'],
-                'consecutive' => $quote['consecutive'],
+                'consecutive' => str_pad($quote['consecutive'], 3, 0, STR_PAD_LEFT) . '-' . $quote['version']['version'] . '-2023',
+                'products' => $quote['version']['quoteTypeShips'],
+                'clases' => implode(', ', collect($quote['version']['quoteTypeShips'])->pluck('name')->toArray())
             ];
         });
 
         return Inertia::render('Quotes/Index', compact('quotes'));
-        // return response()->json([
-        //     $quote
-        // ], 200);
     }
 
     /**
@@ -74,13 +78,16 @@ class QuoteController extends Controller
         $empleado = collect(searchEmpleados('Num_SAP', $validateData['estimador_id']))->first();
         try {
             $validateData['gerencia'] = auth()->user()->gerencia;
+
             $validateData['estimador_name'] = $empleado['Usuario'];
+
             $quote = Quote::create([
                 'gerencia' => auth()->user()->gerencia,
                 'consecutive' => Quote::max('consecutive') + 1,
                 'user_id' => auth()->user()->id,
                 'name' => $validateData['name']
             ]); //Creamos en la BD y guardamos la estimacion en una variable
+
             $quoteVersion = QuoteVersion::create([
                 'quote_id' => $quote->id,
                 'version' => 1,
@@ -91,8 +98,10 @@ class QuoteController extends Controller
                 'expeted_answer_date' => $validateData['expeted_answer_date'],
                 'offer_type' => $validateData['offer_type'],
             ])->id; // Creamos una nueva version 1, con el consecutivo de la variable que se utilizó antes
+
             $quote->current_version_id = $quoteVersion;
             $quote->save();
+
             foreach (TypeShip::whereIn('id', $request->type_ships)->get() as $typeShip) {
                 QuoteTypeShip::create([
                     'quote_version_id' => $quoteVersion,
@@ -100,7 +109,17 @@ class QuoteController extends Controller
                     'name' => $typeShip->name,
                 ]);
             }
+            QuoteStatus::create([
+                'status' => 1,
+                'user_id' => auth()->user()->id,
+                'quote_version_id' => $quoteVersion,
+                'fecha' => Carbon::now()
+            ]);
+
             $quote = QuoteVersion::with('quote', 'quoteTypeShips')->where('id', $quoteVersion)->first();
+
+
+
             return response()->json([
                 'status' => true,
                 'quote' => $quote
@@ -120,7 +139,6 @@ class QuoteController extends Controller
      */
     public function show(Quote $quote)
     {
-        //
     }
 
     /**

@@ -25,55 +25,17 @@ const openStatusDialog = ref(false)
 const openCommentsDialog = ref(false)
 const showDateResponse = ref(true)
 const statusSelected = ref()
-const statusOptions = ref([
+const statusOptions = ref(
+[
   'Proceso',
   'Entregada',
-  'Pendinete por firma',
+  'Pendiente por Firma',
   'Firmada',
   'No Firmada',
   'Contratada'
 ])
 
-//#region fakeData
-const listOfVersions = [
-  {
-    id: '1'
-  },
-  {
-    id: '2'
-  },
-  {
-    id: '3'
-  },
-  {
-    id: '4'
-  },
-  {
-    id: '5'
-  },
-  {
-    id: '6'
-  },
-  {
-    id: '7'
-  },
-  {
-    id: '8'
-  },
-  {
-    id: '9'
-  },
-  {
-    id: '10'
-  },
-  {
-    id: '11'
-  },
-  {
-    id: '12'
-  },
-]
-//#endregion
+
 
 const props = defineProps(
   {
@@ -81,9 +43,9 @@ const props = defineProps(
       type: Boolean,
       default: false
     },
-    qoute: {
+    quote: {
       type: Object,
-      required: true
+      required: false
     }
   }
 )
@@ -92,7 +54,7 @@ const openStatusModal = () => {
   openStatusDialog.value = true
 }
 
-const closeStatusDialog  = () => {
+const closeStatusDialog = () => {
   openStatusDialog.value = false
 }
 
@@ -136,6 +98,7 @@ const formatCurrency = (value) => {
   })
 }
 </script>
+
 <template>
   <TransitionRoot as="template" :show="props.openSlideOver">
     <Dialog as="div" class="relative z-10" @close="open = false">
@@ -166,13 +129,15 @@ const formatCurrency = (value) => {
                 </TransitionChild>
                 <div class="h-full overflow-y-auto bg-white p-2">
                   <div class="rounded-lg bg-blue-900 text-white uppercase p-2 mb-2">
-                    <h2 class="text-md text-center font-bold text-white">Embarcadero Tipo C 698-2-2023</h2>
+                    <h2 class="text-md text-center font-bold text-white">
+                      {{ quote.name }} {{ quote.consecutive }}-{{ quote.version }}
+                    </h2>
                   </div>
                   <header class="w-full">
-                    <div class="flex flex-nowrap text-center justify-center items-center">
+                    <div class="flex flex-nowrap text-center justify-center items-center" v-if="quote.version > 1">
                       <ul class="hover:border-b text-md text-center font-semibold text-blue-900 w-10 cursor-pointer"
-                        v-for="version in listOfVersions" :key="version.id">
-                        <li>{{ version.id }}</li>
+                        v-for="version in quote.version">
+                        <li>{{ version }}</li>
                       </ul>
                     </div>
                     <div class="flex flex-nowrap space-x-2 p-2 justify-center rounded-lg">
@@ -191,19 +156,27 @@ const formatCurrency = (value) => {
                       <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Estimador:</dt>
-                          <dd class="text-gray-900">Giovany Enrique Buelvas Jaspe</dd>
+                          <dd class="text-gray-900 uppercase">{{ quote.estimador }}</dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Cliente:</dt>
-                          <dd class="text-gray-900">Cotecmar</dd>
+                          <dd class="text-gray-900">{{ quote.customer }}</dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-500">Tipo de Oferta:</dt>
+                          <dd class="text-gray-900">ROM</dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Fecha de Solicitud:</dt>
-                          <dd class="text-gray-900">{{ Moment().format('DD/MM/YY') }}</dd>
+                          <dd class="text-gray-900">{{ Moment(quote.created_at).format('DD/MM/YY') }}</dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Fecha Respuesta Esperada:</dt>
-                          <dd class="text-gray-900">{{ Moment().add(4, 'days').format('DD/MM/YY') }}</dd>
+                          <dd class="text-gray-900">{{ Moment(quote.expected_answer_date).format('DD/MM/YY') }}</dd>
+                        </div>
+                        <div v-if="showDateResponse" class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-500">Fecha de Respuesta:</dt>
+                          <dd class="text-gray-900">{{ Moment().add(6, 'days').format('DD/MM/YY') }}</dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Estado:</dt>
@@ -214,69 +187,42 @@ const formatCurrency = (value) => {
                       </dl>
                     </div>
                   </header>
-                  <Accordion :activeIndex="0">
-                    <AccordionTab header="Producto 1" :pt="{
+                  <Accordion>
+                    <AccordionTab v-for="product in quote.products"
+                    :header="product.name" :pt="{
                       root: '!border-0 !ring-0',
-                      headerAction: '!bg-slate-200',
+                      headerAction: '!bg-slate-200 mb-2',
                       headerTitle: '!font-semibold',
                     }">
-                      <div class="space-y-6 pb-16">
-                        <!-- <div>
-                          <div class="aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg">
-                            <img
-                              src="https://images.unsplash.com/photo-1582053433976-25c00369fc93?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=512&q=80"
-                              alt="" class="object-cover" />
-                          </div>
-                          <div class="mt-4 flex items-start justify-between">
-                            <div>
-                              <h2 class="text-base font-semibold leading-6 text-gray-900"><span class="sr-only">Details for
-                                </span>IMG_4985.HEIC</h2>
-                              <p class="text-sm font-medium text-gray-500">3.9 MB</p>
-                            </div>
-                            <button type="button"
-                              class="relative ml-4 flex h-8 w-8 items-center justify-center rounded-full bg-white text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                              <span class="absolute -inset-1.5" />
-                              <HeartIcon class="h-6 w-6" aria-hidden="true" />
-                              <span class="sr-only">Favorite</span>
-                            </button>
-                          </div>
-                        </div> -->
+                      <div class="space-y-6">
                         <div>
                           <h3 class="font-medium text-gray-900">Información del producto</h3>
                           <dl class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
                             <div class="flex justify-between py-3 text-sm font-medium">
                               <dt class="text-gray-500">Clase:</dt>
-                              <dd class="text-gray-900">Embarcadero BN6</dd>
+                              <dd class="text-gray-900">{{ product.name }}</dd>
                             </div>
                             <div class="flex justify-between py-3 text-sm font-medium">
                               <dt class="text-gray-500">Tipo de proyecto:</dt>
-                              <dd class="text-gray-900">Artefacto Naval</dd>
+                              <dd class="text-gray-900">{{ quote.project_type == null ? 'N/A' : quote.project_type }}</dd>
                             </div>
                             <div class="flex justify-between py-3 text-sm font-medium">
                               <dt class="text-gray-500">Alcance:</dt>
-                              <dd class="text-gray-900">Construcción</dd>
+                              <dd class="text-gray-900">{{ quote.scope == null ? 'N/A' : quote.scope }}</dd>
                             </div>
                             <div class="flex justify-between py-3 text-sm font-medium">
                               <dt class="text-gray-500">Madurez:</dt>
-                              <dd class="text-gray-900">Contractual</dd>
+                              <dd class="text-gray-900">{{ quote.maturity == null ? 'N/A' : quote.maturity }}</dd>
                             </div>
                             <div class="flex justify-between py-3 text-sm font-medium">
                               <dt class="text-gray-500">Cantidad:</dt>
-                              <dd class="text-gray-900">2</dd>
+                              <dd class="text-gray-900">{{ quote.units == null ? 'N/A' : quote.units }}</dd>
                             </div>
                           </dl>
                         </div>
                         <div>
                           <h3 class="font-medium text-gray-900">Información de la Oferta</h3>
                           <dl class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Versión:</dt>
-                              <dd class="text-gray-900">1</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Tipo de Oferta:</dt>
-                              <dd class="text-gray-900">ROM</dd>
-                            </div>
                             <div class="flex justify-between py-3 text-sm font-medium">
                               <dt class="text-gray-500">Margen Estimado:</dt>
                               <dd class="text-gray-900">25.3%</dd>
@@ -293,83 +239,30 @@ const formatCurrency = (value) => {
                               <dt class="text-gray-500">IVA:</dt>
                               <dd class="text-gray-900">19%</dd>
                             </div>
-                            <div v-if="showDateResponse" class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Fecha de Respuesta:</dt>
-                              <dd class="text-gray-900">{{ Moment().add(6, 'days').format('DD/MM/YY') }}</dd>
-                            </div>
                           </dl>
-                        </div>
-                        <!-- <div>
-                          <h3 class="font-medium text-gray-900">Description</h3>
-                          <div class="mt-2 flex items-center justify-between">
-                            <p class="text-sm italic text-gray-500">Add a description to this image.</p>
-                            <button type="button"
-                              class="relative -mr-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                              <span class="absolute -inset-1.5" />
-                              <PencilIcon class="h-5 w-5" aria-hidden="true" />
-                              <span class="sr-only">Add description</span>
-                            </button>
-                          </div>
-                        </div>
-                        <div>
-                          <h3 class="font-medium text-gray-900">Shared with</h3>
-                          <ul role="list" class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
-                            <li class="flex items-center justify-between py-3">
-                              <div class="flex items-center">
-                                <img
-                                  src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=3&w=1024&h=1024&q=80"
-                                  alt="" class="h-8 w-8 rounded-full" />
-                                <p class="ml-4 text-sm font-medium text-gray-900">Aimee Douglas</p>
-                              </div>
-                              <button type="button"
-                                class="ml-6 rounded-md bg-white text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Remove<span
-                                  class="sr-only"> Aimee Douglas</span></button>
-                            </li>
-                            <li class="flex items-center justify-between py-3">
-                              <div class="flex items-center">
-                                <img
-                                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixqx=oilqXxSqey&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                  alt="" class="h-8 w-8 rounded-full" />
-                                <p class="ml-4 text-sm font-medium text-gray-900">Andrea McMillan</p>
-                              </div>
-                              <button type="button"
-                                class="ml-6 rounded-md bg-white text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Remove<span
-                                  class="sr-only"> Andrea McMillan</span></button>
-                            </li>
-                            <li class="flex items-center justify-between py-2">
-                              <button type="button"
-                                class="group -ml-1 flex items-center rounded-md bg-white p-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <span
-                                  class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed border-gray-300 text-gray-400">
-                                  <PlusIcon class="h-5 w-5" aria-hidden="true" />
-                                </span>
-                                <span
-                                  class="ml-4 text-sm font-medium text-indigo-600 group-hover:text-indigo-500">Share</span>
-                              </button>
-                            </li>
-                          </ul>
-                        </div> -->
-                        <div>
-                          <h3 class="font-medium text-gray-900">Documentos</h3>
-                          <div class="divide-y divide-gray-200 border-b border-t border-gray-200"></div>
-                        </div>
-                        <div class="grid grid-cols-2 space-x-2 text-center">
-                          <div class="col-span-1 space-y-2 items-center">
-                            <button type="button"
-                              class="flex-1 w-full rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">Clonar</button>
-                            <button type="button"
-                              class="flex-1 w-full rounded-md bg-orange-600 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-orange-500">Editar</button>
-                          </div>
-                          <div class="col-span-1 space-y-2 items-center">
-                            <button type="button"
-                              class="flex-1 w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Actualizar</button>
-                            <button type="button"
-                              class="flex-1 w-full rounded-md bg-red-600 text-white px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-red-500">Eliminar</button>
-                          </div>
                         </div>
                       </div>
                     </AccordionTab>
                   </Accordion>
+                  <section class="border border-gray-200 p-4">
+                    <div class="mb-4">
+                      <h3 class="font-semibold text-gray-900 text-center">Documentos</h3>
+                    </div>
+                    <section class="grid grid-cols-2 space-x-2 text-center">
+                      <div class="col-span-1 space-y-2 items-center">
+                        <button type="button"
+                          class="flex-1 w-full rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">Clonar</button>
+                        <button type="button"
+                          class="flex-1 w-full rounded-md bg-orange-600 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-orange-500">Editar</button>
+                      </div>
+                      <div class="col-span-1 space-y-2 items-center">
+                        <button type="button"
+                          class="flex-1 w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Actualizar</button>
+                        <button type="button"
+                          class="flex-1 w-full rounded-md bg-red-600 text-white px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-red-500">Eliminar</button>
+                      </div>
+                    </section>
+                  </section>
                 </div>
               </DialogPanel>
             </TransitionChild>
@@ -379,6 +272,7 @@ const formatCurrency = (value) => {
     </Dialog>
   </TransitionRoot>
 
+  <!--MODAL DE ASIGNACIÓN DE ESTADOS-->
   <CustomModal :visible="openStatusDialog" :closable="true" :maximizable="true" width="40rem">
     <template #icon>
       <span class="text-white material-symbols-outlined text-4xl">
@@ -393,24 +287,24 @@ const formatCurrency = (value) => {
         <div>
           <label for="dd-city">Estado de la Estimación</label>
           <Dropdown v-model="statusSelected" :options="statusOptions" showClear
-          placeholder="Seleccione Estado de la estimación" class="w-full md:w-14rem" />
+            placeholder="Seleccione Estado de la Estimación" class="w-full md:w-14rem" />
         </div>
         <div>
           <label for="dd-city">Seleccione Fecha</label>
-          <Calendar v-model="dateSelected" showIcon :manualInput="true"
-          placeholder="Fecha Inicio de Reunión" />
+          <Calendar v-model="dateSelected" showIcon :manualInput="true" placeholder="Fecha Inicio de Reunión" />
         </div>
       </div>
       <div class="overflow-y-auto custom-scroll p-4">
-        <Feed />
+        <Feed :quoteId="quote.version_id" />
       </div>
     </template>
-    <template #footer >
-      <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised  />
-      <Button @click="closeStatusDialog()" label="Cerrar" icon="pi pi-save" severity="danger" raised  />
+    <template #footer>
+      <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised />
+      <Button @click="closeStatusDialog()" label="Cerrar" icon="pi pi-save" severity="danger" raised />
     </template>
   </CustomModal>
 
+  <!--MODAL DE COMENTARIOS-->
   <CustomModal :visible="openCommentsDialog" :closable="true" :maximizable="true" width="40rem">
     <template #icon>
       <span class="text-white material-symbols-outlined text-4xl">
@@ -418,21 +312,14 @@ const formatCurrency = (value) => {
       </span>
     </template>
     <template #titulo>
-      <span class="text-xl font-bold text-white white-space-nowrap">Cambiar Estado</span>
+      <span class="text-xl font-bold text-white white-space-nowrap">Comentarios</span>
     </template>
     <template #body>
-      <div >
-          <div class="">
-            <FeedWithComments />
-          </div>
-        <!-- <div class="h-20">
-          <CommentForm class="fixed bottom-8 left-0 right-0 p-6" />
-        </div> -->
-      </div>
+      <FeedWithComments />
     </template>
-    <template #footer >
-      <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised  />
-      <Button @click="closeCommentsModal()" label="Cerrar" icon="pi pi-save" severity="danger" raised  />
+    <template #footer>
+      <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised />
+      <Button @click="closeCommentsModal()" label="Cerrar" icon="pi pi-save" severity="danger" raised />
     </template>
   </CustomModal>
 </template>
