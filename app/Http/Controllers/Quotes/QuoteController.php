@@ -20,7 +20,17 @@ class QuoteController extends Controller
      */
     public function index()
     {
-        $quotes = Quote::with('version', 'version.quoteTypeShips')->orderBy('id')->get();
+        $quotes = Quote::with('version', 'version.quoteTypeShips')->orderBy('id')->get()->map(function ($quote) {
+            return [
+                'id' => $quote['id'],
+                'name' => $quote['name'],
+                'gerencia' => $quote['gerencia'],
+                'version' => $quote['version']['version'],
+                'customer' => $quote['version']['customer']['name'],
+                'expeted_answer_date' => $quote['version']['expeted_answer_date'],
+                'consecutive' => $quote['consecutive'],
+            ];
+        });
 
         return Inertia::render('Quotes/Index', compact('quotes'));
         // return response()->json([
@@ -81,7 +91,8 @@ class QuoteController extends Controller
                 'expeted_answer_date' => $validateData['expeted_answer_date'],
                 'offer_type' => $validateData['offer_type'],
             ])->id; // Creamos una nueva version 1, con el consecutivo de la variable que se utilizó antes
-
+            $quote->current_version_id = $quoteVersion;
+            $quote->save();
             foreach (TypeShip::whereIn('id', $request->type_ships)->get() as $typeShip) {
                 QuoteTypeShip::create([
                     'quote_version_id' => $quoteVersion,

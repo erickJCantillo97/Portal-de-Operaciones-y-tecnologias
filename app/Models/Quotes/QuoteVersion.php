@@ -2,6 +2,7 @@
 
 namespace App\Models\Quotes;
 
+use App\Models\Projects\Customer;
 use App\Models\Scopes\GerenciaScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +25,11 @@ class QuoteVersion extends Model
     {
         return $this->belongsTo(Quote::class, 'quote_id');
     }
+
+    public function customer(){
+        return $this->belongsTo(Customer::class);
+    }
+
     public function quoteTypeShips()
     {
         return $this->hasMany(QuoteTypeShip::class, 'quote_version_id');
