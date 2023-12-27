@@ -152,7 +152,7 @@ const selectedColumns = ref(columns.value);
         </DataTable>
     </AppLayout>
 
-    <CustomModal :visible="modalVisible">
+    <CustomModal v-model:visible="modalVisible">
         <template #icon>
             <i class="text-white fa-solid fa-ship"></i>
         </template>

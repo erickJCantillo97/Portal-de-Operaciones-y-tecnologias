@@ -1,10 +1,6 @@
 <script setup>
 import Dialog from 'primevue/dialog';
 const props = defineProps({
-    visible: {
-        type: Boolean,
-        default: false
-    },
     width: {
         type: String,
         default: '60rem'
@@ -17,7 +13,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <Dialog v-model:visible="props.visible" :maximizable="maximizable" modal :closable="false" class=""
+    <Dialog v-model:visible="visible" :maximizable="maximizable" modal :closable="true" closeOnEscape
         :style="{ width: props.width }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :pt="{
             header: { class: '!bg-primary !h-[5vh]' },
             closeButtonIcon: { class: 'text-white' },
