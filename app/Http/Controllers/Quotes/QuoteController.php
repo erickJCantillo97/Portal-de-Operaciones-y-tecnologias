@@ -54,8 +54,8 @@ class QuoteController extends Controller
     {
         // dd($request);
         $validateData = $request->validate([
-            'customer_id' => 'nullable|exists:id',
-            'name' => 'request',
+            'customer_id' => 'nullable',
+            'name' => 'required',
             'estimador_id' => 'required|numeric',
             'expeted_answer_date' => 'required|date',
             'offer_type' => 'nullable',
@@ -74,14 +74,14 @@ class QuoteController extends Controller
             ]); //Creamos en la BD y guardamos la estimacion en una variable
             $quoteVersion = QuoteVersion::create([
                 'quote_id' => $quote->id,
-                'version' => $quote->current_version_id,
+                'version' => 1,
                 'estimador_id' => $validateData['estimador_id'],
                 'customer_id' => $validateData['customer_id'],
                 'observation' => $validateData['observation'],
                 'estimador_name' => $validateData['estimador_name'],
                 'expeted_answer_date' => $validateData['expeted_answer_date'],
                 'offer_type' => $validateData['offer_type'],
-            ]); // Creamos una nueva version 1, con el consecutivo de la variable que se utilizó antes
+            ])->id; // Creamos una nueva version 1, con el consecutivo de la variable que se utilizó antes
 
             foreach (TypeShip::whereIn('id', $request->type_ships) as $typeShip) {
                 QuoteTypeShip::create([
