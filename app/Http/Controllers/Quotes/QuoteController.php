@@ -20,25 +20,25 @@ class QuoteController extends Controller
      */
     public function index()
     {
-        $quotes = Quote::with('version', 'version.quoteTypeShips')->orderBy('id')->get()->map(function ($quote) {
-            return [
-                'id' => $quote['id'],
-                'name' => $quote['name'],
-                'gerencia' => $quote['gerencia'],
-                'version' => $quote['version']['version'],
-                'estimador' => $quote['version']['estimador_name'],
-                'customer' => $quote['version']['customer']['name'],
-                'created_at' => $quote['version']['created_at'],
-                'expeted_answer_date' => $quote['version']['expeted_answer_date'],
-                'consecutive' => $quote['consecutive'],
-                'products' => $quote['version']['quoteTypeShips']
-            ];
-        });
+        $quotes = Quote::with('version', 'version.quoteTypeShips')
+            ->orderBy('id')
+            ->get()
+            ->map(function ($quote) {
+                return [
+                    'id' => $quote['id'],
+                    'name' => $quote['name'],
+                    'gerencia' => $quote['gerencia'],
+                    'version' => $quote['version']['version'],
+                    'estimador' => $quote['version']['estimador_name'],
+                    'customer' => $quote['version']['customer']['name'],
+                    'created_at' => $quote['version']['created_at'],
+                    'expected_answer_date' => $quote['version']['expeted_answer_date'],
+                    'consecutive' => $quote['consecutive'],
+                    'products' => $quote['version']['quoteTypeShips']
+                ];
+            });
 
         return Inertia::render('Quotes/Index', compact('quotes'));
-        // return response()->json([
-        //     $quote
-        // ], 200);
     }
 
     /**

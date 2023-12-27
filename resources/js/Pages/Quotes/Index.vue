@@ -15,7 +15,6 @@ const props = defineProps({
 const openSlideOver = ref(false)
 const quote = ref({})
 
-
 //#region columnas de CustomDataTable
 const columnas = ref([
     // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
@@ -31,6 +30,7 @@ const columnas = ref([
     { field: 'created_at', header: 'Fecha creacion', filter: false },
 ])
 //#endregion
+
 //#region Botones de CustomDatatable
 const buttons = ref([
     { event: 'showClic', severity: 'success', class: '', icon: 'fa-solid fa-eye', text: true, outlined: false, rounded: false },
@@ -47,6 +47,10 @@ const deleteClic = (event, data) => {
     console.log(event)
 }
 
+const slideOver = () => {
+    openSlideOver.value = true
+}
+
 </script>
 
 <template>
@@ -61,6 +65,8 @@ const deleteClic = (event, data) => {
                 <Button title="Agregar Estimación" severity="success" label="Agregar" outlined icon="fa-solid fa-plus"
                     class="!h-8" />
                 </Link>
+                <Button @click="slideOver()" title="Agregar Estimación" severity="success" label="Ver" outlined icon="fa-solid fa-plus"
+                    class="!h-8" />
             </template>
         </CustomDataTable>
 
