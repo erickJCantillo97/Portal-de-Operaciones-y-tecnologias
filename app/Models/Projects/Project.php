@@ -2,6 +2,7 @@
 
 namespace App\Models\Projects;
 
+use App\Models\Scopes\GerenciaScope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +17,12 @@ class Project extends Model implements Auditable
 
     protected $guarded = [];
 
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new GerenciaScope);
+    }
+
     public function contract()
     {
         return $this->belongsTo(Contract::class)->withDefault(function ($contract) {
@@ -25,7 +32,7 @@ class Project extends Model implements Auditable
 
     public function projectShip()
     {
-        return $this->hasMany(projectShip::class);
+        return $this->hasMany(ProjectsShip::class);
     }
 
     public function status(): Attribute

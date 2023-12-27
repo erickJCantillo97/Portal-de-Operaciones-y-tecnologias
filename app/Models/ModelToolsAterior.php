@@ -11,9 +11,9 @@ class ModelToolsAterior extends Model implements Auditable
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
 
-    protected $table = 'swbs_base_activities';
+    protected $table = 'clientes';
 
-    protected $connection = 'sqlsrv_anterior';
+    protected $connection = 'sqlsrv_GECON';
 
     protected $guarded = 'personal_sap';
 }

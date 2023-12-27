@@ -104,6 +104,18 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
         ],
+        'sqlsrv_GECON' => [
+            'driver' => 'sqlsrv',
+            'url' => env('DATABASE_URL'),
+            'host' => env('GECON_DB_HOST', 'localhost'),
+            'port' => env('GECON_DB_PORT', '1433'),
+            'database' => env('GECON_DB_DATABASE', 'forge'),
+            'username' => env('GECON_DB_USERNAME', 'forge'),
+            'password' => env('GECON_DB_PASSWORD', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+        ],
 
     ],
 
@@ -137,7 +149,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
         ],
 
         'default' => [

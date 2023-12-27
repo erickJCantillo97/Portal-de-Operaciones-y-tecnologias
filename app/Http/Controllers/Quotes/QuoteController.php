@@ -20,7 +20,17 @@ class QuoteController extends Controller
      */
     public function index()
     {
-        $quotes = Quote::orderBy('id')->get();
+        $quotes = Quote::with('version', 'version.quoteTypeShips')->orderBy('id')->get()->map(function ($quote) {
+            return [
+                'id' => $quote['id'],
+                'name' => $quote['name'],
+                'gerencia' => $quote['gerencia'],
+                'version' => $quote['version']['version'],
+                'customer' => $quote['version']['customer']['name'],
+                'expeted_answer_date' => $quote['version']['expeted_answer_date'],
+                'consecutive' => $quote['consecutive'],
+            ];
+        });
 
         return Inertia::render('Quotes/Index', compact('quotes'));
         // return response()->json([
@@ -35,13 +45,13 @@ class QuoteController extends Controller
     {
         $typeships = TypeShip::orderBy('name')->get();
         $customers = Customer::orderBy('name')->get();
-        $estimadores = collect(getPersonalGerenciaOficina('GECON', 'DEEST'))->map(function ($estimador) {
+        $estimadores = getPersonalGerenciaOficina('GECON', 'DEEST')->map(function ($estimador) {
             return [
                 'user_id' => $estimador['Num_SAP'],
                 'name' => $estimador['Nombres_Apellidos'],
                 'email' => $estimador['Correo']
             ];
-        });
+        })->toArray();
         return Inertia::render('Quotes/Form', compact('typeships', 'customers', 'estimadores'));
     }
 
@@ -53,8 +63,8 @@ class QuoteController extends Controller
     {
         // dd($request);
         $validateData = $request->validate([
-            'customer_id' => 'nullable|exists:id',
-            'name' => 'request',
+            'customer_id' => 'nullable',
+            'name' => 'required',
             'estimador_id' => 'required|numeric',
             'expeted_answer_date' => 'required|date',
             'offer_type' => 'nullable',
@@ -73,26 +83,30 @@ class QuoteController extends Controller
             ]); //Creamos en la BD y guardamos la estimacion en una variable
             $quoteVersion = QuoteVersion::create([
                 'quote_id' => $quote->id,
-                'version' => $quote->current_version_id,
+                'version' => 1,
                 'estimador_id' => $validateData['estimador_id'],
                 'customer_id' => $validateData['customer_id'],
                 'observation' => $validateData['observation'],
                 'estimador_name' => $validateData['estimador_name'],
                 'expeted_answer_date' => $validateData['expeted_answer_date'],
                 'offer_type' => $validateData['offer_type'],
-            ]); // Creamos una nueva version 1, con el consecutivo de la variable que se utilizó antes
-            $quotesTypeShips = [];
-            foreach (TypeShip::whereIn('id', $request->type_ships) as $typeShip) {
-                $quoteTypeShip = QuoteTypeShip::create([
-                    'quote_version_id' => $quoteVersion->id,
+            ])->id; // Creamos una nueva version 1, con el consecutivo de la variable que se utilizó antes
+            $quote->current_version_id = $quoteVersion;
+            $quote->save();
+            foreach (TypeShip::whereIn('id', $request->type_ships)->get() as $typeShip) {
+                QuoteTypeShip::create([
+                    'quote_version_id' => $quoteVersion,
                     'type_ship_id' => $typeShip->id,
                     'name' => $typeShip->name,
                 ]);
-                array_push($quotesTypeShips, $quoteTypeShip); //se Añaden las relaciones creadas a un array para devolverlos al front una vez sean creados
             }
-            return back()->with(['message' => 'Oferta creada correctamente'], 200);
+            $quote = QuoteVersion::with('quote', 'quoteTypeShips')->where('id', $quoteVersion)->first();
+            return response()->json([
+                'status' => true,
+                'quote' => $quote
+            ]);
         } catch (Exception $e) {
-            return back()->withErrors(['message' => 'Ocurrió un error al crear la Cotizacion: '.$e->getMessage()], 500);
+            return back()->withErrors(['message' => 'Ocurrió un error al crear la Cotizacion: ' . $e->getMessage()], 500);
         }
 
         return redirect('ships.index');
@@ -131,12 +145,12 @@ class QuoteController extends Controller
                 $validateData['file'] = Storage::putFileAs(
                     'public/Quote/',
                     $request->pdf,
-                    $validateData['code'].'.'.$request->pdf->getClientOriginalExtension()
+                    $validateData['code'] . '.' . $request->pdf->getClientOriginalExtension()
                 );
             }
             $quote->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -148,7 +162,7 @@ class QuoteController extends Controller
         try {
             $quote->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }

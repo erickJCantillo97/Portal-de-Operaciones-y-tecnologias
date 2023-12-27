@@ -5,6 +5,7 @@ use App\Http\Controllers\Suggestion\SuggestionController;
 use App\Ldap\User;
 use App\Models\Gantt\Task;
 use App\Models\Process;
+use App\Models\Projects\Customer;
 use App\Models\Projects\Project;
 use App\Models\SWBS\SubSystem;
 use App\Models\SWBS\System;
@@ -60,7 +61,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         if (auth()->user()->hasRole('Super Admin')) {
             return getEmpleadosAPI()->groupBy('GERENCIA');
         }
-
         return searchEmpleados('Gerencia', auth()->user()->gerencia)->groupBy('Oficina');
     })->name('get.empleados.gerencia');
 
@@ -152,3 +152,17 @@ Route::get('/timeline', function () {
         'projects' => $taskProject,
     ]);
 })->name('timeline');
+
+
+Route::get('anterior', function () {
+    $clientes =  DB::connection('sqlsrv_GECON')->table('clientes')->get();
+    foreach ($clientes as $cliente) {
+        Customer::create([
+            'nit' => $cliente->id,
+            'name' => $cliente->nombre_cliente,
+            'type' => $cliente->tipo_cliente,
+            'country' => $cliente->pais,
+        ]);
+    }
+    return Customer::get();
+});

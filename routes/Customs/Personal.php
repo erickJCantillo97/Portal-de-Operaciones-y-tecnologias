@@ -18,9 +18,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('personal', [PersonalController::class, 'store'])->name('personal.store');
     Route::delete('personal/delete/{personal}', [PersonalController::class, 'destroy'])->name('personal.destroy');
     Route::get('personalActivos', [PersonalController::class, 'getPersonalActivo'])->name('personal.activos');
+    
     Route::get('updateCargo', function () {
         updateCargos();
-
         return Labor::get();
     });
 

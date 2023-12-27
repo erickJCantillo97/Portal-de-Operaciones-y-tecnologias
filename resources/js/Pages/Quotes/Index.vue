@@ -17,9 +17,9 @@ const openCustomSlideOver = () => openSlideOver.value = true
 
 //#region columnas de CustomDataTable
 const columnas = ref([
-    { field: 'id', header: 'Id', frozen:true, filter: true, sortable: true },
+    // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
     { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true },
-    { field: 'costumer_id', header: 'Cliente' },
+    { field: 'customer', header: 'Cliente' },
     { field: 'consecutive', header: 'Consecutivo' },
     { field: 'version', header: 'Version', filter: false },
     { field: 'expeted_answer_date', header: 'Fecha maxima respuesta', type: 'date', filter: true, },

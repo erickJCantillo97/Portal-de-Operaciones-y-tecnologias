@@ -108,10 +108,10 @@ class PersonalController extends Controller
     }
 
     /* Con esta  función podemos listar los usuario que estan activos en el DA */
-    public function getPersonalActivo()
+    public function getPersonalActivo(Request $request)
     {
         //Validar para usuario de tipo administrador, puedan ver todo el personal cotecmar
-        $personal = getPersonalGerenciaOficina(auth()->user()->gerencia)->values()->map(function ($person) {
+        $personal = getPersonalGerenciaOficina('VPEXE')->values()->map(function ($person) {
             return [
                 'Num_SAP' => (int) $person['Num_SAP'],
                 'Fecha_Final' => $person['Fecha_Final'],
@@ -123,6 +123,11 @@ class PersonalController extends Controller
                 'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
             ];
         });
+        if ($request->expectsJson()) {
+            return response()->json([
+                'personal' => $personal
+            ]);
+        }
 
         return inertia('Personal/Activos', [
             'personal' => $personal,

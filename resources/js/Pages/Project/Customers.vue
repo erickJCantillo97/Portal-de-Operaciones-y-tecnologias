@@ -255,9 +255,9 @@ const showShips = (selectCustomer) => {
                                             null ? 'Editar ' : 'Crear' }} Cliente
                                         </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                         <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
-                                            <TextInput class="mt-2 text-left" label="NIT" placeholder="e.g. 9234232988-0"
+                                            <!-- <TextInput class="mt-2 text-left" label="NIT" placeholder="e.g. 9234232988-0"
                                                 v-model="formData.customer.NIT" :error="router.page.props.errors.nit">
-                                            </TextInput>
+                                            </TextInput> -->
                                             <TextInput class="mt-2 text-left" label="Nombre del Cliente"
                                                 placeholder="Escriba el nombre del CLiente" v-model="formData.customer.name"
                                                 :error="router.page.props.errors.name"></TextInput>
@@ -265,13 +265,31 @@ const showShips = (selectCustomer) => {
                                                 v-model="formData.customer.country"
                                                 :error="router.page.props.errors.country">
                                             </TextInput>
-                                            <TextInput class="mt-2 text-left" label="Tipo de Cliente"
+                                            <div class="text-left">
+                                                <label class="text-sm font-medium" for="hull_material">Tipo de
+                                                    Cliente</label>
+                                                <Dropdown id="hull_material" v-model="formData.customer.type"
+                                                    :options="['GOBIERNO', 'ARMADOR CIVIL', 'FUERZAS ARMADAS']"
+                                                    placeholder="Selecciona un Tipo de Cliente"
+                                                    class="w-full -mt-1 rounded-md md:w-14rem" :pt="{
+                                                        root: {
+                                                            class: 'h-10 !ring-gray-300 !ring-inset ring-1 !border-0 !shadow-sm '
+                                                        },
+                                                        input: {
+                                                            class: '!text-sm pt-3 pl-2'
+                                                        },
+                                                        item: {
+                                                            class: '!text-sm'
+                                                        }
+                                                    }" />
+                                            </div>
+                                            <!-- <TextInput class="mt-2 text-left" label="Tipo de Cliente"
                                                 :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.customer.type"
-                                                :error="router.page.props.errors.type"></TextInput>
-                                            <TextInput class="mt-2 text-left" label="Correo"
+                                                :error="router.page.props.errors.type"></TextInput> -->
+                                            <!-- <TextInput class="mt-2 text-left" label="Correo"
                                                 placeholder="Escriba su correo electronico"
                                                 v-model="formData.customer.email" :error="router.page.props.errors.email">
-                                            </TextInput>
+                                            </TextInput> -->
                                         </div>
                                     </div>
                                 </div>

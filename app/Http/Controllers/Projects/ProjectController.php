@@ -41,7 +41,7 @@ class ProjectController extends Controller
         $authorizations = Authorization::orderBy('contract_id')->get();
         $quotes = Quote::get();
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
-
+        // return $ships;
         return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes', 'ships'));
     }
 
@@ -116,6 +116,7 @@ class ProjectController extends Controller
         $contracts = Contract::get();
         $authorizations = Authorization::orderBy('contract_id')->get();
         $quotes = Quote::get();
+        $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
 
         return Inertia::render(
             'Project/CreateProjects',
@@ -125,6 +126,7 @@ class ProjectController extends Controller
                 'contracts' => $contracts,
                 'authorizations' => $authorizations,
                 'quotes' => $quotes,
+                'ships' => $ships
             ]
         );
     }
