@@ -21,7 +21,8 @@ class QuoteController extends Controller
     public function index()
     {
         $quotes = Quote::orderBy('id')->get();
-
+        $quote = QuoteVersion::with('quote', 'quoteTypeShips')->where('id', 3)->first();
+        return $quote;
         return Inertia::render('Quotes/Index', compact('quotes'));
         // return response()->json([
         //     $quote

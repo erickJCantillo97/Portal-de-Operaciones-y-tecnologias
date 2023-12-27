@@ -2,6 +2,7 @@
 
 namespace App\Models\Quotes;
 
+use App\Models\Scopes\GerenciaScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,6 +15,11 @@ class Quote extends Model implements Auditable
     use SoftDeletes;
 
     protected $guarded = [];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new GerenciaScope);
+    }
 
 
     public function version()

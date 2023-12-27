@@ -2,6 +2,7 @@
 
 namespace App\Models\Projects;
 
+use App\Models\Scopes\GerenciaScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,6 +13,12 @@ class Contract extends Model implements Auditable
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
     use SoftDeletes;
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new GerenciaScope);
+    }
+
 
     protected $guarded = [];
 

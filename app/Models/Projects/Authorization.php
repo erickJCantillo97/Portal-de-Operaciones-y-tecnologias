@@ -2,6 +2,7 @@
 
 namespace App\Models\Projects;
 
+use App\Models\Quotes\Quote;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;

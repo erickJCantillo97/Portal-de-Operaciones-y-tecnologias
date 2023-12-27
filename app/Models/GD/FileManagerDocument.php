@@ -15,7 +15,6 @@ class FileManagerDocument extends Model
 
     protected $guarded = [];
 
-
     protected function filepath(): Attribute
     {
         return Attribute::make(
