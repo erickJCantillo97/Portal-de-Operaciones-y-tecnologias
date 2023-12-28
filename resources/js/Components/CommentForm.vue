@@ -1,12 +1,12 @@
 <script setup>
 import { ref } from 'vue'
-import Button from 'primevue/button'
 import { defineEmits } from 'vue'
+import Button from 'primevue/button'
 
 const emit = defineEmits(['addComment'])
 
-
 const message = ref('')
+
 const props = defineProps({
   quoteId: Number
 })
