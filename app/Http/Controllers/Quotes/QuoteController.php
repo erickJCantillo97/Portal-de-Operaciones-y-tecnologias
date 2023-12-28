@@ -146,16 +146,7 @@ class QuoteController extends Controller
      */
     public function edit(Quote $quote)
     {
-        $typeships = TypeShip::orderBy('name')->get();
-        $customers = Customer::orderBy('name')->get();
-        $estimadores = getPersonalGerenciaOficina('GECON', 'DEEST')->map(function ($estimador) {
-            return [
-                'user_id' => $estimador['Num_SAP'],
-                'name' => $estimador['Nombres_Apellidos'],
-                'email' => $estimador['Correo']
-            ];
-        })->toArray();
-        return Inertia::render('Quotes/Form', compact('typeships', 'customers', 'estimadores','quote'));
+       //
     }
 
     /**

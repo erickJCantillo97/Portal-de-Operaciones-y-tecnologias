@@ -20,7 +20,7 @@ const props = defineProps({
     estimadores: Object,
     customers: Array,
     typeships: Array,
-    quote:Object
+    quote: Object
 })
 const errors = ref({
     name: false,
@@ -34,9 +34,9 @@ const minDate = new Date();
 const oferta = ['ROM', 'FINAL']
 
 const quoteData = ref()
-if (props.quote){
-    newQuote.value=false
-    quoteData.value=props.quote
+if (props.quote) {
+    newQuote.value = false
+    quoteData.value = props.quote
 }
 
 const quoteSave = () => {
@@ -75,6 +75,13 @@ const quoteSave = () => {
     })
 }
 
+const editField = () => {
+    if (quote.name == quoteData.quote.name) {
+        console.log('entra')
+        return false
+    }
+}
+
 
 
 const op = ref();
@@ -104,8 +111,8 @@ const toggle = (event) => {
                         <span class="col-span-2">
                             <p>Nombre</p>
                             <InputText v-model="quote.name" filter optionLabel="name"
-                                :class="errors.name ? 'p-invalid' : ''" placeholder="Escriba el nombre de la estimacion"
-                                class="w-full md:w-14rem !h-8" />
+                                @input="this.class = editField ? 'hidden' : ''" :class="errors.name ? 'p-invalid' : ''"
+                                placeholder="Escriba el nombre de la estimacion" class="w-full md:w-14rem !h-8" />
                             <small v-if="errors.name" class="p-error" id="text-error">La estimacion debe tener un
                                 nombre</small>
                         </span>
@@ -157,7 +164,7 @@ const toggle = (event) => {
                                     }" />
                                 <span v-if="!newQuote" class="w-full justify-end flex">
                                     <Button severity="success" @click="quoteSave()" icon="fa-solid fa-floppy-disk"
-                                        label="Guardar cambios" class="!h-8"></Button>
+                                        label="Actualizar" class="!h-8"></Button>
                                 </span>
                             </span>
                         </span>
@@ -175,7 +182,7 @@ const toggle = (event) => {
                                 </span>
                                 <span class="">
                                     <p class="mt-1">Archivo a subir</p>
-                                    <FileUpload mode="basic" accept="application/pdf"  class="!h-8 !min-w-[200px]" />
+                                    <FileUpload mode="basic" accept="application/pdf" class="!h-8 !min-w-[200px]" />
                                 </span>
 
                             </div>
