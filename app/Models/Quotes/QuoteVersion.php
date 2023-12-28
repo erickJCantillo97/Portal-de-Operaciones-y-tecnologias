@@ -2,11 +2,13 @@
 
 namespace App\Models\Quotes;
 
+use App\Models\Comment;
 use App\Models\Projects\Customer;
 use App\Models\Scopes\GerenciaScope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class QuoteVersion extends Model
@@ -50,5 +52,10 @@ class QuoteVersion extends Model
     public function getStatusAttribute()
     {
         return QuoteStatus::where('quote_version_id', $this->id)->orderBy('fecha', 'DESC')->first()->status ?? 0;
+    }
+
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, 'commentable');
     }
 }
