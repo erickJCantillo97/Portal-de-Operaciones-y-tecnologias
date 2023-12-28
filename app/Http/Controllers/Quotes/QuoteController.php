@@ -110,7 +110,7 @@ class QuoteController extends Controller
                 ]);
             }
             QuoteStatus::create([
-                'status' => 1,
+                'status' => 0,
                 'user_id' => auth()->user()->id,
                 'quote_version_id' => $quoteVersion,
                 'fecha' => Carbon::now()
@@ -155,7 +155,7 @@ class QuoteController extends Controller
                 'email' => $estimador['Correo']
             ];
         })->toArray();
-        return Inertia::render('Quotes/Form', compact('typeships', 'customers', 'estimadores','quote'));
+        return Inertia::render('Quotes/Form', compact('typeships', 'customers', 'estimadores', 'quote'));
     }
 
     /**

@@ -14,6 +14,7 @@ import CommentForm from '@/Components/CommentForm.vue'
 import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 import Button from 'primevue/button'
+import { router } from '@inertiajs/vue3'
 
 onMounted(() => {
   // getVersions()
@@ -26,21 +27,20 @@ const openCommentsDialog = ref(false)
 const showDateResponse = ref(true)
 const statusSelected = ref()
 const statusOptions = ref(
-[
-  'Proceso',
-  'Entregada',
-  'Pendiente por Firma',
-  'Firmada',
-  'No Firmada',
-  'Contratada'
-])
+  [
+    { id: 0, name: 'Proceso' },
+    { id: 1, name: 'Entregada' },
+    { id: 2, name: 'Pendiente por Firma' },
+    { id: 3, name: 'Firmada' },
+    { id: 4, name: 'No Firmada' },
+    { id: 5, name: 'Contratada' }
+  ])
 
 
 
 const props = defineProps(
   {
-    openSlideOver: {
-      type: Boolean,
+    show: {
       default: false
     },
     quote: {
@@ -65,6 +65,21 @@ const openCommentsModal = () => {
 const closeCommentsModal = () => {
   openCommentsDialog.value = false
 }
+const key = ref(0)
+const saveStatus = () => {
+  try {
+    axios.post(route('quotestatus.store', {
+      status: statusSelected.value,
+      quote_version_id: props.quote.version_id,
+      fecha: dateSelected.value
+    })).then(res => {
+      key.value++;
+      console.log('Hello ' + res.data)
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 //#region API's
 const getVersions = () => {
@@ -78,16 +93,7 @@ const getVersions = () => {
   }
 }
 
-const saveStatus = () => {
-  try {
-    axios.post(route('post.quotes.status')
-      .then(res => {
-        console.log('Hello ' + res.data)
-      }))
-  } catch (error) {
-    console.log(error)
-  }
-}
+
 //#endregion
 
 // Formatear el número en moneda (USD)
@@ -100,8 +106,8 @@ const formatCurrency = (value) => {
 </script>
 
 <template>
-  <TransitionRoot as="template" :show="props.openSlideOver">
-    <Dialog as="div" class="relative z-10" @close="open = false">
+  <TransitionRoot as="template" :show="show">
+    <Dialog as="div" class="relative z-10" @close="$emit('closeSlideOver')">
       <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0" enter-to="opacity-100"
         leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
@@ -181,15 +187,14 @@ const formatCurrency = (value) => {
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Estado:</dt>
                           <dd class="text-gray-900">
-                            <Tag icon="pi pi-times" severity="danger" value="No Firmado"></Tag>
+                            <Tag icon="pi pi-times" severity="danger" :value="quote.status"></Tag>
                           </dd>
                         </div>
                       </dl>
                     </div>
                   </header>
                   <Accordion>
-                    <AccordionTab v-for="product in quote.products"
-                    :header="product.name" :pt="{
+                    <AccordionTab v-for="product in quote.products" :header="product.name" :pt="{
                       root: '!border-0 !ring-0',
                       headerAction: '!bg-slate-200 mb-2',
                       headerTitle: '!font-semibold',
@@ -273,7 +278,7 @@ const formatCurrency = (value) => {
   </TransitionRoot>
 
   <!--MODAL DE ASIGNACIÓN DE ESTADOS-->
-  <CustomModal :visible="openStatusDialog" :closable="true" :maximizable="true" width="40rem">
+  <CustomModal v-model:visible="openStatusDialog" :closable="true" :maximizable="true" width="40rem">
     <template #icon>
       <span class="text-white material-symbols-outlined text-4xl">
         engineering
@@ -286,7 +291,7 @@ const formatCurrency = (value) => {
       <div class="flex flex-nowrap p-4 space-x-2 justify-center items-center ">
         <div>
           <label for="dd-city">Estado de la Estimación</label>
-          <Dropdown v-model="statusSelected" :options="statusOptions" showClear
+          <Dropdown v-model="statusSelected" option-label="name" option-value="id" :options="statusOptions" showClear
             placeholder="Seleccione Estado de la Estimación" class="w-full md:w-14rem" />
         </div>
         <div>
@@ -295,7 +300,7 @@ const formatCurrency = (value) => {
         </div>
       </div>
       <div class="overflow-y-auto custom-scroll p-4">
-        <Feed :quoteId="quote.version_id" />
+        <Feed :quoteId="quote.version_id" :key="key" />
       </div>
     </template>
     <template #footer>
@@ -305,7 +310,7 @@ const formatCurrency = (value) => {
   </CustomModal>
 
   <!--MODAL DE COMENTARIOS-->
-  <CustomModal :visible="openCommentsDialog" :closable="true" :maximizable="true" width="40rem">
+  <CustomModal v-model:visible="openCommentsDialog" :closable="true" :maximizable="true" width="40rem">
     <template #icon>
       <span class="text-white material-symbols-outlined text-4xl">
         engineering

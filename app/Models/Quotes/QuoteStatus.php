@@ -40,6 +40,6 @@ class QuoteStatus extends Model implements Auditable
 
     public function getGetStatusAttribute()
     {
-        return $this->estados[$this->status - 1];
+        return $this->estados[$this->status];
     }
 }
