@@ -72,6 +72,6 @@ const slideOver = () => {
             </template>
         </CustomDataTable>
 
-        <CustomSlideOver :quote="quote" :openSlideOver="openSlideOver" @closeSlideOver="openSlideOver = false" />
+        <CustomSlideOver :quote="quote" :show="openSlideOver" @closeSlideOver="openSlideOver = false" />
     </AppLayout>
 </template>

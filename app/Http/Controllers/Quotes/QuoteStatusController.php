@@ -14,7 +14,7 @@ class QuoteStatusController extends Controller
      */
     public function index(Request $request)
     {
-        $status = QuoteStatus::with('user')->where('quote_version_id', $request->id)->get();
+        $status = QuoteStatus::orderBy('fecha')->with('user')->where('quote_version_id', $request->id)->get();
         return response()->json([
             'status' => $status
         ]);
@@ -35,7 +35,8 @@ class QuoteStatusController extends Controller
     {
         $validateData = $request->validate([
             'status' => 'required',
-            'quote_version_id' => 'required'
+            'quote_version_id' => 'required',
+            'fecha' => 'required'
         ]);
         $validateData['user_id'] = auth()->user()->id;
 

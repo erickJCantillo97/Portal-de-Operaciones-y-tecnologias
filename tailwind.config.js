@@ -32,12 +32,12 @@ export default {
                     "dark-light": "rgba(0,171,85,.15)",
                 },
                 danger: {
-                    DEFAULT: "#e7515a",
+                    DEFAULT: "#DC2626",
                     light: "#fff5f5",
                     "dark-light": "rgba(231,81,90,.15)",
                 },
                 warning: {
-                    DEFAULT: "#e2a03f",
+                    DEFAULT: "#EA580C",
                     light: "#fff9ed",
                     "dark-light": "rgba(226,160,63,.15)",
                 },

@@ -44,11 +44,11 @@ class QuoteVersion extends Model
 
     public function getGetStatusAttribute()
     {
-        return $this->estados[(QuoteStatus::where('quote_version_id', $this->id)->orderBy('fecha', 'DESC')->first()->status ?? 1) - 1];
+        return $this->estados[(QuoteStatus::where('quote_version_id', $this->id)->orderBy('fecha', 'DESC')->first()->status ?? 0)];
     }
 
     public function getStatusAttribute()
     {
-        return QuoteStatus::where('quote_version_id', $this->id)->orderBy('fecha', 'DESC')->first()->status ?? 1;
+        return QuoteStatus::where('quote_version_id', $this->id)->orderBy('fecha', 'DESC')->first()->status ?? 0;
     }
 }
