@@ -16,7 +16,17 @@ class CommentController extends Controller
     {
         $quote = QuoteVersion::findOrFail($request->id);
 
-        $comments = $quote->comments;
+        $comments = $quote->comments->map(
+            function ($comment) {
+                return [
+                    'user_photo' => $comment->user->photo,
+                    'user_name' => $comment->user->short_name,
+                    'message' => $comment['message'],
+                    'id' => $comment['id'],
+                    'date' => $comment['created_at']
+                ];
+            }
+        )->toArray();
 
         return response()->json([
             'comments' => $comments,
@@ -42,6 +52,7 @@ class CommentController extends Controller
             'response_id' => 'nullable'
         ]);
         $validateData['commentable_type'] = 'App\Models\Quotes\QuoteVersion';
+        $validateData['user_id'] = auth()->user()->id;
         try {
             Comment::create($validateData);
         } catch (Exception $e) {
