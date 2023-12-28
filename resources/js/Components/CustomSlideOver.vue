@@ -14,10 +14,10 @@ import CommentForm from '@/Components/CommentForm.vue'
 import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 import Button from 'primevue/button'
-import { router } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
 
 onMounted(() => {
-  // getVersions()
+    // getVersions()
 })
 
 const checked = ref(false)
@@ -27,70 +27,70 @@ const openCommentsDialog = ref(false)
 const showDateResponse = ref(true)
 const statusSelected = ref()
 const statusOptions = ref(
-  [
-    { id: 0, name: 'Proceso' },
-    { id: 1, name: 'Entregada' },
-    { id: 2, name: 'Pendiente por Firma' },
-    { id: 3, name: 'Firmada' },
-    { id: 4, name: 'No Firmada' },
-    { id: 5, name: 'Contratada' }
-  ])
+    [
+        { id: 0, name: 'Proceso' },
+        { id: 1, name: 'Entregada' },
+        { id: 2, name: 'Pendiente por Firma' },
+        { id: 3, name: 'Firmada' },
+        { id: 4, name: 'No Firmada' },
+        { id: 5, name: 'Contratada' }
+    ])
 
 
 
 const props = defineProps(
-  {
-    show: {
-      default: false
-    },
-    quote: {
-      type: Object,
-      required: false
+    {
+        show: {
+            default: false
+        },
+        quote: {
+            type: Object,
+            required: false
+        }
     }
-  }
 )
 
 const openStatusModal = () => {
-  openStatusDialog.value = true
+    openStatusDialog.value = true
 }
 
 const closeStatusDialog = () => {
-  openStatusDialog.value = false
+    openStatusDialog.value = false
 }
 
 const openCommentsModal = () => {
-  openCommentsDialog.value = true
+    openCommentsDialog.value = true
 }
 
 const closeCommentsModal = () => {
-  openCommentsDialog.value = false
+    openCommentsDialog.value = false
 }
 const key = ref(0)
 const saveStatus = () => {
-  try {
-    axios.post(route('quotestatus.store', {
-      status: statusSelected.value,
-      quote_version_id: props.quote.version_id,
-      fecha: dateSelected.value
-    })).then(res => {
-      key.value++;
-      console.log('Hello ' + res.data)
-    })
-  } catch (error) {
-    console.log(error)
-  }
+    try {
+        axios.post(route('quotestatus.store', {
+            status: statusSelected.value,
+            quote_version_id: props.quote.version_id,
+            fecha: dateSelected.value
+        })).then(res => {
+            key.value++;
+            console.log('Hello ' + res.data)
+        })
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 //#region API's
 const getVersions = () => {
-  try {
-    axios.get(route('get.quotes.versions')
-      .then(res => {
-        console.log('Hello ' + res.data)
-      }))
-  } catch (error) {
-    console.log(error)
-  }
+    try {
+        axios.get(route('get.quotes.versions')
+            .then(res => {
+                console.log('Hello ' + res.data)
+            }))
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 
@@ -98,234 +98,253 @@ const getVersions = () => {
 
 // Formatear el número en moneda (USD)
 const formatCurrency = (value) => {
-  return parseFloat(value).toLocaleString('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-  })
+    return parseFloat(value).toLocaleString('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+    })
 }
 </script>
 
 <template>
-  <TransitionRoot as="template" :show="show">
-    <Dialog as="div" class="relative z-10" @close="$emit('closeSlideOver')">
-      <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0" enter-to="opacity-100"
-        leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-      </TransitionChild>
-
-      <div class="fixed inset-0 overflow-hidden">
-        <div class="absolute inset-0 overflow-hidden">
-          <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
-            <TransitionChild as="template" enter="transform transition ease-in-out duration-500 sm:duration-700"
-              enter-from="translate-x-full" enter-to="translate-x-0"
-              leave="transform transition ease-in-out duration-500 sm:duration-700" leave-from="translate-x-0"
-              leave-to="translate-x-full">
-              <DialogPanel class="pointer-events-auto relative w-96">
-                <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0"
-                  enter-to="opacity-100" leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
-                  <div class="absolute left-0 top-0 -ml-8 flex pr-2 pt-4 sm:-ml-10 sm:pr-4">
-                    <button type="button"
-                      class="relative rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
-                      @click="$emit('closeSlideOver')">
-                      <span class="absolute -inset-2.5" />
-                      <span class="sr-only">Close panel</span>
-                      <XMarkIcon class="h-6 w-6" aria-hidden="true" />
-                    </button>
-                  </div>
-                </TransitionChild>
-                <div class="h-full overflow-y-auto bg-white p-2">
-                  <div class="rounded-lg bg-blue-900 text-white uppercase p-2 mb-2">
-                    <h2 class="text-md text-center font-bold text-white">
-                      {{ quote.name }} {{ quote.consecutive }}-{{ quote.version }}
-                    </h2>
-                  </div>
-                  <header class="w-full">
-                    <div class="flex flex-nowrap text-center justify-center items-center" v-if="quote.version > 1">
-                      <ul class="hover:border-b text-md text-center font-semibold text-blue-900 w-10 cursor-pointer"
-                        v-for="version in quote.version">
-                        <li>{{ version }}</li>
-                      </ul>
-                    </div>
-                    <div class="flex flex-nowrap space-x-2 p-2 justify-center rounded-lg">
-                      <Button @click="openStatusModal()" size="small" label="Estados" icon="pi pi-list" />
-                      <Button @click="openCommentsModal()" severity="help" size="small" label="Comentarios"
-                        icon="pi pi-comments" />
-                    </div>
-                    <div class="border border-solid rounded-lg p-2 mb-2">
-                      <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
-                        <div class="flex justify-between py-3 text-sm font-medium">
-                          <dt class="text-gray-500">Estimador:</dt>
-                          <dd class="text-gray-900 uppercase">{{ quote.estimador }}</dd>
-                        </div>
-                        <div class="flex justify-between py-3 text-sm font-medium">
-                          <dt class="text-gray-500">Cliente:</dt>
-                          <dd class="text-gray-900">{{ quote.customer }}</dd>
-                        </div>
-                        <div class="flex justify-between py-3 text-sm font-medium">
-                          <dt class="text-gray-500">Tipo de Oferta:</dt>
-                          <dd class="text-gray-900">ROM</dd>
-                        </div>
-                        <div class="flex justify-between py-3 text-sm font-medium">
-                          <dt class="text-gray-500">Fecha de Solicitud:</dt>
-                          <dd class="text-gray-900">{{ Moment(quote.created_at).format('DD/MM/YY') }}</dd>
-                        </div>
-                        <div class="flex justify-between py-3 text-sm font-medium">
-                          <dt class="text-gray-500">Fecha Respuesta Esperada:</dt>
-                          <dd class="text-gray-900">{{ Moment(quote.expected_answer_date).format('DD/MM/YY') }}</dd>
-                        </div>
-                        <div v-if="showDateResponse" class="flex justify-between py-3 text-sm font-medium">
-                          <dt class="text-gray-500">Fecha de Respuesta:</dt>
-                          <dd class="text-gray-900">{{ Moment().add(6, 'days').format('DD/MM/YY') }}</dd>
-                        </div>
-                        <div class="flex justify-between py-3 text-sm font-medium">
-                          <dt class="text-gray-500">Estado:</dt>
-                          <dd class="text-gray-900">
-                            <Tag icon="pi pi-times" severity="danger" :value="quote.status"></Tag>
-                          </dd>
-                        </div>
-                      </dl>
-                    </div>
-                  </header>
-                  <Accordion>
-                    <AccordionTab v-for="product in quote.products" :header="product.name" :pt="{
-                      root: '!border-0 !ring-0',
-                      headerAction: '!bg-slate-200 mb-2',
-                      headerTitle: '!font-semibold',
-                    }">
-                      <div class="space-y-6">
-                        <div>
-                          <h3 class="font-medium text-gray-900">Información del producto</h3>
-                          <dl class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Clase:</dt>
-                              <dd class="text-gray-900">{{ product.name }}</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Tipo de proyecto:</dt>
-                              <dd class="text-gray-900">{{ quote.project_type == null ? 'N/A' : quote.project_type }}</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Alcance:</dt>
-                              <dd class="text-gray-900">{{ quote.scope == null ? 'N/A' : quote.scope }}</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Madurez:</dt>
-                              <dd class="text-gray-900">{{ quote.maturity == null ? 'N/A' : quote.maturity }}</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Cantidad:</dt>
-                              <dd class="text-gray-900">{{ quote.units == null ? 'N/A' : quote.units }}</dd>
-                            </div>
-                          </dl>
-                        </div>
-                        <div>
-                          <h3 class="font-medium text-gray-900">Información de la Oferta</h3>
-                          <dl class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Margen Estimado:</dt>
-                              <dd class="text-gray-900">25.3%</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Precio Original:</dt>
-                              <dd class="text-gray-900">{{ formatCurrency('1200000000') }}</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Tasa de Venta:</dt>
-                              <dd class="text-gray-900">0</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">IVA:</dt>
-                              <dd class="text-gray-900">19%</dd>
-                            </div>
-                          </dl>
-                        </div>
-                      </div>
-                    </AccordionTab>
-                  </Accordion>
-                  <section class="border border-gray-200 p-4">
-                    <div class="mb-4">
-                      <h3 class="font-semibold text-gray-900 text-center">Documentos</h3>
-                    </div>
-                    <section class="grid grid-cols-2 space-x-2 text-center">
-                      <div class="col-span-1 space-y-2 items-center text-center">
-                        <Button size="small" label="Clonar" :pt="{
-                          root: '!w-full !bg-emerald-600 !hover:bg-emerald-500',
-                          label: '!text-center',
-                        }" />
-                        <Button size="small" label="Editar" :pt="{
-                          root: '!w-full !bg-warning !hover:bg-orange-500',
-                          label: '!text-center',
-                        }" />
-                      </div>
-                      <div class="col-span-1 space-y-2 items-center">
-                        <Button size="small" label="Actualizar" :pt="{
-                          root: '!w-full !bg-primary !hover:bg-blue-500',
-                          label: '!text-center',
-                        }" />
-                        <Button size="small" label="Eliminar" :pt="{
-                          root: '!w-full !bg-danger !hover:bg-red-500',
-                          label: '!text-center',
-                        }" />
-                      </div>
-                    </section>
-                  </section>
-                </div>
-              </DialogPanel>
+    <TransitionRoot as="template" :show="show">
+        <Dialog as="div" class="relative z-10" @close="$emit('closeSlideOver')">
+            <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0" enter-to="opacity-100"
+                leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
             </TransitionChild>
-          </div>
-        </div>
-      </div>
-    </Dialog>
-  </TransitionRoot>
 
-  <!--MODAL DE ASIGNACIÓN DE ESTADOS-->
-  <CustomModal v-model:visible="openStatusDialog" :closable="true" :maximizable="true" width="40rem">
-    <template #icon>
-      <span class="text-white material-symbols-outlined text-4xl">
-        engineering
-      </span>
-    </template>
-    <template #titulo>
-      <span class="text-xl font-bold text-white white-space-nowrap">Cambiar Estado</span>
-    </template>
-    <template #body>
-      <div class="flex flex-nowrap p-4 space-x-2 justify-center items-center ">
-        <div>
-          <label for="dd-city">Estado de la Estimación</label>
-          <Dropdown v-model="statusSelected" option-label="name" option-value="id" :options="statusOptions" showClear
-            placeholder="Seleccione Estado de la Estimación" class="w-full md:w-14rem" />
-        </div>
-        <div>
-          <label for="dd-city">Seleccione Fecha</label>
-          <Calendar v-model="dateSelected" showIcon :manualInput="true" placeholder="Fecha Inicio de Reunión" />
-        </div>
-      </div>
-      <div class="overflow-y-auto custom-scroll p-4">
-        <Feed :quoteId="quote.version_id" :key="key" />
-      </div>
-    </template>
-    <template #footer>
-      <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised />
-      <Button @click="closeStatusDialog()" label="Cerrar" icon="pi pi-save" severity="danger" raised />
-    </template>
-  </CustomModal>
+            <div class="fixed inset-0 overflow-hidden">
+                <div class="absolute inset-0 overflow-hidden">
+                    <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+                        <TransitionChild as="template" enter="transform transition ease-in-out duration-500 sm:duration-700"
+                            enter-from="translate-x-full" enter-to="translate-x-0"
+                            leave="transform transition ease-in-out duration-500 sm:duration-700" leave-from="translate-x-0"
+                            leave-to="translate-x-full">
+                            <DialogPanel class="pointer-events-auto relative w-96">
+                                <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0"
+                                    enter-to="opacity-100" leave="ease-in-out duration-500" leave-from="opacity-100"
+                                    leave-to="opacity-0">
+                                    <div class="absolute left-0 top-0 -ml-8 flex pr-2 pt-4 sm:-ml-10 sm:pr-4">
+                                        <button type="button"
+                                            class="relative rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                                            @click="$emit('closeSlideOver')">
+                                            <span class="absolute -inset-2.5" />
+                                            <span class="sr-only">Close panel</span>
+                                            <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+                                        </button>
+                                    </div>
+                                </TransitionChild>
+                                <div class="h-full overflow-y-auto bg-white p-2">
+                                    <div class="rounded-lg bg-blue-900 text-white uppercase p-2 mb-2">
+                                        <h2 class="text-md text-center font-bold text-white">
+                                            {{ quote.name }} {{ quote.consecutive }}-{{ quote.version }}
+                                        </h2>
+                                    </div>
+                                    <header class="w-full">
+                                        <div class="flex flex-nowrap text-center justify-center items-center"
+                                            v-if="quote.version > 1">
+                                            <ul class="hover:border-b text-md text-center font-semibold text-blue-900 w-10 cursor-pointer"
+                                                v-for="version in quote.version">
+                                                <li>{{ version }}</li>
+                                            </ul>
+                                        </div>
+                                        <div class="flex flex-nowrap space-x-2 p-2 justify-center rounded-lg">
+                                            <Button @click="openStatusModal()" size="small" label="Estados"
+                                                icon="pi pi-list" />
+                                            <Button @click="openCommentsModal()" severity="help" size="small"
+                                                label="Comentarios" icon="pi pi-comments" />
+                                        </div>
+                                        <div class="border border-solid rounded-lg p-2 mb-2">
+                                            <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
+                                                <div class="flex justify-between py-3 text-sm font-medium">
+                                                    <dt class="text-gray-500">Estimador:</dt>
+                                                    <dd class="text-gray-900 uppercase">{{ quote.estimador }}</dd>
+                                                </div>
+                                                <div class="flex justify-between py-3 text-sm font-medium">
+                                                    <dt class="text-gray-500">Cliente:</dt>
+                                                    <dd class="text-gray-900">{{ quote.customer }}</dd>
+                                                </div>
+                                                <div class="flex justify-between py-3 text-sm font-medium">
+                                                    <dt class="text-gray-500">Tipo de Oferta:</dt>
+                                                    <dd class="text-gray-900">ROM</dd>
+                                                </div>
+                                                <div class="flex justify-between py-3 text-sm font-medium">
+                                                    <dt class="text-gray-500">Fecha de Solicitud:</dt>
+                                                    <dd class="text-gray-900">{{ Moment(quote.created_at).format('DD/MM/YY')
+                                                    }}</dd>
+                                                </div>
+                                                <div class="flex justify-between py-3 text-sm font-medium">
+                                                    <dt class="text-gray-500">Fecha Respuesta Esperada:</dt>
+                                                    <dd class="text-gray-900">{{
+                                                        Moment(quote.expected_answer_date).format('DD/MM/YY') }}</dd>
+                                                </div>
+                                                <div v-if="showDateResponse"
+                                                    class="flex justify-between py-3 text-sm font-medium">
+                                                    <dt class="text-gray-500">Fecha de Respuesta:</dt>
+                                                    <dd class="text-gray-900">{{ Moment().add(6, 'days').format('DD/MM/YY')
+                                                    }}</dd>
+                                                </div>
+                                                <div class="flex justify-between py-3 text-sm font-medium">
+                                                    <dt class="text-gray-500">Estado:</dt>
+                                                    <dd class="text-gray-900">
+                                                        <Tag icon="pi pi-times" severity="danger" :value="quote.status">
+                                                        </Tag>
+                                                    </dd>
+                                                </div>
+                                            </dl>
+                                        </div>
+                                    </header>
+                                    <Accordion>
+                                        <AccordionTab v-for="product in quote.products" :header="product.name" :pt="{
+                                            root: '!border-0 !ring-0',
+                                            headerAction: '!bg-slate-200 mb-2',
+                                            headerTitle: '!font-semibold',
+                                        }">
+                                            <div class="space-y-6">
+                                                <div>
+                                                    <h3 class="font-medium text-gray-900">Información del producto</h3>
+                                                    <dl
+                                                        class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
+                                                        <div class="flex justify-between py-3 text-sm font-medium">
+                                                            <dt class="text-gray-500">Clase:</dt>
+                                                            <dd class="text-gray-900">{{ product.name }}</dd>
+                                                        </div>
+                                                        <div class="flex justify-between py-3 text-sm font-medium">
+                                                            <dt class="text-gray-500">Tipo de proyecto:</dt>
+                                                            <dd class="text-gray-900">{{ quote.project_type == null ? 'N/A'
+                                                                : quote.project_type }}</dd>
+                                                        </div>
+                                                        <div class="flex justify-between py-3 text-sm font-medium">
+                                                            <dt class="text-gray-500">Alcance:</dt>
+                                                            <dd class="text-gray-900">{{ quote.scope == null ? 'N/A' :
+                                                                quote.scope }}</dd>
+                                                        </div>
+                                                        <div class="flex justify-between py-3 text-sm font-medium">
+                                                            <dt class="text-gray-500">Madurez:</dt>
+                                                            <dd class="text-gray-900">{{ quote.maturity == null ? 'N/A' :
+                                                                quote.maturity }}</dd>
+                                                        </div>
+                                                        <div class="flex justify-between py-3 text-sm font-medium">
+                                                            <dt class="text-gray-500">Cantidad:</dt>
+                                                            <dd class="text-gray-900">{{ quote.units == null ? 'N/A' :
+                                                                quote.units }}</dd>
+                                                        </div>
+                                                    </dl>
+                                                </div>
+                                                <div>
+                                                    <h3 class="font-medium text-gray-900">Información de la Oferta</h3>
+                                                    <dl
+                                                        class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
+                                                        <div class="flex justify-between py-3 text-sm font-medium">
+                                                            <dt class="text-gray-500">Margen Estimado:</dt>
+                                                            <dd class="text-gray-900">25.3%</dd>
+                                                        </div>
+                                                        <div class="flex justify-between py-3 text-sm font-medium">
+                                                            <dt class="text-gray-500">Precio Original:</dt>
+                                                            <dd class="text-gray-900">{{ formatCurrency('1200000000') }}
+                                                            </dd>
+                                                        </div>
+                                                        <div class="flex justify-between py-3 text-sm font-medium">
+                                                            <dt class="text-gray-500">Tasa de Venta:</dt>
+                                                            <dd class="text-gray-900">0</dd>
+                                                        </div>
+                                                        <div class="flex justify-between py-3 text-sm font-medium">
+                                                            <dt class="text-gray-500">IVA:</dt>
+                                                            <dd class="text-gray-900">19%</dd>
+                                                        </div>
+                                                    </dl>
+                                                </div>
+                                            </div>
+                                        </AccordionTab>
+                                    </Accordion>
+                                    <section class="border border-gray-200 p-4">
+                                        <div class="mb-4">
+                                            <h3 class="font-semibold text-gray-900 text-center">Documentos</h3>
+                                        </div>
+                                        <section class="grid grid-cols-2 space-x-2 text-center">
+                                            <div class="col-span-1 space-y-2 items-center text-center">
+                                                <Button size="small" label="Clonar" :pt="{
+                                                    root: '!w-full !bg-emerald-600 !hover:bg-emerald-500',
+                                                    label: '!text-center',
+                                                }" />
+                                                <div>
+                                                    <Link class="" :href="route('quotesversion.edit', quote.version_id)">
+                                                    <Button size="small" label="Editar" :pt="{
+                                                        root: '!w-full !bg-warning !hover:bg-orange-500',
+                                                        label: '!text-center',
+                                                    }" />
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                            <div class="col-span-1 space-y-2 items-center">
+                                                <Button size="small" label="Actualizar" :pt="{
+                                                    root: '!w-full !bg-primary !hover:bg-blue-500',
+                                                    label: '!text-center',
+                                                }" />
+                                                <Button size="small" label="Eliminar" :pt="{
+                                                    root: '!w-full !bg-danger !hover:bg-red-500',
+                                                    label: '!text-center',
+                                                }" />
+                                            </div>
+                                        </section>
+                                    </section>
+                                </div>
+                            </DialogPanel>
+                        </TransitionChild>
+                    </div>
+                </div>
+            </div>
+        </Dialog>
+    </TransitionRoot>
 
-  <!--MODAL DE COMENTARIOS-->
-  <CustomModal v-model:visible="openCommentsDialog" :closable="true" :maximizable="true" width="40rem">
-    <template #icon>
-      <span class="text-white material-symbols-outlined text-4xl">
-        engineering
-      </span>
-    </template>
-    <template #titulo>
-      <span class="text-xl font-bold text-white white-space-nowrap">Comentarios</span>
-    </template>
-    <template #body>
-      <FeedWithComments />
-    </template>
-    <template #footer>
-      <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised />
-      <Button @click="closeCommentsModal()" label="Cerrar" icon="pi pi-save" severity="danger" raised />
-    </template>
-  </CustomModal>
+    <!--MODAL DE ASIGNACIÓN DE ESTADOS-->
+    <CustomModal v-model:visible="openStatusDialog" :closable="true" :maximizable="true" width="40rem">
+        <template #icon>
+            <span class="text-white material-symbols-outlined text-4xl">
+                engineering
+            </span>
+        </template>
+        <template #titulo>
+            <span class="text-xl font-bold text-white white-space-nowrap">Cambiar Estado</span>
+        </template>
+        <template #body>
+            <div class="flex flex-nowrap p-4 space-x-2 justify-center items-center ">
+                <div>
+                    <label for="dd-city">Estado de la Estimación</label>
+                    <Dropdown v-model="statusSelected" option-label="name" option-value="id" :options="statusOptions"
+                        showClear placeholder="Seleccione Estado de la Estimación" class="w-full md:w-14rem" />
+                </div>
+                <div>
+                    <label for="dd-city">Seleccione Fecha</label>
+                    <Calendar v-model="dateSelected" showIcon :manualInput="true" placeholder="Fecha Inicio de Reunión" />
+                </div>
+            </div>
+            <div class="overflow-y-auto custom-scroll p-4">
+                <Feed :quoteId="quote.version_id" :key="key" />
+            </div>
+        </template>
+        <template #footer>
+            <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised />
+            <Button @click="closeStatusDialog()" label="Cerrar" icon="pi pi-save" severity="danger" raised />
+        </template>
+    </CustomModal>
+
+    <!--MODAL DE COMENTARIOS-->
+    <CustomModal v-model:visible="openCommentsDialog" :closable="true" :maximizable="true" width="40rem">
+        <template #icon>
+            <span class="text-white material-symbols-outlined text-4xl">
+                engineering
+            </span>
+        </template>
+        <template #titulo>
+            <span class="text-xl font-bold text-white white-space-nowrap">Comentarios</span>
+        </template>
+        <template #body>
+            <FeedWithComments />
+        </template>
+        <template #footer>
+            <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised />
+            <Button @click="closeCommentsModal()" label="Cerrar" icon="pi pi-save" severity="danger" raised />
+        </template>
+    </CustomModal>
 </template>
