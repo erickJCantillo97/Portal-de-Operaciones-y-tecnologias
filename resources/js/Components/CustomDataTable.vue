@@ -93,7 +93,7 @@ const formatCurrency = (valor, moneda) => {
     if (valor == undefined || valor == null) {
         return 'Sin definir'
     } else {
-        return new Date(date).toLocaleString('es-CO',
+        return new Date(valor).toLocaleString('es-CO',
             { style: 'currency', currency: moneda })
     }
 }
@@ -195,8 +195,9 @@ const formatCurrency = (valor, moneda) => {
 
         <!-- #region Columnas -->
 
-        <Column v-for="col, index in columnasSelect" :field="col.field" :filterField="col.field" :sortable="col.sortable"
-            :show-filter-match-modes="false" :filterMenuStyle="{ width: '16rem' }" :frozen="col.frozen" :pt="{
+        <Column v-for="col, index in   columnasSelect  " :field="col.field" :filterField="col.field"
+            :sortable="col.sortable" :show-filter-match-modes="false" :filterMenuStyle="{ width: '16rem' }"
+            :frozen="col.frozen" :pt="{
                 headerContent: { class: '!h-8' },
                 headerCell: { class: '!py-0 !px-1' },
             }">
@@ -225,18 +226,20 @@ const formatCurrency = (valor, moneda) => {
                 <p v-else-if="col.type == 'currency'" class="text-center">
                     {{ formatCurrency(data[col.field], col.moneda) }}
                 </p>
-                <Tag v-else-if="col.type == 'tag'">
-
-                </Tag>
+                <span v-else-if="col.type == 'tag'">
+                    <p :class="col.severity[data[col.field]].class" class="text-center rounded-lg px-2">
+                        {{ col.severity[data[col.field]].name }}
+                    </p>
+                </span>
                 <p v-else>{{ data[col.field] }} </p>
             </template>
 
         </Column>
 
-        <Column frozen alignFrozen="right" style="width:8%" v-if="props.actions.length > 0">
+        <Column frozen alignFrozen=" right" style="width:8%" v-if="props.actions.length > 0">
             <template #body="{ data }">
                 <div class="flex items-center justify-center w-full">
-                    <Button v-for="button in props.actions" @click="$emit(button.event, $event, data)"
+                    <Button v-for="  button   in   props.actions  " @click="$emit(button.event, $event, data)"
                         :severity="button.severity" :text="button.text" :outlined="button.outlined"
                         :rounded="button.rounded" :icon="button.icon" :label="button.label" :class="button.class" />
                 </div>
