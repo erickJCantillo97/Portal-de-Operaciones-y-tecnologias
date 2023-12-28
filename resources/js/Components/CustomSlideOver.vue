@@ -149,7 +149,7 @@ const formatCurrency = (value) => {
                 <div class="h-full overflow-y-auto bg-white p-2">
                   <div class="rounded-lg bg-blue-900 text-white uppercase p-2 mb-2">
                     <h2 class="text-md text-center font-bold text-white">
-                      {{ quote.name }} {{ quote.consecutive }}-{{ quote.version }}
+                      {{ quote.name }} {{ quote.consecutive }}
                     </h2>
                   </div>
                   <header class="w-full">
