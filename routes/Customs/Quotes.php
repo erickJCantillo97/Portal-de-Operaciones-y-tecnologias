@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\Quotes\QuoteController;
 use App\Http\Controllers\Quotes\QuoteStatusController;
 use App\Http\Controllers\Quotes\QuoteVersionController;
@@ -11,4 +12,5 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::resource('quotes', QuoteController::class);
     Route::resource('quotestatus', QuoteStatusController::class);
     Route::resource('quotesversion', QuoteVersionController::class);
+    Route::resource('comment', CommentController::class);
 });

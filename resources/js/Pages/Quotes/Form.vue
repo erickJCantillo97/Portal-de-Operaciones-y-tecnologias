@@ -29,7 +29,7 @@ const errors = ref({
 })
 const { toast } = useSweetalert();
 const newQuote = ref(true)
-const quote = ref({})
+const dataQuoteNew = ref({})
 const minDate = new Date();
 const oferta = ['ROM', 'FINAL']
 
@@ -37,6 +37,12 @@ const quoteData = ref()
 if (props.quote) {
     newQuote.value = false
     quoteData.value = props.quote
+    dataQuoteNew.value.name = props.quote.quote.name
+    dataQuoteNew.value.type_ships = props.quote.quote_type_ships.map((ship => parseInt(ship.type_ship_id)))
+    dataQuoteNew.value.observation = props.quote.observation
+    dataQuoteNew.value.customer_id = parseInt(props.quote.customer_id)
+    dataQuoteNew.value.offer_type = props.quote.offer_type
+    dataQuoteNew.value.route = props.quote.route
 }
 
 const quoteSave = () => {
@@ -48,11 +54,11 @@ const quoteSave = () => {
         denyButtonText: 'Cancelar'
     }).then((result) => {
         if (result.isConfirmed) {
-            axios.post(route('quotes.store', quote.value)).then((res) => {
+            axios.post(route('quotes.store', dataQuoteNew.value)).then((res) => {
                 console.log(res)
                 if (res.data.status) {
                     Swal.fire({
-                        title: 'La estimacion: ' + quote.value.name + ' se ha creado exitosamente ¿Desea agregar datos a las clases?',
+                        title: 'La estimacion: ' + dataQuoteNew.value.name + ' se ha creado exitosamente ¿Desea agregar datos a las clases?',
                         icon: 'success',
                         showDenyButton: true,
                         confirmButtonText: 'Sí',
@@ -75,11 +81,9 @@ const quoteSave = () => {
     })
 }
 
-const editField = () => {
-    if (quote.name == quoteData.quote.name) {
-        console.log('entra')
-        return false
-    }
+const modEdit = ref(false)
+const editActive = () => {
+    modEdit.value = true
 }
 
 
@@ -110,17 +114,17 @@ const toggle = (event) => {
                     <div class="grid grid-cols-2 gap-1">
                         <span class="col-span-2">
                             <p>Nombre</p>
-                            <InputText v-model="quote.name" filter optionLabel="name"
-                                @input="this.class = editField ? 'hidden' : ''" :class="errors.name ? 'p-invalid' : ''"
-                                placeholder="Escriba el nombre de la estimacion" class="w-full md:w-14rem !h-8" />
+                            <InputText v-model="dataQuoteNew.name" filter optionLabel="name" :disabled="!modEdit"
+                                :class="errors.name ? 'p-invalid' : ''" placeholder="Escriba el nombre de la estimacion"
+                                class="w-full md:w-14rem !h-8" />
                             <small v-if="errors.name" class="p-error" id="text-error">La estimacion debe tener un
                                 nombre</small>
                         </span>
                         <span class="col-span-2">
                             <p>Clase(s) de buque</p>
-                            <MultiSelect v-model="quote.type_ships" display="chip" filter optionValue="id"
-                                :options="typeships" optionLabel="name" placeholder="Selecciona la(s) clase(s) de buque"
-                                class="w-full md:w-20rem !h-8" :pt="{
+                            <MultiSelect v-model="dataQuoteNew.type_ships" display="chip" filter optionValue="id"
+                                :disabled="!modEdit" :options="typeships" optionLabel="name"
+                                placeholder="Selecciona la(s) clase(s) de buque" class="w-full md:w-20rem !h-8" :pt="{
                                     label: '!p-0 !px-2 !flex !items-center !h-8',
                                     token: '!p-0 !px-1',
                                     tokenLabel: '!text-sm'
@@ -128,15 +132,15 @@ const toggle = (event) => {
                         </span>
                         <span class="">
                             <p>Cliente</p>
-                            <Dropdown v-model="quote.customer_id" :options="customers" filter optionLabel="name"
+                            <Dropdown v-model="dataQuoteNew.customer_id" :options="customers" filter optionLabel="name"
                                 optionValue="id" placeholder="Selecciona un cliente" class="w-full md:w-14rem !h-8"
-                                showClear :pt="{
+                                showClear :disabled="!modEdit" :pt="{
                                     input: '!p-0 !pt-1 !px-1 '
                                 }" />
                         </span>
                         <span class="" v-if="newQuote">
                             <p>Estimador</p>
-                            <Dropdown v-model="quote.estimador_id" :options="Object.values(estimadores)" filter
+                            <Dropdown v-model="dataQuoteNew.estimador_id" :options="Object.values(estimadores)" filter
                                 optionLabel="name" optionValue="user_id" placeholder="Selecciona un estimador"
                                 :class="errors.estimador_id ? 'p-invalid' : ''" class="w-full md:w-14rem !h-8 " showClear
                                 :pt="{
@@ -147,8 +151,8 @@ const toggle = (event) => {
                         </span>
                         <span class="" v-if="newQuote">
                             <p>Fecha estimada de respuesta</p>
-                            <Calendar v-model="quote.expeted_answer_date" dateFormat="dd/mm/yy" showIcon :minDate="minDate"
-                                class="!h-8 w-full" placeholder="Fecha de respuesta"
+                            <Calendar v-model="dataQuoteNew.expeted_answer_date" dateFormat="dd/mm/yy" showIcon
+                                :minDate="minDate" class="!h-8 w-full" placeholder="Fecha de respuesta"
                                 :class="errors.expeted_answer_date ? 'p-invalid' : ''" :pt="{
                                     input: '!p-0 !pt-1 !px-1'
                                 }" />
@@ -158,36 +162,37 @@ const toggle = (event) => {
                         <span class="">
                             <p>Tipo de oferta</p>
                             <span class="flex space-x-2">
-                                <Dropdown v-model="quote.offer_type" :options="oferta"
+                                <Dropdown v-model="dataQuoteNew.offer_type" :options="oferta" :disabled="!modEdit"
                                     placeholder="Selecciona tipo de oferta" class="w-full md:w-14rem !h-8" showClear :pt="{
                                         input: '!p-0 !pt-1 !px-1'
                                     }" />
-                                <span v-if="!newQuote" class="w-full justify-end flex">
-                                    <Button severity="success" @click="quoteSave()" icon="fa-solid fa-floppy-disk"
-                                        label="Actualizar" class="!h-8"></Button>
+                                <span v-if="!newQuote" class="w-full justify-end flex gap-2">
+                                    <Button title="Editar estimacion" severity="danger" v-if="!modEdit" @click="editActive"
+                                        icon="fa-solid fa-pencil" class="!h-8"></Button>
+                                    <Button title="Guardar cambios" severity="success" v-if="modEdit" @click="quoteSave"
+                                        icon="fa-solid fa-floppy-disk" class="!h-8"></Button>
                                 </span>
                             </span>
                         </span>
                     </div>
-                    <span class="space-y-2 w">
-                        <Editor v-model="quote.observation" editorStyle="height: 210px" v-if="newQuote"
+                    <span class="space-y-2">
+                        <Editor v-model="dataQuoteNew.observation" editorStyle="height: 210px" v-if="newQuote"
                             placeholder="Escriba aqui las sugerencias que seran enviadas al estimador">
                         </Editor>
                         <span v-if="!newQuote" class="flex flex-col h-full justify-between">
                             <div class="space-y-2">
                                 <span class="">
                                     <p>Ruta</p>
-                                    <InputText for="ruta" v-model="quote.name" filter optionLabel="name"
+                                    <InputText for="ruta" v-model="dataQuoteNew.route" filter optionLabel="name"
                                         placeholder="Escriba la direccion" class="w-full md:w-14rem !h-8" />
                                 </span>
                                 <span class="">
                                     <p class="mt-1">Archivo a subir</p>
                                     <FileUpload mode="basic" accept="application/pdf" class="!h-8 !min-w-[200px]" />
                                 </span>
-
                             </div>
-                            <span class="flex justify-end gap-2">
-                                <Button severity="success" icon="fa-solid fa-floppy-disk" label="Guardar"
+                            <span class="flex justify-end gap-2" v-if="!modEdit">
+                                <Button severity=" success" icon="fa-solid fa-floppy-disk" label="Guardar"
                                     class="!h-8"></Button>
                                 <Button severity="primary" icon="fa-solid fa-paper-plane" label="Enviar a revision"
                                     class="!h-8"></Button>
@@ -201,7 +206,7 @@ const toggle = (event) => {
                     </span>
                 </div>
             </span>
-            <span class="" v-if="quoteData">
+            <span class="" v-if="quoteData && !modEdit">
                 <TabView class="tabview-custom" :scrollable="true">
                     <TabPanel v-for="buque, index in quoteData.quote_type_ships">
                         <template #header>
@@ -282,7 +287,7 @@ const toggle = (event) => {
     </AppLayout>
 
     <OverlayPanel ref="op" class="w-96">
-        <Editor v-model="quote.observation" editorStyle="height: 210px" :pt="{
+        <Editor v-model="dataQuoteNew.observation" editorStyle="height: 210px" :pt="{
             toolbar: '!hidden',
             content: '!border-0',
             root: 'border p-1 !rounded-md'

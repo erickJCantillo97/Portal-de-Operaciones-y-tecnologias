@@ -14,7 +14,7 @@ import CommentForm from '@/Components/CommentForm.vue'
 import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 import Button from 'primevue/button'
-import { router } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
 
 onMounted(() => {
   // getVersions()
@@ -81,6 +81,7 @@ const openCommentsModal = () => {
 const closeCommentsModal = () => {
   openCommentsDialog.value = false
 }
+
 const key = ref(0)
 const saveStatus = () => {
   try {
@@ -107,8 +108,6 @@ const getVersions = () => {
     console.log(error)
   }
 }
-
-
 //#endregion
 
 // Formatear el número en moneda (USD)
@@ -127,7 +126,6 @@ const formatCurrency = (value) => {
         leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
       </TransitionChild>
-
       <div class="fixed inset-0 overflow-hidden">
         <div class="absolute inset-0 overflow-hidden">
           <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
