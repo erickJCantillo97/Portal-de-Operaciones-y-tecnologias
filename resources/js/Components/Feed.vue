@@ -19,6 +19,16 @@ const icons = [
   DocumentIcon,
   UserIcon,
   HandThumbUpIcon,
+  HandThumbUpIcon,
+]
+
+const colors = [
+  'bg-red-500',
+  'bg-teal-500',
+  'bg-teal-500',
+  'bg-teal-500',
+  'bg-primary',
+  'bg-teal-500',
 ]
 </script>
 
@@ -31,8 +41,9 @@ const icons = [
             aria-hidden="true" />
           <div class="relative flex space-x-3">
             <div>
-              <span :class="['bg-gray-400 h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white']">
-                <component :is="icons[event.status-1]" class="h-5 w-5 text-white" aria-hidden="true" />
+              <span
+                :class="[colors[event.status], 'h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white']">
+                <component :is="icons[event.status]" class="h-5 w-5 text-white" aria-hidden="true" />
               </span>
             </div>
             <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
