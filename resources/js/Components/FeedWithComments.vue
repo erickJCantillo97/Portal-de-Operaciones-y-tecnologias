@@ -5,6 +5,10 @@ import CommentForm from '@/Components/CommentForm.vue'
 import Menu from 'primevue/menu'
 import Button from 'primevue/button'
 
+const props = defineProps({
+  quoteId: Number
+})
+
 const menu = ref()
 const items = ref([
   {
@@ -74,10 +78,9 @@ const activity = [
 <template>
   <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
   <div class="flow-root">
-    <ul role="list" class="h-72 overflow-y-auto scroll-smooth p-6 mt-4 border-t border-b border-blue-300 rounded-lg">
+    <ul role="list" class="max-h-[258px] overflow-y-auto scroll-smooth p-6 mt-4 shadow-md rounded-lg">
       <li v-for="(activityItem, activityItemIdx) in activity" :key="activityItem.id">
-
-        <div class="relative pb-8">
+        <div class="relative pb-1">
           <span v-if="activityItemIdx !== activity.length - 1"
             class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true" />
           <div class="relative flex items-start space-x-3">
@@ -102,7 +105,6 @@ const activity = [
                   </div>
                   <p class="mt-0.5 text-sm text-gray-500">Comentado {{ activityItem.date }}</p>
                 </div>
-
                 <div class="mt-2 text-sm text-gray-700">
                   <p>{{ activityItem.comment }}</p>
                 </div>
@@ -112,6 +114,6 @@ const activity = [
         </div>
       </li>
     </ul>
-    <CommentForm class="bottom-0 left-0 right-0" />
+    <CommentForm :quoteId="quoteId" class="bottom-0 left-0 right-0" />
   </div>
 </template>
