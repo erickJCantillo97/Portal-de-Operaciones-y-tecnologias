@@ -163,7 +163,7 @@ const quitar = (persona) => {
             </DataTable>
         </div>
 
-        <CustomModal :visible="modalVisible">
+        <CustomModal v-model:visible="modalVisible">
             <template #icon>
                 <span class="text-white material-symbols-outlined text-4xl">
                     engineering
