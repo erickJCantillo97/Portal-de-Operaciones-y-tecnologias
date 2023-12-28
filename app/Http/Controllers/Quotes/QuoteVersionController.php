@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Quotes;
 
 use App\Http\Controllers\Controller;
+use App\Models\Projects\Customer;
 use App\Models\Projects\TypeShip;
 use App\Models\Quotes\Quote;
 use App\Models\Quotes\QuoteTypeShip;
 use App\Models\Quotes\QuoteVersion;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class QuoteVersionController extends Controller
 {
@@ -75,7 +77,17 @@ class QuoteVersionController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $typeships = TypeShip::orderBy('name')->get();
+        $customers = Customer::orderBy('name')->get();
+        $estimadores = getPersonalGerenciaOficina('GECON', 'DEEST')->map(function ($estimador) {
+            return [
+                'user_id' => $estimador['Num_SAP'],
+                'name' => $estimador['Nombres_Apellidos'],
+                'email' => $estimador['Correo']
+            ];
+        })->toArray();
+        $quote = QuoteVersion::with('quote', 'quoteTypeShips')->where('id', $id)->first();
+        return Inertia::render('Quotes/Form', compact('typeships', 'customers', 'estimadores','quote'));
     }
 
     /**
