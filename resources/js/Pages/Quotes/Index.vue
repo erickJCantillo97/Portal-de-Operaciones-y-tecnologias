@@ -22,7 +22,16 @@ const columnas = ref([
     { field: 'name', header: 'Nombre' },
     { field: 'clases', header: 'Clases' },
     { field: 'customer', header: 'Cliente' },
-    { field: 'get_status', header: 'Estado', filter: false },
+    {
+        field: 'status', header: 'Estado', filter: false, type: 'tag', severity: [
+            { name: 'Proceso', class: 'bg-primary text-white' },
+            { name: 'Entregada', class: '' },
+            { name: 'Pendiente por Firma', class: '' },
+            { name: 'Firmada', class: '' },
+            { name: 'No Firmada', class: '' },
+            { name: 'Contratada', class: '' }
+        ]
+    },// Firmada, Proceso, Entregada,Pendiente por firma, Firmada, No firmada, Contratada
     { field: 'expeted_answer_date', header: 'Fecha maxima respuesta', type: 'date', filter: true, },
     { field: 'estimador_anaswer_date', header: 'Fecha respuesta', type: 'date', filter: true },
     { field: 'route', header: 'Ruta', filter: false },
