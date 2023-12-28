@@ -101,7 +101,7 @@ const formatCurrency = (value) => {
 
 <template>
   <TransitionRoot as="template" :show="props.openSlideOver">
-    <Dialog as="div" class="relative z-10" @close="open = false">
+    <Dialog as="div" class="relative z-10" @close="$emit('closeSlideOver')">
       <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0" enter-to="opacity-100"
         leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
@@ -141,16 +141,9 @@ const formatCurrency = (value) => {
                       </ul>
                     </div>
                     <div class="flex flex-nowrap space-x-2 p-2 justify-center rounded-lg">
-                      <button type="button" @click="openStatusModal()"
-                        class="flex flex-nowrap justify-center items-center space-x-2 bg-emerald-600 p-2 cursor-pointer rounded-lg hover:bg-emerald-500">
-                        <i class="fa-regular fa-rectangle-list fa-xl" style="color: #ffffff;"></i>
-                        <p class="text-md text-center font-bold text-white">Estados</p>
-                      </button>
-                      <button type="button" @click="openCommentsModal()"
-                        class="flex flex-nowrap justify-center items-center space-x-2 bg-orange-600 p-2 cursor-pointer rounded-lg hover:bg-orange-500">
-                        <i class="fa-regular fa-comment-dots fa-xl" style="color: #ffffff;"></i>
-                        <p class="text-md text-center font-bold text-white">Comentarios</p>
-                      </button>
+                      <Button @click="openStatusModal()" size="small" label="Estados" icon="pi pi-list" />
+                      <Button @click="openCommentsModal()" severity="help" size="small" label="Comentarios"
+                        icon="pi pi-comments" />
                     </div>
                     <div class="border border-solid rounded-lg p-2 mb-2">
                       <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
@@ -249,17 +242,25 @@ const formatCurrency = (value) => {
                       <h3 class="font-semibold text-gray-900 text-center">Documentos</h3>
                     </div>
                     <section class="grid grid-cols-2 space-x-2 text-center">
-                      <div class="col-span-1 space-y-2 items-center">
-                        <button type="button"
-                          class="flex-1 w-full rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">Clonar</button>
-                        <button type="button"
-                          class="flex-1 w-full rounded-md bg-orange-600 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-orange-500">Editar</button>
+                      <div class="col-span-1 space-y-2 items-center text-center">
+                        <Button size="small" label="Clonar" :pt="{
+                          root: '!w-full !bg-emerald-600 !hover:bg-emerald-500',
+                          label: '!text-center',
+                        }" />
+                        <Button size="small" label="Editar" :pt="{
+                          root: '!w-full !bg-warning !hover:bg-orange-500',
+                          label: '!text-center',
+                        }" />
                       </div>
                       <div class="col-span-1 space-y-2 items-center">
-                        <button type="button"
-                          class="flex-1 w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Actualizar</button>
-                        <button type="button"
-                          class="flex-1 w-full rounded-md bg-red-600 text-white px-3 py-2 text-sm font-semibold  shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-red-500">Eliminar</button>
+                        <Button size="small" label="Actualizar" :pt="{
+                          root: '!w-full !bg-primary !hover:bg-blue-500',
+                          label: '!text-center',
+                        }" />
+                        <Button size="small" label="Eliminar" :pt="{
+                          root: '!w-full !bg-danger !hover:bg-red-500',
+                          label: '!text-center',
+                        }" />
                       </div>
                     </section>
                   </section>
