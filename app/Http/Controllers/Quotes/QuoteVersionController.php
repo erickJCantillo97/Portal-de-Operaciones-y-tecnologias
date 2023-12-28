@@ -77,6 +77,7 @@ class QuoteVersionController extends Controller
      */
     public function edit(string $id)
     {
+
         $typeships = TypeShip::orderBy('name')->get();
         $customers = Customer::orderBy('name')->get();
         $estimadores = getPersonalGerenciaOficina('GECON', 'DEEST')->map(function ($estimador) {
@@ -87,7 +88,7 @@ class QuoteVersionController extends Controller
             ];
         })->toArray();
         $quote = QuoteVersion::with('quote', 'quoteTypeShips')->where('id', $id)->first();
-        return Inertia::render('Quotes/Form', compact('typeships', 'customers', 'estimadores','quote'));
+        return Inertia::render('Quotes/Form', compact('typeships', 'customers', 'estimadores', 'quote'));
     }
 
     /**
@@ -95,7 +96,37 @@ class QuoteVersionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validateData = $request->validate([
+            'estimador_id' => 'required|numeric',
+            'customer_id' => 'required|numeric',
+            'observation' => 'nullable|string',
+            'expeted_answer_date' => 'required|date|after_or_equal:' . Carbon::now()->format('Y-m-d'),
+            'offer_type' => 'string',
+        ]);
+        $quoteVersion = QuoteVersion::findOrFail($id)->update([
+            'estimador_id' => $validateData['estimador_id'],
+            'customer_id' => $validateData['customer_id'],
+            'observation' => $validateData['observation'],
+            'estimador_name' => $validateData['estimador_name'],
+            'expeted_answer_date' => $validateData['expeted_answer_date'],
+            'offer_type' => $validateData['offer_type'],
+        ])->id;
+
+        QuoteTypeShip::where('quote_version_id', $id)->whereNotIn('type_ship_id', $request->type_ships)->delete();
+
+        foreach (TypeShip::whereIn('id', $request->type_ships)->get() as $typeShip) {
+            QuoteTypeShip::firstOrCreate([
+                'quote_version_id' => $id,
+                'type_ship_id' => $typeShip->id,
+                'name' => $typeShip->name,
+            ]);
+        }
+
+        $quote = QuoteVersion::with('quote', 'quoteTypeShips')->where('id', $id)->first();
+        return response()->json([
+            'status' => true,
+            'quote' => $quote
+        ]);
     }
 
     /**
