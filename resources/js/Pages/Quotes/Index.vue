@@ -67,8 +67,8 @@ const slideOver = () => {
                 <Button title="Agregar Estimación" severity="success" label="Agregar" outlined icon="fa-solid fa-plus"
                     class="!h-8" />
                 </Link>
-                <Button @click="slideOver()" title="Agregar Estimación" severity="success" label="Ver" outlined icon="fa-solid fa-plus"
-                    class="!h-8" />
+                <!-- <Button @click="slideOver()" title="Agregar Estimación" severity="success" label="Ver" outlined icon="fa-solid fa-plus"
+                    class="!h-8" /> -->
             </template>
         </CustomDataTable>
 
