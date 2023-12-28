@@ -49,10 +49,10 @@ const props = defineProps({
 
 const submit = () => {
   try {
-    axios.post(route('comment.store')
+    axios.post(route('comment.store', { commentable_id: props.quoteId, message:message.value }))
       .then(res => {
         console.log('Hello ' + res.data)
-      }))
+      })
   } catch (error) {
     console.log(error)
   }
@@ -72,7 +72,7 @@ const submit = () => {
           placeholder="Escriba su comentario..." />
       </div>
       <div class="flex justify-end items-center mt-2">
-        <Button icon="pi pi-send" label="Enviar" severity="primary" size="small" outlined />
+        <Button type="submit" icon="pi pi-send" label="Enviar" severity="primary" size="small" outlined />
       </div>
     </form>
   </div>
