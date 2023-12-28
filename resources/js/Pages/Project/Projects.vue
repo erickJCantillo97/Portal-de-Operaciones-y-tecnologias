@@ -347,7 +347,7 @@ const showPdf = (event, data) => {
         </div>
     </OverlayPanel>
 
-    <CustomModal :visible="modalDocument" :maximizable="true" width="95vw">
+    <CustomModal v-model:visible="modalDocument" :maximizable="true" width="95vw">
         <template #icon>
             <i class="fa-solid fa-cloud-arrow-up text-white text-xl"></i>
         </template>

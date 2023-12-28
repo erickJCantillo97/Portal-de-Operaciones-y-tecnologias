@@ -93,7 +93,7 @@ class QuoteController extends Controller
                 'version' => 1,
                 'estimador_id' => $validateData['estimador_id'],
                 'customer_id' => $validateData['customer_id'],
-                'observation' => $validateData['observation'],
+                'observation' => $validateData['observation'] ?? '',
                 'estimador_name' => $validateData['estimador_name'],
                 'expeted_answer_date' => $validateData['expeted_answer_date'],
                 'offer_type' => $validateData['offer_type'],
@@ -125,11 +125,13 @@ class QuoteController extends Controller
                 'quote' => $quote
             ]);
         } catch (Exception $e) {
-
-            return back()->withErrors(['message' => 'Ocurrió un error al crear la Cotizacion: ' . $e->getMessage()], 500);
+            return response()->json([
+                'status' => false,
+                'message' => "Ocurrió un error al crear la Cotizacion",
+                'errorCode' => 500,
+                'error' => $e->getMessage()
+            ]);
         }
-
-        return redirect('ships.index');
     }
 
     /**
@@ -144,7 +146,16 @@ class QuoteController extends Controller
      */
     public function edit(Quote $quote)
     {
-        //
+        $typeships = TypeShip::orderBy('name')->get();
+        $customers = Customer::orderBy('name')->get();
+        $estimadores = getPersonalGerenciaOficina('GECON', 'DEEST')->map(function ($estimador) {
+            return [
+                'user_id' => $estimador['Num_SAP'],
+                'name' => $estimador['Nombres_Apellidos'],
+                'email' => $estimador['Correo']
+            ];
+        })->toArray();
+        return Inertia::render('Quotes/Form', compact('typeships', 'customers', 'estimadores','quote'));
     }
 
     /**

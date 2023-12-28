@@ -196,11 +196,7 @@ const calcularDiferencia = (start, end) => {
                                 v-model="filters.global.value" placeholder="Buscar..." />
                         </span>
                     </div>
-                    <div>
-                        <Button @click="createShift()" title="Crear horario" outlined icon="pi pi-plus" type="button" severity="success" class="!h-8">
-
-                        </Button>
-                    </div>
+                        <Button @click="createShift()" title="Crear horario" label="Nuevo" icon="pi pi-plus" severity="success" class="!h-8"/>
                 </div>
             </template>
 
@@ -229,24 +225,19 @@ const calcularDiferencia = (start, end) => {
             </Column>
             <Column field="status" header="Estado" class="w-1/12">
                 <template #body="slotProps">
-                    <Button @click="shiftSave(slotProps.data.status == false, slotProps.data)"
-                        :severity="(slotProps.data.status == true) ? 'success' : 'danger'">
-                        {{ (slotProps.data.status == true) ? 'Activo' : 'Inactivo' }}
-                    </Button>
+                    <Button @click="shiftSave(slotProps.data.status == false, slotProps.data)" class="!h-8"
+                        :severity="(slotProps.data.status == true) ? 'success' : 'danger'" :label="(slotProps.data.status == true) ? 'Activo' : 'Inactivo'"/>
+
                 </template>
             </Column>
             <Column header="Acciones" class="w-1/12">
                 <template #body="slotProps">
                     <div class="flex justify-center space-x-1">
                         <div title="Editar">
-                            <Button severity="primary" @click="editShift(slotProps.data)" class="hover:bg-primary">
-                                <i class="fa-solid fa-pen" />
-                            </Button>
+                            <Button severity="primary" icon="fa-solid fa-pen" @click="editShift(slotProps.data)" class="!h-8"/>
                         </div>
                         <div title="Eliminar">
-                            <Button severity="danger" @click="deleteShift(slotProps.data.id)" class="hover:bg-danger">
-                                <i class="fa-solid fa-trash" />
-                            </Button>
+                            <Button severity="danger" icon="fa-solid fa-trash" @click="deleteShift(slotProps.data.id)" class="!h-8"/>
                         </div>
                     </div>
                 </template>
@@ -256,7 +247,7 @@ const calcularDiferencia = (start, end) => {
         </DataTable>
     </div>
 
-    <CustomModal :visible=shiftDialog width="30rem">
+    <CustomModal v-model:visible=shiftDialog width="30rem">
         <template #icon>
             <i class="text-white fa-regular fa-clock"></i>
         </template>
