@@ -1,22 +1,25 @@
 <?php
 
-namespace App\Http\Controllers\Quotes;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\Quotes\QuoteStatus;
+use App\Models\Comment;
+use App\Models\Quotes\QuoteVersion;
 use Exception;
 use Illuminate\Http\Request;
 
-class QuoteStatusController extends Controller
+class CommentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $status = QuoteStatus::orderBy('fecha', 'DESC')->with('user')->where('quote_version_id', $request->id)->get();
+        $quote = QuoteVersion::findOrFail($request->id);
+
+        $comments = $quote->comments;
+
         return response()->json([
-            'status' => $status
+            'comments' => $comments,
         ]);
     }
 
@@ -29,19 +32,18 @@ class QuoteStatusController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in stor'age.
      */
     public function store(Request $request)
-    {
+    {;
         $validateData = $request->validate([
-            'status' => 'required',
-            'quote_version_id' => 'required',
-            'fecha' => 'required'
+            'commentable_id' => 'required|numeric',
+            'message' => 'required',
+            'response_id' => 'nullable'
         ]);
-        $validateData['user_id'] = auth()->user()->id;
-
+        $validateData['commentable_type'] = 'App\Models\Quotes\QuoteVersion';
         try {
-            QuoteStatus::create($validateData);
+            Comment::create($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
@@ -50,7 +52,7 @@ class QuoteStatusController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(QuoteStatus $quoteStatus)
+    public function show(Comment $comment)
     {
         //
     }
@@ -58,7 +60,7 @@ class QuoteStatusController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(QuoteStatus $quoteStatus)
+    public function edit(Comment $comment)
     {
         //
     }
@@ -66,14 +68,14 @@ class QuoteStatusController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, QuoteStatus $quoteStatus)
+    public function update(Request $request, Comment $comment)
     {
         $validateData = $request->validate([
             //
         ]);
 
         try {
-            $quoteStatus->update($validateData);
+            $comment->update($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
@@ -82,10 +84,10 @@ class QuoteStatusController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(QuoteStatus $quoteStatus)
+    public function destroy(Comment $comment)
     {
         try {
-            $quoteStatus->delete();
+            $comment->delete();
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
