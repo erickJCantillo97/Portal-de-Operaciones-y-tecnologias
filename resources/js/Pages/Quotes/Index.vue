@@ -24,12 +24,12 @@ const columnas = ref([
     { field: 'customer', header: 'Cliente' },
     {
         field: 'status', header: 'Estado', filter: false, type: 'tag', severity: [
-            { name: 'Proceso', class: 'bg-primary text-white' },
-            { name: 'Entregada', class: '' },
-            { name: 'Pendiente por Firma', class: '' },
-            { name: 'Firmada', class: '' },
-            { name: 'No Firmada', class: '' },
-            { name: 'Contratada', class: '' }
+            { text: 'Proceso', class: 'bg-primary text-white' },
+            { text: 'Entregada', class: '' },
+            { text: 'Pendiente por Firma', class: '' },
+            { text: 'Firmada', class: '' },
+            { text: 'No Firmada', class: '' },
+            { text: 'Contratada', class: '' }
         ]
     },// Firmada, Proceso, Entregada,Pendiente por firma, Firmada, No firmada, Contratada
     { field: 'expeted_answer_date', header: 'Fecha maxima respuesta', type: 'date', filter: true, },
@@ -76,8 +76,6 @@ const slideOver = () => {
                 <Button title="Agregar Estimación" severity="success" label="Agregar" outlined icon="fa-solid fa-plus"
                     class="!h-8" />
                 </Link>
-                <!-- <Button @click="slideOver()" title="Agregar Estimación" severity="success" label="Ver" outlined icon="fa-solid fa-plus"
-                    class="!h-8" /> -->
             </template>
         </CustomDataTable>
 
