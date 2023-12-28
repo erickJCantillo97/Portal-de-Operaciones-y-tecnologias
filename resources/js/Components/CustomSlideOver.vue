@@ -36,7 +36,23 @@ const statusOptions = ref(
     { id: 5, name: 'Contratada' }
   ])
 
+const icons = [
+  'fa-solid fa-user-clock', //0 -> Proceso
+  'fa-solid fa-thumbs-up', //1 -> Entregada
+  'fa-solid fa-calendar-days', //2 -> Pendiente por Firma
+  'fa-solid fa-check', //3 -> Firmada
+  'fa-solid fa-xmark', //4 -> No Firmada
+  'fa-solid fa-dollar-sign', //5 -> Contratada
+]
 
+const colors = [
+  'orange', //0 -> Proceso
+  'purple', //1 -> Entregada
+  'yellow', //2 -> Pendiente por Firma
+  'blue', //3 -> Firmada
+  'red', //4 -> No Firmada
+  'emerald', //5 -> Contratada
+]
 
 const props = defineProps(
   {
@@ -179,7 +195,11 @@ const formatCurrency = (value) => {
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Estado:</dt>
                           <dd class="text-gray-900">
-                            <Tag icon="pi pi-times" severity="danger" :value="quote.get_status"></Tag>
+                            <span
+                              :class="['bg-' + colors[quote.status] + '-500', 'inline-flex items-center rounded-md px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-green-600/20']">
+                              <i :class="icons[quote.status]" class="mr-2" aria-hidden="true" />
+                              {{ quote.get_status }}
+                            </span>
                           </dd>
                         </div>
                       </dl>
@@ -278,53 +298,50 @@ const formatCurrency = (value) => {
   </TransitionRoot>
 
   <!--MODAL DE ASIGNACIÓN DE ESTADOS-->
-  <CustomModal v-model:visible="openStatusDialog" :closable="true" :maximizable="true" width="40rem">
+  <CustomModal v-model:visible="openStatusDialog" :closable="true" :footer="false" width="50rem">
     <template #icon>
-      <span class="text-white material-symbols-outlined text-4xl">
-        engineering
+      <span class="text-white material-symbols-outlined text-3xl">
+        manage_history
       </span>
     </template>
     <template #titulo>
       <span class="text-xl font-bold text-white white-space-nowrap">Cambiar Estado</span>
     </template>
     <template #body>
-      <div class="flex flex-nowrap p-4 space-x-2 justify-center items-center ">
+      <div class="flex flex-nowrap p-4 space-x-2 justify-center items-center align-items-center">
         <div>
           <label for="dd-city">Estado de la Estimación</label>
           <Dropdown v-model="statusSelected" option-label="name" option-value="id" :options="statusOptions" showClear
-            placeholder="Seleccione Estado de la Estimación" class="w-full md:w-14rem" />
+            placeholder="Seleccione Estado de la Estimación" class="w-full md:w-14rem" :pt="{
+              filterContainer: '!h-12',
+            }" />
         </div>
         <div>
           <label for="dd-city">Seleccione Fecha</label>
           <Calendar v-model="dateSelected" showIcon :manualInput="true" placeholder="Fecha Inicio de Reunión" />
         </div>
+        <div class="mt-8">
+          <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" size="small" />
+        </div>
       </div>
-      <div class="overflow-y-auto custom-scroll p-4">
+      <div>
         <Feed :quoteId="quote.version_id" :key="key" />
       </div>
-    </template>
-    <template #footer>
-      <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised />
-      <Button @click="closeStatusDialog()" label="Cerrar" icon="pi pi-save" severity="danger" raised />
     </template>
   </CustomModal>
 
   <!--MODAL DE COMENTARIOS-->
-  <CustomModal v-model:visible="openCommentsDialog" :closable="true" :maximizable="true" width="40rem">
+  <CustomModal v-model:visible="openCommentsDialog" :closable="true" :footer="false" width="40rem">
     <template #icon>
-      <span class="text-white material-symbols-outlined text-4xl">
-        engineering
+      <span class="text-white material-symbols-outlined text-3xl">
+        chat
       </span>
     </template>
     <template #titulo>
       <span class="text-xl font-bold text-white white-space-nowrap">Comentarios</span>
     </template>
     <template #body>
-      <FeedWithComments />
-    </template>
-    <template #footer>
-      <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" raised />
-      <Button @click="closeCommentsModal()" label="Cerrar" icon="pi pi-save" severity="danger" raised />
+      <FeedWithComments :quoteId="quote.version_id" />
     </template>
   </CustomModal>
 </template>

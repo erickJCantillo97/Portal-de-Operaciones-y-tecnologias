@@ -5,6 +5,10 @@ const props = defineProps({
         type: String,
         default: '60rem'
     },
+    footer: {
+        type: Boolean,
+        default: true
+    },
     maximizable: {
         type: Boolean,
         default: false
@@ -27,11 +31,11 @@ const props = defineProps({
             </div>
         </template>
         <template #default>
-            <div class="h-full">
+            <div class="h-full ">
                 <slot name="body" />
             </div>
         </template>
-        <template #footer>
+        <template #footer v-if="footer">
             <slot name="footer" />
         </template>
         <template #maximizeicon="{ maximized }">

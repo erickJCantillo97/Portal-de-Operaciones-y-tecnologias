@@ -22,7 +22,7 @@ const columnas = ref([
     { field: 'name', header: 'Nombre' },
     { field: 'clases', header: 'Clases' },
     { field: 'customer', header: 'Cliente' },
-    { field: 'status', header: 'Estado', filter: false },
+    { field: 'get_status', header: 'Estado', filter: false },
     { field: 'expeted_answer_date', header: 'Fecha maxima respuesta', type: 'date', filter: true, },
     { field: 'estimador_anaswer_date', header: 'Fecha respuesta', type: 'date', filter: true },
     { field: 'route', header: 'Ruta', filter: false },

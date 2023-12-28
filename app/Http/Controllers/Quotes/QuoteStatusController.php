@@ -14,7 +14,7 @@ class QuoteStatusController extends Controller
      */
     public function index(Request $request)
     {
-        $status = QuoteStatus::orderBy('fecha')->with('user')->where('quote_version_id', $request->id)->get();
+        $status = QuoteStatus::orderBy('fecha', 'DESC')->with('user')->where('quote_version_id', $request->id)->get();
         return response()->json([
             'status' => $status
         ]);
