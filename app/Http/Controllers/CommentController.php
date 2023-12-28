@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
+use App\Models\Quotes\QuoteVersion;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -11,9 +12,15 @@ class CommentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $quote = QuoteVersion::findOrFail($request->id);
+
+        $comments = $quote->comments;
+
+        return response()->json([
+            'comments' => $comments,
+        ]);
     }
 
     /**

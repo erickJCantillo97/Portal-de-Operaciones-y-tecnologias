@@ -27,8 +27,7 @@ class QuoteController extends Controller
                 'id' => $quote['id'],
                 'name' => $quote['name'],
                 'gerencia' => $quote['gerencia'],
-                'get_status' => $quote['version']['get_status'],
-                'status' => $quote['version']['status'],
+                'status' => $quote['version']['get_status'],
                 'estimador' => $quote['version']['estimador_name'],
                 'customer' => $quote['version']['customer']['name'],
                 'version_id' => $quote['version']['id'],
@@ -119,8 +118,6 @@ class QuoteController extends Controller
 
             $quote = QuoteVersion::with('quote', 'quoteTypeShips')->where('id', $quoteVersion)->first();
 
-
-
             return response()->json([
                 'status' => true,
                 'quote' => $quote
@@ -147,7 +144,7 @@ class QuoteController extends Controller
      */
     public function edit(Quote $quote)
     {
-       //
+        //
     }
 
     /**
