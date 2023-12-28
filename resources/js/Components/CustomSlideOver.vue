@@ -74,7 +74,6 @@ const saveStatus = () => {
             fecha: dateSelected.value
         })).then(res => {
             key.value++;
-            console.log('Hello ' + res.data)
         })
     } catch (error) {
         console.log(error)
@@ -187,7 +186,7 @@ const formatCurrency = (value) => {
                                                 <div class="flex justify-between py-3 text-sm font-medium">
                                                     <dt class="text-gray-500">Estado:</dt>
                                                     <dd class="text-gray-900">
-                                                        <Tag icon="pi pi-times" severity="danger" :value="quote.status">
+                                                        <Tag icon="pi pi-times" severity="danger" :value="quote.get_status">
                                                         </Tag>
                                                     </dd>
                                                 </div>
@@ -267,14 +266,10 @@ const formatCurrency = (value) => {
                                                     root: '!w-full !bg-emerald-600 !hover:bg-emerald-500',
                                                     label: '!text-center',
                                                 }" />
-                                                <div>
-                                                    <Link class="" :href="route('quotesversion.edit', quote.version_id)">
-                                                    <Button size="small" label="Editar" :pt="{
-                                                        root: '!w-full !bg-warning !hover:bg-orange-500',
-                                                        label: '!text-center',
-                                                    }" />
-                                                    </Link>
-                                                </div>
+                                                <Button size="small" label="Editar" :pt="{
+                                                    root: '!w-full !bg-warning !hover:bg-orange-500',
+                                                    label: '!text-center',
+                                                }" />
                                             </div>
                                             <div class="col-span-1 space-y-2 items-center">
                                                 <Button size="small" label="Actualizar" :pt="{
