@@ -234,10 +234,10 @@ const calcularDiferencia = (start, end) => {
                 <template #body="slotProps">
                     <div class="flex justify-center space-x-1">
                         <div title="Editar">
-                            <Button severity="primary" icon="fa-solid fa-pen" @click="editShift(slotProps.data)" class="!h-8"/>
+                            <Button severity="primary" text icon="fa-solid fa-pen" @click="editShift(slotProps.data)" class="!h-8"/>
                         </div>
                         <div title="Eliminar">
-                            <Button severity="danger" icon="fa-solid fa-trash" @click="deleteShift(slotProps.data.id)" class="!h-8"/>
+                            <Button severity="danger" text icon="fa-solid fa-trash" @click="deleteShift(slotProps.data.id)" class="!h-8"/>
                         </div>
                     </div>
                 </template>
@@ -306,8 +306,8 @@ const calcularDiferencia = (start, end) => {
             </div>
         </template>
         <template #footer>
-            <Button type="button" severity="primary" icon="fa-solid fa-floppy-disk" @click="shiftSave(true, shift)" outline label="Guardar"/>
-            <Button type="button" severity="danger" icon="fa-solid fa-xmark" @click="shiftDialog = false" outline label="Cancelar"/>
+            <Button type="button" severity="primary" class="!h-8" icon="fa-solid fa-floppy-disk" @click="shiftSave(true, shift)" outline label="Guardar"/>
+            <Button type="button" severity="danger" class="!h-8" icon="fa-solid fa-xmark" @click="shiftDialog = false" outline label="Cancelar"/>
         </template>
     </CustomModal>
 </template>
