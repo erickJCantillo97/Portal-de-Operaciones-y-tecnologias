@@ -273,7 +273,7 @@ const formatCurrency = (value) => {
   </TransitionRoot>
 
   <!--MODAL DE ASIGNACIÓN DE ESTADOS-->
-  <CustomModal :visible="openStatusDialog" :closable="true" :maximizable="true" width="40rem">
+  <CustomModal v-model:visible="openStatusDialog" :closable="true" :maximizable="true" width="40rem">
     <template #icon>
       <span class="text-white material-symbols-outlined text-4xl">
         engineering
@@ -305,7 +305,7 @@ const formatCurrency = (value) => {
   </CustomModal>
 
   <!--MODAL DE COMENTARIOS-->
-  <CustomModal :visible="openCommentsDialog" :closable="true" :maximizable="true" width="40rem">
+  <CustomModal v-model:visible="openCommentsDialog" :closable="true" :maximizable="true" width="40rem">
     <template #icon>
       <span class="text-white material-symbols-outlined text-4xl">
         engineering
