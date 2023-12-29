@@ -32,7 +32,10 @@ const newQuote = ref(true)
 const dataQuoteNew = ref({})
 const minDate = new Date();
 const oferta = ['ROM', 'FINAL']
-
+const iva = ['5%', '16%', '19%', 'Exento', 'Excluido']
+const alcance = ['ADQUISICIÓN Y ENTREGA', 'CO DESARROLL DISEÑO Y CONSTRUCCIÓN', 'CO PRODUCCIÓN', 'CONSTRUCCIÓN', 'DISEÑO BUQUE', 'DISEÑO Y CONSTRUCCIÓN', 'SERVICIOS INDUSTRIALES']
+const madurez = ['CONCEPTUAL', 'PRELIMINAR', 'CONTRACTUAL', 'PORTAFOLIO']
+const docTecnico = ['PENDIENTE', 'HT', 'ET', 'PTB', 'DG', 'AT']
 const quoteData = ref()
 if (props.quote) {
     newQuote.value = false
@@ -221,18 +224,17 @@ const toggle = (event) => {
                         <div class="grid grid-cols-4 gap-2 ">
                             <span class="">
                                 <p for="username">Alcance</p>
-                                <InputText v-model="buque.scope" filter optionLabel="name" placeholder="Alcance"
-                                    class="w-full md:w-14rem !h-8" showClear />
-                            </span>
-                            <span class="">
-                                <p for="username">Tipo de proyecto</p>
-                                <InputText v-model="buque.project_type" filter optionLabel="name"
-                                    placeholder="Tipo de proyecto" class="w-full md:w-14rem !h-8" showClear />
+                                <Dropdown v-model="buque.scope" :options="alcance" placeholder="Selecciona el alcance"
+                                    class="w-full md:w-14rem !h-8" showClear :pt="{
+                                        input: '!p-0 !pt-1 !px-1 '
+                                    }" />
                             </span>
                             <span class="">
                                 <p for="username">Madurez</p>
-                                <InputText v-model="buque.maturity" filter optionLabel="name" placeholder="Madurez"
-                                    class="w-full md:w-14rem !h-8" showClear />
+                                <Dropdown v-model="buque.maturity" :options="madurez" placeholder="Selecciona la madurez"
+                                    class="w-full md:w-14rem !h-8" showClear :pt="{
+                                        input: '!p-0 !pt-1 !px-1 '
+                                    }" />
                             </span>
                             <span class="">
                                 <p for="username">Unidades</p>
@@ -261,8 +263,10 @@ const toggle = (event) => {
                             </span>
                             <span class="">
                                 <p for="username">IVA</p>
-                                <InputText v-model="buque.iva" filter optionLabel="name" placeholder="IVA"
-                                    class="w-full md:w-14rem !h-8" showClear />
+                                <Dropdown v-model="buque.iva" :options="iva" placeholder="Selecciona el IVA"
+                                    class="w-full md:w-14rem !h-8" showClear :pt="{
+                                        input: '!p-0 !pt-1 !px-1 '
+                                    }" />
                             </span>
                             <span class="">
                                 <p for="username">Margen</p>
@@ -271,8 +275,11 @@ const toggle = (event) => {
                             </span>
                             <span class="">
                                 <p for="username">Tipo de documento tecnico</p>
-                                <InputText v-model="buque.white_paper" filter optionLabel="name" placeholder="Tipo de DT"
-                                    class="w-full md:w-14rem !h-8" showClear />
+                                <Dropdown v-model="buque.white_paper" :options="docTecnico"
+                                    placeholder="Selecciona el tipo de DT" class="w-full md:w-14rem !h-8" showClear :pt="{
+                                        input: '!p-0 !pt-1 !px-1 '
+                                    }" />
+
                             </span>
                             <span class="">
                                 <p for="username">Numero de documento tecnico</p>

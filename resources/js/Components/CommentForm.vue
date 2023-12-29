@@ -1,23 +1,33 @@
 <script setup>
 import { ref } from 'vue'
-import Button from 'primevue/button'
 import { defineEmits } from 'vue'
+import Button from 'primevue/button'
 
 const emit = defineEmits(['addComment'])
 
-
 const message = ref('')
+
 const props = defineProps({
-  quoteId: Number
+  quoteId: Number,
+  message: Object,
+  actions: Number
 })
 
 const submit = () => {
   try {
-    axios.post(route('comment.store', { commentable_id: props.quoteId, message: message.value }))
-      .then(res => {
-        message.value = ''
-        emit('addComment')
-      })
+    if (props.actions == 1) {
+      axios.put(route('comment.update', props.message.id), { commentable_id: props.quoteId, message: message.value })
+        .then(res => {
+          message.value = ''
+          emit('addComment')
+        })
+    } else {
+      axios.post(route('comment.store', { commentable_id: props.quoteId, message: message.value, response_id: props.message.id }))
+        .then(res => {
+          message.value = ''
+          emit('addComment')
+        })
+    }
   } catch (error) {
     console.log(error)
   }
