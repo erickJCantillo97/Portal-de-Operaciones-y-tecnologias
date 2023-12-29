@@ -17,7 +17,6 @@ return new class extends Migration
             $table->bigInteger('type_ship_id')->index()->unsigned();
             $table->string('name');
             $table->string('scope')->nullable();
-            $table->string('project_type')->nullable();
             $table->string('maturity')->nullable();
             $table->integer('units')->nullable();
             $table->string('coin')->nullable();
