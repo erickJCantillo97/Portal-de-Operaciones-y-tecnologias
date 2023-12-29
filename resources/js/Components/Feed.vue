@@ -1,7 +1,9 @@
 <script setup>
 import { onMounted, ref } from 'vue'
+import Loading from '@/Components/Loading.vue'
 
 const status = ref([])
+const loadingStatus = ref(false)
 
 const props = defineProps({
   quoteId: Number
@@ -11,6 +13,7 @@ onMounted(() => {
   axios.get(route('quotestatus.index', { id: props.quoteId }))
     .then((res) => {
       status.value = res.data.status
+      loadingStatus.value = false
     })
 })
 
@@ -42,6 +45,9 @@ const format_ES_Date = (date) => {
   <div class="flow-root">
     <ul role="list" class="shadow-md rounded-lg p-8 max-h-[258px] overflow-y-auto">
       <li v-for="(event, eventIdx) in status" :key="event.id">
+        <section v-if="loadingStatus" class="h-[50vh] w-full flex flex-col justify-center items-center col-span-6">
+          <Loading message="Cargando Estados" />
+        </section>
         <div class="relative pb-8">
           <span v-if="eventIdx !== status.length - 1" class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200"
             aria-hidden="true" />

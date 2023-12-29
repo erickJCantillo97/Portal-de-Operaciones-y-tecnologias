@@ -13,7 +13,7 @@ const props = defineProps({
 const menu = ref()
 const loadingStatus = ref(true)
 
-const items = ref([
+const overlayOptions = ref([
   {
     label: 'Opciones',
     items: [
@@ -43,7 +43,7 @@ const getComments = () => {
   axios.get(route('comment.index', { id: props.quoteId })).then(
     (res) => {
       comments.value = res.data.comments
-      loadingStatus.value = false
+      // loadingStatus.value = false
     })
 }
 onMounted(() => {
@@ -57,12 +57,9 @@ const format_ES_Date = (date) => {
 </script>
 
 <template>
-  <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
+  <Menu ref="menu" id="overlay_menu" :model="overlayOptions" :popup="true" />
   <div class="flow-root">
     <ul role="list" class="max-h-[258px] overflow-y-auto scroll-smooth p-6 mt-4 shadow-md rounded-lg">
-      <section v-if="loadingStatus" class="h-[50vh] w-full flex flex-col justify-center items-center col-span-6">
-        <Loading message="Cargando Proyectos" />
-      </section>
       <li v-for="(commentItem, commentItemIdx) in comments">
         <div class="relative pb-1">
           <span v-if="commentItemIdx !== comments.length - 1"
