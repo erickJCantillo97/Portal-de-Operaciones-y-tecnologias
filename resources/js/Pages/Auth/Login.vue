@@ -50,7 +50,7 @@ const submit = () => {
                 <form action="#" method="POST" @submit.prevent="submit" class="space-y-6">
                     <div>
                         <div class="flex flex-col gap-1">
-                            <label for="username">Nombre de usuario</label>
+                            <label for="username">Usuario o Correo de Dominio</label>
                             <InputText id="username" size="small" class="!h-8" v-model="form.username"
                                 aria-describedby="username-help" />
                             <small id="username-help">Inicia sesión con tu usuario de dominio.</small>
@@ -62,7 +62,7 @@ const submit = () => {
                         <div class="flex flex-col gap-1">
                             <label for="password">Contraseña</label>
                             <Password id="password" v-model="form.password" toggleMask :feedback="false" class="!h-8" :pt="{
-                                input:'w-full'
+                                input: 'w-full'
                             }" />
                         </div>
                         <p class="text-xs font-bold text-red-800" id="email-error">{{ $page.props.errors.password }}
@@ -77,7 +77,7 @@ const submit = () => {
                         </div>
                     </div>
                     <div>
-                        <Button type="submit" class="!h-8 w-full" label="Iniciar sesion" :loading="form.processing"/>
+                        <Button type="submit" class="!h-8 w-full" label="Iniciar sesion" :loading="form.processing" />
                     </div>
                 </form>
             </AuthenticationCard>
