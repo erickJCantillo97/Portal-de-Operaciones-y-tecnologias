@@ -16,7 +16,7 @@ const props = defineProps({
 const submit = () => {
   try {
     if (props.actions == 1) {
-      axios.post(route('comment.update', props.message.id), { commentable_id: props.quoteId, message: message.value })
+      axios.put(route('comment.update', props.message.id), { commentable_id: props.quoteId, message: message.value })
         .then(res => {
           message.value = ''
           emit('addComment')
