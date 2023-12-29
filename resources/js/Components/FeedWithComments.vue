@@ -9,7 +9,8 @@ import Button from 'primevue/button'
 const props = defineProps({
   quoteId: Number
 })
-
+const action = ref(0)
+const comment = ref({})
 const menu = ref()
 const loadingStatus = ref(true)
 
@@ -19,7 +20,11 @@ const overlayOptions = ref([
     items: [
       {
         label: 'Responder',
-        icon: 'pi pi-reply'
+        icon: 'pi pi-reply',
+        command: () => {
+          action.value = 2;
+          console.log(action.value)
+        }
       },
       {
         label: 'Editar',
@@ -33,16 +38,21 @@ const overlayOptions = ref([
   }
 ])
 
-const toggle = (event, index) => {
+const toggle = (event, commentItem) => {
   menu.value.toggle(event)
+  comment.value = commentItem
+  console.log(comment.value)
 }
 
 const comments = ref([])
 
 const getComments = () => {
+  comment.value = {}
+  action.value = 0
   axios.get(route('comment.index', { id: props.quoteId })).then(
     (res) => {
       comments.value = res.data.comments
+
       // loadingStatus.value = false
     })
 }
@@ -66,7 +76,8 @@ const format_ES_Date = (date) => {
             class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true" />
           <div class="relative flex items-start space-x-3">
             <div class="relative">
-              <img class="flex h-10 w-10 items-center justify-center rounded-full object-cover bg-gray-400 ring-8 ring-white"
+              <img
+                class="flex h-10 w-10 items-center justify-center rounded-full object-cover bg-gray-400 ring-8 ring-white"
                 :src="commentItem.user_photo" alt="profile_photo" />
               <span class="absolute -bottom-0.5 -right-1 rounded-tl bg-white px-0.5 py-px">
                 <ChatBubbleLeftEllipsisIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -79,8 +90,9 @@ const format_ES_Date = (date) => {
                     {{ commentItem.user_name }}
                   </a>
                   <div class="flex justify-end">
-                    <Button @click="toggle($event, commentItem)" class="!size-4" type="button" icon="pi pi-ellipsis-v"
-                      aria-haspopup="true" aria-controls="overlay_menu" text />
+                    <Button @click="toggle($event, commentItem)" v-if="commentItem.user_id === $page.props.auth.user.id"
+                      class="!size-4" type="button" icon="pi pi-ellipsis-v" aria-haspopup="true"
+                      aria-controls="overlay_menu" text />
                   </div>
                 </div>
                 <p class="mt-0.5 text-sm text-gray-500">Comentado el: {{ format_ES_Date(commentItem.date) }}</p>
@@ -93,6 +105,7 @@ const format_ES_Date = (date) => {
         </div>
       </li>
     </ul>
-    <CommentForm :quoteId="quoteId" @addComment="getComments" class="bottom-0 left-0 right-0" />
+    <CommentForm :quoteId="quoteId" @addComment="getComments" :comment="comment" :actions="action"
+      class="bottom-0 left-0 right-0" />
   </div>
 </template>
