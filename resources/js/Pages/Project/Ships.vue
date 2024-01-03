@@ -160,11 +160,9 @@ const buttons = ref([
     <AppLayout>
         <div class="h-full overflow-y-auto">
             <CustomDataTable :data="ships" :columnas="columnas" cacheName="ships" :actions="buttons"
+                :title="customer ? 'Unidades del cliente:' + customer.name : 'Todas las unidades'"
                 @confirmDelete="deleteItem" @editItem="editItem" @cloneItem="cloneItem">
-                <template #header>
-                    <h1 class="text-xl font-semibold leading-6 text-primary">
-                        {{ customer ? 'Unidades del cliente:' + customer.name : 'Todas las unidades' }}
-                    </h1>
+                <template #buttonHeader>
                     <Button title="Agregar Estimación" @click="addItem()" severity="success" label="Agregar" outlined
                         icon="fa-solid fa-plus" class="!h-8" />
                 </template>

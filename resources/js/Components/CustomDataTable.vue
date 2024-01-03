@@ -36,6 +36,10 @@ const props = defineProps({
     filterButtons: {
         type: Array,
         default: null
+    },
+    title: {
+        type: String,
+        default: ''
     }
 })
 
@@ -128,7 +132,10 @@ const formatCurrency = (valor, moneda) => {
         <template #header>
             <div class="space-y-3">
                 <span class="flex justify-between">
-                    <slot name="header" />
+                    <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
+                        {{ title }}
+                    </h1>
+                    <slot name="buttonHeader" />
                 </span>
                 <div class="flex items-center justify-between">
                     <div class="space-x-2">
@@ -240,11 +247,15 @@ const formatCurrency = (valor, moneda) => {
                 <p v-else-if="col.type == 'currency'" class="text-center">
                     {{ formatCurrency(data[col.field], col.moneda) }}
                 </p>
-                <span v-else-if="col.type == 'tag'">
-                    <p :class="col.severity.find((severity) => severity.text == data[col.field]).class"
+                <span v-else-if="col.type == 'customTag'">
+                    <p :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
                         class="text-center rounded-lg px-2">
                         {{ data[col.field] }}
                     </p>
+                </span>
+                <span v-else-if="col.type == 'tag'">
+                    <Tag :severity="col.severitys.find((severity) => severity.text == data[col.field]).severity"
+                        :value="data[col.field]" />
                 </span>
                 <span v-else-if="col.type == 'object'">
                     <div class="flex items-center space-x-2 w-full justify-center">
@@ -274,7 +285,8 @@ const formatCurrency = (valor, moneda) => {
                 <div class="flex items-center justify-center w-full">
                     <Button v-for="   button    in    props.actions   " @click="$emit(button.event, $event, data)"
                         :severity="button.severity" :text="button.text" :outlined="button.outlined"
-                        :rounded="button.rounded" :icon="button.icon" :label="button.label" :class="button.class" />
+                        :rounded="button.rounded" :icon="button.icon" :label="button.label" :class="button.class"
+                        class="!h-8" />
                 </div>
             </template>
         </Column>

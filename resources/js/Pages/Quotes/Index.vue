@@ -23,7 +23,7 @@ const columnas = [
     { field: 'clases', header: 'Clases', filter: true, sortable: true },
     { field: 'customer', header: 'Cliente', filter: true, sortable: true },
     {
-        field: 'status', header: 'Estado', filter: true, sortable: true, type: 'tag', severity: [
+        field: 'status', header: 'Estado', filter: true, sortable: true, type: 'customTag', severitys: [
             { text: 'Proceso', class: 'bg-primary text-white' },
             { text: 'Entregada', class: '' },
             { text: 'Pendiente por Firma', class: '' },
@@ -53,7 +53,6 @@ const buttons = [
 const filterButtons = [
     { field: 'status', label: 'En proceso', data: 'Proceso' },
     { field: 'status', label: 'Entregadas', data: 'Entregada' },
-    { field: 'name', label: 'Estimacion 1', data: 'Estimacion 1' },
 ]
 //#endregion
 
@@ -75,11 +74,8 @@ const slideOver = () => {
 <template>
     <AppLayout>
         <CustomDataTable :data="quotes" :columnas="columnas" :actions="buttons" :filterButtons="filterButtons"
-            @showClic="showClic" @deleteClic="deleteClic">
-            <template #header>
-                <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
-                    Estimaciones
-                </h1>
+            title="Estimaciones" @showClic="showClic" @deleteClic="deleteClic">
+            <template #buttonHeader>
                 <Link :href="route('quotes.create')">
                 <Button title="Agregar Estimación" severity="success" label="Agregar" outlined icon="fa-solid fa-plus"
                     class="!h-8" />
