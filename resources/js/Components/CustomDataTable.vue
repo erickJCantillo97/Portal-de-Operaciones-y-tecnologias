@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
 import ProgressBar from 'primevue/progressbar';
 import Tag from 'primevue/tag';
 import InputNumber from 'primevue/inputnumber';
-
+import ToggleButton from 'primevue/toggleButton'
 const props = defineProps({
     data: {
         type: Array,
@@ -33,13 +33,15 @@ const props = defineProps({
         type: Array,
         default: []
     },
+    filterButtons: {
+        type: Array,
+        default: null
+    }
 })
 
 //#region Filtros de tabla y visor columnas
-const rows = ref(5)
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-});
+const rows = ref(10)
+const filters = ref({});
 const globalFilterFields = ref([])
 const columnasSelect = ref()
 if (props.columnas.length > 7) {
@@ -49,6 +51,7 @@ if (props.columnas.length > 7) {
 }
 const initFilters = () => {
     globalFilterFields.value = ['id']
+    filters.value.global = { value: null, matchMode: FilterMatchMode.CONTAINS }
     for (var columna of props.columnas) {
         if (columna.filter) {
             filters.value[columna.field] = { value: null, matchMode: FilterMatchMode.CONTAINS }
@@ -56,6 +59,7 @@ const initFilters = () => {
         }
     }
 };
+initFilters()
 onMounted(() => {
     initFilters()
 })
@@ -105,7 +109,7 @@ const formatCurrency = (valor, moneda) => {
 <template>
     <DataTable id="tabla" :value="data" paginator :rows="rows" selectionMode="single" tableStyle="min-width: 70rem"
         currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" v-model:filters="filters"
-        scrollHeight="flex" stripedRows filterDisplay="menu" scrollable class="p-datatable-sm" :removableSort="true"
+        scrollHeight="500px" stripedRows filterDisplay="menu" scrollable class="p-datatable-sm" :removableSort="true"
         stateStorage="session" :stateKey="'dt-' + cacheName + '-state-session'" :globalFilterFields="globalFilterFields"
         paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink" :pt="{
             paginator: {
@@ -119,7 +123,8 @@ const formatCurrency = (valor, moneda) => {
                 nextPageButton: '!h-8 !rounded-md',
                 lastPageButton: '!h-8 !rounded-md'
             }
-        }">
+        }
+            ">
         <template #header>
             <div class="space-y-3">
                 <span class="flex justify-between">
@@ -133,7 +138,13 @@ const formatCurrency = (valor, moneda) => {
                             <i class="fa-solid fa-magnifying-glass"></i>
                             <InputText v-model="filters.global.value" type="search" size="small" placeholder="Buscar" :pt="{
                                 root: { class: '!h-8' }
-                            }" />
+                            }
+                                " />
+                        </span>
+                        <span v-if="props.filterButtons" class="p-buttonset">
+                            <Button v-for="button in props.filterButtons" :label=button.label
+                                @click="filters[button.field].value = button.data"
+                                :outlined="filters[button.field].value != button.data" class="!h-8" icon="" />
                         </span>
                     </div>
                     <div class="space-x-2">
@@ -147,7 +158,8 @@ const formatCurrency = (valor, moneda) => {
                                 token: '!p-0',
                                 item: ' !p-2',
                                 header: '!p-2'
-                            }">
+                            }
+                                ">
                             <template #value>
                                 <Button icon="fa-solid fa-eye" text class="!h-8 !w-8" />
                             </template>
@@ -173,7 +185,8 @@ const formatCurrency = (valor, moneda) => {
                     root: '!h-8 !border-0 !ring-0',
                     input: '!py-0 !flex !items-center',
                     item: '!p-1 w-full text-center'
-                }" />
+                }
+                    " />
             </div>
         </template>
         <template #paginatorfirstpagelinkicon>
@@ -195,14 +208,15 @@ const formatCurrency = (valor, moneda) => {
 
         <!-- #region Columnas -->
 
-        <Column v-for="col, index in   columnasSelect  " :field="col.field" :filterField="col.field"
+        <Column v-for=" col, index  in    columnasSelect   " :field="col.field" :filterField="col.field" :class="col.class"
             :sortable="col.sortable" :show-filter-match-modes="false" :filterMenuStyle="{ width: '16rem' }"
             :frozen="col.frozen" :pt="{
                 headerContent: { class: '!h-8' },
                 headerCell: { class: '!py-0 !px-1' },
-            }">
+            }
+                ">
             <template #header>
-                <p class="text-sm text-primary text-center w-full font-bold">{{ col.header }}</p>
+                <p class="text-sm text-primary uppercase text-center w-full font-bold">{{ col.header }}</p>
             </template>
             <template #filtericon>
                 <i class="fa-solid fa-filter"></i>
@@ -232,15 +246,33 @@ const formatCurrency = (valor, moneda) => {
                         {{ data[col.field] }}
                     </p>
                 </span>
+                <span v-else-if="col.type == 'object'">
+                    <div class="flex items-center space-x-2 w-full justify-center">
+                        <img v-if="col.objectRows.photo" :src="data[col.objectRows.photo.field]" alt="Image"
+                            onerror="this.src='/svg/cotecmar-logo.svg'" class=" border py-0.5 rounded-lg sm:h-12 sm:w-16" />
+                        <div>
+                            <p class="font-bold text-sm ">{{
+                                col.objectRows.primary.subfield ?
+                                data[col.objectRows.primary.field][col.objectRows.primary.subfield] :
+                                data[col.objectRows.primary.field]
+                            }} </p>
+                            <p class="text-xs italic">{{
+                                col.objectRows.secundary.subfield ?
+                                data[col.objectRows.secundary.field][col.objectRows.secundary.subfield] :
+                                data[col.objectRows.secundary.field]
+                            }} </p>
+                        </div>
+                    </div>
+                </span>
                 <p v-else class="">{{ data[col.field] }} </p>
             </template>
 
         </Column>
 
-        <Column frozen alignFrozen=" right" style="width:8%" v-if="props.actions.length > 0">
+        <Column frozen alignFrozen=" right" class="w-[8%]" v-if="props.actions.length > 0">
             <template #body="{ data }">
                 <div class="flex items-center justify-center w-full">
-                    <Button v-for="  button   in   props.actions  " @click="$emit(button.event, $event, data)"
+                    <Button v-for="   button    in    props.actions   " @click="$emit(button.event, $event, data)"
                         :severity="button.severity" :text="button.text" :outlined="button.outlined"
                         :rounded="button.rounded" :icon="button.icon" :label="button.label" :class="button.class" />
                 </div>
