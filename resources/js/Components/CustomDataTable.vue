@@ -11,7 +11,6 @@ import Swal from 'sweetalert2';
 import ProgressBar from 'primevue/progressbar';
 import Tag from 'primevue/tag';
 import InputNumber from 'primevue/inputnumber';
-import ToggleButton from 'primevue/toggleButton'
 const props = defineProps({
     data: {
         type: Array,
@@ -48,6 +47,7 @@ const rows = ref(10)
 const filters = ref({});
 const globalFilterFields = ref([])
 const columnasSelect = ref()
+const filterOK = ref(false)
 if (props.columnas.length > 7) {
     columnasSelect.value = props.columnas.slice(0, 7)
 } else {
@@ -62,6 +62,7 @@ const initFilters = () => {
             globalFilterFields.value.push(columna.field)
         }
     }
+    filterOK.value = true
 };
 initFilters()
 onMounted(() => {
@@ -111,10 +112,11 @@ const formatCurrency = (valor, moneda) => {
 </script>
 
 <template>
-    <DataTable id="tabla" :value="data" paginator :rows="rows" selectionMode="single" tableStyle="min-width: 70rem"
-        currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" v-model:filters="filters"
-        scrollHeight="500px" stripedRows filterDisplay="menu" scrollable class="p-datatable-sm" :removableSort="true"
-        stateStorage="session" :stateKey="'dt-' + cacheName + '-state-session'" :globalFilterFields="globalFilterFields"
+    <DataTable id="tabla" :value="data" :paginator="data.length > rows" :rows="rows" selectionMode="single"
+        tableStyle="min-width: 70rem" currentPageReportTemplate="{first} al {last} de un total de {totalRecords}"
+        v-model:filters="filters" scrollHeight="500px" stripedRows filterDisplay="menu" scrollable class="p-datatable-sm"
+        :removableSort="true" stateStorage="session" :stateKey="'dt-' + title.toLowerCase() + '-state-session'"
+        :globalFilterFields="globalFilterFields"
         paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink" :pt="{
             paginator: {
                 paginatorWrapper: '!p-0',
@@ -148,7 +150,7 @@ const formatCurrency = (valor, moneda) => {
                             }
                                 " />
                         </span>
-                        <span v-if="props.filterButtons" class="p-buttonset">
+                        <span v-if="props.filterButtons && filterOK" class="p-buttonset">
                             <Button v-for="button in props.filterButtons" :label=button.label
                                 @click="filters[button.field].value = button.data"
                                 :outlined="filters[button.field].value != button.data" class="!h-8" icon="" />
@@ -223,7 +225,7 @@ const formatCurrency = (valor, moneda) => {
             }
                 ">
             <template #header>
-                <p class="text-sm text-primary uppercase text-center w-full font-bold">{{ col.header }}</p>
+                <p class="text-sm text-primary uppercase w-full font-bold">{{ col.header }}</p>
             </template>
             <template #filtericon>
                 <i class="fa-solid fa-filter"></i>
@@ -258,7 +260,7 @@ const formatCurrency = (valor, moneda) => {
                         :value="data[col.field]" />
                 </span>
                 <span v-else-if="col.type == 'object'">
-                    <div class="flex items-center space-x-2 w-full justify-center">
+                    <div class="flex items-center space-x-2 w-full">
                         <img v-if="col.objectRows.photo" :src="data[col.objectRows.photo.field]" alt="Image"
                             onerror="this.src='/svg/cotecmar-logo.svg'" class=" border py-0.5 rounded-lg sm:h-12 sm:w-16" />
                         <div>
@@ -280,7 +282,7 @@ const formatCurrency = (valor, moneda) => {
 
         </Column>
 
-        <Column frozen alignFrozen=" right" class="w-[8%]" v-if="props.actions.length > 0">
+        <Column frozen alignFrozen="right" class="w-[8%]" v-if="props.actions.length > 0">
             <template #body="{ data }">
                 <div class="flex items-center justify-center w-full">
                     <Button v-for="   button    in    props.actions   " @click="$emit(button.event, $event, data)"
