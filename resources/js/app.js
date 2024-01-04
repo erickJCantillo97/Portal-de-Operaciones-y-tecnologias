@@ -15,8 +15,8 @@ import Tooltip from "primevue/tooltip";
 import VueApexCharts from "vue3-apexcharts";
 import { Head } from '@inertiajs/vue3';
 import CustomModal from '@/Components/CustomModal.vue'
-import moment from 'moment'
-import "moment/locale/es"
+// import VueChatScroll from 'vue-chat-scroll'
+
 const appName =
     import.meta.env.VITE_APP_NAME || "Portal";
 
@@ -38,7 +38,7 @@ createInertiaApp({
                 locale: optionsPrimeVUE,
             })
             .use(VueApexCharts)
-            .use(moment)
+            // .use(VueChatScroll)
             .component("Head", Head)
             .directive("tooltip", Tooltip)
             .mixin({ component: { CustomModal } })
