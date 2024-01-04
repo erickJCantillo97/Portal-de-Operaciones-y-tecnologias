@@ -16,14 +16,14 @@ const openSlideOver = ref(false)
 const quote = ref({})
 
 //#region columnas de CustomDataTable
-const columnas = ref([
+const columnas = [
     // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
-    { field: 'consecutive', header: 'Consecutivo' },
-    { field: 'name', header: 'Nombre' },
-    { field: 'clases', header: 'Clases' },
-    { field: 'customer', header: 'Cliente' },
+    { field: 'consecutive', header: 'Consecutivo', filter: true, sortable: true },
+    { field: 'name', header: 'Nombre', filter: true, sortable: true },
+    { field: 'clases', header: 'Clases', filter: true, sortable: true },
+    { field: 'customer', header: 'Cliente', filter: true, sortable: true },
     {
-        field: 'status', header: 'Estado', filter: false, type: 'tag', severity: [
+        field: 'status', header: 'Estado', filter: true, sortable: true, type: 'customTag', severitys: [
             { text: 'Proceso', class: 'bg-primary text-white' },
             { text: 'Entregada', class: '' },
             { text: 'Pendiente por Firma', class: '' },
@@ -31,22 +31,29 @@ const columnas = ref([
             { text: 'No Firmada', class: '' },
             { text: 'Contratada', class: '' }
         ]
-    },// Firmada, Proceso, Entregada,Pendiente por firma, Firmada, No firmada, Contratada
-    { field: 'expeted_answer_date', header: 'Fecha maxima respuesta', type: 'date', filter: true, },
-    { field: 'estimador_anaswer_date', header: 'Fecha respuesta', type: 'date', filter: true },
+    },
+    { field: 'expeted_answer_date', header: 'Fecha maxima respuesta', type: 'date', sortable: true, filter: true, },
+    { field: 'estimador_anaswer_date', header: 'Fecha respuesta', type: 'date', sortable: true, filter: true },
     { field: 'route', header: 'Ruta', filter: false },
     { field: 'file', header: 'Documento', filter: false },
     { field: 'observation', header: 'Observacion', filter: false },
     { field: 'created_at', header: 'Fecha creacion', filter: false },
     { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true },
-])
+]
 //#endregion
 
 //#region Botones de CustomDatatable
-const buttons = ref([
+const buttons = [
     { event: 'showClic', severity: 'success', class: '', icon: 'fa-solid fa-eye', text: true, outlined: false, rounded: false },
-    { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
-])
+    // { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
+]
+//#endregion
+
+//#region Botones de filtro de CustomDatatable
+const filterButtons = [
+    { field: 'status', label: 'En proceso', data: 'Proceso' },
+    { field: 'status', label: 'Entregadas', data: 'Entregada' },
+]
 //#endregion
 
 const showClic = (event, data) => {
@@ -66,12 +73,9 @@ const slideOver = () => {
 
 <template>
     <AppLayout>
-        <CustomDataTable :data="quotes" :columnas="columnas" :actions="buttons" @showClic="showClic"
-            @deleteClic="deleteClic">
-            <template #header>
-                <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
-                    Estimaciones
-                </h1>
+        <CustomDataTable :data="quotes" :columnas="columnas" :actions="buttons" :filterButtons="filterButtons"
+            title="Estimaciones" @showClic="showClic" @deleteClic="deleteClic">
+            <template #buttonHeader>
                 <Link :href="route('quotes.create')">
                 <Button title="Agregar Estimación" severity="success" label="Agregar" outlined icon="fa-solid fa-plus"
                     class="!h-8" />

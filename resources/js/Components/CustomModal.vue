@@ -1,4 +1,6 @@
 <script setup>
+
+import { defineModel } from 'vue';
 import Dialog from 'primevue/dialog';
 const props = defineProps({
     width: {
@@ -12,8 +14,9 @@ const props = defineProps({
     maximizable: {
         type: Boolean,
         default: false
-    }
+    },
 })
+const visible = defineModel('visible')
 </script>
 
 <template>
@@ -21,11 +24,11 @@ const props = defineProps({
         :style="{ width: props.width }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :pt="{
             header: { class: '!bg-primary !h-[5vh]' },
             closeButtonIcon: { class: 'text-white' },
-            footer: { class: '!p-2 !h-[8vh] !align-baseline !flex !justify-end' }
+            footer: { class: '!p-2 !h-min !items-end !flex !justify-end' }
         }
             ">
         <template #header>
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2 text-white">
                 <slot name="icon" />
                 <slot name="titulo" />
             </div>

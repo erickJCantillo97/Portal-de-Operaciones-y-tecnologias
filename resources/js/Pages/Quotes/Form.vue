@@ -36,11 +36,18 @@ const iva = ['5%', '16%', '19%', 'Exento', 'Excluido']
 const alcance = ['ADQUISICIÓN Y ENTREGA', 'CO DESARROLL DISEÑO Y CONSTRUCCIÓN', 'CO PRODUCCIÓN', 'CONSTRUCCIÓN', 'DISEÑO BUQUE', 'DISEÑO Y CONSTRUCCIÓN', 'SERVICIOS INDUSTRIALES']
 const madurez = ['CONCEPTUAL', 'PRELIMINAR', 'CONTRACTUAL', 'PORTAFOLIO']
 const docTecnico = ['PENDIENTE', 'HT', 'ET', 'PTB', 'DG', 'AT']
-const quoteData = ref()
-if (props.quote) {
-    newQuote.value = false
-    quoteData.value = props.quote
+const modEdit = ref(false)
+const loadingButton = ref(false)
+const quoteShips = ref({})
+
+const editActive = () => {
+    modEdit.value = true
+}
+const editInactive = () => {
+    modEdit.value = false
+    dataQuoteNew.expeted_answer_date = props.quote.expeted_answer_date
     dataQuoteNew.value.name = props.quote.quote.name
+    dataQuoteNew.value.estimador_id = props.quote.estimador_id
     dataQuoteNew.value.type_ships = props.quote.quote_type_ships.map((ship => parseInt(ship.type_ship_id)))
     dataQuoteNew.value.observation = props.quote.observation
     dataQuoteNew.value.customer_id = parseInt(props.quote.customer_id)
@@ -48,17 +55,30 @@ if (props.quote) {
     dataQuoteNew.value.route = props.quote.route
 }
 
+if (props.quote) {
+    newQuote.value = false
+    dataQuoteNew.value.expeted_answer_date = props.quote.expeted_answer_date
+    dataQuoteNew.value.name = props.quote.quote.name
+    dataQuoteNew.value.estimador_id = props.quote.estimador_id
+    dataQuoteNew.value.type_ships = props.quote.quote_type_ships.map((ship => parseInt(ship.type_ship_id)))
+    dataQuoteNew.value.observation = props.quote.observation
+    dataQuoteNew.value.customer_id = parseInt(props.quote.customer_id)
+    dataQuoteNew.value.offer_type = props.quote.offer_type
+    dataQuoteNew.value.route = props.quote.route
+    quoteShips.value = props.quote.quote_type_ships
+}
+
 const quoteSave = () => {
+    loadingButton.value = true
     Swal.fire({
         title: '¿Desea guardar la solicitud de estimacion?',
         icon: 'warning',
         showDenyButton: true,
         confirmButtonText: 'Guardar',
         denyButtonText: 'Cancelar'
-    }).then((result) => {
+    }).then(async (result) => {
         if (result.isConfirmed) {
-            axios.post(route('quotes.store', dataQuoteNew.value)).then((res) => {
-                console.log(res)
+            await axios.post(route('quotes.store', dataQuoteNew.value)).then((res) => {
                 if (res.data.status) {
                     Swal.fire({
                         title: 'La estimacion: ' + dataQuoteNew.value.name + ' se ha creado exitosamente ¿Desea agregar datos a las clases?',
@@ -68,8 +88,8 @@ const quoteSave = () => {
                         denyButtonText: 'No'
                     }).then((result2) => {
                         if (result2.isConfirmed) {
-                            newQuote.value = false
-                            quoteData.value = res.data.quote
+                            console.log(res.data.quote)
+                            router.get(route('quotesversion.edit', res.data.quote.id))
                         } else if (result2.isDenied) {
                             router.get(route('quotes.index'))
                         }
@@ -81,15 +101,55 @@ const quoteSave = () => {
                 toast('Hay errores en los datos a guardar', 'error')
             })
         }
+        loadingButton.value = false
+    })
+
+}
+
+const quoteUpdate = () => {
+    loadingButton.value = true
+    Swal.fire({
+        title: '¿Desea actualizar la estimacion?',
+        text: 'Los cambios no guardados en las clases de buque se perderan',
+        icon: 'warning',
+        showDenyButton: true,
+        confirmButtonText: 'Guardar',
+        denyButtonText: 'Cancelar'
+    }).then(async (result) => {
+        await axios.put(route('quotesversion.update', props.quote.id), dataQuoteNew.value).then((res) => {
+            quoteShips.value = res.data.quote.quote_type_ships
+            toast('Estimacion actualizada correctamente', 'success')
+            modEdit.value = false
+        }).catch((e) => {
+            console.log(e)
+            errors.value = e.response.data.errors
+            toast('Hay errores en los datos a guardar', 'error')
+        })
+        loadingButton.value = false
     })
 }
 
-const modEdit = ref(false)
-const editActive = () => {
-    modEdit.value = true
+const quoteShipsSave = () => {
+    loadingButton.value = true
+    Swal.fire({
+        title: '¿Desea actualizar los datos de las clases en la estimacion?',
+        icon: 'warning',
+        showDenyButton: true,
+        confirmButtonText: 'Guardar',
+        denyButtonText: 'Cancelar'
+    }).then(async (result) => {
+        await axios.put(route('', props.quote.id), quoteShips.value).then((res) => {
+            quoteShips.value = res.data.quote.quote_type_ships
+            toast('Datos de las clases actualizados correctamente', 'success')
+            modEdit.value = false
+        }).catch((e) => {
+            console.log(e)
+            errors.value = e.response.data.errors
+            toast('Hay errores en los datos a guardar', 'error')
+        })
+        loadingButton.value = false
+    })
 }
-
-
 
 const op = ref();
 const toggle = (event) => {
@@ -105,8 +165,7 @@ const toggle = (event) => {
                     <p class="text-primary font-bold text-xl">
                         {{
                             newQuote ? 'Crear solicitud de estimacion' : 'Editar estimacion #' +
-                            quoteData.quote.created_at.slice(0, 4) + '-' + quoteData.quote.consecutive + '-V' +
-                        quoteData.version
+                        props.quote.quote.id
                         }}
                     </p>
                     <Button v-if="!newQuote" label="Ver sugerencia" icon="fa-solid fa-file-circle-question" class="!h-8"
@@ -117,7 +176,7 @@ const toggle = (event) => {
                     <div class="grid grid-cols-2 gap-1">
                         <span class="col-span-2">
                             <p>Nombre</p>
-                            <InputText v-model="dataQuoteNew.name" filter optionLabel="name" :disabled="!modEdit"
+                            <InputText v-model="dataQuoteNew.name" :disabled="newQuote ? false : !modEdit"
                                 :class="errors.name ? 'p-invalid' : ''" placeholder="Escriba el nombre de la estimacion"
                                 class="w-full md:w-14rem !h-8" />
                             <small v-if="errors.name" class="p-error" id="text-error">La estimacion debe tener un
@@ -126,7 +185,7 @@ const toggle = (event) => {
                         <span class="col-span-2">
                             <p>Clase(s) de buque</p>
                             <MultiSelect v-model="dataQuoteNew.type_ships" display="chip" filter optionValue="id"
-                                :disabled="!modEdit" :options="typeships" optionLabel="name"
+                                :disabled="newQuote ? false : !modEdit" :options="typeships" optionLabel="name"
                                 placeholder="Selecciona la(s) clase(s) de buque" class="w-full md:w-20rem !h-8" :pt="{
                                     label: '!p-0 !px-2 !flex !items-center !h-8',
                                     token: '!p-0 !px-1',
@@ -137,7 +196,7 @@ const toggle = (event) => {
                             <p>Cliente</p>
                             <Dropdown v-model="dataQuoteNew.customer_id" :options="customers" filter optionLabel="name"
                                 optionValue="id" placeholder="Selecciona un cliente" class="w-full md:w-14rem !h-8"
-                                showClear :disabled="!modEdit" :pt="{
+                                showClear :disabled="newQuote ? false : !modEdit" :pt="{
                                     input: '!p-0 !pt-1 !px-1 '
                                 }" />
                         </span>
@@ -165,15 +224,19 @@ const toggle = (event) => {
                         <span class="">
                             <p>Tipo de oferta</p>
                             <span class="flex space-x-2">
-                                <Dropdown v-model="dataQuoteNew.offer_type" :options="oferta" :disabled="!modEdit"
-                                    placeholder="Selecciona tipo de oferta" class="w-full md:w-14rem !h-8" showClear :pt="{
+                                <Dropdown v-model="dataQuoteNew.offer_type" :options="oferta"
+                                    :disabled="newQuote ? false : !modEdit" placeholder="Selecciona tipo de oferta"
+                                    class="w-full md:w-14rem !h-8" showClear :pt="{
                                         input: '!p-0 !pt-1 !px-1'
                                     }" />
                                 <span v-if="!newQuote" class="w-full justify-end flex gap-2">
                                     <Button title="Editar estimacion" severity="danger" v-if="!modEdit" @click="editActive"
-                                        icon="fa-solid fa-pencil" class="!h-8"></Button>
-                                    <Button title="Guardar cambios" severity="success" v-if="modEdit" @click="quoteSave"
-                                        icon="fa-solid fa-floppy-disk" class="!h-8"></Button>
+                                        icon="fa-solid fa-pencil" class="!h-8" />
+                                    <Button title="Cancelar cambios" severity="danger" :disabled="loadingButton"
+                                        v-if="modEdit" @click="editInactive" icon="fa-solid fa-xmark" class="!h-8" />
+                                    <Button title="Guardar cambios" severity="success" v-if="modEdit"
+                                        :loading="loadingButton" @click="quoteUpdate" icon="fa-solid fa-floppy-disk"
+                                        class="!h-8" />
                                 </span>
                             </span>
                         </span>
@@ -182,36 +245,16 @@ const toggle = (event) => {
                         <Editor v-model="dataQuoteNew.observation" editorStyle="height: 210px" v-if="newQuote"
                             placeholder="Escriba aqui las sugerencias que seran enviadas al estimador">
                         </Editor>
-                        <span v-if="!newQuote" class="flex flex-col h-full justify-between">
-                            <div class="space-y-2">
-                                <span class="">
-                                    <p>Ruta</p>
-                                    <InputText for="ruta" v-model="dataQuoteNew.route" filter optionLabel="name"
-                                        placeholder="Escriba la direccion" class="w-full md:w-14rem !h-8" />
-                                </span>
-                                <span class="">
-                                    <p class="mt-1">Archivo a subir</p>
-                                    <FileUpload mode="basic" accept="application/pdf" class="!h-8 !min-w-[200px]" />
-                                </span>
-                            </div>
-                            <span class="flex justify-end gap-2" v-if="!modEdit">
-                                <Button severity=" success" icon="fa-solid fa-floppy-disk" label="Guardar"
-                                    class="!h-8"></Button>
-                                <Button severity="primary" icon="fa-solid fa-paper-plane" label="Enviar a revision"
-                                    class="!h-8"></Button>
-                            </span>
-
-                        </span>
                         <span v-if="newQuote" class="w-full justify-end flex">
-                            <Button severity="success" @click="quoteSave()" icon="fa-solid fa-floppy-disk"
-                                label="Guardar solicitud" class="!h-8"></Button>
+                            <Button severity="success" @click="quoteSave()" :loading="loadingButton"
+                                icon="fa-solid fa-floppy-disk" label="Guardar solicitud" class="!h-8" />
                         </span>
                     </span>
                 </div>
             </span>
-            <span class="" v-if="quoteData && !modEdit">
+            <span class="" v-if="quoteShips && !modEdit">
                 <TabView class="tabview-custom" :scrollable="true">
-                    <TabPanel v-for="buque, index in quoteData.quote_type_ships">
+                    <TabPanel v-for="buque, index in quoteShips">
                         <template #header>
                             <div class="flex items-center space-x-1">
                                 <Avatar :image="buque.render ? buque.render : '/images/generic-boat.png'" shape="circle" />
@@ -289,6 +332,27 @@ const toggle = (event) => {
                         </div>
                     </TabPanel>
                 </TabView>
+                <span v-if="!newQuote" class=" p-2 flex h-full justify-between">
+                    <div class="space-y-2 w-1/2">
+                        <span class="">
+                            <p>Ruta</p>
+                            <InputText for="ruta" v-model="dataQuoteNew.route" filter optionLabel="name"
+                                placeholder="Escriba o pegue la ruta a la carpeta de los documentos"
+                                class="w-full md:w-14rem !h-8" />
+                        </span>
+                        <span class="">
+                            <p class="mt-1">Archivo a subir</p>
+                            <FileUpload mode="basic" accept="application/pdf" class="!h-8 !min-w-[200px]" />
+                        </span>
+                    </div>
+                    <span class="flex flex-col justify-end gap-2" v-if="!modEdit">
+                        <Button severity="success" @click="quoteShipsSave" icon="fa-solid fa-floppy-disk"
+                            :loading="loadingButton" label="Guardar" class="!h-8"></Button>
+                        <Button severity="primary" icon="fa-solid fa-paper-plane" :loading="loadingButton"
+                            label="Enviar a revision" class="!h-8"></Button>
+                    </span>
+
+                </span>
             </span>
         </div>
     </AppLayout>
