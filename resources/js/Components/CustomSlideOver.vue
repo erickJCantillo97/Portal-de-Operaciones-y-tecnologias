@@ -1,20 +1,16 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { XMarkIcon } from '@heroicons/vue/24/outline'
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { HeartIcon, XMarkIcon } from '@heroicons/vue/24/outline'
-import { PencilIcon, PlusIcon, CheckIcon, HandThumbUpIcon, UserIcon } from '@heroicons/vue/20/solid'
 import Moment from 'moment'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
-import Tag from 'primevue/tag'
 import CustomModal from '@/Components/CustomModal.vue'
 import Feed from '@/Components/Feed.vue'
 import FeedWithComments from '@/Components/FeedWithComments.vue'
-import CommentForm from '@/Components/CommentForm.vue'
 import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 import Button from 'primevue/button'
-import { Link, router } from '@inertiajs/vue3'
 
 onMounted(() => {
   // getVersions()
@@ -142,7 +138,7 @@ const formatCurrency = (value) => {
                       @click="$emit('closeSlideOver')">
                       <span class="absolute -inset-2.5" />
                       <span class="sr-only">Close panel</span>
-                      <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+                      <XMarkIcon class="size-6" aria-hidden="true" />
                     </button>
                   </div>
                 </TransitionChild>
