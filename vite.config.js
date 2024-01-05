@@ -22,5 +22,5 @@ export default defineConfig({
             }
         }),
     ],
-    resolve: { alias: { vue: path.resolve('./node_modules/vue', 'dist', 'vue.runtime.esm-bundler.js') } }
+    // resolve: { alias: { vue: path.resolve('./node_modules/vue', 'dist', 'vue.runtime.esm-bundler.js') } },
 });
