@@ -73,16 +73,17 @@ const slideOver = () => {
 
 <template>
     <AppLayout>
-        <CustomDataTable :data="quotes" :columnas="columnas" :actions="buttons" :filterButtons="filterButtons"
-            title="Estimaciones" @showClic="showClic" @deleteClic="deleteClic">
-            <template #buttonHeader>
-                <Link :href="route('quotes.create')">
-                <Button title="Agregar Estimación" severity="success" label="Agregar" outlined icon="fa-solid fa-plus"
-                    class="!h-8" />
-                </Link>
-            </template>
-        </CustomDataTable>
-
-        <CustomSlideOver :quote="quote" :show="openSlideOver" @closeSlideOver="openSlideOver = false" />
+        <div class="h-[85vh] overflow-y-auto">
+            <CustomDataTable :data="quotes" :columnas="columnas" :actions="buttons" :filterButtons="filterButtons"
+                title="Estimaciones" @showClic="showClic" @deleteClic="deleteClic">
+                <template #buttonHeader>
+                    <Link :href="route('quotes.create')">
+                    <Button title="Agregar Estimación" severity="success" label="Agregar" outlined icon="fa-solid fa-plus"
+                        class="!h-8" />
+                    </Link>
+                </template>
+            </CustomDataTable>
+            <CustomSlideOver :quote="quote" :show="openSlideOver" @closeSlideOver="openSlideOver = false" />
+        </div>
     </AppLayout>
 </template>

@@ -3,7 +3,6 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { onMounted, ref } from 'vue';
 import { FilterMatchMode } from 'primevue/api'
-import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
 import MultiSelect from 'primevue/multiselect';
@@ -112,11 +111,10 @@ const formatCurrency = (valor, moneda) => {
 </script>
 
 <template>
-    <DataTable id="tabla" :value="data" :paginator="data.length > rows" :rows="rows" selectionMode="single"
-        tableStyle="min-width: 70rem" currentPageReportTemplate="{first} al {last} de un total de {totalRecords}"
-        v-model:filters="filters" scrollHeight="500px" stripedRows filterDisplay="menu" scrollable class="p-datatable-sm"
-        :removableSort="true" stateStorage="session" :stateKey="'dt-' + title.toLowerCase() + '-state-session'"
-        :globalFilterFields="globalFilterFields"
+    <DataTable id="tabla" :value="data" paginator :rows="rows" selectionMode="single" tableStyle="min-width: 70rem"
+        sortMode="multiple" currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort
+        v-model:filters="filters" stripedRows filterDisplay="menu" scrollable class="p-datatable-sm" stateStorage="session"
+        :stateKey="'dt-' + title.toLowerCase() + '-state-session'" :globalFilterFields="globalFilterFields"
         paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink" :pt="{
             paginator: {
                 paginatorWrapper: '!p-0',

@@ -15,6 +15,7 @@ import Tooltip from "primevue/tooltip";
 import VueApexCharts from "vue3-apexcharts";
 import { Head } from '@inertiajs/vue3';
 import CustomModal from '@/Components/CustomModal.vue'
+import Button from "primevue/button"
 // import VueChatScroll from 'vue-chat-scroll'
 
 const appName =
@@ -37,6 +38,7 @@ createInertiaApp({
                 ripple: true,
                 locale: optionsPrimeVUE,
             })
+            .component('Button', Button)
             .use(VueApexCharts)
             // .use(VueChatScroll)
             .component("Head", Head)
