@@ -23,12 +23,14 @@ const overlayOptions = ref([
         icon: 'pi pi-reply',
         command: () => {
           action.value = 2;
-          console.log(action.value)
         }
       },
       {
         label: 'Editar',
-        icon: 'pi pi-pencil'
+        icon: 'pi pi-pencil',
+        command: () => {
+          action.value = 1;
+        }
       },
       {
         label: 'Eliminar',
@@ -90,9 +92,8 @@ const format_ES_Date = (date) => {
                     {{ commentItem.user_name }}
                   </a>
                   <div class="flex justify-end">
-                    <Button @click="toggle($event, commentItem)" v-if="commentItem.user_id === $page.props.auth.user.id"
-                      class="!size-4" type="button" icon="pi pi-ellipsis-v" aria-haspopup="true"
-                      aria-controls="overlay_menu" text />
+                    <Button @click="toggle($event, commentItem)" class="!size-4" type="button" icon="pi pi-ellipsis-v"
+                      aria-haspopup="true" aria-controls="overlay_menu" text />
                   </div>
                 </div>
                 <p class="mt-0.5 text-sm text-gray-500">Comentado el: {{ format_ES_Date(commentItem.date) }}</p>

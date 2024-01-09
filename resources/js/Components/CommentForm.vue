@@ -5,19 +5,18 @@ import Button from 'primevue/button'
 
 const emit = defineEmits(['addComment'])
 
-const message = ref('')
 
 const props = defineProps({
   quoteId: Number,
   comment: Object,
   actions: Number
 })
+const message = ref(props.comment?.message ?? '')
 
 const submit = () => {
   try {
-
     if (props.actions == 1) {
-      axios.put(route('comment.update', props.message.id), { commentable_id: props.quoteId, message: message.value })
+      axios.put(route('comment.update', props.message.id), { message: message.value })
         .then(res => {
           message.value = ''
           emit('addComment')
@@ -40,10 +39,15 @@ const submit = () => {
   <div class="mt-4 flex gap-x-3">
     <img :src="$page.props.auth.user.photo" class="size-10 rounded-full object-cover" />
     <form @submit.prevent="submit()" class="flex-auto">
-      <div v-if="actions == 2"
+      <div v-if="actions == 2 || actions == 1"
         class="w-full p-1 rounded-t-lg rounded-l-lg text-sm bg-gray-200 italic mb-2 border-l-8 border-blue-900">
         <div class="truncate max-w-96 ">
-          <div class="text-xs text-blue-900 uppercase font-bold">{{ comment.user_name }}</div>
+
+          <div class="text-xs text-blue-900  font-bold">
+            <span>{{ actions == 2 ? 'Respondiendo a:' : 'Editando: ' }}</span>
+            <span class="uppercase">{{ comment.user_name }}</span>
+
+          </div>
           {{ comment.message }}
         </div>
       </div>

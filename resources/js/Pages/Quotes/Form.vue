@@ -84,7 +84,7 @@ const quoteSave = () => {
     })
 }
 
-const modEdit = ref(false)
+const modEdit = ref(true)
 const editActive = () => {
     modEdit.value = true
 }

@@ -21,14 +21,15 @@ const columnas = ref([
     { field: 'consecutive', header: 'Consecutivo' },
     { field: 'name', header: 'Nombre' },
     { field: 'clases', header: 'Clases' },
-    { field: 'customer', header: 'Cliente' },
+    { field: 'estimador', header: 'Estimador', filter: true },
+    { field: 'customer', header: 'Cliente', filter: true },
     {
-        field: 'status', header: 'Estado', filter: false, type: 'tag', severity: [
+        field: 'get_status', header: 'Estado', filter: true, type: 'tag', severity: [
             { text: 'Proceso', class: 'bg-primary text-white' },
             { text: 'Entregada', class: '' },
             { text: 'Pendiente por Firma', class: '' },
             { text: 'Firmada', class: '' },
-            { text: 'No Firmada', class: '' },
+            { text: 'No Firmada', class: 'bg-red-500 text-white' },
             { text: 'Contratada', class: '' }
         ]
     },// Firmada, Proceso, Entregada,Pendiente por firma, Firmada, No firmada, Contratada

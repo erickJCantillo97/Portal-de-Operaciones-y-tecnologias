@@ -96,9 +96,7 @@ class CommentController extends Controller
     public function update(Request $request, Comment $comment)
     {
         $validateData = $request->validate([
-            'commentable_id' => 'required|numeric',
             'message' => 'required',
-            'response_id' => 'nullable'
         ]);
 
         try {
