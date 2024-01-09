@@ -3,6 +3,7 @@
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\Quotes\QuoteController;
 use App\Http\Controllers\Quotes\QuoteStatusController;
+use App\Http\Controllers\Quotes\QuoteTypeShipController;
 use App\Http\Controllers\Quotes\QuoteVersionController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,4 +14,5 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::resource('quotestatus', QuoteStatusController::class);
     Route::resource('quotesversion', QuoteVersionController::class);
     Route::resource('comment', CommentController::class);
+    Route::post('quote_version_ship_update/{quoteVersion}', [QuoteTypeShipController::class, 'update'])->name('quote.version.type_ship.update');
 });

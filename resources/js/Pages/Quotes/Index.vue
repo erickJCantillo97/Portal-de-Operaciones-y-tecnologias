@@ -49,8 +49,8 @@ const buttons = [
 
 //#region Botones de filtro de CustomDatatable
 const filterButtons = [
-    { field: 'status', label: 'En proceso', data: 'Proceso' },
-    { field: 'status', label: 'Entregadas', data: 'Entregada' },
+    { field: 'get_status', label: 'En proceso', data: 'Proceso' },
+    { field: 'get_status', label: 'Entregadas', data: 'Entregada' },
 ]
 //#endregion
 

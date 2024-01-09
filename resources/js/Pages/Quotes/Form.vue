@@ -138,7 +138,7 @@ const quoteShipsSave = () => {
         confirmButtonText: 'Guardar',
         denyButtonText: 'Cancelar'
     }).then(async (result) => {
-        await axios.put(route('', props.quote.id), quoteShips.value).then((res) => {
+        await axios.post(route('quote.version.type_ship.update', props.quote.id), { type_ships: quoteShips.value }).then((res) => {
             quoteShips.value = res.data.quote.quote_type_ships
             toast('Datos de las clases actualizados correctamente', 'success')
             modEdit.value = false
