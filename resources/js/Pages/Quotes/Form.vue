@@ -243,7 +243,12 @@ const toggle = (event) => {
                     </div>
                     <span class="space-y-2">
                         <Editor v-model="dataQuoteNew.observation" editorStyle="height: 210px" v-if="newQuote"
-                            placeholder="Escriba aqui las sugerencias que seran enviadas al estimador">
+                            placeholder="Escriba aqui las sugerencias que seran enviadas al estimador" :pt="{
+                                link: { class: '!hidden' },
+                                image: { class: '!hidden' },
+                                codeBlock: { class: '!hidden' },
+                                toolbar: { class: '!bg-gray-100' }
+                            }">
                         </Editor>
                         <span v-if="newQuote" class="w-full justify-end flex">
                             <Button severity="success" @click="quoteSave()" :loading="loadingButton"
