@@ -30,7 +30,7 @@ const columnas = [
             { text: 'Contratada', class: '' }
         ]
     },
-    { field: 'expeted_answer_date', header: 'Fecha maxima respuesta', type: 'date', sortable: true, filter: true, },
+    { field: 'expeted_answer_date', header: 'Fecha esperada', type: 'date', sortable: true, filter: true, },
     { field: 'estimador_anaswer_date', header: 'Fecha respuesta', type: 'date', sortable: true, filter: true },
     { field: 'route', header: 'Ruta', filter: false },
     { field: 'file', header: 'Documento', filter: false },
@@ -41,21 +41,21 @@ const columnas = [
 //#endregion
 
 //#region Botones de CustomDatatable
-const buttons = [
-    { event: 'showClic', severity: 'success', class: '', icon: 'fa-solid fa-eye', text: true, outlined: false, rounded: false },
-    // { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
-]
+// const buttons = [
+//     { event: 'showClic', severity: 'success', class: '', icon: 'fa-solid fa-eye', text: true, outlined: false, rounded: false },
+//     // { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
+// ]
 //#endregion
 
 //#region Botones de filtro de CustomDatatable
 const filterButtons = [
-    { field: 'status', label: 'En proceso', data: 'Proceso' },
-    { field: 'status', label: 'Entregadas', data: 'Entregada' },
+    { field: 'get_status', label: 'En proceso', data: 'Proceso' },
+    { field: 'get_status', label: 'Entregadas', data: 'Entregada' },
 ]
 //#endregion
 
-const showClic = (event, data) => {
-    quote.value = data;
+const showClic = (event) => {
+    quote.value = event.data;
     openSlideOver.value = true
 }
 
@@ -72,8 +72,8 @@ const slideOver = () => {
 <template>
     <AppLayout>
         <div class="h-[85vh] overflow-y-auto">
-            <CustomDataTable :data="quotes" :columnas="columnas" :actions="buttons" :filterButtons="filterButtons"
-                title="Estimaciones" @showClic="showClic" @deleteClic="deleteClic">
+            <CustomDataTable :data="quotes" :columnas="columnas" :filterButtons="filterButtons" title="Estimaciones"
+                @rowClic="showClic">
                 <template #buttonHeader>
                     <Link :href="route('quotes.create')">
                     <Button title="Agregar Estimación" severity="success" label="Agregar" outlined icon="fa-solid fa-plus"

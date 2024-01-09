@@ -115,6 +115,7 @@ const formatCurrency = (valor, moneda) => {
         sortMode="multiple" currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort
         v-model:filters="filters" stripedRows filterDisplay="menu" scrollable class="p-datatable-sm" stateStorage="session"
         :stateKey="'dt-' + title.toLowerCase() + '-state-session'" :globalFilterFields="globalFilterFields"
+        @row-click="$emit('rowClic', $event)"
         paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink" :pt="{
             paginator: {
                 paginatorWrapper: '!p-0',
@@ -219,11 +220,11 @@ const formatCurrency = (valor, moneda) => {
             :sortable="col.sortable" :show-filter-match-modes="false" :filterMenuStyle="{ width: '16rem' }"
             :frozen="col.frozen" :pt="{
                 headerContent: { class: '!h-8' },
-                headerCell: { class: '!py-0 !px-1' },
+                headerCell: { class: '!p-0.5' }
             }
                 ">
             <template #header>
-                <p class="text-sm text-primary uppercase w-full font-bold">{{ col.header }}</p>
+                <p class="text-sm text-primary uppercase font-bold">{{ col.header }}</p>
             </template>
             <template #filtericon>
                 <i class="fa-solid fa-filter"></i>
