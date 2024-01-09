@@ -75,6 +75,23 @@ class QuoteVersionController extends Controller
         //
     }
 
+    public function updating(QuoteVersion $quote)
+    {
+        $typeships = TypeShip::orderBy('name')->get();
+        $customers = Customer::orderBy('name')->get();
+
+        $estimadores = getPersonalGerenciaOficina('GECON', 'DEEST')->map(function ($estimador) {
+            return [
+                'user_id' => $estimador['Num_SAP'],
+                'name' => $estimador['Nombres_Apellidos'],
+                'email' => $estimador['Correo']
+            ];
+        })->toArray();
+        $action = 2;
+        $quote = QuoteVersion::with('quote', 'quoteTypeShips')->where('id', $quote->id)->first();
+        return Inertia::render('Quotes/Form', compact('typeships', 'customers', 'estimadores', 'quote', 'action'));
+    }
+
     /**
      * Show the form for editing the specified resource.
      */

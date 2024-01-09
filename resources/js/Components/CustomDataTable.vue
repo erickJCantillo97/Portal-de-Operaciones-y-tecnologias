@@ -101,7 +101,7 @@ const formatCurrency = (valor, moneda) => {
     if (valor == undefined || valor == null) {
         return 'Sin definir'
     } else {
-        return new Date(valor).toLocaleString('es-CO',
+        return valor.toLocaleString('es-CO',
             { style: 'currency', currency: moneda })
     }
 }
@@ -246,7 +246,7 @@ const formatCurrency = (valor, moneda) => {
             <template #body="{ data }">
                 <p v-if="col.type == 'date'" class="text-center"> {{ formatDate(data[col.field]) }}</p>
                 <p v-else-if="col.type == 'currency'" class="text-center">
-                    {{ formatCurrency(data[col.field], col.moneda) }}
+                    {{ formatCurrency(data[col.field], 'COP') }}
                 </p>
                 <span v-else-if="col.type == 'customTag'">
                     <p :class="col.severitys.find((severity) => severity.text == data[col.field]).class"

@@ -108,7 +108,8 @@ const getVersions = () => {
 
 // Formatear el número en moneda (USD)
 const formatCurrency = (value) => {
-  return parseFloat(value).toLocaleString('es-CO', {
+
+  return !value ? 0 : parseFloat(value).toLocaleString('es-CO', {
     style: 'currency',
     currency: 'COP',
   })
@@ -172,7 +173,7 @@ const formatCurrency = (value) => {
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Tipo de Oferta:</dt>
-                          <dd class="text-gray-900">ROM</dd>
+                          <dd class="text-gray-900">{{ quote.offer_type }}</dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Fecha de Solicitud:</dt>
@@ -185,6 +186,10 @@ const formatCurrency = (value) => {
                         <div v-if="showDateResponse" class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Fecha de Respuesta:</dt>
                           <dd class="text-gray-900">{{ Moment().add(6, 'days').format('DD/MM/YY') }}</dd>
+                        </div>
+                        <div v-if="showDateResponse" class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-500">Precio antes de Iva:</dt>
+                          <dd class="text-gray-900">{{ formatCurrency(quote.total_cost) }}</dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Estado:</dt>
@@ -200,11 +205,20 @@ const formatCurrency = (value) => {
                     </div>
                   </header>
                   <Accordion>
-                    <AccordionTab v-for="product in quote.products" :header="product.name" :pt="{
+                    <AccordionTab v-for="product in  quote.products " :pt="{
                       root: '!border-0 !ring-0',
-                      headerAction: '!bg-slate-200 mb-2',
-                      headerTitle: '!font-semibold',
+                      headerAction: '!bg-slate-200 !px-4 !py-1 mb-1',
+                      headerTitle: '!text- sm',
                     }">
+                      <template #header>
+                        <div class="block gap-2 w-full">
+                          <p class="white-space-nowrap font-semibold">{{ product.name }}</p>
+                          <p class=" white-space-nowrap text-xs">{{
+                            formatCurrency(product.price_before_iva_original)
+                          }}</p>
+
+                        </div>
+                      </template>
                       <div class="space-y-6">
                         <div>
                           <h3 class="font-medium text-gray-900">Información del producto</h3>
@@ -214,20 +228,16 @@ const formatCurrency = (value) => {
                               <dd class="text-gray-900">{{ product.name }}</dd>
                             </div>
                             <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Tipo de proyecto:</dt>
-                              <dd class="text-gray-900">{{ quote.project_type == null ? 'N/A' : quote.project_type }}</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
                               <dt class="text-gray-500">Alcance:</dt>
-                              <dd class="text-gray-900">{{ quote.scope == null ? 'N/A' : quote.scope }}</dd>
+                              <dd class="text-gray-900">{{ product.scope == null ? 'N/A' : product.scope }}</dd>
                             </div>
                             <div class="flex justify-between py-3 text-sm font-medium">
                               <dt class="text-gray-500">Madurez:</dt>
-                              <dd class="text-gray-900">{{ quote.maturity == null ? 'N/A' : quote.maturity }}</dd>
+                              <dd class="text-gray-900">{{ product.maturity == null ? 'N/A' : product.maturity }}</dd>
                             </div>
                             <div class="flex justify-between py-3 text-sm font-medium">
                               <dt class="text-gray-500">Cantidad:</dt>
-                              <dd class="text-gray-900">{{ quote.units == null ? 'N/A' : quote.units }}</dd>
+                              <dd class="text-gray-900">{{ product.units == null ? 'N/A' : product.units }}</dd>
                             </div>
                           </dl>
                         </div>
@@ -236,11 +246,11 @@ const formatCurrency = (value) => {
                           <dl class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
                             <div class="flex justify-between py-3 text-sm font-medium">
                               <dt class="text-gray-500">Margen Estimado:</dt>
-                              <dd class="text-gray-900">25.3%</dd>
+                              <dd class="text-gray-900">{{ product.margin }}%</dd>
                             </div>
                             <div class="flex justify-between py-3 text-sm font-medium">
                               <dt class="text-gray-500">Precio Original:</dt>
-                              <dd class="text-gray-900">{{ formatCurrency('1200000000') }}</dd>
+                              <dd class="text-gray-900">{{ formatCurrency(product.price_before_iva_original) }}</dd>
                             </div>
                             <div class="flex justify-between py-3 text-sm font-medium">
                               <dt class="text-gray-500">Tasa de Venta:</dt>
@@ -248,7 +258,7 @@ const formatCurrency = (value) => {
                             </div>
                             <div class="flex justify-between py-3 text-sm font-medium">
                               <dt class="text-gray-500">IVA:</dt>
-                              <dd class="text-gray-900">19%</dd>
+                              <dd class="text-gray-900">{{ product.iva }}</dd>
                             </div>
                           </dl>
                         </div>
@@ -264,21 +274,25 @@ const formatCurrency = (value) => {
                         <Button size="small" label="Clonar" :pt="{
                           root: '!w-full !bg-emerald-600 !hover:bg-emerald-500',
                           label: '!text-center',
-                        }" />
+                        }
+                          " />
                         <Button size="small" label="Editar" :pt="{
                           root: '!w-full !bg-warning !hover:bg-orange-500',
                           label: '!text-center',
-                        }" />
+                        }
+                          " />
                       </div>
                       <div class="col-span-1 space-y-2 items-center">
                         <Button size="small" label="Actualizar" :pt="{
                           root: '!w-full !bg-primary !hover:bg-blue-500',
                           label: '!text-center',
-                        }" />
+                        }
+                          " />
                         <Button size="small" label="Eliminar" :pt="{
                           root: '!w-full !bg-danger !hover:bg-red-500',
                           label: '!text-center',
-                        }" />
+                        }
+                          " />
                       </div>
                     </section>
                   </section>
@@ -308,7 +322,8 @@ const formatCurrency = (value) => {
           <Dropdown v-model="statusSelected" option-label="name" option-value="id" :options="statusOptions" showClear
             placeholder="Seleccione Estado de la Estimación" class="w-full md:w-14rem" :pt="{
               filterContainer: '!h-12',
-            }" />
+            }
+              " />
         </div>
         <div>
           <label for="dd-city">Seleccione Fecha</label>

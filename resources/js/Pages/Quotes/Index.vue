@@ -30,6 +30,7 @@ const columnas = [
             { text: 'Contratada', class: '' }
         ]
     },
+    { field: 'total_cost', header: 'Precio', type: 'currency', sortable: true, filter: true, },
     { field: 'expeted_answer_date', header: 'Fecha esperada', type: 'date', sortable: true, filter: true, },
     { field: 'estimador_anaswer_date', header: 'Fecha respuesta', type: 'date', sortable: true, filter: true },
     { field: 'route', header: 'Ruta', filter: false },
