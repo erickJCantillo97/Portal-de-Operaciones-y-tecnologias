@@ -248,7 +248,7 @@ const formatCurrency = (valor, moneda) => {
                     {{ formatDate(data[col.field]) }}
                 </p>
                 <p v-else-if="col.type == 'currency'" class="text-center">
-                    {{ formatCurrency(data[col.field], col.moneda) }}
+                    {{ formatCurrency(data[col.field], 'COP') }}
                 </p>
                 <span v-else-if="col.type == 'customTag'">
                     <p :class="col.severitys.find((severity) => severity.text == data[col.field]).class"

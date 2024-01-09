@@ -13,6 +13,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::resource('quotes', QuoteController::class);
     Route::resource('quotestatus', QuoteStatusController::class);
     Route::resource('quotesversion', QuoteVersionController::class);
+    Route::get('quotesversion/{quote}/updating', [QuoteVersionController::class, 'updating'])->name('quotesversion.updating');
     Route::resource('comment', CommentController::class);
     Route::post('quote_version_ship_update/{quoteVersion}', [QuoteTypeShipController::class, 'update'])->name('quote.version.type_ship.update');
 });

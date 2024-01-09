@@ -28,6 +28,7 @@ class QuoteController extends Controller
                 'name' => $quote['name'],
                 'gerencia' => $quote['gerencia'],
                 'status' => $quote['version']['status'],
+                'offer_type' => $quote['version']['offer_type'],
                 'get_status' => $quote['version']['get_status'],
                 'estimador' => $quote['version']['estimador_name'],
                 'customer' => $quote['version']['customer']['name'],
@@ -37,6 +38,7 @@ class QuoteController extends Controller
                 'expeted_answer_date' => $quote['version']['expeted_answer_date'],
                 'consecutive' => str_pad($quote['consecutive'], 3, 0, STR_PAD_LEFT) . '-' . $quote['version']['version'] . '-2023',
                 'products' => $quote['version']['quoteTypeShips'],
+                'total_cost' => collect($quote['version']['quoteTypeShips'])->sum('price_before_iva_original'),
                 'clases' => implode(', ', collect($quote['version']['quoteTypeShips'])->pluck('name')->toArray())
             ];
         });
@@ -90,10 +92,11 @@ class QuoteController extends Controller
                 'user_id' => auth()->user()->id,
                 'name' => $validateData['name']
             ]); //Creamos en la BD y guardamos la estimacion en una variable
+            $version = $request->action == 2 ? $quote->version->version + 1 : 1;
 
             $quoteVersion = QuoteVersion::create([
                 'quote_id' => $quote->id,
-                'version' => 1,
+                'version' => $version,
                 'estimador_id' => $validateData['estimador_id'],
                 'customer_id' => $validateData['customer_id'],
                 'observation' => $validateData['observation'] ?? '',
@@ -140,6 +143,22 @@ class QuoteController extends Controller
      */
     public function show(Quote $quote)
     {
+    }
+
+    public function updating(QuoteVersion $quoteVersion)
+    {
+        $typeships = TypeShip::orderBy('name')->get();
+        $customers = Customer::orderBy('name')->get();
+
+        $estimadores = getPersonalGerenciaOficina('GECON', 'DEEST')->map(function ($estimador) {
+            return [
+                'user_id' => $estimador['Num_SAP'],
+                'name' => $estimador['Nombres_Apellidos'],
+                'email' => $estimador['Correo']
+            ];
+        })->toArray();
+        return $quoteVersion;
+        return Inertia::render('Quotes/Form', compact('typeships', 'customers', 'estimadores', 'quoteVersion'));
     }
 
     /**

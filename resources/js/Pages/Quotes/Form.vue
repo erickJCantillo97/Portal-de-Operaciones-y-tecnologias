@@ -16,11 +16,13 @@ import Swal from 'sweetalert2';
 import { router } from '@inertiajs/vue3';
 import OverlayPanel from 'primevue/overlaypanel';
 import FileUpload from 'primevue/fileupload';
+import { number } from 'echarts';
 const props = defineProps({
     estimadores: Object,
     customers: Array,
     typeships: Array,
-    quote: Object
+    quote: Object,
+    action: number,
 })
 const errors = ref({
     name: false,
@@ -257,7 +259,7 @@ const toggle = (event) => {
                     </span>
                 </div>
             </span>
-            <span class="" v-if="quoteShips && !modEdit">
+            <span class="" v-if="quoteShips && !modEdit && action != 2">
                 <TabView class="tabview-custom" :scrollable="true">
                     <TabPanel v-for="buque, index in quoteShips">
                         <template #header>

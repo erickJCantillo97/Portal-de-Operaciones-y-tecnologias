@@ -21,11 +21,10 @@ class Quote extends Model implements Auditable
         static::addGlobalScope(new GerenciaScope);
     }
 
-
     public function version()
     {
-        return $this->belongsTo(QuoteVersion::class, 'current_version_id');
+        return $this->belongsTo(QuoteVersion::class, 'current_version_id')->withDefault(function ($version) {
+            $version->version = 0;
+        });;
     }
-
-    
 }
