@@ -1,18 +1,14 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
-import '../../../sass/dataTableCustomized.scss';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon, DocumentDuplicateIcon } from '@heroicons/vue/24/outline';
 import { useSweetalert } from '@/composable/sweetAlert';
 import TextInput from '../../Components/TextInput.vue';
-import Button from '../../Components/Button.vue';
+import Button from 'primevue/button';
 import FileUpload from 'primevue/fileupload';
 import CustomModal from '@/Components/CustomModal.vue';
 import Dropdown from 'primevue/dropdown';
+import CustomDataTable from '@/Components/CustomDataTable.vue';
 
 const modalType = ref('Nueva unidad')
 const customerSelect = ref();
@@ -20,10 +16,7 @@ const typeSelect = ref();
 const { toast } = useSweetalert();
 const loading = ref(false);
 const { confirmDelete } = useSweetalert();
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-})
-const modalVisible = ref(false)
+const visible = ref(false)
 
 const props = defineProps({
     ships: Array,
@@ -46,10 +39,6 @@ const formData = useForm({
 });
 //#endregion
 
-onMounted(() => {
-    initFilters();
-})
-
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
@@ -64,7 +53,7 @@ const submit = () => {
         router.post(route('ships.store'), formData, {
             preserveScroll: true,
             onSuccess: (res) => {
-                modalVisible.value = false;
+                visible.value = false;
                 toast(' Buque creado exitosamente', 'success');
             },
             onError: (errors) => {
@@ -80,7 +69,7 @@ const submit = () => {
     router.post(route('ships.update', formData.id), formData, {
         preserveScroll: true,
         onSuccess: (res) => {
-            modalVisible.value = false;
+            visible.value = false;
             toast('¡Buque actualizado exitosamente!', 'success');
         },
         onError: (errors) => {
@@ -98,10 +87,10 @@ const addItem = () => {
     formData.reset();
     clearErrors();
     modalType.value = "Nueva unidad"
-    modalVisible.value = true;
+    visible.value = true;
 }
 
-const editItem = (ship) => {
+const editItem = (event, ship) => {
     clearErrors();
     modalType.value = "Editar unidad"
     typeSelect.value = ship.type_ship
@@ -114,10 +103,10 @@ const editItem = (ship) => {
     formData.pantoque = ship.pantoque;
     formData.acronyms = ship.acronyms;
     formData.image = ship.image;
-    modalVisible.value = true;
+    visible.value = true;
 };
 
-const cloneItem = (ship) => {
+const cloneItem = (event, ship) => {
     clearErrors();
     modalType.value = "Clonar unidad"
     typeSelect.value = ship.type_ship
@@ -130,138 +119,58 @@ const cloneItem = (ship) => {
     formData.pantoque = ship.pantoque;
     formData.acronyms = ship.acronyms;
     formData.image = ship.image;
-    modalVisible.value = true;
+    visible.value = true;
 };
 
-
-const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    }
-};
-
-
-
-const clearFilter = () => {
-    initFilters();
-};
-
+const deleteItem = (event, ship) => {
+    confirmDelete(ship.id, 'Buque', 'ships')
+}
 const clearErrors = () => {
     router.page.props.errors = {};
 };
 
-const formatMeters = (value) => {
-    // Eliminar caracteres no numéricos, excepto el punto decimal
-    const unformattedLength = value.replace(/[^0-9.]/g, "");
-
-    // Convertir la cadena a un número
-    length = parseFloat(unformattedLength);
-
-    // Formatear el número con la unidad "m"
-    value = `${length} metros`;
-
-    return value;
-};
+const columnas = ref([
+    {
+        field: 'name', header: 'Nombre', class: 'w-[20%]', type: 'object', objectRows: {
+            photo: { field: 'file' },
+            primary: { field: 'name' },
+            secundary: { field: 'type_ship', subfield: 'name' }
+        }
+    },
+    { field: 'idHull', header: 'N° CASCO' },
+    { field: 'quilla', header: 'QUILLAS' },
+    { field: 'pantoque', header: 'PANTOQUE' },
+    { field: 'acronyms', header: 'SIGLAS' },
+    {
+        field: 'customer.name', header: 'CLIENTE', type: 'object', objectRows: {
+            primary: { field: 'customer', subfield: 'name' },
+            secundary: { field: 'customer', subfield: 'type' }
+        }
+    },
+])
+const buttons = ref([
+    { event: 'editItem', severity: 'primary', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
+    { event: 'cloneItem', severity: 'warning', icon: 'fa-solid fa-copy', class: '!h-8', text: true, outlined: false, rounded: false },
+    { event: 'confirmDelete', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
+])
 
 </script>
 
 <template>
     <AppLayout>
-        <div class="h-full overflow-y-auto custom-scroll">
-            <div class="flex items-center mx-2 mb-2">
-                <div class="flex-auto">
-                    <h1 class="text-xl font-semibold leading-6 text-primary">
-                        <p v-if="customer" icon="pi pi-eye">Unidades del cliente: {{ customer.name }}</p>
-                        <p v-else>Todas las unidades</p>
-                    </h1>
-                </div>
-            </div>
-            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="ships" v-model:filters="filters" dataKey="id"
-                filterDisplay="menu" :loading="loading" :globalFilterFields="['name', 'gerencia', 'type', 'details']"
-                currentPageReportTemplate=" {first} al {last} de {totalRecords}"
-                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-                :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
-
-                <template #header>
-                    <div class="flex justify-between w-full h-8 mb-2">
-                        <div class="flex space-x-4">
-                            <div class="w-8" title="Filtrar Buques">
-                                <Button @click="clearFilter()" type="button" severity="primary" class="hover:bg-primary ">
-                                    <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
-                                </Button>
-                            </div>
-                            <div class="relative flex rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <MagnifyingGlassIcon class="w-5 h-4 text-gray-400" aria-hidden="true" />
-                                </div>
-                                <input type="search" title="Buscar Buque"
-                                    class="block w-10/12 py-4 pl-10 text-gray-900 border-0 rounded-md ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                    v-model="filters.global.value" placeholder="Buscar..." />
-                            </div>
-                        </div>
-                        <div class="" title="Agregar Unidad">
-                            <Button @click="addItem()" severity="success">
-                                <PlusIcon class="w-5" aria-hidden="true" />
-                            </Button>
-                        </div>
-                    </div>
+        <div class="h-full overflow-y-auto">
+            <CustomDataTable :data="ships" :columnas="columnas" cacheName="ships" :actions="buttons"
+                :title="customer ? 'Unidades del cliente:' + customer.name : 'Todas las unidades'"
+                @confirmDelete="deleteItem" @editItem="editItem" @cloneItem="cloneItem">
+                <template #buttonHeader>
+                    <Button title="Agregar Estimación" @click="addItem()" severity="success" label="Agregar" outlined
+                        icon="fa-solid fa-plus" class="!h-8" />
                 </template>
-
-                <!--COLUMNAS-->
-                <Column field="name" header="Nombre" class="p-1">
-                    <template #body="slotProps">
-                        <div class="flex items-center space-x-2">
-                            <img :src="slotProps.data.file" onerror="this.src='/images/generic-boat.png'" alt="Image"
-                                class="h-0 mr-1 rounded-lg sm:h-12 sm:w-16" />
-                            <div>
-                                <p class="font-bold">{{ slotProps.data.name }} </p>
-                                <p class="text-xs italic">{{ slotProps.data.type_ship.name }} </p>
-                            </div>
-
-                        </div>
-                    </template>
-                </Column>
-                <Column field="idHull" header="N° Casco" class=""></Column>
-                <Column field="quilla" header="Quillas" class=""></Column>
-                <Column field="pantoque" header="Pantoque" class=""></Column>
-                <Column field="acronyms" header="Siglas" class=""></Column>
-
-                <Column header="Cliente" class="">
-                    <template #body="slotProps">
-                        <p v-if=slotProps.data.customer>{{ slotProps.data.customer.name }}</p>
-                        <p v-else> Sin asignar cliente</p>
-                    </template>
-                </Column>
-                <!--ACCIONES-->
-                <Column header="Acciones" class="flex justify-center space-x-1 ">
-                    <template #body="slotProps">
-                        <!--BOTÓN EDITAR-->
-                        <div title="Editar Unidad" class="py-1">
-                            <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
-                                <PencilIcon class="w-4 h-4 " aria-hidden="true" />
-                            </Button>
-                        </div>
-                        <div title="Clonar Unidad" class="py-1">
-                            <Button severity="primary" @click="cloneItem(slotProps.data)" class="hover:bg-primary">
-                                <DocumentDuplicateIcon class="w-4 h-4 " aria-hidden="true" />
-                            </Button>
-                        </div>
-                        <!--BOTÓN ELIMINAR-->
-                        <div title="Eliminar Unidad" class="py-1">
-                            <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Buque', 'ships')"
-                                class="hover:bg-danger">
-                                <TrashIcon class="w-4 h-4 " aria-hidden="true" />
-                            </Button>
-                        </div>
-                    </template>
-                </Column>
-            </DataTable>
+            </CustomDataTable>
         </div>
-
     </AppLayout>
 
-    <CustomModal v-model:visible="modalVisible">
+    <CustomModal v-model:visible="visible">
         <template #icon>
             <i class="text-white fa-solid fa-ship"></i>
         </template>
@@ -352,12 +261,9 @@ const formatMeters = (value) => {
             </div>
         </template>
         <template #footer>
-            <Button severity="success" :loading="loading" class="text-success hover:bg-success border-success"
-                @click="submit()">
-                {{ formData.id != null ? 'Actualizar ' : 'Guardar' }}
-            </Button>
-            <Button class="hover:bg-danger text-danger border-danger" severity="danger"
-                @click="modalVisible = false">Cancelar</Button>
+            <Button severity="success" :loading="loading" @click="submit()"
+                :label="formData.id != null ? 'Actualizar ' : 'Guardar'" class="!h-8" />
+            <Button severity="danger" @click="visible = false" label="Cancelar" class="!h-8" />
         </template>
     </CustomModal>
 </template>

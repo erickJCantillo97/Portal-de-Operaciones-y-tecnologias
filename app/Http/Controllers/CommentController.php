@@ -41,9 +41,7 @@ class CommentController extends Controller
             }
         )->toArray();
 
-        return response()->json([
-            'comments' => $comments,
-        ]);
+        return response()->json(['comments' => $comments]);
     }
 
     /**
@@ -59,7 +57,6 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-
         $validateData = $request->validate([
             'commentable_id' => 'required|numeric',
             'message' => 'required',
@@ -85,9 +82,36 @@ class CommentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Comment $comment)
+    public function edit(Request $request)
     {
-        //
+        $validateData = $request->validate([
+        'commentable_id' => 'required|numeric',
+        'message' => 'required',
+        'response_id' => 'nullable'
+    ]);
+
+    if ($request->has('comment_id')) {
+
+        $comment = Comment::findOrFail($request->comment_id);
+
+        if ($comment->user_id != auth()->user()->id) {
+            return back()->withErrors('message', 'No tienes permiso para editar este comentario.');
+        }
+
+        $comment->update($validateData);
+
+        } else {
+            $validateData['commentable_type'] = !isset($request->response_id) ? 'App\Models\Quotes\QuoteVersion' : 'App\Models\Comment';
+            $validateData['user_id'] = auth()->user()->id;
+
+            try {
+                Comment::create($validateData);
+            } catch (Exception $e) {
+                return back()->withErrors('message', 'Ocurrió un error al crear: ' . $e->getMessage());
+            }
+        }
+
+        return response()->json(['comment' => $comment]);
     }
 
     /**
@@ -98,7 +122,6 @@ class CommentController extends Controller
         $validateData = $request->validate([
             'message' => 'required',
         ]);
-
         try {
             $comment->update($validateData);
         } catch (Exception $e) {

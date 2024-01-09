@@ -42,6 +42,9 @@ class QuoteVersionController extends Controller
             'expeted_answer_date' => 'required|date|after_or_equal:' . Carbon::now()->format('Y-m-d'),
             'offer_type' => 'string',
         ]);
+        $empleado = collect(searchEmpleados('Num_SAP', $validateData['estimador_id']))->first();
+
+        $validateData['estimador_name'] = $empleado['Usuario'];
         $quoteVersion = QuoteVersion::create([
             'quote_id' => $quote->id,
             'version' => $quote->version->version + 1,
@@ -101,9 +104,12 @@ class QuoteVersionController extends Controller
             'estimador_id' => 'required|numeric',
             'customer_id' => 'required|numeric',
             'observation' => 'nullable|string',
-            'expeted_answer_date' => 'required|date|after_or_equal:' . Carbon::now()->format('Y-m-d'),
+            'expeted_answer_date' => 'required|date',
             'offer_type' => 'string',
         ]);
+        $empleado = collect(searchEmpleados('Num_SAP', $validateData['estimador_id']))->first();
+
+        $validateData['estimador_name'] = $empleado['Usuario'];
         $quoteVersion = QuoteVersion::findOrFail($id)->update([
             'estimador_id' => $validateData['estimador_id'],
             'customer_id' => $validateData['customer_id'],
@@ -111,7 +117,7 @@ class QuoteVersionController extends Controller
             'estimador_name' => $validateData['estimador_name'],
             'expeted_answer_date' => $validateData['expeted_answer_date'],
             'offer_type' => $validateData['offer_type'],
-        ])->id;
+        ]);
 
         QuoteTypeShip::where('quote_version_id', $id)->whereNotIn('type_ship_id', $request->type_ships)->delete();
 

@@ -24,9 +24,7 @@ class ProjectController extends Controller
     {
         $projects = Project::with('contract')->orderBy('created_at', 'DESC')->get();
         if ($request->expectsJson()) {
-            return response()->json([
-                'projects' => $projects
-            ]);
+            return response()->json(['projects' => $projects]);
         }
 
         return Inertia::render('Project/Projects', compact('projects'));
@@ -118,8 +116,7 @@ class ProjectController extends Controller
         $quotes = Quote::get();
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
 
-        return Inertia::render(
-            'Project/CreateProjects',
+        return Inertia::render('Project/CreateProjects',
             [
                 'project' => $project,
                 'project_id' => $project->id,

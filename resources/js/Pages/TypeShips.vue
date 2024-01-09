@@ -1,10 +1,7 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Dropdown from 'primevue/dropdown';
-import "../../sass/dataTableCustomized.scss";
 import { ref } from 'vue';
 import Button from 'primevue/button';
 import TextInput from '@/Components/TextInput.vue';
@@ -12,13 +9,14 @@ import CustomModal from '@/Components/CustomModal.vue';
 import FileUpload from 'primevue/fileupload';
 import Image from 'primevue/image';
 import { useSweetalert } from '@/composable/sweetAlert';
+import CustomDataTable from '@/Components/CustomDataTable.vue';
 const { toast } = useSweetalert();
 const { confirmDelete } = useSweetalert();
 
 const props = defineProps({
     typeShips: Object
 })
-
+const hull_materials = ['ACERO', 'ALUMINIO', 'MATERIALES COMPUESTOS']
 const modalVisible = ref(false)
 const modalType = ref('new')
 
@@ -75,7 +73,7 @@ const save = () => {
     })
 }
 
-const showEdit = (dato) => {
+const showEdit = (event, dato) => {
     typeShip.id = dato.id
     typeShip.name = dato.name
     typeShip.type = dato.type
@@ -114,42 +112,34 @@ const edit = () => {
     })
 }
 
-const columns = ref([
+const deleteClic = (event, dato) => {
+    confirmDelete(dato.id, 'Clase', 'typeShips')
+}
+
+const columns = [
     { field: 'name', header: 'Nombre' },
     { field: 'projects', header: 'Cascos' },
     { field: 'type', header: 'Tipo' },
     { field: 'hull_material', header: 'Material del casco' },
     { field: 'length', header: 'Eslora' },
     { field: 'breadth', header: 'Manga' },
-]);
-
-const hull_materials = ref(['ACERO', 'ALUMINIO', 'MATERIALES COMPUESTOS'])
-const selectedColumns = ref(columns.value);
+];
+const buttons = [
+    { event: 'showEdit', severity: 'success', class: '', icon: 'fa-solid fa-pen-to-square', text: true, outlined: false, rounded: false },
+    { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
+]
 
 </script>
 
 <template>
     <AppLayout>
-        <DataTable :value="props.typeShips" tableStyle="min-width: 50rem">
-            <template #header>
-                <div class="flex items-center justify-between">
-                    <p class="text-base font-bold">Clases de buque</p>
-                    <Button title="Nuevo" severity="primary" text icon="fa-solid fa-plus" @click="showNew()" />
-                </div>
+        <CustomDataTable :data="typeShips" :columnas="columns" :actions="buttons" @showEdit="showEdit"
+            title="Clases de buque" @deleteClic="deleteClic">
+            <template #buttonHeader>
+                <Button title="Nuevo" severity="primary" label="Agregar" outlined class="!h-8" icon="fa-solid fa-plus"
+                    @click="showNew()" />
             </template>
-            <Column v-for="(col, index) of selectedColumns" :field="col.field" :header="col.header" :key="col.field + '_' +
-                index" />
-            <Column header="Acciones" class="space-x-3">
-                <template #body="slotProps">
-                    <div class=" flex justify-center">
-                        <Button title="Editar" severity="success" text @click="showEdit(slotProps.data)" class="!h-8"
-                            icon="fa-solid fa-pen-to-square" />
-                        <Button title="Eliminar" severity="danger" icon="fa-solid fa-trash" text class="!h-8"
-                            @click="confirmDelete(slotProps.data.id, 'Clase', 'typeShips')" />
-                    </div>
-                </template>
-            </Column>
-        </DataTable>
+        </CustomDataTable>
     </AppLayout>
 
     <CustomModal v-model:visible="modalVisible">
@@ -226,9 +216,9 @@ const selectedColumns = ref(columns.value);
             </div>
         </template>
         <template #footer>
-            <Button severity="primary" outlined label="Guardar" icon="fa-solid fa-floppy-disk"
+            <Button severity="primary" outlined label="Guardar" icon="fa-solid fa-floppy-disk" class="!h-8"
                 @click="modalType == 'new' ? save() : edit()" />
-            <Button severity="danger" outlined label="Cancelar" icon="fa-regular fa-circle-xmark"
+            <Button severity="danger" outlined label="Cancelar" icon="fa-regular fa-circle-xmark" class="!h-8"
                 @click="modalVisible = false; typeShip.reset()" />
         </template>
     </CustomModal>
