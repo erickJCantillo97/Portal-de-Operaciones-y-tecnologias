@@ -143,15 +143,15 @@ const formatCurrency = (value) => {
                   </div>
                 </TransitionChild>
                 <div class="h-full overflow-y-auto bg-white p-2">
-                  <div class="rounded-lg bg-blue-900 text-white uppercase p-2 mb-2">
-                    <h2 class="text-md text-center font-bold text-white">
+                  <div class="fixed w-96 -m-2 z-50 py-4 bg-blue-900 text-white uppercase p-2">
+                    <h2 class="text-lg text-center font-bold text-white">
                       {{ quote.name }} {{ quote.consecutive }}
                     </h2>
                   </div>
-                  <header class="w-full">
-                    <div class="flex flex-nowrap text-center justify-center items-center" v-if="quote.version > 1">
-                      <ul class="hover:border-b text-md text-center font-semibold text-blue-900 w-10 cursor-pointer"
-                        v-for="version in quote.version">
+                  <header class="w-full mt-16">
+                    <div class="flex flex-nowrap text-center justify-center items-center">
+                      <ul class=" text-md text-center    w-10 cursor-pointer" v-for="version in 3"
+                        :class="quote.version == version ? 'border-b border-black font-extrabold text-blue-900' : 'hover:border-b text-blue-700'">
                         <li>{{ version }}</li>
                       </ul>
                     </div>

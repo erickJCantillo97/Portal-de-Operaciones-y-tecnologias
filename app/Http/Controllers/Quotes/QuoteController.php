@@ -27,10 +27,12 @@ class QuoteController extends Controller
                 'id' => $quote['id'],
                 'name' => $quote['name'],
                 'gerencia' => $quote['gerencia'],
-                'status' => $quote['version']['get_status'],
+                'status' => $quote['version']['status'],
+                'get_status' => $quote['version']['get_status'],
                 'estimador' => $quote['version']['estimador_name'],
                 'customer' => $quote['version']['customer']['name'],
                 'version_id' => $quote['version']['id'],
+                'version' => $quote['version']['version'],
                 'created_at' => $quote['version']['created_at'],
                 'expeted_answer_date' => $quote['version']['expeted_answer_date'],
                 'consecutive' => str_pad($quote['consecutive'], 3, 0, STR_PAD_LEFT) . '-' . $quote['version']['version'] . '-2023',
@@ -49,6 +51,7 @@ class QuoteController extends Controller
     {
         $typeships = TypeShip::orderBy('name')->get();
         $customers = Customer::orderBy('name')->get();
+
         $estimadores = getPersonalGerenciaOficina('GECON', 'DEEST')->map(function ($estimador) {
             return [
                 'user_id' => $estimador['Num_SAP'],

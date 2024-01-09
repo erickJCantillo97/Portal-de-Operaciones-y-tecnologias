@@ -8,8 +8,6 @@ import { Link } from '@inertiajs/vue3'
 
 const props = defineProps({
     quotes: Array,
-    gerencias: Array,
-    ships: Array
 })
 
 const openSlideOver = ref(false)
@@ -23,12 +21,12 @@ const columnas = [
     { field: 'clases', header: 'Clases', filter: true, sortable: true },
     { field: 'customer', header: 'Cliente', filter: true, sortable: true },
     {
-        field: 'status', header: 'Estado', filter: true, sortable: true, type: 'customTag', severitys: [
+        field: 'get_status', header: 'Estado', filter: true, sortable: true, type: 'customTag', severitys: [
             { text: 'Proceso', class: 'bg-primary text-white' },
             { text: 'Entregada', class: '' },
             { text: 'Pendiente por Firma', class: '' },
-            { text: 'Firmada', class: '' },
-            { text: 'No Firmada', class: '' },
+            { text: 'Firmada', class: 'bg-success text-white' },
+            { text: 'No Firmada', class: 'bg-danger  text-white' },
             { text: 'Contratada', class: '' }
         ]
     },

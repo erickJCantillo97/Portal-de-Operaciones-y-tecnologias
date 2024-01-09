@@ -4,7 +4,6 @@ import Button from 'primevue/button'
 
 const emit = defineEmits(['addComment'])
 
-const message = ref('')
 const actions = defineModel('actions')
 const closeResponse = ref(false)
 
@@ -12,6 +11,7 @@ const props = defineProps({
     quoteId: Number,
     comment: Object,
 })
+const message = ref(props.comment?.message ?? '')
 
 const closeResponseComponent = () => {
     closeResponse.value = true

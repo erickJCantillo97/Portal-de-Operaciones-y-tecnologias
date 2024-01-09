@@ -25,7 +25,6 @@ const overlayOptions = ref([
         icon: 'pi pi-reply',
         command: () => {
           action.value = 2
-          console.log(action.value)
         }
       },
       {
@@ -73,11 +72,11 @@ const getComments = () => {
   comment.value = {}
   action.value = 0
   axios.get(route('comment.index', { id: props.quoteId }))
-  .then((res) => {
-    comments.value = res.data.comments
-    orderByLatest()
-    // loadingStatus.value = false
-  })
+    .then((res) => {
+      comments.value = res.data.comments
+      orderByLatest()
+      // loadingStatus.value = false
+    })
 }
 
 //#region LifeCycles Hooks
@@ -87,8 +86,8 @@ onMounted(() => {
 //#endregion
 
 const orderByLatest = () => {
-    let container = document.querySelector('#conversation')
-    container.scrollTop = container.scrollHeight
+  let container = document.querySelector('#conversation')
+  container.scrollTop = container.scrollHeight
 }
 
 const format_ES_Date = (date) => {
@@ -100,7 +99,8 @@ const format_ES_Date = (date) => {
 <template>
   <Menu ref="menu" id="overlay_menu" :model="overlayOptions" :popup="true" />
   <div class="flow-root">
-    <div id="conversation" class="max-h-[258px] overflow-y-auto scroll-p-0 scroll-m-0 scroll-smooth p-6 mt-4 shadow-md rounded-lg">
+    <div id="conversation"
+      class="max-h-[258px] overflow-y-auto scroll-p-0 scroll-m-0 scroll-smooth p-6 mt-4 shadow-md rounded-lg">
       <ul role="list">
         <li v-for="(commentItem, commentItemIdx) in comments">
           <div class="relative pb-1">
