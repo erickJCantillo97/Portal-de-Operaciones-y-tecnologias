@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Quotes;
 
+use App\Http\Controllers\Controller;
 use App\Models\Quotes\QuoteTypeShip;
+use App\Models\Quotes\QuoteVersion;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -59,26 +61,23 @@ class QuoteTypeShipController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, QuoteTypeShip $quoteTypeShip)
+    public function update(Request $request, QuoteVersion $quoteVersion)
     {
-        $validateData = $request->validate([
-            // 'name' => $typeShip->name,
-            // 'scope' => $request->scope,
-            // 'project_type' => $request->project_type,
-            // 'maturity' => $request->maturity,
-            // 'units' => $request->units,
-            // 'coin' => $request->coin,
-            // 'rate_buy_usd' => $request->rate_buy_usd,
-            // 'rate_buy_eur' => $request->rate_buy_eur,
-            // 'price_before_iva_original' => $request->price_before_iva_original,
-            // 'iva' => $request->iva,
-            // 'margin' => $request->margin,
-            // 'white_paper' => $request->white_paper,
-            // 'white_paper_number' => $request->white_paper_number,
-        ]);
-
         try {
-            $quoteTypeShip->update($validateData);
+            foreach ($request->type_ships as $type_ship) {
+                $id = $type_ship['type_ship_id'];
+                $datos = array_diff_key($type_ship,  array_flip(['id', 'created_at', 'updated_at']));
+                QuoteTypeShip::where('quote_version_id',  $type_ship['quote_version_id'])->where('type_ship_id', $id)->first()->update(
+                    $datos
+                );
+            }
+
+
+            $quote = QuoteVersion::with('quote', 'quoteTypeShips')->where('id', $quoteVersion->id)->first();
+            return response()->json([
+                'status' => true,
+                'quote' => $quote
+            ]);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }

@@ -3,7 +3,6 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { onMounted, ref } from 'vue';
 import { FilterMatchMode } from 'primevue/api'
-import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
 import MultiSelect from 'primevue/multiselect';
@@ -102,7 +101,7 @@ const formatCurrency = (valor, moneda) => {
     if (valor == undefined || valor == null) {
         return 'Sin definir'
     } else {
-        return new Date(valor).toLocaleString('es-CO',
+        return valor.toLocaleString('es-CO',
             { style: 'currency', currency: moneda })
     }
 }
@@ -112,11 +111,11 @@ const formatCurrency = (valor, moneda) => {
 </script>
 
 <template>
-    <DataTable id="tabla" :value="data" :paginator="data.length > rows" :rows="rows" selectionMode="single"
-        tableStyle="min-width: 70rem" currentPageReportTemplate="{first} al {last} de un total de {totalRecords}"
-        v-model:filters="filters" scrollHeight="500px" stripedRows filterDisplay="menu" scrollable class="p-datatable-sm"
-        :removableSort="true" stateStorage="session" :stateKey="'dt-' + title.toLowerCase() + '-state-session'"
-        :globalFilterFields="globalFilterFields"
+    <DataTable id="tabla" :value="data" paginator :rows="rows" selectionMode="single" tableStyle="min-width: 70rem"
+        sortMode="multiple" currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort
+        v-model:filters="filters" stripedRows filterDisplay="menu" scrollable class="p-datatable-sm text-xs"
+        stateStorage="session" :stateKey="'dt-' + title.toLowerCase() + '-state-session'"
+        :globalFilterFields="globalFilterFields" @row-click="$emit('rowClic', $event)"
         paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink" :pt="{
             paginator: {
                 paginatorWrapper: '!p-0',
@@ -152,7 +151,7 @@ const formatCurrency = (valor, moneda) => {
                         </span>
                         <span v-if="props.filterButtons && filterOK" class="p-buttonset">
                             <Button v-for="button in props.filterButtons" :label=button.label
-                                @click="filters[button.field].value = button.data"
+                                @click="filters[button.field].value == button.data ? filters[button.field].value = null : filters[button.field].value = button.data"
                                 :outlined="filters[button.field].value != button.data" class="!h-8" icon="" />
                         </span>
                     </div>
@@ -221,11 +220,11 @@ const formatCurrency = (valor, moneda) => {
             :sortable="col.sortable" :show-filter-match-modes="false" :filterMenuStyle="{ width: '16rem' }"
             :frozen="col.frozen" :pt="{
                 headerContent: { class: '!h-8' },
-                headerCell: { class: '!py-0 !px-1' },
+                headerCell: { class: '!p-0.5' }
             }
                 ">
             <template #header>
-                <p class="text-sm text-primary uppercase w-full font-bold">{{ col.header }}</p>
+                <span class="text-sm text-primary uppercase font-bold">{{ col.header }}</span>
             </template>
             <template #filtericon>
                 <i class="fa-solid fa-filter"></i>
@@ -245,13 +244,15 @@ const formatCurrency = (valor, moneda) => {
             </template>
 
             <template #body="{ data }">
-                <p v-if="col.type == 'date'" class="text-center"> {{ formatDate(data[col.field]) }}</p>
+                <p v-if="col.type == 'date'" class="text-center">
+                    {{ formatDate(data[col.field]) }}
+                </p>
                 <p v-else-if="col.type == 'currency'" class="text-center">
-                    {{ formatCurrency(data[col.field], col.moneda) }}
+                    {{ formatCurrency(data[col.field], 'COP') }}
                 </p>
                 <span v-else-if="col.type == 'customTag'">
                     <p :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
-                        class="text-center rounded-lg px-2">
+                        class="text-center rounded-lg px-2 py-1">
                         {{ data[col.field] }}
                     </p>
                 </span>

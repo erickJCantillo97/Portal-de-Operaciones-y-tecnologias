@@ -16,11 +16,13 @@ import Swal from 'sweetalert2';
 import { router } from '@inertiajs/vue3';
 import OverlayPanel from 'primevue/overlaypanel';
 import FileUpload from 'primevue/fileupload';
+import { number } from 'echarts';
 const props = defineProps({
     estimadores: Object,
     customers: Array,
     typeships: Array,
-    quote: Object
+    quote: Object,
+    action: number,
 })
 const errors = ref({
     name: false,
@@ -138,7 +140,7 @@ const quoteShipsSave = () => {
         confirmButtonText: 'Guardar',
         denyButtonText: 'Cancelar'
     }).then(async (result) => {
-        await axios.put(route('', props.quote.id), quoteShips.value).then((res) => {
+        await axios.post(route('quote.version.type_ship.update', props.quote.id), { type_ships: quoteShips.value }).then((res) => {
             quoteShips.value = res.data.quote.quote_type_ships
             toast('Datos de las clases actualizados correctamente', 'success')
             modEdit.value = false
@@ -243,7 +245,12 @@ const toggle = (event) => {
                     </div>
                     <span class="space-y-2">
                         <Editor v-model="dataQuoteNew.observation" editorStyle="height: 210px" v-if="newQuote"
-                            placeholder="Escriba aqui las sugerencias que seran enviadas al estimador">
+                            placeholder="Escriba aqui las sugerencias que seran enviadas al estimador" :pt="{
+                                link: { class: '!hidden' },
+                                image: { class: '!hidden' },
+                                codeBlock: { class: '!hidden' },
+                                toolbar: { class: '!bg-gray-100' }
+                            }">
                         </Editor>
                         <span v-if="newQuote" class="w-full justify-end flex">
                             <Button severity="success" @click="quoteSave()" :loading="loadingButton"
@@ -252,7 +259,7 @@ const toggle = (event) => {
                     </span>
                 </div>
             </span>
-            <span class="" v-if="quoteShips && !modEdit">
+            <span class="" v-if="quoteShips && !modEdit && action != 2">
                 <TabView class="tabview-custom" :scrollable="true">
                     <TabPanel v-for="buque, index in quoteShips">
                         <template #header>

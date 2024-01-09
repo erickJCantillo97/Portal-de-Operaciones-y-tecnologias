@@ -37,6 +37,7 @@ createInertiaApp({
                 ripple: true,
                 locale: optionsPrimeVUE,
             })
+            .component('Button', Button)
             .use(VueApexCharts)
             // .use(VueChatScroll)
             .component("Head", Head)
