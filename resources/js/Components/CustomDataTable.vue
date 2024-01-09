@@ -101,7 +101,7 @@ const formatCurrency = (valor, moneda) => {
     if (valor == undefined || valor == null) {
         return 'Sin definir'
     } else {
-        return new Date(valor).toLocaleString('es-CO',
+        return valor.toLocaleString('es-CO',
             { style: 'currency', currency: moneda })
     }
 }
@@ -113,9 +113,9 @@ const formatCurrency = (valor, moneda) => {
 <template>
     <DataTable id="tabla" :value="data" paginator :rows="rows" selectionMode="single" tableStyle="min-width: 70rem"
         sortMode="multiple" currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort
-        v-model:filters="filters" stripedRows filterDisplay="menu" scrollable class="p-datatable-sm" stateStorage="session"
-        :stateKey="'dt-' + title.toLowerCase() + '-state-session'" :globalFilterFields="globalFilterFields"
-        @row-click="$emit('rowClic', $event)"
+        v-model:filters="filters" stripedRows filterDisplay="menu" scrollable class="p-datatable-sm text-xs"
+        stateStorage="session" :stateKey="'dt-' + title.toLowerCase() + '-state-session'"
+        :globalFilterFields="globalFilterFields" @row-click="$emit('rowClic', $event)"
         paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink" :pt="{
             paginator: {
                 paginatorWrapper: '!p-0',
@@ -151,7 +151,7 @@ const formatCurrency = (valor, moneda) => {
                         </span>
                         <span v-if="props.filterButtons && filterOK" class="p-buttonset">
                             <Button v-for="button in props.filterButtons" :label=button.label
-                                @click="filters[button.field].value = button.data"
+                                @click="filters[button.field].value == button.data ? filters[button.field].value = null : filters[button.field].value = button.data"
                                 :outlined="filters[button.field].value != button.data" class="!h-8" icon="" />
                         </span>
                     </div>
@@ -224,7 +224,7 @@ const formatCurrency = (valor, moneda) => {
             }
                 ">
             <template #header>
-                <p class="text-sm text-primary uppercase font-bold">{{ col.header }}</p>
+                <span class="text-sm text-primary uppercase font-bold">{{ col.header }}</span>
             </template>
             <template #filtericon>
                 <i class="fa-solid fa-filter"></i>
@@ -244,13 +244,15 @@ const formatCurrency = (valor, moneda) => {
             </template>
 
             <template #body="{ data }">
-                <p v-if="col.type == 'date'" class="text-center"> {{ formatDate(data[col.field]) }}</p>
+                <p v-if="col.type == 'date'" class="text-center">
+                    {{ formatDate(data[col.field]) }}
+                </p>
                 <p v-else-if="col.type == 'currency'" class="text-center">
                     {{ formatCurrency(data[col.field], col.moneda) }}
                 </p>
                 <span v-else-if="col.type == 'customTag'">
                     <p :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
-                        class="text-center rounded-lg px-2">
+                        class="text-center rounded-lg px-2 py-1">
                         {{ data[col.field] }}
                     </p>
                 </span>
