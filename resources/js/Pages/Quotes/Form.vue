@@ -262,7 +262,7 @@ const toggle = (event) => {
                                 <Avatar :image="buque.render ? buque.render : '/images/generic-boat.png'" shape="circle" />
                                 <span class="flex-col flex">
                                     <span class="font-bold white-space-nowrap">{{ buque.name }}</span>
-                                    <span class="text-xs">$999.999.999</span>
+                                    <span class="text-xs">$ {{ buque?.price_before_iva_original ?? 0 }}</span>
                                 </span>
                             </div>
                         </template>

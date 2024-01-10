@@ -4,7 +4,6 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import AuthenticationCard from '@/Components/AuthenticationCard.vue';
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
-import Button from 'primevue/button';
 defineProps({
     canResetPassword: Boolean,
     status: String,
