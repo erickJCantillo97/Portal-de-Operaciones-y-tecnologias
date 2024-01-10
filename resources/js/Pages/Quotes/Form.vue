@@ -22,7 +22,7 @@ const props = defineProps({
     customers: Array,
     typeships: Array,
     quote: Object,
-    action: number,
+    action: Number,
 })
 const errors = ref({
     name: false,
@@ -35,6 +35,7 @@ const dataQuoteNew = ref({})
 const minDate = new Date();
 const oferta = ['ROM', 'FINAL']
 const iva = ['5%', '16%', '19%', 'Exento', 'Excluido']
+const moneda = ['USD', 'COP', 'EUR']
 const alcance = ['ADQUISICIÓN Y ENTREGA', 'CO DESARROLL DISEÑO Y CONSTRUCCIÓN', 'CO PRODUCCIÓN', 'CONSTRUCCIÓN', 'DISEÑO BUQUE', 'DISEÑO Y CONSTRUCCIÓN', 'SERVICIOS INDUSTRIALES']
 const madurez = ['CONCEPTUAL', 'PRELIMINAR', 'CONTRACTUAL', 'PORTAFOLIO']
 const docTecnico = ['PENDIENTE', 'HT', 'ET', 'PTB', 'DG', 'AT']
@@ -55,10 +56,10 @@ const editInactive = () => {
     dataQuoteNew.value.customer_id = parseInt(props.quote.customer_id)
     dataQuoteNew.value.offer_type = props.quote.offer_type
     dataQuoteNew.value.route = props.quote.route
+    dataQuoteNew.value.coin = props.quote.coin
 }
 
 if (props.quote) {
-    newQuote.value = false
     dataQuoteNew.value.expeted_answer_date = props.quote.expeted_answer_date
     dataQuoteNew.value.name = props.quote.quote.name
     dataQuoteNew.value.estimador_id = props.quote.estimador_id
@@ -67,7 +68,13 @@ if (props.quote) {
     dataQuoteNew.value.customer_id = parseInt(props.quote.customer_id)
     dataQuoteNew.value.offer_type = props.quote.offer_type
     dataQuoteNew.value.route = props.quote.route
+    dataQuoteNew.value.coin = props.quote.coin
     quoteShips.value = props.quote.quote_type_ships
+    if (props.action == null) {
+        newQuote.value = false
+    } else {
+
+    }
 }
 
 const quoteSave = () => {
@@ -259,86 +266,85 @@ const toggle = (event) => {
                     </span>
                 </div>
             </span>
-            <span class="" v-if="quoteShips && !modEdit && action != 2">
-                <TabView class="tabview-custom" :scrollable="true">
-                    <TabPanel v-for="buque, index in quoteShips">
-                        <template #header>
-                            <div class="flex items-center space-x-1">
-                                <Avatar :image="buque.render ? buque.render : '/images/generic-boat.png'" shape="circle" />
-                                <span class="flex-col flex">
-                                    <span class="font-bold white-space-nowrap">{{ buque.name }}</span>
-                                    <span class="text-xs">$ {{ buque?.price_before_iva_original ?? 0 }}</span>
+            <div class="" v-if="quoteShips && !modEdit && action != 2">
+                <div class=" border rounded-md p-1">
+                    <TabView class="tabview-custom" :scrollable="true">
+                        <TabPanel v-for="buque, index in quoteShips">
+                            <template #header>
+                                <div class="flex items-center space-x-1">
+                                    <Avatar :image="buque.render ? buque.render : '/images/generic-boat.png'"
+                                        shape="circle" />
+                                    <span class="flex-col flex">
+                                        <span class="font-bold white-space-nowrap">{{ buque.name }}</span>
+                                        <span class="text-xs">$ {{ buque?.price_before_iva_original ?? 0 }}</span>
+                                    </span>
+                                </div>
+                            </template>
+                            <div class="grid grid-cols-4 gap-2 ">
+                                <span class="">
+                                    <p for="username">Alcance</p>
+                                    <Dropdown v-model="buque.scope" :options="alcance" placeholder="Selecciona el alcance"
+                                        class="w-full md:w-14rem !h-8" showClear :pt="{
+                                            input: '!p-0 !pt-1 !px-1 '
+                                        }" />
+                                </span>
+                                <span class="">
+                                    <p for="username">Madurez</p>
+                                    <Dropdown v-model="buque.maturity" :options="madurez"
+                                        placeholder="Selecciona la madurez" class="w-full md:w-14rem !h-8" showClear :pt="{
+                                            input: '!p-0 !pt-1 !px-1 '
+                                        }" />
+                                </span>
+                                <span class="">
+                                    <p for="username">Unidades</p>
+                                    <InputText v-model="buque.units" filter optionLabel="name"
+                                        placeholder="Unidades a producir" class="w-full md:w-14rem !h-8" showClear />
+                                </span>
+                                <span class="">
+                                    <p for="username">Precio compra USD</p>
+                                    <InputText v-model="buque.rate_buy_usd" filter optionLabel="name"
+                                        placeholder="Precio de compra en Dolares" class="w-full md:w-14rem !h-8"
+                                        showClear />
+                                </span>
+                                <span class="">
+                                    <p for="username">Precio de compra EUR</p>
+                                    <InputText v-model="buque.rate_buy_eur" filter optionLabel="name"
+                                        placeholder="Precio de compra en Euros" class="w-full md:w-14rem !h-8" showClear />
+                                </span>
+                                <span class="">
+                                    <p for="username">Precio antes de IVA</p>
+                                    <InputText v-model="buque.price_before_iva_original" filter optionLabel="name"
+                                        placeholder="Precio antes de IVA" class="w-full md:w-14rem !h-8" showClear />
+                                </span>
+                                <span class="">
+                                    <p for="username">IVA</p>
+                                    <Dropdown v-model="buque.iva" :options="iva" placeholder="Selecciona el IVA"
+                                        class="w-full md:w-14rem !h-8" showClear :pt="{
+                                            input: '!p-0 !pt-1 !px-1 '
+                                        }" />
+                                </span>
+                                <span class="">
+                                    <p for="username">Margen</p>
+                                    <InputText v-model="buque.margin" filter optionLabel="name"
+                                        placeholder="Margen estimado" class="w-full md:w-14rem !h-8" showClear />
+                                </span>
+                                <span class="">
+                                    <p for="username">Tipo de documento tecnico</p>
+                                    <Dropdown v-model="buque.white_paper" :options="docTecnico"
+                                        placeholder="Selecciona el tipo de DT" class="w-full md:w-14rem !h-8" showClear :pt="{
+                                            input: '!p-0 !pt-1 !px-1 '
+                                        }" />
+
+                                </span>
+                                <span class="">
+                                    <p for="username">Numero de documento tecnico</p>
+                                    <InputText v-model="buque.no_white_paper" optionLabel="name" placeholder="Numero DT"
+                                        class="w-full md:w-14rem !h-8" showClear />
                                 </span>
                             </div>
-                        </template>
-                        <div class="grid grid-cols-4 gap-2 ">
-                            <span class="">
-                                <p for="username">Alcance</p>
-                                <Dropdown v-model="buque.scope" :options="alcance" placeholder="Selecciona el alcance"
-                                    class="w-full md:w-14rem !h-8" showClear :pt="{
-                                        input: '!p-0 !pt-1 !px-1 '
-                                    }" />
-                            </span>
-                            <span class="">
-                                <p for="username">Madurez</p>
-                                <Dropdown v-model="buque.maturity" :options="madurez" placeholder="Selecciona la madurez"
-                                    class="w-full md:w-14rem !h-8" showClear :pt="{
-                                        input: '!p-0 !pt-1 !px-1 '
-                                    }" />
-                            </span>
-                            <span class="">
-                                <p for="username">Unidades</p>
-                                <InputText v-model="buque.units" filter optionLabel="name" placeholder="Unidades a producir"
-                                    class="w-full md:w-14rem !h-8" showClear />
-                            </span>
-                            <span class="">
-                                <p for="username">Moneda</p>
-                                <InputText v-model="buque.coin" filter optionLabel="name" placeholder="Tipo de moneda"
-                                    class="w-full md:w-14rem !h-8" showClear />
-                            </span>
-                            <span class="">
-                                <p for="username">Precio compra USD</p>
-                                <InputText v-model="buque.rate_buy_usd" filter optionLabel="name"
-                                    placeholder="Precio de compra en Dolares" class="w-full md:w-14rem !h-8" showClear />
-                            </span>
-                            <span class="">
-                                <p for="username">Precio de compra EUR</p>
-                                <InputText v-model="buque.rate_buy_eur" filter optionLabel="name"
-                                    placeholder="Precio de compra en Euros" class="w-full md:w-14rem !h-8" showClear />
-                            </span>
-                            <span class="">
-                                <p for="username">Precio antes de IVA</p>
-                                <InputText v-model="buque.price_before_iva_original" filter optionLabel="name"
-                                    placeholder="Precio antes de IVA" class="w-full md:w-14rem !h-8" showClear />
-                            </span>
-                            <span class="">
-                                <p for="username">IVA</p>
-                                <Dropdown v-model="buque.iva" :options="iva" placeholder="Selecciona el IVA"
-                                    class="w-full md:w-14rem !h-8" showClear :pt="{
-                                        input: '!p-0 !pt-1 !px-1 '
-                                    }" />
-                            </span>
-                            <span class="">
-                                <p for="username">Margen</p>
-                                <InputText v-model="buque.margin" filter optionLabel="name" placeholder="Margen estimado"
-                                    class="w-full md:w-14rem !h-8" showClear />
-                            </span>
-                            <span class="">
-                                <p for="username">Tipo de documento tecnico</p>
-                                <Dropdown v-model="buque.white_paper" :options="docTecnico"
-                                    placeholder="Selecciona el tipo de DT" class="w-full md:w-14rem !h-8" showClear :pt="{
-                                        input: '!p-0 !pt-1 !px-1 '
-                                    }" />
-
-                            </span>
-                            <span class="">
-                                <p for="username">Numero de documento tecnico</p>
-                                <InputText v-model="buque.no_white_paper" optionLabel="name" placeholder="Numero DT"
-                                    class="w-full md:w-14rem !h-8" showClear />
-                            </span>
-                        </div>
-                    </TabPanel>
-                </TabView>
+                        </TabPanel>
+                    </TabView>
+                </div>
                 <span v-if="!newQuote" class=" p-2 flex h-full justify-between">
                     <div class="space-y-2 w-1/2">
                         <span class="">
@@ -347,9 +353,18 @@ const toggle = (event) => {
                                 placeholder="Escriba o pegue la ruta a la carpeta de los documentos"
                                 class="w-full md:w-14rem !h-8" />
                         </span>
-                        <span class="">
-                            <p class="mt-1">Archivo a subir</p>
-                            <FileUpload mode="basic" accept="application/pdf" class="!h-8 !min-w-[200px]" />
+                        <span class="flex space-x-4">
+                            <span class="">
+                                <p for="username">Moneda</p>
+                                <Dropdown v-model="dataQuoteNew.coin" :options="moneda" placeholder="Selecciona la moneda"
+                                    class="w-full md:w-14rem !h-8" showClear :pt="{
+                                        input: '!p-0 !pt-1 !px-1 '
+                                    }" />
+                            </span>
+                            <span class="">
+                                <p class="">Archivo a subir</p>
+                                <FileUpload mode="basic" accept="application/pdf" class="!h-8 !min-w-[200px]" />
+                            </span>
                         </span>
                     </div>
                     <span class="flex flex-col justify-end gap-2" v-if="!modEdit">
@@ -360,7 +375,7 @@ const toggle = (event) => {
                     </span>
 
                 </span>
-            </span>
+            </div>
         </div>
     </AppLayout>
 

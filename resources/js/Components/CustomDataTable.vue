@@ -58,7 +58,7 @@ const initFilters = () => {
     filters.value.global = { value: null, matchMode: FilterMatchMode.CONTAINS }
     for (var columna of props.columnas) {
         if (columna.filter) {
-            filters.value[columna.field] = { value: null, matchMode: FilterMatchMode.CONTAINS }
+            filters.value[columna.field] = { value: null, matchMode: FilterMatchMode[columna.filtertype ? columna.filtertype : 'CONTAINS'] }
             globalFilterFields.value.push(columna.field)
         }
     }
@@ -236,10 +236,13 @@ const formatCurrency = (valor, moneda) => {
             </template>
 
             <template #filter="{ filterModel }" v-if="col.filter">
-                <input v-if="col.type == 'date'" class="w-full rounded-md" type="date" v-model="filterModel.value"
-                    dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
-                <InputNumber v-else v-if="col.type == 'number'" v-model="filterModel.value" class="p-column-filter"
+                <input v-if="col.type == 'date'" class="w-full rounded-md p-column-filter" type="date"
+                    v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
+                <InputNumber v-else-if="col.type == 'number'" v-model="filterModel.value" class="p-column-filter"
                     placeholder="Numero a buscar" />
+                <Dropdown v-else-if="col.type == 'tag' || col.type == 'customtag'" v-model="filterModel.value"
+                    :options="col.severitys.map(option => option.text)" placeholder="Selecciona una opcion"
+                    class="p-column-filter w-full md:w-14rem" showClear />
                 <InputText v-else v-model="filterModel.value" type="text" class="p-column-filter"
                     placeholder="Escriba algo para buscar" />
             </template>
@@ -251,7 +254,7 @@ const formatCurrency = (valor, moneda) => {
                 <p v-else-if="col.type == 'currency'" class="text-right">
                     {{ formatCurrency(data[col.field], 'COP') }}
                 </p>
-                <p v-else-if="col.type == 'customTag'"
+                <p v-else-if="col.type == 'customtag'"
                     :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
                     class="text-center rounded-lg px-2 py-1">
                     {{ data[col.field] }}
