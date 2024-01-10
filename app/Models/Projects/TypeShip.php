@@ -23,4 +23,9 @@ class TypeShip extends Model implements Auditable
             set: fn ($value) => $value,
         );
     }
+
+    public function ships()
+    {
+        return $this->hasMany(Ship::class, 'type_ship_id');
+    }
 }
