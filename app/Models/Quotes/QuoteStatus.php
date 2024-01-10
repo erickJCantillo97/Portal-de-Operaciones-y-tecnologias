@@ -18,10 +18,10 @@ class QuoteStatus extends Model implements Auditable
 
     protected $appends = ['get_status'];
 
-    protected  $estados = [
+    protected $estados = [
         'Proceso',
         'Entregada',
-        'Pendiente por firma',
+        'Pendiente por Firma',
         'Firmada',
         'No Firmada',
         'Contratada',

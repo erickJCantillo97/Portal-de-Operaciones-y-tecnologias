@@ -21,13 +21,13 @@ const columnas = [
     { field: 'clases', header: 'Clases', filter: true, sortable: true },
     { field: 'customer', header: 'Cliente', filter: true, sortable: true },
     {
-        field: 'get_status', header: 'Estado', filter: true, sortable: true, type: 'customTag', severitys: [
-            { text: 'Proceso', class: 'bg-primary text-white' },
-            { text: 'Entregada', class: '' },
-            { text: 'Pendiente por Firma', class: '' },
-            { text: 'Firmada', class: 'bg-success text-white' },
-            { text: 'No Firmada', class: 'bg-danger  text-white' },
-            { text: 'Contratada', class: '' }
+        field: 'get_status', header: 'Estado', filter: true, sortable: true, type: 'tag', severitys: [
+            { text: 'Proceso', severity: 'primary', class: 'bg-primary text-white' },
+            { text: 'Entregada', severity: 'warning', class: '' },
+            { text: 'Pendiente por Firma', severity: 'warning', class: '' },
+            { text: 'Firmada', severity: 'success', class: 'bg-success text-white' },
+            { text: 'No Firmada', severity: 'danger', class: 'bg-danger  text-white' },
+            { text: 'Contratada', severity: 'success', class: '' }
         ]
     },
     { field: 'total_cost', header: 'Precio', type: 'currency', sortable: true, filter: true, },
@@ -50,8 +50,10 @@ const columnas = [
 
 //#region Botones de filtro de CustomDatatable
 const filterButtons = [
-    { field: 'get_status', label: 'En proceso', data: 'Proceso' },
-    { field: 'get_status', label: 'Entregadas', data: 'Entregada' },
+    { field: 'get_status', label: 'En proceso', data: 'Proceso', severity: 'primary' },
+    { field: 'get_status', label: 'Entregadas', data: 'Entregada', severity: 'warning' },
+    { field: 'get_status', label: 'Firmadas', data: 'Firmada', severity: 'success' },
+    { field: 'get_status', label: 'Pendiente', data: 'Pendiente por Firma', severity: 'warning' },
 ]
 //#endregion
 

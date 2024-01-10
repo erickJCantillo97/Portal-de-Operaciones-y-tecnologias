@@ -19,10 +19,10 @@ class QuoteVersion extends Model
     protected $guarded = [];
     protected $appends = ['status', 'get_status'];
 
-    protected  $estados = [
+    protected $estados = [
         'Proceso',
         'Entregada',
-        'Pendinete por firma',
+        'Pendiente por Firma',
         'Firmada',
         'No Firmada',
         'Contratada',

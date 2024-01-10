@@ -150,7 +150,7 @@ const formatCurrency = (valor, moneda) => {
                                 " />
                         </span>
                         <span v-if="props.filterButtons && filterOK" class="p-buttonset">
-                            <Button v-for="button in props.filterButtons" :label=button.label
+                            <Button v-for="button in props.filterButtons" :label=button.label :severity=button.severity
                                 @click="filters[button.field].value == button.data ? filters[button.field].value = null : filters[button.field].value = button.data"
                                 :outlined="filters[button.field].value != button.data" class="!h-8" icon="" />
                         </span>
@@ -224,6 +224,7 @@ const formatCurrency = (valor, moneda) => {
             }
                 ">
             <template #header>
+                {{ console.log(col.field) }}
                 <span class="text-sm text-primary uppercase font-bold">{{ col.header }}</span>
             </template>
             <template #filtericon>
@@ -244,40 +245,36 @@ const formatCurrency = (valor, moneda) => {
             </template>
 
             <template #body="{ data }">
-                <p v-if="col.type == 'date'" class="text-center">
+                <p v-if="col.type == 'date'" class="text-left">
                     {{ formatDate(data[col.field]) }}
                 </p>
-                <p v-else-if="col.type == 'currency'" class="text-center">
+                <p v-else-if="col.type == 'currency'" class="text-right">
                     {{ formatCurrency(data[col.field], 'COP') }}
                 </p>
-                <span v-else-if="col.type == 'customTag'">
-                    <p :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
-                        class="text-center rounded-lg px-2 py-1">
-                        {{ data[col.field] }}
-                    </p>
-                </span>
-                <span v-else-if="col.type == 'tag'">
-                    <Tag :severity="col.severitys.find((severity) => severity.text == data[col.field]).severity"
-                        :value="data[col.field]" />
-                </span>
-                <span v-else-if="col.type == 'object'">
-                    <div class="flex items-center space-x-2 w-full">
-                        <img v-if="col.objectRows.photo" :src="data[col.objectRows.photo.field]" alt="Image"
-                            onerror="this.src='/svg/cotecmar-logo.svg'" class=" border py-0.5 rounded-lg sm:h-12 sm:w-16" />
-                        <div>
-                            <p class="font-bold text-sm ">{{
-                                col.objectRows.primary.subfield ?
-                                data[col.objectRows.primary.field][col.objectRows.primary.subfield] :
-                                data[col.objectRows.primary.field]
-                            }} </p>
-                            <p class="text-xs italic">{{
-                                col.objectRows.secundary.subfield ?
-                                data[col.objectRows.secundary.field][col.objectRows.secundary.subfield] :
-                                data[col.objectRows.secundary.field]
-                            }} </p>
-                        </div>
+                <p v-else-if="col.type == 'customTag'"
+                    :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
+                    class="text-center rounded-lg px-2 py-1">
+                    {{ data[col.field] }}
+                </p>
+                <Tag v-else-if="col.type == 'tag'" class="w-full"
+                    :severity="col.severitys.find((severity) => severity.text == data[col.field]).severity"
+                    :value="data[col.field]" />
+                <div v-else-if="col.type == 'object'" class="flex items-center space-x-2 w-full">
+                    <img v-if="col.objectRows.photo" :src="data[col.objectRows.photo.field]" alt="Image"
+                        onerror="this.src='/svg/cotecmar-logo.svg'" class=" border py-0.5 rounded-lg sm:h-12 sm:w-16" />
+                    <div>
+                        <p class="font-bold text-sm ">{{
+                            col.objectRows.primary.subfield ?
+                            data[col.objectRows.primary.field][col.objectRows.primary.subfield] :
+                            data[col.objectRows.primary.field]
+                        }} </p>
+                        <p class="text-xs italic">{{
+                            col.objectRows.secundary.subfield ?
+                            data[col.objectRows.secundary.field][col.objectRows.secundary.subfield] :
+                            data[col.objectRows.secundary.field]
+                        }} </p>
                     </div>
-                </span>
+                </div>
                 <p v-else class="">{{ data[col.field] }} </p>
             </template>
 
