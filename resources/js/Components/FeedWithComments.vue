@@ -6,6 +6,7 @@ import CommentForm from '@/Components/CommentForm.vue'
 import Loading from '@/Components/Loading.vue'
 import Menu from 'primevue/menu'
 import Button from 'primevue/button'
+import Moment from 'moment'
 
 const props = defineProps({
   quoteId: Number
@@ -13,6 +14,7 @@ const props = defineProps({
 
 const action = ref(0)
 const comment = ref({})
+const commentSelect = ref()
 const menu = ref()
 const loadingStatus = ref(true)
 
@@ -25,21 +27,17 @@ const overlayOptions = ref([
         icon: 'pi pi-reply',
         command: () => {
           action.value = 2
+          comment.value = commentSelect.value
+          console.log(action.value)
         }
       },
       {
         label: 'Editar',
         icon: 'pi pi-pencil',
         command: () => {
-          action.value = 0
-          router.get(route('comment.edit', comment.value.id), {
-            onSuccess: () => {
-              getComments()
-            },
-            onError: (errors) => {
-              console.log('error: ' + errors)
-            }
-          })
+          action.value = 3
+          comment.value = commentSelect.value
+          console.log(action.value)
         }
       },
       {
@@ -63,7 +61,7 @@ const overlayOptions = ref([
 
 const toggle = (event, commentItem) => {
   menu.value.toggle(event)
-  comment.value = commentItem
+  commentSelect.value = commentItem
 }
 
 const comments = ref([])
@@ -115,19 +113,20 @@ const format_ES_Date = (date) => {
                   <ChatBubbleLeftEllipsisIcon class="size-5 text-gray-400" aria-hidden="true" />
                 </span>
               </div>
-              <div class="min-w-0 flex-1">
+              <div class="min-w-0 flex-1 p-2">
                 <div>
                   <div class="text-sm flex justify-between">
                     <a class="font-medium text-gray-900">
                       {{ commentItem.user_name }}
                     </a>
                     <div class="flex justify-end">
+                      <p class="mt-0.5 mr-2 text-sm text-gray-500">{{ Moment(commentItem.date).format('DD/MM/YY') }}</p>
                       <Button @click="toggle($event, commentItem)" v-if="commentItem.user_id === $page.props.auth.user.id"
                         class="!size-4" type="button" icon="pi pi-ellipsis-v" aria-haspopup="true"
                         aria-controls="overlay_menu" text />
                     </div>
                   </div>
-                  <p class="mt-0.5 text-sm text-gray-500">Comentado el: {{ format_ES_Date(commentItem.date) }}</p>
+                  <!-- <p class="mt-0.5 text-sm text-gray-500">Comentado el: </p> -->
                 </div>
                 <div class="mt-2 text-sm text-gray-700">
                   <p>{{ commentItem.message }}</p>
