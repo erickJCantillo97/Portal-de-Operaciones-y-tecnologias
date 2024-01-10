@@ -82,36 +82,36 @@ class CommentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request)
-    {
-        $validateData = $request->validate([
-        'commentable_id' => 'required|numeric',
-        'message' => 'required',
-        'response_id' => 'nullable'
-    ]);
+    public function edit(Request $request) {
 
-    if ($request->has('comment_id')) {
+    // $validateData = $request->validate([
+    //     'commentable_id' => 'required|numeric',
+    //     'message' => 'required',
+    //     'response_id' => 'nullable'
+    // ]);
 
-        $comment = Comment::findOrFail($request->comment_id);
+    // if ($request->has('comment_id')) {
 
-        if ($comment->user_id != auth()->user()->id) {
-            return back()->withErrors('message', 'No tienes permiso para editar este comentario.');
-        }
+    //     $comment = Comment::findOrFail($request->comment_id);
 
-        $comment->update($validateData);
+    //     if ($comment->user_id != auth()->user()->id) {
+    //         return back()->withErrors('message', 'No tienes permiso para editar este comentario.');
+    //     }
 
-        } else {
-            $validateData['commentable_type'] = !isset($request->response_id) ? 'App\Models\Quotes\QuoteVersion' : 'App\Models\Comment';
-            $validateData['user_id'] = auth()->user()->id;
+    //     $comment->update($validateData);
 
-            try {
-                Comment::create($validateData);
-            } catch (Exception $e) {
-                return back()->withErrors('message', 'Ocurrió un error al crear: ' . $e->getMessage());
-            }
-        }
+    //     } else {
+    //         $validateData['commentable_type'] = !isset($request->response_id) ? 'App\Models\Quotes\QuoteVersion' : 'App\Models\Comment';
+    //         $validateData['user_id'] = auth()->user()->id;
 
-        return response()->json(['comment' => $comment]);
+    //         try {
+    //             Comment::create($validateData);
+    //         } catch (Exception $e) {
+    //             return back()->withErrors('message', 'Ocurrió un error al crear: ' . $e->getMessage());
+    //         }
+    //     }
+
+    //     return response()->json(['comment' => $comment]);
     }
 
     /**

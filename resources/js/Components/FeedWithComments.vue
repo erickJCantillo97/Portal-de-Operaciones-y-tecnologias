@@ -13,6 +13,7 @@ const props = defineProps({
 
 const action = ref(0)
 const comment = ref({})
+const commentSelect = ref()
 const menu = ref()
 const loadingStatus = ref(true)
 
@@ -25,21 +26,17 @@ const overlayOptions = ref([
         icon: 'pi pi-reply',
         command: () => {
           action.value = 2
+          comment.value = commentSelect.value
+          console.log(action.value)
         }
       },
       {
         label: 'Editar',
         icon: 'pi pi-pencil',
         command: () => {
-          action.value = 0
-          router.get(route('comment.edit', comment.value.id), {
-            onSuccess: () => {
-              getComments()
-            },
-            onError: (errors) => {
-              console.log('error: ' + errors)
-            }
-          })
+          action.value = 3
+          comment.value = commentSelect.value
+          console.log(action.value)
         }
       },
       {
@@ -63,7 +60,7 @@ const overlayOptions = ref([
 
 const toggle = (event, commentItem) => {
   menu.value.toggle(event)
-  comment.value = commentItem
+  commentSelect.value = commentItem
 }
 
 const comments = ref([])
