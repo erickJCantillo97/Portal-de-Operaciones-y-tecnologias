@@ -6,6 +6,7 @@ import CommentForm from '@/Components/CommentForm.vue'
 import Loading from '@/Components/Loading.vue'
 import Menu from 'primevue/menu'
 import Button from 'primevue/button'
+import Skeleton from 'primevue/skeleton'
 import Moment from 'moment'
 
 const props = defineProps({
@@ -99,6 +100,16 @@ const format_ES_Date = (date) => {
   <div class="flow-root">
     <div id="conversation"
       class="max-h-[258px] overflow-y-auto scroll-p-0 scroll-m-0 scroll-smooth p-6 mt-4 shadow-md rounded-lg">
+      <!-- <div class="flex w-full mb-3">
+        <Skeleton shape="circle" size="3rem" class="mr-2"></Skeleton>
+        <div>
+          <Skeleton width="10rem" class="mb-2"></Skeleton>
+          <Skeleton width="5rem" class="mb-2"></Skeleton>
+          <div>
+            <Skeleton height=".5rem" class="mb-2"></Skeleton>
+          </div>
+        </div>
+      </div> -->
       <ul role="list">
         <li v-for="(commentItem, commentItemIdx) in comments">
           <div class="relative pb-1">
@@ -107,7 +118,7 @@ const format_ES_Date = (date) => {
             <div class="relative flex items-start space-x-3">
               <div class="relative">
                 <img
-                  class="flex h-10 w-10 items-center justify-center rounded-full object-cover bg-gray-400 ring-8 ring-white"
+                  class="flex size-10 items-center justify-center rounded-full object-cover bg-gray-400 ring-8 ring-white"
                   :src="commentItem.user_photo" alt="profile_photo" />
                 <span class="absolute -bottom-0.5 -right-1 rounded-tl bg-white px-0.5 py-px">
                   <ChatBubbleLeftEllipsisIcon class="size-5 text-gray-400" aria-hidden="true" />
@@ -126,10 +137,41 @@ const format_ES_Date = (date) => {
                         aria-controls="overlay_menu" text />
                     </div>
                   </div>
-                  <!-- <p class="mt-0.5 text-sm text-gray-500">Comentado el: </p> -->
                 </div>
                 <div class="mt-2 text-sm text-gray-700">
                   <p>{{ commentItem.message }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="relative pb-1 ml-12 bg-gray-200 rounded-lg mb-2" v-for="response in commentItem.responses">
+            <div class="relative flex items-start space-x-3">
+              <div class="relative">
+                <img
+                  class="flex size-10 items-center justify-center rounded-full object-cover bg-gray-400 ring-8 ring-white"
+                  :src="commentItem.user_photo" alt="profile_photo" />
+                <span class="absolute -bottom-0.5 -right-1 rounded-tl bg-white px-0.5 py-px">
+                  <ChatBubbleLeftEllipsisIcon class="size-5 text-gray-400" aria-hidden="true" />
+                </span>
+              </div>
+              <div class="min-w-0 flex-1 p-2">
+                <div>
+                  <div class="text-sm flex justify-between">
+                    <a class="font-medium text-gray-900">
+                      {{ commentItem.user_name }}
+                    </a>
+                    <div class="flex justify-end">
+                      <p class="mt-0.5 mr-2 text-sm text-gray-500">
+                        {{ Moment(commentItem.date).format('DD/MM/YY') }}
+                      </p>
+                      <Button @click="toggle($event, commentItem)" v-if="commentItem.user_id === $page.props.auth.user.id"
+                        class="!size-4" type="button" icon="pi pi-ellipsis-v" aria-haspopup="true"
+                        aria-controls="overlay_menu" text />
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-2 text-sm text-gray-700">
+                  <p>{{ response.message }}</p>
                 </div>
               </div>
             </div>

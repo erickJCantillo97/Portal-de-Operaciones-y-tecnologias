@@ -28,8 +28,8 @@ class Comment extends Model implements Auditable
         return $this->belongsTo(User::class);
     }
 
-    public function comments(): MorphMany
+    public function comments()
     {
-        return $this->morphMany(Comment::class, 'commentable');
+        return $this->hasMany(Comment::class, 'response_id');
     }
 }
