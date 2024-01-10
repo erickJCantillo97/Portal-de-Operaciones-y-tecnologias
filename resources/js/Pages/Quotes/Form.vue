@@ -174,15 +174,15 @@ const toggle = (event) => {
                     <p class="text-primary font-bold text-xl">
                         {{
                             newQuote ? 'Crear solicitud de estimacion' : 'Editar estimacion #' +
-                        props.quote.quote.id
+                        props.quote.quote.consecutive
                         }}
                     </p>
                     <Button v-if="!newQuote" label="Ver sugerencia" icon="fa-solid fa-file-circle-question" class="!h-8"
                         @click="toggle" />
                 </span>
 
-                <div class="grid grid-cols-2 gap-1 border p-1 rounded-md">
-                    <div class="grid grid-cols-2 gap-1">
+                <div :class="newQuote ? 'grid grid-cols-2 ' : ''" class="gap-1 border p-1 rounded-md">
+                    <div class="grid gap-1" :class="newQuote ? 'grid-cols-2' : 'grid-cols-4'">
                         <span class="col-span-2">
                             <p>Nombre</p>
                             <InputText v-model="dataQuoteNew.name" :disabled="newQuote ? false : !modEdit"
@@ -217,38 +217,54 @@ const toggle = (event) => {
                                 :pt="{
                                     input: '!p-0 !pt-1 !px-1 '
                                 }" />
-                            <small v-if="errors.estimador_id" class="p-error" id="text-error">Debe seleccionar un
-                                estimador</small>
+                            <small v-if="errors.estimador_id" class="p-error" id="text-error">
+                                Debe seleccionar un estimador
+                            </small>
                         </span>
-                        <span class="" v-if="newQuote">
-                            <p>Fecha estimada de respuesta</p>
-                            <Calendar v-model="dataQuoteNew.expeted_answer_date" dateFormat="dd/mm/yy" showIcon
-                                :minDate="minDate" class="!h-8 w-full" placeholder="Fecha de respuesta"
-                                :class="errors.expeted_answer_date ? 'p-invalid' : ''" :pt="{
-                                    input: '!p-0 !pt-1 !px-1'
-                                }" />
-                            <small v-if="errors.expeted_answer_date" class="p-error" id="text-error">Debe seleccionar una
-                                fecha</small>
-                        </span>
-                        <span class="">
-                            <p>Tipo de oferta</p>
-                            <span class="flex space-x-2">
-                                <Dropdown v-model="dataQuoteNew.offer_type" :options="oferta"
-                                    :disabled="newQuote ? false : !modEdit" placeholder="Selecciona tipo de oferta"
-                                    class="w-full md:w-14rem !h-8" showClear :pt="{
+                        <div class="col-span-2 gap-2 w-full"
+                            :class="newQuote ? 'grid grid-cols-3 col-span-2' : 'col-span-3 grid grid-cols-3'">
+                            <span class="" v-if="newQuote">
+                                <p>Fecha estimada de respuesta</p>
+                                <Calendar v-model="dataQuoteNew.expeted_answer_date" dateFormat="dd/mm/yy" showIcon
+                                    :minDate="minDate" class="!h-8 w-full" placeholder="Fecha de respuesta"
+                                    :class="errors.expeted_answer_date ? 'p-invalid' : ''" :pt="{
                                         input: '!p-0 !pt-1 !px-1'
                                     }" />
+                                <small v-if="errors.expeted_answer_date" class="p-error" id="text-error">
+                                    Debe seleccionar una fecha
+                                </small>
+                            </span>
+                            <span class="">
+                                <p>Tipo de oferta</p>
+                                <span class="flex space-x-2">
+                                    <Dropdown v-model="dataQuoteNew.offer_type" :options="oferta"
+                                        :disabled="newQuote ? false : !modEdit" placeholder="Selecciona tipo de oferta"
+                                        class="w-full md:w-14rem !h-8" :pt="{
+                                            input: '!p-0 !pt-1 !px-1'
+                                        }" />
+                                </span>
+                            </span>
+                            <span :class="newQuote ? '' : 'flex col-span-2 items-end'">
+                                <span>
+                                    <p for="username">Moneda</p>
+                                    <Dropdown v-model="dataQuoteNew.coin" :options="moneda"
+                                        :disabled="newQuote ? false : !modEdit" placeholder="Selecciona la moneda"
+                                        class="w-full md:w-14rem !h-8" :pt="{
+                                            input: '!p-0 !pt-1 !px-1 '
+                                        }" />
+                                </span>
                                 <span v-if="!newQuote" class="w-full justify-end flex gap-2">
-                                    <Button title="Editar estimacion" severity="danger" v-if="!modEdit" @click="editActive"
-                                        icon="fa-solid fa-pencil" class="!h-8" />
-                                    <Button title="Cancelar cambios" severity="danger" :disabled="loadingButton"
-                                        v-if="modEdit" @click="editInactive" icon="fa-solid fa-xmark" class="!h-8" />
-                                    <Button title="Guardar cambios" severity="success" v-if="modEdit"
+                                    <Button title="Editar estimacion" label="Activar edicion" severity="danger"
+                                        v-if="!modEdit" @click="editActive" icon="fa-solid fa-pencil" class="!h-8" />
+                                    <Button title="Cancelar cambios" label="Cancelar" severity="danger"
+                                        :disabled="loadingButton" v-if="modEdit" @click="editInactive"
+                                        icon="fa-solid fa-xmark" class="!h-8" />
+                                    <Button title="Guardar cambios" label="Guardar" severity="success" v-if="modEdit"
                                         :loading="loadingButton" @click="quoteUpdate" icon="fa-solid fa-floppy-disk"
                                         class="!h-8" />
                                 </span>
                             </span>
-                        </span>
+                        </div>
                     </div>
                     <span class="space-y-2">
                         <Editor v-model="dataQuoteNew.observation" editorStyle="height: 210px" v-if="newQuote"
@@ -345,29 +361,20 @@ const toggle = (event) => {
                         </TabPanel>
                     </TabView>
                 </div>
-                <span v-if="!newQuote" class=" p-2 flex h-full justify-between">
-                    <div class="space-y-2 w-1/2">
-                        <span class="">
+                <span v-if="!newQuote" class="px-3 py-2 flex h-full justify-between">
+                    <div class="gap-2 w-1/2 flex">
+                        <span class="w-full">
                             <p>Ruta</p>
                             <InputText for="ruta" v-model="dataQuoteNew.route" filter optionLabel="name"
                                 placeholder="Escriba o pegue la ruta a la carpeta de los documentos"
-                                class="w-full md:w-14rem !h-8" />
+                                class="w-full md:w-20rem !h-8" />
                         </span>
-                        <span class="flex space-x-4">
-                            <span class="">
-                                <p for="username">Moneda</p>
-                                <Dropdown v-model="dataQuoteNew.coin" :options="moneda" placeholder="Selecciona la moneda"
-                                    class="w-full md:w-14rem !h-8" showClear :pt="{
-                                        input: '!p-0 !pt-1 !px-1 '
-                                    }" />
-                            </span>
-                            <span class="">
-                                <p class="">Archivo a subir</p>
-                                <FileUpload mode="basic" accept="application/pdf" class="!h-8 !min-w-[200px]" />
-                            </span>
+                        <span class="">
+                            <p class="">Archivo a subir</p>
+                            <FileUpload mode="basic" accept="application/pdf" class="!h-8 !w-min !min-w-[200px]" />
                         </span>
                     </div>
-                    <span class="flex flex-col justify-end gap-2" v-if="!modEdit">
+                    <span class="flex items-end gap-2" v-if="!modEdit">
                         <Button severity="success" @click="quoteShipsSave" icon="fa-solid fa-floppy-disk"
                             :loading="loadingButton" label="Guardar" class="!h-8"></Button>
                         <Button severity="primary" icon="fa-solid fa-paper-plane" :loading="loadingButton"
