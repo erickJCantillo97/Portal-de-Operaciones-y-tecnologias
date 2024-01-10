@@ -20,8 +20,10 @@ const columnas = [
     { field: 'name', header: 'Nombre', filter: true, sortable: true },
     { field: 'clases', header: 'Clases', filter: true, sortable: true },
     { field: 'customer', header: 'Cliente', filter: true, sortable: true },
+    { field: 'estimador', header: 'Estimador', filter: true, sortable: true },
     {
-        field: 'get_status', header: 'Estado', filter: true, sortable: true, type: 'tag', severitys: [
+        field: 'get_status', header: 'Estado', filter: true, sortable: true, type: 'tag', filtertype: 'EQUALS',
+        severitys: [
             { text: 'Proceso', severity: 'primary', class: 'bg-primary text-white' },
             { text: 'Entregada', severity: 'warning', class: '' },
             { text: 'Pendiente por Firma', severity: 'warning', class: '' },
