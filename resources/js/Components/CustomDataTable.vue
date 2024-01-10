@@ -224,7 +224,6 @@ const formatCurrency = (valor, moneda) => {
             }
                 ">
             <template #header>
-                {{ console.log(col.field) }}
                 <span class="text-sm text-primary uppercase font-bold">{{ col.header }}</span>
             </template>
             <template #filtericon>
