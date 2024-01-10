@@ -15,6 +15,17 @@ const props = defineProps({
 
 const message = ref(props.comment?.message ?? '')
 
+const showResponse = () => {
+    axios.get(route('comment.index', {
+        commentable_id: props.quoteId,
+        message: message.value,
+        response_id: props.comment?.id ?? null
+    })).then((res) => {
+        message.value = res.data.message
+        emit('addComment')
+    })
+}
+
 const submit = () => {
     try {
         if (props.actions == 3) {
@@ -24,6 +35,7 @@ const submit = () => {
             }).then(() => {
                 message.value = ''
                 emit('addComment')
+                showResponse()
             })
         } else {
             axios.post(route('comment.store', {

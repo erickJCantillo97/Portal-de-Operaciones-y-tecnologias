@@ -10,6 +10,7 @@ import Swal from 'sweetalert2';
 import ProgressBar from 'primevue/progressbar';
 import Tag from 'primevue/tag';
 import InputNumber from 'primevue/inputnumber';
+
 const props = defineProps({
     data: {
         type: Array,

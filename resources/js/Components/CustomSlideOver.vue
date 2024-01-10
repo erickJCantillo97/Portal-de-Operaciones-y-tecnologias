@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { Link } from '@inertiajs/vue3'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import Moment from 'moment'
@@ -276,18 +277,23 @@ const formatCurrency = (value) => {
                           label: '!text-center',
                         }
                           " />
+
+                        <Link :href="route('quotesversion.edit', slotProps.data.version_id)">
                         <Button size="small" label="Editar" :pt="{
                           root: '!w-full !bg-warning !hover:bg-orange-500',
                           label: '!text-center',
                         }
                           " />
+                        </Link>
                       </div>
+
                       <div class="col-span-1 space-y-2 items-center">
                         <Button size="small" label="Actualizar" :pt="{
                           root: '!w-full !bg-primary !hover:bg-blue-500',
                           label: '!text-center',
                         }
                           " />
+
                         <Button size="small" label="Eliminar" :pt="{
                           root: '!w-full !bg-danger !hover:bg-red-500',
                           label: '!text-center',
