@@ -15,7 +15,8 @@ import Tooltip from "primevue/tooltip";
 import VueApexCharts from "vue3-apexcharts";
 import { Head } from '@inertiajs/vue3';
 import CustomModal from '@/Components/CustomModal.vue'
-// import VueChatScroll from "vue3-chat-scroll";
+import Button from "primevue/button"
+// import VueChatScroll from 'vue-chat-scroll'
 
 const appName =
     import.meta.env.VITE_APP_NAME || "Portal";
