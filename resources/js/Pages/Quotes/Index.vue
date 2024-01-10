@@ -1,7 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { ref } from 'vue'
-import Button from 'primevue/button'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomSlideOver from '@/Components/CustomSlideOver.vue'
 import { Link } from '@inertiajs/vue3'
@@ -14,9 +13,28 @@ const openSlideOver = ref(false)
 const quote = ref({})
 
 //#region columnas de CustomDataTable
+
+class Columms {
+    /**
+ * @gbuelvas
+ * Construcctor de columnas
+
+Valores Columms:
+@param {string} field El nombre de la columna de la tabla.
+@param {string} header El titulo que se mostrara en la cabecera de la columna.
+*/
+    constructor(field, header, filter, sortable) {
+        this.field = field
+        this.header = header
+        this.filter = filter
+        this.sortable = sortable
+    }
+}
+
 const columnas = [
-    // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
-    { field: 'consecutive', header: 'Consecutivo', filter: true, sortable: true },
+    {
+        field: 'consecutive', header: 'Consecutivo', filter: true, sortable: true
+    },
     { field: 'name', header: 'Nombre', filter: true, sortable: true },
     { field: 'clases', header: 'Clases', filter: true, sortable: true },
     { field: 'customer', header: 'Cliente', filter: true, sortable: true },
