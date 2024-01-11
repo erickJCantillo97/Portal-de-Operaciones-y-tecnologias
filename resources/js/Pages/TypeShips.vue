@@ -133,13 +133,15 @@ const buttons = [
 
 <template>
     <AppLayout>
-        <CustomDataTable :data="typeShips" :columnas="columns" :actions="buttons" @showEdit="showEdit"
-            title="Clases de buque" @deleteClic="deleteClic">
-            <template #buttonHeader>
-                <Button title="Nuevo" severity="primary" label="Agregar" outlined class="!h-8" icon="fa-solid fa-plus"
-                    @click="showNew()" />
-            </template>
-        </CustomDataTable>
+        <div class="w-full h-[89vh] overflow-y-auto">
+            <CustomDataTable :data="typeShips" :columnas="columns" :actions="buttons" @showEdit="showEdit"
+                title="Clases de buque" @deleteClic="deleteClic">
+                <template #buttonHeader>
+                    <Button title="Nuevo" severity="primary" label="Agregar" outlined class="!h-8" icon="fa-solid fa-plus"
+                        @click="showNew()" />
+                </template>
+            </CustomDataTable>
+        </div>
     </AppLayout>
 
     <CustomModal v-model:visible="modalVisible">

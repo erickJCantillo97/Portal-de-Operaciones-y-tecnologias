@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('scope')->nullable();
             $table->string('maturity')->nullable();
             $table->integer('units')->nullable();
-            $table->string('coin')->nullable();
             $table->double('rate_buy_usd')->nullable();
             $table->double('rate_buy_eur')->nullable();
             $table->double('price_before_iva_original')->nullable();

@@ -1,12 +1,8 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue'
-import { ref, onMounted } from 'vue'
-import { Link, router, useForm } from '@inertiajs/vue3'
+import { ref } from 'vue'
+import { router, useForm } from '@inertiajs/vue3'
 import '../../../sass/dataTableCustomized.scss'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Tag from 'primevue/tag'
-import { FilterMatchMode, FilterOperator } from 'primevue/api'
 import { MagnifyingGlassPlusIcon, SparklesIcon, PhotoIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline'
 import { useSweetalert } from '@/composable/sweetAlert'
 import Loading from '@/Components/Loading.vue';
@@ -18,36 +14,35 @@ import FileUpload from 'primevue/fileupload'
 import DataView from 'primevue/dataview'
 import Button from 'primevue/button'
 import Image from 'primevue/image'
-import InputText from 'primevue/inputtext'
 import Divider from 'primevue/divider'
-
-const modalDocument = ref(false)
-const { toast } = useSweetalert()
-const loading = ref(false)
-const { confirmDelete } = useSweetalert()
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-})
-const projectSelect = ref()
-const op = ref()
-const toggle = (event, p) => {
-    projectSelect.value = p
-    op.value.toggle(event)
-}
+import CustomDataTable from '@/Components/CustomDataTable.vue'
 
 const props = defineProps({
     projects: Array,
 })
+const modalDocument = ref(false)
+const { toast } = useSweetalert()
+const { confirmDelete } = useSweetalert()
+const projectSelect = ref()
+const op = ref()
 
-onMounted(() => {
-    initFilters()
-})
+const addAct = (event, p) => {
+    console.log(p)
+    projectSelect.value = p
+    console.log(event)
+    op.value.toggle(event)
+}
+
+const editClic = (event, data) => {
+    router.get(route('projects.edit', data.id))
+}
 
 const addItem = () => {
     router.get(route('projects.create'))
     clearError()
-    // formData.reset()
-    // open.value = true
+}
+const deleteClic = (event, data) => {
+    confirmDelete(data.id, 'Proyecto', 'projects')
 }
 
 const tipologias = ref(null)
@@ -61,7 +56,8 @@ const getTipologias = (p) => {
     })
 }
 
-const addDoc = (p) => {
+const addDoc = (event, data) => {
+    const p = data
     tipologia.value = null
     tipologias.value = []
     getTipologias(p)
@@ -69,51 +65,11 @@ const addDoc = (p) => {
     modalDocument.value = true
 }
 
-
-const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    }
-}
-
-const clearFilter = () => {
-    initFilters()
-}
-
 const clearError = () => {
     router.page.props.errors = {}
 }
 
 // Formatear el número en moneda (USD)
-const formatCurrency = (value) => {
-    return parseFloat(value).toLocaleString('es-CO', {
-        style: 'currency',
-        currency: 'COP'
-    })
-}
-
-const getStatusSeverity = (status) => {
-    switch (status) {
-        case 'DISEÑO Y CONSTRUCCIÓN':
-            return 'info'
-
-        case 'CONSTRUCCIÓN':
-            return 'info'
-
-        case 'DISEÑO':
-            return 'warning'
-
-        case 'GARANTIA':
-            return 'info'
-
-        case 'SERVICIO POSTVENTA':
-            return 'success'
-
-        default:
-            return 'danger'
-    }
-}
 
 const items = [{
     title: 'Crear cronograma nuevo',
@@ -228,90 +184,49 @@ const showPdf = (event, data) => {
 //#endregion
 
 
+const columnas = [
+    // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
+    { field: 'SAP_code', header: 'Código SAP', filter: true, sortable: true },
+    { field: 'name', header: 'Nombre', filter: true, sortable: true },
+    { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true },
+    { field: 'cost_sale', header: 'Costo de Venta', type: 'currency', filter: true, sortable: true },
+    { field: 'end_date', header: 'Fecha Finalización', filter: true, sortable: true },
+    {
+        field: 'status', header: 'Estado', filter: true, sortable: true, type: 'tag', filtertype: 'EQUALS',
+        severitys: [
+            { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'info', class: '' },
+            { text: 'CONSTRUCCIÓN', severity: 'info', class: '' },
+            { text: 'DISEÑO', severity: 'warning', class: '' },
+            { text: 'GARANTIA', severity: 'info', class: '' },
+            { text: 'SERVICIO POSTVENTA', severity: 'success', class: '' },
+            { text: 'SIN ESTADO', severity: 'danger', class: 'animate-pulse' }
+        ]
+    },
+]
+
+//#region Botones de CustomDatatable
+const buttons = [
+    { event: 'addDoc', severity: 'primary', class: '', icon: 'fa-solid fa-cloud-arrow-up', text: true, outlined: false, rounded: false },
+    { event: 'addAct', severity: 'primary', class: '', icon: 'fa-regular fa-calendar-plus', text: true, outlined: false, rounded: false },
+    { event: 'editClic', severity: 'primary', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
+    { event: 'deleteClic', severity: 'danger', icon: 'fa-regular fa-trash-can', class: '!h-8', text: true, outlined: false, rounded: false },
+]
+//#endregion
+
 </script>
 
 <template>
     <AppLayout>
-        <div class="w-full overflow-y-auto">
-            <div class="flex items-center mx-2 mb-2">
-                <div class="flex-auto">
-                    <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
-                        Proyectos
-                    </h1>
-                </div>
-                <div class="" title="Agregar Proyecto">
-                    <Button @click="addItem()" severity="success" icon="fa-solid fa-plus" label="Agregar" outlined
-                        class="!h-8" />
-                </div>
-            </div>
-            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
-                dataKey="id" filterDisplay="menu" :loading="loading"
-                :globalFilterFields="['name', 'gerencia', 'start_date', 'end_date', 'hoursPerDay', 'daysPerWeek', 'daysPerMonth']"
-                currentPageReportTemplate=" {first} al {last} de {totalRecords}"
-                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-                :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
-
-                <template #header>
-                    <div class="flex justify-between w-full h-8 mb-2">
-                        <div class="flex space-x-4">
-                            <Button title="Quitar filtros" @click="clearFilter()" outlined severity="primary"
-                                icon="pi pi-filter-slash" class="!h-8">
-                            </Button>
-                            <span class="p-input-icon-left">
-                                <i class="pi pi-search" />
-                                <InputText size="small" class="!h-8" type="search" title="Buscar Proyectos"
-                                    v-model="filters.global.value" placeholder="Buscar..." />
-                            </span>
-                        </div>
-                    </div>
+        <div class="w-full h-[89vh] overflow-y-auto">
+            <CustomDataTable title="Proyectos" :data="projects" :columnas="columnas" :actions="buttons" @addDoc="addDoc"
+                @addAct="addAct" @editClic="editClic" @deleteClic="deleteClic">
+                <template #buttonHeader>
+                    <Button @click="addItem" severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
                 </template>
-
-                <!--COLUMNAS-->
-                <Column field="SAP_code" header="Código SAP"></Column>
-                <Column field="name" header="Nombre"></Column>
-                <Column field="gerencia" header="Gerencia"></Column>
-                <Column field="cost_sale" header="Costo de Venta">
-                    <template #body="slotProps">
-                        {{ formatCurrency(slotProps.data.cost_sale) }}
-                    </template>
-                </Column>
-                <Column field="end_date" header="Fecha Finalización"></Column>
-                <Column field="status" header="Estado" sortable>
-                    <template #body="slotProps">
-                        <Tag :value="slotProps.data.status" :severity="getStatusSeverity(slotProps.data.status)"
-                            class="animate-pulse" />
-                    </template>
-                </Column>
-
-                <!--ACCIONES-->
-                <Column header="Acciones" class="space-x-3">
-                    <template #body="slotProps">
-                        <div class="flex text-sm font-medium whitespace-normal">
-
-                            <Button title="Agregar documentos" rounded text severity="primary"
-                                @click="addDoc(slotProps.data)" class="hover:bg-primary"
-                                icon="fa-solid fa-cloud-arrow-up" />
-
-                            <Button title="Crear Actividades" rounded severity="primary" text
-                                @click="toggle($event, slotProps.data)" icon="fa-regular fa-calendar-plus" />
-                            <!--BOTÓN EDITAR-->
-
-                            <Link :href="route('projects.edit', slotProps.data.id)">
-                            <Button title="Editar Proyecto" severity="primary" text class="hover:bg-primary" rounded
-                                icon="fa-solid fa-pencil" />
-                            </Link>
-
-                            <!--BOTÓN ELIMINAR-->
-
-                            <Button title="Eliminar Proyecto" rounded severity="danger" text
-                                @click="confirmDelete(slotProps.data.id, 'Proyecto', 'projects')"
-                                icon="fa-regular fa-trash-can" />
-                        </div>
-                    </template>
-                </Column>
-            </DataTable>
+            </CustomDataTable>
         </div>
     </AppLayout>
+
     <OverlayPanel ref="op">
         <div>
             <h2 class="text-base font-semibold leading-6 text-gray-900">Creación o edición de cronograma</h2>
