@@ -16,7 +16,6 @@ import Swal from 'sweetalert2';
 import { router } from '@inertiajs/vue3';
 import OverlayPanel from 'primevue/overlaypanel';
 import FileUpload from 'primevue/fileupload';
-import { number } from 'echarts';
 const props = defineProps({
     estimadores: Object,
     customers: Array,
@@ -115,6 +114,44 @@ const quoteSave = () => {
 
 }
 
+const quoteNewVersion = () => {
+    loadingButton.value = true
+    Swal.fire({
+        title: '¿Desea generar nueva version para la estimacion #' + props.quote.quote.consecutive,
+        icon: 'warning',
+        showDenyButton: true,
+        confirmButtonText: 'Guardar',
+        denyButtonText: 'Cancelar'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            await axios.post(route('', dataQuoteNew.value)).then((res) => {
+                if (res.data.status) {
+                    Swal.fire({
+                        title: 'La estimacion: ' + dataQuoteNew.value.name + ' se ha creado exitosamente ¿Desea agregar datos a las clases?',
+                        icon: 'success',
+                        showDenyButton: true,
+                        confirmButtonText: 'Sí',
+                        denyButtonText: 'No'
+                    }).then((result2) => {
+                        if (result2.isConfirmed) {
+                            console.log(res.data.quote)
+                            router.get(route('quotesversion.edit', res.data.quote.id))
+                        } else if (result2.isDenied) {
+                            router.get(route('quotes.index'))
+                        }
+                    })
+                }
+            }).catch((e) => {
+                console.log(e)
+                errors.value = e.response.data.errors
+                toast('Hay errores en los datos a guardar', 'error')
+            })
+        }
+        loadingButton.value = false
+    })
+
+}
+
 const quoteUpdate = () => {
     loadingButton.value = true
     Swal.fire({
@@ -173,7 +210,8 @@ const toggle = (event) => {
                 <span class="flex justify-between p-1">
                     <p class="text-primary font-bold text-xl">
                         {{
-                            newQuote ? 'Crear solicitud de estimacion' : 'Editar estimacion #' +
+                            newQuote ? action == 2 ? 'Creando nueva version para estimacion #' + props.quote.quote.consecutive :
+                            'Crear solicitud de estimacion' : 'Editar estimacion #' +
                         props.quote.quote.consecutive
                         }}
                     </p>
@@ -224,7 +262,7 @@ const toggle = (event) => {
                         <div class="col-span-2 gap-2 w-full"
                             :class="newQuote ? 'grid grid-cols-3 col-span-2' : 'col-span-3 grid grid-cols-3'">
                             <span class="" v-if="newQuote">
-                                <p>Fecha estimada de respuesta</p>
+                                <p>Fecha estimada</p>
                                 <Calendar v-model="dataQuoteNew.expeted_answer_date" dateFormat="dd/mm/yy" showIcon
                                     :minDate="minDate" class="!h-8 w-full" placeholder="Fecha de respuesta"
                                     :class="errors.expeted_answer_date ? 'p-invalid' : ''" :pt="{
@@ -276,8 +314,9 @@ const toggle = (event) => {
                             }">
                         </Editor>
                         <span v-if="newQuote" class="w-full justify-end flex">
-                            <Button severity="success" @click="quoteSave()" :loading="loadingButton"
-                                icon="fa-solid fa-floppy-disk" label="Guardar solicitud" class="!h-8" />
+                            <Button severity="success" @click="action == 2 ? quoteNewVersion() : quoteSave()"
+                                :loading="loadingButton" icon="fa-solid fa-floppy-disk" label="Guardar solicitud"
+                                class="!h-8" />
                         </span>
                     </span>
                 </div>

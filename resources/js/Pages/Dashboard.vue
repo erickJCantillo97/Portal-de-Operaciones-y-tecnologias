@@ -1,22 +1,21 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { ref, onMounted } from "vue";
-import axios from "axios";
-import { usePermissions } from "@/composable/permission";
+// import axios from "axios";
+// import { usePermissions } from "@/composable/permission";
 import { Link, router } from "@inertiajs/vue3";
-const { hasRole } = usePermissions();
+// const { hasRole } = usePermissions();
 import UserHeader from "@/Components/sections/UserHeader.vue";
-import ProjectCardMinimal from "@/Components/ProjectCardMinimal.vue";
-import DataTable from "primevue/datatable";
-import { FilterMatchMode, FilterOperator } from "primevue/api";
-import Column from "primevue/column";
+// import ProjectCardMinimal from "@/Components/ProjectCardMinimal.vue";
+// import DataTable from "primevue/datatable";
+// import { FilterMatchMode, FilterOperator } from "primevue/api";
 // import Tag from "primevue/tag";
 // import { MagnifyingGlassIcon, PencilIcon, TrashIcon } from "@heroicons/vue/20/solid";
-import Button from "primevue/button";
-import ProgressBar from "primevue/progressbar";
+
 import DataChart from "./DataChart.vue";
 // import OurTeam from "@/Components/OurTeam.vue";
 import "../../sass/dataTableCustomized.scss";
+import CustomDataTable from "@/Components/CustomDataTable.vue";
 
 // import TimeLine from './TimeLine.vue';
 
@@ -27,58 +26,37 @@ const props = defineProps({
     costoMes: Number,
 });
 
-const colors = {
-    GEDIN: "bg-blue-500",
-    VPEXE: "bg-gray-500",
-    GEMAM: "bg-teal-500",
-    "VPT&O": "bg-yellow-500",
-    GEBOC: "bg-cyan-500",
-    GECTI: "bg-indigo-500",
-    GETHU: "bg-red-500",
-    PCTMAR: "bg-purple-500",
-    GEFAD: "bg-sky-500",
-    GECON: "bg-pink-500",
-};
-const personal = ref([]);
-const totalMembers = ref(0);
-const loading = ref(false);
-const tasks = ref([]);
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-});
-const chartOptions = ref();
+// const colors = {
+//     GEDIN: "bg-blue-500",
+//     VPEXE: "bg-gray-500",
+//     GEMAM: "bg-teal-500",
+//     "VPT&O": "bg-yellow-500",
+//     GEBOC: "bg-cyan-500",
+//     GECTI: "bg-indigo-500",
+//     GETHU: "bg-red-500",
+//     PCTMAR: "bg-purple-500",
+//     GEFAD: "bg-sky-500",
+//     GECON: "bg-pink-500",
+// };
+// const personal = ref([]);
+// const totalMembers = ref(0);
+// const loading = ref(false);
+// const tasks = ref([]);
+// const filters = ref({
+//     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+// });
+// const chartOptions = ref();
 onMounted(() => {
-    initFilters();
-
     // getTask();
 }
 );
-
-const formatCurrency = (value) => {
-    return parseFloat(value).toLocaleString("es-CO", {
-        style: "currency",
-        currency: "COP",
-    });
-};
 
 // const getTask = () => {
 //     axios.get(route("actividadesDeultimonivel")).then((res) => {
 //         tasks.value = res.data;
 //     });
 // };
-const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        name: {
-            operator: FilterOperator.AND,
-            constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
-        },
-    };
-};
 
-const clearFilter = () => {
-    initFilters();
-};
 
 // const broadcastChannel = () => {
 //     setTimeout(() => {
@@ -88,18 +66,34 @@ const clearFilter = () => {
 //             })
 //     }, 200);
 // }
+const columnas = [
+    { field: 'name', header: 'Proyecto' },
+    { field: 'avance', header: 'Ejecución' },
+    { field: 'contrato', header: 'Contrato' },
+    { field: 'costo', header: 'Valor Venta' },
+    { field: 'fechaF', header: 'Fin Producción' },
+]
+//#region Botones de CustomDatatable
+const buttons = [
+    { event: 'showProgramming', severity: 'success', class: '', icon: 'fa-solid fa-list-check', text: true, outlined: false, rounded: false },
+    { event: 'showGantt', severity: 'primary', class: '', icon: 'fa-solid fa-list-check', text: true, outlined: false, rounded: false },
+    // { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
+]
+//#endregion
 </script>
 
 <template>
     <AppLayout>
-        <div class="space-y-5 overflow-y-scroll custom-scroll">
+        <div class="space-y-5 overflow-y-scroll">
 
             <div class="flex justify-between">
                 <UserHeader />
             </div>
-            <!--DATATABLE PROYECTOS-->
-            <div class="p-3 m-1 shadow-md rounded-xl">
-                <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
+            <CustomDataTable :data="projects" :columnas="columnas" :filter="false"
+                @showProgramming="router.get(route('programming'), { id: $event.data.project_id })"
+                @showGantt="router.get(route('createSchedule.create', $event.data.project_id))">
+            </CustomDataTable>
+            <!-- <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
                     dataKey="id" filterDisplay="menu" :loading="loading" :globalFilterFields="[
                         'name',
                         'gerencia',
@@ -111,7 +105,6 @@ const clearFilter = () => {
                     ]" currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                     :paginator="true" :rows="5" :rowsPerPageOptions="[5, 10, 25, 50, 100]">
-                    <!--COLUMNAS-->
                     <Column field="name" header="Proyecto">
                         <template #body="slotProps">
                             <ProjectCardMinimal :project="slotProps.data" :activo="false" :menu="false" :avance="false" />
@@ -133,8 +126,6 @@ const clearFilter = () => {
                         </template>
                     </Column>
                     <Column field="fechaF" header="Fin producción"></Column>
-
-                    <!--ACCIONES-->
                     <Column header="Acciones" class="space-x-3">
                         <template #body="slotProps">
                             <div class="flex justify-center space-x-1">
@@ -151,8 +142,7 @@ const clearFilter = () => {
                             </div>
                         </template>
                     </Column>
-                </DataTable>
-            </div>
+                </DataTable> -->
             <div class="p-8 m-1 shadow-md rounded-xl">
                 <DataChart></DataChart>
             </div>

@@ -37,6 +37,14 @@ createInertiaApp({
             .use(PrimeVue, {
                 ripple: true,
                 locale: optionsPrimeVUE,
+                pt: {
+                    button: {
+                        root: '!h-8'
+                    },
+                    inputtext: {
+                        root: '!h-8'
+                    }
+                }
             })
             .component('Button', Button)
             .use(VueApexCharts)

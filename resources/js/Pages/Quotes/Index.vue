@@ -14,15 +14,17 @@ const quote = ref({})
 
 //#region columnas de CustomDataTable
 
-class Columms {
-    /**
- * @gbuelvas
- * Construcctor de columnas
+/**
+* @gbuelvas
+* Construcctor de columnas
 
 Valores Columms:
 @param {string} field El nombre de la columna de la tabla.
 @param {string} header El titulo que se mostrara en la cabecera de la columna.
+@param {boolean} filter activar o no el filtro. Predefinido en false
+@param {boolean} filter activar o no el ordenable. Predefinido en false
 */
+class Columms {
     constructor(field, header, filter, sortable) {
         this.field = field
         this.header = header
@@ -32,9 +34,7 @@ Valores Columms:
 }
 
 const columnas = [
-    {
-        field: 'consecutive', header: 'Consecutivo', filter: true, sortable: true
-    },
+    { field: 'consecutive', header: 'Consecutivo', filter: true, sortable: true },
     { field: 'name', header: 'Nombre', filter: true, sortable: true },
     { field: 'clases', header: 'Clases', filter: true, sortable: true },
     { field: 'customer', header: 'Cliente', filter: true, sortable: true },
