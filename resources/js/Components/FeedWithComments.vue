@@ -98,7 +98,7 @@ const format_ES_Date = (date) => {
 <template>
   <Menu ref="menu" id="overlay_menu" :model="overlayOptions" :popup="true" />
   <div class="flow-root">
-    <div id="conversation"
+    <div v-chat-scroll id="conversation"
       class="max-h-[258px] overflow-y-auto scroll-p-0 scroll-m-0 scroll-smooth p-6 mt-4 shadow-md rounded-lg">
       <!-- <div class="flex w-full mb-3">
         <Skeleton shape="circle" size="3rem" class="mr-2"></Skeleton>
