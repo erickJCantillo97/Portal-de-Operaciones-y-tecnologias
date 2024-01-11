@@ -158,7 +158,7 @@ const buttons = ref([
 
 <template>
     <AppLayout>
-        <div class="h-full overflow-y-auto">
+        <div class="w-full h-[89vh] overflow-y-auto">
             <CustomDataTable :data="ships" :columnas="columnas" cacheName="ships" :actions="buttons"
                 :title="customer ? 'Unidades del cliente:' + customer.name : 'Todas las unidades'"
                 @confirmDelete="deleteItem" @editItem="editItem" @cloneItem="cloneItem">
