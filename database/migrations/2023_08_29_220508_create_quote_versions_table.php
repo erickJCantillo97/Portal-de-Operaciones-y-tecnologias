@@ -21,7 +21,9 @@ return new class extends Migration
             $table->date('estimador_anaswer_date')->nullable();
             $table->string('offer_type')->nullable();
             $table->string('estimador_name');
+            $table->string('original_coin')->nullable();
             $table->text('route')->nullable();
+            $table->double('exchange_rate')->default(1);
             $table->string('file')->nullable();
             $table->text('observation')->nullable();
             $table->foreign('quote_id')->references('id')->on('quotes');
