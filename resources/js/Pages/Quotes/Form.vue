@@ -315,8 +315,8 @@ const toggle = (event) => {
                         </Editor>
                         <span v-if="newQuote" class="w-full justify-end flex">
                             <Button severity="success" @click="action == 2 ? quoteNewVersion() : quoteSave()"
-                                :loading="loadingButton" icon="fa-solid fa-floppy-disk" label="Guardar solicitud"
-                                class="!h-8" />
+                                :loading="loadingButton" icon="fa-solid fa-floppy-disk"
+                                :label="action == 2 ? 'Generar nueva version' : 'Guardar solicitud'" class="!h-8" />
                         </span>
                     </span>
                 </div>
@@ -324,7 +324,7 @@ const toggle = (event) => {
             <div class="" v-if="quoteShips && !modEdit && action != 2">
                 <div class=" border rounded-md p-1">
                     <TabView class="tabview-custom" :scrollable="true">
-                        <TabPanel v-for="buque, index in quoteShips">
+                        <TabPanel v-for=" buque, index  in  quoteShips ">
                             <template #header>
                                 <div class="flex items-center space-x-1">
                                     <Avatar :image="buque.render ? buque.render : '/images/generic-boat.png'"
@@ -338,17 +338,19 @@ const toggle = (event) => {
                             <div class="grid grid-cols-4 gap-2 ">
                                 <span class="">
                                     <p for="username">Alcance</p>
-                                    <Dropdown v-model="buque.scope" :options="alcance" placeholder="Selecciona el alcance"
-                                        class="w-full md:w-14rem !h-8" showClear :pt="{
-                                            input: '!p-0 !pt-1 !px-1 '
-                                        }" />
+                                    <Dropdown v-model="buque.scope" :options="alcance"
+                                        placeholder="Selecciona el alcance" class="w-full md:w-14rem !h-8" showClear :pt="{
+                                                input: '!p-0 !pt-1 !px-1 '
+                                            }
+                                            " />
                                 </span>
                                 <span class="">
                                     <p for="username">Madurez</p>
                                     <Dropdown v-model="buque.maturity" :options="madurez"
                                         placeholder="Selecciona la madurez" class="w-full md:w-14rem !h-8" showClear :pt="{
-                                            input: '!p-0 !pt-1 !px-1 '
-                                        }" />
+                                                input: '!p-0 !pt-1 !px-1 '
+                                            }
+                                            " />
                                 </span>
                                 <span class="">
                                     <p for="username">Unidades</p>
@@ -375,8 +377,9 @@ const toggle = (event) => {
                                     <p for="username">IVA</p>
                                     <Dropdown v-model="buque.iva" :options="iva" placeholder="Selecciona el IVA"
                                         class="w-full md:w-14rem !h-8" showClear :pt="{
-                                            input: '!p-0 !pt-1 !px-1 '
-                                        }" />
+                                                input: '!p-0 !pt-1 !px-1 '
+                                            }
+                                            " />
                                 </span>
                                 <span class="">
                                     <p for="username">Margen</p>
@@ -387,8 +390,9 @@ const toggle = (event) => {
                                     <p for="username">Tipo de documento tecnico</p>
                                     <Dropdown v-model="buque.white_paper" :options="docTecnico"
                                         placeholder="Selecciona el tipo de DT" class="w-full md:w-14rem !h-8" showClear :pt="{
-                                            input: '!p-0 !pt-1 !px-1 '
-                                        }" />
+                                                input: '!p-0 !pt-1 !px-1 '
+                                            }
+                                            " />
 
                                 </span>
                                 <span class="">
@@ -427,10 +431,11 @@ const toggle = (event) => {
 
     <OverlayPanel ref="op" class="w-96">
         <Editor v-model="dataQuoteNew.observation" editorStyle="height: 210px" :pt="{
-            toolbar: '!hidden',
-            content: '!border-0',
-            root: 'border p-1 !rounded-md'
-        }">
+                toolbar: '!hidden',
+                content: '!border-0',
+                root: 'border p-1 !rounded-md'
+            }
+            ">
         </Editor>
     </OverlayPanel>
 </template>
