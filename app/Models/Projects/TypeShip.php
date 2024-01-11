@@ -16,6 +16,8 @@ class TypeShip extends Model implements Auditable
 
     protected $guarded = [];
 
+    protected $appends = ['count_ships'];
+
     protected function render(): Attribute
     {
         return Attribute::make(
@@ -27,5 +29,10 @@ class TypeShip extends Model implements Auditable
     public function ships()
     {
         return $this->hasMany(Ship::class, 'type_ship_id');
+    }
+
+    public function getCountShipsAttribute()
+    {
+        return $this->ships->count();
     }
 }

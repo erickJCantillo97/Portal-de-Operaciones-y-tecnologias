@@ -22,6 +22,8 @@ return new class extends Migration
             $table->double('eslora')->nullable();
             $table->string('acronyms')->nullable();
             $table->string('file')->nullable();
+            $table->foreign('customer_id')->references('id')->on('customers');
+            $table->foreign('type_ship_id')->references('id')->on('type_ships');
             $table->timestamps();
             $table->softDeletes();
         });
