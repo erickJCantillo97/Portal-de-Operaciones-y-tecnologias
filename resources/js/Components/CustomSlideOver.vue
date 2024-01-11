@@ -118,190 +118,193 @@ const formatCurrency = (value) => {
 </script>
 
 <template>
-  <TransitionRoot as="template" :show="show">
-    <Dialog as="div" class="relative z-10" @close="$emit('closeSlideOver')">
-      <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0" enter-to="opacity-100"
-        leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-      </TransitionChild>
-      <div class="fixed inset-0 overflow-hidden">
-        <div class="absolute inset-0 overflow-hidden">
-          <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+    <TransitionRoot as="template" :show="show">
+        <Dialog as="div" class="relative z-10" @close="$emit('closeSlideOver')">
+            <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0" enter-to="opacity-100"
+                leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            </TransitionChild>
             <TransitionChild as="template" enter="transform transition ease-in-out duration-500 sm:duration-700"
-              enter-from="translate-x-full" enter-to="translate-x-0"
-              leave="transform transition ease-in-out duration-500 sm:duration-700" leave-from="translate-x-0"
-              leave-to="translate-x-full">
-              <DialogPanel class="pointer-events-auto relative w-96">
-                <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0"
-                  enter-to="opacity-100" leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
-                  <div class="absolute left-0 top-0 -ml-8 flex pr-2 pt-4 sm:-ml-10 sm:pr-4">
-                    <button type="button"
-                      class="relative rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
-                      @click="$emit('closeSlideOver')">
-                      <span class="absolute -inset-2.5" />
-                      <span class="sr-only">Close panel</span>
-                      <XMarkIcon class="size-6" aria-hidden="true" />
-                    </button>
-                  </div>
-                </TransitionChild>
-                <div class="h-full overflow-y-auto bg-white p-2">
-                  <div class="fixed w-96 -m-2 z-50 py-4 bg-blue-900 text-white uppercase p-2">
-                    <h2 class="text-lg text-center font-bold text-white">
-                      {{ quote.name }} {{ quote.consecutive }}
-                    </h2>
-                  </div>
-                  <header class="w-full mt-16">
-                    <div class="flex flex-nowrap text-center justify-center items-center">
-                      <ul class=" text-md text-center    w-10 cursor-pointer" v-for="version in 3"
-                        :class="quote.version == version ? 'border-b border-black font-extrabold text-blue-900' : 'hover:border-b text-blue-700'">
-                        <li>{{ version }}</li>
-                      </ul>
-                    </div>
-                    <div class="flex flex-nowrap space-x-2 p-2 justify-center rounded-lg">
-                      <Button @click="openStatusModal()" size="small" label="Estados" icon="pi pi-list" />
-                      <Button @click="openCommentsModal()" severity="help" size="small" label="Comentarios"
-                        icon="pi pi-comments" />
-                    </div>
-                    <div class="border border-solid rounded-lg p-2 mb-2">
-                      <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
-                        <div class="flex justify-between py-3 text-sm font-medium">
-                          <dt class="text-gray-500">Estimador:</dt>
-                          <dd class="text-gray-900 uppercase">{{ quote.estimador }}</dd>
+                enter-from="translate-x-full" enter-to="translate-x-0"
+                leave="transform transition ease-in-out duration-500 sm:duration-700" leave-from="translate-x-0"
+                leave-to="translate-x-full">
+                <DialogPanel class="pointer-events-auto relative w-96">
+                    <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0"
+                        enter-to="opacity-100" leave="ease-in-out duration-500" leave-from="opacity-100"
+                        leave-to="opacity-0">
+                        <div class="absolute left-0 top-0 -ml-8 flex pr-2 pt-4 sm:-ml-10 sm:pr-4">
+                            <button type="button"
+                                class="relative rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                                @click="$emit('closeSlideOver')">
+                                <span class="absolute -inset-2.5" />
+                                <span class="sr-only">Close panel</span>
+                                <XMarkIcon class="size-6" aria-hidden="true" />
+                            </button>
                         </div>
-                        <div class="flex justify-between py-3 text-sm font-medium">
-                          <dt class="text-gray-500">Cliente:</dt>
-                          <dd class="text-gray-900">{{ quote.customer }}</dd>
+                    </TransitionChild>
+                    <div class="h-full overflow-y-auto bg-white p-2">
+                        <div class="fixed w-96 -m-2 z-50 py-4 bg-blue-900 text-white uppercase p-2">
+                            <h2 class="text-lg text-center font-bold text-white">
+                                {{ quote.name }} {{ quote.consecutive }}
+                            </h2>
                         </div>
-                        <div class="flex justify-between py-3 text-sm font-medium">
-                          <dt class="text-gray-500">Tipo de Oferta:</dt>
-                          <dd class="text-gray-900">{{ quote.offer_type }}</dd>
-                        </div>
-                        <div class="flex justify-between py-3 text-sm font-medium">
-                          <dt class="text-gray-500">Fecha de Solicitud:</dt>
-                          <dd class="text-gray-900">{{ Moment(quote.created_at).format('DD/MM/YY') }}</dd>
-                        </div>
-                        <div class="flex justify-between py-3 text-sm font-medium">
-                          <dt class="text-gray-500">Fecha Respuesta Esperada:</dt>
-                          <dd class="text-gray-900">{{ Moment(quote.expected_answer_date).format('DD/MM/YY') }}</dd>
-                        </div>
-                        <div v-if="showDateResponse" class="flex justify-between py-3 text-sm font-medium">
-                          <dt class="text-gray-500">Fecha de Respuesta:</dt>
-                          <dd class="text-gray-900">{{ Moment().add(6, 'days').format('DD/MM/YY') }}</dd>
-                        </div>
-                        <div v-if="showDateResponse" class="flex justify-between py-3 text-sm font-medium">
-                          <dt class="text-gray-500">Precio antes de Iva:</dt>
-                          <dd class="text-gray-900">{{ formatCurrency(quote.total_cost) }}</dd>
-                        </div>
-                        <div class="flex justify-between py-3 text-sm font-medium">
-                          <dt class="text-gray-500">Estado:</dt>
-                          <dd class="text-gray-900">
-                            <span
-                              :class="['bg-' + colors[quote.status] + '-500', 'inline-flex items-center rounded-md px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-green-600/20']">
-                              <i :class="icons[quote.status]" class="mr-2" aria-hidden="true" />
-                              {{ quote.get_status }}
-                            </span>
-                          </dd>
-                        </div>
-                      </dl>
-                    </div>
-                  </header>
-                  <Accordion>
-                    <AccordionTab v-for="product in  quote.products " :pt="{
-                      root: '!border-0 !ring-0',
-                      headerAction: '!bg-slate-200 !px-4 !py-1 mb-1',
-                      headerTitle: '!text- sm',
-                    }">
-                      <template #header>
-                        <div class="block gap-2 w-full">
-                          <p class="white-space-nowrap font-semibold">{{ product.name }}</p>
-                          <p class=" white-space-nowrap text-xs">{{
-                            formatCurrency(product.price_before_iva_original)
-                          }}</p>
+                        <header class="w-full mt-16">
+                            <div class="flex flex-nowrap text-center justify-center items-center">
+                                <ul class=" text-md text-center    w-10 cursor-pointer" v-for="version in 3"
+                                    :class="quote.version == version ? 'border-b border-black font-extrabold text-blue-900' : 'hover:border-b text-blue-700'">
+                                    <li>{{ version }}</li>
+                                </ul>
+                            </div>
+                            <div class="flex flex-nowrap space-x-2 p-2 justify-center rounded-lg">
+                                <Button @click="openStatusModal()" size="small" label="Estados" icon="pi pi-list" />
+                                <Button @click="openCommentsModal()" severity="help" size="small" label="Comentarios"
+                                    icon="pi pi-comments" />
+                            </div>
+                            <div class="border border-solid rounded-lg p-2 mb-2">
+                                <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
+                                    <div class="flex justify-between py-3 text-sm font-medium">
+                                        <dt class="text-gray-500">Estimador:</dt>
+                                        <dd class="text-gray-900 uppercase">{{ quote.estimador }}</dd>
+                                    </div>
+                                    <div class="flex justify-between py-3 text-sm font-medium">
+                                        <dt class="text-gray-500">Cliente:</dt>
+                                        <dd class="text-gray-900">{{ quote.customer }}</dd>
+                                    </div>
+                                    <div class="flex justify-between py-3 text-sm font-medium">
+                                        <dt class="text-gray-500">Tipo de Oferta:</dt>
+                                        <dd class="text-gray-900">{{ quote.offer_type }}</dd>
+                                    </div>
+                                    <div class="flex justify-between py-3 text-sm font-medium">
+                                        <dt class="text-gray-500">Fecha de Solicitud:</dt>
+                                        <dd class="text-gray-900">{{ Moment(quote.created_at).format('DD/MM/YY') }}</dd>
+                                    </div>
+                                    <div class="flex justify-between py-3 text-sm font-medium">
+                                        <dt class="text-gray-500">Fecha Respuesta Esperada:</dt>
+                                        <dd class="text-gray-900">{{ Moment(quote.expected_answer_date).format('DD/MM/YY')
+                                        }}</dd>
+                                    </div>
+                                    <div v-if="showDateResponse" class="flex justify-between py-3 text-sm font-medium">
+                                        <dt class="text-gray-500">Fecha de Respuesta:</dt>
+                                        <dd class="text-gray-900">{{ Moment().add(6, 'days').format('DD/MM/YY') }}</dd>
+                                    </div>
+                                    <div v-if="showDateResponse" class="flex justify-between py-3 text-sm font-medium">
+                                        <dt class="text-gray-500">Precio antes de Iva:</dt>
+                                        <dd class="text-gray-900">{{ formatCurrency(quote.total_cost) }}</dd>
+                                    </div>
+                                    <div class="flex justify-between py-3 text-sm font-medium">
+                                        <dt class="text-gray-500">Estado:</dt>
+                                        <dd class="text-gray-900">
+                                            <span
+                                                :class="['bg-' + colors[quote.status] + '-500', 'inline-flex items-center rounded-md px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-green-600/20']">
+                                                <i :class="icons[quote.status]" class="mr-2" aria-hidden="true" />
+                                                {{ quote.get_status }}
+                                            </span>
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </header>
+                        <Accordion>
+                            <AccordionTab v-for="product in  quote.products " :pt="{
+                                root: '!border-0 !ring-0',
+                                headerAction: '!bg-slate-200 !px-4 !py-1 mb-1',
+                                headerTitle: '!text- sm',
+                            }">
+                                <template #header>
+                                    <div class="block gap-2 w-full">
+                                        <p class="white-space-nowrap font-semibold">{{ product.name }}</p>
+                                        <p class=" white-space-nowrap text-xs">{{
+                                            formatCurrency(product.price_before_iva_original)
+                                        }}</p>
 
-                        </div>
-                      </template>
-                      <div class="space-y-6">
-                        <div>
-                          <h3 class="font-medium text-gray-900">Información del producto</h3>
-                          <dl class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Clase:</dt>
-                              <dd class="text-gray-900">{{ product.name }}</dd>
+                                    </div>
+                                </template>
+                                <div class="space-y-6">
+                                    <div>
+                                        <h3 class="font-medium text-gray-900">Información del producto</h3>
+                                        <dl class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
+                                            <div class="flex justify-between py-3 text-sm font-medium">
+                                                <dt class="text-gray-500">Clase:</dt>
+                                                <dd class="text-gray-900">{{ product.name }}</dd>
+                                            </div>
+                                            <div class="flex justify-between py-3 text-sm font-medium">
+                                                <dt class="text-gray-500">Alcance:</dt>
+                                                <dd class="text-gray-900">{{ product.scope == null ? 'N/A' : product.scope
+                                                }}</dd>
+                                            </div>
+                                            <div class="flex justify-between py-3 text-sm font-medium">
+                                                <dt class="text-gray-500">Madurez:</dt>
+                                                <dd class="text-gray-900">{{ product.maturity == null ? 'N/A' :
+                                                    product.maturity }}</dd>
+                                            </div>
+                                            <div class="flex justify-between py-3 text-sm font-medium">
+                                                <dt class="text-gray-500">Cantidad:</dt>
+                                                <dd class="text-gray-900">{{ product.units == null ? 'N/A' : product.units
+                                                }}</dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-medium text-gray-900">Información de la Oferta</h3>
+                                        <dl class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
+                                            <div class="flex justify-between py-3 text-sm font-medium">
+                                                <dt class="text-gray-500">Margen Estimado:</dt>
+                                                <dd class="text-gray-900">{{ product.margin }}%</dd>
+                                            </div>
+                                            <div class="flex justify-between py-3 text-sm font-medium">
+                                                <dt class="text-gray-500">Precio Original:</dt>
+                                                <dd class="text-gray-900">{{
+                                                    formatCurrency(product.price_before_iva_original) }}</dd>
+                                            </div>
+                                            <div class="flex justify-between py-3 text-sm font-medium">
+                                                <dt class="text-gray-500">Tasa de Venta:</dt>
+                                                <dd class="text-gray-900">0</dd>
+                                            </div>
+                                            <div class="flex justify-between py-3 text-sm font-medium">
+                                                <dt class="text-gray-500">IVA:</dt>
+                                                <dd class="text-gray-900">{{ product.iva }}</dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </AccordionTab>
+                        </Accordion>
+                        <section class="border border-gray-200 p-4">
+                            <div class="mb-4">
+                                <h3 class="font-semibold text-gray-900 text-center">Documentos</h3>
                             </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Alcance:</dt>
-                              <dd class="text-gray-900">{{ product.scope == null ? 'N/A' : product.scope }}</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Madurez:</dt>
-                              <dd class="text-gray-900">{{ product.maturity == null ? 'N/A' : product.maturity }}</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Cantidad:</dt>
-                              <dd class="text-gray-900">{{ product.units == null ? 'N/A' : product.units }}</dd>
-                            </div>
-                          </dl>
-                        </div>
-                        <div>
-                          <h3 class="font-medium text-gray-900">Información de la Oferta</h3>
-                          <dl class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Margen Estimado:</dt>
-                              <dd class="text-gray-900">{{ product.margin }}%</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Precio Original:</dt>
-                              <dd class="text-gray-900">{{ formatCurrency(product.price_before_iva_original) }}</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Tasa de Venta:</dt>
-                              <dd class="text-gray-900">0</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">IVA:</dt>
-                              <dd class="text-gray-900">{{ product.iva }}</dd>
-                            </div>
-                          </dl>
-                        </div>
-                      </div>
-                    </AccordionTab>
-                  </Accordion>
-                  <section class="border border-gray-200 p-4">
-                    <div class="mb-4">
-                      <h3 class="font-semibold text-gray-900 text-center">Documentos</h3>
+                            <section class="grid grid-cols-2 space-x-2 text-center">
+                                <div class="col-span-1 space-y-2 items-center text-center">
+                                    <Button size="small" label="Clonar" :pt="{
+                                        root: '!w-full !bg-emerald-600 !hover:bg-emerald-500',
+                                        label: '!text-center',
+                                    }" />
+
+                                    <div>
+                                        <Link :href="route('quotesversion.edit', props.quote.version_id)">
+                                        <Button size="small" label="Editar" :pt="{
+                                            root: '!w-full !bg-warning !hover:bg-orange-500',
+                                            label: '!text-center',
+                                        }" />
+                                        </Link>
+                                    </div>
+                                </div>
+
+                                <div class="col-span-1 space-y-2 items-center">
+                                    <Button size="small" label="Actualizar" :pt="{
+                                        root: '!w-full !bg-primary !hover:bg-blue-500',
+                                        label: '!text-center',
+                                    }" />
+
+                                    <Button size="small" label="Eliminar" :pt="{
+                                        root: '!w-full !bg-danger !hover:bg-red-500',
+                                        label: '!text-center',
+                                    }" />
+                                </div>
+                            </section>
+                        </section>
                     </div>
-                    <section class="grid grid-cols-2 space-x-2 text-center">
-                      <div class="col-span-1 space-y-2 items-center text-center">
-                        <Button size="small" label="Clonar" :pt="{
-                          root: '!w-full !bg-emerald-600 !hover:bg-emerald-500',
-                          label: '!text-center',
-                        }" />
-
-                        <div>
-                          <Link :href="route('quotesversion.edit', props.quote.version_id)">
-                          <Button size="small" label="Editar" :pt="{
-                            root: '!w-full !bg-warning !hover:bg-orange-500',
-                            label: '!text-center',
-                          }" />
-                          </Link>
-                        </div>
-                      </div>
-
-                      <div class="col-span-1 space-y-2 items-center">
-                        <Button size="small" label="Actualizar" :pt="{
-                          root: '!w-full !bg-primary !hover:bg-blue-500',
-                          label: '!text-center',
-                        }" />
-
-                        <Button size="small" label="Eliminar" :pt="{
-                          root: '!w-full !bg-danger !hover:bg-red-500',
-                          label: '!text-center',
-                        }" />
-                      </div>
-                    </section>
-                  </section>
-                </div>
-              </DialogPanel>
+                </DialogPanel>
             </TransitionChild>
             <div class="fixed inset-0 overflow-hidden">
                 <div class="absolute inset-0 overflow-hidden">
@@ -552,7 +555,6 @@ const formatCurrency = (value) => {
             <span class="text-xl font-bold text-white white-space-nowrap">Comentarios</span>
         </template>
         <template #body>
-            <FeedWithComments :quoteId="quote.version_id" />
-        </template>
-    </CustomModal>
-</template>
+        <FeedWithComments :quoteId="quote.version_id" />
+    </template>
+</CustomModal></template>
