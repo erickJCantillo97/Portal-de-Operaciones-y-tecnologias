@@ -28,7 +28,7 @@ defineProps(
 
 const keyword = ref('')
 const selectedItems = ref([])
-const filteredProjects = ref()
+const filteredProjects = ref([])
 const projectsOptions = ref([])
 const gerenciasOptions = ref([])
 const selectedGerencia = ref()
