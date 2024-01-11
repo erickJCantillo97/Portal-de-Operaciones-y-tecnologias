@@ -108,19 +108,18 @@ const formatCurrency = (valor, moneda) => {
     if (valor == undefined || valor == null) {
         return 'Sin definir'
     } else {
-        return valor.toLocaleString('es-CO',
+        return parseFloat(valor).toLocaleString('es-CO',
             { style: 'currency', currency: moneda })
     }
 }
-
 //#endregion
 </script>
 
 <template>
     <DataTable id="tabla" :value="data" :paginator="data.length > 0" :rows="rows" selectionMode="single"
-        tableStyle="min-width: 70rem" sortMode="multiple"
+        tableStyle="min-width: 70rem" sortMode="multiple" scrollable scrollHeight="flex"
         currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort v-model:filters="filters"
-        stripedRows filterDisplay="menu" scrollable class="p-datatable-sm text-xs p-1 rounded-md" stateStorage="session"
+        stripedRows filterDisplay="menu" class="p-datatable-sm text-xs p-1 rounded-md" stateStorage="session"
         :stateKey="'dt-' + title.toLowerCase() + '-state-session'" :globalFilterFields="globalFilterFields"
         @row-click="$emit('rowClic', $event)"
         paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink" :pt="{
@@ -266,6 +265,7 @@ const formatCurrency = (valor, moneda) => {
                     {{ data[col.field] }}
                 </p>
                 <Tag v-else-if="col.type == 'tag'" class="w-full"
+                    :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
                     :severity="col.severitys.find((severity) => severity.text == data[col.field]).severity"
                     :value="data[col.field]" />
                 <div v-else-if="col.type == 'object'" class="flex items-center space-x-2 w-full">

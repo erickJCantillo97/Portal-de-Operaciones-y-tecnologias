@@ -110,7 +110,7 @@ const buttons = [
 
 <template>
     <AppLayout>
-        <div class="w-full overflow-y-auto">
+        <div class="w-full h-[89vh] overflow-y-auto">
             <CustomDataTable :data="customers" title="Clientes" cacheName="customers" :columnas="columnas"
                 :actions="buttons" @showShips="showShips" @deleteItem="deleteItem" @editItem="editItem">
                 <template #buttonHeader>
