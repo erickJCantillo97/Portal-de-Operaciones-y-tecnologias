@@ -81,7 +81,7 @@ const formData = useForm({
 
 onMounted(() => {
     getManagers()
-    
+
     initFilters()
 })
 
@@ -213,21 +213,6 @@ const formatCurrency = (value) => {
     })
 }
 
-const excelExport = () => {
-    //console.log(dt.value)
-    // Acquire Data (reference to the HTML table)
-    var table_elt = document.getElementById("tabla")
-
-    var workbook = XLSX.utils.table_to_book(table_elt)
-
-    var ws = workbook.Sheets["Sheet1"]
-    XLSX.utils.sheet_add_aoa(ws, [
-        ["Creado " + new Date().toISOString()]
-    ], { origin: -1 })
-
-    // Package and Release Data (`writeFile` tries to write and save an XLSB file)
-    XLSX.writeFile(workbook, 'Lista de Contratos_' + contract.nit + '_' + contract.name + ".xlsb")
-}
 </script>
 
 <template>

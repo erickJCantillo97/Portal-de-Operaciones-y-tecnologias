@@ -262,8 +262,8 @@ const buttons = ref([
         </template>
         <template #footer>
             <Button severity="success" :loading="loading" @click="submit()"
-                :label="formData.id != null ? 'Actualizar ' : 'Guardar'" class="!h-8" />
-            <Button severity="danger" @click="visible = false" label="Cancelar" class="!h-8" />
+                :label="formData.id != null ? 'Actualizar ' : 'Guardar'" />
+            <Button severity="danger" @click="visible = false" label="Cancelar" />
         </template>
     </CustomModal>
 </template>

@@ -292,7 +292,8 @@ const formatCurrency = (value) => {
                                                 }
                                                     " />
 
-                                                <Link :href="route('quotesversion.edit', props.quote.version_id)">
+                                                <Link :href="route('quotesversion.edit', props.quote.version_id)"
+                                                    class="flex">
                                                 <Button size="small" label="Editar" :pt="{
                                                     root: '!w-full !bg-warning !hover:bg-orange-500',
                                                     label: '!text-center',
@@ -302,12 +303,14 @@ const formatCurrency = (value) => {
                                             </div>
 
                                             <div class="col-span-1 space-y-2 items-center">
+                                                <Link :href="route('quotesversion.updating', props.quote.version_id)"
+                                                    class="flex">
                                                 <Button size="small" label="Actualizar" :pt="{
                                                     root: '!w-full !bg-primary !hover:bg-blue-500',
                                                     label: '!text-center',
                                                 }
                                                     " />
-
+                                                </Link>
                                                 <Button size="small" label="Eliminar" :pt="{
                                                     root: '!w-full !bg-danger !hover:bg-red-500',
                                                     label: '!text-center',

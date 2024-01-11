@@ -10,6 +10,8 @@ import Swal from 'sweetalert2';
 import ProgressBar from 'primevue/progressbar';
 import Tag from 'primevue/tag';
 import InputNumber from 'primevue/inputnumber';
+import InputSwitch from 'primevue/inputswitch';
+import ApplicationLogo from './ApplicationLogo.vue';
 
 const props = defineProps({
     data: {
@@ -31,6 +33,10 @@ const props = defineProps({
     actions: {
         type: Array,
         default: []
+    },
+    filter: {
+        type: Boolean,
+        default: true
     },
     filterButtons: {
         type: Array,
@@ -108,15 +114,15 @@ const formatCurrency = (valor, moneda) => {
 }
 
 //#endregion
-
 </script>
 
 <template>
-    <DataTable id="tabla" :value="data" paginator :rows="rows" selectionMode="single" tableStyle="min-width: 70rem"
-        sortMode="multiple" currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort
-        v-model:filters="filters" stripedRows filterDisplay="menu" scrollable class="p-datatable-sm text-xs"
-        stateStorage="session" :stateKey="'dt-' + title.toLowerCase() + '-state-session'"
-        :globalFilterFields="globalFilterFields" @row-click="$emit('rowClic', $event)"
+    <DataTable id="tabla" :value="data" :paginator="data.length > 0" :rows="rows" selectionMode="single"
+        tableStyle="min-width: 70rem" sortMode="multiple"
+        currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort v-model:filters="filters"
+        stripedRows filterDisplay="menu" scrollable class="p-datatable-sm text-xs p-1 rounded-md" stateStorage="session"
+        :stateKey="'dt-' + title.toLowerCase() + '-state-session'" :globalFilterFields="globalFilterFields"
+        @row-click="$emit('rowClic', $event)"
         paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink" :pt="{
             paginator: {
                 paginatorWrapper: '!p-0',
@@ -132,32 +138,29 @@ const formatCurrency = (valor, moneda) => {
         }
             ">
         <template #header>
-            <div class="space-y-3">
+            <div class="">
                 <span class="flex justify-between">
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
                         {{ title }}
                     </h1>
                     <slot name="buttonHeader" />
                 </span>
-                <div class="flex items-center justify-between">
-                    <div class="space-x-2">
-                        <Button label="Quitar filtros" @click="clearFilter()" outlined class="!h-8"
+                <div class="flex items-center " :class="filter ? 'justify-between' : 'justify-end'">
+                    <div class="space-x-2" v-if="filter">
+                        <Button label="Quitar filtros" @click="clearFilter()" outlined
                             icon="fa-solid fa-filter-circle-xmark" />
                         <span class="p-input-icon-left">
                             <i class="fa-solid fa-magnifying-glass"></i>
-                            <InputText v-model="filters.global.value" type="search" size="small" placeholder="Buscar" :pt="{
-                                root: { class: '!h-8' }
-                            }
-                                " />
+                            <InputText v-model="filters.global.value" type="search" size="small" placeholder="Buscar" />
                         </span>
                         <span v-if="props.filterButtons && filterOK" class="p-buttonset">
                             <Button v-for="button in props.filterButtons" :label=button.label :severity=button.severity
                                 @click="filters[button.field].value == button.data ? filters[button.field].value = null : filters[button.field].value = button.data"
-                                :outlined="filters[button.field].value != button.data" class="!h-8" icon="" />
+                                :outlined="filters[button.field].value != button.data" icon="" />
                         </span>
                     </div>
                     <div class="space-x-2">
-                        <Button v-if="exportRute != ''" @click="exportar" icon="fa-solid fa-file-excel" class="!h-8 !w-8" />
+                        <Button v-if="exportRute != ''" @click="exportar" icon="fa-solid fa-file-excel" class="!w-8" />
                         <MultiSelect v-model="columnasSelect" display="chip" :options="props.columnas" optionLabel="header"
                             placeholder="Selecciona columnas a mostrar" class="md:w-20rem w-min h-8" :pt="{
                                 root: '!border-0 !ring-0',
@@ -170,7 +173,7 @@ const formatCurrency = (valor, moneda) => {
                             }
                                 ">
                             <template #value>
-                                <Button icon="fa-solid fa-eye" text class="!h-8 !w-8" />
+                                <Button icon="fa-solid fa-eye" text class="!w-8" />
                             </template>
                         </MultiSelect>
                     </div>
@@ -179,8 +182,11 @@ const formatCurrency = (valor, moneda) => {
         </template>
         <!-- #region ajustes de tabla -->
         <template #empty>
-            <div class="flex justify-center">
-                No hay registros
+            <div class="flex flex-col items-center space-y-1">
+                <ApplicationLogo />
+                <p class="text-center font-bold italic">
+                    No hay registros
+                </p>
             </div>
         </template>
         <template #loading>
@@ -264,7 +270,8 @@ const formatCurrency = (valor, moneda) => {
                     :value="data[col.field]" />
                 <div v-else-if="col.type == 'object'" class="flex items-center space-x-2 w-full">
                     <img v-if="col.objectRows.photo" :src="data[col.objectRows.photo.field]" alt="Image"
-                        onerror="this.src='/svg/cotecmar-logo.svg'" class=" border py-0.5 rounded-lg sm:h-12 sm:w-16" />
+                        onerror="this.src='/svg/cotecmar-logo.svg'"
+                        class="min-w-16 border py-0.5 rounded-lg sm:h-12 sm:w-16" />
                     <div>
                         <p class="font-bold text-sm ">{{
                             col.objectRows.primary.subfield ?
