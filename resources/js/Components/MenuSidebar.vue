@@ -147,9 +147,9 @@ const navigation = [
         ],
     },
     {
-        name: 'DocuFlow',
+        name: 'Documentos',
         href: 'get.projectsGD',
-        icon: HomeIcon,
+        icon: DocumentDuplicateIcon,
         current: true,
         show: true
     },

@@ -118,9 +118,9 @@ const deleteClic = (event, dato) => {
 
 const columns = [
     { field: 'name', header: 'Nombre' },
-    { field: 'projects', header: 'Cascos' },
+    { field: 'count_ships', header: 'Cascos', filter: true, type: 'number' },
     { field: 'type', header: 'Tipo' },
-    { field: 'hull_material', header: 'Material del casco' },
+    { field: 'hull_material', header: 'Material del casco', filter: true },
     { field: 'length', header: 'Eslora' },
     { field: 'breadth', header: 'Manga' },
 ];
