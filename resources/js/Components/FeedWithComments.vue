@@ -31,7 +31,6 @@ const overlayOptions = ref([
         command: () => {
           action.value = 2
           comment.value = commentSelect.value
-          console.log(action.value)
         }
       },
       {
@@ -40,7 +39,6 @@ const overlayOptions = ref([
         command: () => {
           action.value = 3
           comment.value = commentSelect.value
-          console.log(action.value)
         }
       },
       {
@@ -48,7 +46,7 @@ const overlayOptions = ref([
         icon: 'pi pi-trash',
         command: () => {
           action.value = 1
-          router.delete(route('comment.destroy', comment.value.id), {
+          router.delete(route('comment.destroy', commentSelect.value.id), {
             onSuccess: () => {
               getComments()
             },
@@ -65,6 +63,11 @@ const overlayOptions = ref([
 const toggle = (event, commentItem) => {
   menu.value.toggle(event)
   commentSelect.value = commentItem
+}
+
+const reply = (commentItem) => {
+  comment.value = commentItem
+  action.value = 2
 }
 
 const getComments = async () => {
@@ -102,7 +105,7 @@ onMounted(() => {
   <Menu ref="menu" id="overlay_menu" :model="overlayOptions" :popup="true" />
   <div class="flow-root">
     <ChatSkeleton v-if="showChatSkeleton" />
-    <NoContentToShow subject="Comentarios" v-if="showNoContent" />
+    <NoContentToShow subject="Comentarios" v-if="comments.length == 0 && !showChatSkeleton" />
     <!--COMENTARIOS-->
     <div v-chat-scroll
       class="max-h-[258px] overflow-y-auto scroll-p-0 scroll-m-0 scroll-smooth p-6 mt-4 shadow-md rounded-lg">
@@ -126,11 +129,14 @@ onMounted(() => {
                     <a class="font-medium text-gray-900">
                       {{ commentItem.user_name }}
                     </a>
-                    <div class="flex justify-end">
+                    <div class="flex justify-end items-center">
                       <p class="mt-0.5 mr-2 text-sm text-gray-500">{{ Moment(commentItem.date).format('DD/MM/YY') }}</p>
                       <Button @click="toggle($event, commentItem)" v-if="commentItem.user_id === $page.props.auth.user.id"
                         class="!size-4" type="button" icon="pi pi-ellipsis-v" aria-haspopup="true"
                         aria-controls="overlay_menu" text />
+                      <Button class="!size-4" type="button" icon="pi pi-reply" aria-haspopup="true"
+                        aria-controls="overlay_menu" text v-else @click="reply(commentItem)">
+                      </Button>
                     </div>
                   </div>
                 </div>

@@ -18,7 +18,7 @@ const message = ref(props.comment?.message ?? '')
 const submit = () => {
     try {
         if (props.actions == 3) {
-            axios.put(route('comment.update', props.message.id), {
+            axios.put(route('comment.update', props.comment.id), {
                 commentable_id: props.quoteId,
                 message: message.value
             }).then(() => {
@@ -54,9 +54,9 @@ const submit = () => {
                         <i @click="actions = null"
                             class="fa-solid fa-xmark absolute top-0.5 right-0.5 text-gray-400 cursor-pointer"></i>
                     </div>
-                    <div class="truncate max-w-96" >
+                    <div class="truncate max-w-96">
                         <div class="text-xs text-blue-900 uppercase font-bold"
-                            :class="actions == 2 ? 'text-emerald-500' : 'text-blue-900'" >
+                            :class="actions == 2 ? 'text-emerald-500' : 'text-blue-900'">
                             {{ comment.user_name }}
                         </div>
                         {{ comment.message }}

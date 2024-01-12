@@ -25,7 +25,7 @@ class CommentController extends Controller
                     'message' => $comment['message'],
                     'responses' => $comment->comments->map(
                         function ($comment) {
-                            return [
+                            return [ 
                                 'user_photo' => $comment->user->photo,
                                 'user_name' => $comment->user->short_name,
                                 'user_id' => $comment->user->id,
