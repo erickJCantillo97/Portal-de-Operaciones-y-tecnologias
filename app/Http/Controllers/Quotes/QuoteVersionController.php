@@ -33,7 +33,7 @@ class QuoteVersionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Quote $quote)
+    public function store(Request $request, QuoteVersion $quoteVersion)
     {
         $validateData = $request->validate([
             'estimador_id' => 'required|numeric',
@@ -41,10 +41,13 @@ class QuoteVersionController extends Controller
             'observation' => 'nullable|string',
             'expeted_answer_date' => 'required|date|after_or_equal:' . Carbon::now()->format('Y-m-d'),
             'offer_type' => 'string',
+            'coin' => 'string',
         ]);
         $empleado = collect(searchEmpleados('Num_SAP', $validateData['estimador_id']))->first();
+        $quote = Quote::where('id', $quoteVersion->quote_id)->first();
 
         $validateData['estimador_name'] = $empleado['Usuario'];
+
         $quoteVersion = QuoteVersion::create([
             'quote_id' => $quote->id,
             'version' => $quote->version->version + 1,

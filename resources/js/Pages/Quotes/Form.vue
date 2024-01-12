@@ -92,7 +92,6 @@ const quoteSave = () => {
                         title: 'La estimacion: ' + dataQuoteNew.value.name + ' se ha creado exitosamente ¿Desea agregar datos a las clases?',
                         icon: 'success',
                         showDenyButton: true,
-                        confirmButtonText: 'Sí',
                         denyButtonText: 'No'
                     }).then((result2) => {
                         if (result2.isConfirmed) {
@@ -124,28 +123,29 @@ const quoteNewVersion = () => {
         denyButtonText: 'Cancelar'
     }).then(async (result) => {
         if (result.isConfirmed) {
-            await axios.post(route('', dataQuoteNew.value)).then((res) => {
-                if (res.data.status) {
-                    Swal.fire({
-                        title: 'La estimacion: ' + dataQuoteNew.value.name + ' se ha creado exitosamente ¿Desea agregar datos a las clases?',
-                        icon: 'success',
-                        showDenyButton: true,
-                        confirmButtonText: 'Sí',
-                        denyButtonText: 'No'
-                    }).then((result2) => {
-                        if (result2.isConfirmed) {
-                            console.log(res.data.quote)
-                            router.get(route('quotesversion.edit', res.data.quote.id))
-                        } else if (result2.isDenied) {
-                            router.get(route('quotes.index'))
-                        }
-                    })
-                }
-            }).catch((e) => {
-                console.log(e)
-                errors.value = e.response.data.errors
-                toast('Hay errores en los datos a guardar', 'error')
-            })
+            await axios.post(route('quotesversion.store', props.quote.id),
+                dataQuoteNew.value).then((res) => {
+                    if (res.data.status) {
+                        Swal.fire({
+                            title: 'La estimacion: ' + dataQuoteNew.value.name + ' se ha creado exitosamente ¿Desea agregar datos a las clases?',
+                            icon: 'success',
+                            showDenyButton: true,
+                            confirmButtonText: 'Sí',
+                            denyButtonText: 'No'
+                        }).then((result2) => {
+                            if (result2.isConfirmed) {
+                                console.log(res.data.quote)
+                                router.get(route('quotesversion.edit', res.data.quote.id))
+                            } else if (result2.isDenied) {
+                                router.get(route('quotes.index'))
+                            }
+                        })
+                    }
+                }).catch((e) => {
+                    console.log(e)
+                    errors.value = e.response.data.errors
+                    toast('Hay errores en los datos a guardar', 'error')
+                })
         }
         loadingButton.value = false
     })
