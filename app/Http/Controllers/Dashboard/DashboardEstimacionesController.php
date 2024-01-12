@@ -46,4 +46,16 @@ class DashboardEstimacionesController extends Controller
             'status' => true
         ], 200);
     }
+    public function getStatusWeek()
+    {
+        $quotes = QuoteVersion::get()->filter(function ($quote) {
+            return Carbon::parse($quote->status_date)->format('Y-m-d') >= Carbon::now()->subDays(6)->format('Y-m-d') && Carbon::parse($quote->status_date)->format('Y-m-d') <= Carbon::now()->format('Y-m-d');
+        })->groupBy('status')->map(function ($status) {
+            return [
+                'value' => count($status),
+                'status' => $status[0]['get_status']
+            ];
+        });
+        return $quotes;
+    }
 }
