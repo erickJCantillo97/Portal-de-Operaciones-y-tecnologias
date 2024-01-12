@@ -16,6 +16,8 @@ import DataChart from "./DataChart.vue";
 // import OurTeam from "@/Components/OurTeam.vue";
 import "../../sass/dataTableCustomized.scss";
 import CustomDataTable from "@/Components/CustomDataTable.vue";
+import Estimaciones from "./Dashboards/Estimaciones.vue";
+import Proyectos from "./Dashboards/Proyectos.vue";
 
 // import TimeLine from './TimeLine.vue';
 
@@ -66,83 +68,19 @@ onMounted(() => {
 //             })
 //     }, 200);
 // }
-const columnas = [
-    { field: 'name', header: 'Proyecto' },
-    { field: 'avance', header: 'Ejecución' },
-    { field: 'contrato', header: 'Contrato' },
-    { field: 'costo', header: 'Valor Venta' },
-    { field: 'fechaF', header: 'Fin Producción' },
-]
-//#region Botones de CustomDatatable
-const buttons = [
-    { event: 'showProgramming', severity: 'success', class: '', icon: 'fa-solid fa-list-check', text: true, outlined: false, rounded: false },
-    { event: 'showGantt', severity: 'primary', class: '', icon: 'fa-solid fa-list-check', text: true, outlined: false, rounded: false },
-    // { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
-]
+
 //#endregion
 </script>
 
 <template>
     <AppLayout>
-        <div class="space-y-5 overflow-y-scroll">
+        <div class="overflow-y-scroll">
 
             <div class="flex justify-between">
                 <UserHeader />
             </div>
-            <CustomDataTable :data="projects" :columnas="columnas" :filter="false"
-                @showProgramming="router.get(route('programming'), { id: $event.data.project_id })"
-                @showGantt="router.get(route('createSchedule.create', $event.data.project_id))">
-            </CustomDataTable>
-            <!-- <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="projects" v-model:filters="filters"
-                    dataKey="id" filterDisplay="menu" :loading="loading" :globalFilterFields="[
-                        'name',
-                        'gerencia',
-                        'start_date',
-                        'end_date',
-                        'hoursPerDay',
-                        'daysPerWeek',
-                        'daysPerMonth',
-                    ]" currentPageReportTemplate=" {first} al {last} de {totalRecords}"
-                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-                    :paginator="true" :rows="5" :rowsPerPageOptions="[5, 10, 25, 50, 100]">
-                    <Column field="name" header="Proyecto">
-                        <template #body="slotProps">
-                            <ProjectCardMinimal :project="slotProps.data" :activo="false" :menu="false" :avance="false" />
-                        </template>
-                    </Column>
-                    <Column field="avance" header="Ejecución">
-                        <template #body="slotProps">
-                            <ProgressBar class="m-1" :value="parseInt(slotProps.data.avance)">
-                            </ProgressBar>
-                            <p class="text-center">
-                                Avance actual: {{ parseInt(slotProps.data.avance) }}%
-                            </p>
-                        </template>
-                    </Column>
-                    <Column field="contrato" header="Contrato"></Column>
-                    <Column field="costo" header="Valor venta">
-                        <template #body="slotProps">
-                            {{ formatCurrency(slotProps.data.costo) }}
-                        </template>
-                    </Column>
-                    <Column field="fechaF" header="Fin producción"></Column>
-                    <Column header="Acciones" class="space-x-3">
-                        <template #body="slotProps">
-                            <div class="flex justify-center space-x-1">
-                                <Button title="Ver programacion" severity="primary" rounded text
-                                    icon="fa-solid fa-list-check" @click="
-                                        router.get(route('programming'), { id: slotProps.data.project_id })
-                                        " class="!h-8" />
-                                <Button title="Ver cronograma" severity="success" rounded text
-                                    icon="fa-solid fa-chart-gantt" @click="                                        router.get(
-                                        route('createSchedule.create', slotProps.data.project_id)
-                                    )
-                                        " class="!h-8" />
-
-                            </div>
-                        </template>
-                    </Column>
-                </DataTable> -->
+            <Estimaciones />
+            <Proyectos />
             <div class="p-8 m-1 shadow-md rounded-xl">
                 <DataChart></DataChart>
             </div>

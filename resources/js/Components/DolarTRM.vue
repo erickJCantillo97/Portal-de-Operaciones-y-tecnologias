@@ -107,7 +107,7 @@ onMounted(() => {
         consultaTRM()
         console.log(error)
     }
-    var elemento = document.getElementById("trmdolar");
+    // var elemento = document.getElementById("trmdolar");
     // elemento.addEventListener("mouseenter", function () {
     //     // Simular un clic izquierdo sobre el elemento
     //     elemento.click();
@@ -129,8 +129,9 @@ onMounted(() => {
         </div>
     </div>
     <OverlayPanel ref="op" :pt="{
-        content: '!p-1'
+        content: '!p-0'
     }">
-        <VueApexCharts :key="hist" type="area" height="180" :options="chartOptions" :series="series"></VueApexCharts>
+        <VueApexCharts :key="hist" type="area" height="180" :options="chartOptions" :series="series">
+        </VueApexCharts>
     </OverlayPanel>
 </template>

@@ -92,7 +92,6 @@ const quoteSave = () => {
                         title: 'La estimacion: ' + dataQuoteNew.value.name + ' se ha creado exitosamente ¿Desea agregar datos a las clases?',
                         icon: 'success',
                         showDenyButton: true,
-                        confirmButtonText: 'Sí',
                         denyButtonText: 'No'
                     }).then((result2) => {
                         if (result2.isConfirmed) {
@@ -124,28 +123,29 @@ const quoteNewVersion = () => {
         denyButtonText: 'Cancelar'
     }).then(async (result) => {
         if (result.isConfirmed) {
-            await axios.post(route('', dataQuoteNew.value)).then((res) => {
-                if (res.data.status) {
-                    Swal.fire({
-                        title: 'La estimacion: ' + dataQuoteNew.value.name + ' se ha creado exitosamente ¿Desea agregar datos a las clases?',
-                        icon: 'success',
-                        showDenyButton: true,
-                        confirmButtonText: 'Sí',
-                        denyButtonText: 'No'
-                    }).then((result2) => {
-                        if (result2.isConfirmed) {
-                            console.log(res.data.quote)
-                            router.get(route('quotesversion.edit', res.data.quote.id))
-                        } else if (result2.isDenied) {
-                            router.get(route('quotes.index'))
-                        }
-                    })
-                }
-            }).catch((e) => {
-                console.log(e)
-                errors.value = e.response.data.errors
-                toast('Hay errores en los datos a guardar', 'error')
-            })
+            await axios.post(route('quotesversion.store', props.quote.id),
+                dataQuoteNew.value).then((res) => {
+                    if (res.data.status) {
+                        Swal.fire({
+                            title: 'La estimacion: ' + dataQuoteNew.value.name + ' se ha creado exitosamente ¿Desea agregar datos a las clases?',
+                            icon: 'success',
+                            showDenyButton: true,
+                            confirmButtonText: 'Sí',
+                            denyButtonText: 'No'
+                        }).then((result2) => {
+                            if (result2.isConfirmed) {
+                                console.log(res.data.quote)
+                                router.get(route('quotesversion.edit', res.data.quote.id))
+                            } else if (result2.isDenied) {
+                                router.get(route('quotes.index'))
+                            }
+                        })
+                    }
+                }).catch((e) => {
+                    console.log(e)
+                    errors.value = e.response.data.errors
+                    toast('Hay errores en los datos a guardar', 'error')
+                })
         }
         loadingButton.value = false
     })
@@ -315,8 +315,8 @@ const toggle = (event) => {
                         </Editor>
                         <span v-if="newQuote" class="w-full justify-end flex">
                             <Button severity="success" @click="action == 2 ? quoteNewVersion() : quoteSave()"
-                                :loading="loadingButton" icon="fa-solid fa-floppy-disk" label="Guardar solicitud"
-                                class="!h-8" />
+                                :loading="loadingButton" icon="fa-solid fa-floppy-disk"
+                                :label="action == 2 ? 'Generar nueva version' : 'Guardar solicitud'" class="!h-8" />
                         </span>
                     </span>
                 </div>
@@ -324,7 +324,7 @@ const toggle = (event) => {
             <div class="" v-if="quoteShips && !modEdit && action != 2">
                 <div class=" border rounded-md p-1">
                     <TabView class="tabview-custom" :scrollable="true">
-                        <TabPanel v-for="buque, index in quoteShips">
+                        <TabPanel v-for=" buque, index  in  quoteShips ">
                             <template #header>
                                 <div class="flex items-center space-x-1">
                                     <Avatar :image="buque.render ? buque.render : '/images/generic-boat.png'"
@@ -341,14 +341,16 @@ const toggle = (event) => {
                                     <Dropdown v-model="buque.scope" :options="alcance" placeholder="Selecciona el alcance"
                                         class="w-full md:w-14rem !h-8" showClear :pt="{
                                             input: '!p-0 !pt-1 !px-1 '
-                                        }" />
+                                        }
+                                            " />
                                 </span>
                                 <span class="">
                                     <p for="username">Madurez</p>
                                     <Dropdown v-model="buque.maturity" :options="madurez"
                                         placeholder="Selecciona la madurez" class="w-full md:w-14rem !h-8" showClear :pt="{
                                             input: '!p-0 !pt-1 !px-1 '
-                                        }" />
+                                        }
+                                            " />
                                 </span>
                                 <span class="">
                                     <p for="username">Unidades</p>
@@ -376,7 +378,8 @@ const toggle = (event) => {
                                     <Dropdown v-model="buque.iva" :options="iva" placeholder="Selecciona el IVA"
                                         class="w-full md:w-14rem !h-8" showClear :pt="{
                                             input: '!p-0 !pt-1 !px-1 '
-                                        }" />
+                                        }
+                                            " />
                                 </span>
                                 <span class="">
                                     <p for="username">Margen</p>
@@ -388,7 +391,8 @@ const toggle = (event) => {
                                     <Dropdown v-model="buque.white_paper" :options="docTecnico"
                                         placeholder="Selecciona el tipo de DT" class="w-full md:w-14rem !h-8" showClear :pt="{
                                             input: '!p-0 !pt-1 !px-1 '
-                                        }" />
+                                        }
+                                            " />
 
                                 </span>
                                 <span class="">
@@ -430,7 +434,8 @@ const toggle = (event) => {
             toolbar: '!hidden',
             content: '!border-0',
             root: 'border p-1 !rounded-md'
-        }">
+        }
+            ">
         </Editor>
     </OverlayPanel>
 </template>

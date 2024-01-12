@@ -78,6 +78,7 @@ class QuoteController extends Controller
             'expeted_answer_date' => 'required|date',
             'offer_type' => 'nullable',
             'type_ships' => 'nullable|array',
+            'coin' => 'nullable|string',
             'observation' => 'nullable|string',
         ]);
         $empleado = collect(searchEmpleados('Num_SAP', $validateData['estimador_id']))->first();
@@ -103,6 +104,7 @@ class QuoteController extends Controller
                 'estimador_name' => $validateData['estimador_name'],
                 'expeted_answer_date' => $validateData['expeted_answer_date'],
                 'offer_type' => $validateData['offer_type'],
+                'coin' => $validateData['coin'],
             ])->id; // Creamos una nueva version 1, con el consecutivo de la variable que se utilizó antes
 
             $quote->current_version_id = $quoteVersion;
