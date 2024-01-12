@@ -4,6 +4,7 @@ use App\Events\TestWebsocket;
 use App\Http\Controllers\Dashboard\DashboardEstimacionesController;
 use App\Http\Controllers\Suggestion\SuggestionController;
 use App\Ldap\User;
+use App\Models\Comment;
 use App\Models\Gantt\Task;
 use App\Models\Process;
 use App\Models\Projects\Customer;
@@ -145,6 +146,7 @@ Route::get('anterior', function () {
     QuoteStatus::truncate();
     QuoteVersion::truncate();
     QuoteTypeShip::truncate();
+    Comment::truncate();
     Quote::truncate();
     // $clientes =  DB::connection('sqlsrv_GECON')->table('clientes')->get();
     // foreach ($clientes as $cliente) {

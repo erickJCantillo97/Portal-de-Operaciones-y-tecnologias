@@ -31,7 +31,7 @@ class QuoteController extends Controller
                 'offer_type' => $quote['version']['offer_type'],
                 'get_status' => $quote['version']['get_status'],
                 'estimador' => $quote['version']['estimador_name'],
-                'customer' => $quote['version']['customer']['name'],
+                'customer' => $quote['version']['customer']['name'] ?? '',
                 'version_id' => $quote['version']['id'],
                 'version' => $quote['version']['version'],
                 'created_at' => $quote['version']['created_at'],
@@ -109,14 +109,16 @@ class QuoteController extends Controller
 
             $quote->current_version_id = $quoteVersion;
             $quote->save();
-
-            foreach (TypeShip::whereIn('id', $request->type_ships)->get() as $typeShip) {
-                QuoteTypeShip::create([
-                    'quote_version_id' => $quoteVersion,
-                    'type_ship_id' => $typeShip->id,
-                    'name' => $typeShip->name,
-                ]);
+            if (isset($request->type_ships)) {
+                foreach (TypeShip::whereIn('id', $request->type_ships)->get() as $typeShip) {
+                    QuoteTypeShip::create([
+                        'quote_version_id' => $quoteVersion,
+                        'type_ship_id' => $typeShip->id,
+                        'name' => $typeShip->name,
+                    ]);
+                }
             }
+
             QuoteStatus::create([
                 'status' => 0,
                 'user_id' => auth()->user()->id,

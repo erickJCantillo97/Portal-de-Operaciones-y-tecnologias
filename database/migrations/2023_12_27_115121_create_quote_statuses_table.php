@@ -16,7 +16,7 @@ return new class extends Migration
             $table->bigInteger('quote_version_id');
             $table->integer('user_id')->index()->unsigned();
             $table->integer('status');
-            $table->integer('fecha');
+            $table->dateTime('fecha');
             $table->timestamps();
             $table->softDeletes();
         });
