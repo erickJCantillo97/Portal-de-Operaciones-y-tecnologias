@@ -23,7 +23,6 @@ return new class extends Migration
             $table->string('estimador_name');
             $table->string('coin')->nullable();
             $table->text('route')->nullable();
-            $table->double('exchange_rate')->default(1);
             $table->string('file')->nullable();
             $table->text('observation')->nullable();
             $table->foreign('quote_id')->references('id')->on('quotes');
