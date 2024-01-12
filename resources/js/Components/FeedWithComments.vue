@@ -1,12 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
-import { ChatBubbleLeftEllipsisIcon, TagIcon, UserCircleIcon } from '@heroicons/vue/20/solid'
+import { ChatBubbleLeftEllipsisIcon } from '@heroicons/vue/20/solid'
 import CommentForm from '@/Components/CommentForm.vue'
-import Loading from '@/Components/Loading.vue'
+import ChatSkeleton from '@/Components/ChatSkeleton.vue'
+import NoContentToShow from '@/Components/NoContentToShow.vue'
 import Menu from 'primevue/menu'
 import Button from 'primevue/button'
-import Skeleton from 'primevue/skeleton'
 import Moment from 'moment'
 
 const props = defineProps({
@@ -15,9 +15,11 @@ const props = defineProps({
 
 const action = ref(0)
 const comment = ref({})
+const comments = ref([])
 const commentSelect = ref()
 const menu = ref()
-const loadingStatus = ref(true)
+const showChatSkeleton = ref(true)
+const showNoContent = ref(false)
 
 const overlayOptions = ref([
   {
@@ -65,16 +67,15 @@ const toggle = (event, commentItem) => {
   commentSelect.value = commentItem
 }
 
-const comments = ref([])
-
-const getComments = () => {
+const getComments = async () => {
   comment.value = {}
   action.value = 0
-  axios.get(route('comment.index', { id: props.quoteId }))
+
+  await axios.get(route('comment.index', { id: props.quoteId }))
     .then((res) => {
       comments.value = res.data.comments
-      orderByLatest()
-      // loadingStatus.value = false
+      showChatSkeleton.value = false
+      comments.value == 0 ? showNoContent.value = true : comments.value
     })
 }
 
@@ -84,32 +85,27 @@ onMounted(() => {
 })
 //#endregion
 
-const orderByLatest = () => {
-  let container = document.querySelector('#conversation')
-  container.scrollTop = container.scrollHeight
-}
+//#region Utilities
+// const orderByLatest = () => {
+//   let container = document.querySelector('#conversation')
+//   container.scrollTop = container.scrollHeight
+// }
 
-const format_ES_Date = (date) => {
-  return new Date(date).toLocaleString('es-CO',
-    { day: '2-digit', month: 'long', year: 'numeric', weekday: "long" })
-}
+// const format_ES_Date = (date) => {
+//   return new Date(date).toLocaleString('es-CO',
+//     { day: '2-digit', month: 'long', year: 'numeric', weekday: "long" })
+// }
+//#endregion
 </script>
 
 <template>
   <Menu ref="menu" id="overlay_menu" :model="overlayOptions" :popup="true" />
   <div class="flow-root">
-    <div v-chat-scroll id="conversation"
+    <ChatSkeleton v-if="showChatSkeleton" />
+    <NoContentToShow subject="Comentarios" v-if="showNoContent" />
+    <!--COMENTARIOS-->
+    <div v-chat-scroll
       class="max-h-[258px] overflow-y-auto scroll-p-0 scroll-m-0 scroll-smooth p-6 mt-4 shadow-md rounded-lg">
-      <!-- <div class="flex w-full mb-3">
-        <Skeleton shape="circle" size="3rem" class="mr-2"></Skeleton>
-        <div>
-          <Skeleton width="10rem" class="mb-2"></Skeleton>
-          <Skeleton width="5rem" class="mb-2"></Skeleton>
-          <div>
-            <Skeleton height=".5rem" class="mb-2"></Skeleton>
-          </div>
-        </div>
-      </div> -->
       <ul role="list">
         <li v-for="(commentItem, commentItemIdx) in comments">
           <div class="relative pb-1">
@@ -144,12 +140,14 @@ const format_ES_Date = (date) => {
               </div>
             </div>
           </div>
+
+          <!--RESPUESTAS-->
           <div class="relative pb-1 ml-12 bg-gray-200 rounded-lg mb-2" v-for="response in commentItem.responses">
             <div class="relative flex items-start space-x-3">
               <div class="relative">
                 <img
                   class="flex size-10 items-center justify-center rounded-full object-cover bg-gray-400 ring-8 ring-white"
-                  :src="commentItem.user_photo" alt="profile_photo" />
+                  :src="response.user_photo" alt="profile_photo" />
                 <span class="absolute -bottom-0.5 -right-1 rounded-tl bg-white px-0.5 py-px">
                   <ChatBubbleLeftEllipsisIcon class="size-5 text-gray-400" aria-hidden="true" />
                 </span>
@@ -158,13 +156,13 @@ const format_ES_Date = (date) => {
                 <div>
                   <div class="text-sm flex justify-between">
                     <a class="font-medium text-gray-900">
-                      {{ commentItem.user_name }}
+                      {{ response.user_name }}
                     </a>
                     <div class="flex justify-end">
                       <p class="mt-0.5 mr-2 text-sm text-gray-500">
-                        {{ Moment(commentItem.date).format('DD/MM/YY') }}
+                        {{ Moment(response.date).format('DD/MM/YY') }}
                       </p>
-                      <Button @click="toggle($event, commentItem)" v-if="commentItem.user_id === $page.props.auth.user.id"
+                      <Button @click="toggle($event, response)" v-if="response.user_id === $page.props.auth.user.id"
                         class="!size-4" type="button" icon="pi pi-ellipsis-v" aria-haspopup="true"
                         aria-controls="overlay_menu" text />
                     </div>

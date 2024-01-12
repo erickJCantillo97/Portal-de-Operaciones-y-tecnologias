@@ -1,21 +1,28 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import Loading from '@/Components/Loading.vue'
+import NoContentToShow from '@/Components/NoContentToShow.vue'
 
 const status = ref([])
-const loadingStatus = ref(false)
+const showLoading = ref(true)
+const showNoContent = ref(false)
 
 const props = defineProps({
   quoteId: Number
 })
 
 onMounted(() => {
-  axios.get(route('quotestatus.index', { id: props.quoteId }))
+  getStatus()
+})
+
+const getStatus = async () => {
+  await axios.get(route('quotestatus.index', { id: props.quoteId }))
     .then((res) => {
       status.value = res.data.status
-      loadingStatus.value = false
+      showLoading.value = false
+      status.value == 0 ? showNoContent.value = true : status.value
     })
-})
+}
 
 const icons = [
   'fa-solid fa-user-clock', //0 -> Proceso
@@ -43,11 +50,10 @@ const format_ES_Date = (date) => {
 
 <template>
   <div class="flow-root">
+    <Loading v-if="showLoading" message="Cargando Estados" class="mt-12" />
+    <NoContentToShow v-if="showNoContent" subject="Estados" />
     <ul role="list" class="shadow-md rounded-lg p-8 max-h-[258px] overflow-y-auto">
       <li v-for="(event, eventIdx) in status" :key="event.id">
-        <section v-if="loadingStatus" class="h-[50vh] w-full flex flex-col justify-center items-center col-span-6">
-          <Loading message="Cargando Estados" />
-        </section>
         <div class="relative pb-8">
           <span v-if="eventIdx !== status.length - 1" class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200"
             aria-hidden="true" />

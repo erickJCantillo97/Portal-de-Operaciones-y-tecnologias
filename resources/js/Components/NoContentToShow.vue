@@ -26,7 +26,7 @@ const props = defineProps({
 
 <template>
     <section v-if="showNoProjects"
-        class="h-[50vh] w-full flex flex-col justify-center items-center col-span-6 transition duration-300 ease-in">
+        class="h-[30vh] w-full flex flex-col mt-12 justify-center items-center col-span-6 transition duration-300 ease-in">
         <ApplicationLogo class="mb-4" :width-logo="130" :height-logo="130" />
         <h3 class="text-xl font-semibold italic text-gray-500 text-center">
             No hay {{ props.subject }} para mostrar

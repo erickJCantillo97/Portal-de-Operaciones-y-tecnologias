@@ -80,9 +80,9 @@ const closeCommentsModal = () => {
 }
 
 const key = ref(0)
-const saveStatus = () => {
+const saveStatus = async() => {
     try {
-        axios.post(route('quotestatus.store', {
+        await axios.post(route('quotestatus.store', {
             status: statusSelected.value,
             quote_version_id: props.quote.version_id,
             fecha: dateSelected.value
