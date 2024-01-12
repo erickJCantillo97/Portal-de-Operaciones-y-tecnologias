@@ -13,9 +13,9 @@ class DashboardEstimacionesController extends Controller
 
     public function getQuotesStatus(Request $request)
     {
-        $quotes = QuoteVersion::with('quoteTypeShips', 'quote')->get()->filter(function ($quote) use ($request) {
+        $quotes = QuoteVersion::has('quote')->with('quoteTypeShips', 'quote')->get()->filter(function ($quote) use ($request) {
             $quote->get_status = $quote->get_status == 'Entregada' ? 'Proceso' : $quote->get_status;
-            return $quote->status_date >= Carbon::now()->subDays(6)->format('Y-m-d') && $quote->status_date <= Carbon::now()->format('Y-m-d') && $quote->get_status == $request->status && $quote->id != 23;
+            return Carbon::parse($quote->status_date)->format('Y-m-d') >= Carbon::now()->subDays(6)->format('Y-m-d') && Carbon::parse($quote->status_date)->format('Y-m-d') <= Carbon::now()->format('Y-m-d')  && $quote->get_status  == $request->status;
         })->map(function ($quote) {
             return [
                 'name' => $quote['quote']['name'],
