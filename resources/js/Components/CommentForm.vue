@@ -15,17 +15,6 @@ const props = defineProps({
 
 const message = ref(props.comment?.message ?? '')
 
-const showResponse = () => {
-    axios.get(route('comment.index', {
-        commentable_id: props.quoteId,
-        message: message.value,
-        response_id: props.comment?.id ?? null
-    })).then((res) => {
-        message.value = res.data.message
-        emit('addComment')
-    })
-}
-
 const submit = () => {
     try {
         if (props.actions == 3) {
@@ -35,7 +24,6 @@ const submit = () => {
             }).then(() => {
                 message.value = ''
                 emit('addComment')
-                showResponse()
             })
         } else {
             axios.post(route('comment.store', {
@@ -60,13 +48,15 @@ const submit = () => {
         <form @submit.prevent="submit()" class="flex-auto">
             <div v-if="!closeResponse"> <!--true-->
                 <div v-if="actions == 2 || actions == 3 && comment"
-                    class="w-full p-1 rounded-t-lg rounded-l-lg text-sm bg-gray-200 italic mb-2 border-l-8 border-blue-900">
+                    class="w-full p-1 rounded-t-lg rounded-l-lg text-sm bg-gray-200 italic mb-2 border-l-8 border-blue-900"
+                    :class="actions == 2 ? 'border-emerald-500' : 'border-blue-900'">
                     <div class="relative">
                         <i @click="actions = null"
                             class="fa-solid fa-xmark absolute top-0.5 right-0.5 text-gray-400 cursor-pointer"></i>
                     </div>
-                    <div class="truncate max-w-96 ">
-                        <div class="text-xs text-blue-900 uppercase font-bold">
+                    <div class="truncate max-w-96" >
+                        <div class="text-xs text-blue-900 uppercase font-bold"
+                            :class="actions == 2 ? 'text-emerald-500' : 'text-blue-900'" >
                             {{ comment.user_name }}
                         </div>
                         {{ comment.message }}

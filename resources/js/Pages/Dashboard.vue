@@ -16,6 +16,8 @@ import DataChart from "./DataChart.vue";
 // import OurTeam from "@/Components/OurTeam.vue";
 import "../../sass/dataTableCustomized.scss";
 import CustomDataTable from "@/Components/CustomDataTable.vue";
+import Estimaciones from "./Dashboards/Estimaciones.vue";
+import Proyectos from "./Dashboards/Proyectos.vue";
 
 // import TimeLine from './TimeLine.vue';
 
@@ -66,19 +68,7 @@ onMounted(() => {
 //             })
 //     }, 200);
 // }
-const columnas = [
-    { field: 'name', header: 'Proyecto' },
-    { field: 'avance', header: 'Ejecución' },
-    { field: 'contrato', header: 'Contrato' },
-    { field: 'costo', header: 'Valor Venta' },
-    { field: 'fechaF', header: 'Fin Producción' },
-]
-//#region Botones de CustomDatatable
-const buttons = [
-    { event: 'showProgramming', severity: 'success', class: '', icon: 'fa-solid fa-list-check', text: true, outlined: false, rounded: false },
-    { event: 'showGantt', severity: 'primary', class: '', icon: 'fa-solid fa-list-check', text: true, outlined: false, rounded: false },
-    // { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
-]
+
 //#endregion
 </script>
 
@@ -89,10 +79,8 @@ const buttons = [
             <div class="flex justify-between">
                 <UserHeader />
             </div>
-            <CustomDataTable :data="projects" :columnas="columnas" :filter="false"
-                @showProgramming="router.get(route('programming'), { id: $event.data.project_id })"
-                @showGantt="router.get(route('createSchedule.create', $event.data.project_id))">
-            </CustomDataTable>
+            <Estimaciones />
+            <Proyectos />
             <div class="p-8 m-1 shadow-md rounded-xl">
                 <DataChart></DataChart>
             </div>

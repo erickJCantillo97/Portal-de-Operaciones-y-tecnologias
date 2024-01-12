@@ -59,10 +59,10 @@ if (props.columnas.length > 7) {
 } else {
     columnasSelect.value = props.columnas
 }
-const initFilters = () => {
+const initFilters = async () => {
     globalFilterFields.value = ['id']
     filters.value.global = { value: null, matchMode: FilterMatchMode.CONTAINS }
-    for (var columna of props.columnas) {
+    for await (var columna of props.columnas) {
         if (columna.filter) {
             filters.value[columna.field] = { value: null, matchMode: FilterMatchMode[columna.filtertype ? columna.filtertype : 'CONTAINS'] }
             globalFilterFields.value.push(columna.field)
@@ -222,7 +222,7 @@ const formatCurrency = (valor, moneda) => {
 
         <!-- #region Columnas -->
 
-        <Column v-for=" col, index  in    columnasSelect   " :field="col.field" :filterField="col.field" :class="col.class"
+        <Column v-for="col, index  in columnasSelect" :field="col.field" :filterField="col.field" :class="col.class"
             :sortable="col.sortable" :show-filter-match-modes="false" :filterMenuStyle="{ width: '16rem' }"
             :frozen="col.frozen" :pt="{
                 headerContent: { class: '!h-8' },
@@ -264,7 +264,7 @@ const formatCurrency = (valor, moneda) => {
                     class="text-center rounded-lg px-2 py-1">
                     {{ data[col.field] }}
                 </p>
-                <Tag v-else-if="col.type == 'tag'" class="w-full"
+                <Tag v-else-if="col.type == 'tag'" class="w-full truncate" :title="data[col.field]"
                     :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
                     :severity="col.severitys.find((severity) => severity.text == data[col.field]).severity"
                     :value="data[col.field]" />
@@ -293,10 +293,9 @@ const formatCurrency = (valor, moneda) => {
         <Column frozen alignFrozen="right" class="w-[8%]" v-if="props.actions.length > 0">
             <template #body="{ data }">
                 <div class="flex items-center justify-center w-full">
-                    <Button v-for="   button    in    props.actions   " @click="$emit(button.event, $event, data)"
-                        :severity="button.severity" :text="button.text" :outlined="button.outlined"
-                        :rounded="button.rounded" :icon="button.icon" :label="button.label" :class="button.class"
-                        class="!h-8" />
+                    <Button v-for="button in props.actions" @click="$emit(button.event, $event, data)"
+                        :severity="button.severity" :outlined="button.outlined" :rounded="button.rounded"
+                        :icon="button.icon" :title="button.label" :class="button.class" />
                 </div>
             </template>
         </Column>
