@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Quotes\Quote;
+use App\Models\Quotes\QuoteTypeShip;
 use App\Models\Quotes\QuoteVersion;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DashboardEstimacionesController extends Controller
 {
@@ -28,6 +30,19 @@ class DashboardEstimacionesController extends Controller
 
         return response()->json([
             'quotes' => $quotes,
+            'status' => true
+        ], 200);
+    }
+
+    public function getQuotesManurity()
+    {
+        $maturities =  QuoteTypeShip::whereNotNull('maturity')->select(DB::raw('count(id) as value'), DB::raw('UPPER(maturity) as name'))
+            ->groupBy('maturity')
+            ->orderBy('maturity')
+            ->get();
+
+        return response()->json([
+            'maturities' => $maturities,
             'status' => true
         ], 200);
     }
