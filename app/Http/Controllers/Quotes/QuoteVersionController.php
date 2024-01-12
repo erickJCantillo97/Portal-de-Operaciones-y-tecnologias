@@ -33,38 +33,61 @@ class QuoteVersionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Quote $quote)
+    public function store(Request $request, QuoteVersion $quoteVersion)
     {
+
+
         $validateData = $request->validate([
             'estimador_id' => 'required|numeric',
             'customer_id' => 'required|numeric',
             'observation' => 'nullable|string',
             'expeted_answer_date' => 'required|date|after_or_equal:' . Carbon::now()->format('Y-m-d'),
             'offer_type' => 'string',
+            'coin' => 'string',
         ]);
         $empleado = collect(searchEmpleados('Num_SAP', $validateData['estimador_id']))->first();
+        $quote = Quote::where('id', $quoteVersion->quote_id)->first();
 
         $validateData['estimador_name'] = $empleado['Usuario'];
-        $quoteVersion = QuoteVersion::create([
+
+        $newQuoteVersion = QuoteVersion::create([
             'quote_id' => $quote->id,
             'version' => $quote->version->version + 1,
             'estimador_id' => $validateData['estimador_id'],
             'customer_id' => $validateData['customer_id'],
             'observation' => $validateData['observation'],
+            'coin' => $validateData['coin'],
             'estimador_name' => $validateData['estimador_name'],
             'expeted_answer_date' => $validateData['expeted_answer_date'],
             'offer_type' => $validateData['offer_type'],
         ]);
-        $quote->current_version_id = $quoteVersion->id;
+        $quote->current_version_id = $newQuoteVersion->id;
         $quote->save();
-        // Creamos una nueva version 1, con el consecutivo de la variable que se utilizó antes
-        foreach (TypeShip::whereIn('id', $request->type_ships) as $typeShip) {
-            $quoteTypeShip = QuoteTypeShip::create([
-                'quote_version_id' => $quoteVersion->id,
+        // Creamos una nueva version 1, con el consecutivo de la variable que se utilizó antes 
+        foreach (TypeShip::whereIn('id', $request->type_ships)->get() as $typeShip) {
+            $quoteTypeShip = QuoteTypeShip::where('type_ship_id', $typeShip->id)->where('quote_version_id', $quoteVersion->id)->first();
+            // Añadir una nueva clase a una version nueva 
+            QuoteTypeShip::create([
+                'quote_version_id' => $newQuoteVersion->id,
                 'type_ship_id' => $typeShip->id,
                 'name' => $typeShip->name,
+                'scope' => $quoteTypeShip->scope ?? null,
+                'maturity' => $quoteTypeShip->maturity ?? null,
+                'units' => $quoteTypeShip->units ?? null,
+                'rate_buy_usd' => $quoteTypeShip->rate_buy_usd ?? null,
+                'rate_buy_eur' => $quoteTypeShip->rate_buy_eur ?? null,
+                'iva' => $quoteTypeShip->iva ?? null,
+                'white_paper' => $quoteTypeShip->white_paper ?? null,
+                'white_paper_number' => $quoteTypeShip->white_paper_number ?? null,
             ]);
         }
+
+        $quote = QuoteVersion::with('quote', 'quoteTypeShips')->where('id', $newQuoteVersion->id)->first();
+
+        return response()->json([
+            'status' => true,
+            'quote' => $quote
+        ]);
     }
 
     /**

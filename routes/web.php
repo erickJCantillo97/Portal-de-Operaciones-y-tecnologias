@@ -1,6 +1,7 @@
 <?php
 
 use App\Events\TestWebsocket;
+use App\Http\Controllers\Dashboard\DashboardEstimacionesController;
 use App\Http\Controllers\Suggestion\SuggestionController;
 use App\Ldap\User;
 use App\Models\Gantt\Task;
@@ -137,27 +138,7 @@ Route::get('costoPersonal', function () {
     return $sum;
 });
 
-Route::get('/timeline', function () {
-
-    $taskProject = VirtualTask::whereNull('task_id')->get()->map(function ($item) {
-
-        return [
-            'id' => $item->id,
-            'project_id' => $item->project->id,
-            'avance' => number_format($item['percentDone'], 2),
-            'name' => $item['name'],
-            'file' => $item->project->contract->ship->file,
-            'duracion' => $item->duration,
-            'fechaI' => $item->startDate,
-            'fechaF' => $item->endDate,
-            'unidadDuracion' => $item->durationUnit,
-        ];
-    });
-
-    return Inertia::render('TimeLine', [
-        'projects' => $taskProject,
-    ]);
-})->name('timeline');
+Route::get('/timeline', [DashboardEstimacionesController::class, 'getQuotesStatus'])->name('timeline');
 
 
 Route::get('anterior', function () {
