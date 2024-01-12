@@ -134,7 +134,7 @@ onMounted(() => {
                       <Button @click="toggle($event, commentItem)" v-if="commentItem.user_id === $page.props.auth.user.id"
                         class="!size-4" type="button" icon="pi pi-ellipsis-v" aria-haspopup="true"
                         aria-controls="overlay_menu" text />
-                      <Button class="!size-4" type="button" icon="pi pi-reply" aria-haspopup="true"
+                      <Button class="!size-4 rotate-180 p-2" type="button" icon="pi pi-reply" aria-haspopup="true"
                         aria-controls="overlay_menu" text v-else @click="reply(commentItem)">
                       </Button>
                     </div>

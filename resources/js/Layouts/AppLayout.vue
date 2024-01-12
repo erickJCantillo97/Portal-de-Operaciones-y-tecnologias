@@ -18,21 +18,14 @@
                         <Bars3CenterLeftIcon class="w-6 h-6" aria-hidden="true" />
                     </button>
                     <div class="items-center justify-between hidden lg:flex">
-                        <h1 class="hidden text-xl font-extrabold lg:block text-primary">Portal de Operaciones Tecnológicas e
-                            Inteligencia Artificial</h1>
+                        <h1 class="hidden text-xl font-extrabold lg:block text-primary">
+                            Portal de Operaciones Tecnológicas e Inteligencia Artificial
+                        </h1>
                         <DolarTRM />
                     </div>
                 </div>
                 <div class="flex items-center ">
-                    <button type="button" class="text-gray-400 hover:text-gray-500">
-                        <span class="sr-only">View notifications</span>
-                        <div class="relative w-6 h-6" title="Notificaciones">
-                            <BellIcon aria-hidden="true" />
-                            <span class="flex w-3 h-3">
-                                <span class="absolute inline-flex w-3 h-3 ml-3 bg-red-500 rounded-full -mt-7"></span>
-                            </span>
-                        </div>
-                    </button>
+                    <FlyoutNotificationsMenu />
                     <DropdownSetting title="Utilidades"></DropdownSetting>
                     <Menu as="div" class="relative inline-block text-left">
                         <div title="Perfil">
@@ -109,7 +102,7 @@
                                                     class="relative flex-col p-2 bg-blue-200 hover:animate-pulse focus:outline-none opacity-80 rounded-tl-3xl rounded-bl-3xl"
                                                     @click="sugerenciaVisible = false">
                                                     <XCircleIcon class="w-6 -rotate-90" />
-                                                    <p class="rotate-180" style="writing-mode: vertical-lr;">Cerrar</p>
+                                                    <p class="rotate-180" style="writing-mode: vertical-lr">Cerrar</p>
                                                 </button>
                                             </div>
                                         </TransitionChild>
@@ -122,13 +115,12 @@
                                                         <div class="flex items-center justify-between">
                                                             <DialogTitle
                                                                 class="text-base font-semibold leading-6 text-white">
-                                                                ¡Bienvenido a TOP!</DialogTitle>
+                                                                ¡Bienvenido a TOP!
+                                                            </DialogTitle>
                                                         </div>
                                                         <div class="mt-1">
-                                                            <p class="text-xs text-indigo-300">En este espacio podras
-                                                                informarnos
-                                                                tus opiniones, sugerencias y errores que encuentes en el
-                                                                portal
+                                                            <p class="text-xs text-indigo-300">
+                                                                En este espacio podrás informarnos tus opiniones, sugerencias y errores que encuentes en el portal
                                                             </p>
                                                         </div>
                                                     </div>
@@ -240,7 +232,6 @@
 </template>
 
 <script setup>
-
 import { ref, onMounted, watch } from 'vue'
 import { Menu, MenuButton, MenuItems, MenuItem, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { router } from '@inertiajs/vue3'
@@ -248,18 +239,19 @@ import {
     Bars3CenterLeftIcon
 } from '@heroicons/vue/24/outline'
 import {
-    BellIcon, ChevronDownIcon, ArrowLeftCircleIcon,
+    ChevronDownIcon, ArrowLeftCircleIcon,
     QuestionMarkCircleIcon,
     XCircleIcon
 } from '@heroicons/vue/20/solid'
-import MenuSidebar from '@/Components/MenuSidebar.vue';
-import DropdownSetting from '@/Components/DropdownSetting.vue';
-import Button from '@/Components/Button.vue';
-import html2canvas from 'html2canvas';
-import RadioButton from 'primevue/radiobutton';
-import DolarTRM from "@/Components/DolarTRM.vue";
-import { useSweetalert } from '@/composable/sweetAlert';
-const { toast } = useSweetalert();
+import MenuSidebar from '@/Components/MenuSidebar.vue'
+import DropdownSetting from '@/Components/DropdownSetting.vue'
+import Button from '@/Components/Button.vue'
+import html2canvas from 'html2canvas'
+import RadioButton from 'primevue/radiobutton'
+import DolarTRM from "@/Components/DolarTRM.vue"
+import FlyoutNotificationsMenu from '@/Components/FlyoutNotificationsMenu.vue'
+import { useSweetalert } from '@/composable/sweetAlert'
+const { toast } = useSweetalert()
 const menu = ref(false)
 const sugerencia = ref('')
 const tipoReporte = ref('Sugerencia')
@@ -268,15 +260,15 @@ const suggestions = ref([])
 
 onMounted(() => {
     loadSuggestions()
-});
+})
 
 const logout = () => {
-    router.post(route('logout'));
-};
+    router.post(route('logout'))
+}
 
 const createSuggestion = () => {
     if (sugerencia.value.length < 20) {
-        toast('¡Debe tener minimo 20 caracteres la sugerencia!', 'error');
+        toast('¡Debe tener minimo 20 caracteres la sugerencia!', 'error')
     } else {
         html2canvas(document.body).then(canvas => {
             router.post(route('suggestion.store'),
@@ -287,14 +279,14 @@ const createSuggestion = () => {
                     urlAddress: document.location.href
                 }, {
                 onSuccess: res => {
-                    toast('¡Se ha enviado con exito! Gracias por su reporte', 'success');
+                    toast('¡Se ha enviado con exito! Gracias por su reporte', 'success')
                     sugerenciaVisible.value = false
                     sugerencia.value = null
                     loadSuggestions()
                 },
                 onError: (e) => {
-                    console.log(e);
-                    toast('¡Ha ocurrido un error', 'error');
+                    console.log(e)
+                    toast('¡Ha ocurrido un error', 'error')
                 }
             }
             )
