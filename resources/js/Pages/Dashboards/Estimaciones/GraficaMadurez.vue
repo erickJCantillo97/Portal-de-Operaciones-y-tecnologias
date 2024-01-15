@@ -7,7 +7,7 @@ const series = ref([])
 const loading = ref(true)
 const chartOptions = ref({
     title: {
-        text: 'Madurez',
+        text: 'Estimaciones por madurez',
         align: 'center',
         margin: 0
     },

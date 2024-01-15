@@ -13,17 +13,19 @@ const chartOptions = ref({
     },
     dataLabels: {
         enabled: true,
-        formatter: function (val) {
-            return val + "%";
-        },
         offsetY: -20,
         style: {
             fontSize: '12px',
             colors: ["#304758"]
         }
     },
+    yaxis: {
+        labels: {
+            show: false,
+        }
+    },
     xaxis: {
-        position: 'top',
+        position: 'bottom',
         axisBorder: {
             show: false
         },
@@ -42,32 +44,28 @@ const chartOptions = ref({
                 }
             }
         },
-        tooltip: {
-            enabled: true,
-        }
     },
-    yaxis: {
-        axisBorder: {
-            show: false
-        },
-        axisTicks: {
-            show: false,
-        },
-        labels: {
-            show: false,
-            formatter: function (val) {
-                return val + "%";
-            }
+    theme: {
+        palette: 'palette1' // upto palette10
+    },
+    tooltip: {
+        enabled: true,
+        y: {
+            formatter: function (value) {
+                return parseInt(value)
+            },
         }
-
     }
 })
 const getQuotesMadurity = () => {
     loading.value = true
-    axios.get(route("get.quotes.manurity")).then((res) => {
-        series.value.name = 'Estimaciones'
-        series.value.data = res.data.maturities.map(maturity => (parseInt(maturity.value)));
-        chartOptions.value.xaxis.categories = res.data.maturities.map(maturity => maturity.name);
+    axios.get(route("get.quotes.status.week")).then((res) => {
+        const data = Object.values(res.data)
+        series.value = [{
+            'name': 'Cantidad',
+            'data': data.map(quote => (parseInt(quote.value)))
+        }]
+        chartOptions.value.xaxis.categories = Object.values(res.data).map(status => status.status + '(s)');
         loading.value = false
     });
 }

@@ -19,8 +19,7 @@ const loading = ref(true)
 const getQuotes = () => {
     loading.value = true
     axios.get(route("get.quotes.status", { status: filter.value })).then((res) => {
-        console.log(res.data.quotes)
-        quotes.value = res.data.quotes;
+        quotes.value = Object.values(res.data.quotes);
         loading.value = false
     });
 }
