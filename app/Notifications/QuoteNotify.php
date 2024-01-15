@@ -9,9 +9,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class QuoteNotify extends Notification implements ShouldQueue
+class QuoteNotify extends Notification
 {
-    use Queueable;
+    // use Queueable;
 
     protected $quote;
     protected $user;

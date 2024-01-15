@@ -167,6 +167,6 @@ Route::get('anterior', function () {
 Route::get('prueba_notificacion', function () {
     $quote = Quote::with('version', 'version.quoteTypeShips')->where('id', 1)->first();
     $user = UserNotify::where('id', Auth::user()->id)->first();
-    // Notification::route('mail', ['gienbuja@gmail.com' => $user->short_name])->notify(new QuoteNotify($user, $quote, 'asignament'));
-    Auth::user()->notify(new QuoteNotify($user, $quote, ''));
+    Notification::route('mail', [$user->email => $user->short_name])->notify(new QuoteNotify($user, $quote, 'asignament'));
+    // Auth::user()->notify(new QuoteNotify($user, $quote, ''));
 });
