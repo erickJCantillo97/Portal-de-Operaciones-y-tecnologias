@@ -49,8 +49,8 @@ class QuoteNotify extends Notification
                 ->subject('Nueva estimacion asignada')
                 ->greeting('¡Hola! ' . $this->user->short_name)
                 ->line('Se le ha asignado la estimacion #' . $this->quote->consecutive
-                    . ' para su realizacion, de clic en el botón para ingresar a TOP y completarla.Use su usuario de Windows y la contraseña de su usuario de Windows')
-                ->action('Ir a estimacion', url('http://localhost'))
+                    . ' para su realización, haga clic en el botón para ingresar a TOP y completarla. Use su usuario de Windows y la contraseña de su usuario de Windows')
+                ->action('Ir a estimacion', route('quotes.index'))
                 ->line('¡Gracias por usar la aplicacion!')
                 ->salutation('¡Saludos!');
         } else if ($this->type == 'response') {
