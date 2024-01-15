@@ -27,7 +27,7 @@ getQuotes()
 
 </script>
 <template>
-    <CustomDataTable :data="quotes" title="Estimaciones" :loading :showColumns="false" :paginator="false"
+    <CustomDataTable :data="quotes" title="Estimaciones" :loading="loading" :showColumns="false" :paginator="false"
         :columnas="columnas" :filter="false">
         <template #buttonHeader>
             <Dropdown v-model="filter" class="h-8" @change="getQuotes()" :options="filters" :pt="{
