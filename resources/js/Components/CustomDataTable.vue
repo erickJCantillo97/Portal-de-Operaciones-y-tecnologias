@@ -12,6 +12,7 @@ import Tag from 'primevue/tag';
 import InputNumber from 'primevue/inputnumber';
 import InputSwitch from 'primevue/inputswitch';
 import ApplicationLogo from './ApplicationLogo.vue';
+import Loading from './Loading.vue';
 
 const props = defineProps({
     data: {
@@ -20,7 +21,7 @@ const props = defineProps({
     },
     cacheName: {
         type: String,
-        default: ''
+        default: null
     },
     columnas: {
         type: Array,
@@ -45,6 +46,18 @@ const props = defineProps({
     title: {
         type: String,
         default: ''
+    },
+    showColumns: {
+        type: Boolean,
+        default: true
+    },
+    paginator: {
+        type: Boolean,
+        default: true
+    },
+    loading: {
+        type: Boolean,
+        default: false
     }
 })
 
@@ -116,11 +129,11 @@ const formatCurrency = (valor, moneda) => {
 </script>
 
 <template>
-    <DataTable id="tabla" :value="data" :paginator="data.length > 0" :rows="rows" selectionMode="single"
-        tableStyle="min-width: 70rem" sortMode="multiple" scrollable scrollHeight="flex"
+    <DataTable id="tabla" :value="data" :paginator="data.length > 0 && paginator" :rows="rows" selectionMode="single"
+        tableStyle="" sortMode="multiple" scrollable scrollHeight="flex" :loading="loading"
         currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort v-model:filters="filters"
         stripedRows filterDisplay="menu" class="p-datatable-sm text-xs p-1 rounded-md" stateStorage="session"
-        :stateKey="'dt-' + title.toLowerCase() + '-state-session'" :globalFilterFields="globalFilterFields"
+        :stateKey="cacheName ? 'dt-' + cacheName + '-state-session' : null" :globalFilterFields="globalFilterFields"
         @row-click="$emit('rowClic', $event)"
         paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink" :pt="{
             paginator: {
@@ -133,15 +146,16 @@ const formatCurrency = (valor, moneda) => {
                 previousPageButton: '!h-8 !rounded-md',
                 nextPageButton: '!h-8 !rounded-md',
                 lastPageButton: '!h-8 !rounded-md'
-            }
+            },
+            loadingOverlay: '!bg-white'
         }
             ">
         <template #header>
             <div class="">
-                <span class="flex justify-between">
-                    <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
+                <span class="flex justify-between ">
+                    <p class="text-xl h-ful flex items-center font-semibold leading-6 capitalize text-primary">
                         {{ title }}
-                    </h1>
+                    </p>
                     <slot name="buttonHeader" />
                 </span>
                 <div class="flex items-center " :class="filter ? 'justify-between' : 'justify-end'">
@@ -160,8 +174,9 @@ const formatCurrency = (valor, moneda) => {
                     </div>
                     <div class="space-x-2">
                         <Button v-if="exportRute != ''" @click="exportar" icon="fa-solid fa-file-excel" class="!w-8" />
-                        <MultiSelect v-model="columnasSelect" display="chip" :options="props.columnas" optionLabel="header"
-                            placeholder="Selecciona columnas a mostrar" class="md:w-20rem w-min h-8" :pt="{
+                        <MultiSelect v-if="showColumns" v-model="columnasSelect" display="chip" :options="props.columnas"
+                            optionLabel="header" placeholder="Selecciona columnas a mostrar" class="md:w-20rem w-min h-8"
+                            :pt="{
                                 root: '!border-0 !ring-0',
                                 trigger: '!hidden',
                                 labelContainer: '!p-0 ',
@@ -190,7 +205,7 @@ const formatCurrency = (valor, moneda) => {
         </template>
         <template #loading>
             <div class="flex justify-center">
-                Cargando...
+                <Loading />
             </div>
         </template>
         <template #paginatorstart>

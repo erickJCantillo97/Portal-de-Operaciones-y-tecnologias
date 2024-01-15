@@ -20,10 +20,10 @@ class User extends Model
         // Due to LDAP's multi-valued nature, all values will be
         // contained inside of an array. We will attempt to
         // retrieve the first one, or supply a default.
-        if(!isset($value)){
+        if (!isset($value)) {
             return 'sin Foto';
         }
-        $data = $value[0] ;
+        $data = $value[0];
         $image = base64_encode($data);
 
         $mime = 'image/jpeg';
@@ -38,4 +38,7 @@ class User extends Model
 
         return "data:$mime;base64,$image";
     }
+
+
+
 }

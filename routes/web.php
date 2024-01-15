@@ -4,6 +4,7 @@ use App\Events\TestWebsocket;
 use App\Http\Controllers\Dashboard\DashboardEstimacionesController;
 use App\Http\Controllers\Suggestion\SuggestionController;
 use App\Ldap\User;
+use App\Models\User as UserNotify;
 use App\Models\Comment;
 use App\Models\Gantt\Task;
 use App\Models\Process;
@@ -16,9 +17,13 @@ use App\Models\Quotes\QuoteVersion;
 use App\Models\SWBS\SubSystem;
 use App\Models\SWBS\System;
 use App\Models\VirtualTask;
+use App\Notifications\QuoteAssignmentNotify;
+use App\Notifications\QuoteNotify;
 use Carbon\Carbon;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -164,4 +169,11 @@ Route::get('anterior', function () {
     //     ]);
     // }
     // return Customer::get();
+});
+
+Route::get('prueba_notificacion', function () {
+    $quote = Quote::with('version', 'version.quoteTypeShips')->where('id', 1)->first();
+    $user = UserNotify::where('id', Auth::user()->id)->first();
+    Notification::route('mail', [$user->email => $user->short_name])->notify(new QuoteNotify($user, $quote, 'asignament'));
+    // Auth::user()->notify(new QuoteNotify($user, $quote, ''));
 });

@@ -61,12 +61,20 @@ class User extends Authenticatable implements LdapAuthenticatable
     protected $appends = [
         'profile_photo_url',
         'short_name',
-        'photo'
+        'photo',
+        'email'
     ];
 
 
-    public function getShortNameAttribute(){
-        return explode(' ', $this->name)[0] .' '.explode(' ', $this->name)[count(explode(' ', $this->name)) - 2 > -1 ? count(explode(' ', $this->name)) - 2: 0];
+    public function getEmailAttribute()
+    {
+        return $this->username . '@cotecmar.com';
+    }
+
+
+    public function getShortNameAttribute()
+    {
+        return explode(' ', $this->name)[0] . ' ' . explode(' ', $this->name)[count(explode(' ', $this->name)) - 2 > -1 ? count(explode(' ', $this->name)) - 2 : 0];
     }
 
     public function getPhotoAttribute()
@@ -75,10 +83,10 @@ class User extends Authenticatable implements LdapAuthenticatable
         // Due to LDAP's multi-valued nature, all values will be
         // contained inside of an array. We will attempt to
         // retrieve the first one, or supply a default.
-        if(!isset($value)){
+        if (!isset($value)) {
             return $this->profile_photo_url;
         }
-        $data = $value[0] ;
+        $data = $value[0];
         $image = base64_encode($data);
 
         $mime = 'image/jpeg';
