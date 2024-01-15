@@ -31,5 +31,5 @@ getQuotesMadurity()
 
 </script>
 <template>
-    <VueApexCharts type="pie" v-if="!loading" :options="chartOptions" :series width="380" class="flex justify-center" />
+    <VueApexCharts type="pie" v-if="!loading" :options="chartOptions" series:series width="380" class="flex justify-center" />
 </template>
