@@ -93,7 +93,13 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         ]);
     });
 
+    //SUGERENCIAS
     Route::resource('suggestion', SuggestionController::class);
+
+    //NOTIFICACIONES
+    Route::get('getNotifications', function () {
+        return Inertia::render('Notifications/Index');
+    })->name('notifications.index');
 });
 
 Route::get('recuperarDatos', function () {

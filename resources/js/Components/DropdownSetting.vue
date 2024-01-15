@@ -2,7 +2,7 @@
     <div class="max-w-sm">
         <Popover v-slot="{ open }" class="relative">
             <PopoverButton :class="open ? '' : 'text-opacity-90'"
-                class="group inline-flex items-center rounded-md p-2  text-base font-medium text-white hover:text-opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                class="group inline-flex items-center hover:bg-gray-100 p-1 rounded-full  text-base font-medium text-white hover:text-opacity-100 focus:outline-none">
                 <AdjustmentsVerticalIcon :class="open ? '' : 'text-opacity-80'"
                     class="w-5 text-primary transition duration-150 ease-in-out group-hover:text-opacity-100"
                     aria-hidden="true" />

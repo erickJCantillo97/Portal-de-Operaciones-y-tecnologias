@@ -24,9 +24,9 @@
                         <DolarTRM />
                     </div>
                 </div>
-                <div class="flex items-center ">
-                    <FlyoutNotificationsMenu />
-                    <DropdownSetting title="Utilidades"></DropdownSetting>
+                <div class="flex items-center">
+                    <FlyoutNotificationsMenu title="Notificaciones" />
+                    <DropdownSetting title="Utilidades" />
                     <Menu as="div" class="relative inline-block text-left">
                         <div title="Perfil">
                             <MenuButton
