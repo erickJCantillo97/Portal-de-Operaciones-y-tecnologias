@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notification;
 
 class QuoteNotify extends Notification
 {
-    // use Queueable;
+    use Queueable;
 
     protected $quote;
     protected $user;

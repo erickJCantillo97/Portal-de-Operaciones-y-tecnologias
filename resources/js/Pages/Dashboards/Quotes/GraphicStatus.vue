@@ -45,9 +45,6 @@ const chartOptions = ref({
             }
         },
     },
-    theme: {
-        palette: 'palette1' // upto palette10
-    },
     tooltip: {
         enabled: true,
         y: {
