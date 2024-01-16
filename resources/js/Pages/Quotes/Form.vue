@@ -175,7 +175,7 @@ const quoteUpdate = () => {
     })
 }
 
-const quoteShipsSave = () => {
+const quoteShipsSave = (revision) => {
     loadingButton.value = true
     Swal.fire({
         title: '¿Desea actualizar los datos de las clases en la estimacion?',
@@ -184,7 +184,7 @@ const quoteShipsSave = () => {
         confirmButtonText: 'Guardar',
         denyButtonText: 'Cancelar'
     }).then(async (result) => {
-        await axios.post(route('quote.version.type_ship.update', props.quote.id), { type_ships: quoteShips.value }).then((res) => {
+        await axios.post(route('quote.version.type_ship.update', props.quote.id), { type_ships: quoteShips.value, revision }).then((res) => {
             quoteShips.value = res.data.quote.quote_type_ships
             toast('Datos de las clases actualizados correctamente', 'success')
             modEdit.value = false
@@ -418,10 +418,10 @@ const toggle = (event) => {
                         </span>
                     </div>
                     <span class="flex items-end gap-2" v-if="!modEdit">
-                        <Button severity="success" @click="quoteShipsSave" icon="fa-solid fa-floppy-disk"
+                        <Button severity="success" @click="quoteShipsSave(false)" icon="fa-solid fa-floppy-disk"
                             :loading="loadingButton" label="Guardar" class="!h-8"></Button>
-                        <Button severity="primary" icon="fa-solid fa-paper-plane" :loading="loadingButton"
-                            label="Enviar a revision" class="!h-8"></Button>
+                        <Button severity="primary" @click="quoteShipsSave(true)" icon="fa-solid fa-paper-plane"
+                            :loading="loadingButton" label="Enviar a revision" class="!h-8"></Button>
                     </span>
 
                 </span>
