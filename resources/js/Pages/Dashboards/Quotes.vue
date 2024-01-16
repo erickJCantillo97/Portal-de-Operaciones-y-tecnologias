@@ -5,6 +5,7 @@ import { ref } from 'vue';
 import TableQuotes from '@/Pages/Dashboards/Quotes/TableQuotes.vue';
 import GraphicStatus from '@/Pages/Dashboards/Quotes/GraphicStatus.vue';
 import DataEstimatorCard from '@/Pages/Dashboards/Quotes/DataEstimatorCard.vue';
+import GraphicMadurityTime from './Quotes/GraphicMadurityTime.vue';
 
 const prueba = ref()
 const prueba2 = ref()
@@ -16,6 +17,7 @@ const prueba2 = ref()
         <TableQuotes class="" />
         <GraphicMadurity class="" />
         <GraphicStatus />
+        <GraphicMadurityTime class="" />
         <DataEstimatorCard />
     </div>
     <!-- <div>
