@@ -11,7 +11,7 @@ const notifications = [
   { name: 'Notificación 3', description: 'Lorem Ipsum', icon: ChartPieIcon },
   { name: 'Notificación 4', description: 'Lorem Ipsum', icon: ChartPieIcon },
   { name: 'Notificación 5', description: 'Lorem Ipsum', icon: ChartPieIcon },
-  // { name: 'Notificación 5', description: 'Lorem Ipsum', href:'#' icon: ChartPieIcon },
+  // { name: 'Notificación 6', description: 'Lorem Ipsum', href:'#' icon: ChartPieIcon },
 ]
 
 const callsToAction = [

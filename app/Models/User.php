@@ -62,14 +62,9 @@ class User extends Authenticatable implements LdapAuthenticatable
         'profile_photo_url',
         'short_name',
         'photo',
-        'email'
     ];
 
 
-    public function getEmailAttribute()
-    {
-        return $this->username . '@cotecmar.com';
-    }
 
 
     public function getShortNameAttribute()
@@ -101,5 +96,4 @@ class User extends Authenticatable implements LdapAuthenticatable
 
         return "data:$mime;base64,$image";
     }
-
 }
