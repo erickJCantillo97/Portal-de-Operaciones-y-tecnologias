@@ -38,7 +38,7 @@ onMounted(() => {
             <a href="#" class="focus:outline-none">
               <span class="absolute inset-0" aria-hidden="true" />
               <p class="text-sm font-medium text-gray-900">{{ person.name }}</p>
-              <p class="truncate text-sm text-gray-500">{{ person.quotes }} Estimaciones</p>
+              <p class="truncate text-sm text-gray-500">{{ person.quotes }} Estimación(es)</p>
             </a>
           </div>
           <div>
