@@ -78,6 +78,7 @@ return [
                     'oficina' => 'physicaldeliveryofficename',
                     'num_sap' => 'employeenumber',
                     'identificacion' => 'employeeid',
+                    'email' => 'mail',
                     'cargo' => 'title'
                 ],
             ],
