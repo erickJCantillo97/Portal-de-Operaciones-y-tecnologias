@@ -50,7 +50,7 @@ const props = defineProps({
     maxFractionDigits: {
         type: Number,
         default: null
-    }
+    },
 })
 
 
@@ -61,13 +61,13 @@ const input = defineModel('input', {
 </script>
 <template>
     <div class="flex flex-col">
-        <label v-if="label && !floatLabel" :for="identify" class="-mb-0.5">{{ label }}</label>
+        <label v-if="label && !floatLabel" :for="id" class="-mb-0.5">{{ label }}</label>
         <span class="p-float-label">
             <InputNumber v-if="type == 'number'" :id :disabled :placeholder :minFractionDigits :maxFractionDigits
-                :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="identify + '-help'" :useGrouping />
+                :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" :useGrouping />
             <InputText v-else size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''" v-model="input"
-                :type :aria-describedby="identify + '-help'" />
-            <label v-if="floatLabel && label" :for="identify" class="">{{ label }}</label>
+                :type :aria-describedby="id + '-help'" />
+            <label v-if="floatLabel && label" :for="id" class="">{{ label }}</label>
         </span>
         <small :class="invalid ? 'p-error' : ''" v-if="help || invalid">{{ invalid ? errorMessage : help }}</small>
     </div>

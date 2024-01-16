@@ -72,10 +72,7 @@ onMounted(() => {
 <template>
     <AppLayout>
         <div class="overflow-y-scroll">
-
-            <div class="flex justify-between">
-                <UserHeader />
-            </div>
+            <UserHeader />
             <Quotes />
             <!-- <Projects />
             <div class="p-8 m-1 shadow-md rounded-xl">
