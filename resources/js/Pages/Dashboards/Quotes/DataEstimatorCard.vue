@@ -1,21 +1,22 @@
 <script setup>
-import { EllipsisVerticalIcon } from '@heroicons/vue/20/solid'
+import { ref, onMounted } from 'vue'
 import Badge from 'primevue/badge'
-import { ref } from 'vue'
-const loading = ref(false)
+import CardSkeleton from '@/Components/CardSkeleton.vue'
 
 const people = ref([])
+const showCardSkeleton = ref(true)
 
-const getEstimatorData = () => {
-  loading.value = true
-  axios.get(route("get.estimator.data")).then((res) => {
-    people.value = res.data.people
-    console.log(people.value)
-  })
-  loading.value = false
+const getEstimatorData = async () => {
+  await axios.get(route('get.estimator.data'))
+    .then((res) => {
+      people.value = res.data.people
+      showCardSkeleton.value = false
+    })
 }
-getEstimatorData()
 
+onMounted(() => {
+  getEstimatorData()
+})
 </script>
 
 <template>
@@ -24,13 +25,14 @@ getEstimatorData()
       <h3 class="text-white text-lg font-semibold p-1">Tiempo Promedio de Respuesta de Estimadores</h3>
     </div>
     <div class="max-h-full h-56 p-3 overflow-y-auto custom-scroll border rounded-lg">
+      <CardSkeleton v-if="showCardSkeleton" />
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div v-for="person in  people " :key="person.email"
           class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white p-3 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400"
           v-tooltip="'Proceso: 3 \n Entregada: 5 \n Pendiente por Firma: 1 \n Firmada: 6 \n No Firmada: 1 \n Contratada: 2'"
           type="text" placeholder="Right">
           <div class="flex-shrink-0">
-            <img class="size-10 rounded-full" :src="person.photo" alt="" />
+            <img class="size-10 object-cover rounded-full" :src="person.photo" alt="" />
           </div>
           <div class="min-w-0 flex-1">
             <a href="#" class="focus:outline-none">
@@ -40,7 +42,7 @@ getEstimatorData()
             </a>
           </div>
           <div>
-            <Badge :value="person.promedio + ' Dias'"></Badge>
+            <Badge :value="person.average + ' Dias'"></Badge>
           </div>
         </div>
       </div>

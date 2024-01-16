@@ -94,7 +94,7 @@ class DashboardEstimacionesController extends Controller
                 $empleado = searchEmpleados('Usuario', $quote['estimador_name'])->first();
 
                 return [
-                    'promedio' => $quote['promedio'],
+                    'average' => $quote['promedio'],
                     'quotes' => QuoteVersion::where('estimador_name', $quote['estimador_name'])->count(),
                     'name' => $empleado['Nombres_Apellidos'],
                     'photo' => User::where('userprincipalname', $empleado['Correo'])->first()->photo()
