@@ -4,6 +4,7 @@ import axios from "axios";
 import VueApexCharts from 'vue3-apexcharts';
 import Empty from '@/Components/Empty.vue';
 import Loading from '@/Components/Loading.vue';
+import Card from 'primevue/card';
 
 const series = ref([])
 const loading = ref(true)
@@ -82,5 +83,5 @@ getQuotesMadurity()
 <template>
     <Loading v-if="loading"></loading>
     <Empty v-else-if="empty" message="Aun sin estados que mostrar"></Empty>
-    <VueApexCharts type="bar" v-else :options="chartOptions" :series="series" width="380" class="flex justify-center" />
+    <VueApexCharts v-else type="bar" :options="chartOptions" :series="series" height="200" class="flex justify-center" />
 </template>

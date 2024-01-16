@@ -13,11 +13,11 @@ const prueba2 = ref()
 
 
 <template>
-    <div class="grid grid-cols-2">
-        <TableQuotes class="" />
-        <GraphicMadurity class="" />
+    <div class="grid sm:grid-cols-2 gap-3">
+        <TableQuotes />
+        <GraphicMadurity />
         <GraphicStatus />
-        <GraphicMadurityTime class="" />
+        <GraphicMadurityTime />
         <DataEstimatorCard />
     </div>
     <!-- <div>
