@@ -1,9 +1,10 @@
 <script setup>
 import CustomDataTable from '@/Components/CustomDataTable.vue';
 import Button from 'primevue/button';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import axios from "axios";
 import Dropdown from 'primevue/dropdown';
+import Card from 'primevue/card';
 const columnas = [
     { field: 'consecutive', header: 'Consecutivo' },
     { field: 'name', header: 'Nombre' },

@@ -19,7 +19,14 @@ const chartOptions = ref({
         formatter: function (val) {
             return val + "%"
         },
-    }
+    },
+    legend: {
+        floating: true,
+        position: 'right',
+        horizontalAlign: 'right',
+        fontSize: '11px',
+        fontWeight: 400,
+    },
 })
 const getQuotesMadurity = () => {
     loading.value = true
@@ -41,5 +48,5 @@ getQuotesMadurity()
 <template>
     <Loading v-if="loading"></loading>
     <Empty v-else-if="empty" message="Aun sin cantidades que mostrar"></Empty>
-    <VueApexCharts type="pie" v-else :options="chartOptions" :series="series" width="380" class="flex justify-center" />
+    <VueApexCharts type="pie" v-else :options="chartOptions" height="300" :series="series" class="flex justify-center" />
 </template>

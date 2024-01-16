@@ -4,6 +4,7 @@ import axios from "axios";
 import VueApexCharts from 'vue3-apexcharts';
 import Empty from '@/Components/Empty.vue';
 import Loading from '@/Components/Loading.vue';
+import Card from 'primevue/card';
 
 const series = ref([])
 const loading = ref(true)
@@ -20,7 +21,10 @@ const chartOptions = ref({
         style: {
             fontSize: '12px',
             colors: ["#304758"]
-        }
+        },
+        formatter: function (val) {
+            return val + " dias";
+        },
     },
     yaxis: {
         labels: {
@@ -52,23 +56,22 @@ const chartOptions = ref({
         enabled: true,
         y: {
             formatter: function (value) {
-                return parseInt(value)
+                return parseInt(value) + ' dias'
             },
         }
     }
 })
 const getMaduriTime = () => {
     loading.value = true
-    axios.get(route("get.quotes.status.week")).then((res) => {
-        const data = Object.values(res.data)
-        if (data.length == 0) {
+    axios.get(route("get.avg.manurities")).then((res) => {
+        if (res.data.values.length == 0) {
             empty.value = true
         } else {
             series.value = [{
                 'name': 'Cantidad',
-                'data': data.map(quote => (parseInt(quote.value)))
+                'data': res.data.values
             }]
-            chartOptions.value.xaxis.categories = Object.values(res.data).map(status => status.status + '(s)');
+            chartOptions.value.xaxis.categories = res.data.maturities;
             empty.value = false
         }
         loading.value = false
@@ -81,5 +84,6 @@ getMaduriTime()
 <template>
     <Loading v-if="loading"></loading>
     <Empty v-else-if="empty" message="Aun sin tiempos promedios que mostrar"></Empty>
-    <VueApexCharts type="bar" v-else :options="chartOptions" :series="series" width="380" class="flex justify-center" />
+
+    <VueApexCharts v-else type="bar" :options="chartOptions" height="200" :series="series" class="flex justify-center" />
 </template>
