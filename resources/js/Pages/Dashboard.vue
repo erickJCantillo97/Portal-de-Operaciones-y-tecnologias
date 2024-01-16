@@ -13,11 +13,8 @@ import UserHeader from "@/Components/sections/UserHeader.vue";
 // import { MagnifyingGlassIcon, PencilIcon, TrashIcon } from "@heroicons/vue/20/solid";
 
 import DataChart from "./DataChart.vue";
-// import OurTeam from "@/Components/OurTeam.vue";
-import "../../sass/dataTableCustomized.scss";
-import CustomDataTable from "@/Components/CustomDataTable.vue";
-import Estimaciones from "./Dashboards/Estimaciones.vue";
-import Proyectos from "./Dashboards/Proyectos.vue";
+import Projects from "@/Pages/Dashboards/Projects.vue";
+import Quotes from "@/Pages/Dashboards/Quotes.vue";
 
 // import TimeLine from './TimeLine.vue';
 
@@ -79,8 +76,8 @@ onMounted(() => {
             <div class="flex justify-between">
                 <UserHeader />
             </div>
-            <Estimaciones />
-            <Proyectos />
+            <Quotes />
+            <Projects />
             <div class="p-8 m-1 shadow-md rounded-xl">
                 <DataChart></DataChart>
             </div>
