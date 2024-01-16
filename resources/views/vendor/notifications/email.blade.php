@@ -32,7 +32,6 @@
 {{-- Outro Lines --}}
 @foreach ($outroLines as $line)
 {{ $line }}
-
 @endforeach
 
 {{-- Salutation --}}

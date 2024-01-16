@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Quotes;
 use App\Http\Controllers\Controller;
 use App\Models\Quotes\QuoteTypeShip;
 use App\Models\Quotes\QuoteVersion;
+use App\Notifications\QuoteNotify;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 
 class QuoteTypeShipController extends Controller
 {
@@ -72,8 +75,12 @@ class QuoteTypeShipController extends Controller
                 );
             }
 
-
             $quote = QuoteVersion::with('quote', 'quoteTypeShips')->where('id', $quoteVersion->id)->first();
+            if ($request->revision) {
+                $quote->estimador_anaswer_date = Carbon::now();
+                $quote->save();
+                Notification::route('mail', ['ecantillo@cotecmar.com' => 'ERICK J '])->notify(new QuoteNotify('ERICK J', $quote, 'response'));
+            }
             return response()->json([
                 'status' => true,
                 'quote' => $quote
