@@ -4,6 +4,7 @@ import CustomInput from '@/Components/CustomInput.vue';
 import { ref } from 'vue';
 import TableQuotes from '@/Pages/Dashboards/Quotes/TableQuotes.vue';
 import GraphicStatus from '@/Pages/Dashboards/Quotes/GraphicStatus.vue';
+import DataEstimatorCard from '@/Pages/Dashboards/Quotes/DataEstimatorCard.vue';
 import GraphicPersonsVsMadurity from './Quotes/GraphicPersonsVsMadurity.vue';
 
 const prueba = ref()
@@ -17,5 +18,6 @@ const prueba2 = ref()
         <GraphicMadurity class="" />
         <GraphicStatus />
         <GraphicPersonsVsMadurity />
+        <DataEstimatorCard />
     </div>
 </template>
