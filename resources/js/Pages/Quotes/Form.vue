@@ -143,7 +143,7 @@ const quoteNewVersion = () => {
                     }
                 }).catch((e) => {
                     console.log(e)
-                    errors.value = e.response.data.errors
+                    // errors.value = e.response.data.errors
                     toast('Hay errores en los datos a guardar', 'error')
                 })
         }

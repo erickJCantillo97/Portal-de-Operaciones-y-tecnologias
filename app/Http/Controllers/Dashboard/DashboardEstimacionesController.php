@@ -58,4 +58,22 @@ class DashboardEstimacionesController extends Controller
         });
         return $quotes;
     }
+
+    public function getAvgManurities()
+    {
+        $promedioPorDificultad = QuoteVersion::join('quote_type_ships', 'quote_versions.id', '=', 'quote_type_ships.quote_version_id')
+            ->select('quote_type_ships.maturity', DB::raw('AVG(DATEDIFF(day, quote_versions.created_at, quote_versions.estimador_anaswer_date)) AS promedio'))
+            ->groupBy('quote_type_ships.maturity')
+            ->get();
+
+        return [
+            'values' => $promedioPorDificultad->map(function ($value) {
+                return $value['promedio'];
+            }),
+            'maturities' => $promedioPorDificultad->map(function ($value) {
+                return $value['maturity'];
+            }),
+            'status' => true
+        ];
+    }
 }

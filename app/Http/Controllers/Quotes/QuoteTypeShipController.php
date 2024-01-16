@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Quotes;
 
 use App\Http\Controllers\Controller;
+use App\Models\Quotes\QuoteStatus;
 use App\Models\Quotes\QuoteTypeShip;
 use App\Models\Quotes\QuoteVersion;
 use App\Notifications\QuoteNotify;
@@ -79,7 +80,14 @@ class QuoteTypeShipController extends Controller
             if ($request->revision) {
                 $quote->estimador_anaswer_date = Carbon::now();
                 $quote->save();
-                Notification::route('mail', ['ecantillo@cotecmar.com' => 'ERICK J '])->notify(new QuoteNotify('ERICK J', $quote, 'response'));
+
+                QuoteStatus::create([
+                    'status' => 1,
+                    'user_id' => auth()->user()->id,
+                    'quote_version_id' => $quote->id,
+                    'fecha' => Carbon::now()
+                ]);
+                Notification::route('mail', ['ecantillo@cotecmar.com' => 'ERICK J'])->notify(new QuoteNotify('ERICK J', $quote, 'response'));
             }
             return response()->json([
                 'status' => true,

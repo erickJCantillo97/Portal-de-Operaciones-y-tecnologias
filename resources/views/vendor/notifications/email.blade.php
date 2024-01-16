@@ -16,7 +16,7 @@
 
 @endforeach
 
-{{-- Action Button --}}
+{{-- Action Button --}}ype
 @isset($actionText)
 <?php
     $color = match ($level) {
