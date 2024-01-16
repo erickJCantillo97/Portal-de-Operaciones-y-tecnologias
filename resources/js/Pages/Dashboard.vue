@@ -77,10 +77,10 @@ onMounted(() => {
                 <UserHeader />
             </div>
             <Quotes />
-            <Projects />
+            <!-- <Projects />
             <div class="p-8 m-1 shadow-md rounded-xl">
                 <DataChart></DataChart>
-            </div>
+            </div> -->
         </div>
         <!-- <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
                 <TimeLine :projects="props.projects"></TimeLine>
