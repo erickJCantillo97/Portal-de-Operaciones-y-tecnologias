@@ -28,10 +28,10 @@ const callsToAction = [
         <!-- <i p-badge="2" class="pi pi-bell p-overlay-badge" style="font-size: 1rem" /> -->
         <BellIcon class="size-6 text-gray-400" aria-hidden="true" />
         <div
-          class="absolute inline-flex size-4 z-10 bg-blue-500 rounded-full -mt-7 animate-[ping_3s_ease-in-out_infinite]">
+          class="absolute inline-flex size-4 z-[1] bg-blue-500 rounded-full -mt-7 animate-[ping_3s_ease-in-out_infinite]">
         </div>
         <div class="absolute inline-flex size-4 bg-blue-500 rounded-full -mt-7 ">
-          <span class="text-white text-xs z-20 ml-[0.3rem]">5</span>
+          <span class="text-white text-xs z-[2] ml-[0.3rem]">5</span>
         </div>
       </div>
     </PopoverButton>
