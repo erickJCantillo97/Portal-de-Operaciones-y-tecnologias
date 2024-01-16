@@ -48,5 +48,5 @@ getQuotesMadurity()
 <template>
     <Loading v-if="loading"></loading>
     <Empty v-else-if="empty" message="Aun sin cantidades que mostrar"></Empty>
-    <VueApexCharts type="pie" v-else :options="chartOptions" height="300" :series="series" class="flex justify-center" />
+    <VueApexCharts type="pie" v-else :options="chartOptions" height="300" :series="series" />
 </template>

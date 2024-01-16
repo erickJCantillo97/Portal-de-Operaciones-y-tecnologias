@@ -13,8 +13,8 @@ const prueba2 = ref()
 
 
 <template>
-    <div class="grid sm:grid-cols-2 gap-3">
-        <TableQuotes />
+    <div class="p-2 grid sm:grid-cols-2 gap-3">
+        <TableQuotes class="ring" />
         <GraphicMadurity />
         <GraphicStatus />
         <GraphicMadurityTime />
