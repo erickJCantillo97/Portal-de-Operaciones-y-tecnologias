@@ -2,10 +2,7 @@
 import ApplicationLogo from './ApplicationLogo.vue';
 
 defineProps({
-    message: {
-        type: String,
-        default: 'Cargando'
-    }
+    message: String
 })
 </script>
 
@@ -22,15 +19,15 @@ defineProps({
     border-radius: 50%;
     position: absolute;
     inset: 0;
-    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.3) inset;
+    box-shadow: 0 0 10px 2px rgb(46, 48, 146, 0.3) inset;
 }
 
-.loader:after {
+/* .loader:after {
     box-shadow: 0 2px 0 rgb(46 48 146) inset;
     animation: rotate 2s linear infinite;
-}
+} */
 
-@keyframes rotate {
+/* @keyframes rotate {
     0% {
         transform: rotate(0)
     }
@@ -38,7 +35,7 @@ defineProps({
     100% {
         transform: rotate(360deg)
     }
-}
+} */
 </style>
 
 <template>
@@ -46,6 +43,6 @@ defineProps({
         <span class="grid items-center justify-center loader">
             <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
         </span>
-        <p class="font-bold pt-4 animate-pulse text-primary">{{ message }}</p>
+        <p class="font-bold pt-4 text-primary">{{ message }}</p>
     </div>
 </template>

@@ -2,9 +2,12 @@
 import { ref } from 'vue';
 import axios from "axios";
 import VueApexCharts from 'vue3-apexcharts';
+import Empty from '@/Components/Empty.vue';
+import Loading from '@/Components/Loading.vue';
 
 const series = ref([])
 const loading = ref(true)
+const empty = ref()
 const chartOptions = ref({
     title: {
         text: 'Estimaciones por madurez',
@@ -21,8 +24,13 @@ const chartOptions = ref({
 const getQuotesMadurity = () => {
     loading.value = true
     axios.get(route("get.quotes.manurity")).then((res) => {
-        series.value = res.data.maturities.map(maturity => parseInt(maturity.value));
-        chartOptions.value.labels = res.data.maturities.map(maturity => maturity.name);
+        if (res.data.maturities.length == 0) {
+            empty.value = true
+        } else {
+            series.value = res.data.maturities.map(maturity => parseInt(maturity.value));
+            chartOptions.value.labels = res.data.maturities.map(maturity => maturity.name);
+            empty.value = false
+        }
         loading.value = false
     });
 }
@@ -31,5 +39,7 @@ getQuotesMadurity()
 
 </script>
 <template>
-    <VueApexCharts type="pie" v-if="!loading" :options="chartOptions" :series="series" width="380" class="flex justify-center" />
+    <Loading v-if="loading"></loading>
+    <Empty v-else-if="empty" message="Aun sin cantidades que mostrar"></Empty>
+    <VueApexCharts type="bar" v-else :options="chartOptions" :series="series" width="380" class="flex justify-center" />
 </template>

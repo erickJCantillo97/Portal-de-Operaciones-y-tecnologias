@@ -9,9 +9,11 @@ use App\Models\Quotes\Quote;
 use App\Models\Quotes\QuoteStatus;
 use App\Models\Quotes\QuoteTypeShip;
 use App\Models\Quotes\QuoteVersion;
+use App\Notifications\QuoteNotify;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -127,7 +129,7 @@ class QuoteController extends Controller
             ]);
 
             $quote = QuoteVersion::with('quote', 'quoteTypeShips')->where('id', $quoteVersion)->first();
-
+            Notification::route('mail', ['ecantillo@cotecmar.com' => $validateData['estimador_name'], 'GBUELVAS@cotecmar.com' => $validateData['estimador_name']])->notify(new QuoteNotify($validateData['estimador_name'], $quote, 'asignament'));
             return response()->json([
                 'status' => true,
                 'quote' => $quote
