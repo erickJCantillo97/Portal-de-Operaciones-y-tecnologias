@@ -39,7 +39,7 @@ getQuotes()
                 input: '!p-0'
             }">
                 <template #value="slotProps">
-                    <Button :label="slotProps.value"></Button>
+                    <Button :label="slotProps.value" text></Button>
                 </template>
             </Dropdown>
         </template>

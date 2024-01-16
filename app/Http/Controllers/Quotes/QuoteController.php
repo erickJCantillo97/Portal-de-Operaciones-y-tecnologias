@@ -120,14 +120,12 @@ class QuoteController extends Controller
                     ]);
                 }
             }
-
             QuoteStatus::create([
                 'status' => 0,
                 'user_id' => auth()->user()->id,
                 'quote_version_id' => $quoteVersion,
                 'fecha' => Carbon::now()
             ]);
-
             $quote = QuoteVersion::with('quote', 'quoteTypeShips')->where('id', $quoteVersion)->first();
             Notification::route('mail', ['ecantillo@cotecmar.com' => $validateData['estimador_name'], 'GBUELVAS@cotecmar.com' => $validateData['estimador_name']])->notify(new QuoteNotify($validateData['estimador_name'], $quote, 'asignament'));
             return response()->json([

@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Ldap\User;
 use App\Models\Quotes\Quote;
 use App\Models\Quotes\QuoteTypeShip;
 use App\Models\Quotes\QuoteVersion;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use LdapRecord\Models\OpenLDAP\User as OpenLDAPUser;
 
 class DashboardEstimacionesController extends Controller
 {
@@ -75,5 +77,36 @@ class DashboardEstimacionesController extends Controller
             }),
             'status' => true
         ];
+    }
+    public function getEstimatorData()
+    {
+        //     $estimadores = getPersonalGerenciaOficina('GECON', 'DEEST')->map(function ($estimador) {
+        //         return [
+        //             'user_id' => $estimador['Num_SAP'],
+        //             'name' => $estimador['Nombres_Apellidos'],
+        //             'email' => $estimador['Correo']
+        //         ];
+        //     })->toArray();
+
+        $people = QuoteVersion::whereNotNull('estimador_anaswer_date')->whereYear('estimador_anaswer_date', '!=', '1970')->select(DB::raw('AVG(DATEDIFF(day, created_at, estimador_anaswer_date)) AS promedio'), 'estimador_name')
+            ->groupBy('estimador_name')
+            ->get()->map(function ($quote) {
+                $empleado = searchEmpleados('Usuario', $quote['estimador_name'])->first();
+
+                return [
+                    'average' => $quote['promedio'],
+                    'quotes' => QuoteVersion::where('estimador_name', $quote['estimador_name'])->count(),
+                    'name' => $empleado['Nombres_Apellidos'],
+                    'photo' => User::where('userprincipalname', $empleado['Correo'])->first()->photo()
+                ];
+            });
+
+        return response()->json(
+            [
+                'people' => $people,
+                'status' => true
+            ],
+            200
+        );
     }
 }
