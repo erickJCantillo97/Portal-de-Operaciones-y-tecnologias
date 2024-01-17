@@ -222,10 +222,15 @@ const gantt = new Gantt(({
         filter: true,
         pdfExport: {
             exportServer: 'https://dev.bryntum.com:8082',
-            // Required for font-awesome icons to display correctly
-
-            // headerTpl,
-            // footerTpl
+            headerTpl: ({ currentPage, totalPages }) => `
+                <div class="demo-export-header p-10">
+                    <img src="cotecmar-logo.svg"/>
+                    <dl>
+                        <dt>Date: ${DateHelper.format(new Date(), 'll LT')}</dt>
+                        <dd>${totalPages ? `Page: ${currentPage + 1}/${totalPages}` : ''}</dd>
+                    </dl>
+                </div>`,
+            footerTpl: () => `<h3 class="p-10">©COTECMAR</h3>`
         },
         projectLines: false,
         mspExport: true,

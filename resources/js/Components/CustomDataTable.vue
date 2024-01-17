@@ -308,7 +308,7 @@ const formatCurrency = (valor, moneda) => {
         <Column frozen alignFrozen="right" class="w-[8%]" v-if="props.actions.length > 0">
             <template #body="{ data }">
                 <div class="flex items-center justify-center w-full">
-                    <Button v-for="button in props.actions" @click="$emit(button.event, $event, data)"
+                    <Button v-for="button in props.actions" @click="$emit(button.event, $event, data)" :text="button.text"
                         :severity="button.severity" :outlined="button.outlined" :rounded="button.rounded"
                         :icon="button.icon" :title="button.label" :class="button.class" />
                 </div>
