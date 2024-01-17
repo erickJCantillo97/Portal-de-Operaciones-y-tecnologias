@@ -33,7 +33,6 @@ getQuotes()
         <template #buttonHeader>
             <Dropdown v-model="filter" class="h-8" @change="getQuotes()" :options="filters" :pt="{
                 root: '!ring-0 !border-0',
-                trigger: '!hidden',
                 token: '!p-0',
                 item: ' !p-2',
                 input: '!p-0'

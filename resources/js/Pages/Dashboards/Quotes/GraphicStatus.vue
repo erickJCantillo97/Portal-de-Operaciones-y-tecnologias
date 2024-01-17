@@ -83,5 +83,5 @@ getQuotesMadurity()
 <template>
     <Loading v-if="loading"></loading>
     <Empty v-else-if="empty" message="Aun sin estados que mostrar"></Empty>
-    <VueApexCharts v-else type="bar" :options="chartOptions" :series="series" height="200" class="flex justify-center" />
+    <VueApexCharts v-else type="bar" :options="chartOptions" :series="series" height="300" />
 </template>

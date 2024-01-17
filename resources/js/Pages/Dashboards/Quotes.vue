@@ -13,19 +13,11 @@ const prueba2 = ref()
 
 
 <template>
-    <div class="grid sm:grid-cols-2 gap-3">
-        <TableQuotes />
-        <GraphicMadurity />
-        <GraphicStatus />
-        <GraphicMadurityTime />
-        <DataEstimatorCard />
+    <div class="p-2 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 space-y-4">
+        <TableQuotes class="shadow-md xl:col-span-3 " />
+        <GraphicMadurity class="shadow-md" />
+        <GraphicStatus class="shadow-md" />
+        <GraphicMadurityTime class="shadow-md" />
+        <DataEstimatorCard class="shadow-md" />
     </div>
-    <!-- <div>
-        <CustomInput v-model:input="prueba" floatLabel placeholder="Hola" :floatLabel="false" minFractionDigits="2"
-            maxFractionDigits="4" type="number" identify="Prueba1" label="Prueba 1" />
-        {{ prueba }}
-        <CustomInput v-model:input="prueba2" help="Esto es una prueba" invalid errorMessage="Esto es una prueba de error"
-            :floatLabel="false" type="text" identify="Prueba2" label="Prueba 2" />
-        {{ prueba2 }}
-    </div> -->
 </template>
