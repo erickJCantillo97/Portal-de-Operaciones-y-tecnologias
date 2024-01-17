@@ -18,13 +18,9 @@ const { toast } = useSweetalert();
 const loading = ref(false);
 const { confirmDelete } = useSweetalert();
 const open = ref(false)
-const paises = ref()
+const country = ref()
 const props = defineProps({
     customers: Array,
-})
-
-axios.get('https://restcountries.com/v3.1/all?fields=translations').then(r => {
-    paises.value = r.data.map(pais => pais.translations.spa);
 })
 
 //#region UseForm
@@ -36,7 +32,8 @@ const formData = useForm({
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
-
+    formData.customer.country = country.value.translations.spa.common
+    formData.customer.country_en = country.value.name.common
     if (formData.customer.id == null) {
         router.post(route('customers.store'), formData.customer, {
             preserveScroll: true,
@@ -143,19 +140,8 @@ const buttons = [
             <div class="text-left">
                 <label class="text-sm font-medium" for="pais">
                     Pais</label>
-                <CustomSelectCountries v-model:selected="formData.customer.country" />
-                <!-- <Dropdown id="pais" v-model="formData.customer.country" :options="paises" filter optionLabel="common"
-                    placeholder="Selecciona el pais" class="w-full -mt-1 rounded-md md:w-14rem" :pt="{
-                        root: {
-                            class: 'h-10 !ring-gray-300 !ring-inset ring-1 !border-0 !shadow-sm '
-                        },
-                        input: {
-                            class: '!text-sm pt-3 pl-2'
-                        },
-                        item: {
-                            class: '!text-sm'
-                        }
-                    }" /> -->
+                <CustomSelectCountries v-model:selected="country" />
+                {{ country }}
             </div>
             <div class="text-left">
                 <label class="text-sm font-medium" for="hull_material">Tipo de
