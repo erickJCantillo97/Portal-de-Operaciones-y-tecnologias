@@ -24,7 +24,7 @@ const chartOptions = ref({
         floating: true,
         position: 'right',
         horizontalAlign: 'right',
-        fontSize: '11px',
+        fontSize: '14px',
         fontWeight: 400,
     },
 })

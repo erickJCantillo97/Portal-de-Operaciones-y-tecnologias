@@ -22,8 +22,8 @@ return new class extends Migration
             $table->string('durationUnit');
             $table->double('percentDone');
             $table->double('duration');
-            $table->date('startDate');
-            $table->date('endDate');
+            $table->date('startDate')->nullable();
+            $table->date('endDate')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

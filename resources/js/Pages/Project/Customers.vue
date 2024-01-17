@@ -92,11 +92,11 @@ const deleteItem = (event, data) => {
 
 const columnas = [
     // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
-    { field: 'NIT', header: 'NIT', filter: true, sortable: true },
+    // { field: 'NIT', header: 'NIT', filter: true, sortable: true },
     { field: 'name', header: 'Nombre', filter: true, sortable: true },
     { field: 'country', header: 'Pais', filter: true, sortable: true },
     { field: 'type', header: 'Tipo', filter: true, sortable: true },
-    { field: 'email', header: 'Correo', filter: true, sortable: true }
+    // { field: 'email', header: 'Correo', filter: true, sortable: true }
 ]
 const buttons = [
     { event: 'showShips', severity: 'success', icon: 'fa-solid fa-ship', text: true, outlined: false, rounded: false },
