@@ -5,6 +5,9 @@ import { GChart } from 'vue-google-charts'
 
 const loading = ref(false)
 const empty = ref(false)
+const chartData = ref([
+    ['country', 'Ofertas'],
+])
 const getData = () => {
     loading.value = true
     axios.get(route("get.quotes.country")).then((res) => {
@@ -21,17 +24,10 @@ const getData = () => {
 }
 getData()
 
-const chartData = ref([
-    ['country', 'Ofertas'],
-])
 
 const chartOptions = ref({
-    chart: {
-        title: 'Company Performance',
-        subtitle: 'Sales, Expenses, and Profit: 2014-2017',
-    },
-    height: "300"
-
+    height: "300",
+    colorAxis: { colors: ['rgb(234,241,255)', 'rgb(46, 48, 146)'] }
 })
 
 </script>

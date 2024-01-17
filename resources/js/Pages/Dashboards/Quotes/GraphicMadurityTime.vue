@@ -17,7 +17,7 @@ const chartOptions = ref({
     },
     dataLabels: {
         enabled: true,
-        offsetY: -20,
+        textAnchor: 'start',
         style: {
             fontSize: '12px',
             colors: ["#304758"]
@@ -29,6 +29,13 @@ const chartOptions = ref({
     yaxis: {
         labels: {
             show: false,
+        }
+    },
+    plotOptions: {
+        bar: {
+            borderRadius: 8,
+            horizontal: true,
+            barHeight: '60%',
         }
     },
     xaxis: {
@@ -70,7 +77,8 @@ const getMaduriTime = () => {
             series.value = [{
                 'name': 'Cantidad',
                 'data': res.data.values
-            }]
+            }
+            ]
             chartOptions.value.xaxis.categories = res.data.maturities;
             empty.value = false
         }
@@ -84,6 +92,5 @@ getMaduriTime()
 <template>
     <Loading v-if="loading"></loading>
     <Empty v-else-if="empty" message="Aun sin tiempos promedios que mostrar"></Empty>
-
     <VueApexCharts v-else type="bar" :options="chartOptions" height="300" :series="series" />
 </template>
