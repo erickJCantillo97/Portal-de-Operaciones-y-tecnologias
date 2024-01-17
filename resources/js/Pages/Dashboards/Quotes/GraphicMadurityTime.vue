@@ -10,25 +10,43 @@ const series = ref([])
 const loading = ref(true)
 const empty = ref()
 const chartOptions = ref({
+
     title: {
         text: 'Tiempo promedio por madurez',
         align: 'center',
         margin: 0
     },
+    colors: ['rgb(46, 48, 146)', '#546E7A', '#13d8aa', '#A5978B'],
     dataLabels: {
         enabled: true,
-        offsetY: -20,
+        textAnchor: 'start',
         style: {
-            fontSize: '12px',
-            colors: ["#304758"]
+            colors: ['#fff']
         },
-        formatter: function (val) {
-            return val + " dias";
+        formatter: function (val, opt) {
+            console.log(opt.w.globals);
+            return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
+        },
+        offsetY: 0,
+        offsetX: 0,
+        dropShadow: {
+            enabled: true
+        },
+        dataLabels: {
+            position: 'bottom'
         },
     },
     yaxis: {
         labels: {
             show: false,
+        }
+    },
+    plotOptions: {
+        bar: {
+            borderRadius: 8,
+            horizontal: true,
+            distributed: true,
+            barHeight: '40%',
         }
     },
     xaxis: {
@@ -39,26 +57,11 @@ const chartOptions = ref({
         axisTicks: {
             show: false
         },
-        crosshairs: {
-            fill: {
-                type: 'gradient',
-                gradient: {
-                    colorFrom: '#D8E3F0',
-                    colorTo: '#BED1E6',
-                    stops: [0, 100],
-                    opacityFrom: 0.4,
-                    opacityTo: 0.5,
-                }
-            }
-        },
+
     },
     tooltip: {
-        enabled: true,
-        y: {
-            formatter: function (value) {
-                return parseInt(value) + ' dias'
-            },
-        }
+        enabled: false,
+
     }
 })
 const getMaduriTime = () => {
@@ -67,11 +70,14 @@ const getMaduriTime = () => {
         if (res.data.values.length == 0) {
             empty.value = true
         } else {
+
+
+            // series.value.data = [400, 430, 448, 470, 540, 580, 690, 1100, 1200, 1380]
             series.value = [{
-                'name': 'Cantidad',
                 'data': res.data.values
-            }]
-            chartOptions.value.xaxis.categories = res.data.maturities;
+            }
+            ]
+            chartOptions.value.xaxis.categories = res.data.maturities
             empty.value = false
         }
         loading.value = false
@@ -84,6 +90,5 @@ getMaduriTime()
 <template>
     <Loading v-if="loading"></loading>
     <Empty v-else-if="empty" message="Aun sin tiempos promedios que mostrar"></Empty>
-
     <VueApexCharts v-else type="bar" :options="chartOptions" height="300" :series="series" />
 </template>

@@ -16,28 +16,15 @@ class ScheduleController extends Controller
 {
     public function create(Project $project)
     {
-        $groups = gruposConstructivos();
-        $taskProject = Task::where('project_id', $project->id)->first();
-        if (!$taskProject) {
-            Task::firstOrcreate([
-                'project_id' => $project->id,
-                'name' => $project->name,
-                'percentDone' => 0,
-                'duration' => Carbon::parse($project->start_date)->diffInDays($project->end_date),
-                'durationUnit' => 'Days',
-                'startDate' => $project->start_date,
-                'endDate' => $project->end_date,
-            ]);
-        }
-        return Inertia::render('GanttBryntum', [
-            'project' => Project::where('id', $project->id)->first(),
-            'groups' => $groups,
+
+        return Inertia::render('Project/Schedule/Schedule', [
+            'project' => $project,
         ]);
     }
 
     public function index(Project $project)
     {
-        return Inertia::render('GanttBryntum', [
+        return Inertia::render('Project/Schedule/Schedule', [
             'project' => $project->id,
         ]);
     }
@@ -82,7 +69,7 @@ class ScheduleController extends Controller
         $assgimentRows = [];
         if (isset($request->tasks['added'])) {
             foreach ($request->tasks['added'] as $task) {
-                if (isset($task['parentID'])) {
+                if (!isset($task['parentID'])) {
                     $parentID = null;
                 } else {
                     $parentID = is_numeric($task['parentId']) ? $parentID = Task::orWhere('id', $task['parentId'])->first()->id : $parentID = Task::where('PhantomId', $task['parentId'])->first()->id;
@@ -117,6 +104,7 @@ class ScheduleController extends Controller
                     'startDate' => $task['startDate'] ?? $taskUpdate->startDate,
                     'endDate' => $task['endDate'] ?? $taskUpdate->endDate,
                 ]);
+                // dd($taskUpdate);
             }
         }
         if (isset($request->tasks['removed'])) {
@@ -128,8 +116,8 @@ class ScheduleController extends Controller
         if (isset($request->dependencies['added'])) {
             foreach ($request->dependencies['added'] as $dependency) {
                 Dependecy::create([
-                    'from' => Task::where('PhantomId', $dependency['from'])->first()->id,
-                    'to' => Task::where('PhantomId', $dependency['to'])->first()->id,
+                    'from' =>  $dependency['from'],
+                    'to' => $dependency['to'],
                     'type' => $dependency['type'],
                     'lag' => $dependency['lag'],
                     'lagUnit' => $dependency['lagUnit'],

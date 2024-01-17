@@ -20,7 +20,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="max-h-72  mb-8">
+  <div class="max-h-80 mb-8">
     <div class="bg-blue-800 text-center sticky">
       <h3 class="text-white text-lg font-semibold p-1">Tiempo Promedio de Respuesta de Estimadores</h3>
     </div>

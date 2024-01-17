@@ -4,7 +4,7 @@ import { onMounted } from 'vue';
 import "@bryntum/gantt/gantt.material.css";
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
 import { DateHelper, Gantt, List, LocaleManager, ProjectModel, StringHelper, Widget } from '@bryntum/gantt/gantt.module.js';
-import '../../css/app.scss'
+
 import { useSweetalert } from '@/composable/sweetAlert';
 const { toast } = useSweetalert();
 const props = defineProps({
@@ -91,7 +91,7 @@ const project = new ProjectModel({
             gantt.unmaskBody();
             // console.log(e);
             toast('Ha ocurrido un error, reiniciando...', 'error');
-            setTimeout(() => { location.reload() }, 3000);
+            // setTimeout(() => { location.reload() }, 3000);
 
         }
     }

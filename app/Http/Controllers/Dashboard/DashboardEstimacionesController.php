@@ -17,9 +17,10 @@ class DashboardEstimacionesController extends Controller
 
     public function getQuotesStatus(Request $request)
     {
-        $quotes = QuoteVersion::has('quote')->with('quoteTypeShips', 'quote')->get()->filter(function ($quote) use ($request) {
-            $quote->get_status = $quote->get_status == 'Entregada' ? 'Proceso' : $quote->get_status;
-            return Carbon::parse($quote->status_date)->format('Y-m-d') >= Carbon::now()->subDays(6)->format('Y-m-d') && Carbon::parse($quote->status_date)->format('Y-m-d') <= Carbon::now()->format('Y-m-d')  && $quote->get_status  == $request->status;
+        $status = $request->status == 'Entregada' || !$request->status ? 'Proceso' : $request->status;
+        $quotes = QuoteVersion::has('quote')->with('quoteTypeShips', 'quote')->get()->filter(function ($quote) use ($status) {
+            $get_status = $quote->get_status == 'Entregada' ? 'Proceso' : $quote->get_status;
+            return Carbon::parse($quote->status_date)->format('Y-m-d') >= Carbon::now()->subDays(6)->format('Y-m-d') && Carbon::parse($quote->status_date)->format('Y-m-d') <= Carbon::now()->format('Y-m-d')  && $get_status  == $status;
         })->map(function ($quote) {
             return [
                 'name' => $quote['quote']['name'],
@@ -66,11 +67,13 @@ class DashboardEstimacionesController extends Controller
         $promedioPorDificultad = QuoteVersion::join('quote_type_ships', 'quote_versions.id', '=', 'quote_type_ships.quote_version_id')
             ->select('quote_type_ships.maturity', DB::raw('AVG(DATEDIFF(day, quote_versions.created_at, quote_versions.estimador_anaswer_date)) AS promedio'))
             ->groupBy('quote_type_ships.maturity')
+            ->whereNotNull('quote_type_ships.maturity')
+            ->whereNotNull('quote_versions.estimador_anaswer_date')
             ->get();
 
         return [
             'values' => $promedioPorDificultad->map(function ($value) {
-                return $value['promedio'];
+                return intval($value['promedio']);
             }),
             'maturities' => $promedioPorDificultad->map(function ($value) {
                 return $value['maturity'];
@@ -104,8 +107,8 @@ class DashboardEstimacionesController extends Controller
     public function getQuotesCountry()
     {
         $countQuoteCountry = QuoteVersion::join('customers', 'quote_versions.customer_id', '=', 'customers.id')
-            ->select('customers.country as country', DB::raw('COUNT(quote_versions.id) AS value'))
-            ->groupBy('customers.country')
+            ->select('customers.country_en as country', DB::raw('COUNT(quote_versions.id) AS value'))
+            ->groupBy('customers.country_en')
             ->get();
 
         return [
