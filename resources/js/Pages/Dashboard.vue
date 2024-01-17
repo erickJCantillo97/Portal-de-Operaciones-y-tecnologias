@@ -75,7 +75,7 @@ onMounted(() => {
         <div class="overflow-y-scroll">
             <div class="grid grid-cols-2 max-w-full">
                 <UserHeader class="col-span-1" />
-                <QuotesCard class="col-span-1" />
+                <QuotesCard class="col-span-1" :showIndicators="true" />
             </div>
                 <Quotes />
             <!-- <Projects />

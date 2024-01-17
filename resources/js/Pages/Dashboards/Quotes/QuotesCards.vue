@@ -71,11 +71,10 @@ const responsiveOptions = ref([
 
 <template>
   <Carousel :value="item" :numVisible="2" :numScroll="2" circular :autoplayInterval="60000" :pt="{
-    indicators: '!hidden',
     // indicatorButton: '!rounded-lg',
-    // indicatorButton: ({ state }) => ({
-    //   class: state.focused ? '!bg-blue-100' : '!bg-orange-800',
-    // })
+    indicatorButton: ({ state, context }) => ({
+      // class: console.log([state], [context]) ? '!bg-blue-800' : '!bg-blue-100',
+    })
   }">
     <template #item="slotProps">
       <section class="items-center gap-x-2 mt-2 mb-2">
