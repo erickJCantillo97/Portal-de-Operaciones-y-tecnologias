@@ -3,6 +3,7 @@ import AppLayout from '@/Layouts/AppLayout.vue'
 import { ref, onMounted, computed } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
 import Combobox from '@/Components/Combobox.vue'
+import Dropdown from 'primevue/dropdown'
 import { FilterMatchMode, FilterOperator } from 'primevue/api'
 import { ClockIcon } from '@heroicons/vue/24/outline'
 import { useSweetalert } from '@/composable/sweetAlert'
@@ -10,6 +11,8 @@ import { useConfirm } from "primevue/useconfirm"
 import axios from 'axios'
 import TextInput from '../../Components/TextInput.vue'
 import Textarea from 'primevue/textarea'
+import Loading from '@/Components/Loading.vue'
+import NoContentToShow from '@/Components/NoContentToShow.vue'
 import { FormWizard, TabContent } from 'vue3-form-wizard'
 import 'vue3-form-wizard/dist/style.css'
 
@@ -41,6 +44,8 @@ const filteredShips = ref(props.ships)
 const keyword = ref('')
 const shiftSelect = ref('1')
 const shiftOptions = ref()
+const showLoading = ref(true)
+const showNoContent = ref(false)
 //#endregion
 
 const searchShips = () => {
@@ -335,8 +340,7 @@ const exportarExcel = () => {
                     <!--DOCUMENTOS CONTRACTUALES-->
                     <tab-content title="Información Contractual" icon="fa-solid fa-file-signature"
                         :before-change="beforeChange">
-                        <section
-                            class="sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 grid grid-cols-2">
+                        <section class="border gap-4 border-gray-200 rounded-lg p-4 grid grid-cols-2">
                             <!--CAMPO NOMBRE DEL PROYECTO (name)-->
                             <TextInput type="text" label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
                                 v-model="formData.name" :error="$page.props.errors.name">
@@ -348,48 +352,105 @@ const exportarExcel = () => {
                             </TextInput>
 
                             <!--CAMPO ALCANCE DEL PROYECTO (scope)-->
-                            <Combobox class="text-left text-gray-900" label="Alcance del Proyecto"
-                                placeholder="Seleccione Alcance del Proyecto" :options="scopeOptions" v-model="scopeSelect">
-                            </Combobox>
+                            <div>
+                                <label class="text-sm font-medium">Alcance del Proyecto</label>
+                                <Dropdown class="h-10" :options="scopeOptions" v-model="scopeSelect" showClear
+                                    optionLabel="name" placeholder="Seleccione Alcance del Proyecto" :pt="{
+                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
+                                        input: '!text-sm',
+                                        filterInput: '!text-gray-300',
+                                        item: ({ context }) => ({
+                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
+                                        })
+                                    }">
+                                </Dropdown>
+                            </div>
 
                             <!--CAMPO CONTRATO (contract)-->
-                            <Combobox class="text-left text-gray-900" label="Contrato" placeholder="Seleccione Contrato"
-                                :options="contracts" v-model="contractSelect">
-                            </Combobox>
+                            <div>
+                                <label class="text-sm font-medium">Contrato</label>
+                                <Dropdown class="h-10" :options="contracts" v-model="contractSelect" showClear
+                                    optionLabel="name" placeholder="Seleccione Contrato" :pt="{
+                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
+                                        input: '!text-sm',
+                                        filterInput: '!text-gray-300',
+                                        item: ({ context }) => ({
+                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
+                                        })
+                                    }">
+                                </Dropdown>
+                            </div>
 
                             <!--CAMPO AUTORIZACIONES (authorization)-->
-                            <Combobox class="text-left text-gray-900" label="Autorizaciones"
-                                placeholder="Seleccione Autorización" :options="authorizations"
-                                v-model="authorizationSelect">
-                            </Combobox>
+                            <div>
+                                <label class="text-sm font-medium">Autorizaciones</label>
+                                <Dropdown class="h-10" :options="authorizations" v-model="authorizationSelect" showClear
+                                    optionLabel="name" placeholder="Seleccione Autorización" :pt="{
+                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
+                                        input: '!text-sm',
+                                        filterInput: '!text-gray-300',
+                                        item: ({ context }) => ({
+                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
+                                        })
+                                    }">
+                                </Dropdown>
+                            </div>
 
                             <!--CAMPO ESTIMACIÓN (quote)-->
-                            <Combobox class="text-left text-gray-900" label="Estimaciones"
-                                placeholder="Seleccione Estimación" :options="quotes" v-model="quoteSelect">
-                            </Combobox>
+                            <div>
+                                <label class="text-sm font-medium">Estimaciones</label>
+                                <Dropdown class="h-10" :options="quotes" v-model="quoteSelect" showClear optionLabel="name"
+                                    placeholder="Seleccione Estimación" :pt="{
+                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
+                                        input: '!text-sm',
+                                        filterInput: '!text-gray-300',
+                                        item: ({ context }) => ({
+                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
+                                        })
+                                    }">
+                                </Dropdown>
+                            </div>
                         </section>
                     </tab-content>
 
                     <!--DATOS DEL PROYECTO-->
                     <tab-content title="Datos del Proyecto" icon="fa-solid fa-diagram-project"
                         :before-change="beforeChange">
-                        <section
-                            class="grid grid-cols-2 sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4">
+                        <section class="grid grid-cols-2 border gap-4 border-gray-200 rounded-lg p-4">
                             <!--CAMPO SUPERVISOR (supervisor)-->
                             <TextInput label="Supervisor" type="text" :placeholder="'Nombre del supervisor'"
                                 v-model="formData.supervisor" :error="router.page.props.errors.supervisor">
                             </TextInput>
 
                             <!--CAMPO TIPO DE PROYECTO (type)-->
-                            <Combobox class="text-left text-gray-900" label="Tipo de Proyecto"
-                                placeholder="Seleccione Tipo de Proyecto" :options="typeOptions" v-model="typeSelect">
-                            </Combobox>
+                            <div>
+                                <label class="text-sm font-medium">Tipo de Proyecto</label>
+                                <Dropdown class="h-10" :options="typeOptions" v-model="typeSelect" showClear
+                                    optionLabel="name" placeholder="Seleccione Tipo de Proyecto" :pt="{
+                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
+                                        input: '!text-sm',
+                                        filterInput: '!text-gray-300',
+                                        item: ({ context }) => ({
+                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
+                                        })
+                                    }">
+                                </Dropdown>
+                            </div>
 
                             <!--CAMPO ESTADO DEL PROYECTO (state)-->
-                            <Combobox class="text-left text-gray-900" label="Estado del Proyecto"
-                                placeholder="Seleccione Estado del Proyecto" :options="statusOptions"
-                                v-model="statusSelect">
-                            </Combobox>
+                            <div>
+                                <label class="text-sm font-medium">Estado del Proyecto</label>
+                                <Dropdown class="h-10" :options="statusOptions" v-model="statusSelect" showClear
+                                    optionLabel="name" placeholder="Seleccione Estado del Proyecto" :pt="{
+                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
+                                        input: '!text-sm',
+                                        filterInput: '!text-gray-300',
+                                        item: ({ context }) => ({
+                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
+                                        })
+                                    }">
+                                </Dropdown>
+                            </div>
 
                             <!--CAMPO COSTO DE VENTA (cost_sale)-->
                             <TextInput label="Costo de Venta" type="number" :placeholder="'Escriba el costo de venta'"
@@ -397,11 +458,13 @@ const exportarExcel = () => {
                             </TextInput>
 
                             <!--CAMPO DESCRIPCIÓN (description)-->
-                            <div>
+                            <div class="col-span-2">
                                 <label class="text-sm font-bold text-gray-900">Descripción</label>
-                                <Textarea class="col-span-4 text-sm text-gray-500 placeholder:text-sm italic"
+                                <Textarea class="text-sm text-gray-500 placeholder:text-sm italic"
                                     placeholder="Descripción del proyecto..." v-model="formData.description" rows="1"
-                                    cols="143" autoResize />
+                                    cols="143" autoResize :pt="{
+                                        root: '!w-full'
+                                    }" />
                             </div>
                         </section>
                     </tab-content>
@@ -409,8 +472,8 @@ const exportarExcel = () => {
                     <!--PLANEACIÓN DEL PROYECTO-->
                     <tab-content title="Planeación del Proyecto" icon="fa-solid fa-calendar-check"
                         :before-change="beforeChange">
-                        <section class="flex sm:col-span-1 md:col-span-1 border gap-6 border-gray-200 rounded-lg p-4">
-                            <div class="grid grid-cols-6 gap-6">
+                        <section class="flex border gap-6 border-gray-200 rounded-lg p-4">
+                            <div class="grid grid-cols-6 gap-6 w-full">
                                 <div class="col-span-3 space-y-4">
                                     <!--CAMPO FECHA INICIO-->
                                     <TextInput class="text-left" type="date" label="Fecha De Inicio"
@@ -458,7 +521,7 @@ const exportarExcel = () => {
                                                     <p class=" text-xs font-bold">{{ shift.name }}:</p>
                                                 </div>
                                                 <div class="flex italic">
-                                                    <ClockIcon class="w-4 h-4" />
+                                                    <ClockIcon class="size-4" />
                                                     <p><b>&nbsp Hora Inicio:</b> {{ formatDateTime24h(shift.startShift) }} -
                                                     </p>
                                                     <p>&nbsp <b>Hora Fin:</b> {{ formatDateTime24h(shift.endShift) }} - </p>
@@ -483,6 +546,8 @@ const exportarExcel = () => {
                         </div>
                         <section
                             class="grid grid-cols-4 h-60 overflow-y-auto custom-scroll snap-y snap-mandatory sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2">
+                            <!-- <Loading v-if="showLoading" message="Cargando Estados" class="mt-12" />
+                            <NoContentToShow v-if="showNoContent" subject="Estados" /> -->
                             <ul v-for="ship in filteredShips" :key="ship.id"
                                 class="text-sm italic [&>li>p]:font-semibold snap-start">
                                 <div @click="toggleSelectShip(ship.id)"

@@ -73,11 +73,11 @@ onMounted(() => {
 <template>
     <AppLayout>
         <div class="overflow-y-scroll">
-            <div class="grid grid-cols-2 max-w-full">
+            <div class="grid grid-cols-1  md:grid-cols-2 max-w-full">
                 <UserHeader class="col-span-1" />
-                <QuotesCard class="col-span-1" />
+                <QuotesCard class="col-span-1" :showIndicators="false" />
             </div>
-                <Quotes />
+            <Quotes />
             <!-- <Projects />
                 <div class="p-8 m-1 shadow-md rounded-xl">
                     <DataChart></DataChart>
