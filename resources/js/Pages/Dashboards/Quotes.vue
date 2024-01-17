@@ -6,6 +6,7 @@ import TableQuotes from '@/Pages/Dashboards/Quotes/TableQuotes.vue';
 import GraphicStatus from '@/Pages/Dashboards/Quotes/GraphicStatus.vue';
 import DataEstimatorCard from '@/Pages/Dashboards/Quotes/DataEstimatorCard.vue';
 import GraphicMadurityTime from './Quotes/GraphicMadurityTime.vue';
+import GraphicQuoteCountry from './Quotes/GraphicQuoteCountry.vue';
 
 const prueba = ref()
 const prueba2 = ref()
@@ -14,9 +15,11 @@ const prueba2 = ref()
 
 <template>
     <div class="p-2 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 space-y-4">
+        <GraphicQuoteCountry class="shadow-md col-span-2 h-full" />
         <GraphicMadurity class="shadow-md" />
         <GraphicStatus class="shadow-md" />
         <GraphicMadurityTime class="shadow-md" />
+        <!-- <DataEstimatorCard class="shadow-md" /> -->
         <DataEstimatorCard class="shadow-md rounded-b-md" />
         <TableQuotes class="shadow-md xl:col-span-3 mt-4" />
     </div>

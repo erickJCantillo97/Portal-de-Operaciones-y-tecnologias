@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
-            $table->string('NIT')->unique()->nullable();
+            // $table->string('NIT')->unique()->nullable();
             $table->string('country')->nullable();
+            $table->string('country_en')->nullable();
             $table->string('name');
             $table->string('type')->nullable();
             $table->string('email')->nullable();
