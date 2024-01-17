@@ -6,6 +6,7 @@ import { ref, onMounted } from "vue";
 import { Link, router } from "@inertiajs/vue3";
 // const { hasRole } = usePermissions();
 import UserHeader from "@/Components/sections/UserHeader.vue";
+import QuotesCard from "@/Pages/Dashboards/Quotes/QuotesCards.vue";
 // import ProjectCardMinimal from "@/Components/ProjectCardMinimal.vue";
 // import DataTable from "primevue/datatable";
 // import { FilterMatchMode, FilterOperator } from "primevue/api";
@@ -72,12 +73,15 @@ onMounted(() => {
 <template>
     <AppLayout>
         <div class="overflow-y-scroll">
-            <UserHeader />
-            <Quotes />
+            <div class="grid grid-cols-2 max-w-full">
+                <UserHeader class="col-span-1" />
+                <QuotesCard class="col-span-1" />
+            </div>
+                <Quotes />
             <!-- <Projects />
-            <div class="p-8 m-1 shadow-md rounded-xl">
-                <DataChart></DataChart>
-            </div> -->
+                <div class="p-8 m-1 shadow-md rounded-xl">
+                    <DataChart></DataChart>
+                </div> -->
         </div>
         <!-- <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
                 <TimeLine :projects="props.projects"></TimeLine>

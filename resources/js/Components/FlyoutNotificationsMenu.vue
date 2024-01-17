@@ -58,7 +58,7 @@ const callsToAction = [
             <div v-for="item in notifications" :key="item.name"
               class="group relative flex gap-x-6 rounded-lg p-2 hover:bg-gray-50">
               <div
-                class="mt-1 flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
+                class="mt-1 flex size-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
                 <component :is="item.icon" class="size-6 text-gray-600 group-hover:text-indigo-600" aria-hidden="true" />
               </div>
               <div>
