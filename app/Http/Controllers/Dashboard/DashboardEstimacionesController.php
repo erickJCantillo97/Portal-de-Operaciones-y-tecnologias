@@ -80,19 +80,10 @@ class DashboardEstimacionesController extends Controller
     }
     public function getEstimatorData()
     {
-        //     $estimadores = getPersonalGerenciaOficina('GECON', 'DEEST')->map(function ($estimador) {
-        //         return [
-        //             'user_id' => $estimador['Num_SAP'],
-        //             'name' => $estimador['Nombres_Apellidos'],
-        //             'email' => $estimador['Correo']
-        //         ];
-        //     })->toArray();
-
         $people = QuoteVersion::whereNotNull('estimador_anaswer_date')->whereYear('estimador_anaswer_date', '!=', '1970')->select(DB::raw('AVG(DATEDIFF(day, created_at, estimador_anaswer_date)) AS promedio'), 'estimador_name')
             ->groupBy('estimador_name')
             ->get()->map(function ($quote) {
                 $empleado = searchEmpleados('Usuario', $quote['estimador_name'])->first();
-
                 return [
                     'average' => $quote['promedio'],
                     'quotes' => QuoteVersion::where('estimador_name', $quote['estimador_name'])->count(),
@@ -108,5 +99,23 @@ class DashboardEstimacionesController extends Controller
             ],
             200
         );
+    }
+
+    public function getQuotesCountry()
+    {
+        $countQuoteCountry = QuoteVersion::join('customers', 'quote_versions.customer_id', '=', 'customers.id')
+            ->select('customers.country as country', DB::raw('COUNT(quote_versions.id) AS value'))
+            ->groupBy('customers.country')
+            ->get();
+
+        return [
+            'values' => $countQuoteCountry->map(function ($value) {
+                return $value['value'];
+            }),
+            'countries' => $countQuoteCountry->map(function ($value) {
+                return $value['country'];
+            }),
+            'status' => true
+        ];
     }
 }

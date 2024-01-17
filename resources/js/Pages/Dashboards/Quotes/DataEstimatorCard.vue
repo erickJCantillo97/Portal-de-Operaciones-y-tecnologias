@@ -20,13 +20,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="max-h-full  mb-8">
+  <div class="max-h-72  mb-8">
     <div class="bg-blue-800 text-center sticky">
       <h3 class="text-white text-lg font-semibold p-1">Tiempo Promedio de Respuesta de Estimadores</h3>
     </div>
     <div class=" custom-scroll border">
       <CardSkeleton v-if="showCardSkeleton" />
-      <div class="block space-y-2 max-h-full h-56 p-1 overflow-y-auto">
+      <div class="block space-y-2 h-56 p-1 overflow-y-auto">
         <div v-for="person in  people" :key="person.email"
           class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white p-3 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400"
           v-tooltip="'Proceso: 3 \n Entregada: 5 \n Pendiente por Firma: 1 \n Firmada: 6 \n No Firmada: 1 \n Contratada: 2'"

@@ -11,4 +11,5 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('getStatusWeek', [DashboardEstimacionesController::class, 'getStatusWeek'])->name('get.quotes.status.week');
     Route::get('getAvgManurities', [DashboardEstimacionesController::class, 'getAvgManurities'])->name('get.avg.manurities');
     Route::get('getEstimatorData', [DashboardEstimacionesController::class, 'getEstimatorData'])->name('get.estimator.data');
+    Route::get('getQuotesCountry', [DashboardEstimacionesController::class, 'getQuotesCountry'])->name('get.quotes.country');
 });
