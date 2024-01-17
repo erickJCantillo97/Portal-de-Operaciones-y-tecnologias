@@ -17,7 +17,7 @@ const chartOptions = ref({
     dataLabels: {
         enabled: true,
         formatter: function (val) {
-            return val + "%"
+            return parseInt(val) + " %"
         },
     },
     legend: {

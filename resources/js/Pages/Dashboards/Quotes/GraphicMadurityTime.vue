@@ -85,5 +85,5 @@ getMaduriTime()
     <Loading v-if="loading"></loading>
     <Empty v-else-if="empty" message="Aun sin tiempos promedios que mostrar"></Empty>
 
-    <VueApexCharts v-else type="bar" :options="chartOptions" height="200" :series="series" />
+    <VueApexCharts v-else type="bar" :options="chartOptions" height="300" :series="series" />
 </template>
