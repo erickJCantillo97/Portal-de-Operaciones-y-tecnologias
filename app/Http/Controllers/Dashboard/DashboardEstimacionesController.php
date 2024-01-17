@@ -110,11 +110,9 @@ class DashboardEstimacionesController extends Controller
 
         return [
             'values' => $countQuoteCountry->map(function ($value) {
-                return $value['value'];
+                return [$value['country'], $value['value']];
             }),
-            'countries' => $countQuoteCountry->map(function ($value) {
-                return $value['country'];
-            }),
+
             'status' => true
         ];
     }

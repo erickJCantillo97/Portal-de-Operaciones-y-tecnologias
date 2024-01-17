@@ -80,6 +80,7 @@ class CustomerController extends Controller
             'NIT' => 'nullable',
             'name' => 'required',
             'country' => 'nullable',
+            'country_en' => 'nullable',
             'type' => 'required',
             'email' => 'nullable|email',
         ]);
