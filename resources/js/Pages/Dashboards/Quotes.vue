@@ -15,11 +15,12 @@ const prueba2 = ref()
 
 <template>
     <div class="p-2 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 space-y-4">
-        <TableQuotes class="shadow-md xl:col-span-3 " />
         <GraphicMadurity class="shadow-md" />
         <GraphicStatus class="shadow-md" />
         <GraphicMadurityTime class="shadow-md" />
         <!-- <DataEstimatorCard class="shadow-md" /> -->
-        <GraphicQuoteCountry />
+        <DataEstimatorCard class="shadow-md rounded-b-md" />
+        <TableQuotes class="shadow-md xl:col-span-3 mt-4" />
+        <GraphicQuoteCountry class="shadow-md col-span-2" />
     </div>
 </template>
