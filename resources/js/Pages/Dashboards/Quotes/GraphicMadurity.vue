@@ -9,6 +9,7 @@ const series = ref([])
 const loading = ref(true)
 const empty = ref()
 const chartOptions = ref({
+    colors: ['rgb(46, 48, 146)', '#546E7A', '#13d8aa', '#A5978B'],
     title: {
         text: 'Estimaciones por madurez',
         align: 'center',
