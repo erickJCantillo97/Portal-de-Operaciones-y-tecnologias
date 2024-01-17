@@ -1,4 +1,8 @@
 <script setup>
+const format_ES_Date = (date) => {
+  return new Date(date).toLocaleString('es-CO',
+    { day: '2-digit', month: 'long', year: 'numeric', weekday: "long" })
+}
 </script>
 
 <template>
@@ -8,16 +12,18 @@
         <img class="size-12 object-cover rounded-full" src="../../../public/images/generic-boat.png" alt="Profile-Picture" />
       </div>
       <div class="max-w-full w-full h-6">
-        <h3 class="text-md font-semibold">Nombre</h3>
-        <div>
-          <p class="text-sm text-gray-500">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vero recusandae quaerat velit...</p>
+        <h3 class="text-md font-semibold">Ronny Gutierrez Vitola</h3>
+        <div class="w-full h-34">
+          <p class="text-sm text-gray-500 truncate">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur itaque recusandae tenetur odio at omnis.
+          </p>
         </div>
-        <div class="size-32">
+        <div class="w-20 h-6">
           <span class="text-xs italic text-gray-500">Hace 12 mins</span>
         </div>
       </div>
       <div class="w-36 bg-gray-300 rounded-lg align-middle">
-        <h3 class="text-sm text-gray-500">16, Ene de 2024</h3>
+        <h3 class="text-sm text-gray-500">17, Ene de 2024</h3>
       </div>
     </div>
   </main>
