@@ -84,6 +84,7 @@ class QuoteController extends Controller
             'observation' => 'nullable|string',
         ]);
         $empleado = collect(searchEmpleados('Num_SAP', $validateData['estimador_id']))->first();
+
         try {
             $validateData['gerencia'] = auth()->user()->gerencia;
 
@@ -110,6 +111,7 @@ class QuoteController extends Controller
             ])->id; // Creamos una nueva version 1, con el consecutivo de la variable que se utilizó antes
 
             $quote->current_version_id = $quoteVersion;
+
             $quote->save();
             if (isset($request->type_ships)) {
                 foreach (TypeShip::whereIn('id', $request->type_ships)->get() as $typeShip) {

@@ -12,7 +12,7 @@ import Carousel from 'primevue/carousel'
 // const quoteInfo = ref([])
 
 // const getQuoteInfo = async() => {
-//   await axios.get(route('fet.quotes.info'))
+//   await axios.get(route('get.quotes.info'))
 //     .then((res) => {
 //       quoteInfo.value = res.data.message
 //     })
@@ -66,7 +66,7 @@ const responsiveOptions = ref([
     numVisible: 1,
     numScroll: 1
   }
-]);
+])
 </script>
 
 <template>

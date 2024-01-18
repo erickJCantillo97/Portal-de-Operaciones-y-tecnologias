@@ -2,13 +2,11 @@
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { ref, onMounted, computed } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
-import Combobox from '@/Components/Combobox.vue'
-import Dropdown from 'primevue/dropdown'
 import { FilterMatchMode, FilterOperator } from 'primevue/api'
 import { ClockIcon } from '@heroicons/vue/24/outline'
 import { useSweetalert } from '@/composable/sweetAlert'
-import { useConfirm } from "primevue/useconfirm"
 import axios from 'axios'
+import Dropdown from 'primevue/dropdown'
 import TextInput from '../../Components/TextInput.vue'
 import Textarea from 'primevue/textarea'
 import Loading from '@/Components/Loading.vue'
@@ -16,10 +14,7 @@ import NoContentToShow from '@/Components/NoContentToShow.vue'
 import { FormWizard, TabContent } from 'vue3-form-wizard'
 import 'vue3-form-wizard/dist/style.css'
 
-const confirm = useConfirm()
 const { toast } = useSweetalert()
-const loading = ref(false)
-const { confirmDelete } = useSweetalert()
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
@@ -91,7 +86,6 @@ const scopeOptions = ref([
     { name: 'SERVICIOS INDUSTRIALES' }
 ])
 //#endregion
-
 
 //#region UseForm
 const formData = useForm({
@@ -207,6 +201,8 @@ const getShift = () => {
     axios.get(route('shift.index'))
         .then(response => {
             shiftOptions.value = response.data[0]
+            showLoading.value = false
+            shiftOptions.value == 0 ? showNoContent.value = true : shiftOptions.value
         })
 }
 
@@ -332,7 +328,6 @@ const exportarExcel = () => {
                     Agregar Proyecto
                 </h2>
             </header>
-
             <section class="grid grid-cols-1">
                 <!-- AQUÍ VA EL CONTENIDO DEL FORMULARIO-->
                 <form-wizard @on-complete="submit()" stepSize="md" color="#2E3092" nextButtonText="Siguiente"
@@ -513,6 +508,10 @@ const exportarExcel = () => {
                                     <label class="text-sm font-bold text-gray-900">Seleccione el Turno</label>
                                     <div
                                         class="w-full h-52 overflow-y-auto custom-scroll border-2 border-gray-300 rounded-lg p-2 focus hover:border-blue-500">
+                                        <div class="flex justify-center">
+                                            <Loading v-if="showLoading" message="Cargando Turnos" class="mt-12" />
+                                            <NoContentToShow v-if="showNoContent" subject="Turnos" class="!size-64 !mt-6 !h-[20vh]" />
+                                        </div>
                                         <ul v-for="shift in shiftOptions" :key="shift.id">
                                             <div @click="selectShiftList(shift.id)"
                                                 :class="shiftSelect == shift.id ? 'bg-blue-900 text-white' : 'hover:bg-gray-200'"
@@ -546,9 +545,8 @@ const exportarExcel = () => {
                         </div>
                         <section
                             class="grid grid-cols-4 h-60 overflow-y-auto custom-scroll snap-y snap-mandatory sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2">
-                            <!-- <Loading v-if="showLoading" message="Cargando Estados" class="mt-12" />
-                            <NoContentToShow v-if="showNoContent" subject="Estados" /> -->
-                            <ul v-for="ship in filteredShips" :key="ship.id"
+                            <NoContentToShow v-if="props.ships == 0" subject="Buques" class="!mt-0" />
+                            <ul v-for="ship in filteredShips" :key="ship.id" v-else
                                 class="text-sm italic [&>li>p]:font-semibold snap-start">
                                 <div @click="toggleSelectShip(ship.id)"
                                     :class="selectedShips.includes(ship.id) ? 'bg-blue-900 text-white' : 'hover:bg-blue-300'"

@@ -63,10 +63,10 @@ class QuoteVersionController extends Controller
         ]);
         $quote->current_version_id = $newQuoteVersion->id;
         $quote->save();
-        // Creamos una nueva version 1, con el consecutivo de la variable que se utilizó antes 
+        // Creamos una nueva version 1, con el consecutivo de la variable que se utilizó antes
         foreach (TypeShip::whereIn('id', $request->type_ships)->get() as $typeShip) {
             $quoteTypeShip = QuoteTypeShip::where('type_ship_id', $typeShip->id)->where('quote_version_id', $quoteVersion->id)->first();
-            // Añadir una nueva clase a una version nueva 
+            // Añadir una nueva clase a una version nueva
             QuoteTypeShip::create([
                 'quote_version_id' => $newQuoteVersion->id,
                 'type_ship_id' => $typeShip->id,
@@ -179,8 +179,12 @@ class QuoteVersionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(QuoteVersion $quoteVersion)
     {
-        //
+        try {
+            $quoteVersion->delete();
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
+        }
     }
 }

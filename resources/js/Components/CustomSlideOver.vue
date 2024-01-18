@@ -3,7 +3,9 @@ import { ref, onMounted } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import { useSweetalert } from '@/composable/sweetAlert'
 import Moment from 'moment'
+import Swal from 'sweetalert2'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
 import CustomModal from '@/Components/CustomModal.vue'
@@ -12,6 +14,8 @@ import FeedWithComments from '@/Components/FeedWithComments.vue'
 import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 import Button from 'primevue/button'
+
+const { toast } = useSweetalert()
 
 onMounted(() => {
     // getVersions()
@@ -105,11 +109,32 @@ const getVersions = () => {
         console.log(error)
     }
 }
+
+const deleteQuoteVersion = () => {
+    try {
+        Swal.fire({
+            title: `¿Está seguro de eliminar la versión ${props.quote.version_id} de la estimación \n ${props.quote.name} ${props.quote.consecutive}?`,
+            icon: 'warning',
+            showDenyButton: true,
+            confirmButtonText: 'Eliminar',
+            denyButtonText: 'Cancelar'
+        }).then(async (response) => {
+            if (response.isConfirmed) {
+                await axios.delete(route('quotestatus.destroy', {
+                    quote_version_id: props.quote.version_id
+                })).then((res) => {
+                    toast(`Se ha eliminado la versión ${props.quote.version_id} de la estimación \n ${props.quote.name} ${props.quote.consecutive} satisfactoriamente`, 'success')
+                })
+            }
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
 //#endregion
 
 // Formatear el número en moneda (USD)
 const formatCurrency = (value) => {
-
     return !value ? 0 : parseFloat(value).toLocaleString('es-CO', {
         style: 'currency',
         currency: 'COP',
@@ -313,7 +338,9 @@ const formatCurrency = (value) => {
                                                 }
                                                     " />
                                                 </Link>
-                                                <Button size="small" label="Eliminar" :pt="{
+
+                                                <!--Botón Elimnar-->
+                                                <Button @click="(deleteQuoteVersion())" size="small" label="Eliminar" :pt="{
                                                     root: '!w-full !bg-danger !hover:bg-red-500',
                                                     label: '!text-center',
                                                 }
