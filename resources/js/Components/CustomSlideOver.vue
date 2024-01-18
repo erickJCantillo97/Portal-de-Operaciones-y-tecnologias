@@ -14,7 +14,7 @@ import FeedWithComments from '@/Components/FeedWithComments.vue'
 import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 import Button from 'primevue/button'
-
+import { router } from '@inertiajs/vue3'
 const { toast } = useSweetalert()
 
 onMounted(() => {
@@ -113,17 +113,17 @@ const getVersions = () => {
 const deleteQuoteVersion = () => {
     try {
         Swal.fire({
-            title: `¿Está seguro de eliminar la versión ${props.quote.version_id} de la estimación \n ${props.quote.name} ${props.quote.consecutive}?`,
+            title: `¿Está seguro de eliminar la estimación \n ${props.quote.name} ${props.quote.consecutive}?`,
             icon: 'warning',
             showDenyButton: true,
             confirmButtonText: 'Eliminar',
             denyButtonText: 'Cancelar'
         }).then(async (response) => {
             if (response.isConfirmed) {
-                await axios.delete(route('quotestatus.destroy', {
-                    quote_version_id: props.quote.version_id
-                })).then((res) => {
-                    toast(`Se ha eliminado la versión ${props.quote.version_id} de la estimación \n ${props.quote.name} ${props.quote.consecutive} satisfactoriamente`, 'success')
+                await router.delete(route('quotesversion.destroy', props.quote.version_id), {
+                    onSuccess: () => {
+                        toast(`Se ha eliminado la estimación \n ${props.quote.name} ${props.quote.consecutive} satisfactoriamente`, 'success')
+                    }
                 })
             }
         })

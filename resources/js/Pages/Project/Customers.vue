@@ -135,7 +135,7 @@ const buttons = [
             <!-- <TextInput class="mt-2 text-left" label="NIT" placeholder="e.g. 9234232988-0"
                                                 v-model="formData.customer.NIT" :error="router.page.props.errors.nit">
                                             </TextInput> -->
-            <TextInput class="mt-2 text-left" label="Nombre del Cliente" placeholder="Escriba el nombre del CLiente"
+            <TextInput class="mt-2 text-left" label="Nombre del Cliente" placeholder="Escriba el nombre del Cliente"
                 v-model="formData.customer.name" :error="router.page.props.errors.name"></TextInput>
             <div class="text-left">
                 <label class="text-sm font-medium" for="pais">

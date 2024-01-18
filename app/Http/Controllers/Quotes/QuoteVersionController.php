@@ -9,6 +9,7 @@ use App\Models\Quotes\Quote;
 use App\Models\Quotes\QuoteTypeShip;
 use App\Models\Quotes\QuoteVersion;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -179,10 +180,24 @@ class QuoteVersionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(QuoteVersion $quoteVersion)
+    public function destroy($quoteVersion_id)
     {
+        $quoteVersion = QuoteVersion::find($quoteVersion_id);
+
         try {
-            $quoteVersion->delete();
+            if ($quoteVersion->id == $quoteVersion->quote->current_version_id) {
+                $quoteVersion->delete();
+                $ultimaVersion = QuoteVersion::where('quote_id', $quoteVersion->quote_id)->orderBy('version', 'DESC')->first();
+                if (!isset($ultimaVersion)) {
+                    Quote::find($quoteVersion->quote_id)->delete();
+                    return back()->with(['message' => 'Estimacion eliminada']);
+                }
+                Quote::find($quoteVersion->quote_id)->update([
+                    'current_version_id' => $ultimaVersion->id
+                ]);
+                return back()->with(['message' => 'Estimacion eliminada']);
+            }
+            QuoteTypeShip::where('quote_version_id', $quoteVersion->id)->delete();
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
