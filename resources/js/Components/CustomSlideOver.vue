@@ -3,7 +3,9 @@ import { ref, onMounted } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import { useSweetalert } from '@/composable/sweetAlert'
 import Moment from 'moment'
+import Swal from 'sweetalert2'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
 import CustomModal from '@/Components/CustomModal.vue'
@@ -12,6 +14,8 @@ import FeedWithComments from '@/Components/FeedWithComments.vue'
 import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 import Button from 'primevue/button'
+
+const { toast } = useSweetalert()
 
 onMounted(() => {
     // getVersions()
@@ -80,7 +84,7 @@ const closeCommentsModal = () => {
 }
 
 const key = ref(0)
-const saveStatus = async() => {
+const saveStatus = async () => {
     try {
         await axios.post(route('quotestatus.store', {
             status: statusSelected.value,
@@ -105,11 +109,32 @@ const getVersions = () => {
         console.log(error)
     }
 }
+
+const deleteQuoteVersion = () => {
+    try {
+        Swal.fire({
+            title: `¿Está seguro de eliminar la versión ${props.quote.version_id} de la estimación \n ${props.quote.name} ${props.quote.consecutive}?`,
+            icon: 'warning',
+            showDenyButton: true,
+            confirmButtonText: 'Eliminar',
+            denyButtonText: 'Cancelar'
+        }).then(async (response) => {
+            if (response.isConfirmed) {
+                await axios.delete(route('quotestatus.destroy', {
+                    quote_version_id: props.quote.version_id
+                })).then((res) => {
+                    toast(`Se ha eliminado la versión ${props.quote.version_id} de la estimación \n ${props.quote.name} ${props.quote.consecutive} satisfactoriamente`, 'success')
+                })
+            }
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
 //#endregion
 
 // Formatear el número en moneda (USD)
 const formatCurrency = (value) => {
-
     return !value ? 0 : parseFloat(value).toLocaleString('es-CO', {
         style: 'currency',
         currency: 'COP',
@@ -146,12 +171,12 @@ const formatCurrency = (value) => {
                                     </div>
                                 </TransitionChild>
                                 <div class="h-full overflow-y-auto bg-white p-2">
-                                    <div class="fixed w-96 -m-2 z-50 py-4 bg-blue-900 text-white uppercase p-2">
+                                    <div class="absolute w-96 -m-2 z-50 py-4 bg-blue-900 text-white uppercase p-2">
                                         <h2 class="text-lg text-center font-bold text-white">
                                             {{ quote.name }} {{ quote.consecutive }}
                                         </h2>
                                     </div>
-                                    <header class="w-full mt-16">
+                                    <header class="w-full mt-20">
                                         <div class="flex flex-nowrap text-center justify-center items-center"
                                             v-if="quote.version != 1">
                                             <ul class=" text-md text-center    w-10 cursor-pointer"
@@ -313,7 +338,9 @@ const formatCurrency = (value) => {
                                                 }
                                                     " />
                                                 </Link>
-                                                <Button size="small" label="Eliminar" :pt="{
+
+                                                <!--Botón Elimnar-->
+                                                <Button @click="(deleteQuoteVersion())" size="small" label="Eliminar" :pt="{
                                                     root: '!w-full !bg-danger !hover:bg-red-500',
                                                     label: '!text-center',
                                                 }

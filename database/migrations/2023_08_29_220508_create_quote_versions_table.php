@@ -21,6 +21,7 @@ return new class extends Migration
             $table->date('estimador_anaswer_date')->nullable();
             $table->string('offer_type')->nullable();
             $table->string('estimador_name');
+            // $table->string('estimador_short_name');
             $table->string('coin')->nullable();
             $table->text('route')->nullable();
             $table->string('file')->nullable();
