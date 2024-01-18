@@ -15,7 +15,10 @@ import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 import Button from 'primevue/button'
 import { router } from '@inertiajs/vue3'
+
 const { toast } = useSweetalert()
+
+const emit = defineEmits(['closeSlideOver'])
 
 onMounted(() => {
     // getVersions()
@@ -118,11 +121,12 @@ const deleteQuoteVersion = () => {
             showDenyButton: true,
             confirmButtonText: 'Eliminar',
             denyButtonText: 'Cancelar'
-        }).then(async (response) => {
+        }).then((response) => {
             if (response.isConfirmed) {
-                await router.delete(route('quotesversion.destroy', props.quote.version_id), {
+                router.delete(route('quotesversion.destroy', props.quote.version_id), {
                     onSuccess: () => {
                         toast(`Se ha eliminado la estimación \n ${props.quote.name} ${props.quote.consecutive} satisfactoriamente`, 'success')
+                        emit('closeSlideOver')
                     }
                 })
             }
@@ -313,12 +317,14 @@ const formatCurrency = (value) => {
                                         </div>
                                         <section class="grid grid-cols-2 space-x-2 text-center">
                                             <div class="col-span-1 space-y-2 items-center text-center">
+                                                <!--Botón Clonar-->
                                                 <Button size="small" label="Clonar" :pt="{
                                                     root: '!w-full !bg-emerald-600 !hover:bg-emerald-500',
                                                     label: '!text-center',
                                                 }
                                                     " />
 
+                                                <!--Botón Editar-->
                                                 <Link :href="route('quotesversion.edit', props.quote.version_id)"
                                                     class="flex">
                                                 <Button size="small" label="Editar" :pt="{
@@ -329,6 +335,7 @@ const formatCurrency = (value) => {
                                                 </Link>
                                             </div>
 
+                                            <!--Botón Actualizar-->
                                             <div class="col-span-1 space-y-2 items-center">
                                                 <Link :href="route('quotesversion.updating', props.quote.version_id)"
                                                     class="flex">
@@ -339,7 +346,7 @@ const formatCurrency = (value) => {
                                                     " />
                                                 </Link>
 
-                                                <!--Botón Elimnar-->
+                                                <!--Botón Eliminar-->
                                                 <Button @click="(deleteQuoteVersion())" size="small" label="Eliminar" :pt="{
                                                     root: '!w-full !bg-danger !hover:bg-red-500',
                                                     label: '!text-center',
