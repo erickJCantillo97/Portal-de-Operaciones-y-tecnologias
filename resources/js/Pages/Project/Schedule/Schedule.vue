@@ -186,44 +186,44 @@ const gantt = new Gantt(({
             }
         },
         { type: 'addnew', text: 'Añadir Columna' },
-        // {
-        //     text: 'Linea Base 1',
-        //     collapsible: true,
-        //     children: [
-        //         { type: 'baselinestartdate', text: 'Start', field: 'baselines[0].startDate' },
-        //         { type: 'baselineenddate', text: 'Finish', field: 'baselines[0].endDate' },
-        //         { type: 'baselineduration', text: 'Duration', field: 'baselines[0].fullDuration' },
-        //         { type: 'baselinestartvariance', field: 'baselines[0].startVariance' },
-        //         { type: 'baselineendvariance', field: 'baselines[0].endVariance' },
-        //         { type: 'baselinedurationvariance', field: 'baselines[0].durationVariance' }
-        //     ]
-        // },
-        // {
-        //     text: 'Linea Base 2',
-        //     collapsible: true,
-        //     collapsed: true,
-        //     children: [
-        //         { type: 'baselinestartdate', text: 'Start', field: 'baselines[1].startDate' },
-        //         { type: 'baselineenddate', text: 'Finish', field: 'baselines[1].endDate' },
-        //         { type: 'baselineduration', text: 'Duration', field: 'baselines[1].fullDuration' },
-        //         { type: 'baselinestartvariance', field: 'baselines[1].startVariance' },
-        //         { type: 'baselineendvariance', field: 'baselines[1].endVariance' },
-        //         { type: 'baselinedurationvariance', field: 'baselines[1].durationVariance' }
-        //     ]
-        // },
-        // {
-        //     text: 'Linea Base 3',
-        //     collapsible: true,
-        //     collapsed: true,
-        //     children: [
-        //         { type: 'baselinestartdate', text: 'Start', field: 'baselines[2].startDate' },
-        //         { type: 'baselineenddate', text: 'Finish', field: 'baselines[2].endDate' },
-        //         { type: 'baselineduration', text: 'Duration', field: 'baselines[2].fullDuration' },
-        //         { type: 'baselinestartvariance', field: 'baselines[2].startVariance' },
-        //         { type: 'baselineendvariance', field: 'baselines[2].endVariance' },
-        //         { type: 'baselinedurationvariance', field: 'baselines[2].durationVariance' }
-        //     ]
-        // }
+        {
+            text: 'Linea Base 1',
+            collapsible: true,
+            children: [
+                { type: 'baselinestartdate', text: 'Start', field: 'baselines[0].startDate' },
+                { type: 'baselineenddate', text: 'Finish', field: 'baselines[0].endDate' },
+                { type: 'baselineduration', text: 'Duration', field: 'baselines[0].fullDuration' },
+                { type: 'baselinestartvariance', field: 'baselines[0].startVariance' },
+                { type: 'baselineendvariance', field: 'baselines[0].endVariance' },
+                { type: 'baselinedurationvariance', field: 'baselines[0].durationVariance' }
+            ]
+        },
+        {
+            text: 'Linea Base 2',
+            collapsible: true,
+            collapsed: true,
+            children: [
+                { type: 'baselinestartdate', text: 'Start', field: 'baselines[1].startDate' },
+                { type: 'baselineenddate', text: 'Finish', field: 'baselines[1].endDate' },
+                { type: 'baselineduration', text: 'Duration', field: 'baselines[1].fullDuration' },
+                { type: 'baselinestartvariance', field: 'baselines[1].startVariance' },
+                { type: 'baselineendvariance', field: 'baselines[1].endVariance' },
+                { type: 'baselinedurationvariance', field: 'baselines[1].durationVariance' }
+            ]
+        },
+        {
+            text: 'Linea Base 3',
+            collapsible: true,
+            collapsed: true,
+            children: [
+                { type: 'baselinestartdate', text: 'Start', field: 'baselines[2].startDate' },
+                { type: 'baselineenddate', text: 'Finish', field: 'baselines[2].endDate' },
+                { type: 'baselineduration', text: 'Duration', field: 'baselines[2].fullDuration' },
+                { type: 'baselinestartvariance', field: 'baselines[2].startVariance' },
+                { type: 'baselineendvariance', field: 'baselines[2].endVariance' },
+                { type: 'baselinedurationvariance', field: 'baselines[2].durationVariance' }
+            ]
+        }
     ],
     // Allow extra space for baseline(s)
     subGridConfigs: {
@@ -243,9 +243,9 @@ const gantt = new Gantt(({
             footerTpl,
             exportDialog: {
                 autoSelectVisibleColumns: false,
-                items: {
-                    columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
-                }
+                // items: {
+                //     columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
+                // }
             }
         },
         projectLines: false,
