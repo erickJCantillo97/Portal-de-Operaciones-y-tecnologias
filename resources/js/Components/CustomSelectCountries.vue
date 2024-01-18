@@ -33,7 +33,6 @@ const selected = defineModel('selected', {
         }">
         <template #value="slotProps">
             <div v-if="slotProps.value" class="flex space-x-1">
-                {{ console.log(slotProps.value) }}
                 <img :src="slotProps.value.flags.svg" width="30" :alt="slotProps.value">
                 <p class="">{{ slotProps.value.translations.spa.common }}</p>
             </div>

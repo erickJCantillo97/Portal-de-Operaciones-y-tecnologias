@@ -6,6 +6,7 @@ import '@bryntum/gantt/locales/gantt.locale.Es.js';
 import { DateHelper, Gantt, List, LocaleManager, ProjectModel, StringHelper, Widget } from '@bryntum/gantt/gantt.module.js';
 
 import { useSweetalert } from '@/composable/sweetAlert';
+import Tag from 'primevue/tag';
 const { toast } = useSweetalert();
 const props = defineProps({
     project: Object,
@@ -98,18 +99,33 @@ const project = new ProjectModel({
 
 });
 
+const headerTpl = ({ currentPage, totalPages }) => `
+    <div class="flex space-x-3 items-center">
+        <img class="max-h-8" alt="Company logo" src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
+        <h3>${props.project.name}</h3>
+    </div>
+    <img class="opacity-50 top-100" alt="Company logo" src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
+    <dl>
+        <dt>Fecha y hora de impresion: ${DateHelper.format(new Date(), 'll LT')}</dt>
+        <dd>${totalPages ? `Pagina: ${currentPage + 1}/${totalPages}` : ''}</dd>
+    </dl>
+    `;
+
+const footerTpl = () => `<h3 class="">© ${new Date().getFullYear()} TOP - COTECMAR</h3>`;
+
+
 const gantt = new Gantt(({
     project,
+    rowHeight: 28,
     // resourceImageFolderPath: '../images/users/',
     dependencyIdField: 'sequenceNumber',
-    rowHeight: 30,
     columns: [
-        { type: 'wbs', text: 'EDT', width: 20 },
-        { type: 'name', width: 280 },
-        { type: 'percentdone', text: 'Avance', showCircle: true, width: 20 },
-        { type: 'duration', text: 'Duración', with: 20 },
-        { type: 'startdate', text: 'Fecha Inicio', with: 20 },
-        { type: 'enddate', text: 'Fecha fin', with: 20 },
+        { type: 'wbs', text: 'EDT' },
+        { type: 'name', },
+        { type: 'percentdone', text: 'Avance', showCircle: true },
+        { type: 'duration', text: 'Duración' },
+        { type: 'startdate', text: 'Fecha Inicio' },
+        { type: 'enddate', text: 'Fecha fin' },
         {
             type: 'resourceassignment',
             text: 'Recursos',
@@ -169,45 +185,45 @@ const gantt = new Gantt(({
                 `;
             }
         },
-        { type: 'addnew', text: 'Añadir Columna', with: 50 },
-        {
-            text: 'Linea Base 1',
-            collapsible: true,
-            children: [
-                { type: 'baselinestartdate', text: 'Start', field: 'baselines[0].startDate' },
-                { type: 'baselineenddate', text: 'Finish', field: 'baselines[0].endDate' },
-                { type: 'baselineduration', text: 'Duration', field: 'baselines[0].fullDuration' },
-                { type: 'baselinestartvariance', field: 'baselines[0].startVariance' },
-                { type: 'baselineendvariance', field: 'baselines[0].endVariance' },
-                { type: 'baselinedurationvariance', field: 'baselines[0].durationVariance' }
-            ]
-        },
-        {
-            text: 'Linea Base 2',
-            collapsible: true,
-            collapsed: true,
-            children: [
-                { type: 'baselinestartdate', text: 'Start', field: 'baselines[1].startDate' },
-                { type: 'baselineenddate', text: 'Finish', field: 'baselines[1].endDate' },
-                { type: 'baselineduration', text: 'Duration', field: 'baselines[1].fullDuration' },
-                { type: 'baselinestartvariance', field: 'baselines[1].startVariance' },
-                { type: 'baselineendvariance', field: 'baselines[1].endVariance' },
-                { type: 'baselinedurationvariance', field: 'baselines[1].durationVariance' }
-            ]
-        },
-        {
-            text: 'Linea Base 3',
-            collapsible: true,
-            collapsed: true,
-            children: [
-                { type: 'baselinestartdate', text: 'Start', field: 'baselines[2].startDate' },
-                { type: 'baselineenddate', text: 'Finish', field: 'baselines[2].endDate' },
-                { type: 'baselineduration', text: 'Duration', field: 'baselines[2].fullDuration' },
-                { type: 'baselinestartvariance', field: 'baselines[2].startVariance' },
-                { type: 'baselineendvariance', field: 'baselines[2].endVariance' },
-                { type: 'baselinedurationvariance', field: 'baselines[2].durationVariance' }
-            ]
-        }
+        { type: 'addnew', text: 'Añadir Columna' },
+        // {
+        //     text: 'Linea Base 1',
+        //     collapsible: true,
+        //     children: [
+        //         { type: 'baselinestartdate', text: 'Start', field: 'baselines[0].startDate' },
+        //         { type: 'baselineenddate', text: 'Finish', field: 'baselines[0].endDate' },
+        //         { type: 'baselineduration', text: 'Duration', field: 'baselines[0].fullDuration' },
+        //         { type: 'baselinestartvariance', field: 'baselines[0].startVariance' },
+        //         { type: 'baselineendvariance', field: 'baselines[0].endVariance' },
+        //         { type: 'baselinedurationvariance', field: 'baselines[0].durationVariance' }
+        //     ]
+        // },
+        // {
+        //     text: 'Linea Base 2',
+        //     collapsible: true,
+        //     collapsed: true,
+        //     children: [
+        //         { type: 'baselinestartdate', text: 'Start', field: 'baselines[1].startDate' },
+        //         { type: 'baselineenddate', text: 'Finish', field: 'baselines[1].endDate' },
+        //         { type: 'baselineduration', text: 'Duration', field: 'baselines[1].fullDuration' },
+        //         { type: 'baselinestartvariance', field: 'baselines[1].startVariance' },
+        //         { type: 'baselineendvariance', field: 'baselines[1].endVariance' },
+        //         { type: 'baselinedurationvariance', field: 'baselines[1].durationVariance' }
+        //     ]
+        // },
+        // {
+        //     text: 'Linea Base 3',
+        //     collapsible: true,
+        //     collapsed: true,
+        //     children: [
+        //         { type: 'baselinestartdate', text: 'Start', field: 'baselines[2].startDate' },
+        //         { type: 'baselineenddate', text: 'Finish', field: 'baselines[2].endDate' },
+        //         { type: 'baselineduration', text: 'Duration', field: 'baselines[2].fullDuration' },
+        //         { type: 'baselinestartvariance', field: 'baselines[2].startVariance' },
+        //         { type: 'baselineendvariance', field: 'baselines[2].endVariance' },
+        //         { type: 'baselinedurationvariance', field: 'baselines[2].durationVariance' }
+        //     ]
+        // }
     ],
     // Allow extra space for baseline(s)
     subGridConfigs: {
@@ -220,20 +236,19 @@ const gantt = new Gantt(({
     },
     features: {
         filter: true,
+        mspExport: true,
         pdfExport: {
             exportServer: 'https://dev.bryntum.com:8082',
-            headerTpl: ({ currentPage, totalPages }) => `
-                <div class="demo-export-header p-10">
-                    <img src="cotecmar-logo.svg"/>
-                    <dl>
-                        <dt>Date: ${DateHelper.format(new Date(), 'll LT')}</dt>
-                        <dd>${totalPages ? `Page: ${currentPage + 1}/${totalPages}` : ''}</dd>
-                    </dl>
-                </div>`,
-            footerTpl: () => `<h3 class="p-10">©COTECMAR</h3>`
+            headerTpl,
+            footerTpl,
+            exportDialog: {
+                autoSelectVisibleColumns: false,
+                items: {
+                    columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
+                }
+            }
         },
         projectLines: false,
-        mspExport: true,
         taskEdit: {
             items: {
                 resourcesTab: {
@@ -554,7 +569,7 @@ const toggleBaselineVisible = (index, visible) => {
 //#endregion
 
 onMounted(() => {
-    gantt.appendTo = 'container';
+    gantt.appendTo = 'containergantt';
 })
 //#region toolbar
 
@@ -662,16 +677,68 @@ const onSettingsMarginChange = ({ value }) => {
 </script>
 <template>
     <AppLayout>
-        <div class="grid grid-cols-5 justify-center w-full h-[10vh] overflow-y-auto">
-            <p>{{ props.project.name }}</p>
-        </div>
-        <div class="grid h-full grid-cols-1 grid-rows-1">
-            <div id="container" class="h-[80vh] flex-1 text-xs">
+        <div class="h-[89vh] overflow-y-auto">
+            <div class="grid grid-cols-4 justify-center w-full h-[18vh] overflow-y-auto">
+                <span>
+                    <p class="text-xl h-ful flex items-center font-semibold leading-6 capitalize text-primary">
+                        {{ props.project.name }}
+                    </p>
+                    <p class="text-sm">Codigo SAP: {{ props.project.SAP_code }}</p>
+                    <p class="text-xs">{{ props.project.type }}</p>
+                    <p class="text-xs">Supervisor: {{ props.project.supervisor }}</p>
+                    <Tag severity="info">{{ props.project.status }}</Tag>
+                </span>
+                <span>
+                    <p class="font-bold">Detalles del cronograma</p>
+                    <p class="text-sm">Horas por dia: {{ props.project.hoursPerDay }} horas</p>
+                    <p class="text-sm">Dias por semana: {{ props.project.daysPerWeek }} dias</p>
+                    <p class="text-sm">Dias por mes: {{ props.project.daysPerMonth }} dias</p>
+                    <p class="text-sm">Horario: {{ props.project.shift }}</p>
+                </span>
+                <!-- <p>{{ props.project }}</p> -->
+            </div>
+            <div id="containergantt" class="h-full text-xs">
             </div>
         </div>
     </AppLayout>
 </template>
 <style>
+.b-export-header,
+.b-export-footer {
+    display: flex;
+    color: #fff;
+    background: #0076f8;
+    align-items: center;
+    z-index: 10000;
+}
+
+.b-export-header {
+    text-align: start;
+    height: 40px;
+    position: relative;
+    padding: 0.7em 1em 0.5em 1em;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+}
+
+.b-export-header img {
+    height: 60%;
+}
+
+.b-export-header dl {
+    margin: 0;
+    font-size: 10px;
+}
+
+.b-export-header dd {
+    margin: 0;
+}
+
+.b-export-footer {
+    justify-content: center;
+}
+
 #id {
     font-size: 12px !important;
 }
