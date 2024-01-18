@@ -80,7 +80,7 @@ const closeCommentsModal = () => {
 }
 
 const key = ref(0)
-const saveStatus = async() => {
+const saveStatus = async () => {
     try {
         await axios.post(route('quotestatus.store', {
             status: statusSelected.value,
@@ -146,12 +146,12 @@ const formatCurrency = (value) => {
                                     </div>
                                 </TransitionChild>
                                 <div class="h-full overflow-y-auto bg-white p-2">
-                                    <div class="fixed w-96 -m-2 z-50 py-4 bg-blue-900 text-white uppercase p-2">
+                                    <div class="absolute w-96 -m-2 z-50 py-4 bg-blue-900 text-white uppercase p-2">
                                         <h2 class="text-lg text-center font-bold text-white">
                                             {{ quote.name }} {{ quote.consecutive }}
                                         </h2>
                                     </div>
-                                    <header class="w-full mt-16">
+                                    <header class="w-full mt-20">
                                         <div class="flex flex-nowrap text-center justify-center items-center"
                                             v-if="quote.version != 1">
                                             <ul class=" text-md text-center    w-10 cursor-pointer"
