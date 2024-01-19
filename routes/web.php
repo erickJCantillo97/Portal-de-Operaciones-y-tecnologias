@@ -10,6 +10,7 @@ use App\Models\Gantt\Task;
 use App\Models\Process;
 use App\Models\Projects\Customer;
 use App\Models\Projects\Project;
+use App\Models\Projects\TypeShip;
 use App\Models\Quotes\Quote;
 use App\Models\Quotes\QuoteStatus;
 use App\Models\Quotes\QuoteTypeShip;
@@ -153,23 +154,60 @@ Route::get('costoPersonal', function () {
 Route::get('/timeline', [DashboardEstimacionesController::class, 'getQuotesStatus'])->name('timeline');
 
 
-Route::get('anterior', function () {
+Route::get('clientes_anterior', function () {
     // QuoteStatus::truncate();
     // QuoteVersion::truncate();
     // QuoteTypeShip::truncate();
     // Comment::truncate();
     // Quote::truncate();
-    $clientes =  DB::connection('sqlsrv_GECON')->table('clientes')->get();
+    Customer::truncate();
+    $clientes =  DB::connection('sqlsrv_anterior')->table('clientes')->get();
     foreach ($clientes as $cliente) {
         Customer::create([
-            'nit' => $cliente->id,
+            // 'nit' => $cliente->id,
             'name' => $cliente->nombre_cliente,
             'type' => $cliente->tipo_cliente,
             'country' => $cliente->pais,
+            'country_en' => strtoupper($cliente->pais),
         ]);
     }
     return Customer::get();
 });
+Route::get('estmaciones_anterior', function () {
+    // QuoteStatus::truncate();
+    // QuoteVersion::truncate();
+    // QuoteTypeShip::truncate();
+    // Comment::truncate();
+    // Quote::truncate();
+    $estimaciones =  DB::connection('sqlsrv_anterior')->table('estimacions')->get();
+    foreach ($estimaciones as $estimacion) {
+        return $estimacion;
+    }
+});
+Route::get('estmaciones_clases', function () {
+    // QuoteStatus::truncate();
+    // QuoteVersion::truncate();
+    // QuoteTypeShip::truncate();
+    // Comment::truncate();
+    // Quote::truncate();
+    $data =  DB::connection('sqlsrv_anterior')->table('clases')->get();
+    foreach ($data as $object) {
+        TypeShip::create([
+            'name' => $object['name'],
+            'type' => $object['type'],
+            'disinger' => $object['empresa_diseñadora'],
+            'name' => $object['name'],
+            'name' => $object['name'],
+            'name' => $object['name'],
+            'name' => $object['name'],
+        ]);
+        return $object;
+    }
+});
+
+
+
+
 
 Route::get('prueba_notificacion', function () {
     $quote = Quote::with('version', 'version.quoteTypeShips')->where('id', 1)->first();
