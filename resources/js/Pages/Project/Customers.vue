@@ -125,27 +125,20 @@ const buttons = [
             <i class="fa-solid fa-plus text-xl"></i>
         </template>
         <template #titulo>
-            <p>
-                {{
-                    formData.customer.id !=
-                    null ? 'Editar ' : 'Crear' }} Cliente
-            </p>
+            <p> {{ formData.customer.id != null ? 'Editar ' : 'Crear' }} Cliente </p>
         </template>
         <template #body>
             <!-- <TextInput class="mt-2 text-left" label="NIT" placeholder="e.g. 9234232988-0"
                                                 v-model="formData.customer.NIT" :error="router.page.props.errors.nit">
                                             </TextInput> -->
-            <TextInput class="mt-2 text-left" label="Nombre del Cliente" placeholder="Escriba el nombre del Cliente"
+            <TextInput class="mt-2 text-left mb-4" label="Nombre del Cliente" placeholder="Escriba el nombre del Cliente"
                 v-model="formData.customer.name" :error="router.page.props.errors.name"></TextInput>
-            <div class="text-left">
-                <label class="text-sm font-medium" for="pais">
-                    Pais</label>
+            <div class="text-left mb-4">
+                <label class="text-sm font-medium" for="pais">Pais</label>
                 <CustomSelectCountries v-model:selected="country" />
-                {{ country }}
             </div>
             <div class="text-left">
-                <label class="text-sm font-medium" for="hull_material">Tipo de
-                    Cliente</label>
+                <label class="text-sm font-medium" for="hull_material">Tipo de Cliente</label>
                 <Dropdown id="hull_material" v-model="formData.customer.type"
                     :options="['GOBIERNO', 'ARMADOR CIVIL', 'FUERZAS ARMADAS']" placeholder="Selecciona un Tipo de Cliente"
                     class="w-full -mt-1 rounded-md md:w-14rem" :pt="{
