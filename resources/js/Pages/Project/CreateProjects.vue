@@ -419,7 +419,7 @@ const exportarExcel = () => {
 
                             <!--CAMPO TIPO DE PROYECTO (type)-->
                             <div>
-                                <label class="text-sm font-medium">Tipo de Proyecto</label>
+                                <p class="text-sm font-medium mb-0.5">Tipo de Proyecto</p>
                                 <Dropdown class="h-10" :options="typeOptions" v-model="typeSelect" showClear
                                     optionLabel="name" placeholder="Seleccione Tipo de Proyecto" :pt="{
                                         root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
@@ -510,7 +510,8 @@ const exportarExcel = () => {
                                         class="w-full h-52 overflow-y-auto custom-scroll border-2 border-gray-300 rounded-lg p-2 focus hover:border-blue-500">
                                         <div class="flex justify-center">
                                             <Loading v-if="showLoading" message="Cargando Turnos" class="mt-12" />
-                                            <NoContentToShow v-if="showNoContent" subject="Turnos" class="!size-64 !mt-6 !h-[20vh]" />
+                                            <NoContentToShow v-if="showNoContent" subject="Turnos"
+                                                class="!size-64 !mt-6 !h-[20vh]" />
                                         </div>
                                         <ul v-for="shift in shiftOptions" :key="shift.id">
                                             <div @click="selectShiftList(shift.id)"

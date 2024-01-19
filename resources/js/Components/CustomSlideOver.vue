@@ -124,6 +124,7 @@ const deleteQuoteVersion = () => {
                     onSuccess: () => {
                         toast(`Se ha eliminado la estimación \n ${props.quote.name} ${props.quote.consecutive} satisfactoriamente`, 'success')
                     }
+                }).then((res) => {
                 })
             }
         })
