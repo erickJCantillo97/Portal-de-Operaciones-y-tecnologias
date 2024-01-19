@@ -23,6 +23,7 @@ class DashboardEstimacionesController extends Controller
             return Carbon::parse($quote->status_date)->format('Y-m-d') >= Carbon::now()->subDays(6)->format('Y-m-d') && Carbon::parse($quote->status_date)->format('Y-m-d') <= Carbon::now()->format('Y-m-d')  && $get_status  == $status;
         })->map(function ($quote) {
             return [
+                'id' => $quote['id'],
                 'name' => $quote['quote']['name'],
                 'get_status' => $quote['get_status'],
                 'estimador' => $quote['estimador_name'],
