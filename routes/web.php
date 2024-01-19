@@ -226,12 +226,22 @@ Route::get('estmaciones_anterior', function () {
 });
 Route::get('statuos_estimaciones', function () {
 
-    $estados =  DB::connection('sqlsrv_anterior')->table('estado_estimacions')->get();
+    $estados =  DB::connection('sqlsrv_anterior')->table('estado_estimacions')->whereYear('fecha', 2023)->get();
     foreach ($estados as $estado) {
-        $estados =  DB::connection('sqlsrv_anterior')->table('estimacions')->where('id', $estado->estimacion_id)->get();
-        // QuoteStatus::create([
-        //     'quote_version_id' => 1
-        // ]);
+        $estimacion =  DB::connection('sqlsrv_anterior')->table('estimacions')->where('id', $estado->estimacion_id)->first();
+        $quote = null;
+        if ($estimacion) {
+            $quote = Quote::where('consecutive', $estimacion->consecutivo)->first();
+        }
+        if (isset($quote)) {
+            $version = QuoteVersion::where('quote_id', $quote->id)->where('version', $estimacion->version)->first();
+            QuoteStatus::create([
+                'quote_version_id' => $version->id,
+                'status' => $estado->estado,
+                'fecha' => $estado->fecha,
+                'user_id' => auth()->user()->id
+            ]);
+        }
     }
 });
 Route::get('estmaciones_anterior', function () {

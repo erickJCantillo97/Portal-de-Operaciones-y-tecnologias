@@ -21,7 +21,7 @@ class DashboardEstimacionesController extends Controller
         $quotes = QuoteVersion::has('quote')->with('quoteTypeShips', 'quote')->get()->filter(function ($quote) use ($status) {
             $get_status = $quote->get_status == 'Entregada' ? 'Proceso' : $quote->get_status;
             return Carbon::parse($quote->status_date)->format('Y-m-d') >= Carbon::now()->subDays(6)->format('Y-m-d') && Carbon::parse($quote->status_date)->format('Y-m-d') <= Carbon::now()->format('Y-m-d')  && $get_status  == $status;
-        })->map(function ($quote) {
+        })->map(function ($quote) { 
             return [
                 'id' => $quote['id'],
                 'name' => $quote['quote']['name'],
@@ -90,12 +90,12 @@ class DashboardEstimacionesController extends Controller
         $people = QuoteVersion::whereNotNull('estimador_anaswer_date')->whereYear('estimador_anaswer_date', '!=', '1970')->select(DB::raw('AVG(DATEDIFF(day, created_at, estimador_anaswer_date)) AS promedio'), 'estimador_name')
             ->groupBy('estimador_name')
             ->get()->map(function ($quote) {
-                $empleado = searchEmpleados('Usuario', $quote['estimador_name'])->first();
+                // $empleado = searchEmpleados('Usuario', $quote['estimador_name'])->first();
                 return [
                     'average' => $quote['promedio'],
                     'quotes' => QuoteVersion::where('estimador_name', $quote['estimador_name'])->count(),
-                    'name' => $empleado['Nombres_Apellidos'],
-                    'photo' => User::where('userprincipalname', $empleado['Correo'])->first()->photo()
+                    'name' => $quote['estimador_name'],
+                    'photo' => User::where('userprincipalname', $quote['estimador_name'] . '@cotecmar.com')->first()->photo()
                 ];
             });
 
