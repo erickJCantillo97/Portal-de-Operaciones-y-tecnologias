@@ -120,13 +120,14 @@ const gantt = new Gantt(({
     // resourceImageFolderPath: '../images/users/',
     dependencyIdField: 'sequenceNumber',
     columns: [
-        { type: 'wbs', text: 'EDT' },
-        { type: 'name', },
-        { type: 'percentdone', text: 'Avance', showCircle: true },
-        { type: 'duration', text: 'Duración' },
-        { type: 'startdate', text: 'Fecha Inicio' },
-        { type: 'enddate', text: 'Fecha fin' },
+        { id: 'wbs', type: 'wbs', text: 'EDT' },
+        { id: 'name', type: 'name', },
+        { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true },
+        { id: 'duration', type: 'duration', text: 'Duración' },
+        { id: 'startdate', type: 'startdate', text: 'Fecha Inicio' },
+        { id: 'enddate', type: 'enddate', text: 'Fecha fin' },
         {
+            id: 'resourceassignment',
             type: 'resourceassignment',
             text: 'Recursos',
             width: 150,
@@ -241,11 +242,14 @@ const gantt = new Gantt(({
             exportServer: 'https://dev.bryntum.com:8082',
             headerTpl,
             footerTpl,
+            orientation: 'landscape',
+            paperFormat: 'Letter',
+            keepRegionSizes: { locked: true },
             exportDialog: {
                 autoSelectVisibleColumns: false,
-                // items: {
-                //     columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
-                // }
+                items: {
+                    columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
+                }
             }
         },
         projectLines: false,
@@ -741,5 +745,20 @@ const onSettingsMarginChange = ({ value }) => {
 
 #id {
     font-size: 12px !important;
+}
+
+.b-grid-panel-body {
+    margin-bottom: 30px !important;
+    background-color: cadetblue;
+}
+
+.b-panel-body-wrap {
+    margin-bottom: 30px !important;
+    background-color: #0076f8;
+}
+
+.b-pdfexport {
+    margin-bottom: 30px !important;
+    background-color: red;
 }
 </style>
