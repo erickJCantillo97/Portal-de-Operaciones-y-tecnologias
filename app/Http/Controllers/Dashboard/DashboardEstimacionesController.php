@@ -65,8 +65,8 @@ class DashboardEstimacionesController extends Controller
 
     public function getAvgManurities()
     {
-        $promedioPorDificultad = QuoteVersion::join('quote_type_ships', 'quote_versions.id', '=', 'quote_type_ships.quote_version_id')
-            ->select('quote_type_ships.maturity', DB::raw('AVG(DATEDIFF(day, quote_versions.created_at, quote_versions.estimador_anaswer_date)) AS promedio'))
+        $promedioPorDificultad = QuoteVersion::whereDate('estimador_anaswer_date', '<>', '1970-01-01')->join('quote_type_ships', 'quote_versions.id', '=', 'quote_type_ships.quote_version_id')
+            ->select('quote_type_ships.maturity', DB::raw('AVG(DATEDIFF(day, quote_versions.expeted_answer_date, quote_versions.estimador_anaswer_date)) AS promedio'))
             ->groupBy('quote_type_ships.maturity')
             ->whereNotNull('quote_type_ships.maturity')
             ->whereNotNull('quote_versions.estimador_anaswer_date')
@@ -76,6 +76,9 @@ class DashboardEstimacionesController extends Controller
             'values' => $promedioPorDificultad->map(function ($value) {
                 return intval($value['promedio']);
             }),
+            // 'values' => $promedioPorDificultad->map(function ($value) {
+            //     return intval($value['promedio']);
+            // }),
             'maturities' => $promedioPorDificultad->map(function ($value) {
                 return $value['maturity'];
             }),

@@ -27,7 +27,7 @@ getData()
 
 const chartOptions = ref({
     height: "300",
-    colorAxis: { colors: ['rgb(234,241,255)', 'rgb(46, 48, 146)'] }
+    colorAxis: { colors: ['#D7DA0F', 'rgb(46, 48, 146)'] }
 })
 
 </script>
