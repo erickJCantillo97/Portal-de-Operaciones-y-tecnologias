@@ -45,8 +45,11 @@ class QuoteController extends Controller
             ];
         });
         $quote = null;
-        if ($request->quote_id)
-            $quote = collect($quotes)->where('id', $request->quote_id)->first();
+        if ($request->quote_id) {
+
+            $quote = collect($quotes)->where('version_id', $request->quote_id)->first();
+
+        }
 
 
         return Inertia::render('Quotes/Index', compact('quotes', 'quote'));
