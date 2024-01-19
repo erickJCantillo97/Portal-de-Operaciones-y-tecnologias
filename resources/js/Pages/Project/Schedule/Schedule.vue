@@ -747,7 +747,7 @@ const onSettingsMarginChange = ({ value }) => {
     font-size: 12px !important;
 }
 
-.b-grid-panel-body {
+/* .b-grid-panel-body {
     margin-bottom: 30px !important;
     background-color: cadetblue;
 }
@@ -760,5 +760,5 @@ const onSettingsMarginChange = ({ value }) => {
 .b-pdfexport {
     margin-bottom: 30px !important;
     background-color: red;
-}
+} */
 </style>
