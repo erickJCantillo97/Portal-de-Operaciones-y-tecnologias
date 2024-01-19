@@ -4,7 +4,7 @@ import Button from 'primevue/button';
 import { ref } from 'vue';
 import axios from "axios";
 import Dropdown from 'primevue/dropdown';
-import Card from 'primevue/card';
+import { router } from '@inertiajs/vue3';
 const columnas = [
     { field: 'consecutive', header: 'Consecutivo' },
     { field: 'name', header: 'Nombre' },
@@ -26,10 +26,14 @@ const getQuotes = () => {
 }
 getQuotes()
 
+const rowClic = (event) => {
+    router.get(route('quotes.index'), { quote_id: event.data.id })
+}
+
 </script>
 <template>
-    <CustomDataTable :data="quotes" title="Estimaciones" :loading="loading" :showColumns="false" :paginator="false"
-        :columnas="columnas" :filter="false">
+    <CustomDataTable @rowClic="rowClic" :data="quotes" title="Estimaciones" :loading="loading" :showColumns="false"
+        :paginator="false" :columnas="columnas" :filter="false">
         <template #buttonHeader>
             <Dropdown v-model="filter" class="h-8" @change="getQuotes()" :options="filters" :pt="{
                 root: '!ring-0 !border-0',

@@ -16,7 +16,6 @@ const getData = () => {
         } else {
             for (var values of res.data.values)
                 chartData.value.push([values[0], parseInt(values[1])])
-            console.log(chartData.value)
             empty.value = false
         }
         loading.value = false
