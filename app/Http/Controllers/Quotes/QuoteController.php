@@ -22,7 +22,7 @@ class QuoteController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $quotes = Quote::with('version', 'version.quoteTypeShips')->orderBy('id')->get()->map(function ($quote) {
             return [
@@ -44,8 +44,12 @@ class QuoteController extends Controller
                 'clases' => implode(', ', collect($quote['version']['quoteTypeShips'])->pluck('name')->toArray())
             ];
         });
+        $quote = null;
+        if ($request->quote_id)
+            $quote = collect($quotes)->where('id', $request->quote_id)->first();
 
-        return Inertia::render('Quotes/Index', compact('quotes'));
+
+        return Inertia::render('Quotes/Index', compact('quotes', 'quote'));
     }
 
     /**

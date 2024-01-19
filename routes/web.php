@@ -154,21 +154,21 @@ Route::get('/timeline', [DashboardEstimacionesController::class, 'getQuotesStatu
 
 
 Route::get('anterior', function () {
-    QuoteStatus::truncate();
-    QuoteVersion::truncate();
-    QuoteTypeShip::truncate();
-    Comment::truncate();
-    Quote::truncate();
-    // $clientes =  DB::connection('sqlsrv_GECON')->table('clientes')->get();
-    // foreach ($clientes as $cliente) {
-    //     Customer::create([
-    //         'nit' => $cliente->id,
-    //         'name' => $cliente->nombre_cliente,
-    //         'type' => $cliente->tipo_cliente,
-    //         'country' => $cliente->pais,
-    //     ]);
-    // }
-    // return Customer::get();
+    // QuoteStatus::truncate();
+    // QuoteVersion::truncate();
+    // QuoteTypeShip::truncate();
+    // Comment::truncate();
+    // Quote::truncate();
+    $clientes =  DB::connection('sqlsrv_GECON')->table('clientes')->get();
+    foreach ($clientes as $cliente) {
+        Customer::create([
+            'nit' => $cliente->id,
+            'name' => $cliente->nombre_cliente,
+            'type' => $cliente->tipo_cliente,
+            'country' => $cliente->pais,
+        ]);
+    }
+    return Customer::get();
 });
 
 Route::get('prueba_notificacion', function () {
