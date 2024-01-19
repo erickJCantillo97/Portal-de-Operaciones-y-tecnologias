@@ -104,7 +104,7 @@ const headerTpl = ({ currentPage, totalPages }) => `
         <img class="max-h-8" alt="Company logo" src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
         <h3>${props.project.name}</h3>
     </div>
-    <img class="opacity-50 top-100" alt="Company logo" src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
+    <img class="opacity-50" alt="Company logo" src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
     <dl>
         <dt>Fecha y hora de impresion: ${DateHelper.format(new Date(), 'll LT')}</dt>
         <dd>${totalPages ? `Pagina: ${currentPage + 1}/${totalPages}` : ''}</dd>
@@ -242,7 +242,7 @@ const gantt = new Gantt(({
             exportServer: 'https://dev.bryntum.com:8082',
             headerTpl,
             footerTpl,
-            orientation: 'landscape',
+            orientation: 'portrait',
             paperFormat: 'Letter',
             keepRegionSizes: { locked: true },
             exportDialog: {
@@ -701,7 +701,7 @@ const onSettingsMarginChange = ({ value }) => {
                 </span>
                 <!-- <p>{{ props.project }}</p> -->
             </div>
-            <div id="containergantt" class="h-full text-xs">
+            <div id="containergantt" class="h-[80vh] text-xs">
             </div>
         </div>
     </AppLayout>
@@ -713,7 +713,6 @@ const onSettingsMarginChange = ({ value }) => {
     color: #fff;
     background: #0076f8;
     align-items: center;
-    z-index: 10000;
 }
 
 .b-export-header {
@@ -726,9 +725,6 @@ const onSettingsMarginChange = ({ value }) => {
     justify-content: space-between;
 }
 
-.b-export-header img {
-    height: 60%;
-}
 
 .b-export-header dl {
     margin: 0;
@@ -746,19 +742,4 @@ const onSettingsMarginChange = ({ value }) => {
 #id {
     font-size: 12px !important;
 }
-
-/* .b-grid-panel-body {
-    margin-bottom: 30px !important;
-    background-color: cadetblue;
-}
-
-.b-panel-body-wrap {
-    margin-bottom: 30px !important;
-    background-color: #0076f8;
-}
-
-.b-pdfexport {
-    margin-bottom: 30px !important;
-    background-color: red;
-} */
 </style>
