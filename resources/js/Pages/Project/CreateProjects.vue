@@ -173,27 +173,28 @@ const beforeChange = async () => {
 const submit = async () => {
     // TO DO store onComplete()
     // return false
-    try {
-        formData.ships = selectedShips.value
-        if (!projectIdRef) {
-            await axios.post(route('projects.store', projectIdRef), formData)
-                .then((res) => {
-                    toast('Proyecto creado exitosamente!', 'success')
-                    switchTabsStates = true
-                })
-            return switchTabsStates
-        } else {
-            await axios.put(route('projects.update', projectIdRef), formData)
-                .then((res) => {
-                    toast('Proyecto actualizado exitosamente!', 'success')
-                    switchTabsStates = true
-                })
-            return switchTabsStates
-            // return true
-        }
-    } catch (error) {
-        toast(error.message)
-    }
+    toast('Proyecto creado exitosamente!', 'success')
+    router.get(route('projects.index'));
+    // try {
+    //     formData.ships = selectedShips.value
+    //     if (!projectIdRef) {
+    //         await axios.post(route('projects.store', projectIdRef), formData)
+    //             .then((res) => {
+    //                 switchTabsStates = true
+    //             })
+    //         return switchTabsStates
+    //     } else {
+    //         await axios.put(route('projects.update', projectIdRef), formData)
+    //             .then((res) => {
+    //                 toast('Proyecto actualizado exitosamente!', 'success')
+    //                 switchTabsStates = true
+    //             })
+    //         return switchTabsStates
+    //         // return true
+    //     }
+    // } catch (error) {
+    //     toast(error.message)
+    // }
     // return false
 }
 
@@ -365,7 +366,7 @@ const exportarExcel = () => {
                             <div>
                                 <label class="text-sm font-medium">Contrato</label>
                                 <Dropdown class="h-10" :options="contracts" v-model="contractSelect" showClear
-                                    optionLabel="name" placeholder="Seleccione Contrato" :pt="{
+                                    optionLabel="contract_id" placeholder="Seleccione Contrato" :pt="{
                                         root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
                                         input: '!text-sm',
                                         filterInput: '!text-gray-300',
