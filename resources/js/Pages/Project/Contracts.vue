@@ -118,8 +118,8 @@ const buttons = [
 <template>
     <AppLayout>
         <div class="w-full overflow-y-auto">
-            <CustomDataTable :data="contracts" title="Contratos" :columnas="columnas" :actions="buttons" @edit="editItem"
-                @delete="del">
+            <CustomDataTable :data="contracts" :rowsDefault="20" title="Contratos" :columnas="columnas" :actions="buttons"
+                @edit="editItem" @delete="del">
                 <template #buttonHeader>
                     <span>
                         <Button @click="addItem()" severity="success" icon="fa-solid fa-plus" outlined label="Nuevo">
