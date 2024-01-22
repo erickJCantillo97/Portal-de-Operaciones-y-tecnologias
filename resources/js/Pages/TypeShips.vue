@@ -134,8 +134,8 @@ const buttons = [
 <template>
     <AppLayout>
         <div class="w-full h-[89vh] overflow-y-auto">
-            <CustomDataTable :data="typeShips" :columnas="columns" :actions="buttons" @showEdit="showEdit"
-                title="Clases de buque" @deleteClic="deleteClic">
+            <CustomDataTable :rows-default="100" :data="typeShips" :columnas="columns" :actions="buttons"
+                @showEdit="showEdit" title="Clases de buque" @deleteClic="deleteClic">
                 <template #buttonHeader>
                     <Button title="Nuevo" severity="primary" label="Agregar" outlined class="!h-8" icon="fa-solid fa-plus"
                         @click="showNew()" />

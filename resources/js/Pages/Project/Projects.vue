@@ -222,8 +222,8 @@ const buttons = [
 <template>
     <AppLayout>
         <div class="w-full h-[89vh] overflow-y-auto">
-            <CustomDataTable title="Proyectos" :data="projects" :columnas="columnas" :actions="buttons" @addDoc="addDoc"
-                @addAct="addAct" @editClic="editClic" @deleteClic="deleteClic">
+            <CustomDataTable title="Proyectos" :data="projects" :rows-default="100" :columnas="columnas" :actions="buttons"
+                @addDoc="addDoc" @addAct="addAct" @editClic="editClic" @deleteClic="deleteClic">
                 <template #buttonHeader>
                     <Button @click="addItem" severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
                 </template>

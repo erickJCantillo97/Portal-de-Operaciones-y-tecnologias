@@ -18,6 +18,14 @@ class TypeShip extends Model implements Auditable
 
     protected $appends = ['count_ships'];
 
+    protected $casts = [
+        'length' => 'decimal:2',
+        'breadth' => 'decimal:2',
+        'draught' => 'decimal:2',
+        'depth' => 'decimal:2',
+        'full_load' => 'decimal:2',
+    ];
+
     protected function render(): Attribute
     {
         return Attribute::make(

@@ -13,8 +13,7 @@ import QuotesCard from "@/Pages/Dashboards/Quotes/QuotesCards.vue";
 // import Tag from "primevue/tag";
 // import { MagnifyingGlassIcon, PencilIcon, TrashIcon } from "@heroicons/vue/20/solid";
 
-import DataChart from "./DataChart.vue";
-import Projects from "@/Pages/Dashboards/Projects.vue";
+import Projects from "@/Pages/Dashboards/Projects/Projects.vue";
 import Quotes from "@/Pages/Dashboards/Quotes.vue";
 
 // import TimeLine from './TimeLine.vue';
@@ -75,9 +74,10 @@ onMounted(() => {
         <div class="overflow-y-scroll">
             <div class="grid grid-cols-1  md:grid-cols-2 max-w-full">
                 <UserHeader class="col-span-1" />
-                <QuotesCard class="col-span-1" :showIndicators="false" />
+                <QuotesCard class="col-span-1" :showIndicators="false" v-if="$page.props.auth.user.oficina == 'DEEST'" />
             </div>
-            <Quotes />
+            <Quotes v-if="$page.props.auth.user.oficina == 'DEEST'" />
+            <Projects v-else />
             <!-- <Projects />
                 <div class="p-8 m-1 shadow-md rounded-xl">
                     <DataChart></DataChart>

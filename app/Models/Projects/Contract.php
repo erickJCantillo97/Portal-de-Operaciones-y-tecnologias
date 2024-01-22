@@ -19,6 +19,9 @@ class Contract extends Model implements Auditable
         static::addGlobalScope(new GerenciaScope);
     }
 
+    protected $casts = [
+        'end_date' => 'datetime:d/m/Y',
+    ];
 
     protected $guarded = [];
 

@@ -3,6 +3,7 @@
 namespace App\Models\Projects;
 
 use App\Models\Scopes\GerenciaScope;
+use App\Models\VirtualTask;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -41,5 +42,10 @@ class Project extends Model implements Auditable
             set: fn ($value) => $value,
             get: fn ($value) => $value ?? 'SIN ESTADO',
         );
+    }
+
+    public function tasks()
+    {
+        return $this->hasMany(VirtualTask::class, 'project_id');
     }
 }
