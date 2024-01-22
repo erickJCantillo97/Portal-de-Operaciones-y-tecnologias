@@ -168,17 +168,17 @@ const navigation = [
             {
                 name: 'Proyectos',
                 href: 'projects.index',
-                dev: true
+                // dev: true
             }, //gerencia (auth()->user()gerencia)
             {
                 name: 'Unidades',
                 href: 'ships.index',
-                dev: true
+                // dev: true
             },
             {
                 name: 'Clases',
                 href: 'typeShips.index',
-                dev: true
+                // dev: true
             },
         ],
     },
@@ -190,12 +190,12 @@ const navigation = [
             {
                 name: 'Clientes',
                 href: 'customers.index',
-                dev: true
+                // dev: true
             },
             {
                 name: 'Contratos',
                 href: 'contracts.index',
-                dev: true
+                // dev: true
             },
             {
                 name: 'Autorizaciones',
@@ -205,7 +205,7 @@ const navigation = [
             {
                 name: 'Estimaciones',
                 href: 'quotes.index',
-                dev: true
+                // dev: true
             },
         ],
     },
