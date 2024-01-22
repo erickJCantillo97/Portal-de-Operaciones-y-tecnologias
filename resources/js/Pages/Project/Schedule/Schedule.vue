@@ -670,39 +670,45 @@ const onSettingsRowHeightChange = ({ value }) => {
 const onSettingsMarginChange = ({ value }) => {
     gantt.barMargin = value;
 }
-
 //#endregion
-
 
 </script>
 <template>
     <AppLayout>
-        <div class="h-[89vh] overflow-y-auto">
-            <div class="grid grid-cols-4 justify-center w-full h-[18vh] overflow-y-auto">
-                <span>
-                    <p class="text-xl h-ful flex items-center font-semibold leading-6 capitalize text-primary">
+        <main class="h-[89vh] overflow-y-auto">
+            <section class="grid grid-cols-4 place-content-center w-full h-[18vh] overflow-y-auto [&>div>p]:p-[0.15rem]">
+                <div class="col-span-2">
+                    <p
+                        class="text-xl h-ful flex items-center justify-center font-semibold leading-6 capitalize text-primary">
                         {{ props.project.name }}
                     </p>
-                    <p class="text-sm">Codigo SAP: {{ props.project.SAP_code }}</p>
-                    <p class="text-xs">{{ props.project.type }}</p>
-                    <p class="text-xs">Supervisor: {{ props.project.supervisor }}</p>
-                    <Tag severity="info">{{ props.project.status }}</Tag>
-                </span>
-                <span>
+                    <div class="flex content-between">
+                        <p class="text-sm">Codigo SAP: {{ props.project.SAP_code }}</p>
+                        <p class="text-xs">{{ props.project.type }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs">Supervisor: {{ props.project.supervisor }}</p>
+                        <Tag severity="info">{{ props.project.status }}</Tag>
+                    </div>
+                </div>
+                <div class="col-span-2">
                     <p class="font-bold">Detalles del cronograma</p>
                     <p class="text-sm">Horas por dia: {{ props.project.hoursPerDay }} horas</p>
                     <p class="text-sm">Dias por semana: {{ props.project.daysPerWeek }} dias</p>
                     <p class="text-sm">Dias por mes: {{ props.project.daysPerMonth }} dias</p>
                     <p class="text-sm">Horario: {{ props.project.shift }}</p>
-                </span>
-                <!-- <p>{{ props.project }}</p> -->
-            </div>
-            <div id="containergantt" class="h-full text-xs">
-            </div>
-        </div>
+                </div>
+            </section>
+            <div id="containergantt" class="h-full text-xs"></div>
+        </main>
     </AppLayout>
 </template>
 <style>
+/* .b-export .b-panel {
+    overflow: visible !important;
+    contain: none !important;
+} */
+
 .b-export-header,
 .b-export-footer {
     display: flex;
@@ -738,6 +744,14 @@ const onSettingsMarginChange = ({ value }) => {
 .b-export-footer {
     justify-content: center;
 }
+
+/* .b-export .b-sch-canvas {
+    width: 100% !important;
+    background-color: #62ff65 !important;
+    overflow: visible !important;
+    contain: none !important;
+    height: 100% !important;
+} */
 
 #id {
     font-size: 12px !important;
