@@ -48,6 +48,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     })->name('get.foto');
 
     Route::get('/dashboard', function () {
+
+        
         $taskProject = [];
 
         // VirtualTask::whereNull('task_id')->get()->map(function ($item) {
@@ -173,57 +175,7 @@ Route::get('clientes_anterior', function () {
     }
     return Customer::get();
 });
-Route::get('estmaciones_anterior', function () {
-    // QuoteStatus::truncate();
-    // QuoteVersion::truncate();
-    // QuoteTypeShip::truncate();
-    // Comment::truncate();
-    // Quote::truncate();
-    $estimaciones =  DB::connection('sqlsrv_anterior')->table('estimacions')->whereYear('fecha_solicitud', 2023)->get();
-    foreach ($estimaciones as $estimacion) {
-        if (Carbon::parse($estimacion->fecha_solicitud)->format('Y') == 2023) {
-            $quote = Quote::where('consecutive', $estimacion->consecutivo)->first();
-            if (!$quote)
-                $quote = Quote::create([
-                    'gerencia' => auth()->user()->gerencia,
-                    'name' => $estimacion->nombre,
-                    'consecutive' => $estimacion->consecutivo,
-                    'user_id' =>  auth()->user()->id
-                ]);
 
-            $cliente = DB::connection('sqlsrv_anterior')->table('clientes')->where('id', $estimacion->cliente_id)->first();
-            $cliente_id = null;
-            if ($cliente) {
-                $cliente_id = Customer::where('name', $cliente->nombre_cliente)->first()->id;
-            }
-            $quoteVersion = QuoteVersion::FirstOrCreate([
-                'quote_id' => $quote->id,
-                'version' => $estimacion->version,
-                'estimador_id' => $estimacion->estimador_id,
-                'customer_id' =>  $cliente_id,
-                'expeted_answer_date' => $estimacion->fecha_respuesta_esperada,
-                'estimador_anaswer_date' => $estimacion->fecha_respuesta_estimador,
-                'offer_type' => $estimacion->tipo_oferta,
-                'estimador_name' => $estimacion->nombre_estimador,
-                'coin' => $estimacion->moneda_original,
-                'file' => $estimacion->file,
-            ]);
-            $quote->current_version_id = $quoteVersion->id;
-            $quote->save();
-            $estados =  DB::connection('sqlsrv_anterior')->table('estado_estimacions')->get();
-
-            if ($estimacion->clase_id) {
-                QuoteTypeShip::FirstOrCreate([
-                    'quote_version_id' => $quoteVersion->id,
-                    'type_ship_id' => $estimacion->clase_id,
-                    'name' => TypeShip::find($estimacion->clase_id)->name ?? 'Sin Clase',
-                    'scope' => $estimacion->alcance,
-                    'maturity' => $estimacion->madurez,
-                ]);
-            }
-        }
-    }
-});
 
 Route::get('estmaciones_anterior', function () {
     // QuoteStatus::truncate();
@@ -269,6 +221,10 @@ Route::get('estmaciones_anterior', function () {
                     'name' => TypeShip::find($estimacion->clase_id)->name ?? 'Sin Clase',
                     'scope' => $estimacion->alcance,
                     'maturity' => $estimacion->madurez,
+                    'units' => $estimacion->cantidad,
+                    'iva' => $estimacion->iva,
+                    'white_paper' => $estimacion->documento_tecnico,
+                    'price_before_iva_original' => $estimacion->precio_antes_de_iva_original ?? 0,
                 ]);
             }
             $estado = 0;
@@ -316,10 +272,6 @@ Route::get('clases_anterior', function () {
         ]);
     }
 });
-
-
-
-
 
 Route::get('prueba_notificacion', function () {
     $quote = Quote::with('version', 'version.quoteTypeShips')->where('id', 1)->first();

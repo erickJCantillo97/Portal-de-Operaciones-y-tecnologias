@@ -66,8 +66,8 @@ const showClic = (event) => {
 <template>
     <AppLayout>
         <div class="h-[85vh] overflow-y-auto">
-            <CustomDataTable :data="quotes" :columnas="columnas" :filterButtons="filterButtons" title="Estimaciones"
-                @rowClic="showClic">
+            <CustomDataTable :rowsDefault="100" :data="quotes" :columnas="columnas" :filterButtons="filterButtons"
+                title="Estimaciones" @rowClic="showClic">
                 <template #buttonHeader>
                     <Link :href="route('quotes.create')">
                     <Button title="Agregar Estimación" severity="success" label="Agregar" outlined icon="fa-solid fa-plus"

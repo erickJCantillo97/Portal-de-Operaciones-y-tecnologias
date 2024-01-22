@@ -6,6 +6,7 @@ use App\Events\ContractEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Projects\Contract;
 use App\Models\Projects\Customer;
+use App\Models\Quotes\QuoteVersion;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -21,8 +22,10 @@ class ContractController extends Controller
     {
         $contracts = Contract::with('customer')->orderBy('contract_id')->get();
         $customers = Customer::orderBy('name')->get();
-
-        return Inertia::render('Project/Contracts', compact('contracts', 'customers'));
+        $quotes = QuoteVersion::get()->filter(function ($quote) {
+            return $quote['get_status'] === 'Contratada';
+        });
+        return Inertia::render('Project/Contracts', compact('contracts', 'customers', 'quotes'));
     }
 
     /**
@@ -60,7 +63,7 @@ class ContractController extends Controller
                 $validateData['file'] = Storage::putFileAs(
                     'public/contract/',
                     $request->pdf,
-                    $validateData['name'].'.'.$request->pdf->getClientOriginalExtension()
+                    $validateData['name'] . '.' . $request->pdf->getClientOriginalExtension()
                 );
             }
             Contract::create($validateData);
@@ -69,7 +72,7 @@ class ContractController extends Controller
 
             return back()->with(['message' => 'Contrato creado correctamente'], 200);
         } catch (Exception $e) {
-            return back()->withErrors(['message' => 'Ocurrió un error al crear el contrato: '.$e->getMessage()], 500);
+            return back()->withErrors(['message' => 'Ocurrió un error al crear el contrato: ' . $e->getMessage()], 500);
         }
 
         return redirect('contracts.index');
@@ -97,7 +100,7 @@ class ContractController extends Controller
     public function update(Request $request, Contract $contract)
     {
         $validateData = $request->validate([
-            'contract_id' => 'required|unique:contracts,contract_id,'.$contract->id,
+            'contract_id' => 'required|unique:contracts,contract_id,' . $contract->id,
             'subject' => 'nullable',
             'customer_id' => 'nullable',
             'manager_id' => 'nullable',
@@ -116,13 +119,13 @@ class ContractController extends Controller
                 $validateData['file'] = Storage::putFileAs(
                     'public/contract/',
                     $request->pdf,
-                    $validateData['name'].'.'.$request->pdf->getClientOriginalExtension()
+                    $validateData['name'] . '.' . $request->pdf->getClientOriginalExtension()
                 );
             }
             $contract->update($validateData);
             event(new ContractEvent($contract, 'updated'));
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -135,7 +138,7 @@ class ContractController extends Controller
             $contract->delete();
             event(new ContractEvent($contract, 'deleted'));
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 
