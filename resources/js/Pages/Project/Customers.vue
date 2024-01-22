@@ -10,7 +10,6 @@ import TextInput from '../../Components/TextInput.vue';
 import Button from 'primevue/button';
 import CustomDataTable from '@/Components/CustomDataTable.vue';
 import CustomModal from '@/Components/CustomModal.vue';
-import axios from 'axios';
 import CustomSelectCountries from '@/Components/CustomSelectCountries.vue';
 
 const confirm = useConfirm();
