@@ -25,7 +25,7 @@ onMounted(() => {
       <h3 class="text-white text-lg font-semibold">Tiempo Promedio de Respuesta de Estimadores</h3>
     </div>
     <CardSkeleton v-if="showCardSkeleton" />
-    <div class="block space-y-2 h-56 p-1 overflow-y-auto">
+    <div class="block space-y-2 h-72 p-1 overflow-y-auto">
       <div v-for="person in  people" :key="person.email"
         class="relative flex items-center space-x-3 rounded-lg shadow-xl bg-white p-2 border-0"
         v-tooltip="'Proceso: 3 \n Entregada: 5 \n Pendiente por Firma: 1 \n Firmada: 6 \n No Firmada: 1 \n Contratada: 2'"

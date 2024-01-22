@@ -21,7 +21,7 @@ const prueba2 = ref()
         <GraphicMadurityTime class="shadow-md" />
         <!-- <GraphicMadurityTime class="shadow-md" /> -->
         <!-- <DataEstimatorCard class="shadow-md" /> -->
-        <TableQuotes class="shadow-md col-span-1 md:col-span-2 mt-4" />
+        <!-- <TableQuotes class="shadow-md col-span-1 md:col-span-2 mt-4" /> -->
         <DataEstimatorCard class="shadow-md rounded-b-md" />
     </div>
 </template>
