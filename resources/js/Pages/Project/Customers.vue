@@ -107,8 +107,9 @@ const buttons = [
 <template>
     <AppLayout>
         <div class="h-[89vh] overflow-y-auto">
-            <CustomDataTable :data="customers" title="Clientes" cacheName="customers" :columnas="columnas"
-                :actions="buttons" @showShips="showShips" @deleteItem="deleteItem" @editItem="editItem">
+            <CustomDataTable :data="customers" :rows-default="100" title="Clientes" cacheName="customers"
+                :columnas="columnas" :actions="buttons" @showShips="showShips" @deleteItem="deleteItem"
+                @editItem="editItem">
                 <template #buttonHeader>
                     <Button title="Agregar Estimación" @click="addItem()" severity="success" label="Agregar" outlined
                         icon="fa-solid fa-plus" class="!h-8" />

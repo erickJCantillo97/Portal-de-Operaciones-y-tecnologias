@@ -26,7 +26,8 @@ let loading = true
 //Obtener Contratos por API Routes
 const getContracts = () => {
     try {
-        axios.get(route('getContracts')).then((res) => {
+        axios.get(route('getContracts'))
+        .then((res) => {
             contracts.value = res.data.contracts
             loadInitialSelectedContracts()
             suma.value = res.data.contracts.reduce((total, obj) => total + parseInt(obj.cost), 0); // Cálculo del Porcentaje de Contratos

@@ -24,7 +24,7 @@ class QuoteController extends Controller
      */
     public function index(Request $request)
     {
-        $quotes = Quote::with('version', 'version.quoteTypeShips')->orderBy('id')->get()->map(function ($quote) {
+        $quotes = Quote::with('version', 'version.quoteTypeShips')->orderBy('consecutive', 'DESC')->get()->map(function ($quote) {
             return [
                 'id' => $quote['id'],
                 'name' => $quote['name'],
@@ -48,7 +48,6 @@ class QuoteController extends Controller
         if ($request->quote_id) {
 
             $quote = collect($quotes)->where('version_id', $request->quote_id)->first();
-
         }
 
 

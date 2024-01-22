@@ -13,6 +13,7 @@ import InputNumber from 'primevue/inputnumber';
 import InputSwitch from 'primevue/inputswitch';
 import ApplicationLogo from './ApplicationLogo.vue';
 import Loading from './Loading.vue';
+import { IntegerDataField } from '@bryntum/gantt';
 
 const props = defineProps({
     data: {
@@ -58,11 +59,15 @@ const props = defineProps({
     loading: {
         type: Boolean,
         default: false
+    },
+    rowsDefault: {
+        type: Number,
+        defaul: 10
     }
 })
 
 //#region Filtros de tabla y visor columnas
-const rows = ref(10)
+const rows = ref(props.rowsDefault)
 const filters = ref({});
 const globalFilterFields = ref([])
 const columnasSelect = ref()
