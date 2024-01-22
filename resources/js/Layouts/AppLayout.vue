@@ -1,5 +1,5 @@
 <template>
-    <div class="max-h-[3vh] flex items-center px-6 bg-orange-300 gap-x-6 sm:before:flex-1">
+    <div v-if="debug == 'true'" class="max-h-[3vh] flex items-center px-6 bg-orange-300 gap-x-6 sm:before:flex-1">
         <p class="space-x-2 text-sm text-white">
             <strong class="font-semibold">Modo de pruebas</strong>
         </p>
@@ -120,7 +120,8 @@
                                                         </div>
                                                         <div class="mt-1">
                                                             <p class="text-xs text-indigo-300">
-                                                                En este espacio podrás informarnos tus opiniones, sugerencias y errores que encuentes en el portal
+                                                                En este espacio podrás informarnos tus opiniones,
+                                                                sugerencias y errores que encuentes en el portal
                                                             </p>
                                                         </div>
                                                     </div>
@@ -257,6 +258,7 @@ const sugerencia = ref('')
 const tipoReporte = ref('Sugerencia')
 const sugerenciaVisible = ref(false)
 const suggestions = ref([])
+const debug = import.meta.env.VITE_APP_DEBUG
 
 onMounted(() => {
     loadSuggestions()

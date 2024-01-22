@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('task_id')->index()->nullable();
             $table->unsignedBigInteger('project_id')->index()->nullable();
             $table->string('manager')->nullable();
+            $table->boolean('manuallyScheduled')->default(1);
             $table->string('executor')->nullable();
             $table->string('name');
             $table->string('durationUnit');

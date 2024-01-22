@@ -10,6 +10,7 @@ use App\Models\Gantt\Task;
 use App\Models\Process;
 use App\Models\Projects\Customer;
 use App\Models\Projects\Project;
+use App\Models\Projects\TypeShip;
 use App\Models\Quotes\Quote;
 use App\Models\Quotes\QuoteStatus;
 use App\Models\Quotes\QuoteTypeShip;
@@ -153,23 +154,172 @@ Route::get('costoPersonal', function () {
 Route::get('/timeline', [DashboardEstimacionesController::class, 'getQuotesStatus'])->name('timeline');
 
 
-Route::get('anterior', function () {
-    QuoteStatus::truncate();
-    QuoteVersion::truncate();
-    QuoteTypeShip::truncate();
-    Comment::truncate();
-    Quote::truncate();
-    // $clientes =  DB::connection('sqlsrv_GECON')->table('clientes')->get();
-    // foreach ($clientes as $cliente) {
-    //     Customer::create([
-    //         'nit' => $cliente->id,
-    //         'name' => $cliente->nombre_cliente,
-    //         'type' => $cliente->tipo_cliente,
-    //         'country' => $cliente->pais,
-    //     ]);
-    // }
-    // return Customer::get();
+Route::get('clientes_anterior', function () {
+    // QuoteStatus::truncate();
+    // QuoteVersion::truncate();
+    // QuoteTypeShip::truncate();
+    // Comment::truncate();
+    // Quote::truncate();
+    // Customer::truncate();
+    $clientes =  DB::connection('sqlsrv_anterior')->table('clientes')->get();
+    foreach ($clientes as $cliente) {
+        Customer::create([
+            // 'nit' => $cliente->id,
+            'name' => $cliente->nombre_cliente,
+            'type' => $cliente->tipo_cliente,
+            'country' => $cliente->pais,
+            'country_en' => strtoupper($cliente->pais),
+        ]);
+    }
+    return Customer::get();
 });
+Route::get('estmaciones_anterior', function () {
+    // QuoteStatus::truncate();
+    // QuoteVersion::truncate();
+    // QuoteTypeShip::truncate();
+    // Comment::truncate();
+    // Quote::truncate();
+    $estimaciones =  DB::connection('sqlsrv_anterior')->table('estimacions')->whereYear('fecha_solicitud', 2023)->get();
+    foreach ($estimaciones as $estimacion) {
+        if (Carbon::parse($estimacion->fecha_solicitud)->format('Y') == 2023) {
+            $quote = Quote::where('consecutive', $estimacion->consecutivo)->first();
+            if (!$quote)
+                $quote = Quote::create([
+                    'gerencia' => auth()->user()->gerencia,
+                    'name' => $estimacion->nombre,
+                    'consecutive' => $estimacion->consecutivo,
+                    'user_id' =>  auth()->user()->id
+                ]);
+
+            $cliente = DB::connection('sqlsrv_anterior')->table('clientes')->where('id', $estimacion->cliente_id)->first();
+            $cliente_id = null;
+            if ($cliente) {
+                $cliente_id = Customer::where('name', $cliente->nombre_cliente)->first()->id;
+            }
+            $quoteVersion = QuoteVersion::FirstOrCreate([
+                'quote_id' => $quote->id,
+                'version' => $estimacion->version,
+                'estimador_id' => $estimacion->estimador_id,
+                'customer_id' =>  $cliente_id,
+                'expeted_answer_date' => $estimacion->fecha_respuesta_esperada,
+                'estimador_anaswer_date' => $estimacion->fecha_respuesta_estimador,
+                'offer_type' => $estimacion->tipo_oferta,
+                'estimador_name' => $estimacion->nombre_estimador,
+                'coin' => $estimacion->moneda_original,
+                'file' => $estimacion->file,
+            ]);
+            $quote->current_version_id = $quoteVersion->id;
+            $quote->save();
+            $estados =  DB::connection('sqlsrv_anterior')->table('estado_estimacions')->get();
+
+            if ($estimacion->clase_id) {
+                QuoteTypeShip::FirstOrCreate([
+                    'quote_version_id' => $quoteVersion->id,
+                    'type_ship_id' => $estimacion->clase_id,
+                    'name' => TypeShip::find($estimacion->clase_id)->name ?? 'Sin Clase',
+                    'scope' => $estimacion->alcance,
+                    'maturity' => $estimacion->madurez,
+                ]);
+            }
+        }
+    }
+});
+
+Route::get('estmaciones_anterior', function () {
+    // QuoteStatus::truncate();
+    // QuoteVersion::truncate();
+    // QuoteTypeShip::truncate();
+    // Comment::truncate();
+    // Quote::truncate();
+    $estimaciones =  DB::connection('sqlsrv_anterior')->table('estimacions')->whereYear('fecha_solicitud', 2023)->get();
+    foreach ($estimaciones as $estimacion) {
+        if (Carbon::parse($estimacion->fecha_solicitud)->format('Y') == 2023) {
+            $quote = Quote::where('consecutive', $estimacion->consecutivo)->first();
+            if (!$quote)
+                $quote = Quote::create([
+                    'gerencia' => auth()->user()->gerencia,
+                    'name' => $estimacion->nombre,
+                    'consecutive' => $estimacion->consecutivo,
+                    'user_id' =>  auth()->user()->id
+                ]);
+
+            $cliente = DB::connection('sqlsrv_anterior')->table('clientes')->where('id', $estimacion->cliente_id)->first();
+            $cliente_id = null;
+            if ($cliente) {
+                $cliente_id = Customer::where('name', $cliente->nombre_cliente)->first()->id;
+            }
+            $quoteVersion = QuoteVersion::FirstOrCreate([
+                'quote_id' => $quote->id,
+                'version' => $estimacion->version,
+                'estimador_id' => $estimacion->estimador_id,
+                'customer_id' =>  $cliente_id,
+                'expeted_answer_date' => $estimacion->fecha_respuesta_esperada,
+                'estimador_anaswer_date' => $estimacion->fecha_respuesta_estimador,
+                'offer_type' => $estimacion->tipo_oferta,
+                'estimador_name' => $estimacion->nombre_estimador,
+                'coin' => $estimacion->moneda_original,
+                'file' => $estimacion->file,
+            ]);
+            $quote->current_version_id = $quoteVersion->id;
+            $quote->save();
+            if ($estimacion->clase_id) {
+                QuoteTypeShip::FirstOrCreate([
+                    'quote_version_id' => $quoteVersion->id,
+                    'type_ship_id' => $estimacion->clase_id,
+                    'name' => TypeShip::find($estimacion->clase_id)->name ?? 'Sin Clase',
+                    'scope' => $estimacion->alcance,
+                    'maturity' => $estimacion->madurez,
+                ]);
+            }
+            $estado = 0;
+            $fecha = $estimacion->fecha_solicitud;
+            if ($estimacion->firmada) {
+                $estado = 3;
+                $fecha = $estimacion->fecha_firma;
+            } else if ($estimacion->fecha_pendiente_firma != null) {
+                $estado = 2;
+                $fecha = $estimacion->fecha_pendiente_firma;
+            } else if ($estimacion->fecha_respuesta_estimador != null) {
+                $estado = 1;
+                $fecha = $estimacion->fecha_respuesta_estimador;
+            }
+            if (isset($quote)) {
+                QuoteStatus::create([
+                    'quote_version_id' => $quoteVersion->id,
+                    'status' => $estado,
+                    'fecha' => $estado,
+                    'user_id' => auth()->user()->id
+                ]);
+            }
+        }
+    }
+});
+Route::get('clases_anterior', function () {
+    // QuoteStatus::truncate();
+    // QuoteVersion::truncate();
+    // QuoteTypeShip::truncate();
+    // Comment::truncate();
+    // Quote::truncate();
+    $data =  DB::connection('sqlsrv_anterior')->table('clases')->get();
+    foreach ($data as $clase) {
+        TypeShip::firstOrCreate([
+            'name' => $clase->name,
+            'type' => $clase->type,
+            'disinger' => $clase->empresa_diseñadora,
+            'hull_material' => $clase->material_casco,
+            'length' => $clase->eslora,
+            'breadth' => $clase->manga,
+            'draught' => $clase->calado_diseño,
+            'depth' => $clase->puntal,
+            'full_load' => $clase->full_load,
+            'light_ship' => $clase->light_ship,
+        ]);
+    }
+});
+
+
+
+
 
 Route::get('prueba_notificacion', function () {
     $quote = Quote::with('version', 'version.quoteTypeShips')->where('id', 1)->first();

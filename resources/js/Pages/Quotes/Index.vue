@@ -7,31 +7,17 @@ import { Link } from '@inertiajs/vue3'
 
 const props = defineProps({
     quotes: Array,
+    quote: Object
 })
 
 const openSlideOver = ref(false)
 const quote = ref({})
-
-//#region columnas de CustomDataTable
-
-/**
-* @gbuelvas
-* Construcctor de columnas
-
-Valores Columms:
-@param {string} field El nombre de la columna de la tabla.
-@param {string} header El titulo que se mostrara en la cabecera de la columna.
-@param {boolean} filter activar o no el filtro. Predefinido en false
-@param {boolean} filter activar o no el ordenable. Predefinido en false
-*/
-class Columms {
-    constructor(field, header, filter, sortable) {
-        this.field = field
-        this.header = header
-        this.filter = filter
-        this.sortable = sortable
-    }
+console.log(props.quote)
+if (props.quote) {
+    quote.value = props.quote
+    openSlideOver.value = true
 }
+//#region columnas de CustomDataTable
 
 const columnas = [
     { field: 'consecutive', header: 'Consecutivo', filter: true, sortable: true },
@@ -61,13 +47,6 @@ const columnas = [
 ]
 //#endregion
 
-//#region Botones de CustomDatatable
-// const buttons = [
-//     { event: 'showClic', severity: 'success', class: '', icon: 'fa-solid fa-eye', text: true, outlined: false, rounded: false },
-//     // { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
-// ]
-//#endregion
-
 //#region Botones de filtro de CustomDatatable
 const filterButtons = [
     { field: 'get_status', label: 'En proceso', data: 'Proceso', severity: 'primary' },
@@ -79,14 +58,6 @@ const filterButtons = [
 
 const showClic = (event) => {
     quote.value = event.data;
-    openSlideOver.value = true
-}
-
-const deleteClic = (event, data) => {
-    console.log(event)
-}
-
-const slideOver = () => {
     openSlideOver.value = true
 }
 

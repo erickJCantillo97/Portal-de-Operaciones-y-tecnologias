@@ -132,6 +132,7 @@ const deleteQuoteVersion = () => {
                         toast(`Ha ocurrido un error al eliminar la versión \n ${props.quote.name} ${props.quote.consecutive}`, 'error')
                         emit('closeSlideOver')
                     }
+                }).then((res) => {
                 })
             }
         })

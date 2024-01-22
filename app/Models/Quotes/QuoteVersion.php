@@ -47,7 +47,7 @@ class QuoteVersion extends Model
 
     public function getConsecutiveAttribute()
     {
-        return  str_pad($this->quote->consecutive ?? 1, 3, 0, STR_PAD_LEFT) . '-' . $this->version . '-' . Carbon::parse($this->created_at)->format('Y');
+        return  str_pad($this->quote->consecutive ?? 1, 3, 0, STR_PAD_LEFT) . '-' . $this->version . '-' . Carbon::parse($this->expeted_answer_date)->format('Y');
     }
 
     public function getGetStatusAttribute()
@@ -62,7 +62,7 @@ class QuoteVersion extends Model
 
     public function getStatusDateAttribute()
     {
-        return QuoteStatus::where('quote_version_id', $this->id)->orderBy('fecha', 'DESC')->first()->fecha ?? $this->created_at;
+        return QuoteStatus::where('quote_version_id', $this->id)->orderBy('fecha', 'DESC')->first()->fecha ?? '2023-05-02';
     }
 
     public function comments(): MorphMany

@@ -24,7 +24,6 @@ const chartOptions = ref({
             colors: ['#fff']
         },
         formatter: function (val, opt) {
-            console.log(opt.w.globals);
             return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val + " Dias"
         },
         offsetY: 0,
@@ -46,7 +45,7 @@ const chartOptions = ref({
             borderRadius: 8,
             horizontal: true,
             distributed: true,
-            barHeight: '16%',
+            barHeight: '60%',
         }
     },
     xaxis: {

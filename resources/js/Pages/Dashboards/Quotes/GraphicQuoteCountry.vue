@@ -16,7 +16,6 @@ const getData = () => {
         } else {
             for (var values of res.data.values)
                 chartData.value.push([values[0], parseInt(values[1])])
-            console.log(chartData.value)
             empty.value = false
         }
         loading.value = false
@@ -27,7 +26,7 @@ getData()
 
 const chartOptions = ref({
     height: "300",
-    colorAxis: { colors: ['rgb(234,241,255)', 'rgb(46, 48, 146)'] }
+    colorAxis: { colors: ['#D7DA0F', 'rgb(46, 48, 146)'] }
 })
 
 </script>

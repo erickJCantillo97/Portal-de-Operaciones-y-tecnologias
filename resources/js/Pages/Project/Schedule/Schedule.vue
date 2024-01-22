@@ -104,7 +104,7 @@ const headerTpl = ({ currentPage, totalPages }) => `
         <img class="max-h-8" alt="Company logo" src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
         <h3>${props.project.name}</h3>
     </div>
-    <img class="opacity-50 top-100" alt="Company logo" src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
+    <img class="opacity-50" alt="Company logo" src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
     <dl>
         <dt>Fecha y hora de impresion: ${DateHelper.format(new Date(), 'll LT')}</dt>
         <dd>${totalPages ? `Pagina: ${currentPage + 1}/${totalPages}` : ''}</dd>
@@ -120,13 +120,14 @@ const gantt = new Gantt(({
     // resourceImageFolderPath: '../images/users/',
     dependencyIdField: 'sequenceNumber',
     columns: [
-        { type: 'wbs', text: 'EDT' },
-        { type: 'name', },
-        { type: 'percentdone', text: 'Avance', showCircle: true },
-        { type: 'duration', text: 'Duración' },
-        { type: 'startdate', text: 'Fecha Inicio' },
-        { type: 'enddate', text: 'Fecha fin' },
+        { id: 'wbs', type: 'wbs', text: 'EDT' },
+        { id: 'name', type: 'name', },
+        { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true },
+        { id: 'duration', type: 'duration', text: 'Duración' },
+        { id: 'startdate', type: 'startdate', text: 'Fecha Inicio' },
+        { id: 'enddate', type: 'enddate', text: 'Fecha fin' },
         {
+            id: 'resourceassignment',
             type: 'resourceassignment',
             text: 'Recursos',
             width: 150,
@@ -241,11 +242,14 @@ const gantt = new Gantt(({
             exportServer: 'https://dev.bryntum.com:8082',
             headerTpl,
             footerTpl,
+            orientation: 'portrait',
+            paperFormat: 'Letter',
+            keepRegionSizes: { locked: true },
             exportDialog: {
                 autoSelectVisibleColumns: false,
-                // items: {
-                //     columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
-                // }
+                items: {
+                    columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
+                }
             }
         },
         projectLines: false,
@@ -698,8 +702,10 @@ const onSettingsMarginChange = ({ value }) => {
                     <p class="text-sm">Dias por mes: {{ props.project.daysPerMonth }} dias</p>
                     <p class="text-sm">Horario: {{ props.project.shift }}</p>
                 </div>
+                <!-- <p>{{ props.project }}</p> -->
             </section>
-            <div id="containergantt" class="h-full text-xs"></div>
+            <div id="containergantt" class="h-[80vh] text-xs">
+            </div>
         </main>
     </AppLayout>
 </template>
@@ -715,7 +721,6 @@ const onSettingsMarginChange = ({ value }) => {
     color: #fff;
     background: #0076f8;
     align-items: center;
-    z-index: 10000;
 }
 
 .b-export-header {
@@ -728,9 +733,6 @@ const onSettingsMarginChange = ({ value }) => {
     justify-content: space-between;
 }
 
-.b-export-header img {
-    height: 60%;
-}
 
 .b-export-header dl {
     margin: 0;
