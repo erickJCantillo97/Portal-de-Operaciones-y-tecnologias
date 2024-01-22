@@ -686,7 +686,7 @@ const onSettingsMarginChange = ({ value }) => {
                         class="text-xl h-ful flex items-center justify-center font-semibold leading-6 capitalize text-primary">
                         {{ props.project.name }}
                     </p>
-                    <div class="flex content-between">
+                    <div class="col-span-1">
                         <p class="text-sm">Codigo SAP: {{ props.project.SAP_code }}</p>
                         <p class="text-xs">{{ props.project.type }}</p>
                     </div>

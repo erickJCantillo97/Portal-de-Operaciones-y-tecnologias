@@ -15,6 +15,7 @@ import DataView from 'primevue/dataview'
 import Button from 'primevue/button'
 import Image from 'primevue/image'
 import Divider from 'primevue/divider'
+import Tag from 'primevue/tag'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 
 const props = defineProps({
@@ -83,19 +84,22 @@ const items = [{
     description: 'Podra crear el proyecto con un asistente inteligente',
     icon: SparklesIcon,
     background: 'bg-yellow-500',
-    page: 'wizard'
+    page: 'wizard',
+    dev: true
 },
 {
     title: 'Crear proyecto desde proyecto anterior',
     description: 'Actualmente en desarollo',
     icon: PhotoIcon,
     background: 'bg-green-500',
+    dev: true
 },
 {
     title: 'Crear proyecto desde plantilla prediseñada',
     description: 'Actualmente en desarrollo',
     icon: ViewColumnsIcon,
     background: 'bg-blue-500',
+    dev: true
 },
 ]
 //#region subida de documentos
@@ -249,6 +253,9 @@ const buttons = [
                                 </a>
                             </h3>
                             <p class="mt-1 text-sm text-gray-500">{{ item.description }}</p>
+                            <Tag v-if="item.dev" value="En Desarrollo" severity="info" class="animate-pulse" rounded :pt="{
+                                value: '!text-xs'
+                            }" />
                         </div>
                     </div>
                 </li>
