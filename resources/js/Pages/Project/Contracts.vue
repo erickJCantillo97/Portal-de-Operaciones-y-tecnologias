@@ -50,7 +50,7 @@ const formData = ref({
 /*SUBMIT*/
 const submit = () => {
     loading.value = true
-    if (!formData.contract.id) {
+    if (!formData.value.contract.id) {
         router.post(route('contracts.store'), formData.value.contract, {
             preserveScroll: true,
             onSuccess: (res) => {
@@ -105,7 +105,7 @@ const columnas = [
     { field: 'contract_id', header: 'Contrato ID', filter: true, sortable: true },
     { field: 'customer.name', header: 'Cliente', filter: true, sortable: true },
     { field: 'start_date', header: 'Fecha Inicio', filter: true, sortable: true, type: 'date' },
-    { field: 'end_date', header: 'Fecha Finalización', filter: true, sortable: true, type: 'date' },
+    { field: 'end_date', header: 'Fecha Finalización', filter: true, sortable: true, },
     { field: 'cost', header: 'Costo', filter: true, sortable: true, type: 'currency' },
 ]
 const buttons = [
