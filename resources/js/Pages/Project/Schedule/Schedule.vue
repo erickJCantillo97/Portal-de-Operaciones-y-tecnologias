@@ -680,27 +680,33 @@ const onSettingsMarginChange = ({ value }) => {
 <template>
     <AppLayout>
         <main class="h-[89vh] overflow-y-auto">
-            <section class="grid grid-cols-4 place-content-center w-full h-[18vh] overflow-y-auto [&>div>p]:p-[0.15rem]">
-                <div class="col-span-2">
-                    <p
-                        class="text-xl h-ful flex items-center justify-center font-semibold leading-6 capitalize text-primary">
-                        {{ props.project.name }}
-                    </p>
-                    <div class="flex content-between">
-                        <p class="text-sm">Codigo SAP: {{ props.project.SAP_code }}</p>
-                        <p class="text-xs">{{ props.project.type }}</p>
+            <section class="grid grid-cols-4 place-content-center w-full h-[18vh] [&>div>p]:p-[0.15rem]">
+                <div class="col-span-2 p-1">
+                    <div class="bg-blue-800 rounded-t-lg">
+                        <p class="text-md flex items-center justify-center font-semibold leading-6 capitalize text-white">
+                            PROYECTO: {{ props.project.name }}
+                        </p>
                     </div>
-                    <div>
-                        <p class="text-xs">Supervisor: {{ props.project.supervisor }}</p>
+                    <div class="col-span-2 [&>p]:p-[0.15rem]">
+                        <p class="text-sm font-semibold">Codigo SAP: {{ props.project.SAP_code }}</p>
+                        <p class="text-sm font-semibold">Tipo de Proyecto: {{ props.project.type }}</p>
+                        <p class="text-sm font-semibold">Supervisor: {{ props.project.supervisor }}</p>
                         <Tag severity="info">{{ props.project.status }}</Tag>
                     </div>
                 </div>
-                <div class="col-span-2">
-                    <p class="font-bold">Detalles del cronograma</p>
-                    <p class="text-sm">Horas por dia: {{ props.project.hoursPerDay }} horas</p>
-                    <p class="text-sm">Dias por semana: {{ props.project.daysPerWeek }} dias</p>
-                    <p class="text-sm">Dias por mes: {{ props.project.daysPerMonth }} dias</p>
-                    <p class="text-sm">Horario: {{ props.project.shift }}</p>
+                <!-- <div class="divide-x"></div> -->
+                <div class="col-span-2 p-1 [&>div>p]:p-[0.15rem] border border-gray-300">
+                    <div class="bg-blue-800 rounded-t-lg">
+                        <p class="text-md flex items-center justify-center font-semibold leading-6 uppercase text-white">
+                            Detalles del cronograma
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-2 justify-items-center p-6">
+                        <p class="text-sm font-semibold">Horas por dia: {{ props.project.hoursPerDay }} horas</p>
+                        <p class="text-sm font-semibold">Dias por semana: {{ props.project.daysPerWeek }} dias</p>
+                        <p class="text-sm font-semibold">Dias por mes: {{ props.project.daysPerMonth }} dias</p>
+                        <p class="text-sm font-semibold">Horario: {{ props.project.shift }}</p>
+                    </div>
                 </div>
                 <!-- <p>{{ props.project }}</p> -->
             </section>
