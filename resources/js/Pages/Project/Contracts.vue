@@ -1,26 +1,16 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue'
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
-import '../../../sass/dataTableCustomized.scss'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import { FilterMatchMode, FilterOperator } from 'primevue/api'
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import { webNotifications } from '@/composable/webNotifications'
-import TextInput from '../../Components/TextInput.vue'
-import Button from '../../Components/Button.vue'
-import Combobox from '@/Components/Combobox.vue'
-import ComboboxPersonalData from '@/Components/ComboboxPersonalData.vue'
-import FileUpload from 'primevue/fileupload'
 import { useSweetalert } from '@/composable/sweetAlert'
+import CustomDataTable from '@/Components/CustomDataTable.vue'
+import CustomModal from '@/Components/CustomModal.vue'
+import CustomInput from '@/Components/CustomInput.vue'
 const { toast } = useSweetalert()
 const loading = ref(false)
 const { confirmDelete } = useSweetalert()
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-})
+
 const { contractNotification } = webNotifications()
 
 //Props
@@ -36,87 +26,32 @@ const managerOptions = ref([])
 
 //Tipo de Venta
 const typeOfSaleSelect = ref()
-const typeOfSaleOptions = ref([
-    { name: 'VENTA DIRECTA' },
-    { name: 'FINANCIADA' },
-    { name: 'LEASING' }
-])
+const typeOfSaleOptions = ref(['VENTA DIRECTA', 'FINANCIADA', 'LEASING'])
 
 //Moneda
 const currencySelect = ref()
-const currencyOptions = ref([
-    { name: 'COP' },
-    { name: 'USD' },
-    { name: 'EUR' }
-])
+const currencyOptions = ref(['COP', 'USD', 'EUR'])
 
 //Estado de la venta
 const stateSelect = ref()
-const stateOptions = ref([
-    { name: 'LIQUIDADO' },
-    { name: 'EN EJECUCIÓN' }
-])
+const stateOptions = ref(['LIQUIDADO', 'EN EJECUCIÓN'])
 
 //Abrir Modal
 const open = ref(false)
 //#endregion
 
 //#region UseForm
-const formData = useForm({
-    id: props.contracts?.id ?? '0',
-    contract_id: props.contracts?.contract_id ?? '',
-    subject: props.contracts?.subject ?? '',
-    customer_id: props.contracts?.customer_id ?? '0',
-    manager_id: props.contracts?.manager_id ?? '0',
-    type_of_sale: props.contracts?.type_of_sale ?? '',
-    supervisor: props.contracts?.supervisor ?? '',
-    start_date: props.contracts?.start_date ?? '',
-    end_date: props.contracts?.end_date ?? '',
-    currency: props.contracts?.currency ?? '',
-    cost: props.contracts?.cost ?? '0',
-    state: props.contracts?.state ?? '',
-    pdf: null
+const formData = ref({
+    contract: {}
 })
 //#endregion
 
-onMounted(() => {
-    getManagers()
-
-    initFilters()
-})
-
-const getManagers = () => {
-    try {
-        const manager = {
-            key: 'Cargo',
-            value: 'Gerente',
-            all: true
-        }
-        axios.get(route('search.personal', manager))
-            .then((res) => {
-                managerOptions.value = res.data.employees
-                // toast('Éxito', 'success')
-            })
-            .catch((error) => {
-                // toast('Error', 'error')
-            })
-    } catch (error) {
-        console.error('Error al obtener empleados:', error)
-    }
-}
 
 /*SUBMIT*/
 const submit = () => {
     loading.value = true
-
-    formData.customer_id = customerSelect.value ? customerSelect.value.id : null
-    formData.manager_id = managerSelect.value ? managerSelect.value.id : null
-    formData.type_of_sale = typeOfSaleSelect.value ? typeOfSaleSelect.value['name'] : null
-    formData.currency = currencySelect.value ? currencySelect.value['name'] : null
-    formData.state = stateSelect.value ? stateSelect.value['name'] : null
-
-    if (formData.id == 0) {
-        router.post(route('contracts.store'), formData, {
+    if (!formData.contract.id) {
+        router.post(route('contracts.store'), formData.value.contract, {
             preserveScroll: true,
             onSuccess: (res) => {
                 open.value = false
@@ -131,7 +66,7 @@ const submit = () => {
         })
         return 'creado'
     }
-    router.put(route('contracts.update', formData.id), formData, {
+    router.put(route('contracts.update', formData.value.contract.id), formData.value.contract, {
         preserveScroll: true,
         onSuccess: (res) => {
             open.value = false
@@ -147,171 +82,110 @@ const submit = () => {
 }
 
 const addItem = () => {
-    formData.reset()
+    formData.value.contract = {}
     clearErrors()
-    customerSelect.value = {} //Resetear los datos
-    managerSelect.value = {} //Resetear los datos
-    typeOfSaleSelect.value = {} //Resetear los datos
-    currencySelect.value = {} //Resetear los datos
-    stateSelect.value = {} //Resetear los datos
     open.value = true
 }
 
-const editItem = (contract) => {
+const editItem = (event, contract) => {
     clearErrors()
-
-    formData.id = contract.id
-    formData.contract_id = contract.contract_id
-    formData.subject = contract.subject
-    customerSelect.value = contract.customer //Este dato viene del Contract::with('customer')
-    managerSelect.value = managerOptions.value.filter(
-        manager => manager.id == contract.manager_id
-    )[0] //Este dato viene del Contract::with('manager')
-    typeOfSaleSelect.value = typeOfSaleOptions.value.filter(
-        sale => sale.name == contract.type_of_sale
-    )[0]
-    formData.supervisor = contract.supervisor
-    formData.start_date = contract.start_date
-    formData.end_date = contract.end_date
-    currencySelect.value = currencyOptions.value.filter(
-        currency => currency.name == contract.currency
-    )[0]
-    formData.cost = contract.cost
-    stateSelect.value = stateOptions.value.filter(state => state.name == contract.state)[0]
-    formData.pdf = contract.pdf
+    formData.value.contract = contract
     open.value = true
-}
-
-const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    }
-}
-
-const clearFilter = () => {
-    initFilters()
 }
 
 const clearErrors = () => {
     router.page.props.errors = {}
 }
 
-const formatDate = (value) => {
-    return value.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    })
+const del = (event, data) => {
+    confirmDelete(data.id, 'Contrato', 'contracts')
 }
 
-// Formatear el número en moneda (USD)
-const formatCurrency = (value) => {
-    return parseFloat(value).toLocaleString('es-CO', {
-        style: 'currency',
-        currency: 'COP',
-    })
-}
+const columnas = [
+    { field: 'contract_id', header: 'Contrato ID', filter: true, sortable: true },
+    { field: 'customer.name', header: 'Cliente', filter: true, sortable: true },
+    { field: 'start_date', header: 'Fecha Inicio', filter: true, sortable: true, type: 'date' },
+    { field: 'end_date', header: 'Fecha Finalización', filter: true, sortable: true, type: 'date' },
+    { field: 'cost', header: 'Costo', filter: true, sortable: true, type: 'currency' },
+]
+const buttons = [
+    { event: 'edit', severity: 'primary', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
+    { event: 'delete', severity: 'danger', class: '', icon: 'fa-regular fa-trash-can', text: true, outlined: false, rounded: false },
+]
 
 </script>
 
 <template>
     <AppLayout>
-        <div class="w-full overflow-y-auto custom-scroll">
-            <div class="flex items-center mx-2 mb-2">
-                <div class="flex-auto">
-                    <h1 class="text-xl font-semibold leading-6 capitalize text-primary">
-                        Contratos
-                    </h1>
-                </div>
-
-                <div class="" title="Agregar Contrato">
-                    <Button @click="addItem()" severity="success">
-                        <PlusIcon class="w-6 h-6" aria-hidden="true" />
-                        Agregar
-                    </Button>
-                </div>
-            </div>
-            <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="contracts" v-model:filters="filters"
-                dataKey="id" filterDisplay="menu" :loading="loading"
-                :globalFilterFields="['contract_id', 'customer.name', 'start_date', 'end_date', 'cost']"
-                currentPageReportTemplate=" {first} al {last} de {totalRecords}"
-                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-                :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
-
-                <template #header>
-                    <div class="flex justify-between w-full h-8 mb-2">
-                        <div class="flex space-x-4">
-                            <div class="w-8" title="Filtrar Contratos">
-                                <Button @click="clearFilter()" type="button" severity="primary" class="hover:bg-primary ">
-                                    <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
-                                </Button>
-                            </div>
-
-                            <div class="relative flex rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <MagnifyingGlassIcon class="w-5 h-4 text-gray-400" aria-hidden="true" />
-                                </div>
-                                <input type="search" title="Buscar Contrato"
-                                    class="block w-10/12 py-4 pl-10 text-gray-900 border-0 rounded-md ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                    v-model="filters.global.value" placeholder="Buscar..." />
-                            </div>
-                        </div>
-                    </div>
+        <div class="w-full overflow-y-auto">
+            <CustomDataTable :data="contracts" :rowsDefault="20" title="Contratos" :columnas="columnas" :actions="buttons"
+                @edit="editItem" @delete="del">
+                <template #buttonHeader>
+                    <span>
+                        <Button @click="addItem()" severity="success" icon="fa-solid fa-plus" outlined label="Nuevo">
+                        </Button>
+                    </span>
                 </template>
-
-                <!--COLUMNAS-->
-                <Column field="contract_id" header="Contrato ID"></Column>
-                <!-- <Column field="subject" header="Objeto del Contrato"></Column> -->
-                <Column field="customer.name" header="Cliente"></Column>
-                <!-- <Column field="manager.name" header="Gerente"></Column> -->
-                <!-- <Column field="type_of_sale" header="Tipo de Venta"></Column> -->
-                <!-- <Column field="supervisor" header="Supervisor"></Column> -->
-                <Column field="start_date" header="Fecha Inicio"></Column>
-                <Column field="end_date" header="Fecha Finalización"></Column>
-                <!-- <Column field="currency" header="Moneda">
-                        <template #body="slotProps">
-                            {{ formatCurrency(slotProps.data.cost) }}
-                        </template>
-                    </Column> -->
-                <Column field="cost" header="Costo">
-                    <template #body="slotProps">
-                        {{ formatCurrency(slotProps.data.cost) }}
-                    </template>
-                </Column>
-                <!-- <Column field="state" header="Estado del Contrato"></Column> -->
-                <!-- <Column field="status" header="Estado" sortable>
-                        <template #body="slotProps">
-                            <Tag :value="slotProps.data.status" :severity="getContractStatusSeverity(slotProps.data)" />
-                        </template>
-                    </Column> -->
-
-                <!--ACCIONES-->
-                <Column header="Acciones" class="space-x-3">
-                    <template #body="slotProps">
-                        <!--BOTÓN EDITAR-->
-                        <div
-                            class="flex pl-4 pr-3 space-x-2 text-sm font-medium text-gray-900 whitespace-normal sm:pl-6 lg:pl-8 ">
-                            <div title="Editar Contrato">
-                                <Button severity="primary" @click="editItem(slotProps.data)" class="hover:bg-primary">
-                                    <PencilIcon class="w-4 h-4 " aria-hidden="true" />
-                                </Button>
-                            </div>
-                            <!--BOTÓN ELIMINAR-->
-                            <div title="Eliminar Contrato">
-                                <Button severity="danger" @click="confirmDelete(slotProps.data.id, 'Contrato', 'contracts')"
-                                    class="hover:bg-danger">
-                                    <TrashIcon class="w-4 h-4 " aria-hidden="true" />
-                                </Button>
-                            </div>
-                        </div>
-                    </template>
-                </Column>
-            </DataTable>
+            </CustomDataTable>
         </div>
 
         <!--MODAL DE FORMULARIO-->
-        <TransitionRoot as="template" :show="open">
+        <CustomModal v-model:visible="open">
+            <template #icon>
+                <i class="fa-solid fa-file-contract"></i>
+            </template>
+            <template #titulo>
+                <p>{{ formData.contract.id != 0 ? 'Editar ' : 'Crear ' }} Contrato</p>
+            </template>
+            <template #body>
+                <span class="grid grid-cols-1 md:grid-cols-3 pt-2 gap-4">
+                    <CustomInput label="Contrato ID" placeholder="Escriba ID del Contrato"
+                        v-model:input="formData.contract.contract_id" :errorMessage="$page.props.errors.contract_id">
+                    </CustomInput>
+
+                    <CustomInput label="Tipo de Venta" :options="typeOfSaleOptions" type="dropdown"
+                        placeholder="Seleccione un Tipo de Venta" v-model:input="formData.contract.type_of_sale">
+                    </CustomInput>
+
+                    <CustomInput label="Supervisor" placeholder="Escriba nombre del supervisor"
+                        v-model:input="formData.contract.supervisor" :errorMessage="$page.props.errors.supervisor">
+                    </CustomInput>
+
+                    <CustomInput type="date" label="Fecha de inicio" placeholder="Escriba el Tipo de Cliente"
+                        v-model:input="formData.contract.start_date" :errorMessage="$page.props.errors.start_date">
+                    </CustomInput>
+
+                    <CustomInput type="date" label="Fecha de Finalización" placeholder="Fecha fin del contrato"
+                        v-model:input="formData.contract.end_date" :errorMessage="$page.props.errors.end_date">
+                    </CustomInput>
+
+                    <CustomInput label="Estado del Contrato" :options="stateOptions" type="dropdown"
+                        placeholder="Seleccione un Tipo de Venta" v-model:input="formData.contract.state"
+                        :errorMessage="$page.props.errors.stateSelect">
+                    </CustomInput>
+
+                    <CustomInput label="Oferta" placeholder="Seleccione la oferta" type="dropdown" :options="stateOptions"
+                        v-model:input="formData.contract.quote" :errorMessage="$page.props.errors.quote">
+                    </CustomInput>
+
+                    <CustomInput label="Adjuntar PDF" type="file" v-model:input="formData.contract.pdf" acceptFile=".pdf"
+                        :errorMessage="$page.props.errors.pdf">
+                    </CustomInput>
+                </span>
+                <CustomInput label="Objeto del Contrato" placeholder="Escriba Objeto del Contrato" type="textarea"
+                    v-model:input="formData.contract.subject" :errorMessage="$page.props.errors.subject">
+                </CustomInput>
+            </template>
+            <template #footer>
+                <Button severity="danger" @click="open = false">Cancelar</Button>
+                <Button severity="success" :loading="false" @click="submit()">
+                    {{ formData.contract.id != 0 ? 'Actualizar ' : 'Guardar' }}
+                </Button>
+            </template>
+
+        </CustomModal>
+
+        <!-- <TransitionRoot as="template" :show="open">
             <Dialog as="div" class="relative z-30" @close="open = false">
                 <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
                     leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
@@ -331,72 +205,41 @@ const formatCurrency = (value) => {
                                         <DialogTitle as="h3" class="text-xl font-semibold text-center text-primary">
                                             {{ formData.id != 0 ? 'Editar ' : 'Crear' }}
                                             Contrato
-                                        </DialogTitle> <!--Se puede usar {{ tittle }}-->
+                                        </DialogTitle>
                                         <div class="grid grid-cols-1 gap-4 p-2 md:grid-cols-2 space-y-2 rounded-lg">
                                             <div class="col-span-1 p-2 mt-2 space-y-2 text-left">
-                                                <!--CAMPO CONTRATO ID-->
                                                 <TextInput label="Contrato ID" placeholder="Escriba ID del Contrato"
                                                     v-model="formData.contract_id" :error="$page.props.errors.contract_id">
                                                 </TextInput>
 
-                                                <!--CAMPO OBJETO DEL CONTRATO ()-->
                                                 <TextInput label="Objeto del Contrato"
                                                     placeholder="Escriba Objeto del Contrato" v-model="formData.subject"
                                                     :error="$page.props.errors.subject">
                                                 </TextInput>
-
-                                                <!--CAMPO CLIENTE (customer)-->
-                                                <Combobox label="Cliente" placeholder="Seleccione Cliente"
-                                                    :options="customers" v-model="customerSelect">
-                                                </Combobox>
-
-                                                <!--CAMPO GERENTE (manager)-->
-                                                <ComboboxPersonalData label="Gerente" :options="managerOptions"
-                                                    placeholder="Seleccione Gerente" v-model="managerSelect">
-                                                </ComboboxPersonalData>
-
-                                                <!--CAMPO TIPO DE VENTA (type_of_sale)-->
                                                 <Combobox label="Tipo de Venta" :options="typeOfSaleOptions"
                                                     placeholder="Seleccione un Tipo de Venta" v-model="typeOfSaleSelect">
                                                 </Combobox>
-
-                                                <!--CAMPO SUPERVISOR-->
                                                 <TextInput label="Supervisor" placeholder="Escriba nombre del supervisor"
                                                     v-model="formData.supervisor" :error="$page.props.errors.supervisor">
                                                 </TextInput>
                                             </div>
 
                                             <div class="col-span-1 p-2 mt-2 space-y-2 text-left">
-                                                <!--CAMPO FECHA INICIO-->
                                                 <TextInput type="date" label="Fecha de inicio"
                                                     :placeholder="'Escriba el Tipo de Cliente'"
                                                     v-model="formData.start_date" :error="$page.props.errors.start_date">
                                                 </TextInput>
 
-                                                <!--CAMPO FECHA FINALIZACIÓN-->
                                                 <TextInput type="date" label="Fecha de Finalización"
                                                     :placeholder="'Escriba el Tipo de Cliente'" v-model="formData.end_date"
                                                     :error="$page.props.errors.end_date">
                                                 </TextInput>
 
-                                                <!--CAMPO MONEDA-->
-                                                <Combobox label="Moneda" placeholder="Seleccione Tipo de Moneda"
-                                                    v-model="currencySelect" :options="currencyOptions">
-                                                </Combobox>
-
-                                                <!--CAMPO PRECIO DE VENTA (cost)-->
-                                                <TextInput label="Precio de Venta" type="number"
-                                                    :placeholder="'Escriba el valor total estimado'" v-model="formData.cost"
-                                                    :error="router.page.props.errors.cost">
-                                                </TextInput>
-
-                                                <!--CAMPO ESTADO DEL CONTRATO (state)-->
                                                 <Combobox label="Estado del Contrato" :options="stateOptions"
                                                     placeholder="Seleccione un Tipo de Venta" v-model="stateSelect">
                                                 </Combobox>
 
                                                 <div class="flex justify-center align-content-center pt-6">
-                                                    <!--CAMPO SUBIR ARCHIVO-->
                                                     <FileUpload chooseLabel="Adjuntar PDF" mode="basic" name="demo[]"
                                                         :multiple="false" accept=".pdf" :maxFileSize="1000000"
                                                         @input="formData.pdf = $event.target.files[0]">
@@ -421,6 +264,6 @@ const formatCurrency = (value) => {
                     </div>
                 </div>
             </Dialog>
-        </TransitionRoot>
+        </TransitionRoot> -->
     </AppLayout>
 </template>
