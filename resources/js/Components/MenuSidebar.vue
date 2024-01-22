@@ -9,7 +9,6 @@
                     <!-- <span
                         class="ml-2 text-2xl font-semibold align-middle lg:inline dark:text-white-light text-primary">COTECMAR</span> -->
                 </div>
-
             </div>
 
             <nav class="h-[calc(100vh-80px)] relative">
@@ -20,9 +19,9 @@
                                 <Link v-if="!item.children" v-show="item.show" :href="route(item.href)" class="group">
                                 <div class="flex items-center group-hover:!text-primary">
                                     <component :is="item.icon" class="w-6 h-6 text-gray-400 shrink-0" aria-hidden="true" />
-                                    <span class="pl-3 text-black dark:text-[#506690] dark:group-hover:text-white">{{
-                                        item.name
-                                    }}</span>
+                                    <h3 class="pl-3 text-black dark:text-[#506690] dark:group-hover:text-white">
+                                        {{ item.name }}
+                                    </h3>
                                 </div>
                                 </Link>
                                 <button v-else type="button" class="w-full nav-link group"
@@ -31,10 +30,17 @@
                                     <div class="flex items-center">
                                         <component :is="item.icon" class="w-6 h-6 text-gray-100 shrink-0 dark:text-white"
                                             aria-hidden="true" />
-
-                                        <span class="pl-3  text-black dark:text-[#506690] dark:group-hover:text-white">{{
-                                            item.name
-                                        }}</span>
+                                        <h3 class="pl-3  text-black dark:text-[#506690] dark:group-hover:text-white">
+                                            {{ item.name }}
+                                        </h3>
+                                        <!--HIJOS-->
+                                        <div class="p-2">
+                                            <Tag v-if="item.dev" value="WIP" severity="info" class="animate-pulse" rounded
+                                                :pt="{
+                                                    rot: '!size-1',
+                                                    value: '!text-xs'
+                                                }" />
+                                        </div>
                                     </div>
                                     <div class="rtl:rotate-180 dark:group-hover:text-white"
                                         :class="{ '!rotate-90': activeDropdown === item.name }">
@@ -47,20 +53,21 @@
                                 </button>
                                 <vue-collapsible :isOpen="activeDropdown === item.name">
                                     <ul class="text-gray-500 sub-menu dark:text-white" v-for="children of item.children">
-                                        <li>
+                                        <li class="flex items-center">
                                             <Link :href="route(children.href)">{{ children.name }}</Link>
+                                            <Tag v-if="children.dev" value="WIP" severity="info" class="animate-pulse"
+                                                rounded :pt="{
+                                                    value: '!text-xs'
+                                                }" />
                                         </li>
                                     </ul>
                                 </vue-collapsible>
-
                             </li>
                         </ul>
                     </li>
-
                 </ul>
             </nav>
         </div>
-
     </div>
 </template>
 
@@ -69,7 +76,7 @@ import { ref } from 'vue'
 import { Link } from '@inertiajs/vue3';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 import { usePermissions } from '@/composable/permission';
-
+import Tag from 'primevue/tag'
 import VueCollapsible from 'vue-height-collapsible/vue3';
 import {
     CalendarIcon,
@@ -80,8 +87,11 @@ import {
     HomeIcon,
     UsersIcon,
 } from '@heroicons/vue/24/outline'
-const activeDropdown = ref();
+
 const { hasRole } = usePermissions();
+const activeDropdown = ref();
+const showTag = ref(false);
+
 const navigation = [
     {
         name: 'Dashboard',
@@ -95,11 +105,31 @@ const navigation = [
         icon: UsersIcon,
         current: false,
         children: [
-            { name: 'Mi Personal', href: 'personal.index' },
-            { name: 'Programacion', href: 'programming' },
-            { name: 'Parte Actual', href: 'personal.index' },
-            { name: 'Solicitudes', href: 'personal.index' },
-            { name: 'Personal Activo', href: 'personal.activos' },
+            {
+                name: 'Mi Personal',
+                href: 'personal.index',
+                // dev: true
+            },
+            {
+                name: 'Programacion',
+                href: 'programming',
+                dev: true
+            },
+            {
+                name: 'Parte Actual',
+                href: 'personal.index',
+                dev: true
+            },
+            {
+                name: 'Solicitudes',
+                href: 'personal.index',
+                dev: true
+            },
+            {
+                name: 'Personal Activo',
+                href: 'personal.activos',
+                dev: true
+            },
             // { name: 'Programación', href: '#' },
             // { name: 'Parte Diario', href: '#' },
             // { name: 'Informes', href: '#' },
@@ -110,9 +140,21 @@ const navigation = [
         icon: IdentificationIcon,
         current: false,
         children: [
-            { name: 'Parte de Personal', href: 'dashboard' },
-            { name: 'Planilla', href: 'programming' },
-            { name: 'Novedades', href: 'personal.index' },
+            {
+                name: 'Parte de Personal',
+                href: 'dashboard',
+                dev: true
+            },
+            {
+                name: 'Planilla',
+                href: 'programming',
+                dev: true
+            },
+            {
+                name: 'Novedades',
+                href: 'personal.index',
+                dev: true
+            },
             // { name: 'Programación', href: '#' },
             // { name: 'Parte Diario', href: '#' },
             // { name: 'Informes', href: '#' },
@@ -123,9 +165,21 @@ const navigation = [
         icon: FolderIcon,
         current: false,
         children: [
-            { name: 'Proyectos', href: 'projects.index' }, //gerencia (auth()->user()gerencia)
-            { name: 'Unidades', href: 'ships.index', },
-            { name: 'Clases', href: 'typeShips.index' },
+            {
+                name: 'Proyectos',
+                href: 'projects.index',
+                dev: true
+            }, //gerencia (auth()->user()gerencia)
+            {
+                name: 'Unidades',
+                href: 'ships.index',
+                dev: true
+            },
+            {
+                name: 'Clases',
+                href: 'typeShips.index',
+                dev: true
+            },
         ],
     },
     {
@@ -133,17 +187,37 @@ const navigation = [
         icon: CreditCardIcon,
         current: false,
         children: [
-            { name: 'Clientes', href: 'customers.index' },
-            { name: 'Contratos', href: 'contracts.index' },
-            { name: 'Autorizaciones', href: 'authorizations.index' },
-            { name: 'Estimaciones', href: 'quotes.index' },
+            {
+                name: 'Clientes',
+                href: 'customers.index',
+                dev: true
+            },
+            {
+                name: 'Contratos',
+                href: 'contracts.index',
+                dev: true
+            },
+            {
+                name: 'Autorizaciones',
+                href: 'authorizations.index',
+                dev: true
+            },
+            {
+                name: 'Estimaciones',
+                href: 'quotes.index',
+                dev: true
+            },
         ],
     },
     {
         name: 'Sugerencias',
         icon: CalendarIcon,
         children: [
-            { name: 'Ver sugerencias', href: 'suggestion.index' },
+            {
+                name: 'Ver sugerencias',
+                href: 'suggestion.index',
+                dev: true
+            },
         ],
     },
     {
