@@ -224,26 +224,7 @@ Route::get('estmaciones_anterior', function () {
         }
     }
 });
-Route::get('statuos_estimaciones', function () {
 
-    $estados =  DB::connection('sqlsrv_anterior')->table('estado_estimacions')->whereYear('fecha', 2023)->get();
-    foreach ($estados as $estado) {
-        $estimacion =  DB::connection('sqlsrv_anterior')->table('estimacions')->where('id', $estado->estimacion_id)->first();
-        $quote = null;
-        if ($estimacion) {
-            $quote = Quote::where('consecutive', $estimacion->consecutivo)->first();
-        }
-        if (isset($quote)) {
-            $version = QuoteVersion::where('quote_id', $quote->id)->where('version', $estimacion->version)->first();
-            QuoteStatus::create([
-                'quote_version_id' => $version->id,
-                'status' => $estado->estado,
-                'fecha' => $estado->fecha,
-                'user_id' => auth()->user()->id
-            ]);
-        }
-    }
-});
 Route::get('estmaciones_anterior', function () {
     // QuoteStatus::truncate();
     // QuoteVersion::truncate();
@@ -288,6 +269,26 @@ Route::get('estmaciones_anterior', function () {
                     'name' => TypeShip::find($estimacion->clase_id)->name ?? 'Sin Clase',
                     'scope' => $estimacion->alcance,
                     'maturity' => $estimacion->madurez,
+                ]);
+            }
+            $estado = 0;
+            $fecha = $estimacion->fecha_solicitud;
+            if ($estimacion->firmada) {
+                $estado = 3;
+                $fecha = $estimacion->fecha_firma;
+            } else if ($estimacion->fecha_pendiente_firma != null) {
+                $estado = 2;
+                $fecha = $estimacion->fecha_pendiente_firma;
+            } else if ($estimacion->fecha_respuesta_estimador != null) {
+                $estado = 1;
+                $fecha = $estimacion->fecha_respuesta_estimador;
+            }
+            if (isset($quote)) {
+                QuoteStatus::create([
+                    'quote_version_id' => $quoteVersion->id,
+                    'status' => $estado,
+                    'fecha' => $estado,
+                    'user_id' => auth()->user()->id
                 ]);
             }
         }

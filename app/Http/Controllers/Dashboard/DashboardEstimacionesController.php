@@ -17,25 +17,22 @@ class DashboardEstimacionesController extends Controller
 
     public function getQuotesStatus(Request $request)
     {
-        $status = $request->status == 'Entregada' || !$request->status ? 'Proceso' : $request->status;
-        $quotes = QuoteVersion::has('quote')->with('quoteTypeShips', 'quote')->get()->filter(function ($quote) use ($status) {
-            $get_status = $quote->get_status == 'Entregada' ? 'Proceso' : $quote->get_status;
-            return Carbon::parse($quote->status_date)->format('Y-m-d') >= Carbon::now()->subDays(6)->format('Y-m-d') && Carbon::parse($quote->status_date)->format('Y-m-d') <= Carbon::now()->format('Y-m-d')  && $get_status  == $status;
-        })->map(function ($quote) { 
-            return [
-                'id' => $quote['id'],
-                'name' => $quote['quote']['name'],
-                'get_status' => $quote['get_status'],
-                'estimador' => $quote['estimador_name'],
-                'consecutive' => $quote['consecutive'],
-                'total_cost' => collect($quote['quoteTypeShips'])->sum('price_before_iva_original'),
-            ];
-        });
+        // $status = $request->status == 'Entregada' || !$request->status ? 'Proceso' : $request->status;
+        // $quotes = QuoteVersion::has('quote')->with('quoteTypeShips', 'quote')->get()->map(function ($quote) {
+        //     return [
+        //         'id' => $quote['id'],
+        //         'name' => $quote['quote']['name'],
+        //         'get_status' => $quote['get_status'],
+        //         'estimador' => $quote['estimador_name'],
+        //         'consecutive' => $quote['consecutive'],
+        //         'total_cost' => collect($quote['quoteTypeShips'])->sum('price_before_iva_original'),
+        //     ];
+        // });
 
-        return response()->json([
-            'quotes' => $quotes,
-            'status' => true
-        ], 200);
+        // return response()->json([
+        //     'quotes' => $quotes,
+        //     'status' => true
+        // ], 200);
     }
 
     public function getQuotesManurity()
@@ -52,9 +49,7 @@ class DashboardEstimacionesController extends Controller
     }
     public function getStatusWeek()
     {
-        $quotes = QuoteVersion::get()->filter(function ($quote) {
-            return Carbon::parse($quote->status_date)->format('Y-m-d') >= Carbon::now()->subDays(6)->format('Y-m-d') && Carbon::parse($quote->status_date)->format('Y-m-d') <= Carbon::now()->format('Y-m-d');
-        })->groupBy('status')->map(function ($status) {
+        $quotes = QuoteVersion::get()->groupBy('status')->map(function ($status) {
             return [
                 'value' => count($status),
                 'status' => $status[0]['get_status']
@@ -87,17 +82,19 @@ class DashboardEstimacionesController extends Controller
     }
     public function getEstimatorData()
     {
-        $people = QuoteVersion::whereNotNull('estimador_anaswer_date')->whereYear('estimador_anaswer_date', '!=', '1970')->select(DB::raw('AVG(DATEDIFF(day, created_at, estimador_anaswer_date)) AS promedio'), 'estimador_name')
+        $people = QuoteVersion::whereNotNull('estimador_anaswer_date')->whereYear('estimador_anaswer_date', '!=', '1970')->select(DB::raw('AVG(DATEDIFF(day, expeted_answer_date, estimador_anaswer_date)) AS promedio'), 'estimador_name')
             ->groupBy('estimador_name')
             ->get()->map(function ($quote) {
                 // $empleado = searchEmpleados('Usuario', $quote['estimador_name'])->first();
+                $user = User::where('userprincipalname', trim($quote['estimador_name']) . '@cotecmar.com')->first();
+
                 return [
                     'average' => $quote['promedio'],
                     'quotes' => QuoteVersion::where('estimador_name', $quote['estimador_name'])->count(),
                     'name' => $quote['estimador_name'],
-                    'photo' => User::where('userprincipalname', $quote['estimador_name'] . '@cotecmar.com')->first()->photo()
+                    'photo' =>  $user->photo(),
                 ];
-            });
+            })->sortBy('average', SORT_REGULAR);
 
         return response()->json(
             [

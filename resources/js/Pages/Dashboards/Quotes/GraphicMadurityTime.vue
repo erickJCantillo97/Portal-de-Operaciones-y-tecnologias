@@ -45,7 +45,7 @@ const chartOptions = ref({
             borderRadius: 8,
             horizontal: true,
             distributed: true,
-            barHeight: '40%',
+            barHeight: '60%',
         }
     },
     xaxis: {
