@@ -13,8 +13,7 @@ import QuotesCard from "@/Pages/Dashboards/Quotes/QuotesCards.vue";
 // import Tag from "primevue/tag";
 // import { MagnifyingGlassIcon, PencilIcon, TrashIcon } from "@heroicons/vue/20/solid";
 
-import DataChart from "./DataChart.vue";
-import Projects from "@/Pages/Dashboards/Projects.vue";
+import Projects from "@/Pages/Dashboards/Projects/Projects.vue";
 import Quotes from "@/Pages/Dashboards/Quotes.vue";
 
 // import TimeLine from './TimeLine.vue';

@@ -3,6 +3,8 @@ import CustomDataTable from '@/Components/CustomDataTable.vue';
 import { ResourceTimeRangeModel } from '@bryntum/gantt';
 import { router } from "@inertiajs/vue3";
 import { onMounted, ref } from 'vue';
+import DataChart from "../DataChart.vue";
+
 
 const columnas = [
     { field: 'name', header: 'Proyecto' },
@@ -30,8 +32,11 @@ const gannt = (event, data) => {
 }
 </script>
 <template>
-    <CustomDataTable title="Proyectos" :data="projects" :rowsDefault="10" :columnas="columnas" :actions="buttons"
-        @showProgramming="router.get(route('programming'), { id: $event.data.project_id })" @showGantt="gannt">
-    </CustomDataTable>
+    <div class="grid grid-cols-1 md:grid-cols-2">
+        <CustomDataTable title="Proyectos" :data="projects" :rowsDefault="10" :columnas="columnas" :actions="buttons"
+            @showProgramming="router.get(route('programming'), { id: $event.data.project_id })" @showGantt="gannt">
+        </CustomDataTable>
+        <DataChart></DataChart>
+    </div>
 </template>
     

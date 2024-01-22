@@ -7,7 +7,6 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid';
 import Button from '@/Components/Button.vue';
 import PieChart from './PieChart.vue';
-import '../../sass/dataTableCustomized.scss';
 
 onMounted(() => {
     initFilters();
@@ -27,12 +26,12 @@ let loading = true
 const getContracts = () => {
     try {
         axios.get(route('getContracts'))
-        .then((res) => {
-            contracts.value = res.data.contracts
-            loadInitialSelectedContracts()
-            suma.value = res.data.contracts.reduce((total, obj) => total + parseInt(obj.cost), 0); // Cálculo del Porcentaje de Contratos
-            loading = false;
-        })
+            .then((res) => {
+                contracts.value = res.data.contracts
+                loadInitialSelectedContracts()
+                suma.value = res.data.contracts.reduce((total, obj) => total + parseInt(obj.cost), 0); // Cálculo del Porcentaje de Contratos
+                loading = false;
+            })
     } catch (error) {
         console.error('Error al obtener contratos:', error);
     }
@@ -75,7 +74,7 @@ const formatCurrency = (value) => {
     return parseFloat(value).toLocaleString('es-CO', {
         style: 'currency',
         currency: 'COP',
-
+        maximumFractionDigits: 0
     });
 };
 
@@ -188,11 +187,6 @@ const contractsList = () => {
             <!--COLUMNAS-->
             <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
             <Column field="contract_id" header="Contrato"></Column>
-            <Column header="Porcentaje">
-                <template #body="slotProps">
-                    {{ ((slotProps.data.cost / suma) * 100).toFixed(2) }} %
-                </template>
-            </Column>
             <Column field="cost" header="Costo">
                 <template #body="slotProps">
                     {{ formatCurrency(slotProps.data.cost) }}

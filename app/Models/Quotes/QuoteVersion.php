@@ -18,7 +18,7 @@ class QuoteVersion extends Model
     use SoftDeletes;
 
     protected $guarded = [];
-    protected $appends = ['status', 'get_status', 'status_date', 'consecutive'];
+    protected $appends = ['status', 'get_status', 'status_date', 'consecutive', 'total_cost'];
 
     protected $estados = [
         'Proceso',
@@ -63,6 +63,10 @@ class QuoteVersion extends Model
     public function getStatusDateAttribute()
     {
         return QuoteStatus::where('quote_version_id', $this->id)->orderBy('fecha', 'DESC')->first()->fecha ?? '2023-05-02';
+    }
+    public function getTotalCostAttribute()
+    {
+        return $this->quoteTypeShips->sum('price_before_iva_original');
     }
 
     public function comments(): MorphMany
