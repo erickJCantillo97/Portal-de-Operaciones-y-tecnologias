@@ -57,25 +57,15 @@ class ContractController extends Controller
             'file' => 'nullable',
         ]);
 
-        try {
-            $validateData['gerencia'] = auth()->user()->gerencia;
-            if ($request->pdf != null) {
-                $validateData['file'] = Storage::putFileAs(
-                    'public/contract/',
-                    $request->pdf,
-                    $validateData['name'] . '.' . $request->pdf->getClientOriginalExtension()
-                );
-            }
-            Contract::create($validateData);
-            // $contract = Contract::create($validateData);
-            // event(new ContractEvent($contract, 'created'));
-
-            return back()->with(['message' => 'Contrato creado correctamente'], 200);
-        } catch (Exception $e) {
-            return back()->withErrors(['message' => 'Ocurrió un error al crear el contrato: ' . $e->getMessage()], 500);
+        $validateData['gerencia'] = auth()->user()->gerencia;
+        if ($request->pdf != null) {
+            $validateData['file'] = Storage::putFileAs(
+                'public/contract/',
+                $request->pdf,
+                $validateData['contract_id'] . '.' . $request->pdf->getClientOriginalExtension()
+            );
         }
-
-        return redirect('contracts.index');
+        Contract::create($validateData);
     }
 
     /**
