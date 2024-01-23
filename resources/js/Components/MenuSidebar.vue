@@ -45,8 +45,8 @@
                                             <Link :href="children.dev ? '#' : route(children.href)">
                                             <span class="">
                                                 <p :class="children.dev ? '-mb-2' : ''">{{ children.name }}</p>
-                                                <small v-if="children.dev" class="text-xs text-red-300 animate-pulse"> En
-                                                    desarrollo
+                                                <small v-if="children.dev" class="text-xs text-red-300 animate-pulse">
+                                                    En desarrollo
                                                 </small>
                                             </span>
                                             </Link>
@@ -67,7 +67,6 @@ import { ref } from 'vue'
 import { Link } from '@inertiajs/vue3';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 import { usePermissions } from '@/composable/permission';
-import Tag from 'primevue/tag'
 import VueCollapsible from 'vue-height-collapsible/vue3';
 import {
     CalendarIcon,
@@ -81,7 +80,6 @@ import {
 
 const { hasRole } = usePermissions();
 const activeDropdown = ref();
-const showTag = ref(false);
 
 const navigation = [
     {

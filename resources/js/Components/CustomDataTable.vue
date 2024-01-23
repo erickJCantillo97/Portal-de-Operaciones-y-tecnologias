@@ -161,7 +161,9 @@ const formatCurrency = (valor, moneda) => {
                     <p class="text-xl h-ful flex items-center font-semibold leading-6 capitalize text-primary">
                         {{ title }}
                     </p>
-                    <slot name="buttonHeader" />
+                    <span>
+                        <slot name="buttonHeader" />
+                    </span>
                 </span>
                 <div class="flex items-center " :class="filter ? 'justify-between' : 'justify-end'">
                     <div class="space-x-2" v-if="filter">
@@ -292,7 +294,7 @@ const formatCurrency = (valor, moneda) => {
                     <div v-else-if="col.type == 'object'" class="flex items-center space-x-2 w-full">
                         <img v-if="col.objectRows.photo" :src="data[col.objectRows.photo.field]" alt="Image"
                             onerror="this.src='/svg/cotecmar-logo.svg'"
-                            class="min-w-16 border py-0.5 rounded-lg sm:h-12 sm:w-16" />
+                            class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16" />
                         <div>
                             <p class="font-bold text-sm ">{{
                                 col.objectRows.primary.subfield ?
