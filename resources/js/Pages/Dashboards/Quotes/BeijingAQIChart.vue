@@ -164,27 +164,7 @@ export default {
         'BCFBC FONSECON II',
         'FONSECON LANCHA POLICÍA'
       ],
-      variations: [
-        19,
-        13,
-        13,
-        13,
-        2,
-        16,
-        4,
-        0,
-        0,
-        1,
-        8,
-        1,
-        0,
-        -4,
-        4,
-        2,
-        23,
-        13,
-        5
-      ]
+      variations: [ 19, 13, 13, 13, 2, 16, 4, 0, 0, 1, 8, 1, 0, -4, 4, 2, 23, 13, 5 ]
     }
   }
 };
