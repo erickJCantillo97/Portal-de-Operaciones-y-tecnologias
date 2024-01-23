@@ -54,11 +54,12 @@
                                 <vue-collapsible :isOpen="activeDropdown === item.name">
                                     <ul class="text-gray-500 sub-menu dark:text-white" v-for="children of item.children">
                                         <li class="flex items-center">
-                                            <Link :href="route(children.href)">{{ children.name }}</Link>
-                                            <Tag v-if="children.dev" value="WIP" severity="info" class="animate-pulse"
+                                            <Link as="button" :disabled="children.dev" :class="children.dev ? 'cursor-default opacity-5 hover:bg-white' : ''"
+                                            :href="route(children.href)" >{{ children.name }}</Link>
+                                            <!-- <Tag v-if="children.dev" value="WIP" severity="info" class="animate-pulse"
                                                 rounded :pt="{
                                                     value: '!text-xs'
-                                                }" />
+                                                }" /> -->
                                         </li>
                                     </ul>
                                 </vue-collapsible>
@@ -113,7 +114,7 @@ const navigation = [
             {
                 name: 'Programacion',
                 href: 'programming',
-                dev: true
+                // dev: true
             },
             {
                 name: 'Parte Actual',
@@ -216,7 +217,7 @@ const navigation = [
             {
                 name: 'Ver sugerencias',
                 href: 'suggestion.index',
-                dev: true
+                // dev: true
             },
         ],
     },

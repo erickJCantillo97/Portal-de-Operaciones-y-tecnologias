@@ -19,7 +19,6 @@ const props = defineProps({
     customers: Array,
     quotes: Object
 })
-console.log(props.quotes)
 const typeOfSaleOptions = ref(['VENTA DIRECTA', 'FINANCIADA', 'LEASING'])
 const stateOptions = ref(['LIQUIDADO', 'EN EJECUCIÓN'])
 
@@ -45,7 +44,7 @@ const submit = () => {
                 toast(' Contrato creado exitosamente', 'success')
             },
             onError: (errors) => {
-                toast('Por favor diligencie todos los campos', 'error')
+                toast('Hubo un error al crear el contrato', 'error')
             },
             onFinish: visit => {
                 loading.value = false
@@ -60,6 +59,7 @@ const submit = () => {
             toast('Contrato actualizado exitosamente!', 'success')
         },
         onError: (errors) => {
+            console.log(errors)
             toast('¡Ups! Ha surgido un error', 'error')
         },
         onFinish: visit => {
@@ -70,18 +70,12 @@ const submit = () => {
 
 const addItem = () => {
     formData.value.contract = {}
-    clearErrors()
     open.value = true
 }
 
 const editItem = (event, contract) => {
-    clearErrors()
     formData.value.contract = contract
     open.value = true
-}
-
-const clearErrors = () => {
-    router.page.props.errors = {}
 }
 
 const del = (event, data) => {
@@ -92,7 +86,7 @@ const columnas = [
     { field: 'contract_id', header: 'Contrato ID', filter: true, sortable: true },
     { field: 'customer.name', header: 'Cliente', filter: true, sortable: true },
     { field: 'start_date', header: 'Fecha Inicio', filter: true, sortable: true, type: 'date' },
-    { field: 'end_date', header: 'Fecha Finalización', filter: true, sortable: true, },
+    { field: 'end_date', header: 'Fecha Finalización', filter: true, sortable: true, type: 'date' },
     { field: 'cost', header: 'Costo', filter: true, sortable: true, type: 'currency' },
 ]
 const buttons = [
@@ -125,49 +119,55 @@ const buttons = [
                 <p>{{ formData.contract.id != 0 ? 'Editar ' : 'Crear ' }} Contrato</p>
             </template>
             <template #body>
-                <span class="grid grid-cols-1 md:grid-cols-3 pt-2 gap-4">
-                    <CustomInput label="Contrato ID" placeholder="Escriba ID del Contrato"
-                        v-model:input="formData.contract.contract_id" :errorMessage="$page.props.errors.contract_id">
+                <span class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <CustomInput label="Contrato ID" placeholder="Escriba ID del Contrato" id="contrato_id"
+                        v-model:input="formData.contract.contract_id" :invalid="$attrs.errors.contract_id != null"
+                        :errorMessage="$attrs.errors.contract_id">
                     </CustomInput>
 
-                    <CustomInput label="Tipo de Venta" :options="typeOfSaleOptions" type="dropdown"
-                        placeholder="Seleccione un Tipo de Venta" v-model:input="formData.contract.type_of_sale">
+                    <CustomInput label="Tipo de Venta" :options="typeOfSaleOptions" type="dropdown" id="tipo_venta"
+                        placeholder="Seleccione un Tipo de Venta" v-model:input="formData.contract.type_of_sale"
+                        :invalid="$attrs.errors.type_of_sale != null" :errorMessage="$attrs.errors.type_of_sale">
                     </CustomInput>
 
-                    <CustomInput label="Supervisor" placeholder="Escriba nombre del supervisor"
-                        v-model:input="formData.contract.supervisor" :errorMessage="$page.props.errors.supervisor">
+                    <CustomInput label="Supervisor" placeholder="Escriba nombre del supervisor" id="supervisor"
+                        v-model:input="formData.contract.supervisor" :invalid="$attrs.errors.supervisor != null"
+                        :errorMessage="$attrs.errors.supervisor">
                     </CustomInput>
 
                     <CustomInput type="date" label="Fecha de inicio" placeholder="Escriba el Tipo de Cliente"
-                        v-model:input="formData.contract.start_date" :errorMessage="$page.props.errors.start_date">
+                        id="fecha_inicio" v-model:input="formData.contract.start_date"
+                        :invalid="$attrs.errors.start_date != null" :errorMessage="$attrs.errors.start_date">
                     </CustomInput>
 
                     <CustomInput type="date" label="Fecha de Finalización" placeholder="Fecha fin del contrato"
-                        v-model:input="formData.contract.end_date" :errorMessage="$page.props.errors.end_date">
+                        id="fecha_final" v-model:input="formData.contract.end_date"
+                        :invalid="$attrs.errors.end_date != null" :errorMessage="$attrs.errors.end_date">
                     </CustomInput>
 
-                    <CustomInput label="Estado del Contrato" :options="stateOptions" type="dropdown"
+                    <CustomInput label="Estado del Contrato" :options="stateOptions" type="dropdown" id="estado_contrato"
                         placeholder="Seleccione un Tipo de Venta" v-model:input="formData.contract.state"
-                        :errorMessage="$page.props.errors.stateSelect">
+                        :invalid="$attrs.errors.state != null" :errorMessage="$attrs.errors.state">
                     </CustomInput>
 
-                    <CustomInput label="Oferta" placeholder="Seleccione la oferta" type="dropdown"
-                        :options="Object.values(quotes)" v-model:input="formData.contract.quote"
-                        optionLabel="quote_type_ships.0.name" :errorMessage="$page.props.errors.quote">
+                    <CustomInput label="Oferta" placeholder="Seleccione la oferta" type="dropdown" id="oferta"
+                        optionLabel="consecutive" :options="Object.values(quotes)" v-model:input="formData.contract.quote"
+                        :invalid="$attrs.errors.quote != null" :errorMessage="$attrs.errors.quote">
                     </CustomInput>
 
                     <CustomInput label="Adjuntar PDF" type="file" v-model:input="formData.contract.pdf" acceptFile=".pdf"
-                        :errorMessage="$page.props.errors.pdf">
+                        id="pdf" :invalid="$attrs.errors.pdf != null" :errorMessage="$attrs.errors.pdf">
                     </CustomInput>
                 </span>
-                <CustomInput label="Objeto del Contrato" placeholder="Escriba Objeto del Contrato" type="textarea"
-                    v-model:input="formData.contract.subject" :errorMessage="$page.props.errors.subject">
+                <CustomInput class="mt-2" label="Objeto del Contrato" placeholder="Escriba Objeto del Contrato"
+                    type="textarea" v-model:input="formData.contract.subject" :invalid="$attrs.errors.subject != null"
+                    :errorMessage="$attrs.errors.subject">
                 </CustomInput>
             </template>
             <template #footer>
                 <Button severity="danger" @click="open = false">Cancelar</Button>
                 <Button severity="success" :loading="false" @click="submit()">
-                    {{ formData.contract.id != 0 ? 'Actualizar ' : 'Guardar' }}
+                    {{ formData.contract.id ? 'Actualizar ' : 'Guardar' }}
                 </Button>
             </template>
 
