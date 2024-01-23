@@ -109,7 +109,7 @@ class QuoteController extends Controller
                 'version' => $version,
                 'estimador_id' => $validateData['estimador_id'],
                 'estimador_name' => $validateData['estimador_name'],
-                'customer_id' => $validateData['customer_id'],
+                'customer_id' => $validateData['customer_id'] ?? null,
                 'observation' => $validateData['observation'] ?? '',
                 'expeted_answer_date' => $validateData['expeted_answer_date'],
                 'offer_type' => $validateData['offer_type'],

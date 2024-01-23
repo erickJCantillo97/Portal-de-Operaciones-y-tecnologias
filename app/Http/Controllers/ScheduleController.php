@@ -84,7 +84,7 @@ class ScheduleController extends Controller
                 if (!isset($task['parentID'])) {
                     $parentID = null;
                 } else {
-                    $parentID = is_numeric($task['parentId']) ? Task::orWhere('id', $task['parentId'])->first()->id : Task::where('PhantomId', $task['parentId'])->first()->id;
+                    $parentID = is_numeric($task['parentId']) ? Task::Where('id', $task['parentId'])->first()->id : Task::where('PhantomId', $task['parentId'])->first()->id;
                 }
                 $taskCreate = Task::create([
                     'project_id' => $project->id,
@@ -128,7 +128,7 @@ class ScheduleController extends Controller
         if (isset($request->dependencies['added'])) {
             foreach ($request->dependencies['added'] as $dependency) {
                 Dependecy::create([
-                    'from' =>  $dependency['from'],
+                    'from' => $dependency['from'],
                     'to' => $dependency['to'],
                     'type' => $dependency['type'],
                     'lag' => $dependency['lag'],

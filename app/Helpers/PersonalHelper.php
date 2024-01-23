@@ -74,10 +74,10 @@ function searchEmpleados(string $clave, string $valor)
 
 function getPersonalUser()
 {
-    $NumSAPPersonal = Personal::where('boss_id', auth()->user()->id)->pluck('user_id')->toArray();
+    $NumSAPPersonal = Personal::where('boss_id', auth()->user()->num_sap)->pluck('user_id')->toArray();
 
     $miPersonal = getEmpleadosAPI()->filter(function ($employee) use ($NumSAPPersonal) {
-        return $employee['JI_Num_SAP'] == auth()->user()->id || in_array($employee['Num_SAP'], $NumSAPPersonal);
+        return $employee['JI_Num_SAP'] == auth()->user()->num_sap || in_array($employee['Num_SAP'], $NumSAPPersonal);
     })->values()->map(function ($person) use ($NumSAPPersonal) {
         return [
             'Num_SAP' => (int) $person['Num_SAP'],
@@ -85,7 +85,7 @@ function getPersonalUser()
             'Costo_Hora' => $person['Costo_Hora'],
             'Costo_Mes' => $person['Costo_Mes'],
             'Oficina' => $person['Oficina'],
-            'canDelete' => in_array($person['Num_SAP'], $NumSAPPersonal) && $person['JI_Num_SAP'] != auth()->user()->id,
+            'canDelete' => in_array($person['Num_SAP'], $NumSAPPersonal) && $person['JI_Num_SAP'] != auth()->user()->num_sap,
             'Nombres_Apellidos' => $person['Nombres_Apellidos'],
             'Cargo' => $person['Cargo'],
             'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
