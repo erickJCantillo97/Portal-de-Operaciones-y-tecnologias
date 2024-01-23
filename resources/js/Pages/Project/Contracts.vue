@@ -16,24 +16,11 @@ const { contractNotification } = webNotifications()
 //Props
 const props = defineProps({
     contracts: Array,
-    customers: Array
+    customers: Array,
+    quotes: Object
 })
-
-//#region v-models (ref())
-const customerSelect = ref({})
-const managerSelect = ref()
-const managerOptions = ref([])
-
-//Tipo de Venta
-const typeOfSaleSelect = ref()
+console.log(props.quotes)
 const typeOfSaleOptions = ref(['VENTA DIRECTA', 'FINANCIADA', 'LEASING'])
-
-//Moneda
-const currencySelect = ref()
-const currencyOptions = ref(['COP', 'USD', 'EUR'])
-
-//Estado de la venta
-const stateSelect = ref()
 const stateOptions = ref(['LIQUIDADO', 'EN EJECUCIÓN'])
 
 //Abrir Modal
@@ -164,8 +151,9 @@ const buttons = [
                         :errorMessage="$page.props.errors.stateSelect">
                     </CustomInput>
 
-                    <CustomInput label="Oferta" placeholder="Seleccione la oferta" type="dropdown" :options="stateOptions"
-                        v-model:input="formData.contract.quote" :errorMessage="$page.props.errors.quote">
+                    <CustomInput label="Oferta" placeholder="Seleccione la oferta" type="dropdown"
+                        :options="Object.values(quotes)" v-model:input="formData.contract.quote"
+                        optionLabel="quote_type_ships.0.name" :errorMessage="$page.props.errors.quote">
                     </CustomInput>
 
                     <CustomInput label="Adjuntar PDF" type="file" v-model:input="formData.contract.pdf" acceptFile=".pdf"

@@ -59,6 +59,10 @@ const props = defineProps({
         type: Array,
         default: null
     },
+    optionLabel: {
+        typ: String,
+        default: null
+    },
     acceptFile: {
         type: String,
         default: '*'
@@ -88,8 +92,8 @@ const input = defineModel('input', {
             <Textarea v-else-if="type == 'textarea'" :id :disabled :placeholder class="w-full"
                 :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
 
-            <Dropdown v-else-if="type == 'dropdown'" :id :disabled :placeholder :options :class="invalid ? 'p-invalid' : ''"
-                v-model="input" :aria-describedby="id + '-help'" class="w-full" :pt="{
+            <Dropdown v-else-if="type == 'dropdown'" :id :disabled :placeholder :options :optionLabel
+                :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" class="w-full" :pt="{
                     root: '!h-8',
                     input: '!py-0 !flex !items-center',
                     item: '!py-1 !px-3'
