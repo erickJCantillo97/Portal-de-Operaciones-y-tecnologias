@@ -10,10 +10,8 @@ import Swal from 'sweetalert2';
 import ProgressBar from 'primevue/progressbar';
 import Tag from 'primevue/tag';
 import InputNumber from 'primevue/inputnumber';
-import InputSwitch from 'primevue/inputswitch';
 import ApplicationLogo from './ApplicationLogo.vue';
 import Loading from './Loading.vue';
-import { IntegerDataField } from '@bryntum/gantt';
 
 const props = defineProps({
     data: {
@@ -126,8 +124,8 @@ const formatCurrency = (valor, moneda) => {
     if (valor == undefined || valor == null) {
         return 'Sin definir'
     } else {
-        return parseFloat(valor).toLocaleString('es-CO',
-            { style: 'currency', currency: moneda })
+        return parseInt(valor).toLocaleString('es-CO',
+            { style: 'currency', currency: moneda, maximumFractionDigits: 0 })
     }
 }
 //#endregion
@@ -156,12 +154,12 @@ const formatCurrency = (valor, moneda) => {
         }
             ">
         <template #header>
-            <div class="">
+            <div class="space-y-1">
                 <span class="flex justify-between ">
                     <p class="text-xl h-ful flex items-center font-semibold leading-6 capitalize text-primary">
                         {{ title }}
                     </p>
-                    <span>
+                    <span class="space-x-1">
                         <slot name="buttonHeader" />
                     </span>
                 </span>

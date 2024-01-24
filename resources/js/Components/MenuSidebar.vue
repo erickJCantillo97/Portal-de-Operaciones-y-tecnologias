@@ -117,7 +117,7 @@ const navigation = [
             {
                 name: 'Personal Activo',
                 href: 'personal.activos',
-                dev: true
+                dev: false
             },
             // { name: 'Programación', href: '#' },
             // { name: 'Parte Diario', href: '#' },

@@ -16,9 +16,28 @@ class PersonalController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return inertia('Personal/Index', ['miPersonal' => getPersonalUser()]);
+        // dd($request->all());
+        $groups = [
+            [
+                'name' => 'Soldadores con plata',
+                'id' => 0
+            ],
+            [
+                'name' => 'Pintores con plata',
+                'id' => 1
+            ],
+            [
+                'name' => 'programadores pobres',
+                'id' => 2
+            ]
+        ];
+        return inertia('Personal/Index', [
+            'miPersonal' => getPersonalUser(),
+            'group' => $groups[$request->id] ?? null,
+            'groups' => $groups
+        ]);
     }
 
     public function getPersonalUser()
@@ -48,7 +67,7 @@ class PersonalController extends Controller
                 $persona->gerencia_lent = auth()->user()->gerencia;
                 $persona->oficina_lent = auth()->user()->oficina;
                 $persona->boss_id = auth()->user()->num_sap;
-                $persona->return_date =  Carbon::parse($validateData['fecha_devolucion'])->format('Y-m-d') ?? null;
+                $persona->return_date = Carbon::parse($validateData['fecha_devolucion'])->format('Y-m-d') ?? null;
                 $persona->save();
             }
             return back()->with(['message' => 'Personal Añadido correctamente'], 200);
