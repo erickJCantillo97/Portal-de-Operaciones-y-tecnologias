@@ -28,7 +28,7 @@ const props = defineProps({
                 <UserHeader class="col-span-1" />
                 <QuotesCard class="col-span-1" :showIndicators="false" v-if="$page.props.auth.user.oficina == 'DEPPC'" />
             </div>
-            <Quotes v-if="$page.props.auth.user.oficina == 'DDEST'" />
+            <Quotes v-if="$page.props.auth.user.oficina == 'DEPPC'" />
             <Projects v-else />
         </div>
 
