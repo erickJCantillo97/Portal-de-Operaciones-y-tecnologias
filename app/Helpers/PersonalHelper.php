@@ -4,6 +4,7 @@ use App\Ldap\User;
 use App\Models\Labor;
 use App\Models\Personal\Personal;
 use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
 
 function UpdateCargos()
 {
@@ -81,7 +82,7 @@ function getPersonalUser()
     })->values()->map(function ($person) use ($NumSAPPersonal) {
         return [
             'Num_SAP' => (int) $person['Num_SAP'],
-            'Fecha_Final' => $person['Fecha_Final'],
+            'Fecha_Final' => Carbon::createFromFormat('Ymd', $person['Fecha_Final']),
             'Costo_Hora' => $person['Costo_Hora'],
             'Costo_Mes' => $person['Costo_Mes'],
             'Oficina' => $person['Oficina'],

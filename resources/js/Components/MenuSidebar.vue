@@ -33,34 +33,23 @@
                                         <h3 class="pl-3  text-black dark:text-[#506690] dark:group-hover:text-white">
                                             {{ item.name }}
                                         </h3>
-                                        <!--HIJOS-->
-                                        <div class="p-2">
-                                            <Tag v-if="item.dev" value="WIP" severity="info" class="animate-pulse" rounded
-                                                :pt="{
-                                                    rot: '!size-1',
-                                                    value: '!text-xs'
-                                                }" />
-                                        </div>
                                     </div>
-                                    <div class="rtl:rotate-180 dark:group-hover:text-white"
+                                    <div class="rtl:rotate-180 dark:group-hover:text-white transition delay-150"
                                         :class="{ '!rotate-90': activeDropdown === item.name }">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
-                                                stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
+                                        <i class="fa-solid fa-chevron-right"></i>
                                     </div>
                                 </button>
                                 <vue-collapsible :isOpen="activeDropdown === item.name">
                                     <ul class="text-gray-500 sub-menu dark:text-white" v-for="children of item.children">
-                                        <li class="flex items-center">
-                                            <Link as="button" :disabled="children.dev"
-                                                :class="children.dev ? 'cursor-default opacity-50 hover:bg-white' : ''"
-                                                :href="route(children.href)">{{ children.name }}</Link>
-                                            <!-- <Tag v-if="children.dev" value="WIP" severity="info" class="animate-pulse"
-                                                rounded :pt="{
-                                                    value: '!text-xs'
-                                                }" /> -->
+                                        <li>
+                                            <Link :href="children.dev ? '#' : route(children.href)">
+                                            <span class="">
+                                                <p :class="children.dev ? '-mb-2' : ''">{{ children.name }}</p>
+                                                <small v-if="children.dev" class="text-xs text-red-300 animate-pulse">
+                                                    En desarrollo
+                                                </small>
+                                            </span>
+                                            </Link>
                                         </li>
                                     </ul>
                                 </vue-collapsible>
@@ -78,7 +67,6 @@ import { ref } from 'vue'
 import { Link } from '@inertiajs/vue3';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 import { usePermissions } from '@/composable/permission';
-import Tag from 'primevue/tag'
 import VueCollapsible from 'vue-height-collapsible/vue3';
 import {
     CalendarIcon,
@@ -92,7 +80,6 @@ import {
 
 const { hasRole } = usePermissions();
 const activeDropdown = ref();
-const showTag = ref(false);
 
 const navigation = [
     {
@@ -130,7 +117,7 @@ const navigation = [
             {
                 name: 'Personal Activo',
                 href: 'personal.activos',
-                dev: true
+                dev: false
             },
             // { name: 'Programación', href: '#' },
             // { name: 'Parte Diario', href: '#' },
