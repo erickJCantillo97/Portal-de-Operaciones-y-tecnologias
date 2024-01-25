@@ -5,8 +5,7 @@ import Textarea from 'primevue/textarea';
 import Dropdown from 'primevue/dropdown';
 import FileUpload from 'primevue/fileupload';
 import MultiSelect from 'primevue/multiselect';
-
-
+import { ref } from 'vue';
 
 const props = defineProps({
     //general
@@ -107,6 +106,17 @@ const props = defineProps({
     }
 })
 
+const countries = ref()
+if (props.type == 'country') {
+    axios.get('https://restcountries.com/v3.1/all?fields=flags,translations,name').then(
+        (res) => {
+            countries.value = res.data.map(country => {
+                country.translations.spa.common = country.translations.spa.common.toUpperCase()
+                return country
+            })
+        }
+    )
+}
 
 const input = defineModel('input', {
     required: true
@@ -135,6 +145,30 @@ const input = defineModel('input', {
                     item: '!py-1 !px-3 !text-sm !font-normal',
                     filterInput: '!h-8'
                 }" />
+            <Dropdown v-else-if="type == 'country'" :id :disabled :placeholder :options="countries" :optionLabel :loading
+                :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''" v-model="input"
+                :aria-describedby="id + '-help'" class="w-full" :pt="{
+                    root: '!h-8 ',
+                    input: '!py-0 !flex !items-center !text-sm !font-normal',
+                    item: '!py-1 !px-3 !text-sm !font-normal',
+                    filterInput: '!h-8'
+                }">
+                <template #value="slotProps">
+                    <div v-if="slotProps.value" class="flex space-x-1">
+                        <img :src="slotProps.value.flags.svg" width="30" :alt="slotProps.value">
+                        <p class="">{{ slotProps.value.translations.spa.common }}</p>
+                    </div>
+                    <span v-else>
+                        {{ slotProps.placeholder }}
+                    </span>
+                </template>
+                <template #option="slotProps">
+                    <div class="flex space-x-1">
+                        <img :src="slotProps.option.flags.svg" width="30" :alt="slotProps.option.translations.spa.common">
+                        <p>{{ slotProps.option.translations.spa.common }}</p>
+                    </div>
+                </template>
+            </Dropdown>
             <MultiSelect v-else-if="type == 'multiselect'" :id display="chip" v-model="input" :options :optionLabel :loading
                 :maxSelectedLabels :placeholder :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''"
                 class="w-full" :aria-describedby="id + '-help'" :pt="{
