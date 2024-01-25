@@ -116,8 +116,9 @@ const formatDate = (date) => {
     if (date == undefined || date == null) {
         return 'Sin definir'
     } else {
-        return new Date(date).toLocaleString('es-CO',
+        var fecha = new Date(date).toLocaleString('es-CO',
             { day: '2-digit', month: '2-digit', year: 'numeric' })
+        return fecha == '30/11/2' ? 'INDEFINIDO' : fecha;
     }
 }
 const formatCurrency = (valor, moneda) => {

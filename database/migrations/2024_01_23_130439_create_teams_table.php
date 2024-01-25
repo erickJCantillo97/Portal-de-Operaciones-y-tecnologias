@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('working_teams', function (Blueprint $table) {
+        Schema::create('teams', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_num_sap');
-            $table->bigInteger('team_id')->unsigned();
-            $table->bigInteger('user_id')->unsigned();
+            $table->string('name');
+            $table->text('description');
+            $table->unsignedBigInteger('user_id');
+            $table->integer('gerencia');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('team_id')->references('id')->on('teams');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('working_teams');
+        Schema::dropIfExists('teams');
     }
 };

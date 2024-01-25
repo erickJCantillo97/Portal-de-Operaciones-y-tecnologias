@@ -100,7 +100,7 @@ const navigation = [
                 // dev: true
             },
             {
-                name: 'Programacion',
+                name: 'Programación',
                 href: 'programming',
                 // dev: true
             },

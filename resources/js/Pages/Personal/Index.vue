@@ -64,8 +64,8 @@ const columnas = [
         }
     },
     { field: 'Fecha_Final', header: 'Fin contrato', filter: true, sortable: true, type: 'date' },
-    { field: 'Costo_Hora', header: 'Costo hora', filter: true, sortable: true, type: 'currency' },
-    { field: 'Costo_Mes', header: 'costo mes', filter: true, sortable: true, type: 'currency' },
+    { field: 'Costo_Hora', header: 'Costo hora', filter: true, sortable: true, type: 'currency', class: "w-48" },
+    { field: 'Costo_Mes', header: 'costo mes', filter: true, sortable: true, type: 'currency', class: "w-52" },
 ]
 const buttons = [
     { event: 'delete', severity: 'danger', class: '', icon: 'fa-regular fa-trash-can', text: true, outlined: false, rounded: false },
