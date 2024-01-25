@@ -19,7 +19,7 @@ const selected = defineModel('selected', {
 
 </script>
 <template>
-    <Dropdown v-if="paises" v-model="selected" :options="paises" filter resetFilterOnHide placeholder="Selecciona el pais"
+    <Dropdown v-model="selected" :options="paises" filter resetFilterOnHide placeholder="Selecciona el pais"
         optionLabel="translations.spa.common" class="w-full -mt-1 rounded-md md:w-14rem" :pt="{
             root: {
                 class: 'h-10 !ring-gray-300 !ring-inset ring-1 !border-0 !shadow-sm '
@@ -46,7 +46,6 @@ const selected = defineModel('selected', {
                 <p>{{ slotProps.option.translations.spa.common }}</p>
             </div>
         </template>
-
     </Dropdown>
 </template>
 

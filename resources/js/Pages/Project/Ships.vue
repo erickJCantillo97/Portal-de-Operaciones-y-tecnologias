@@ -9,6 +9,7 @@ import FileUpload from 'primevue/fileupload';
 import CustomModal from '@/Components/CustomModal.vue';
 import Dropdown from 'primevue/dropdown';
 import CustomDataTable from '@/Components/CustomDataTable.vue';
+import CustomInput from '@/Components/CustomInput.vue';
 
 const modalType = ref('Nueva unidad')
 const customerSelect = ref();
@@ -179,91 +180,30 @@ const buttons = ref([
                 {{ modalType }}</span>
         </template>
         <template #body>
-            <div class="grid grid-cols-4 gap-2 px-1 pt-4">
-                <TextInput label="Numero del casco" type="text" :placeholder="'Numero del casco'" v-model="formData.idHull"
-                    :error="router.page.props.errors.idHull"></TextInput>
-
-                <TextInput label="Nombre del Buque" type="text" :placeholder="'Nombre del Buque'" v-model="formData.name"
-                    :error="router.page.props.errors.name"></TextInput>
-
-                <div>
-                    <label class="block mb-1 text-sm font-medium text-gray-900 capitalize" for="customer">
-                        Cliente</label>
-                    <Dropdown id="customer" filter v-model="customerSelect" :options="customers" v-if="customers"
-                        @change="formData.customer_id = $event.value.id" optionLabel="name" placeholder="Seleccione Cliente"
-                        class="w-full rounded-md md:w-14rem" :pt="{
-                            root: {
-                                class: 'h-10 !ring-gray-300 !ring-inset ring-1 !border-0 !shadow-sm '
-                            },
-                            input: {
-                                class: '!text-sm pt-3 pl-2'
-                            },
-                            header: {
-                                class: '!p-2'
-                            },
-                            filterInput: {
-                                class: '!p-1'
-                            },
-                            item: {
-                                class: '!text-sm'
-                            },
-                            emptyMessage: {
-                                class: '!text-sm'
-                            }
-                        }" />
-                </div>
-
-                <div>
-                    <label class="block mb-1 text-sm font-medium text-gray-900 capitalize" for="hull_material">
-                        Clase de buque</label>
-                    <Dropdown id="hull_material" filter v-model="typeSelect" clearIcon :options="typeShips" v-if="customers"
-                        optionLabel="name" placeholder="Seleccione tipo" class="w-full rounded-md md:w-14rem" :pt="{
-                            root: {
-                                class: 'h-10 !ring-gray-300 !ring-inset ring-1 !border-0 !shadow-sm '
-                            },
-                            input: {
-                                class: '!text-sm pt-3 pl-2'
-                            },
-                            header: {
-                                class: '!p-2'
-                            },
-                            filterInput: {
-                                class: '!p-1'
-                            },
-                            item: {
-                                class: '!text-sm'
-                            },
-                            emptyMessage: {
-                                class: '!text-sm'
-                            }
-                        }" />
-                </div>
-
-                <TextInput label="Siglas" type="text" :placeholder="'Digite las siglas'" v-model="formData.acronyms"
-                    :error="router.page.props.errors.acronyms">
-                </TextInput>
-
-                <TextInput label="Carros Quillas" type="number" :placeholder="'Números de carros de Quillas necesarios'"
-                    v-model="formData.quilla" :error="router.page.props.errors.quilla">
-                </TextInput>
-
-                <TextInput label="Carros de Pantoques" type="number" :placeholder="'Números carros de Pantoques necesarios'"
-                    v-model="formData.pantoque" :error="router.page.props.errors.pantoque">
-                </TextInput>
-                <div class="flex items-end">
-                    <FileUpload mode="basic" chooseLabel="Adjuntar foto" :show-upload-button=false name="demo[]"
-                        :multiple="false" :show-cancel-button=false accept="image/*" :maxFileSize="10000000"
-                        invalidFileTypeMessage="Archivo Inválido: solo se permite imagen."
-                        invalidFileSizeMessage="Este archivo supera el tamaño permitido: "
-                        @input="formData.image = $event.target.files[0]">
-                    </FileUpload>
-                </div>
+            <div class="grid grid-cols-2 gap-2">
+                <CustomInput label="Numero del casco" type="text" :placeholder="'Numero del casco'"
+                    v-model:input="formData.idHull" :error="router.page.props.errors.idHull" />
+                <CustomInput label="Nombre del Buque" type="text" :placeholder="'Nombre del Buque'"
+                    v-model:input="formData.name" :error="router.page.props.errors.name" />
+                <CustomInput id="customer" label="Cliente" type="dropdown" filter v-model:input="customerSelect"
+                    :options="customers" v-if="customers" @change="formData.customer_id = $event.value.id"
+                    optionLabel="name" placeholder="Seleccione Cliente" />
+                <CustomInput id="class" label="Tipo" type="dropdown" filter v-model:input="typeSelect" clearIcon
+                    :options="typeShips" v-if="customers" optionLabel="name" placeholder="Seleccione tipo" />
+                <CustomInput label="Siglas" type="text" :placeholder="'Digite las siglas'" v-model:input="formData.acronyms"
+                    :error="router.page.props.errors.acronyms" />
+                <CustomInput label="Carros Quillas" type="number" :placeholder="'Números de carros de Quillas necesarios'"
+                    v-model:input="formData.quilla" :error="router.page.props.errors.quilla" />
+                <CustomInput label="Carros de Pantoques" type="number"
+                    :placeholder="'Números carros de Pantoques necesarios'" v-model:input="formData.pantoque"
+                    :error="router.page.props.errors.pantoque" />
+                <CustomInput type="file" label="Adjuntar foto" acceptFile="image/*" v-model:input="formData.image" />
             </div>
         </template>
         <template #footer>
-            <Button severity="success" :loading="loading" @click="submit()"
+            <Button severity="success" :loading="loading" @click="submit()" icon="fa-solid fa-floppy-disk"
                 :label="formData.id != null ? 'Actualizar ' : 'Guardar'" />
-            <Button severity="danger" @click="visible = false" label="Cancelar" />
+            <Button severity="danger" @click="visible = false" label="Cancelar" icon="fa-regular fa-circle-xmark" />
         </template>
     </CustomModal>
 </template>
