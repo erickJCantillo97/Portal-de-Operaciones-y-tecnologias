@@ -10,6 +10,7 @@ import FileUpload from 'primevue/fileupload';
 import Image from 'primevue/image';
 import { useSweetalert } from '@/composable/sweetAlert';
 import CustomDataTable from '@/Components/CustomDataTable.vue';
+import CustomInput from '@/Components/CustomInput.vue';
 const { toast } = useSweetalert();
 const { confirmDelete } = useSweetalert();
 
@@ -137,7 +138,7 @@ const buttons = [
             <CustomDataTable :rows-default="100" :data="typeShips" :columnas="columns" :actions="buttons"
                 @showEdit="showEdit" title="Clases de buque" @deleteClic="deleteClic">
                 <template #buttonHeader>
-                    <Button title="Nuevo" severity="primary" label="Agregar" outlined class="!h-8" icon="fa-solid fa-plus"
+                    <Button title="Nuevo" severity="success" label="Agregar" outlined class="!h-8" icon="fa-solid fa-plus"
                         @click="showNew()" />
                 </template>
             </CustomDataTable>
@@ -154,49 +155,29 @@ const buttons = [
         </template>
         <template #body>
             <div class="grid grid-cols-4 gap-2 px-1 pt-4">
-                <TextInput label="Nombre" type="text" :showSup="true" v-model="typeShip.name" />
-                <TextInput label="Tipo de buque" type="text" v-model="typeShip.type" />
-                <TextInput label="Empresa diseñadora" type="text" v-model="typeShip.disinger" />
-                <div>
-                    <label class="text-sm font-medium" for="hull_material">
-                        Material Casco</label>
-                    <Dropdown id="hull_material" v-model="typeShip.hull_material" :options="hull_materials"
-                        placeholder="Selecciona un material" class="w-full -mt-1 rounded-md md:w-14rem" :pt="{
-                            root: {
-                                class: 'h-10 !ring-gray-300 !ring-inset ring-1 !border-0 !shadow-sm '
-                            },
-                            input: {
-                                class: '!text-sm pt-3 pl-2'
-                            },
-                            item: {
-                                class: '!text-sm'
-                            }
-                        }" />
-                </div>
-                <TextInput label="Eslora" type="number" v-model="typeShip.length" />
-                <TextInput label="Manga" type="number" v-model="typeShip.breadth" />
-                <TextInput label="Calado de diseño" type="number" v-model="typeShip.draught" />
-                <TextInput label="Puntal" type="number" v-model="typeShip.depth" />
-                <TextInput label="Full Load" type="number" v-model="typeShip.full_load" />
-                <TextInput label="Ligth Ship" type="number" v-model="typeShip.light_ship" />
-                <TextInput label="Potencia" type="number" v-model="typeShip.power_total" />
-                <TextInput label="Tipo de propulsion" type="text" v-model="typeShip.propulsion_type" />
-                <TextInput label="Velocidad maxima" type="text" v-model="typeShip.velocity" />
-                <TextInput label="Autonomia" type="number" v-model="typeShip.autonomias" />
-                <TextInput label="Alcance" type="number" v-model="typeShip.autonomy" />
-                <TextInput label="Tripulacion maxima" type="number" v-model="typeShip.crew" />
-                <TextInput label="GT" type="number" v-model="typeShip.GT" />
-                <TextInput label="CGT" type="number" v-model="typeShip.CGT" />
-                <TextInput label="Bollard pull" type="number" v-model="typeShip.bollard_pull" />
-                <TextInput label="Clasificacion" type="text" v-model="typeShip.clasification" />
-                <span class="flex items-center justify-center">
-                    <FileUpload mode="basic" :multiple="false" accept="image/*" class="w-full" :maxFileSize="1000000"
-                        @select="typeShip.image = $event.files[0]" v-model="typeShip.image" :showCancelButton="false"
-                        :showUploadButton="false" chooseLabel="Agregar imagen" :pt="{
-                            root: { class: '' }
-                        }">
-                    </FileUpload>
-                </span>
+                <CustomInput label="Nombre" id='name' :showSup="true" v-model:input="typeShip.name" />
+                <CustomInput label="Tipo de buque" id="type" type="text" v-model:input="typeShip.type" />
+                <CustomInput label="Empresa diseñadora" id="designer" type="text" v-model:input="typeShip.disinger" />
+                <CustomInput label="Material Casco" id="material" :options="hull_materials" type="dropdown"
+                    v-model:input="typeShip.hull_material" placeholder="Selecciona un material" />
+                <CustomInput label="Eslora" type="number" id="eslora" v-model:input="typeShip.length" />
+                <CustomInput label="Manga" type="number" id="breadth" v-model:input="typeShip.breadth" />
+                <CustomInput label="Calado de diseño" id="draught" type="number" v-model:input="typeShip.draught" />
+                <CustomInput label="Puntal" type="number" id="depth" v-model:input="typeShip.depth" />
+                <CustomInput label="Full Load" type="number" id="full_load" v-model:input="typeShip.full_load" />
+                <CustomInput label="Ligth Ship" type="number" id="light_ship" v-model:input="typeShip.light_ship" />
+                <CustomInput label="Potencia" type="number" id="power_total" v-model:input="typeShip.power_total" />
+                <CustomInput label="Tipo de propulsion" type="text" id="propulsion_type"
+                    v-model:input="typeShip.propulsion_type" />
+                <CustomInput label="Velocidad maxima" type="text" id="velocity" v-model:input="typeShip.velocity" />
+                <CustomInput label="Autonomia" type="number" id="autonomias" v-model:input="typeShip.autonomias" />
+                <CustomInput label="Alcance" type="number" id="autonomy" v-model:input="typeShip.autonomy" />
+                <CustomInput label="Tripulacion maxima" id="crew" type="number" v-model:input="typeShip.crew" />
+                <CustomInput label="GT" type="number" id=gt v-model:input="typeShip.GT" />
+                <CustomInput label="CGT" type="number" id="cgt" v-model:input="typeShip.CGT" />
+                <CustomInput label="Bollard pull" type="number" id="bollard_pull" v-model:input="typeShip.bollard_pull" />
+                <CustomInput label="Clasificacion" type="text" id="clasification" v-model:input="typeShip.clasification" />
+                <CustomInput label="Imagen" type="file" id="image" v-model:input="typeShip.image" acceptFile="image/*" />
                 <span class="flex items-center justify-center">
                     <Image v-if="typeShip.image != null || typeShip.render != null" id="verFoto" alt="imagen" preview
                         height="50" width="50" :pt="{
@@ -218,9 +199,9 @@ const buttons = [
             </div>
         </template>
         <template #footer>
-            <Button severity="primary" outlined label="Guardar" icon="fa-solid fa-floppy-disk" class="!h-8"
+            <Button severity="primary" outlined label="Guardar" icon="fa-solid fa-floppy-disk"
                 @click="modalType == 'new' ? save() : edit()" />
-            <Button severity="danger" outlined label="Cancelar" icon="fa-regular fa-circle-xmark" class="!h-8"
+            <Button severity="danger" outlined label="Cancelar" icon="fa-regular fa-circle-xmark"
                 @click="modalVisible = false; typeShip.reset()" />
         </template>
     </CustomModal>

@@ -11,6 +11,7 @@ import Button from 'primevue/button';
 import CustomDataTable from '@/Components/CustomDataTable.vue';
 import CustomModal from '@/Components/CustomModal.vue';
 import CustomSelectCountries from '@/Components/CustomSelectCountries.vue';
+import CustomInput from '@/Components/CustomInput.vue';
 
 const confirm = useConfirm();
 const { toast } = useSweetalert();
@@ -128,31 +129,13 @@ const buttons = [
             <p> {{ formData.customer.id != null ? 'Editar ' : 'Crear' }} Cliente </p>
         </template>
         <template #body>
-            <!-- <TextInput class="mt-2 text-left" label="NIT" placeholder="e.g. 9234232988-0"
-                                                v-model="formData.customer.NIT" :error="router.page.props.errors.nit">
-                                            </TextInput> -->
-            <TextInput class="mt-2 text-left mb-4" label="Nombre del Cliente" placeholder="Escriba el nombre del Cliente"
-                v-model="formData.customer.name" :error="router.page.props.errors.name"></TextInput>
-            <div class="text-left mb-4">
-                <label class="text-sm font-medium" for="pais">Pais</label>
-                <CustomSelectCountries v-model:selected="country" />
-            </div>
-            <div class="text-left">
-                <label class="text-sm font-medium" for="hull_material">Tipo de Cliente</label>
-                <Dropdown id="hull_material" v-model="formData.customer.type"
-                    :options="['GOBIERNO', 'ARMADOR CIVIL', 'FUERZAS ARMADAS']" placeholder="Selecciona un Tipo de Cliente"
-                    class="w-full -mt-1 rounded-md md:w-14rem" :pt="{
-                        root: {
-                            class: 'h-10 !ring-gray-300 !ring-inset ring-1 !border-0 !shadow-sm '
-                        },
-                        input: {
-                            class: '!text-sm pt-3 pl-2'
-                        },
-                        item: {
-                            class: '!text-sm'
-                        }
-                    }" />
-            </div>
+            <CustomInput label="Nombre del Cliente" placeholder="Escriba el nombre del Cliente" id="name"
+                v-model:input="formData.customer.name" :error="router.page.props.errors.name" />
+            <CustomInput label="Pais" placeholder="Seleccione un pais" id="country" type="country" v-model:input="country"
+                :error="router.page.props.errors.country" />
+            <CustomInput label="Tipo de Cliente" placeholder="Selecciona un Tipo de Cliente"
+                :options="['GOBIERNO', 'ARMADOR CIVIL', 'FUERZAS ARMADAS']" id="type" type="dropdown"
+                v-model:input="formData.customer.name" :error="router.page.props.errors.name" />
         </template>
         <template #footer>
             <Button severity="danger" @click="open = false" label="Cancelar" class="!h-8" />
