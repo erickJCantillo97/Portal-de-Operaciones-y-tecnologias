@@ -160,19 +160,24 @@ const buttons = [
                 <CustomInput label="Empresa diseñadora" id="designer" type="text" v-model:input="typeShip.disinger" />
                 <CustomInput label="Material Casco" id="material" :options="hull_materials" type="dropdown"
                     v-model:input="typeShip.hull_material" placeholder="Selecciona un material" />
-                <CustomInput label="Eslora" type="number" id="eslora" v-model:input="typeShip.length" />
-                <CustomInput label="Manga" type="number" id="breadth" v-model:input="typeShip.breadth" />
-                <CustomInput label="Calado de diseño" id="draught" type="number" v-model:input="typeShip.draught" />
-                <CustomInput label="Puntal" type="number" id="depth" v-model:input="typeShip.depth" />
+                <CustomInput label="Eslora" type="number" id="eslora" v-model:input="typeShip.length" suffix=" m" />
+                <CustomInput label="Manga" type="number" id="breadth" v-model:input="typeShip.breadth" suffix=" m" />
+                <CustomInput label="Calado de diseño" id="draught" type="number" v-model:input="typeShip.draught"
+                    suffix=" m" />
+                <CustomInput label="Puntal" type="number" id="depth" v-model:input="typeShip.depth" suffix=" m" />
                 <CustomInput label="Full Load" type="number" id="full_load" v-model:input="typeShip.full_load" />
                 <CustomInput label="Ligth Ship" type="number" id="light_ship" v-model:input="typeShip.light_ship" />
-                <CustomInput label="Potencia" type="number" id="power_total" v-model:input="typeShip.power_total" />
+                <CustomInput label="Potencia" type="number" id="power_total" v-model:input="typeShip.power_total"
+                    suffix=" Kw" />
                 <CustomInput label="Tipo de propulsion" type="text" id="propulsion_type"
                     v-model:input="typeShip.propulsion_type" />
-                <CustomInput label="Velocidad maxima" type="text" id="velocity" v-model:input="typeShip.velocity" />
-                <CustomInput label="Autonomia" type="number" id="autonomias" v-model:input="typeShip.autonomias" />
+                <CustomInput label="Velocidad maxima" type="text" id="velocity" v-model:input="typeShip.velocity"
+                    suffix=" Km/h" />
+                <CustomInput label="Autonomia" type="number" id="autonomias" v-model:input="typeShip.autonomias"
+                    suffix=" dias" />
                 <CustomInput label="Alcance" type="number" id="autonomy" v-model:input="typeShip.autonomy" />
-                <CustomInput label="Tripulacion maxima" id="crew" type="number" v-model:input="typeShip.crew" />
+                <CustomInput label="Tripulacion maxima" id="crew" type="number" v-model:input="typeShip.crew"
+                    suffix=" Personas" />
                 <CustomInput label="GT" type="number" id=gt v-model:input="typeShip.GT" />
                 <CustomInput label="CGT" type="number" id="cgt" v-model:input="typeShip.CGT" />
                 <CustomInput label="Bollard pull" type="number" id="bollard_pull" v-model:input="typeShip.bollard_pull" />
