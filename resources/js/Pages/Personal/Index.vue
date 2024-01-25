@@ -24,6 +24,8 @@ const props = defineProps({
 })
 
 const personal = ref([])
+const groupSelect = ref(props.group)
+const loading = ref(false)
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
@@ -31,6 +33,7 @@ const filters = ref({
 
 let form = useForm({
     users: [],
+    members: [],
     fecha_devolucion: null
 })
 
@@ -58,6 +61,7 @@ const formatCurrency = (value) => {
 }
 
 const modalVisible = ref(false)
+
 const showNew = () => {
     modalVisible.value = true
     if (personal.value.length == 0)
@@ -66,8 +70,7 @@ const showNew = () => {
 
 //#region Modal Crear Grupo
 const showGroupDialog = ref(false)
-const teamwork = ref()
-
+const teamworkName = ref()
 const descriptionValue = ref('')
 
 const openGroupDialog = () => {
@@ -79,21 +82,20 @@ const openGroupDialog = () => {
 const clearModal = () => {
     showGroupDialog.value = false
     if (showGroupDialog.value == false) {
-        teamwork.value = ''
+        teamworkName.value = ''
         descriptionValue.value = ''
-        form.users = []
+        form.members = []
     }
 }
 
 const createGroup = () => {
     console.log('Grupo Creado!')
-    // axios.post(route('personal.store'), {
-    //     users: form.users,
-    //     fecha_devolucion: form.fecha_devolucion
+    // router.post(route('teams.store', { members: form.members }), {
+    //     members: form.members
     // }).then((res) => {
-    //     form.users = []
-    //     modalVisible.value = false
-    //     toast('personal añadido exitosamente', 'info')
+    //     form.members = []
+    //     showGroupDialog.value = false
+    //     toast('Personal añadido exitosamente', 'info')
     // })
 }
 
@@ -113,8 +115,13 @@ function formatDate(date) {
     // Formato de salida: dd/mm/aaaa
     return day === '00' ? 'Indefinido' : `${day}/${month}/${year}`
 }
+
 const quitar = (persona) => {
     form.users = form.users.filter(object => object.Num_SAP !== persona.Num_SAP);
+}
+
+const removeMemberOfGroup = (member) => {
+    form.members = form.members.filter(object => object.Num_SAP !== member.Num_SAP);
 }
 
 const del = (event, data) => {
@@ -136,11 +143,6 @@ const columnas = [
 const buttons = [
     { event: 'delete', severity: 'danger', class: '', icon: 'fa-regular fa-trash-can', text: true, outlined: false, rounded: false },
 ]
-
-const groupSelect = ref(props.group)
-const loading = ref(false)
-
-
 </script>
 
 <template>
@@ -158,9 +160,9 @@ const loading = ref(false)
                                 input: '!py-0 !flex !items-center',
                                 item: '!p-1 w-full'
                             }" />
-                        <Button severity=" success" type="button" outlined label="Agregar Personal" icon="fa-solid fa-plus"
+                        <Button severity=" success" type="button" outlined label="Agregar Personal" icon="pi pi-user-plus"
                             @click="showNew()" />
-                        <Button icon="pi pi-plus" severity="primary" outlined label="Crear Grupo"
+                        <Button icon="pi pi-users" severity="primary" outlined label="Crear Grupo"
                             @click="openGroupDialog()" />
                     </template>
                 </CustomDataTable>
@@ -242,7 +244,7 @@ const loading = ref(false)
                         <div class="border border-gray-300 p-2 max-w-full w-full rounded-lg">
                             <div class="mb-2">
                                 <label>Nombre del Grupo</label>
-                                <InputText type="text" v-model="teamwork" :pt="{
+                                <InputText type="text" v-model="teamworkName" :pt="{
                                     root: '!w-full'
                                 }" />
                             </div>
@@ -257,9 +259,9 @@ const loading = ref(false)
                         </div>
                         <div class="border-0">
                             <label for="">Seleccionar Personal</label>
-                            <Listbox multiple v-model="form.users" listStyle="height:230px"
+                            <Listbox multiple v-model="form.members" listStyle="height:230px"
                                 :filterFields="['Nombres_Apellidos', 'Cargo', 'Identificacion', 'Oficina']" :filter="true"
-                                :options="miPersonal" filter optionLabel="name" class="w-full md:w-14rem"
+                                :options="personal" filter optionLabel="name" class="w-full md:w-14rem"
                                 :loading="personal.length == 0">
                                 <template #option="slotProps">
                                     <UserTable :user="slotProps.option"></UserTable>
@@ -275,11 +277,11 @@ const loading = ref(false)
                             <h3 class="text-center font-bold text-lg text-white">Personal Seleccionado</h3>
                         </div>
                         <div class="block space-y-4 h-[475px] custom-scroll overflow-y-auto shadow-lg rounded-lg p-2">
-                            <div v-for="persona of form.users" class="flex justify-between">
-                                <UserTable :user="persona" :photo="true" />
+                            <div v-for="member of form.members" class="flex justify-between">
+                                <UserTable :user="member" :photo="true" />
                                 <div>
-                                    <Button severity="danger" @click="quitar(persona)" icon="fa-regular fa-trash-can" text>
-                                    </Button>
+                                    <Button severity="danger" @click="removeMemberOfGroup(member)"
+                                        icon="fa-regular fa-trash-can" text />
                                 </div>
                             </div>
                         </div>
