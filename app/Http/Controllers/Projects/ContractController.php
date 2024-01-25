@@ -22,7 +22,7 @@ class ContractController extends Controller
     {
         $contracts = Contract::with('customer')->orderBy('contract_id')->get();
         $customers = Customer::orderBy('name')->get();
-        $quotes = QuoteVersion::get()->filter(function ($quote) {
+        $quotes = QuoteVersion::with('customer')->get()->filter(function ($quote) {
             return $quote['get_status'] === 'Contratada';
         });
         return Inertia::render('Project/Contracts', compact('contracts', 'customers', 'quotes'));
@@ -45,27 +45,29 @@ class ContractController extends Controller
         $validateData = $request->validate([
             'contract_id' => 'required|unique:contracts,contract_id',
             'subject' => 'nullable',
-            'customer_id' => 'nullable',
-            'manager_id' => 'nullable',
             'type_of_sale' => 'nullable',
             'supervisor' => 'nullable',
+            'quote_id' => 'nullable',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
-            'currency' => 'nullable',
-            'cost' => 'nullable|numeric',
             'state' => 'nullable',
             'file' => 'nullable',
         ]);
-
-        $validateData['gerencia'] = auth()->user()->gerencia;
-        if ($request->pdf != null) {
-            $validateData['file'] = Storage::putFileAs(
-                'public/contract/',
-                $request->pdf,
-                $validateData['contract_id'] . '.' . $request->pdf->getClientOriginalExtension()
-            );
+        try {
+            $validateData['gerencia'] = auth()->user()->gerencia;
+            if ($request->pdf != null) {
+                $validateData['file'] = Storage::putFileAs(
+                    'public/contract/',
+                    $request->pdf,
+                    $validateData['contract_id'] . '.' . $request->pdf->getClientOriginalExtension()
+                );
+            }
+            Contract::create($validateData);
+        } catch (Exception $e) {
+            return back()->withErrors(['message' => 'Ocurrio un Error Inesperado']);
         }
-        Contract::create($validateData);
+
+        return back()->with(['message' => 'Contrato Guardado']);
     }
 
     /**

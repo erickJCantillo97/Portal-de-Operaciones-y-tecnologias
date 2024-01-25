@@ -50,12 +50,7 @@ const getPersonal = () => {
     })
 }
 
-const formatCurrency = (value) => {
-    return parseFloat(value).toLocaleString('es-CO', {
-        style: 'currency',
-        currency: 'COP',
-    })
-}
+
 
 const modalVisible = ref(false)
 const showNew = () => {
@@ -86,33 +81,18 @@ const clearModal = () => {
 }
 
 const createGroup = () => {
-    console.log('Grupo Creado!')
-    // axios.post(route('personal.store'), {
-    //     users: form.users,
-    //     fecha_devolucion: form.fecha_devolucion
-    // }).then((res) => {
-    //     form.users = []
-    //     modalVisible.value = false
-    //     toast('personal añadido exitosamente', 'info')
-    // })
+    router.post(router('teams.store'), {
+        users: form.users,
+    })
 }
 
 const getPersonalFilter = (event) => {
-    console.log(event.value)
     loading.value = true
     router.get(route('personal.index'), { id: event.value ? event.value.id : null })
 }
 //#endregion
 
-function formatDate(date) {
-    // Extraer año, mes y día
-    let day = date.slice(6, 8)
-    let month = date.slice(4, 6)
-    let year = date.slice(0, 4)
 
-    // Formato de salida: dd/mm/aaaa
-    return day === '00' ? 'Indefinido' : `${day}/${month}/${year}`
-}
 const quitar = (persona) => {
     form.users = form.users.filter(object => object.Num_SAP !== persona.Num_SAP);
 }
