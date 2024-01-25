@@ -116,8 +116,9 @@ const formatDate = (date) => {
     if (date == undefined || date == null) {
         return 'Sin definir'
     } else {
-        return new Date(date).toLocaleString('es-CO',
+        var fecha = new Date(date).toLocaleString('es-CO',
             { day: '2-digit', month: '2-digit', year: 'numeric' })
+        return fecha == '30/11/2' ? 'INDEFINIDO' : fecha;
     }
 }
 const formatCurrency = (valor, moneda) => {
@@ -292,7 +293,7 @@ const formatCurrency = (valor, moneda) => {
                     <div v-else-if="col.type == 'object'" class="flex items-center space-x-2 w-full">
                         <img v-if="col.objectRows.photo" :src="data[col.objectRows.photo.field]" alt="Image"
                             onerror="this.src='/svg/cotecmar-logo.svg'"
-                            class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16" />
+                            class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16 object-cover" />
                         <div>
                             <p class="font-bold text-sm ">{{
                                 col.objectRows.primary.subfield ?

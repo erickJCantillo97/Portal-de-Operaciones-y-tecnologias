@@ -116,7 +116,8 @@ class ProjectController extends Controller
         $quotes = Quote::get();
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
 
-        return Inertia::render('Project/CreateProjects',
+        return Inertia::render(
+            'Project/CreateProjects',
             [
                 'project' => $project,
                 'project_id' => $project->id,
