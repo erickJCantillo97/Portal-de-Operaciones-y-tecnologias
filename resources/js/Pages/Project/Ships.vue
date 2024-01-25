@@ -185,16 +185,17 @@ const buttons = ref([
                     v-model:input="formData.idHull" :error="router.page.props.errors.idHull" />
                 <CustomInput label="Nombre del Buque" type="text" :placeholder="'Nombre del Buque'"
                     v-model:input="formData.name" :error="router.page.props.errors.name" />
-                <CustomInput id="customer" label="Cliente" type="dropdown" filter v-model:input="customerSelect"
+                <!-- <CustomInput id="customer" label="Cliente" type="dropdown" filter v-model:input="customerSelect"
                     :options="customers" v-if="customers" @change="formData.customer_id = $event.value.id"
-                    optionLabel="name" placeholder="Seleccione Cliente" />
+                    optionLabel="name" placeholder="Seleccione Cliente" /> -->
                 <CustomInput id="class" label="Tipo" type="dropdown" filter v-model:input="typeSelect" clearIcon
                     :options="typeShips" v-if="customers" optionLabel="name" placeholder="Seleccione tipo" />
                 <CustomInput label="Siglas" type="text" :placeholder="'Digite las siglas'" v-model:input="formData.acronyms"
                     :error="router.page.props.errors.acronyms" />
-                <CustomInput label="Carros Quillas" type="number" :placeholder="'Números de carros de Quillas necesarios'"
-                    v-model:input="formData.quilla" :error="router.page.props.errors.quilla" />
-                <CustomInput label="Carros de Pantoques" type="number"
+                <CustomInput v-if="$page.props.auth.user.gerencia == 'GEMAM'" label="Carros Quillas" type="number"
+                    :placeholder="'Números de carros de Quillas necesarios'" v-model:input="formData.quilla"
+                    :error="router.page.props.errors.quilla" />
+                <CustomInput v-if="$page.props.auth.user.gerencia == 'GEMAM'" label="Carros de Pantoques" type="number"
                     :placeholder="'Números carros de Pantoques necesarios'" v-model:input="formData.pantoque"
                     :error="router.page.props.errors.pantoque" />
                 <CustomInput type="file" label="Adjuntar foto" acceptFile="image/*" v-model:input="formData.image" />

@@ -60,7 +60,7 @@ class DashboardEstimacionesController extends Controller
 
     public function getAvgManurities()
     {
-        $promedioPorDificultad = QuoteVersion::whereDate('estimador_anaswer_date', '<>', '1970-01-01')->join('quote_type_ships', 'quote_versions.id', '=', 'quote_type_ships.quote_version_id')
+        $promedioPorDificultad = QuoteVersion::whereDate('expeted_answer_date', '<>', '1970-01-01')->join('quote_type_ships', 'quote_versions.id', '=', 'quote_type_ships.quote_version_id')
             ->select('quote_type_ships.maturity', DB::raw('AVG(DATEDIFF(day, quote_versions.expeted_answer_date, quote_versions.estimador_anaswer_date)) AS promedio'))
             ->groupBy('quote_type_ships.maturity')
             ->whereNotNull('quote_type_ships.maturity')
@@ -92,7 +92,7 @@ class DashboardEstimacionesController extends Controller
                     'average' => $quote['promedio'],
                     'quotes' => QuoteVersion::where('estimador_name', $quote['estimador_name'])->count(),
                     'name' => $quote['estimador_name'],
-                    'photo' =>  $user->photo(),
+                    'photo' => $user !=  null ?  $user->photo() : 'https://ui-avatars.com/api/?name=' . $quote['estimador_name'],
                 ];
             })->sortBy('average', SORT_REGULAR);
 
