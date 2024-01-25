@@ -555,10 +555,10 @@ const exportarExcel = () => {
                     <!--BUQUES-->
                     <tab-content title="Buques" icon="fa-solid fa-ship">
                         <div class="flex w-full gap-2 pb-4">
-                            <input type="search" v-model="keyword" @input="searchShips()"
+                            <input v-if="props.ships != 0" type="search" v-model="keyword" @input="searchShips()"
                                 class="rounded-lg border-2 border-gray-200 w-full placeholder:italic"
                                 placeholder="Filtrar Buques" />
-                            <ToggleButton v-model="checked" onLabel="Seleccionar todo" offLabel="Deseleccionar todo"
+                            <ToggleButton v-if="props.ships != 0" v-model="checked" onLabel="Seleccionar todo" offLabel="Deseleccionar todo"
                                 onIcon="pi pi-check-square" offIcon="pi pi-stop" aria-label="Do you confirm"
                                 @click="selectAllShips()" :pt="{
                                     root: '!w-56 !h-full !border-blue-800 !bg-transparent',
