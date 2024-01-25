@@ -1,6 +1,6 @@
 <template>
     <div class="flex space-x-2">
-        <img v-if="photo" draggable="false" class="w-10 custom-image h-10 rounded-full border border-1 border-indigo-400"
+        <img v-if="photo" draggable="false" class="size-10 object-cover rounded-full border border-1 border-indigo-400"
             :src="user.photo" alt="">
         <div class="block">
             <p class="font-semibold text-gray-800">{{ user.Nombres_Apellidos }}</p>
