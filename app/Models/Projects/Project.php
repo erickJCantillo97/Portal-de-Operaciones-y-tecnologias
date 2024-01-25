@@ -3,6 +3,7 @@
 namespace App\Models\Projects;
 
 use App\Models\Scopes\GerenciaScope;
+use App\Models\Shift;
 use App\Models\VirtualTask;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -47,5 +48,9 @@ class Project extends Model implements Auditable
     public function tasks()
     {
         return $this->hasMany(VirtualTask::class, 'project_id');
+    }
+    public function shift()
+    {
+        return $this->belongsTo(Shift::class);
     }
 }

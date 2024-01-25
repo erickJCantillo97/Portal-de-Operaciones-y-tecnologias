@@ -16,21 +16,28 @@ class PersonalController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $miPersonal = getPersonalUser();
-        $personal = [];
-        // $personal = getPersonalGerenciaOficina(auth()->user()->gerencia)->values()->map(function ($person) {
-        //     return [
-        //         'Num_SAP' => (int) $person['Num_SAP'],
-        //         'Nombres_Apellidos' => $person['Nombres_Apellidos'],
-        //         'Oficina' => $person['Oficina'],
-        //         'Cargo' => $person['Cargo'],
-        //         'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
-        //     ];
-        // }); //Se debe cambiar el num Sap por el del usuario logueado;
-
-        return inertia('Personal/Index', ['miPersonal' => $miPersonal, 'personal' => $personal]);
+        // dd($request->all());
+        $groups = [
+            [
+                'name' => 'Soldadores con plata',
+                'id' => 0
+            ],
+            [
+                'name' => 'Pintores con plata',
+                'id' => 1
+            ],
+            [
+                'name' => 'programadores pobres',
+                'id' => 2
+            ]
+        ];
+        return inertia('Personal/Index', [
+            'miPersonal' => getPersonalUser(),
+            'group' => $groups[$request->id] ?? null,
+            'groups' => $groups
+        ]);
     }
 
     public function getPersonalUser()
@@ -59,9 +66,8 @@ class PersonalController extends Controller
                 $persona->boss_last_id = $persona->boss_id ?? null;
                 $persona->gerencia_lent = auth()->user()->gerencia;
                 $persona->oficina_lent = auth()->user()->oficina;
-                $persona->boss_id = auth()->user()->id;
-                $persona->boss_id = auth()->user()->id;
-                $persona->return_date =  Carbon::parse($validateData['fecha_devolucion'])->format('Y-m-d') ?? null;
+                $persona->boss_id = auth()->user()->num_sap;
+                $persona->return_date = Carbon::parse($validateData['fecha_devolucion'])->format('Y-m-d') ?? null;
                 $persona->save();
             }
             return back()->with(['message' => 'Personal Añadido correctamente'], 200);

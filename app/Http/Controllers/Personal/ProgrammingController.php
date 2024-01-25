@@ -120,14 +120,14 @@ class ProgrammingController extends Controller
             $date_end = Carbon::now()->format('Y-m-d');
         }
 
-        $tareas = VirtualTask::whereNotNull('task_id')->select('task_id')->get()->toArray();
+        $tareas = VirtualTask::has('project')->whereNotNull('task_id')->select('task_id')->get()->toArray();
 
         $ids = array_map(function ($objeto) {
             return $objeto['task_id'];
         }, $tareas);
 
         return response()->json(
-            VirtualTask::where(function ($query) use ($date_start, $date_end) {
+            VirtualTask::has('project')->where(function ($query) use ($date_start, $date_end) {
                 $query->whereBetween('startdate', [$date_start, $date_end])
                     ->orWhereBetween('enddate', [$date_start, $date_end])
                     ->orWhere(function ($query) use ($date_start, $date_end) {

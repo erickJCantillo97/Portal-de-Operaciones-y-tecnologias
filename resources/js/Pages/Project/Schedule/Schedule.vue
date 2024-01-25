@@ -187,44 +187,44 @@ const gantt = new Gantt(({
             }
         },
         { type: 'addnew', text: 'Añadir Columna' },
-        {
-            text: 'Linea Base 1',
-            collapsible: true,
-            children: [
-                { type: 'baselinestartdate', text: 'Start', field: 'baselines[0].startDate' },
-                { type: 'baselineenddate', text: 'Finish', field: 'baselines[0].endDate' },
-                { type: 'baselineduration', text: 'Duration', field: 'baselines[0].fullDuration' },
-                { type: 'baselinestartvariance', field: 'baselines[0].startVariance' },
-                { type: 'baselineendvariance', field: 'baselines[0].endVariance' },
-                { type: 'baselinedurationvariance', field: 'baselines[0].durationVariance' }
-            ]
-        },
-        {
-            text: 'Linea Base 2',
-            collapsible: true,
-            collapsed: true,
-            children: [
-                { type: 'baselinestartdate', text: 'Start', field: 'baselines[1].startDate' },
-                { type: 'baselineenddate', text: 'Finish', field: 'baselines[1].endDate' },
-                { type: 'baselineduration', text: 'Duration', field: 'baselines[1].fullDuration' },
-                { type: 'baselinestartvariance', field: 'baselines[1].startVariance' },
-                { type: 'baselineendvariance', field: 'baselines[1].endVariance' },
-                { type: 'baselinedurationvariance', field: 'baselines[1].durationVariance' }
-            ]
-        },
-        {
-            text: 'Linea Base 3',
-            collapsible: true,
-            collapsed: true,
-            children: [
-                { type: 'baselinestartdate', text: 'Start', field: 'baselines[2].startDate' },
-                { type: 'baselineenddate', text: 'Finish', field: 'baselines[2].endDate' },
-                { type: 'baselineduration', text: 'Duration', field: 'baselines[2].fullDuration' },
-                { type: 'baselinestartvariance', field: 'baselines[2].startVariance' },
-                { type: 'baselineendvariance', field: 'baselines[2].endVariance' },
-                { type: 'baselinedurationvariance', field: 'baselines[2].durationVariance' }
-            ]
-        }
+        // {
+        //     text: 'Linea Base 1',
+        //     collapsible: true,
+        //     children: [
+        //         { type: 'baselinestartdate', text: 'Start', field: 'baselines[0].startDate' },
+        //         { type: 'baselineenddate', text: 'Finish', field: 'baselines[0].endDate' },
+        //         { type: 'baselineduration', text: 'Duration', field: 'baselines[0].fullDuration' },
+        //         { type: 'baselinestartvariance', field: 'baselines[0].startVariance' },
+        //         { type: 'baselineendvariance', field: 'baselines[0].endVariance' },
+        //         { type: 'baselinedurationvariance', field: 'baselines[0].durationVariance' }
+        //     ]
+        // },
+        // {
+        //     text: 'Linea Base 2',
+        //     collapsible: true,
+        //     collapsed: true,
+        //     children: [
+        //         { type: 'baselinestartdate', text: 'Start', field: 'baselines[1].startDate' },
+        //         { type: 'baselineenddate', text: 'Finish', field: 'baselines[1].endDate' },
+        //         { type: 'baselineduration', text: 'Duration', field: 'baselines[1].fullDuration' },
+        //         { type: 'baselinestartvariance', field: 'baselines[1].startVariance' },
+        //         { type: 'baselineendvariance', field: 'baselines[1].endVariance' },
+        //         { type: 'baselinedurationvariance', field: 'baselines[1].durationVariance' }
+        //     ]
+        // },
+        // {
+        //     text: 'Linea Base 3',
+        //     collapsible: true,
+        //     collapsed: true,
+        //     children: [
+        //         { type: 'baselinestartdate', text: 'Start', field: 'baselines[2].startDate' },
+        //         { type: 'baselineenddate', text: 'Finish', field: 'baselines[2].endDate' },
+        //         { type: 'baselineduration', text: 'Duration', field: 'baselines[2].fullDuration' },
+        //         { type: 'baselinestartvariance', field: 'baselines[2].startVariance' },
+        //         { type: 'baselineendvariance', field: 'baselines[2].endVariance' },
+        //         { type: 'baselinedurationvariance', field: 'baselines[2].durationVariance' }
+        //     ]
+        // }
     ],
     // Allow extra space for baseline(s)
     subGridConfigs: {
@@ -680,37 +680,34 @@ const onSettingsMarginChange = ({ value }) => {
 <template>
     <AppLayout>
         <main class="h-[89vh] overflow-y-auto">
-            <section class="grid grid-cols-4 place-content-center w-full h-[18vh] [&>div>p]:p-[0.15rem]">
-                <div class="col-span-2 p-1">
+            <section class="place-content-center w-full shadow-md">
+                <div>
                     <div class="bg-blue-800 rounded-t-lg">
-                        <p class="text-md flex items-center justify-center font-semibold leading-6 capitalize text-white">
-                            PROYECTO: {{ props.project.name }}
+                        <p class="text-md flex items-center justify-center font-semibold capitalize text-white">
+                            {{ props.project.name }}
                         </p>
                     </div>
-                    <div class="col-span-2 [&>p]:p-[0.15rem]">
-                        <p class="text-sm font-semibold">Codigo SAP: {{ props.project.SAP_code }}</p>
-                        <p class="text-sm font-semibold">Tipo de Proyecto: {{ props.project.type }}</p>
-                        <p class="text-sm font-semibold">Supervisor: {{ props.project.supervisor }}</p>
+                    <div class="col-span-2 justify-between px-2 mt-2 flex">
+                        <p class="text-sm shadow-lg p-2 rounded-md font-semibold">Codigo SAP: {{ props.project.SAP_code }}
+                        </p>
+                        <p class="text-sm shadow-lg p-2 rounded-md font-semibold">Horas por dia: {{
+                            props.project.hoursPerDay }} horas
+                        </p>
+                        <p class="text-sm shadow-lg p-2 rounded-md font-semibold">Dias por semana: {{
+                            props.project.daysPerWeek }} dias
+                        </p>
+                        <p class="text-sm shadow-lg p-2 rounded-md font-semibold">Dias por mes: {{
+                            props.project.daysPerMonth }} dias
+                        </p>
+                        <p class="text-sm shadow-lg p-2 rounded-md font-semibold">Horario: {{ props.project.shift }}</p>
                         <Tag severity="info">{{ props.project.status }}</Tag>
                     </div>
                 </div>
                 <!-- <div class="divide-x"></div> -->
-                <div class="col-span-2 p-1 [&>div>p]:p-[0.15rem] border border-gray-300">
-                    <div class="bg-blue-800 rounded-t-lg">
-                        <p class="text-md flex items-center justify-center font-semibold leading-6 uppercase text-white">
-                            Detalles del cronograma
-                        </p>
-                    </div>
-                    <div class="grid grid-cols-2 justify-items-center p-6">
-                        <p class="text-sm font-semibold">Horas por dia: {{ props.project.hoursPerDay }} horas</p>
-                        <p class="text-sm font-semibold">Dias por semana: {{ props.project.daysPerWeek }} dias</p>
-                        <p class="text-sm font-semibold">Dias por mes: {{ props.project.daysPerMonth }} dias</p>
-                        <p class="text-sm font-semibold">Horario: {{ props.project.shift }}</p>
-                    </div>
-                </div>
+
                 <!-- <p>{{ props.project }}</p> -->
             </section>
-            <div id="containergantt" class="h-[80vh] text-xs">
+            <div id="containergantt" class="h-[80vh] text-xs mt-2">
             </div>
         </main>
     </AppLayout>

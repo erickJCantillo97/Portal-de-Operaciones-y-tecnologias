@@ -4,14 +4,25 @@ import InputNumber from 'primevue/inputnumber';
 import Textarea from 'primevue/textarea';
 import Dropdown from 'primevue/dropdown';
 import FileUpload from 'primevue/fileupload';
-import { number } from 'echarts';
+import MultiSelect from 'primevue/multiselect';
+
+
 
 const props = defineProps({
+    //general
     type: {
         type: String,
         default: 'text'
     },
     label: {
+        type: String,
+        default: null
+    },
+    loading: {
+        type: Boolean,
+        default: false
+    },
+    icon: {
         type: String,
         default: null
     },
@@ -43,6 +54,7 @@ const props = defineProps({
         type: String,
         default: null
     },
+    //tipo number
     useGrouping: {
         type: Boolean,
         default: false
@@ -55,6 +67,23 @@ const props = defineProps({
         type: Number,
         default: null
     },
+    currency: {
+        type: String,
+        default: 'COP'
+    },
+    mode: {
+        type: String,
+        default: 'decimal'
+    },
+    suffix: {
+        type: String,
+        default: null
+    },
+    prefix: {
+        type: String,
+        default: null
+    },
+    //tipo dropdown y multiselect
     options: {
         type: Array,
         default: null
@@ -67,6 +96,11 @@ const props = defineProps({
         type: String,
         default: '*'
     },
+    maxSelectedLabels: {
+        type: Number,
+        default: 3
+    },
+    //tipo file
     maxFileSize: {
         type: Number,
         default: 1000000
@@ -82,26 +116,42 @@ const input = defineModel('input', {
 <template>
     <div class="flex flex-col">
         <label v-if="label && !floatLabel" :for="id" class="-mb-0.5">{{ label }}</label>
-        <span class="p-float-label">
+        <span :class="!(label && !floatLabel) ? 'p-float-label' : ''">
             <FileUpload v-if="type == 'file'" mode="basic" name="demo[]" :multiple="false" :accept="acceptFile" :maxFileSize
-                @input="input = $event.target.files[0]" class="w-full h-8" />
+                @input="input = $event.target.files[0]" class="w-full h-8" customUpload />
+
             <InputNumber v-else-if="type == 'number'" :id :disabled :placeholder :minFractionDigits :maxFractionDigits
                 class="w-full" :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'"
-                :useGrouping />
+                :useGrouping="mode == 'currency' ? '' : useGrouping" :currency="currency" :mode="mode" :suffix :prefix />
 
             <Textarea v-else-if="type == 'textarea'" :id :disabled :placeholder class="w-full"
                 :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
 
-            <Dropdown v-else-if="type == 'dropdown'" :id :disabled :placeholder :options :optionLabel
-                :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" class="w-full" :pt="{
-                    root: '!h-8',
-                    input: '!py-0 !flex !items-center',
-                    item: '!py-1 !px-3'
+            <Dropdown v-else-if="type == 'dropdown'" :id :disabled :placeholder :options :optionLabel :loading
+                :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''" v-model="input"
+                :aria-describedby="id + '-help'" class="w-full" :pt="{
+                    root: '!h-8 ',
+                    input: '!py-0 !flex !items-center !text-sm !font-normal',
+                    item: '!py-1 !px-3 !text-sm !font-normal',
+                    filterInput: '!h-8'
                 }" />
-
-            <InputText v-else size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''" v-model="input"
-                :type :aria-describedby="id + '-help'" class="w-full" />
-            <label v-if="floatLabel && label" :for="id" class="">{{ label }}</label>
+            <MultiSelect v-else-if="type == 'multiselect'" :id display="chip" v-model="input" :options :optionLabel :loading
+                :maxSelectedLabels :placeholder :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''"
+                class="w-full" :aria-describedby="id + '-help'" :pt="{
+                    root: '!h-8',
+                    label: '!py-0.5 !flex !h-full !items-center !text-sm !font-normal',
+                    token: '!py-0 !px-1',
+                    tokenLabel: '!text-sm',
+                    item: '!py-1 !px-3 !text-sm !font-normal',
+                    filterInput: '!h-8',
+                    header: '!h-min !py-0.5'
+                }" />
+            <span v-else :class="(loading || icon) ? 'p-input-icon-left' : ''" class="w-full">
+                <i v-if="(loading || icon)" :class="loading ? 'pi pi-spin pi-spinner' : icon" />
+                <InputText size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''" v-model="input" :type
+                    :aria-describedby="id + '-help'" class="w-full" />
+                <label v-if="floatLabel && label" :for="id" class="">{{ label }}</label>
+            </span>
         </span>
         <small :class="invalid ? 'p-error' : ''" v-if="help || invalid">{{ invalid ? errorMessage : help }}</small>
     </div>

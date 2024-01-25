@@ -22,8 +22,9 @@ const visible = defineModel('visible')
 <template>
     <Dialog v-model:visible="visible" :maximizable="maximizable" modal :closable="true" closeOnEscape
         :style="{ width: props.width }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :pt="{
-            header: { class: '!bg-primary !h-[5vh]' },
+            header: { class: '!bg-primary !h-10' },
             closeButtonIcon: { class: 'text-white' },
+            content: { class: '!pb-0 !pt-2' },
             footer: { class: '!p-2 !h-min !items-end !flex !justify-end' }
         }
             ">
