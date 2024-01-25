@@ -84,11 +84,11 @@ const del = (event, data) => {
 
 const columnas = [
     { field: 'contract_id', header: 'Contrato ID', filter: true, sortable: true },
-    { field: 'quote.id', header: 'Estimacion', filter: true, sortable: true },
+    { field: 'quote.consecutive', header: 'Estimacion', filter: true, sortable: true },
     { field: 'quote.customer.name', header: 'Cliente', filter: true, sortable: true },
     { field: 'start_date', header: 'Fecha Inicio', filter: true, sortable: true, type: 'date' },
     { field: 'end_date', header: 'Fecha Finalización', filter: true, sortable: true, type: 'date' },
-    { field: 'cost', header: 'Costo', filter: true, sortable: true, type: 'currency' },
+    { field: 'quote.total_cost', header: 'Costo', filter: true, sortable: true, type: 'currency' },
 ]
 const buttons = [
     { event: 'edit', severity: 'primary', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
