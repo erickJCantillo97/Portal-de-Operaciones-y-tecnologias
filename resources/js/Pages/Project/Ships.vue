@@ -106,12 +106,6 @@ const columnas = ref([
     { field: 'quilla', header: 'QUILLAS' },
     { field: 'pantoque', header: 'PANTOQUE' },
     { field: 'acronyms', header: 'SIGLAS' },
-    {
-        field: 'customer.name', header: 'CLIENTE', type: 'object', objectRows: {
-            primary: { field: 'customer', subfield: 'name' },
-            secundary: { field: 'customer', subfield: 'type' }
-        }
-    },
 ])
 const buttons = ref([
     { event: 'editItem', severity: 'primary', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
@@ -149,15 +143,15 @@ const buttons = ref([
                     v-model:input="formData.ship.idHull" :error="router.page.props.errors.idHull" />
                 <CustomInput label="Nombre del Buque" type="text" :placeholder="'Nombre del Buque'"
                     v-model:input="formData.ship.name" :error="router.page.props.errors.name" />
-                <CustomInput id="customer" label="Cliente" type="dropdown" filter v-model:input="formData.ship.customer"
-                    :options="customers" optionLabel="name" placeholder="Seleccione Cliente" />
                 <CustomInput id="class" label="Tipo" type="dropdown" filter v-model:input="formData.ship.type_ship"
                     clearIcon :options="typeShips" optionLabel="name" placeholder="Seleccione tipo" />
                 <CustomInput label="Siglas" type="text" :placeholder="'Digite las siglas'"
                     v-model:input="formData.ship.acronyms" :error="router.page.props.errors.acronyms" />
-                <CustomInput label="Carros Quillas" type="number" :placeholder="'Números de carros de Quillas necesarios'"
-                    v-model:input="formData.ship.quilla" :error="router.page.props.errors.quilla" />
-                <CustomInput label="Carros de Pantoques" type="number"
+
+                <CustomInput v-if="$page.props.auth.user.gerencia != 'GECON'" label="Carros Quillas" type="number"
+                    :placeholder="'Números de carros de Quillas necesarios'" v-model:input="formData.ship.quilla"
+                    :error="router.page.props.errors.quilla" />
+                <CustomInput v-if="$page.props.auth.user.gerencia != 'GECON'" label="Carros de Pantoques" type="number"
                     :placeholder="'Números carros de Pantoques necesarios'" v-model:input="formData.ship.pantoque"
                     :error="router.page.props.errors.pantoque" />
                 <CustomInput type="file" label="Adjuntar foto" acceptFile="image/*" v-model:input="formData.ship.image" />
