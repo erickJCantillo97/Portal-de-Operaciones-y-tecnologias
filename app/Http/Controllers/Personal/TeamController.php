@@ -47,7 +47,7 @@ class TeamController extends Controller
                 foreach ($request->personal as $persona) {
                     if ($status) {
                         $workingTeams = WorkingTeams::create([
-                            'user_num_sap' => $persona,
+                            'user_num_sap' => $persona['Num_SAP'],
                             'team_id' => $team->id,
                             'user_id' => auth()->user()->id
                         ]);
