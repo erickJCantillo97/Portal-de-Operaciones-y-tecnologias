@@ -16,10 +16,10 @@ class Quote extends Model implements Auditable
 
     protected $guarded = [];
 
-    protected static function booted(): void
-    {
-        static::addGlobalScope(new GerenciaScope);
-    }
+    // protected static function booted(): void
+    // {
+    //     static::addGlobalScope(new GerenciaScope);
+    // }
 
     public function version()
     {

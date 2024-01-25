@@ -38,7 +38,7 @@ class QuoteController extends Controller
                 'version' => $quote['version']['version'],
                 'created_at' => $quote['version']['created_at'],
                 'expeted_answer_date' => $quote['version']['expeted_answer_date'],
-                'consecutive' => str_pad($quote['consecutive'], 3, 0, STR_PAD_LEFT) . '-' . $quote['version']['version'] . '-2023',
+                'consecutive' => $quote['version']['consecutive'],
                 'products' => $quote['version']['quoteTypeShips'],
                 'total_cost' => collect($quote['version']['quoteTypeShips'])->sum('price_before_iva_original'),
                 'clases' => implode(', ', collect($quote['version']['quoteTypeShips'])->pluck('name')->toArray())
