@@ -31,7 +31,10 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 
-let form = useForm({
+const teamworkName = ref()
+const descriptionValue = ref()
+
+const form = useForm({
     users: [],
     members: [],
     fecha_devolucion: null
@@ -48,12 +51,11 @@ const submit = () => {
 }
 
 const getPersonal = () => {
-    axios.get(route('personal.activos')).then((res) => {
-        personal.value = res.data.personal
-    })
+    axios.get(route('personal.activos'))
+        .then((res) => {
+            personal.value = res.data.personal
+        })
 }
-
-
 
 const modalVisible = ref(false)
 
@@ -65,8 +67,6 @@ const showNew = () => {
 
 //#region Modal Crear Grupo
 const showGroupDialog = ref(false)
-const teamworkName = ref()
-const descriptionValue = ref('')
 
 const openGroupDialog = () => {
     showGroupDialog.value = true
@@ -84,14 +84,18 @@ const clearModal = () => {
 }
 
 const createGroup = () => {
-    console.log('Grupo Creado!')
-    // router.post(route('teams.store', { members: form.members }), {
-    //     members: form.members
-    // }).then((res) => {
-    //     form.members = []
-    //     showGroupDialog.value = false
-    //     toast('Personal añadido exitosamente', 'info')
-    // })
+    router.post(route('teams.store'), { name: teamworkName.value, description: descriptionValue.value, personal: form.members }, {
+        onSuccess: () => {
+            teamworkName.value = ''
+            descriptionValue.value = ''
+            form.members = []
+            showGroupDialog.value = false
+            toast('Grupo añadido exitosamente', 'success')
+        },
+        onError: (error) => {
+            toast(`Ha ocurrido un error al crear el grupo \n ${teamworkName.value}; ERROR: ${error}`, 'error')
+        }
+    })
 }
 
 const getPersonalFilter = (event) => {
@@ -246,8 +250,8 @@ const buttons = [
                             <label for="">Seleccionar Personal</label>
                             <Listbox multiple v-model="form.members" listStyle="height:230px"
                                 :filterFields="['Nombres_Apellidos', 'Cargo', 'Identificacion', 'Oficina']" :filter="true"
-                                :options="personal" filter optionLabel="name" class="w-full md:w-14rem"
-                                :loading="personal.length == 0">
+                                :options="miPersonal" filter optionLabel="name" class="w-full md:w-14rem"
+                                :loading="miPersonal.length == 0">
                                 <template #option="slotProps">
                                     <UserTable :user="slotProps.option"></UserTable>
                                 </template>

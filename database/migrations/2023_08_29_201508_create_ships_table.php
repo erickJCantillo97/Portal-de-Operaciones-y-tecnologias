@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,8 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger('type_ship_id')->nullable();
             $table->string('name');
             $table->string('idHull')->nullable();
-            $table->string('quilla')->nullable();
-            $table->string('pantoque')->nullable();
+            $table->integer('quilla')->nullable();
+            $table->integer('pantoque')->nullable();
             $table->double('eslora')->nullable();
             $table->string('acronyms')->nullable();
             $table->string('file')->nullable();
