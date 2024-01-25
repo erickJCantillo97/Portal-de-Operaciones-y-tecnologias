@@ -293,7 +293,7 @@ const formatCurrency = (valor, moneda) => {
                     <div v-else-if="col.type == 'object'" class="flex items-center space-x-2 w-full">
                         <img v-if="col.objectRows.photo" :src="data[col.objectRows.photo.field]" alt="Image"
                             onerror="this.src='/svg/cotecmar-logo.svg'"
-                            class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16 object-cover" />
+                            class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16 object-cover" draggable="false" />
                         <div>
                             <p class="font-bold text-sm ">{{
                                 col.objectRows.primary.subfield ?

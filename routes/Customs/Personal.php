@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Personal\PersonalController;
 use App\Http\Controllers\Personal\ProgrammingController;
+use App\Http\Controllers\Personal\TeamController;
 use App\Models\Labor;
 use Illuminate\Support\Facades\Route;
 
@@ -18,13 +19,15 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('personal', [PersonalController::class, 'store'])->name('personal.store');
     Route::delete('personal/delete/{personal}', [PersonalController::class, 'destroy'])->name('personal.destroy');
     Route::get('personalActivos', [PersonalController::class, 'getPersonalActivo'])->name('personal.activos');
-    
+
     Route::get('updateCargo', function () {
         updateCargos();
         return Labor::get();
     });
 
     Route::get('getPersonalCargo/', [PersonalController::class, 'getPersonalCargo'])->name('get.personal.cargo');
+
+    Route::resources('teams', TeamController::class);
 
     Route::get('getCargos', [PersonalController::class, 'getCargos'])->name('get.cargos');
     Route::get('searchPersonal', [PersonalController::class, 'searchPersonal'])->name('search.personal');

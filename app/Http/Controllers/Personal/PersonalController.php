@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Ldap\User;
 use App\Models\Labor;
 use App\Models\Personal\Personal;
+use App\Models\Personal\Team;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -19,24 +20,15 @@ class PersonalController extends Controller
     public function index(Request $request)
     {
         // dd($request->all());
-        $groups = [
-            [
-                'name' => 'Soldadores con plata',
-                'id' => 0
-            ],
-            [
-                'name' => 'Pintores con plata',
-                'id' => 1
-            ],
-            [
-                'name' => 'programadores pobres',
-                'id' => 2
-            ]
-        ];
+        $groups = Team::where('user_id', auth()->user()->id)->orderBy('name')->get();
+
+        if ($request->id) {
+            $group = Team::where('id', $request->id)->orderBy('name')->fisrt();
+        }
         return inertia('Personal/Index', [
             'miPersonal' => getPersonalUser(),
-            'group' => $groups[$request->id] ?? null,
-            'groups' => $groups
+            'group' =>  $group ?? null,
+            'groups' =>   $groups
         ]);
     }
 
