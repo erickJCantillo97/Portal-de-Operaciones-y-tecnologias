@@ -1,36 +1,40 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref } from 'vue';
-import { router, useForm } from '@inertiajs/vue3';
-import '../../../sass/dataTableCustomized.scss';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import { MagnifyingGlassIcon, TrashIcon, } from '@heroicons/vue/24/outline';
-import { useSweetalert } from '@/composable/sweetAlert';
-import Button from '../../Components/Button.vue';
-import UserTable from '@/Components/UserTable.vue';
-import Calendar from 'primevue/calendar';
-import Listbox from 'primevue/listbox';
-// import MultiSelect from 'primevue/multiselect';
-import CustomModal from '@/Components/CustomModal.vue';
-import Loading from '@/Components/Loading.vue';
+import AppLayout from '@/Layouts/AppLayout.vue'
+import { ref } from 'vue'
+import { router, useForm } from '@inertiajs/vue3'
+import '../../../sass/dataTableCustomized.scss'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import { FilterMatchMode, FilterOperator } from 'primevue/api'
+import { MagnifyingGlassIcon, TrashIcon, } from '@heroicons/vue/24/outline'
+import { useSweetalert } from '@/composable/sweetAlert'
+// import Button from '../../Components/Button.vue'
+import Button from 'primevue/button'
+import Textarea from 'primevue/textarea'
+import InputText from 'primevue/inputtext'
+import UserTable from '@/Components/UserTable.vue'
+import Calendar from 'primevue/calendar'
+import Listbox from 'primevue/listbox'
+// import MultiSelect from 'primevue/multiselect'
+import CustomModal from '@/Components/CustomModal.vue'
+import Loading from '@/Components/Loading.vue'
 const { toast } = useSweetalert()
 const { confirmDelete } = useSweetalert()
 
 const props = defineProps({
     miPersonal: Array,
 })
+
 const personal = ref([])
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 
-var form = useForm({
+let form = useForm({
     users: [],
     fecha_devolucion: null
-});
+})
 
 const submit = () => {
     router.post(route('personal.store'), form, {
@@ -39,7 +43,7 @@ const submit = () => {
             modalVisible.value = false
             toast('personal añadido exitosamente', 'success')
         }
-    });
+    })
 }
 
 const getPersonal = () => {
@@ -52,9 +56,8 @@ const formatCurrency = (value) => {
     return parseFloat(value).toLocaleString('es-CO', {
         style: 'currency',
         currency: 'COP',
-    });
-};
-
+    })
+}
 
 const modalVisible = ref(false)
 const showNew = () => {
@@ -63,17 +66,51 @@ const showNew = () => {
         getPersonal()
 }
 
+//#region Modal Crear Grupo
+const showGroupDialog = ref(false)
+const teamwork = ref()
+
+const descriptionValue = ref('')
+
+const openGroupDialog = () => {
+    showGroupDialog.value = true
+    if (personal.value.length == 0)
+        getPersonal()
+}
+
+const clearModal = () => {
+    showGroupDialog.value = false
+    if (showGroupDialog.value == false) {
+        teamwork.value = ''
+        descriptionValue.value = ''
+        form.users = []
+    }
+}
+
+const createGroup = () => {
+    console.log('Grupo Creado!')
+    // axios.post(route('personal.store'), {
+    //     users: form.users,
+    //     fecha_devolucion: form.fecha_devolucion
+    // }).then((res) => {
+    //     form.users = []
+    //     modalVisible.value = false
+    //     toast('personal añadido exitosamente', 'info')
+    // })
+}
+//#endregion
+
 function formatDate(date) {
     // Extraer año, mes y día
-    var anho = date.slice(0, 4);
-    var mes = date.slice(4, 6);
-    var dia = date.slice(6, 8);
+    let day = date.slice(6, 8)
+    let month = date.slice(4, 6)
+    let year = date.slice(0, 4)
 
     // Formato de salida: dd/mm/aaaa
-    return dia === '00' ? 'Indefinido' : `${dia}/${mes}/${anho}`;
+    return day === '00' ? 'Indefinido' : `${day}/${month}/${year}`
 }
 const quitar = (persona) => {
-    form.users = form.users.filter(object => object.Num_SAP !== persona.Num_SAP);
+    form.users = form.users.filter(object => object.Num_SAP !== persona.Num_SAP)
 }
 
 </script>
@@ -88,10 +125,13 @@ const quitar = (persona) => {
                     </h1>
                 </div>
 
-                <div title="Agregar Cliente" class="">
-                    <Button severity="primary" type="button" @click="showNew()">
-                        <i class="fa-solid fa-plus" />
-                    </Button>
+                <div title="Añadir Personal" class="p-2">
+                    <Button icon="pi pi-user" severity="primary" label="Añadir Personal" @click="showNew()" />
+                </div>
+                <!-- <i class="fa-solid fa-plus" /> -->
+
+                <div title="Crear Grupo" class="p-2">
+                    <Button icon="pi pi-plus" severity="primary" label="Crear Grupo" @click="openGroupDialog()" />
                 </div>
             </div>
             <!--DATATABLE-->
@@ -191,7 +231,9 @@ const quitar = (persona) => {
                         </div>
                     </div>
                     <div class="w-1/2 ">
-                        <h3 class="text-center font-bold text-lg">Personal Seleccionado</h3>
+                        <div class="bg-blue-900 rounded-t-lg">
+                            <h3 class="text-center font-bold text-lg text-white">Personal Seleccionado</h3>
+                        </div>
                         <div class="block space-y-4 h-[320px] custom-scroll overflow-y-auto shadow-lg rounded-lg p-2">
                             <div v-for="persona of form.users" class="flex justify-between">
                                 <UserTable :user="persona" :photo="true">
@@ -210,11 +252,86 @@ const quitar = (persona) => {
             <template #footer>
                 <Button severity="success" v-if="form.users.length > 0" @click="submit()">
                     <i class="fa-solid fa-floppy-disk"></i>
-                    <p>Guardar</p>
+                    <p class="pl-2">Guardar</p>
                 </Button>
                 <Button severity="danger" @click="modalVisible = false" class="hover:bg-danger">
                     <i class="fa-regular fa-circle-xmark"></i>
-                    <p>Cancelar</p>
+                    <p class="pl-2">Cancelar</p>
+                </Button>
+            </template>
+        </CustomModal>
+
+        <!--MODAL CREACIÓN DE GRUPOS-->
+        <CustomModal v-model:visible="showGroupDialog">
+            <template #icon>
+                <div class="text-white material-symbols-outlined">
+                    <span class="material-symbols-outlined text-4xl">
+                        group_add
+                    </span>
+                </div>
+            </template>
+            <template #titulo>
+                <span class="text-xl font-bold text-white white-space-nowrap">Crear Grupo</span>
+            </template>
+            <template #body>
+                <div class="flex py-2 space-x-4">
+                    <div class="w-1/2 space-y-4">
+                        <div class="border border-gray-300 p-2 max-w-full w-full rounded-lg">
+                            <div class="mb-2">
+                                <label>Nombre del Grupo</label>
+                                <InputText type="text" v-model="teamwork" :pt="{
+                                    root: '!w-full'
+                                }" />
+                            </div>
+
+                            <div>
+                                <label>Descripción</label>
+                                <Textarea v-model="descriptionValue" rows="1" col="60"
+                                    placeholder="Agregue una breve descripción al grupo" autoResize :pt="{
+                                        root: '!w-full !text-sm'
+                                    }" />
+                            </div>
+                        </div>
+                        <div class="border-0">
+                            <label for="">Seleccionar Personal</label>
+                            <Listbox multiple v-model="form.users" listStyle="height:230px"
+                                :filterFields="['Nombres_Apellidos', 'Cargo', 'Identificacion', 'Oficina']" :filter="true"
+                                :options="miPersonal" filter optionLabel="name" class="w-full md:w-14rem"
+                                :loading="personal.length == 0">
+                                <template #option="slotProps">
+                                    <UserTable :user="slotProps.option"></UserTable>
+                                </template>
+                                <template #empty>
+                                    <Loading message="Cargando Personal" />
+                                </template>
+                            </Listbox>
+                        </div>
+                    </div>
+                    <div class="w-1/2 ">
+                        <div class="bg-blue-900 rounded-t-lg">
+                            <h3 class="text-center font-bold text-lg text-white">Personal Seleccionado</h3>
+                        </div>
+                        <div class="block space-y-4 h-[475px] custom-scroll overflow-y-auto shadow-lg rounded-lg p-2">
+                            <div v-for="persona of form.users" class="flex justify-between">
+                                <UserTable :user="persona" :photo="true" />
+                                <div>
+                                    <Button severity="danger" @click="quitar(persona)" class="hover:bg-danger">
+                                        <i class="fa-regular fa-circle-xmark px-2"></i>
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            <template #footer>
+                <Button severity="success" v-if="form.users.length > 0" @click="createGroup()">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <p class="pl-2">Guardar</p>
+                </Button>
+                <Button severity="danger" @click="clearModal()" class="hover:bg-danger">
+                    <i class="fa-regular fa-circle-xmark"></i>
+                    <p class="pl-2">Cancelar</p>
                 </Button>
             </template>
         </CustomModal>

@@ -54,7 +54,7 @@
                                 <vue-collapsible :isOpen="activeDropdown === item.name">
                                     <ul class="text-gray-500 sub-menu dark:text-white" v-for="children of item.children">
                                         <li class="flex items-center">
-                                            <Link as="button" :disabled="children.dev" :class="children.dev ? 'cursor-default opacity-5 hover:bg-white' : ''"
+                                            <Link as="button" :disabled="children.dev" :class="children.dev ? 'cursor-default opacity-5' : ''"
                                             :href="route(children.href)" >{{ children.name }}</Link>
                                             <!-- <Tag v-if="children.dev" value="WIP" severity="info" class="animate-pulse"
                                                 rounded :pt="{
@@ -74,11 +74,11 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Link } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3'
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
-import { usePermissions } from '@/composable/permission';
+import { usePermissions } from '@/composable/permission'
 import Tag from 'primevue/tag'
-import VueCollapsible from 'vue-height-collapsible/vue3';
+import VueCollapsible from 'vue-height-collapsible/vue3'
 import {
     CalendarIcon,
     CreditCardIcon,
@@ -89,9 +89,9 @@ import {
     UsersIcon,
 } from '@heroicons/vue/24/outline'
 
-const { hasRole } = usePermissions();
-const activeDropdown = ref();
-const showTag = ref(false);
+const { hasRole } = usePermissions()
+const activeDropdown = ref()
+const showTag = ref(false)
 
 const navigation = [
     {
