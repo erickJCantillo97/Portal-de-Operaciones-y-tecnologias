@@ -2,6 +2,7 @@
 
 namespace App\Models\Projects;
 
+use App\Models\Quotes\QuoteVersion;
 use App\Models\Scopes\GerenciaScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,8 +22,13 @@ class Contract extends Model implements Auditable
 
     protected $guarded = [];
 
-    public function customer()
+    // public function customer()
+    // {
+    //     return $this->belongsTo(Customer::class);
+    // }
+
+    public function quote()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(QuoteVersion::class, 'quote_id');
     }
 }

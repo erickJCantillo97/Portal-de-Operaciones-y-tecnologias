@@ -20,7 +20,7 @@ class ContractController extends Controller
      */
     public function index()
     {
-        $contracts = Contract::with('customer', 'quote')->orderBy('contract_id')->get();
+        $contracts = Contract::with('quote', 'quote.customer')->orderBy('contract_id')->get();
         $customers = Customer::orderBy('name')->get();
         $quotes = QuoteVersion::with('customer')->get()->filter(function ($quote) {
             return $quote['get_status'] === 'Contratada';
@@ -97,6 +97,7 @@ class ContractController extends Controller
             'customer_id' => 'nullable',
             'manager_id' => 'nullable',
             'type_of_sale' => 'nullable',
+            'quote_id' => 'nullable',
             'supervisor' => 'nullable',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
