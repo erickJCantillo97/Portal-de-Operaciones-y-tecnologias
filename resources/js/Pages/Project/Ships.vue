@@ -87,6 +87,7 @@ const cloneItem = (event, ship) => {
     typeSelect.value = ship.type_ship
     formData.value.ship = ship
     formData.value.ship.id = null;
+    formData.value.ship.idHull = null;
     visible.value = true;
 };
 

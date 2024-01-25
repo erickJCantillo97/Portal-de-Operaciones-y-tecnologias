@@ -129,6 +129,8 @@ const formatCurrency = (valor, moneda) => {
             { style: 'currency', currency: moneda, maximumFractionDigits: 0 })
     }
 }
+
+const auxdata = ref()
 //#endregion
 </script>
 
@@ -273,7 +275,7 @@ const formatCurrency = (valor, moneda) => {
                     placeholder="Escriba algo para buscar" />
             </template>
 
-            <template #body="{ data }">
+            <template #body="{ data }" v-if="col.field.indexOf('.') == -1">
                 <span @click="$emit('cellClic', $event)">
                     <p v-if="col.type == 'date'" class="text-left">
                         {{ formatDate(data[col.field]) }}
@@ -307,7 +309,11 @@ const formatCurrency = (valor, moneda) => {
                             }} </p>
                         </div>
                     </div>
-                    <p v-else class="">{{ data[col.field] }} </p>
+                    <p v-else class="">
+                        {{
+                            data[col.field]
+                        }}
+                    </p>
                 </span>
             </template>
 
