@@ -34,7 +34,7 @@ const formData = ref({
 /*SUBMIT*/
 const submit = () => {
     loading.value = true
-    formData.value.contract.quote_id = formData.value.contract.quote.id
+    formData.value.contract.quote_id = formData.value.contract.quote?.id ?? null
     if (!formData.value.contract.id) {
         router.post(route('contracts.store'), formData.value.contract, {
             preserveScroll: true,
