@@ -31,14 +31,17 @@ class TeamController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
+    {;
         $validateData = $request->validate([
             'name' => 'required|max:20',
             'description' => 'required',
         ]);
+
         $status = true;
         try {
             DB::beginTransaction();
+            $validateData['user_id'] = auth()->user()->id;
+            $validateData['gerencia'] = auth()->user()->gerencia;
             $team = Team::create($validateData);
             if ($team && $status) {
                 foreach ($request->personal as $persona) {
