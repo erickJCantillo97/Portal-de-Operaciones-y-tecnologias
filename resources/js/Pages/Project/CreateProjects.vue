@@ -9,6 +9,7 @@ import axios from 'axios'
 import Dropdown from 'primevue/dropdown'
 import TextInput from '../../Components/TextInput.vue'
 import Textarea from 'primevue/textarea'
+import ToggleButton from 'primevue/togglebutton'
 import Loading from '@/Components/Loading.vue'
 import NoContentToShow from '@/Components/NoContentToShow.vue'
 import { FormWizard, TabContent } from 'vue3-form-wizard'
@@ -29,7 +30,7 @@ const props = defineProps({
 })
 
 //#region Referencias (v-model)
-const open = ref(false)
+const checked = ref(true)
 const contractSelect = ref()
 const authorizationSelect = ref()
 const quoteSelect = ref()
@@ -128,11 +129,18 @@ const selectShiftList = (shiftId) => {
     shiftSelect.value = shiftId
 }
 
+const selectAllShips = () => {
+    if (selectedShips.value.length == filteredShips.value.length) {
+        selectedShips.value = []
+    } else {
+        selectedShips.value = filteredShips.value.map(ship => ship.id)
+    }
+}
+
 //Cancelar Creación de Proyectos
 const cancelCreateProject = () => {
     router.get(route('projects.index'))
 }
-
 
 /* SUBMIT*/
 // const isSaved = ref(false)
@@ -319,6 +327,12 @@ const exportarExcel = () => {
 }
 //#endregion
 </script>
+
+<style scoped>
+.form-wizard {
+    padding-left: 20%;
+}
+</style>
 <template>
     <AppLayout>
 
@@ -329,11 +343,11 @@ const exportarExcel = () => {
                     Agregar Proyecto
                 </h2>
             </header>
-            <section class="grid grid-cols-1">
+            <section class="grid grid-cols-1 p-2">
                 <!-- AQUÍ VA EL CONTENIDO DEL FORMULARIO-->
                 <form-wizard @on-complete="submit()" stepSize="md" color="#2E3092" nextButtonText="Siguiente"
                     backButtonText="Regresar" finishButtonText="Guardar">
-                    <!--DOCUMENTOS CONTRACTUALES-->
+                    <!--INFORMACIÓN CONTRACTUAL-->
                     <tab-content title="Información Contractual" icon="fa-solid fa-file-signature"
                         :before-change="beforeChange">
                         <section class="border gap-4 border-gray-200 rounded-lg p-4 grid grid-cols-2">
@@ -544,6 +558,14 @@ const exportarExcel = () => {
                             <input type="search" v-model="keyword" @input="searchShips()"
                                 class="rounded-lg border-2 border-gray-200 w-full placeholder:italic"
                                 placeholder="Filtrar Buques" />
+                            <ToggleButton v-model="checked" onLabel="Seleccionar todo" offLabel="Deseleccionar todo"
+                                onIcon="pi pi-check-square" offIcon="pi pi-stop" aria-label="Do you confirm"
+                                @click="selectAllShips()" :pt="{
+                                    root: '!w-56 !h-full !border-blue-800 !bg-transparent',
+                                    label: '!text-blue-900',
+                                    icon: '!text-blue-900',
+                                    // label: props.text ? 'Seleccionar Todo' : 'Deseleccionar Todo'
+                                }" />
                         </div>
                         <section
                             class="grid grid-cols-4 h-60 overflow-y-auto custom-scroll snap-y snap-mandatory sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2">
