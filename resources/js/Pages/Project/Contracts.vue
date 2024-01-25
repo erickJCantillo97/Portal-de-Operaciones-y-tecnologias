@@ -176,7 +176,6 @@ const formatCurrency = (valor, moneda) => {
                         </span>
                     </span>
                 </span>
-                {{ formData.contract }}
                 <CustomInput class="mt-2" label="Objeto del Contrato" placeholder="Escriba Objeto del Contrato"
                     type="textarea" v-model:input="formData.contract.subject" :invalid="$attrs.errors.subject != null"
                     :errorMessage="$attrs.errors.subject">
