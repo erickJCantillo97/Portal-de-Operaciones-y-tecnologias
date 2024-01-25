@@ -230,7 +230,7 @@ const buttons = [
             <template #body>
                 <div class="flex py-2 space-x-4">
                     <div class="w-1/2 space-y-4">
-                        <div class="border border-gray-300 p-2 max-w-full w-full rounded-lg">
+                        <!-- <div class="border border-gray-300 p-2 max-w-full w-full rounded-lg">
                             <div class="mb-2">
                                 <label>Nombre del Grupo</label>
                                 <InputText type="text" v-model="teamworkName" :pt="{
@@ -245,15 +245,27 @@ const buttons = [
                                         root: '!w-full !text-sm'
                                     }" />
                             </div>
-                        </div>
+                        </div> -->
                         <div class="border-0">
-                            <label for="">Seleccionar Personal</label>
-                            <Listbox multiple v-model="form.members" listStyle="height:230px"
+                            <div class="flex justify-between">
+                                <label for="">Seleccionar Personal</label>
+                                <Button label="Nuevo" icon="pi pi-plus" />
+                                <Button label="Eliminar" icon="pi pi-trash" severity="danger"
+                                    v-if="form.members.length != 0" />
+                            </div>
+                            <Listbox multiple v-model="form.members" listStyle="height:430px"
                                 :filterFields="['Nombres_Apellidos', 'Cargo', 'Identificacion', 'Oficina']" :filter="true"
-                                :options="miPersonal" filter optionLabel="name" class="w-full md:w-14rem"
+                                :options="groups" filter optionLabel="name" class="w-full md:w-14rem"
                                 :loading="miPersonal.length == 0">
                                 <template #option="slotProps">
-                                    <UserTable :user="slotProps.option"></UserTable>
+                                    <div class="p-1">
+                                        <p class="text-md font-semibold">
+                                            {{ slotProps.option.name }}
+                                        </p>
+                                        <p class="text-xs">
+                                            {{ slotProps.option.description }}
+                                        </p>
+                                    </div>
                                 </template>
                                 <template #empty>
                                     <Loading message="Cargando Personal" />
@@ -263,7 +275,9 @@ const buttons = [
                     </div>
                     <div class="w-1/2 ">
                         <div class="bg-blue-900 rounded-t-lg">
-                            <h3 class="text-center font-bold text-lg text-white">Personal Seleccionado</h3>
+                            <h3 class="text-center font-bold text-lg text-white">Personal del Grupo "{{ form.members[0].name
+                            }}""
+                            </h3>
                         </div>
                         <div class="block space-y-4 h-[475px] custom-scroll overflow-y-auto shadow-lg rounded-lg p-2">
                             <div v-for="member of form.members" class="flex justify-between">
