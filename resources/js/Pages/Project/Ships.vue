@@ -1,13 +1,10 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref } from 'vue';
-import { router, useForm } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import { useSweetalert } from '@/composable/sweetAlert';
-import TextInput from '../../Components/TextInput.vue';
 import Button from 'primevue/button';
-import FileUpload from 'primevue/fileupload';
 import CustomModal from '@/Components/CustomModal.vue';
-import Dropdown from 'primevue/dropdown';
 import CustomDataTable from '@/Components/CustomDataTable.vue';
 import CustomInput from '@/Components/CustomInput.vue';
 
@@ -27,31 +24,18 @@ const props = defineProps({
 })
 
 //#region UseForm
-const formData = useForm({
-    id: null,
-    name: null,
-    idHull: null,
-    customer_id: null,
-    type_ship_id: null,
-    quilla: null,
-    pantoque: null,
-    acronyms: null,
-    image: null
+const formData = ref({
+    ship: {}
 });
 //#endregion
 
 /* SUBMIT*/
 const submit = () => {
     loading.value = true;
-
-    if (props.customers == null) {
-        formData.customer_id = props.customer.id;
-    } else if (customerSelect.value != null) {
-        formData.customer_id = customerSelect.value.id;
-    }
-    formData.type_ship_id = typeSelect.value ? typeSelect.value.id : null
-    if (formData.id == null) {
-        router.post(route('ships.store'), formData, {
+    formData.value.ship.customer_id = props.customer?.id ?? formData.value.ship.customer?.id ?? null;
+    formData.value.ship.type_ship_id = formData.value.ship.type_ship?.id ?? null
+    if (formData.value.ship.id == null) {
+        router.post(route('ships.store'), formData.value.ship, {
             preserveScroll: true,
             onSuccess: (res) => {
                 visible.value = false;
@@ -66,69 +50,49 @@ const submit = () => {
             }
         })
         return 'creado';
+    } else {
+        router.post(route('ships.update', formData.value.ship.id), formData.value.ship, {
+            preserveScroll: true,
+            onSuccess: (res) => {
+                visible.value = false;
+                toast('¡Buque actualizado exitosamente!', 'success');
+            },
+            onError: (errors) => {
+                console.log(errors);
+                toast('¡Ups! Ha surgido un error', 'error');
+            },
+            onFinish: visit => {
+                loading.value = false;
+            }
+        })
     }
-    router.post(route('ships.update', formData.id), formData, {
-        preserveScroll: true,
-        onSuccess: (res) => {
-            visible.value = false;
-            toast('¡Buque actualizado exitosamente!', 'success');
-        },
-        onError: (errors) => {
-            console.log(errors);
-            toast('¡Ups! Ha surgido un error', 'error');
-        },
-        onFinish: visit => {
-            loading.value = false;
-        }
-    })
 
 }
 
 const addItem = () => {
-    formData.reset();
-    clearErrors();
+    formData.value.ship = {}
     modalType.value = "Nueva unidad"
     visible.value = true;
 }
 
 const editItem = (event, ship) => {
-    clearErrors();
     modalType.value = "Editar unidad"
-    typeSelect.value = ship.type_ship
-    formData.id = ship.id;
-    formData.name = ship.name;
-    formData.idHull = ship.idHull;
-    formData.customer_id = ship.customer_id;
-    formData.type_ship_id = ship.type_ship_id;
-    formData.quilla = ship.quilla;
-    formData.pantoque = ship.pantoque;
-    formData.acronyms = ship.acronyms;
-    formData.image = ship.image;
+    typeSelect.value = ship
+    formData.value.ship = ship
     visible.value = true;
 };
 
 const cloneItem = (event, ship) => {
-    clearErrors();
     modalType.value = "Clonar unidad"
     typeSelect.value = ship.type_ship
-    formData.id = null;
-    formData.name = ship.name;
-    formData.idHull = null;
-    formData.customer_id = ship.customer_id;
-    formData.type_ship_id = ship.type_ship_id;
-    formData.quilla = ship.quilla;
-    formData.pantoque = ship.pantoque;
-    formData.acronyms = ship.acronyms;
-    formData.image = ship.image;
+    formData.value.ship = ship
+    formData.value.ship.id = null;
     visible.value = true;
 };
 
 const deleteItem = (event, ship) => {
     confirmDelete(ship.id, 'Buque', 'ships')
 }
-const clearErrors = () => {
-    router.page.props.errors = {};
-};
 
 const columnas = ref([
     {
@@ -160,7 +124,7 @@ const buttons = ref([
 <template>
     <AppLayout>
         <div class="w-full h-[89vh] overflow-y-auto">
-            <CustomDataTable :data="ships" :columnas="columnas" cacheName="ships" :actions="buttons"
+            <CustomDataTable :data="ships" :columnas="columnas" cacheName="ships" :actions="buttons" :rowsDefault=20
                 :title="customer ? 'Unidades del cliente:' + customer.name : 'Todas las unidades'"
                 @confirmDelete="deleteItem" @editItem="editItem" @cloneItem="cloneItem">
                 <template #buttonHeader>
@@ -180,30 +144,30 @@ const buttons = ref([
                 {{ modalType }}</span>
         </template>
         <template #body>
-            <div class="grid grid-cols-2 gap-2">
+            <span class="grid grid-cols-2 gap-2">
                 <CustomInput label="Numero del casco" type="text" :placeholder="'Numero del casco'"
-                    v-model:input="formData.idHull" :error="router.page.props.errors.idHull" />
+                    v-model:input="formData.ship.idHull" :error="router.page.props.errors.idHull" />
                 <CustomInput label="Nombre del Buque" type="text" :placeholder="'Nombre del Buque'"
-                    v-model:input="formData.name" :error="router.page.props.errors.name" />
-                <CustomInput id="customer" label="Cliente" type="dropdown" filter v-model:input="customerSelect"
-                    :options="customers" v-if="customers" @change="formData.customer_id = $event.value.id"
-                    optionLabel="name" placeholder="Seleccione Cliente" />
-                <CustomInput id="class" label="Tipo" type="dropdown" filter v-model:input="typeSelect" clearIcon
-                    :options="typeShips" v-if="customers" optionLabel="name" placeholder="Seleccione tipo" />
-                <CustomInput label="Siglas" type="text" :placeholder="'Digite las siglas'" v-model:input="formData.acronyms"
-                    :error="router.page.props.errors.acronyms" />
+                    v-model:input="formData.ship.name" :error="router.page.props.errors.name" />
+                <CustomInput id="customer" label="Cliente" type="dropdown" filter v-model:input="formData.ship.customer"
+                    :options="customers" optionLabel="name" placeholder="Seleccione Cliente" />
+                <CustomInput id="class" label="Tipo" type="dropdown" filter v-model:input="formData.ship.type_ship"
+                    clearIcon :options="typeShips" optionLabel="name" placeholder="Seleccione tipo" />
+                <CustomInput label="Siglas" type="text" :placeholder="'Digite las siglas'"
+                    v-model:input="formData.ship.acronyms" :error="router.page.props.errors.acronyms" />
                 <CustomInput label="Carros Quillas" type="number" :placeholder="'Números de carros de Quillas necesarios'"
-                    v-model:input="formData.quilla" :error="router.page.props.errors.quilla" />
+                    v-model:input="formData.ship.quilla" :error="router.page.props.errors.quilla" />
                 <CustomInput label="Carros de Pantoques" type="number"
-                    :placeholder="'Números carros de Pantoques necesarios'" v-model:input="formData.pantoque"
+                    :placeholder="'Números carros de Pantoques necesarios'" v-model:input="formData.ship.pantoque"
                     :error="router.page.props.errors.pantoque" />
-                <CustomInput type="file" label="Adjuntar foto" acceptFile="image/*" v-model:input="formData.image" />
-            </div>
+                <CustomInput type="file" label="Adjuntar foto" acceptFile="image/*" v-model:input="formData.ship.image" />
+            </span>
         </template>
         <template #footer>
             <Button severity="success" :loading="loading" @click="submit()" icon="fa-solid fa-floppy-disk"
-                :label="formData.id != null ? 'Actualizar ' : 'Guardar'" />
-            <Button severity="danger" @click="visible = false" label="Cancelar" icon="fa-regular fa-circle-xmark" />
+                :label="formData.ship.id != null ? 'Actualizar ' : 'Guardar'" />
+            <Button severity="danger" :loading="loading" @click="visible = false" label="Cancelar"
+                icon="fa-regular fa-circle-xmark" />
         </template>
     </CustomModal>
 </template>
