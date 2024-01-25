@@ -73,4 +73,9 @@ class QuoteVersion extends Model
     {
         return $this->morphMany(Comment::class, 'commentable');
     }
+
+    public function quoye()
+    {
+        return $this->belongsTo(QuoteVersion::class, 'quote_id');
+    }
 }

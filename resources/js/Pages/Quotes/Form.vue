@@ -211,9 +211,9 @@ const toggle = (event) => {
                 <span class="flex justify-between p-1">
                     <p class="text-primary font-bold text-xl">
                         {{
-                            newQuote ? action == 2 ? 'Creando nueva version para estimacion #' + props.quote.quote.consecutive :
+                            newQuote ? action == 2 ? 'Creando nueva version para estimacion #' + props.quote.consecutive :
                             'Crear solicitud de estimacion' : 'Editar estimacion #' +
-                        props.quote.quote.consecutive
+                        props.quote.consecutive
                         }}
                     </p>
                     <Button v-if="!newQuote" label="Ver sugerencia" icon="fa-solid fa-file-circle-question" class="!h-8"

@@ -20,7 +20,7 @@ class ContractController extends Controller
      */
     public function index()
     {
-        $contracts = Contract::with('customer')->orderBy('contract_id')->get();
+        $contracts = Contract::with('customer', 'quote')->orderBy('contract_id')->get();
         $customers = Customer::orderBy('name')->get();
         $quotes = QuoteVersion::with('customer')->get()->filter(function ($quote) {
             return $quote['get_status'] === 'Contratada';
