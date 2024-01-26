@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('user_num_sap');
             $table->bigInteger('team_id')->unsigned();
             $table->bigInteger('user_id')->unsigned();
-            $table->foreign('user_id')->references('id')->on('users');
+            // $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('team_id')->references('id')->on('teams');
             $table->timestamps();
             $table->softDeletes();
