@@ -121,7 +121,7 @@ const buttons = [
 
     <!--MODAL DE FORMULARIO-->
 
-    <CustomModal v-model:visible="open">
+    <CustomModal v-model:visible="open" width="30rem">
         <template #icon>
             <i class="fa-solid fa-plus text-xl"></i>
         </template>
@@ -135,7 +135,7 @@ const buttons = [
                 :error="router.page.props.errors.country" />
             <CustomInput label="Tipo de Cliente" placeholder="Selecciona un Tipo de Cliente"
                 :options="['GOBIERNO', 'ARMADOR CIVIL', 'FUERZAS ARMADAS']" id="type" type="dropdown"
-                v-model:input="formData.customer.name" :error="router.page.props.errors.name" />
+                v-model:input="formData.customer.type" :error="router.page.props.errors.type" />
         </template>
         <template #footer>
             <Button severity="danger" @click="open = false" label="Cancelar" class="!h-8" />

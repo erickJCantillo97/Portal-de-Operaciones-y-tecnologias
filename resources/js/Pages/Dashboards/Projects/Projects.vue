@@ -1,9 +1,8 @@
 <script setup>
 import CustomDataTable from '@/Components/CustomDataTable.vue';
-import { ResourceTimeRangeModel } from '@bryntum/gantt';
 import { router } from "@inertiajs/vue3";
 import { onMounted, ref } from 'vue';
-import DataChart from "../DataChart.vue";
+// import DataChart from "../DataChart.vue";
 
 
 const columnas = [
@@ -37,6 +36,6 @@ const gannt = (event, data) => {
             @showProgramming="router.get(route('programming'), { id: $event.data.project_id })"
             @showGantt="router.get(route('createSchedule.create', $event.data.project_id))">
         </CustomDataTable>
-        <DataChart />
+        <!-- <DataChart /> -->
     </div>
 </template>
