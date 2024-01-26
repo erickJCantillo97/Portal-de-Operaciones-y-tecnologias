@@ -11,6 +11,8 @@ import Image from 'primevue/image';
 import { useSweetalert } from '@/composable/sweetAlert';
 import CustomDataTable from '@/Components/CustomDataTable.vue';
 import CustomInput from '@/Components/CustomInput.vue';
+import Sidebar from 'primevue/sidebar';
+import OverlayPanel from 'primevue/overlaypanel';
 const { toast } = useSweetalert();
 const { confirmDelete } = useSweetalert();
 
@@ -80,18 +82,18 @@ const showEdit = (event, dato) => {
     typeShip.type = dato.type
     typeShip.disinger = dato.disinger
     typeShip.hull_material = dato.hull_material //material del casco
-    typeShip.length = dato.length //eslra
-    typeShip.breadth = dato.breadth //Manga
-    typeShip.draught = dato.draught //calado de diseño
-    typeShip.depth = dato.depth //punta
-    typeShip.full_load = dato.full_load
-    typeShip.light_ship = dato.light_ship
-    typeShip.power_total = dato.power_total
+    typeShip.length = parseFloat(dato.length) //eslra
+    typeShip.breadth = parseFloat(dato.breadth) //Manga
+    typeShip.draught = parseFloat(dato.draught) //calado de diseño
+    typeShip.depth = parseFloat(dato.depth) //punta
+    typeShip.full_load = parseFloat(dato.full_load)
+    typeShip.light_ship = parseFloat(dato.light_ship)
+    typeShip.power_total = parseFloat(dato.power_total)
     typeShip.propulsion_type = dato.propulsion_type
-    typeShip.velocity = dato.velocity
-    typeShip.autonomias = dato.autonomias
-    typeShip.autonomy = dato.autonomy
-    typeShip.crew = dato.crew
+    typeShip.velocity = parseFloat(dato.velocity)
+    typeShip.autonomias = parseFloat(dato.autonomias)
+    typeShip.autonomy = parseFloat(dato.autonomy)
+    typeShip.crew = parseFloat(dato.crew)
     typeShip.GT = dato.GT
     typeShip.CGT = dato.CGT
     typeShip.bollard_pull = dato.bollard_pull
@@ -116,10 +118,15 @@ const edit = () => {
 const deleteClic = (event, dato) => {
     confirmDelete(dato.id, 'Clase', 'typeShips')
 }
-
+const visibleSidebar = ref(false)
+const dataSidebar = ref()
+const rowClick = (event) => {
+    dataSidebar.value = event.data
+    visibleSidebar.value = true
+}
 const columns = [
     { field: 'name', header: 'Nombre' },
-    { field: 'count_ships', header: 'Cascos', filter: true, type: 'number' },
+    { field: 'count_ships', header: 'Cascos', class: 'w-24', filter: true, type: 'button', event: 'showHull', severity: 'info', text: true },
     { field: 'type', header: 'Tipo' },
     { field: 'hull_material', header: 'Material del casco', filter: true },
     { field: 'length', header: 'Eslora' },
@@ -127,16 +134,24 @@ const columns = [
 ];
 const buttons = [
     { event: 'showEdit', severity: 'success', class: '', icon: 'fa-solid fa-pen-to-square', text: true, outlined: false, rounded: false },
-    { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
+    { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', text: true, outlined: false, rounded: false },
 ]
+
+const op = ref();
+const hullsSelect = ref()
+const showHull = (event, data) => {
+    hullsSelect.value = data.ships
+    op.value.toggle(event);
+}
 
 </script>
 
 <template>
     <AppLayout>
-        <div class="w-full h-[89vh] overflow-y-auto">
+        <div class="h-[89vh] overflow-y-auto">
             <CustomDataTable :rows-default="100" :data="typeShips" :columnas="columns" :actions="buttons"
-                @showEdit="showEdit" title="Clases de buque" @deleteClic="deleteClic">
+                @showHull="showHull" @rowClic="rowClick" @showEdit="showEdit" title="Clases de buque"
+                @deleteClic="deleteClic">
                 <template #buttonHeader>
                     <Button title="Nuevo" severity="success" label="Agregar" outlined class="!h-8" icon="fa-solid fa-plus"
                         @click="showNew()" />
@@ -154,25 +169,30 @@ const buttons = [
                 {{ modalType == 'new' ? 'Nueva clase' : 'Editar clase' }}</span>
         </template>
         <template #body>
-            <div class="grid grid-cols-4 gap-2 px-1 pt-4">
+            <div class="grid md:grid-cols-4 gap-2">
                 <CustomInput label="Nombre" id='name' :showSup="true" v-model:input="typeShip.name" />
                 <CustomInput label="Tipo de buque" id="type" type="text" v-model:input="typeShip.type" />
                 <CustomInput label="Empresa diseñadora" id="designer" type="text" v-model:input="typeShip.disinger" />
                 <CustomInput label="Material Casco" id="material" :options="hull_materials" type="dropdown"
                     v-model:input="typeShip.hull_material" placeholder="Selecciona un material" />
-                <CustomInput label="Eslora" type="number" id="eslora" v-model:input="typeShip.length" />
-                <CustomInput label="Manga" type="number" id="breadth" v-model:input="typeShip.breadth" />
-                <CustomInput label="Calado de diseño" id="draught" type="number" v-model:input="typeShip.draught" />
-                <CustomInput label="Puntal" type="number" id="depth" v-model:input="typeShip.depth" />
+                <CustomInput label="Eslora" type="number" id="eslora" v-model:input="typeShip.length" suffix=" m" />
+                <CustomInput label="Manga" type="number" id="breadth" v-model:input="typeShip.breadth" suffix=" m" />
+                <CustomInput label="Calado de diseño" id="draught" type="number" v-model:input="typeShip.draught"
+                    suffix=" m" />
+                <CustomInput label="Puntal" type="number" id="depth" v-model:input="typeShip.depth" suffix=" m" />
                 <CustomInput label="Full Load" type="number" id="full_load" v-model:input="typeShip.full_load" />
                 <CustomInput label="Ligth Ship" type="number" id="light_ship" v-model:input="typeShip.light_ship" />
-                <CustomInput label="Potencia" type="number" id="power_total" v-model:input="typeShip.power_total" />
+                <CustomInput label="Potencia" type="number" id="power_total" v-model:input="typeShip.power_total"
+                    suffix=" Kw" />
                 <CustomInput label="Tipo de propulsion" type="text" id="propulsion_type"
                     v-model:input="typeShip.propulsion_type" />
-                <CustomInput label="Velocidad maxima" type="text" id="velocity" v-model:input="typeShip.velocity" />
-                <CustomInput label="Autonomia" type="number" id="autonomias" v-model:input="typeShip.autonomias" />
+                <CustomInput label="Velocidad maxima" type="text" id="velocity" v-model:input="typeShip.velocity"
+                    suffix=" Km/h" />
+                <CustomInput label="Autonomia" type="number" id="autonomias" v-model:input="typeShip.autonomias"
+                    suffix=" dias" />
                 <CustomInput label="Alcance" type="number" id="autonomy" v-model:input="typeShip.autonomy" />
-                <CustomInput label="Tripulacion maxima" id="crew" type="number" v-model:input="typeShip.crew" />
+                <CustomInput label="Tripulacion maxima" id="crew" type="number" v-model:input="typeShip.crew"
+                    suffix=" Personas" />
                 <CustomInput label="GT" type="number" id=gt v-model:input="typeShip.GT" />
                 <CustomInput label="CGT" type="number" id="cgt" v-model:input="typeShip.CGT" />
                 <CustomInput label="Bollard pull" type="number" id="bollard_pull" v-model:input="typeShip.bollard_pull" />
@@ -205,4 +225,80 @@ const buttons = [
                 @click="modalVisible = false; typeShip.reset()" />
         </template>
     </CustomModal>
+
+    <Sidebar v-model:visible="visibleSidebar" header="Right Sidebar" :showCloseIcon="false" position="right">
+        <span class="grid grid-cols-2 gap-1">
+            <p class="font-bold">Nombre</p>
+            <p class="">{{ dataSidebar.name }}</p>
+            <p class="font-bold">Tipo:</p>
+            <p class="">{{ dataSidebar.type }}</p>
+            <p class="font-bold">Diseñador:</p>
+            <p class="">{{ dataSidebar.disinger }}</p>
+
+            <p class="font-bold">Material del casco:</p>
+            <p class="">{{ dataSidebar.hull_material }}</p>
+
+            <p class="font-bold">Eslora:</p>
+            <p class="">{{ dataSidebar.length }}</p>
+
+            <p class="font-bold">Manga:</p>
+            <p class="">{{ dataSidebar.breadth }}</p>
+
+            <p class="font-bold">Calado:</p>
+            <p class="">{{ dataSidebar.draught }}</p>
+
+            <p class="font-bold">Puntal:</p>
+            <p class="">{{ dataSidebar.depth }}</p>
+
+            <p class="font-bold">Full Load:</p>
+            <p class="">{{ dataSidebar.full_load }}</p>
+
+            <p class="font-bold">Light Ship:</p>
+            <p class="">{{ dataSidebar.light_ship }}</p>
+
+            <p class="font-bold">Potencia:</p>
+            <p class="">{{ dataSidebar.power_total }}</p>
+
+            <p class="font-bold">Tipo de propulsion:</p>
+            <p class="">{{ dataSidebar.propulsion_type }}</p>
+
+            <p class="font-bold">Velocidad maxima:</p>
+            <p class="">{{ dataSidebar.velocity }}</p>
+
+            <p class="font-bold">Autonomia:</p>
+            <p class="">{{ dataSidebar.autonomias }}</p>
+            <p class="font-bold">Alcance:</p>
+            <p class="">{{ dataSidebar.autonomy }}</p>
+            <p class="font-bold">Tripulacion maxima:</p>
+            <p class="">{{ dataSidebar.crew }}</p>
+
+            <p class="font-bold">GT:</p>
+            <p class="">{{ dataSidebar.GT }}</p>
+
+            <p class="font-bold">CGT:</p>
+            <p class="">{{ dataSidebar.CGT }}</p>
+
+            <p class="font-bold">Bollard pull:</p>
+            <p class="">{{ dataSidebar.bollard_pull }}</p>
+
+            <p class="font-bold">Clasificacion:</p>
+            <p class="">{{ dataSidebar.clasification }}</p>
+        </span>
+    </Sidebar>
+
+    <OverlayPanel ref="op">
+        <ul class="list-none p-0 m-0 flex flex-col gap-2 max-w-96 max-h-52 overflow-y-auto">
+            <li v-for="hull in hullsSelect" :key="hull.name" class="flex items-center gap-2">
+                <img :src="hull.file" alt="ImageShip" onerror="this.src='/svg/cotecmar-logo.svg'"
+                    class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16 object-cover" draggable="false" />
+                <span>
+                    <span class="font-medium">{{ hull.name }}</span>
+                    <span class="flex items-center justify-between">
+                        <p>{{ hull.acronyms }}</p>
+                        <div class="text-sm text-color-secondary">Id del casco: {{ hull.idHull }}</div>
+                    </span>
+                </span>
+            </li>
+        </ul>
+    </OverlayPanel>
 </template>
