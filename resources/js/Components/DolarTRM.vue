@@ -1,8 +1,10 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/vue/20/solid'
 import OverlayPanel from 'primevue/overlaypanel';
 import VueApexCharts from 'vue3-apexcharts';
+import CustomInput from './CustomInput.vue';
+import InputNumber from 'primevue/inputnumber';
 const rateT = ref()
 const rateY = ref()
 const change = ref()
@@ -113,8 +115,9 @@ onMounted(() => {
     //     elemento.click();
     // });
 })
-
-
+const peso = ref(null)
+const dolar = ref(null)
+const total = ref()
 </script>
 <template>
     <div v-if="rate > 0" :key="rate" @click="toggle" id="trmdolar"
@@ -128,10 +131,22 @@ onMounted(() => {
             <ArrowDownIcon v-else class="self-center flex-shrink-0 w-5 h-5 text-red-500" aria-hidden="true" />
         </div>
     </div>
-    <OverlayPanel ref="op" :pt="{
+    <OverlayPanel ref="op" class="max-w-72" :pt="{
         content: '!p-0'
     }">
-        <VueApexCharts :key="hist" type="area" height="180" :options="chartOptions" :series="series">
-        </VueApexCharts>
+        <span class=" space-y-1 grid">
+            <VueApexCharts class="-ml-2" :key="hist" type="area" height="180" :options="chartOptions" :series="series" />
+            <span class="flex items-center justify-between pb-1 px-1">
+                <span class="w-min flex gap-1 items-center">
+                    <input v-model="peso" v-if="!dolar" type="number" placeholder="Pesos" class="w-28 h-8 rounded-md"
+                        :maxFractionDigits="0" currency="COP" />
+                    <input v-model="dolar" v-if="!peso" type="number" placeholder="Dolares" class="w-28 h-8 rounded-md"
+                        :maxFractionDigits="0" currency="USD" />
+                    <span class="text-sm" v-if="peso">US${{ total=(peso / rateT).toFixed(2), total }}</span>
+                    <span class="text-sm" v-if="dolar">${{ total=(dolar * rateT).toFixed(2), total }}</span>
+                </span>
+                <Button icon="fa-solid fa-copy" />
+            </span>
+        </span>
     </OverlayPanel>
 </template>

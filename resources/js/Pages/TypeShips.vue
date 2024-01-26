@@ -1,12 +1,9 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3';
 import AppLayout from "@/Layouts/AppLayout.vue";
-import Dropdown from 'primevue/dropdown';
 import { ref } from 'vue';
 import Button from 'primevue/button';
-import TextInput from '@/Components/TextInput.vue';
 import CustomModal from '@/Components/CustomModal.vue';
-import FileUpload from 'primevue/fileupload';
 import Image from 'primevue/image';
 import { useSweetalert } from '@/composable/sweetAlert';
 import CustomDataTable from '@/Components/CustomDataTable.vue';
@@ -140,8 +137,10 @@ const buttons = [
 const op = ref();
 const hullsSelect = ref()
 const showHull = (event, data) => {
-    hullsSelect.value = data.ships
-    op.value.toggle(event);
+    if (data.ships.length > 0) {
+        hullsSelect.value = data.ships
+        op.value.toggle(event);
+    }
 }
 
 </script>
