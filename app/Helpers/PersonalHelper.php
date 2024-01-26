@@ -3,6 +3,7 @@
 use App\Ldap\User;
 use App\Models\Labor;
 use App\Models\Personal\Personal;
+use App\Models\Personal\WorkingTeams;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 
@@ -93,4 +94,12 @@ function getPersonalUser()
         ];
     });
     return $miPersonal;
+}
+
+function getPersonalGroup($grupo_id)
+{
+    $users_SAP = WorkingTeams::where('team_id', $grupo_id)->pluck('user_num_sap')->toArray();
+    return getPersonalUser()->filter(function ($persona) use ($users_SAP) {
+        return in_array($persona['Num_SAP'], $users_SAP);
+    });
 }

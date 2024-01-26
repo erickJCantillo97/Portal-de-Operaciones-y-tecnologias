@@ -7,6 +7,7 @@ use App\Ldap\User;
 use App\Models\Labor;
 use App\Models\Personal\Personal;
 use App\Models\Personal\Team;
+use App\Models\Personal\WorkingTeams;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -23,19 +24,23 @@ class PersonalController extends Controller
         $groups = Team::where('user_id', auth()->user()->id)->orderBy('name')->get();
 
         if ($request->id) {
-            $group = Team::where('id', $request->id)->orderBy('name')->fisrt();
+            $group = Team::find($request->id);
+            return inertia('Personal/Index', [
+                'miPersonal' => getPersonalGroup($request->id),
+                'group' =>  $group,
+                'groups' =>   $groups
+            ]);
         }
         return inertia('Personal/Index', [
             'miPersonal' => getPersonalUser(),
-            'group' =>  $group ?? null,
             'groups' =>   $groups
         ]);
     }
-
-    public function getPersonalUser()
+    /* Esta funcion devulve el persona a cargo del usuario logeado o las personas del grupo pasado por parametros */
+    public function getPersonalUser($id = null)
     {
         return response()->json([
-            'personal' => getPersonalUser(),
+            'personal' => isset($id) ? getPersonalGroup($id) : getPersonalUser(),
         ]);
     }
 
