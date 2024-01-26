@@ -1,5 +1,4 @@
 <script setup>
-
 import { defineModel } from 'vue';
 import Dialog from 'primevue/dialog';
 const props = defineProps({
@@ -15,12 +14,20 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
+    closable: {
+        type: Boolean,
+        default: true
+    },
+    closeOnEscape: {
+        type: Boolean,
+        default: true
+    }
 })
 const visible = defineModel('visible')
 </script>
 
 <template>
-    <Dialog v-model:visible="visible" :maximizable="maximizable" modal :closable="true" closeOnEscape
+    <Dialog v-model:visible="visible" :maximizable="maximizable" modal :closable :closeOnEscape
         :style="{ width: props.width }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :pt="{
             header: { class: '!bg-primary !h-10' },
             closeButtonIcon: { class: 'text-white' },

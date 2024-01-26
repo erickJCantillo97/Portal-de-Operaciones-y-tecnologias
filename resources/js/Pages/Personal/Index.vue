@@ -11,6 +11,7 @@ import UserTable from '@/Components/UserTable.vue'
 import Listbox from 'primevue/listbox'
 import CustomModal from '@/Components/CustomModal.vue'
 import Loading from '@/Components/Loading.vue'
+import NoContentToShow from '@/Components/NoContentToShow.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue';
 import Dropdown from 'primevue/dropdown';
 const { toast } = useSweetalert()
@@ -20,7 +21,6 @@ const props = defineProps({
     miPersonal: Array,
     group: Object,
     groups: Array,
-
 })
 
 const personal = ref([])
@@ -31,8 +31,11 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 
+const showCreateGroupSection = ref(false)
+const showButtonsGroupsCrud = ref(true)
 const teamworkName = ref()
 const descriptionValue = ref()
+const noContentToShow = ref(false)
 
 const form = useForm({
     users: [],
@@ -50,10 +53,13 @@ const submit = () => {
     })
 }
 
-const getPersonal = () => {
-    axios.get(route('personal.activos'))
+const getPersonal = async () => {
+    loading.value = true
+    await axios.get(route('personal.activos'))
         .then((res) => {
             personal.value = res.data.personal
+            loading.value = false
+            noContentToShow.value = true
         })
 }
 
@@ -70,13 +76,15 @@ const showGroupDialog = ref(false)
 
 const openGroupDialog = () => {
     showGroupDialog.value = true
-    if (personal.value.length == 0)
+    if (personal.value.length != 0) {
         getPersonal()
+    }
 }
 
 const clearModal = () => {
     showGroupDialog.value = false
     if (showGroupDialog.value == false) {
+        showCreateGroupSection.value = false
         teamworkName.value = ''
         descriptionValue.value = ''
         form.members = []
@@ -84,13 +92,15 @@ const clearModal = () => {
 }
 
 const createGroup = () => {
-    router.post(route('teams.store'), { name: teamworkName.value, description: descriptionValue.value, personal: form.members }, {
+    router.post(route('teams.store'),
+        { name: teamworkName.value, description: descriptionValue.value, personal: form.members }, {
         onSuccess: () => {
-            teamworkName.value = ''
-            descriptionValue.value = ''
-            form.members = []
-            showGroupDialog.value = false
-            toast('Grupo añadido exitosamente', 'success')
+            // teamworkName.value = ''
+            // descriptionValue.value = ''
+            // form.members = []
+            // showGroupDialog.value = false
+            showCreateGroupSection = false
+            toast(`¡Grupo "${teamworkName.value}" creado exitosamente!`, 'success')
         },
         onError: (error) => {
             toast(`Ha ocurrido un error al crear el grupo \n ${teamworkName.value}; ERROR: ${error}`, 'error')
@@ -158,7 +168,7 @@ const buttons = [
             </div>
         </div>
 
-        <CustomModal v-model:visible="modalVisible">
+        <CustomModal v-model:visible="modalVisible" :closable="false" :closeOnEscape="false">
             <template #icon>
                 <span class="text-white material-symbols-outlined text-4xl">
                     engineering
@@ -216,7 +226,7 @@ const buttons = [
         </CustomModal>
 
         <!--MODAL CREACIÓN DE GRUPOS-->
-        <CustomModal v-model:visible="showGroupDialog">
+        <CustomModal v-model:visible="showGroupDialog" :closable="false" :closeOnEscape="false">
             <template #icon>
                 <div class="text-white material-symbols-outlined">
                     <span class="material-symbols-outlined text-4xl">
@@ -225,38 +235,51 @@ const buttons = [
                 </div>
             </template>
             <template #titulo>
-                <span class="text-xl font-bold text-white white-space-nowrap">Crear Grupo</span>
+                <span class="text-xl font-bold text-white white-space-nowrap">Grupos</span>
             </template>
             <template #body>
                 <div class="flex py-2 space-x-4">
-                    <div class="w-1/2 space-y-4">
-                        <!-- <div class="border border-gray-300 p-2 max-w-full w-full rounded-lg">
+                    <div class="grid max-w-full w-full space-x-2 grid-cols-2">
+                        <!--COLUMNA CREACIÓN DEL GRUPO-->
+                        <div v-if="showCreateGroupSection" class=" border border-gray-300 p-2 max-w-full w-full rounded-lg">
                             <div class="mb-2">
                                 <label>Nombre del Grupo</label>
-                                <InputText type="text" v-model="teamworkName" :pt="{
+                                <InputText type="text" v-model="teamworkName" placeholder="Escriba nombre del grupo" :pt="{
                                     root: '!w-full'
                                 }" />
                             </div>
-
                             <div>
                                 <label>Descripción</label>
-                                <Textarea v-model="descriptionValue" rows="1" col="60"
-                                    placeholder="Agregue una breve descripción al grupo" autoResize :pt="{
+                                <Textarea v-model="descriptionValue" rows="15" col="60"
+                                    placeholder="Agregue una descripción al grupo" autoResize :pt="{
                                         root: '!w-full !text-sm'
                                     }" />
                             </div>
-                        </div> -->
-                        <div class="border-0">
-                            <div class="flex justify-between">
-                                <label for="">Seleccionar Personal</label>
-                                <Button label="Nuevo" icon="pi pi-plus" />
-                                <Button label="Eliminar" icon="pi pi-trash" severity="danger"
-                                    v-if="form.members.length != 0" />
+                            <div class="flex justify-end space-x-2 mt-2">
+                                <Button severity="success" label="Guardar" size="small" @click="createGroup()" />
+                                <Button severity="danger" label="Cancelar" size="small"
+                                    @click="showCreateGroupSection = false" />
                             </div>
-                            <Listbox multiple v-model="form.members" listStyle="height:430px"
+                        </div>
+                        <!--COLUMNA SELECCIONAR GRUPO-->
+                        <div class="border-0 ">
+                            <div class="flex place-content-between mb-2">
+                                <label class="mr-8">Seleccionar Grupo</label>
+                                <Button label="Nuevo" icon="pi pi-plus" @click="showCreateGroupSection = true"
+                                    size="small" />
+                                <Button v-if="form.members.length != 0" label="Editar" icon="pi pi-pencil"
+                                    severity="warning" size="small" :pt="{
+                                        label: '!text-slate-900'
+                                    }" />
+                                <!-- v-if="form.members.length != 0" -->
+                                <Button v-if="form.members.length != 0" label="Eliminar" icon="pi pi-trash"
+                                    severity="danger" size="small" />
+                            </div>
+                            <Listbox multiple v-model="form.members" listStyle="height:385px"
+                                filterPlaceholder="Buscar Grupo"
                                 :filterFields="['Nombres_Apellidos', 'Cargo', 'Identificacion', 'Oficina']" :filter="true"
                                 :options="groups" filter optionLabel="name" class="w-full md:w-14rem"
-                                :loading="miPersonal.length == 0">
+                                :loading="form.members.length == 0 ? noContentToShow : groups.length">
                                 <template #option="slotProps">
                                     <div class="p-1">
                                         <p class="text-md font-semibold">
@@ -268,23 +291,25 @@ const buttons = [
                                     </div>
                                 </template>
                                 <template #empty>
-                                    <Loading message="Cargando Personal" />
+                                    <Loading message="Cargando Grupos" />
+                                    <NoContentToShow subject="Grupos" />
                                 </template>
                             </Listbox>
                         </div>
-                    </div>
-                    <div class="w-1/2 ">
-                        <div class="bg-blue-900 rounded-t-lg">
-                            <h3 class="text-center font-bold text-lg text-white">Personal del Grupo "{{ form.members[0].name
-                            }}""
-                            </h3>
-                        </div>
-                        <div class="block space-y-4 h-[475px] custom-scroll overflow-y-auto shadow-lg rounded-lg p-2">
-                            <div v-for="member of form.members" class="flex justify-between">
-                                <UserTable :user="member" :photo="true" />
-                                <div>
-                                    <Button severity="danger" @click="removeMemberOfGroup(member)"
-                                        icon="fa-regular fa-trash-can" text />
+                        <!--COLUMNA PERSONAL DEL GRUPO-->
+                        <div v-if="!showCreateGroupSection" class=" transition ease-in-out delay-300">
+                            <div class="bg-blue-900 rounded-t-lg">
+                                <h3 class="text-center font-bold text-lg text-white">
+                                    Personal del Grupo "{{ props.groups.name != null ? props.groups.name : '' }}"
+                                </h3>
+                            </div>
+                            <div class="block space-y-4 h-[475px] custom-scroll overflow-y-auto shadow-lg rounded-lg p-2">
+                                <div v-for="member of form.members" class="flex justify-between">
+                                    <UserTable :user="member" :photo="true" />
+                                    <div>
+                                        <Button severity="danger" @click="removeMemberOfGroup(member)"
+                                            icon="fa-regular fa-trash-can" text />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -292,8 +317,8 @@ const buttons = [
                 </div>
             </template>
             <template #footer>
-                <Button severity="success" label="Guardar" icon="fa-solid fa-floppy-disk" @click="createGroup()" />
-                <Button severity="danger" label="Cancelar" icon="fa-regular fa-circle-xmark" @click="clearModal()" />
+                <!-- <Button severity="success" label="Guardar" icon="fa-solid fa-floppy-disk" @click="createGroup()" /> -->
+                <Button severity="danger" label="Cerrar" icon="fa-regular fa-circle-xmark" @click="clearModal()" />
             </template>
         </CustomModal>
     </AppLayout>
