@@ -63,6 +63,16 @@ const getPersonal = async () => {
         })
 }
 
+const getPersonalUser = async () => {
+    loading.value = true
+    await axios.get(route('get.personal.user'), id)
+        .then((res) => {
+            personal.value = res.data.personal
+            loading.value = false
+            noContentToShow.value = true
+        })
+}
+
 const modalVisible = ref(false)
 
 const showNew = () => {
@@ -95,8 +105,42 @@ const createGroup = () => {
     router.post(route('teams.store'),
         { name: teamworkName.value, description: descriptionValue.value, personal: form.members }, {
         onSuccess: () => {
-            // teamworkName.value = ''
-            // descriptionValue.value = ''
+            teamworkName.value = ''
+            descriptionValue.value = ''
+            // form.members = []
+            // showGroupDialog.value = false
+            showCreateGroupSection = false
+            toast(`¡Grupo "${teamworkName.value}" creado exitosamente!`, 'success')
+        },
+        onError: (error) => {
+            toast(`Ha ocurrido un error al crear el grupo \n ${teamworkName.value}; ERROR: ${error}`, 'error')
+        }
+    })
+}
+
+const editGroup = () => {
+    router.put(route('teams.update'),
+        { name: teamworkName.value, description: descriptionValue.value }, {
+        onSuccess: () => {
+            teamworkName.value = ''
+            descriptionValue.value = ''
+            // form.members = []
+            // showGroupDialog.value = false
+            showCreateGroupSection = false
+            toast(`¡Grupo "${teamworkName.value}" creado exitosamente!`, 'success')
+        },
+        onError: (error) => {
+            toast(`Ha ocurrido un error al crear el grupo \n ${teamworkName.value}; ERROR: ${error}`, 'error')
+        }
+    })
+}
+
+const deleteGroup = () => {
+    router.delete(route('teams.destroy'),
+        { name: teamworkName.value, description: descriptionValue.value, personal: form.members }, {
+        onSuccess: () => {
+            teamworkName.value = ''
+            descriptionValue.value = ''
             // form.members = []
             // showGroupDialog.value = false
             showCreateGroupSection = false
@@ -265,15 +309,14 @@ const buttons = [
                         <div class="border-0 ">
                             <div class="flex place-content-between mb-2">
                                 <label class="mr-8">Seleccionar Grupo</label>
-                                <Button label="Nuevo" icon="pi pi-plus" @click="showCreateGroupSection = true"
-                                    size="small" />
-                                <Button v-if="form.members.length != 0" label="Editar" icon="pi pi-pencil"
-                                    severity="warning" size="small" :pt="{
+                                <Button v-if="!showCreateGroupSection" label="Nuevo" icon="pi pi-plus"
+                                    @click="showCreateGroupSection = true" size="small" />
+                                <Button v-if="form.members.length != 0 && !showCreateGroupSection" label="Editar"
+                                    icon="pi pi-pencil" severity="warning" size="small" @click="editGroup()" :pt="{
                                         label: '!text-slate-900'
                                     }" />
-                                <!-- v-if="form.members.length != 0" -->
-                                <Button v-if="form.members.length != 0" label="Eliminar" icon="pi pi-trash"
-                                    severity="danger" size="small" />
+                                <Button v-if="form.members.length != 0 && !showCreateGroupSection" label="Eliminar"
+                                    icon="pi pi-trash" severity="danger" size="small" @click="deleteGroup()" />
                             </div>
                             <Listbox multiple v-model="form.members" listStyle="height:385px"
                                 filterPlaceholder="Buscar Grupo"
@@ -300,7 +343,8 @@ const buttons = [
                         <div v-if="!showCreateGroupSection" class=" transition ease-in-out delay-300">
                             <div class="bg-blue-900 rounded-t-lg">
                                 <h3 class="text-center font-bold text-lg text-white">
-                                    Personal del Grupo "{{ props.groups.name != null ? props.groups.name : '' }}"
+                                    Personal del Grupo:
+                                    "{{ props.groups[0].name != null ? props.groups[0].name : 'No hay Grupos Creados' }}"
                                 </h3>
                             </div>
                             <div class="block space-y-4 h-[475px] custom-scroll overflow-y-auto shadow-lg rounded-lg p-2">
