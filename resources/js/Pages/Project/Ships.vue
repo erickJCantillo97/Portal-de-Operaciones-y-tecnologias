@@ -144,8 +144,9 @@ const buttons = ref([
                     v-model:input="formData.ship.idHull" :error="router.page.props.errors.idHull" />
                 <CustomInput label="Nombre del Buque" type="text" :placeholder="'Nombre del Buque'"
                     v-model:input="formData.ship.name" :error="router.page.props.errors.name" />
-                <CustomInput id="class" label="Tipo" type="dropdown" filter v-model:input="formData.ship.type_ship"
-                    clearIcon :options="typeShips" optionLabel="name" placeholder="Seleccione tipo" />
+                <CustomInput id="class" label="Clase de buque" type="dropdown" filter
+                    v-model:input="formData.ship.type_ship" clearIcon :options="typeShips" optionLabel="name"
+                    placeholder="Seleccione tipo" />
                 <CustomInput label="Siglas" type="text" :placeholder="'Digite las siglas'"
                     v-model:input="formData.ship.acronyms" :error="router.page.props.errors.acronyms" />
 

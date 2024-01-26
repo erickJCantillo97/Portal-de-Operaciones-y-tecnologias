@@ -276,50 +276,53 @@ const auxdata = ref()
             </template>
 
             <template #body="{ data }" v-if="col.field.indexOf('.') == -1">
-                <span @click="$emit('cellClic', $event)">
-                    <p v-if="col.type == 'date'" class="text-left">
-                        {{ formatDate(data[col.field]) }}
-                    </p>
-                    <p v-else-if="col.type == 'currency'" class="text-right">
-                        {{ formatCurrency(data[col.field], 'COP') }}
-                    </p>
-                    <p v-else-if="col.type == 'customtag'"
-                        :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
-                        class="text-center rounded-lg px-2 py-1">
-                        {{ data[col.field] }}
-                    </p>
-                    <Tag v-else-if="col.type == 'tag'" class="w-full truncate" :title="data[col.field]"
-                        :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
-                        :severity="col.severitys.find((severity) => severity.text == data[col.field]).severity"
-                        :value="data[col.field]" />
-                    <div v-else-if="col.type == 'object'" class="flex items-center space-x-2 w-full">
-                        <img v-if="col.objectRows.photo" :src="data[col.objectRows.photo.field]" alt="Image"
-                            onerror="this.src='/svg/cotecmar-logo.svg'"
-                            class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16 object-cover" draggable="false" />
-                        <div>
-                            <p class="font-bold text-sm ">{{
-                                col.objectRows.primary.subfield ?
-                                data[col.objectRows.primary.field][col.objectRows.primary.subfield] :
-                                data[col.objectRows.primary.field]
-                            }} </p>
-                            <p class="text-xs italic">{{
-                                col.objectRows.secundary.subfield ?
-                                data[col.objectRows.secundary.field][col.objectRows.secundary.subfield] :
-                                data[col.objectRows.secundary.field]
-                            }} </p>
-                        </div>
+                <p v-if="col.type == 'date'" class="text-left">
+                    {{ formatDate(data[col.field]) }}
+                </p>
+                <p v-else-if="col.type == 'currency'" class="text-right">
+                    {{ formatCurrency(data[col.field], 'COP') }}
+                </p>
+                <p v-else-if="col.type == 'customtag'"
+                    :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
+                    class="text-center rounded-lg px-2 py-1">
+                    {{ data[col.field] }}
+                </p>
+                <Tag v-else-if="col.type == 'tag'" class="w-full truncate" :title="data[col.field]"
+                    :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
+                    :severity="col.severitys.find((severity) => severity.text == data[col.field]).severity"
+                    :value="data[col.field]" />
+                <span v-else-if="col.type == 'object'" class="flex items-center space-x-2 w-full">
+                    <img v-if="col.objectRows.photo" :src="data[col.objectRows.photo.field]" alt="Image"
+                        onerror="this.src='/svg/cotecmar-logo.svg'"
+                        class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16 object-cover" draggable="false" />
+                    <div>
+                        <p class="font-bold text-sm ">{{
+                            col.objectRows.primary.subfield ?
+                            data[col.objectRows.primary.field][col.objectRows.primary.subfield] :
+                            data[col.objectRows.primary.field]
+                        }} </p>
+                        <p class="text-xs italic">{{
+                            col.objectRows.secundary.subfield ?
+                            data[col.objectRows.secundary.field][col.objectRows.secundary.subfield] :
+                            data[col.objectRows.secundary.field]
+                        }} </p>
                     </div>
-                    <p v-else class="">
-                        {{
-                            data[col.field]
-                        }}
-                    </p>
                 </span>
+                <span v-else-if="col.type == 'button'" class="w-full">
+                    <Button :label="String(data[col.field])" class="w-full" :icon="col.icon" :outlined="col.outlined"
+                        :text="col.text" :severity="col.severity" :rounded="col.rounded"
+                        @click="$emit(col.event, $event, data)">
+                    </Button>
+                </span>
+                <p v-else class="">
+                    {{
+                        data[col.field]
+                    }}
+                </p>
             </template>
-
         </Column>
 
-        <Column frozen alignFrozen="right" class="w-[8%]" v-if="props.actions.length > 0">
+        <Column frozen alignFrozen=" right" class="w-[8%]" v-if="props.actions.length > 0">
             <template #body="{ data }">
                 <div class="flex items-center justify-center w-full">
                     <Button v-for="button in props.actions" @click="$emit(button.event, $event, data)" :text="button.text"
