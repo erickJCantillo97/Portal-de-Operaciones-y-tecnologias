@@ -1,10 +1,11 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/vue/20/solid'
 import OverlayPanel from 'primevue/overlaypanel';
 import VueApexCharts from 'vue3-apexcharts';
-import CustomInput from './CustomInput.vue';
-import InputNumber from 'primevue/inputnumber';
+import Toast from 'primevue/toast';
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 const rateT = ref()
 const rateY = ref()
 const change = ref()
@@ -39,7 +40,7 @@ const toggle = (event) => {
             curve: 'straight'
         },
         title: {
-            text: 'Historial USD',
+            text: 'Historial TRM',
             align: 'center'
         },
         grid: {
@@ -107,7 +108,6 @@ onMounted(() => {
         consultaTRM()
     } catch (error) {
         consultaTRM()
-        console.log(error)
     }
     // var elemento = document.getElementById("trmdolar");
     // elemento.addEventListener("mouseenter", function () {
@@ -117,7 +117,17 @@ onMounted(() => {
 })
 const peso = ref(null)
 const dolar = ref(null)
-const total = ref()
+const total = ref(null)
+
+const formatCurrency = (valor, moneda, decimal) => {
+    total.value = valor
+    return total.value.toLocaleString('es-CO',
+        { style: 'currency', currency: moneda, maximumFractionDigits: decimal })
+}
+const copy = () => {
+    navigator.clipboard.writeText(total.value)
+    toast.add({ summary: 'Copiado  al portapapeles', life: 1500 });
+}
 </script>
 <template>
     <div v-if="rate > 0" :key="rate" @click="toggle" id="trmdolar"
@@ -134,19 +144,28 @@ const total = ref()
     <OverlayPanel ref="op" class="max-w-72" :pt="{
         content: '!p-0'
     }">
-        <span class=" space-y-1 grid">
+        <span class="space-y-1 grid">
             <VueApexCharts class="-ml-2" :key="hist" type="area" height="180" :options="chartOptions" :series="series" />
-            <span class="flex items-center justify-between pb-1 px-1">
-                <span class="w-min flex gap-1 items-center">
-                    <input v-model="peso" v-if="!dolar" type="number" placeholder="Pesos" class="w-28 h-8 rounded-md"
-                        :maxFractionDigits="0" currency="COP" />
-                    <input v-model="dolar" v-if="!peso" type="number" placeholder="Dolares" class="w-28 h-8 rounded-md"
-                        :maxFractionDigits="0" currency="USD" />
-                    <span class="text-sm" v-if="peso">US${{ total=(peso / rateT).toFixed(2), total }}</span>
-                    <span class="text-sm" v-if="dolar">${{ total=(dolar * rateT).toFixed(2), total }}</span>
+            <span class="grid grid-cols-5 items-center justify-between pb-1 px-1 gap-x-2">
+                <input v-model="peso" v-if="!dolar" type="number" placeholder="Pesos" class="col-span-2 h-8 rounded-md" />
+                <span class="text-sm col-span-2" v-if="dolar">{{
+                    formatCurrency((dolar * rateT), 'COP', 0) }}</span>
+                <input v-model="dolar" v-if="!peso" type="number" placeholder="Dolares" class="col-span-2 h-8 rounded-md" />
+                <span class="text-sm col-span-2" v-if="peso">{{
+                    formatCurrency((peso / rateT), 'USD', 2) }}</span>
+                <span class="w-full flex justify-center">
+                    <Button icon="fa-solid fa-copy" :disabled="(!peso & !dolar)" @click="copy"
+                        v-tooltip.bottom="'Copiar al portapapeles'" />
                 </span>
-                <Button icon="fa-solid fa-copy" />
             </span>
         </span>
     </OverlayPanel>
+    <Toast position="bottom-center" :pt="{
+        root: '!h-10 !w-64',
+        container: ' !h-10 !bg-primary !rounded-lg',
+        content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
+        buttonContainer: '!hidden',
+        icon: '!hidden',
+        detail: '!hidden'
+    }" />
 </template>
