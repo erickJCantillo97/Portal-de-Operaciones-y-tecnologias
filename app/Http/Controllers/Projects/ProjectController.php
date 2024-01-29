@@ -106,6 +106,16 @@ class ProjectController extends Controller
         return response()->json($taskProject);
     }
 
+    public function addShips(Request $request, Project $project)
+    {
+        foreach ($request->ships as $ship) {
+            ProjectsShip::create([
+                'project_id' => $project->id,
+                'ship_id' => $ship
+            ]);
+        }
+    }
+
     /**
      * Show the form for editing the specified resource.
      */

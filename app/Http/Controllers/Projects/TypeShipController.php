@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
+use App\Models\Projects\Project;
+use App\Models\Projects\ProjectsShip;
 use App\Models\Projects\TypeShip;
 use Exception;
 use Illuminate\Http\Request;
@@ -86,6 +88,19 @@ class TypeShipController extends Controller
     public function show(TypeShip $typeShip)
     {
         //
+    }
+
+
+    public function getProject(TypeShip $typeShip)
+    {
+        $shipsId = $typeShip->ships->pluck('id')->toArray();
+
+        $projectsID =  ProjectsShip::whereIn('ship_id', $shipsId)->distinct()->pluck('project_id')->toArray();
+
+
+        return response()->json([
+            'project' => Project::whereIn('id', $projectsID)->get()
+        ], 200);
     }
 
     /**

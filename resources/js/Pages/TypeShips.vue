@@ -122,8 +122,8 @@ const rowClick = (event) => {
     visibleSidebar.value = true
 }
 const columns = [
-    { field: 'name', header: 'Nombre' },
-    { field: 'count_ships', header: 'Cascos', class: 'w-24', filter: true, type: 'button', event: 'showHull', severity: 'info', text: true },
+    { field: 'name', header: 'Nombre', sortable: true },
+    { field: 'count_ships', header: 'Cascos', class: 'w-24', sortable: true, filter: true, type: 'button', event: 'showHull', severity: 'info', text: true },
     { field: 'type', header: 'Tipo' },
     { field: 'hull_material', header: 'Material del casco', filter: true },
     { field: 'length', header: 'Eslora' },
