@@ -10,4 +10,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::resource('categories', CategoryController::class);
     Route::resource('assignmentTool', AssignmentController::class);
     Route::resource('tools', ToolController::class);
+
+
+    
 });
