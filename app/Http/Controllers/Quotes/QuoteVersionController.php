@@ -145,6 +145,7 @@ class QuoteVersionController extends Controller
             'estimador_id' => 'required|numeric',
             'customer_id' => 'required|numeric',
             'observation' => 'nullable|string',
+            'coin' => 'nullable|string',
             'expeted_answer_date' => 'required|date',
             'offer_type' => 'string',
         ]);
@@ -153,6 +154,7 @@ class QuoteVersionController extends Controller
         $validateData['estimador_name'] = $empleado['Usuario'];
         $quoteVersion = QuoteVersion::findOrFail($id)->update([
             'estimador_id' => $validateData['estimador_id'],
+            'coin' => $validateData['coin'],
             'customer_id' => $validateData['customer_id'],
             'observation' => $validateData['observation'],
             'estimador_name' => $validateData['estimador_name'],

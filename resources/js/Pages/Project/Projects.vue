@@ -193,6 +193,7 @@ const columnas = [
     { field: 'SAP_code', header: 'Código SAP', filter: true, sortable: true },
     { field: 'name', header: 'Nombre', filter: true, sortable: true },
     { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true },
+    { field: 'contract.contract_id', header: 'Gerencia', filter: true, sortable: true },
     { field: 'cost_sale', header: 'Costo de Venta', type: 'currency', filter: true, sortable: true },
     { field: 'end_date', header: 'Fecha Finalización', filter: true, sortable: true },
     {

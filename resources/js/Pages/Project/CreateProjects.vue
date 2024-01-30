@@ -149,6 +149,7 @@ const beforeChange = async () => {
     formData.type = typeSelect.value?.name ?? null
     formData.status = statusSelect.value?.name ?? null
     formData.scope = scopeSelect.value?.name ?? null
+    formData.contract_id = contractSelect.value?.id ?? null
     formData.ships = selectedShips.value
     let switchTabsStates = false
 
