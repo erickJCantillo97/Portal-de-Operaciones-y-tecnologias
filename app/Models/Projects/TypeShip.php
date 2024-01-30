@@ -16,7 +16,7 @@ class TypeShip extends Model implements Auditable
 
     protected $guarded = [];
 
-    protected $appends = ['count_ships'];
+    protected $appends = ['count_ships',];
 
     protected $casts = [
         'length' => 'decimal:2',
@@ -41,6 +41,6 @@ class TypeShip extends Model implements Auditable
 
     public function getCountShipsAttribute()
     {
-        return $this->ships->count();
+        return $this->ships->count() == 0 ? '-' : $this->ships->count();
     }
 }

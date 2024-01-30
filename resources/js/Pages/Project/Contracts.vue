@@ -88,7 +88,7 @@ const columnas = [
     { field: 'quote.customer.name', header: 'Cliente', filter: true, sortable: true },
     { field: 'start_date', header: 'Fecha Inicio', filter: true, sortable: true, type: 'date' },
     { field: 'end_date', header: 'Fecha Finalización', filter: true, sortable: true, type: 'date' },
-    { field: 'quote.total_cost', header: 'Costo', filter: true, sortable: true, type: 'currency' },
+    { field: 'total_cost', header: 'Costo', filter: true, sortable: true, type: 'currency' },
 ]
 const buttons = [
     { event: 'edit', severity: 'primary', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },

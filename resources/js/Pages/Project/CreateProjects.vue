@@ -114,7 +114,6 @@ const formData = useForm({
 onMounted(() => {
     getShift()
     getProjectsPropsForEdit()
-    initFilters()
 })
 
 const toggleSelectShip = (shipId) => {
@@ -150,6 +149,7 @@ const beforeChange = async () => {
     formData.type = typeSelect.value?.name ?? null
     formData.status = statusSelect.value?.name ?? null
     formData.scope = scopeSelect.value?.name ?? null
+    formData.contract_id = contractSelect.value?.id ?? null
     formData.ships = selectedShips.value
     let switchTabsStates = false
 
@@ -182,13 +182,16 @@ const submit = async () => {
     // TO DO store onComplete()
     // return false
     toast('Proyecto creado exitosamente!', 'success')
+    router.post(route('project.add.ships', projectIdRef.value), {
+        ships: selectedShips.value
+    });
     router.get(route('projects.index'));
     // try {
     //     formData.ships = selectedShips.value
     //     if (!projectIdRef) {
     //         await axios.post(route('projects.store', projectIdRef), formData)
     //             .then((res) => {
-    //                 switchTabsStates = true
+    //                 switchTabsStates = i
     //             })
     //         return switchTabsStates
     //     } else {
@@ -236,96 +239,14 @@ const getProjectsPropsForEdit = () => {
 //     }
 // })
 
-const loadContractDates = () => {
 
-    const contract = contractSelect.value
-
-    if (contract) {
-        formData.start_date = contract.start_date
-        formData.end_date = contract.end_date
-    }
-}
-
-const loadAuthorizationDates = () => {
-
-    const authorization = authorizationSelect.value
-
-    if (authorization) {
-        formData.start_date = authorization.start_date
-        formData.end_date = authorization.end_date
-    }
-}
-
-const loadQuoteDates = () => {
-
-    const quote = quoteSelect.value
-
-    if (quote) {
-        formData.start_date = quote.start_date
-        formData.end_date = quote.end_date
-    }
-}
-
-const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    }
-}
-
-const clearFilter = () => {
-    initFilters()
-}
 
 function formatDateTime24h(date) {
     return new Date(date).toLocaleString('es-CO',
         { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 }
 
-//#region COMPOSABLES
-// Formatear el número en moneda (USD)
-const formatCurrency = (value) => {
-    return parseFloat(value).toLocaleString('es-CO', {
-        style: 'currency',
-        currency: 'COP'
-    })
-}
 
-const getContractStatusSeverity = (project) => {
-    switch (project.status) {
-        case 'INICIADO':
-            return 'info'
-
-        case 'PROCESO':
-            return 'warning'
-
-        case 'PENDIENTE':
-            return 'danger'
-
-        case 'FINALIZADO':
-            return 'success'
-
-        default:
-            return null
-    }
-}
-
-const exportarExcel = () => {
-    //console.log(dt.value)
-    // Acquire Data (reference to the HTML table)
-    var table_elt = document.getElementById("tabla")
-
-    var workbook = XLSX.utils.table_to_book(table_elt)
-
-    var ws = workbook.Sheets["Sheet1"]
-    XLSX.utils.sheet_add_aoa(ws, [
-        ["Creado " + new Date().toISOString()]
-    ], { origin: -1 })
-
-    // Package and Release Data (`writeFile` tries to write and save an XLSB file)
-    XLSX.writeFile(workbook, 'Lista de Contratos_' + project.nit + '_' + project.name + ".xlsb")
-}
-//#endregion
 </script>
 
 <style scoped>
@@ -558,9 +479,9 @@ const exportarExcel = () => {
                             <input v-if="props.ships != 0" type="search" v-model="keyword" @input="searchShips()"
                                 class="rounded-lg border-2 border-gray-200 w-full placeholder:italic"
                                 placeholder="Filtrar Buques" />
-                            <ToggleButton v-if="props.ships != 0" v-model="checked" onLabel="Seleccionar todo" offLabel="Deseleccionar todo"
-                                onIcon="pi pi-check-square" offIcon="pi pi-stop" aria-label="Do you confirm"
-                                @click="selectAllShips()" :pt="{
+                            <ToggleButton v-if="props.ships != 0" v-model="checked" onLabel="Seleccionar todo"
+                                offLabel="Deseleccionar todo" onIcon="pi pi-check-square" offIcon="pi pi-stop"
+                                aria-label="Do you confirm" @click="selectAllShips()" :pt="{
                                     root: '!w-56 !h-full !border-blue-800 !bg-transparent',
                                     label: '!text-blue-900',
                                     icon: '!text-blue-900',

@@ -57,6 +57,9 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('web')
                 ->group(base_path('routes/Customs/Quotes.php'));
             Route::middleware('web')
+                ->group(base_path('routes/Customs/WereHouse.php'));
+
+            Route::middleware('web')
                 ->prefix('documentManagement')
                 ->group(base_path('routes/Customs/GestionDocumental.php'));
         });

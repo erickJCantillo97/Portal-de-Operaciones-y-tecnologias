@@ -129,14 +129,11 @@ const input = defineModel('input', {
         <span :class="!(label && !floatLabel) ? 'p-float-label' : ''">
             <FileUpload v-if="type == 'file'" mode="basic" name="demo[]" :multiple="false" :accept="acceptFile" :maxFileSize
                 @input="input = $event.target.files[0]" class="w-full h-8" customUpload />
-
             <InputNumber v-else-if="type == 'number'" :id :disabled :placeholder :minFractionDigits :maxFractionDigits
                 class="w-full" :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'"
                 :useGrouping="mode == 'currency' ? '' : useGrouping" :currency="currency" :mode="mode" :suffix :prefix />
-
             <Textarea v-else-if="type == 'textarea'" :id :disabled :placeholder class="w-full"
                 :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
-
             <Dropdown v-else-if="type == 'dropdown'" :id :disabled :placeholder :options :optionLabel :loading
                 :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''" v-model="input"
                 :aria-describedby="id + '-help'" class="w-full" :pt="{
@@ -184,8 +181,8 @@ const input = defineModel('input', {
                 <i v-if="(loading || icon)" :class="loading ? 'pi pi-spin pi-spinner' : icon" />
                 <InputText size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''" v-model="input" :type
                     :aria-describedby="id + '-help'" class="w-full" />
-                <label v-if="floatLabel && label" :for="id" class="">{{ label }}</label>
             </span>
+            <label v-if="floatLabel && label" :for="id" class="">{{ label }}</label>
         </span>
         <small :class="invalid ? 'p-error' : ''" v-if="help || invalid">{{ invalid ? errorMessage : help }}</small>
     </div>

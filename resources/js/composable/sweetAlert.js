@@ -1,8 +1,7 @@
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { router, useForm } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 import "sweetalert2/src/sweetalert2.scss";
 import { singularize, camelize } from "inflected";
-import pluralize from "pluralize";
 export function useSweetalert() {
     const Toast = Swal.mixin({
         toast: true,

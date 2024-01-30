@@ -40,7 +40,7 @@ class QuoteController extends Controller
                 'expeted_answer_date' => $quote['version']['expeted_answer_date'],
                 'consecutive' => $quote['version']['consecutive'],
                 'products' => $quote['version']['quoteTypeShips'],
-                'total_cost' => collect($quote['version']['quoteTypeShips'])->sum('price_before_iva_original'),
+                'total_cost' => collect($quote['version']['total_cost']),
                 'clases' => implode(', ', collect($quote['version']['quoteTypeShips'])->pluck('name')->toArray())
             ];
         });

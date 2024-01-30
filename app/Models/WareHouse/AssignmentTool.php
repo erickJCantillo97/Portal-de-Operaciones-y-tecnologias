@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Quotes;
+namespace App\Models\WareHouse;
 
 use App\Models\Scopes\GerenciaScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
-class Quote extends Model implements Auditable
+class AssignmentTool extends Model implements Auditable
 {
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
@@ -19,12 +19,5 @@ class Quote extends Model implements Auditable
     protected static function booted(): void
     {
         static::addGlobalScope(new GerenciaScope);
-    }
-
-    public function version()
-    {
-        return $this->belongsTo(QuoteVersion::class, 'current_version_id')->withDefault(function ($version) {
-            $version->version = 0;
-        });;
     }
 }

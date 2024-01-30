@@ -22,6 +22,8 @@ class Contract extends Model implements Auditable
 
     protected $guarded = [];
 
+    protected $appends = ['total_cost'];
+
     // public function customer()
     // {
     //     return $this->belongsTo(Customer::class);
@@ -30,5 +32,10 @@ class Contract extends Model implements Auditable
     public function quote()
     {
         return $this->belongsTo(QuoteVersion::class, 'quote_id');
+    }
+
+    public function getTotalCostAttribute()
+    {
+        return [$this->quote->total_cost ?? 0, isset($this->quote->coin) ?  $this->quote->coin : 'COP'];
     }
 }
