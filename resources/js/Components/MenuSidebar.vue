@@ -76,6 +76,7 @@ import {
     FolderIcon,
     HomeIcon,
     UsersIcon,
+    WrenchScrewdriverIcon
 } from '@heroicons/vue/24/outline'
 
 const { hasRole } = usePermissions();
@@ -215,6 +216,25 @@ const navigation = [
         icon: DocumentDuplicateIcon,
         current: true,
         show: true
+    },
+    {
+        name: 'Almacén',
+        children: [
+            {
+                name: 'Categorías',
+                href: 'categories.index',
+            },
+            {
+                name: 'Herramientas y Equipos',
+                href: 'tools.index',
+            },
+            {
+                name: 'Asignaciones',
+                href: 'assignmentTool.index',
+            },
+        ],
+        icon: WrenchScrewdriverIcon,
+        current: false
     },
     // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon, current: false },
     // { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
