@@ -125,7 +125,6 @@ const formatCurrency = (valor, moneda) => {
     if (valor == undefined || valor == null) {
         return 'Sin definir'
     } else {
-        console.log(valor)
         return parseInt(valor).toLocaleString('es-CO',
             { style: 'currency', currency: moneda == null ? 'COP' : moneda, maximumFractionDigits: 0 })
     }

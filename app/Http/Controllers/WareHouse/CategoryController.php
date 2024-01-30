@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\WareHouse\Category;
 use Exception;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
@@ -14,7 +15,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render('WareHouse/Categories', [
+            'category' => Category::get()]);
     }
 
     /**
