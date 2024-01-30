@@ -1,6 +1,10 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import CustomDataTable from '@/Components/CustomDataTable.vue';
+import CustomModal from '@/Components/CustomModal.vue';
+import { ref } from 'vue';
+import { useForm } from '@inertiajs/vue3';
+import CustomInput from '@/Components/CustomInput.vue';
 
 const props = defineProps({
     categories: {
@@ -8,6 +12,10 @@ const props = defineProps({
         default: []
     }
 });
+
+const modalVisible = ref(false)
+
+const form = useForm({})
 
 // $table->id();
 // $table->integer('user_id')->index();
@@ -39,15 +47,37 @@ const actions = [
 
 <template>
     <AppLayout>
-        <CustomDataTable :data="categories" title="Categorias" :columnas="columnas" :actions="actions">
-            <template #buttonHeader>
-                <Button label="Nuevo" icon="fa-solid fa-plus" />
-            </template>
-        </CustomDataTable>
+        <div class="h-[89vh] overflow-y-auto">
+            <CustomDataTable :rowsDefault="20" :data="categories" title="Categorias" :columnas="columnas" :actions="actions">
+                <template #buttonHeader>
+                    <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="modalVisible = true" />
+                </template>
+            </CustomDataTable>
+    </div>
     </AppLayout>
-    <CustomModal>
+    <CustomModal v-model:visible="modalVisible">
+        <template #icon>
+            <i class="fa-solid text-white fa-table-list"></i>
+        </template>
+        <template #titulo>
+            <span class="text-lg font-bold text-white white-space-nowrap">
+                Agregar
+            </span>
+        </template>
         <template #body>
-
+            <span class="grid grid-cols-2 gap-2">
+                <CustomInput label="Nombre" v-model:input="form.name" placeholder="Nombre para mostrar"></CustomInput>
+                <CustomInput label="Letra" v-model:input="form.letter" placeholder="Letra que lo identificara"></CustomInput>
+                <CustomInput label="Tipo" v-model:input="form.level" type="dropdown" placeholder="Selecciona una categoria" :options="['Grupo','SubGrupo','Categoria']" ></CustomInput>
+                <CustomInput label="Requiere calibracion?" v-model:input="form.calibration"></CustomInput>
+                <CustomInput label="Estado" v-model:input="form.status"></CustomInput>
+            </span>
+        </template>
+        <template #footer>
+            <Button severity="primary" outlined label="Guardar" icon="fa-solid fa-floppy-disk"
+                @click="modalType == 'new' ? save() : edit()" />
+            <Button severity="danger" outlined label="Cancelar" icon="fa-regular fa-circle-xmark"
+                @click="modalVisible = false; typeShip.reset()" />
         </template>
     </CustomModal>
 </template>
