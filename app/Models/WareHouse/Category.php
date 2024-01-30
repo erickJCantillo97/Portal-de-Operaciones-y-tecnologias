@@ -14,4 +14,9 @@ class Category extends Model implements Auditable
     use SoftDeletes;
 
     protected $guarded = [];
+
+    public function padre()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
 }
