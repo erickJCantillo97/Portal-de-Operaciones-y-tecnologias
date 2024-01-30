@@ -3,14 +3,12 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { Container, Draggable } from "vue-dndrop";
-import { XMarkIcon, PencilIcon, TrashIcon } from "@heroicons/vue/20/solid";
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import { useSweetalert } from '@/composable/sweetAlert';
 import Knob from 'primevue/knob';
 import FullCalendar from '@/Components/FullCalendar.vue'
 import OverlayPanel from 'primevue/overlaypanel';
 import Dropdown from 'primevue/dropdown';
-import Calendar from 'primevue/calendar';
 import Loading from '@/Components/Loading.vue';
 import CustomInput from '@/Components/CustomInput.vue';
 import TabView from 'primevue/tabview';
@@ -379,8 +377,8 @@ const toggle = (event, horario) => {
                     @click="optionSelectHours = 'new'; nuevoHorario = null; nuevoHorario = {}; nuevoHorario.name = null; nuevoHorario.startShift = null; nuevoHorario.endShift" />
             </span>
             <div v-if="optionSelectHours == 'select'" class="col-span-3">
-                <Dropdown v-model="nuevoHorario" :options="props.hours" optionLabel="name" placeholder="Selecciona un horario"
-                    class="w-full md:w-14rem" :pt="{
+                <Dropdown v-model="nuevoHorario" :options="props.hours" optionLabel="name"
+                    placeholder="Selecciona un horario" class="w-full md:w-14rem" :pt="{
                         root: '!h-8 ',
                         input: '!py-0 !flex !items-center !text-sm !font-normal',
                         item: '!py-1 !px-3 !text-sm !font-normal',
@@ -434,10 +432,13 @@ const toggle = (event, horario) => {
                 </div>
             </div>
             <span v-if="optionSelectHours == 'new'" class="col-span-3">
-                <CustomInput v-model:input="nuevoHorario.name" label="Nombre" type="text" id="name" placeholder="Nombre del horario" />
+                <CustomInput v-model:input="nuevoHorario.name" label="Nombre" type="text" id="name"
+                    placeholder="Nombre del horario" />
                 <span class="grid grid-cols-2 gap-x-1">
-                    <CustomInput v-model:input="nuevoHorario.startShift" label="Hora inicio" type="time" id="start" placeholder="Hora de inicio" />
-                    <CustomInput v-model:input="nuevoHorario.endShift" label="Hora fin" type="time" id="end" placeholder="Hora de fin" />
+                    <CustomInput v-model:input="nuevoHorario.startShift" label="Hora inicio" type="time" id="start"
+                        placeholder="Hora de inicio" />
+                    <CustomInput v-model:input="nuevoHorario.endShift" label="Hora fin" type="time" id="end"
+                        placeholder="Hora de fin" />
                 </span>
             </span>
             <span class="col-span-3 flex justify-end">
@@ -523,5 +524,6 @@ const toggle = (event, horario) => {
                 </div>
             </div>
         </Dialog>
-</TransitionRoot>
-<!--#endregion--></template>
+    </TransitionRoot>
+    <!--#endregion-->
+</template>
