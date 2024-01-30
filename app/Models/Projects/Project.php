@@ -53,4 +53,12 @@ class Project extends Model implements Auditable
     {
         return $this->belongsTo(Shift::class);
     }
+
+    public function costSale(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $value,
+            get: fn ($value) => [$value == 0 ? ($this->contract->quote->total_cost ?? 0) : $value, $this->contract->quote->coin ?? 'COP'],
+        );
+    }
 }

@@ -66,13 +66,11 @@ class QuoteVersion extends Model
     }
     public function getTotalCostAttribute()
     {
-        return $this->quoteTypeShips->sum('price_before_iva_original');
+        return [$this->quoteTypeShips->sum('price_before_iva_original'), $this->coin];
     }
 
     public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');
     }
-
-
 }
