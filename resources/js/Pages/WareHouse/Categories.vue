@@ -30,10 +30,11 @@ const form = useForm({})
 
 const columnas = [
     { field: 'name', header: 'Nombre' },
-    { field: 'letter', header: 'Letra' },
-    { field: 'level', header: 'Nivel' },
-    { field: 'calibration', header: 'Calibracion' },
-    { field: 'status', header: 'Estado' },
+    { field: 'padre.name', header: 'Sub Grupo' },
+    { field: 'padre.letter', header: 'Letra' },
+    { field: 'padre.padre.name', header: 'Grupo' },
+    { field: 'padre.padre.letter', header: 'Letra' },
+    // { field: 'status', header: 'Estado' },
 ]
 
 const actions = [
