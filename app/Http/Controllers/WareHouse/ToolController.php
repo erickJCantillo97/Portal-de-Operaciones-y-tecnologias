@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\WareHouse;
 
 use App\Http\Controllers\Controller;
+use App\Models\WareHouse\Category;
 use App\Models\WareHouse\Tool;
+use DateTime;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class ToolController extends Controller
@@ -45,11 +48,27 @@ class ToolController extends Controller
         try {
             $validateData['gerencia'] = auth()->user()->gerencia;
             $validateData['responsible_id'] = auth()->user()->gerencia;
-
+            $validateData['code'] = $this->createCode($validateData);
+            $validateData['responsable'] = auth()->user()->id;
+            $validateData['es_pequeño'] = 0;
+            // $validateData['criticidad'] = 0;
             Tool::create($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
+    }
+
+
+    protected function createCode($data)
+    {
+        $categoria = Category::where('id', $data['category_id'])->first();
+        $equipo = Tool::whereHas('category.padre', function (Builder $query) use ($categoria) {
+            $query->where('id', $categoria->padre->id);
+        })->where("es_pequeño", 0)->latest()->first();
+
+        $valor = isset($equipo->codigo_interno) ? substr($equipo->codigo_interno, -3, 3) : 0;
+
+        return $categoria->padre->padre->letra . "" . $categoria->padre->letra . "" . date_format(new DateTime($data['fecha_ingreso']), "y") . "01" . str_pad(($valor + 1), 3, '0', STR_PAD_LEFT);
     }
 
 

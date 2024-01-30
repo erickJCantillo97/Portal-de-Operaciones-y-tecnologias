@@ -20,4 +20,19 @@ class Tool extends Model implements Auditable
     {
         static::addGlobalScope(new GerenciaScope);
     }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('estado_operativo', '<>', 'BAJA');
+    }
+
+    public function asignaciones()
+    {
+        return $this->HasMany(AssignmentTool::class, 'tool_id');
+    }
 }
