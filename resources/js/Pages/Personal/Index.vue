@@ -7,13 +7,15 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api'
 import { useSweetalert } from '@/composable/sweetAlert'
 import Textarea from 'primevue/textarea'
 import InputText from 'primevue/inputtext'
+import Accordion from 'primevue/accordion'
+import AccordionTab from 'primevue/accordiontab'
 import UserTable from '@/Components/UserTable.vue'
 import Listbox from 'primevue/listbox'
 import CustomModal from '@/Components/CustomModal.vue'
 import Loading from '@/Components/Loading.vue'
 import NoContentToShow from '@/Components/NoContentToShow.vue'
-import CustomDataTable from '@/Components/CustomDataTable.vue';
-import Dropdown from 'primevue/dropdown';
+import CustomDataTable from '@/Components/CustomDataTable.vue'
+import Dropdown from 'primevue/dropdown'
 const { toast } = useSweetalert()
 const { confirmDelete } = useSweetalert()
 
@@ -24,8 +26,11 @@ const props = defineProps({
 })
 
 const personal = ref([])
-const groupSelect = ref(props.group)
+const filterGroup = ref()
+const groupSelected = ref([])
 const loading = ref(false)
+const loadingPersonal = ref(false)
+const loadingGroups = ref(false)
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
@@ -54,23 +59,39 @@ const submit = () => {
 }
 
 const getPersonal = async () => {
-    loading.value = true
-    await axios.get(route('personal.activos'))
-        .then((res) => {
-            personal.value = res.data.personal
-            loading.value = false
-            noContentToShow.value = true
-        })
+    loadingPersonal.value = true
+    try {
+        await axios.get(route('personal.activos'))
+            .then((res) => {
+                personal.value = res.data.personal
+                loadingPersonal.value = false
+                noContentToShow.value = true
+            })
+    } catch (error) {
+        console.error(error)
+    }
 }
 
+const groupPersonal = ref([])
+const noMembersToShow = ref(false)
+
 const getPersonalUser = async () => {
-    loading.value = true
-    await axios.get(route('get.personal.user'), id)
-        .then((res) => {
-            personal.value = res.data.personal
-            loading.value = false
-            noContentToShow.value = true
-        })
+    loadingGroups.value = true
+    try {
+        if (groupSelected.value.id != null) {
+            await axios.get(route('get.personal.user', groupSelected.value.id))
+                .then((res) => {
+                    groupPersonal.value = res.data.personal
+                    loadingGroups.value = false
+                    noContentToShow.value = true
+                })
+        } else {
+            noMembersToShow.value = true
+            console.log('Por favor seleccione un grupo')
+        }
+    } catch (error) {
+        console.error(error)
+    }
 }
 
 const modalVisible = ref(false)
@@ -158,9 +179,26 @@ const getPersonalFilter = (event) => {
 }
 //#endregion
 
-
 const quitar = (persona) => {
     form.users = form.users.filter(object => object.Num_SAP !== persona.Num_SAP);
+}
+
+const addMemberToGroup = (member) => {
+    console.log('Agregando miembro... ¿o no?')
+    // router.put(route('teams.update', member),
+    //     { name: teamworkName.value, description: descriptionValue.value, personal: form.members }, {
+    //     onSuccess: () => {
+    //         teamworkName.value = ''
+    //         descriptionValue.value = ''
+    //         // form.members = []
+    //         // showGroupDialog.value = false
+    //         showCreateGroupSection = false
+    //         toast(`¡Grupo "${teamworkName.value}" creado exitosamente!`, 'success')
+    //     },
+    //     onError: (error) => {
+    //         toast(`Ha ocurrido un error al crear el grupo \n ${teamworkName.value}; ERROR: ${error}`, 'error')
+    //     }
+    // })
 }
 
 const removeMemberOfGroup = (member) => {
@@ -196,8 +234,8 @@ const buttons = [
                 <CustomDataTable title="Mi personal" :loading :rowsDefault="20" :data="miPersonal" :columnas="columnas"
                     :actions="buttons" @delete="del">
                     <template #buttonHeader>
-                        <span v-if="groupSelect" class="mr-10">Filtrado por grupo "{{ groupSelect.name }}"</span>
-                        <Dropdown v-model="groupSelect" @change="getPersonalFilter" :options="groups" showClear
+                        <span v-if="filterGroup" class="mr-10">Filtrado por grupo "{{ filterGroup.name }}"</span>
+                        <Dropdown v-model="filterGroup" @change="getPersonalFilter" :options="groups" showClear
                             optionLabel="name" placeholder="Mis grupos" :pt="{
                                 root: '!h-8',
                                 input: '!py-0 !flex !items-center',
@@ -306,23 +344,22 @@ const buttons = [
                             </div>
                         </div>
                         <!--COLUMNA SELECCIONAR GRUPO-->
-                        <div class="border-0 ">
+                        <div class="border-0">
                             <div class="flex place-content-between mb-2">
                                 <label class="mr-8">Seleccionar Grupo</label>
                                 <Button v-if="!showCreateGroupSection" label="Nuevo" icon="pi pi-plus"
                                     @click="showCreateGroupSection = true" size="small" />
-                                <Button v-if="form.members.length != 0 && !showCreateGroupSection" label="Editar"
+                                <Button v-if="groupSelected != 0 && !showCreateGroupSection" label="Editar"
                                     icon="pi pi-pencil" severity="warning" size="small" @click="editGroup()" :pt="{
                                         label: '!text-slate-900'
                                     }" />
-                                <Button v-if="form.members.length != 0 && !showCreateGroupSection" label="Eliminar"
+                                <Button v-if="groupSelected != 0 && !showCreateGroupSection" label="Eliminar"
                                     icon="pi pi-trash" severity="danger" size="small" @click="deleteGroup()" />
                             </div>
-                            <Listbox multiple v-model="form.members" listStyle="height:385px"
-                                filterPlaceholder="Buscar Grupo"
-                                :filterFields="['Nombres_Apellidos', 'Cargo', 'Identificacion', 'Oficina']" :filter="true"
+                            <Listbox v-model="groupSelected" listStyle="height:385px" @change="getPersonalUser()"
+                                filterPlaceholder="Buscar Grupo" :filterFields="['name', 'description']" :filter="true"
                                 :options="groups" filter optionLabel="name" class="w-full md:w-14rem"
-                                :loading="form.members.length == 0 ? noContentToShow : groups.length">
+                                :loading="groupSelected == 0 ? noContentToShow : groups.length">
                                 <template #option="slotProps">
                                     <div class="p-1">
                                         <p class="text-md font-semibold">
@@ -347,15 +384,45 @@ const buttons = [
                                     "{{ props.groups[0].name != null ? props.groups[0].name : 'No hay Grupos Creados' }}"
                                 </h3>
                             </div>
-                            <div class="block space-y-4 h-[475px] custom-scroll overflow-y-auto shadow-lg rounded-lg p-2">
-                                <div v-for="member of form.members" class="flex justify-between">
-                                    <UserTable :user="member" :photo="true" />
-                                    <div>
-                                        <Button severity="danger" @click="removeMemberOfGroup(member)"
-                                            icon="fa-regular fa-trash-can" text />
+                            <Accordion :activeIndex="0">
+                                <!--Miembros del grupo-->
+                                <AccordionTab header="Miembros del Grupo" :pt="{
+                                    root: '!border-0 !ring-0',
+                                    headerAction: '!bg-slate-200 !px-4 !py-1 mb-1',
+                                    headerTitle: '!text-sm',
+                                    // content: '!h-52'
+                                }">
+                                    <!-- <div class="block space-y-4 h-[475px] custom-scroll overflow-y-auto shadow-lg rounded-lg p-2"> -->
+                                    <div v-for="member of groupPersonal" class="flex justify-between">
+                                        <UserTable :user="member" :photo="true" />
+                                        <div>
+                                            <Button severity="danger" @click="removeMemberOfGroup(member)"
+                                                icon="fa-regular fa-trash-can" text />
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
+                                    <!--TODO CONTENTS MESSAGES-->
+                                    <div v-if="noMembersToShow = true" class="size-52">
+                                        <p>Por favor seleccione un grupo para visualizar sus miembros.</p>
+                                    </div>
+                                    <!-- </div> -->
+                                </AccordionTab>
+
+                                <!--Agregar personal al grupo-->
+                                <AccordionTab header="Agregar personal al grupo" :pt="{
+                                    root: '!border-0 !ring-0',
+                                    headerAction: '!bg-slate-200 !px-4 !py-1 mb-1',
+                                    headerTitle: '!text- sm',
+                                    // content: '!h-20'
+                                }">
+                                    <div v-for="member of props.miPersonal" class="flex justify-between space-y-4">
+                                        <UserTable :user="member" :photo="true" />
+                                        <div>
+                                            <Button severity="success" @click="addMemberToGroup(member)"
+                                                icon="fa-solid fa-plus" outlined />
+                                        </div>
+                                    </div>
+                                </AccordionTab>
+                            </Accordion>
                         </div>
                     </div>
                 </div>

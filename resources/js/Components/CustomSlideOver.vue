@@ -253,7 +253,7 @@ const formatCurrency = (value) => {
                                         <AccordionTab v-for="product in  quote.products " :pt="{
                                             root: '!border-0 !ring-0',
                                             headerAction: '!bg-slate-200 !px-4 !py-1 mb-1',
-                                            headerTitle: '!text- sm',
+                                            headerTitle: '!text- sm'
                                         }">
                                             <template #header>
                                                 <div class="block gap-2 w-full">
