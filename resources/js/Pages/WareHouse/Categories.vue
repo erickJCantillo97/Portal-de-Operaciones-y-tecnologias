@@ -22,10 +22,11 @@ const props = defineProps({
 
 const columnas = [
     { field: 'name', header: 'Nombre' },
-    { field: 'letter', header: 'Letra' },
-    { field: 'level', header: 'Nivel' },
-    { field: 'calibration', header: 'Calibracion' },
-    { field: 'status', header: 'Estado' },
+    { field: 'padre.name', header: 'Sub Grupo' },
+    { field: 'padre.letter', header: 'Letra' },
+    { field: 'padre.padre.name', header: 'Grupo' },
+    { field: 'padre.padre.letter', header: 'Letra' },
+    // { field: 'status', header: 'Estado' },
 ]
 
 const actions = [
@@ -40,7 +41,7 @@ const actions = [
     <AppLayout>
         <CustomDataTable :data="categories" title="Categorias" :columnas="columnas" :actions="actions">
             <template #buttonHeader>
-                <Button label="Nuevo" icon="fa-solid fa-plus"/> 
+                <Button label="Nuevo" icon="fa-solid fa-plus" />
             </template>
         </CustomDataTable>
     </AppLayout>

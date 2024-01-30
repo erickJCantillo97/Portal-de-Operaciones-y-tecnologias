@@ -18,7 +18,7 @@ class CategoryController extends Controller
     {
 
         return Inertia::render('WareHouse/Categories', [
-            'category' => Category::get()
+            'categories' => Category::has('padre')->with('padre', 'padre.padre')->where('level', 'Descripcion')->get()
         ]);
     }
 
