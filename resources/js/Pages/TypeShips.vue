@@ -10,6 +10,9 @@ import CustomDataTable from '@/Components/CustomDataTable.vue';
 import CustomInput from '@/Components/CustomInput.vue';
 import Sidebar from 'primevue/sidebar';
 import OverlayPanel from 'primevue/overlaypanel';
+import axios from 'axios';
+import Card from 'primevue/card'
+import Tag from 'primevue/tag';
 const { toast } = useSweetalert();
 const { confirmDelete } = useSweetalert();
 
@@ -119,6 +122,10 @@ const visibleSidebar = ref(false)
 const dataSidebar = ref()
 const rowClick = (event) => {
     dataSidebar.value = event.data
+    dataSidebar.value.projects = []
+    axios.get(route('typeship.get.project', event.data.id)).then(response => {
+        dataSidebar.value.projects = response.data.project
+    })
     visibleSidebar.value = true
 }
 const columns = [
@@ -225,68 +232,87 @@ const showHull = (event, data) => {
         </template>
     </CustomModal>
 
-    <Sidebar v-model:visible="visibleSidebar" header="Right Sidebar" :showCloseIcon="false" position="right">
-        <span class="grid grid-cols-2 gap-1">
-            <p class="font-bold">Nombre</p>
-            <p class="">{{ dataSidebar.name }}</p>
-            <p class="font-bold">Tipo:</p>
-            <p class="">{{ dataSidebar.type }}</p>
-            <p class="font-bold">Diseñador:</p>
-            <p class="">{{ dataSidebar.disinger }}</p>
+    <Sidebar v-model:visible="visibleSidebar" :showCloseIcon="false" position="right">
+        <span class="flex justify-center">
+            <img :src="dataSidebar.render" alt="ImageShip" onerror="this.src='/svg/cotecmar-logo.svg'"
+                class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16 object-cover" draggable="false" />
+        </span>
 
-            <p class="font-bold">Material del casco:</p>
-            <p class="">{{ dataSidebar.hull_material }}</p>
+        <p class="font-bold text-center">{{ dataSidebar.name }}</p>
+        <p class="text-center">{{ dataSidebar.type }}</p>
+        <span class="grid grid-cols-2 gap-1 text-sm">
+            <p v-if="dataSidebar.disinger" class="font-bold">Diseñador:</p>
+            <p v-if="dataSidebar.disinger" class="">{{ dataSidebar.disinger }}</p>
 
-            <p class="font-bold">Eslora:</p>
-            <p class="">{{ dataSidebar.length }}</p>
+            <p v-if="dataSidebar.hull_material" class="font-bold h-full flex items-center">Material del casco:</p>
+            <p v-if="dataSidebar.hull_material" class="">{{ dataSidebar.hull_material }}</p>
 
-            <p class="font-bold">Manga:</p>
-            <p class="">{{ dataSidebar.breadth }}</p>
+            <p v-if="dataSidebar.length" class="font-bold">Eslora:</p>
+            <p v-if="dataSidebar.length" class="">{{ dataSidebar.length }} m</p>
 
-            <p class="font-bold">Calado:</p>
-            <p class="">{{ dataSidebar.draught }}</p>
+            <p v-if="dataSidebar.breadth" class="font-bold">Manga:</p>
+            <p v-if="dataSidebar.breadth" class="">{{ dataSidebar.breadth }} m</p>
 
-            <p class="font-bold">Puntal:</p>
-            <p class="">{{ dataSidebar.depth }}</p>
+            <p v-if="dataSidebar.draught" class="font-bold">Calado:</p>
+            <p v-if="dataSidebar.draught" class="">{{ dataSidebar.draught }} m</p>
 
-            <p class="font-bold">Full Load:</p>
-            <p class="">{{ dataSidebar.full_load }}</p>
+            <p v-if="dataSidebar.depth" class="font-bold">Puntal:</p>
+            <p v-if="dataSidebar.depth" class="">{{ dataSidebar.depth }} m</p>
 
-            <p class="font-bold">Light Ship:</p>
-            <p class="">{{ dataSidebar.light_ship }}</p>
+            <p v-if="dataSidebar.full_load" class="font-bold">Full Load:</p>
+            <p v-if="dataSidebar.full_load" class="">{{ dataSidebar.full_load }} m</p>
 
-            <p class="font-bold">Potencia:</p>
-            <p class="">{{ dataSidebar.power_total }}</p>
+            <p v-if="dataSidebar.light_ship" class="font-bold">Light Ship:</p>
+            <p v-if="dataSidebar.light_ship" class="">{{ dataSidebar.light_ship }} m</p>
 
-            <p class="font-bold">Tipo de propulsion:</p>
-            <p class="">{{ dataSidebar.propulsion_type }}</p>
+            <p v-if="dataSidebar.power_total" class="font-bold">Potencia:</p>
+            <p v-if="dataSidebar.power_total" class="">{{ dataSidebar.power_total }} kw/h</p>
 
-            <p class="font-bold">Velocidad maxima:</p>
-            <p class="">{{ dataSidebar.velocity }}</p>
+            <p v-if="dataSidebar.propulsion_type" class="font-bold">Tipo de propulsion:</p>
+            <p v-if="dataSidebar.propulsion_type" class="">{{ dataSidebar.propulsion_type }}</p>
 
-            <p class="font-bold">Autonomia:</p>
-            <p class="">{{ dataSidebar.autonomias }}</p>
-            <p class="font-bold">Alcance:</p>
-            <p class="">{{ dataSidebar.autonomy }}</p>
-            <p class="font-bold">Tripulacion maxima:</p>
-            <p class="">{{ dataSidebar.crew }}</p>
+            <p v-if="dataSidebar.velocity" class="font-bold">Velocidad maxima:</p>
+            <p v-if="dataSidebar.velocity" class="">{{ dataSidebar.velocity }} nudos</p>
 
-            <p class="font-bold">GT:</p>
-            <p class="">{{ dataSidebar.GT }}</p>
+            <p v-if="dataSidebar.autonomias" class="font-bold">Autonomia:</p>
+            <p v-if="dataSidebar.autonomias" class="">{{ dataSidebar.autonomias }} dias</p>
 
-            <p class="font-bold">CGT:</p>
-            <p class="">{{ dataSidebar.CGT }}</p>
+            <p v-if="dataSidebar.autonomy" class="font-bold">Alcance:</p>
+            <p v-if="dataSidebar.autonomy" class="">{{ dataSidebar.autonomy }}</p>
 
-            <p class="font-bold">Bollard pull:</p>
-            <p class="">{{ dataSidebar.bollard_pull }}</p>
+            <p v-if="dataSidebar.crew" class="font-bold">Tripulacion:</p>
+            <p v-if="dataSidebar.crew" class="">{{ parseInt(dataSidebar.crew) }} personas</p>
 
-            <p class="font-bold">Clasificacion:</p>
-            <p class="">{{ dataSidebar.clasification }}</p>
+            <p v-if="dataSidebar.GT" class="font-bold">GT:</p>
+            <p v-if="dataSidebar.GT" class="">{{ dataSidebar.GT }} Ton</p>
+
+            <p v-if="dataSidebar.CGT" class="font-bold">CGT:</p>
+            <p v-if="dataSidebar.CGT" class="">{{ dataSidebar.CGT }} Ton</p>
+
+            <p v-if="dataSidebar.bollard_pull" class="font-bold">Bollard pull:</p>
+            <p v-if="dataSidebar.bollard_pull" class="">{{ dataSidebar.bollard_pull }}</p>
+
+            <p v-if="dataSidebar.clasification" class="font-bold">Clasificacion:</p>
+            <p v-if="dataSidebar.clasification" class="">{{ dataSidebar.clasification }}</p>
+        </span>
+        <p v-if="dataSidebar.projects.length > 0" class="font-bold text-center">Proyectos</p>
+        <span v-for="(project, index) in dataSidebar.projects" :key="index" class="grid gap-y-2">
+            <div class="border-2 p-1 rounded-lg cursor-default">
+                <span class="flex justify-between items-center">
+                    <span v-tooltip.left="'Nombre del proyecto'" class="font-bold"> {{ project.name }}</span>
+                    <span v-tooltip.top="'Codigo SAP'" class="text-sm">{{ project.SAP_code }}</span>
+                </span>
+                <span class="text-xs" v-tooltip.top="'Tipo de proyecto'">{{ project.type }}</span>
+                <span class="flex justify-between items-center">
+                    <Tag severity="info" v-tooltip.left="'Estado'" :value="project.status" />
+                    <span class="text-sm" v-tooltip.left="'Gerencia'">{{ project.gerencia }}</span>
+                </span>
+            </div>
         </span>
     </Sidebar>
 
     <OverlayPanel ref="op">
-        <ul class="list-none p-0 m-0 flex flex-col gap-2 max-w-96 max-h-52 overflow-y-auto">
+        <ul class="list-none p-0 m-0 flex flex-col gap-2 w-96 max-w-96 max-h-52 overflow-y-auto">
             <li v-for="hull in hullsSelect" :key="hull.name" class="flex items-center gap-2">
                 <img :src="hull.file" alt="ImageShip" onerror="this.src='/svg/cotecmar-logo.svg'"
                     class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16 object-cover" draggable="false" />
