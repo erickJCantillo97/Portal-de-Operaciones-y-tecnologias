@@ -26,9 +26,6 @@ onMounted(() => {
     });
 });
 
-const gannt = (event, data) => {
-    router.get(route('createSchedule.create', data.project_id))
-}
 </script>
 <template>
     <div class="grid grid-cols-1">

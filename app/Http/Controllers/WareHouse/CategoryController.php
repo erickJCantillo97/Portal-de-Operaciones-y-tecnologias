@@ -7,6 +7,7 @@ use App\Models\WareHouse\Category;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
@@ -15,7 +16,12 @@ class CategoryController extends Controller
      */
     public function index()
     {
+
+        return Inertia::render('WareHouse/Categories', [
+            'category' => Category::get()
+        ]);
     }
+
 
     public function getDataAnterior()
     {
