@@ -16,14 +16,14 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $grouops = Category::level('Grupo')->get();
-        $subgrouops = Category::level('Sub Grupo')->get();
+        $groups = Category::level('Grupo')->get();
+        $subgroups = Category::level('Sub Grupo')->get();
         $categories = Category::has('padre')->with('padre', 'padre.padre')->where('level', 'Descripcion')
             ->get();
         return Inertia::render('WareHouse/Categories', [
             'categories' => $categories,
-            'subgrouops' => $subgrouops,
-            'grouops' => $grouops,
+            'subgroups' => $subgroups,
+            'groups' => $groups,
         ]);
     }
 
