@@ -19,4 +19,9 @@ class Category extends Model implements Auditable
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
+
+    public function scopeLevel($query, $level)
+    {
+        return $query->where('level', $level);
+    }
 }

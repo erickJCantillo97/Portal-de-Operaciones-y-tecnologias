@@ -32,19 +32,18 @@ class RoleController extends Controller
     {
         $validateData = $request->validate(
             [
-                'name'=>'required|unique:roles,name',
+                'name' => 'required|unique:roles,name',
             ]
         );
-        try{
+        try {
             $validateData['guard_name'] = 'web';
             $permisos =  collect($request->permisos)->map(function ($permiso) {
                 return $permiso['name'];
             });
             $role = Role::create($validateData);
             $role->syncPermissions($permisos);
-
-        }catch (\Exception $e) {
-            return back()->withErrors('message' , 'Ocurrio un Error: '.$e);
+        } catch (\Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error: ' . $e);
         }
     }
 
@@ -53,7 +52,7 @@ class RoleController extends Controller
      */
     public function show(Role $role)
     {
-        //
+        
     }
 
     /**
@@ -77,10 +76,10 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
-        try{
+        try {
             $role->delete();
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error: '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error: ' . $e);
         }
     }
 }

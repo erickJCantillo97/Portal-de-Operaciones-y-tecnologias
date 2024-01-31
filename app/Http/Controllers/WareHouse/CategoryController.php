@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\WareHouse\Category;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class CategoryController extends Controller
@@ -15,8 +16,32 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        $groups = Category::level('Grupo')->get();
+        $subgroups = Category::level('Sub Grupo')->get();
+        $categories = Category::has('padre')->with('padre', 'padre.padre')->where('level', 'Descripcion')
+            ->get();
         return Inertia::render('WareHouse/Categories', [
-            'category' => Category::get()]);
+            'categories' => $categories,
+            'subgroups' => $subgroups,
+            'groups' => $groups,
+        ]);
+    }
+
+
+    public function getDataAnterior()
+    {
+        $cas = DB::connection('sqlsrv_anterior')->table('categorias')->get();
+        foreach ($cas as $c) {
+            $padre = DB::connection('sqlsrv_anterior')->table('categorias')->where('id', $c->categoria_id)->first();
+            Category::create([
+                'user_id' => auth()->user()->id,
+                'name' => $c->name,
+                'letter' => $c->letra,
+                'level' => $c->nivel,
+                'category_id' =>  $padre != null ? (Category::where('name', $padre->name)->first()->id ?? 0) : 0,
+            ]);
+        }
+        return Category::get();
     }
 
     /**
@@ -35,7 +60,7 @@ class CategoryController extends Controller
         $validateData = $request->validate([
             'category_id' => 'nullable',
             'letter' => 'nullable',
-            'name' => 'requerid',
+            'name' => 'required',
             'level' => 'required|string',
             'calibration' => 'nullable'
         ]);
@@ -71,7 +96,7 @@ class CategoryController extends Controller
         $validateData = $request->validate([
             'category_id' => 'nullable',
             'letter' => 'nullable',
-            'name' => 'requerid',
+            'name' => 'required',
             'level' => 'required|string',
             'calibration' => 'nullable'
         ]);

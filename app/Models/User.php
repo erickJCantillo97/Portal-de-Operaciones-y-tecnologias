@@ -24,7 +24,8 @@ class User extends Authenticatable implements LdapAuthenticatable
     use TwoFactorAuthenticatable;
     use HasLdapUser, AuthenticatesWithLdap;
 
-    protected $guard_name = 'web';
+    public $guard_name = 'web';
+
     /**
      * The attributes that are mass assignable.
      *

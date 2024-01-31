@@ -5,7 +5,10 @@ import Textarea from 'primevue/textarea';
 import Dropdown from 'primevue/dropdown';
 import FileUpload from 'primevue/fileupload';
 import MultiSelect from 'primevue/multiselect';
+import Checkbox from 'primevue/checkbox';
+
 import { ref } from 'vue';
+import ToggleButton from 'primevue/togglebutton';
 
 const props = defineProps({
     //general
@@ -107,7 +110,15 @@ const props = defineProps({
     maxFileSize: {
         type: Number,
         default: 1000000
-    }
+    },
+    onLabel:{
+        type:String,
+        default:'Si'
+    },
+    offLabel:{
+        type:String,
+        default:'No'
+    },
 })
 
 const countries = ref()
@@ -181,6 +192,10 @@ const input = defineModel('input', {
                     filterInput: '!h-8',
                     header: '!h-min !py-0.5'
                 }" />
+                <Checkbox v-else-if="type == 'checkbox'" v-model="input" :binary="true" />
+                <ToggleButton v-else-if="type == 'tooglebutton'" v-model="input" :onLabel :offLabel :pt="{
+                    root:'!h-8'
+                }"/>
             <span v-else :class="(loading || icon) ? 'p-input-icon-left' : ''" class="w-full">
                 <i v-if="(loading || icon)" :class="loading ? 'pi pi-spin pi-spinner' : icon" />
                 <InputText size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''" v-model="input" :type
