@@ -9,6 +9,7 @@ use DateTime;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ToolController extends Controller
 {
@@ -17,7 +18,13 @@ class ToolController extends Controller
      */
     public function index()
     {
-        //
+        $tools = Tool::with('category','category.padre', 'category.padre.padre')->get();
+        $categories = Category::has('padre')->with('padre', 'padre.padre')->where('level', 'Descripcion')
+            ->get();
+        return Inertia::render('WareHouse/Tools', [
+            'tools' => $tools,
+            'categories' => $categories,
+        ]);
     }
 
     /**
@@ -38,7 +45,7 @@ class ToolController extends Controller
             'serial' => 'required|unique:tools,serial',
             'SAP_code' => 'nullable|string',
             'value' => 'required',
-            'brand_id' => 'nullable',
+            'brand' => 'nullable',
             'entry_date' => 'required|date',
             'is_small' => 'nullable',
             'description' => 'nullable|string',
@@ -47,10 +54,9 @@ class ToolController extends Controller
 
         try {
             $validateData['gerencia'] = auth()->user()->gerencia;
-            $validateData['responsible_id'] = auth()->user()->gerencia;
+            $validateData['responsible_id'] = auth()->user()->id;
             $validateData['code'] = $this->createCode($validateData);
-            $validateData['responsable'] = auth()->user()->id;
-            $validateData['es_pequeño'] = 0;
+            $validateData['is_small'] = 0;
             // $validateData['criticidad'] = 0;
             Tool::create($validateData);
         } catch (Exception $e) {
@@ -64,11 +70,11 @@ class ToolController extends Controller
         $categoria = Category::where('id', $data['category_id'])->first();
         $equipo = Tool::whereHas('category.padre', function (Builder $query) use ($categoria) {
             $query->where('id', $categoria->padre->id);
-        })->where("es_pequeño", 0)->latest()->first();
+        })->where("is_small", 0)->latest()->first();
 
-        $valor = isset($equipo->codigo_interno) ? substr($equipo->codigo_interno, -3, 3) : 0;
+        $valor = isset($equipo->code) ? substr($equipo->code, -3, 3) : 0;
 
-        return $categoria->padre->padre->letra . "" . $categoria->padre->letra . "" . date_format(new DateTime($data['fecha_ingreso']), "y") . "01" . str_pad(($valor + 1), 3, '0', STR_PAD_LEFT);
+        return $categoria->padre->padre->letter . "" . $categoria->padre->letter . "" . date_format(new DateTime($data['entry_date']), "y") . "01" . str_pad(($valor + 1), 3, '0', STR_PAD_LEFT);
     }
 
 
