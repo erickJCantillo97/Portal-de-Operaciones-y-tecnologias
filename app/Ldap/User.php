@@ -8,6 +8,8 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Model
 {
     use HasRoles;
+
+    public $guard_name = 'web';
     /**
      * The object classes of the LDAP model.
      */
@@ -38,7 +40,4 @@ class User extends Model
 
         return "data:$mime;base64,$image";
     }
-
-
-
 }

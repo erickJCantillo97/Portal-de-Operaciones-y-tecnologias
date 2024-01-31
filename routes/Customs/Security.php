@@ -10,20 +10,25 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified'])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
 
-    Route::get('',  function (){
+    Route::get('',  function () {
         $users = User::with('roles')->orderBy('gerencia')->get();
 
-        $roles = Role::orderBy('name')->get();
-
+        $roles = Role::with('permissions')->get()->map(function ($r) {
+            return [
+                'id' => $r['id'],
+                'name' => $r['name'],
+                'users' => User::role($r['name'])->get(),
+                'permissions' => $r['permissions']
+            ];
+        });
         $permisos = Permission::orderBy('name')->get();
 
-        return Inertia::render('Security/Index',[
-            'users' => $users,'roles' => $roles, 'permisos' => $permisos
+        return Inertia::render('Security/Index', [
+            'users' => $users, 'roles' => $roles, 'permisos' => $permisos
         ]);
     })->name('security');
 });
-
