@@ -60,7 +60,7 @@ class CategoryController extends Controller
         $validateData = $request->validate([
             'category_id' => 'nullable',
             'letter' => 'nullable',
-            'name' => 'requerid',
+            'name' => 'required',
             'level' => 'required|string',
             'calibration' => 'nullable'
         ]);
@@ -96,7 +96,7 @@ class CategoryController extends Controller
         $validateData = $request->validate([
             'category_id' => 'nullable',
             'letter' => 'nullable',
-            'name' => 'requerid',
+            'name' => 'required',
             'level' => 'required|string',
             'calibration' => 'nullable'
         ]);
