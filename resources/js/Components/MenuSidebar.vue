@@ -225,7 +225,7 @@ const navigation = [
                 href: 'categories.index',
             },
             {
-                name: 'Herramientas y Equipos',
+                name: 'Equipos y Herramientas',
                 href: 'tools.index',
             },
             {
