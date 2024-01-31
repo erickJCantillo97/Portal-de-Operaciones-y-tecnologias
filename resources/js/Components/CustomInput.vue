@@ -91,6 +91,10 @@ const props = defineProps({
         typ: String,
         default: null
     },
+    showClear: {
+        typ: Boolean,
+        default: true
+    },
     acceptFile: {
         type: String,
         default: '*'
@@ -134,7 +138,7 @@ const input = defineModel('input', {
                 :useGrouping="mode == 'currency' ? '' : useGrouping" :currency="currency" :mode="mode" :suffix :prefix />
             <Textarea v-else-if="type == 'textarea'" :id :disabled :placeholder class="w-full"
                 :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
-            <Dropdown v-else-if="type == 'dropdown'" :id :disabled :placeholder :options :optionLabel :loading
+            <Dropdown v-else-if="type == 'dropdown'" :id :disabled :placeholder :options :optionLabel :loading showClear
                 :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''" v-model="input"
                 :aria-describedby="id + '-help'" class="w-full" :pt="{
                     root: '!h-8 ',

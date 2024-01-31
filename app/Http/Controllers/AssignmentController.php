@@ -14,9 +14,7 @@ class AssignmentController extends Controller
      */
     public function index()
     {
-        $assignments = Assignment::orderBy('name')->get();
-
-        return Inertia::render('WareHouse/Assignment', compact('assignments'));
+        //
     }
 
     /**

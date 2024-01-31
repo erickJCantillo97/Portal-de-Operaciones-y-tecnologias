@@ -33,8 +33,7 @@ const visible = defineModel('visible')
             closeButtonIcon: { class: 'text-white' },
             content: { class: '!pb-0 !pt-2' },
             footer: { class: '!p-2 !h-min !items-end !flex !justify-end' }
-        }
-            ">
+        }">
         <template #header>
             <div class="flex items-center space-x-2 text-white">
                 <slot name="icon" />

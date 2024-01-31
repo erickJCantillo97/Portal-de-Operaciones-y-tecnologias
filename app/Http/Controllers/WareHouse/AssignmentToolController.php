@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\WareHouse;
 
 use App\Http\Controllers\Controller;
+use App\Models\Projects\Project;
 use App\Models\WareHouse\AssignmentTool;
-use Exception;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\AssignmentToolNotification;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Exception;
 
 class AssignmentToolController extends Controller
 {
@@ -14,7 +18,9 @@ class AssignmentToolController extends Controller
      */
     public function index()
     {
-        //
+        $assignmentsTool = AssignmentTool::get();
+        $projects = Project::orderBy('created_at', 'DESC')->get();
+        return Inertia::render('WareHouse/Assignment', compact('assignmentsTool', 'projects'));
     }
 
     /**
@@ -31,11 +37,22 @@ class AssignmentToolController extends Controller
     public function store(Request $request)
     {
         $validateData = $request->validate([
-            //
+            'employee_id' => 'required',
+            'supervisor_id' => 'required',
+            'project_id' => 'required',
+            'tools' => 'required|array',
+            'email' => 'required|email'
         ]);
-
+        //correo user, username, correo persona, nombre persona
         try {
+            $validateData['user_id'] = auth()->user()->id;
+            $validateData['gerencia'] = auth()->user()->gerencia;
+
             AssignmentTool::create($validateData);
+
+            Notification::route('mail', [ auth()->user()->username.'@cotecmar.com' => auth()->user()->short_name, $request->email => $request->employee_name])
+            ->notify(new AssignmentToolNotification(auth()->user(), $request->employee_name, $request->tools,
+            'Le han asignado Equipo(s)'));
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
