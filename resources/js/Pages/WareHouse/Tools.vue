@@ -50,12 +50,15 @@ const showModal = (event, data) => {
         form.value = { error: false, errors: {} }
         modalType.value = 'Editar'
         form.value.id=data.id
+        form.value.category=data.category
+        delete form.value.category.padre
         form.value.is_small = data.is_small == 0 ? false : true
         form.value.serial = data.serial
         form.value.SAP_code = data.SAP_code
-        form.value.value = data.value
+        form.value.value = parseInt(data.value)
         form.value.brand = data.brand
         form.value.entry_date = data.entry_date
+        form.value.description = data.description
         form.value.imagen = data.imagen
         modalVisible.value = true
     }
@@ -88,7 +91,7 @@ const save = () => {
                     toast.add({ summary: 'Actualizado', life: 2000 });
                     modalVisible.value = false
                 },
-                onError: () => {
+                onError: (e) => {
                     form.value.loading = false
                     toast.add({ summary: 'Error al actualizar', life: 2000 });
                     form.value.error = true
@@ -108,12 +111,14 @@ const save = () => {
 
 <template>
     <AppLayout>
-        <CustomDataTable :rowsDefault="20" title="Herramientas y equipos" :data="tools" :columnas="columnas"
-            :actions="actions" @edit="showModal">
-            <template #buttonHeader>
-                <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal" />
-            </template>
-        </CustomDataTable>
+        <div class="w-full h-[89vh] overflow-y-auto">
+            <CustomDataTable :rowsDefault="20" title="Herramientas y equipos" :data="tools" :columnas="columnas"
+                :actions="actions" @edit="showModal">
+                <template #buttonHeader>
+                    <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal" />
+                </template>
+            </CustomDataTable>
+        </div>
     </AppLayout>
     <CustomModal v-model:visible="modalVisible">
         <template #icon>
@@ -148,10 +153,9 @@ const save = () => {
                     placeholder="Nombre para mostrar" :invalid="form.errors.imagen ? true : false"
                     :errorMessage="form.errors.imagen" />
             </span>
-            <CustomInput label="Descripción" type="textarea" id="descripcion" v-model:input="form.descripcion"
-                placeholder="Descripcion de la herramienta" :invalid="form.errors.descripcion ? true : false"
-                :errorMessage="form.errors.descripcion" />
-                {{ form }}
+            <CustomInput label="Descripción" type="textarea" id="description" v-model:input="form.description"
+                placeholder="Descripcion de la herramienta" :invalid="form.errors.description ? true : false"
+                :errorMessage="form.errors.description" />
         </template>
         <template #footer>
             <Button severity="primary" outlined :label="modalType == 'Nuevo' ? 'Guardar' : 'Actualizar'"
