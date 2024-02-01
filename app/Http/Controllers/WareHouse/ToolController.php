@@ -19,7 +19,7 @@ class ToolController extends Controller
     public function index()
     {
         $tools = Tool::with('category','category.padre', 'category.padre.padre')->get();
-        $categories = Category::has('padre')->with('padre', 'padre.padre')->where('level', 'Descripcion')
+        $categories = Category::has('padre')->where('level', 'Descripcion')
             ->get();
         return Inertia::render('WareHouse/Tools', [
             'tools' => $tools,
@@ -100,7 +100,15 @@ class ToolController extends Controller
     public function update(Request $request, Tool $tool)
     {
         $validateData = $request->validate([
-            //
+            'category_id' => 'required',
+            'serial' => 'required|unique:tools,serial,'.$tool->id,
+            'SAP_code' => 'nullable|string',
+            'value' => 'required',
+            'brand' => 'nullable',
+            'entry_date' => 'required|date',
+            'is_small' => 'nullable',
+            'description' => 'nullable|string',
+            'imagen' => 'nullable'
         ]);
 
         try {

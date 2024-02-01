@@ -282,7 +282,6 @@ const auxdata = ref()
                 <p v-else-if="col.type == 'currency'" class="text-right">
                     {{ formatCurrency(data[col.field], !Array.isArray(data[col.field]) ? 'COP'
                         : data[col.field][1]) }}
-
                 </p>
                 <p v-else-if="col.type == 'customtag'"
                     :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
@@ -298,12 +297,12 @@ const auxdata = ref()
                         onerror="this.src='/svg/cotecmar-logo.svg'"
                         class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16 object-cover" draggable="false" />
                     <div>
-                        <p class="font-bold text-sm ">{{
+                        <p class="font-bold text-sm" v-if="col.objectRows.primary">{{
                             col.objectRows.primary.subfield ?
                             data[col.objectRows.primary.field][col.objectRows.primary.subfield] :
                             data[col.objectRows.primary.field]
                         }} </p>
-                        <p class="text-xs italic">{{
+                        <p class="text-xs italic" v-if="col.objectRows.secundary">{{
                             col.objectRows.secundary.subfield ?
                             data[col.objectRows.secundary.field][col.objectRows.secundary.subfield] :
                             data[col.objectRows.secundary.field]
@@ -315,6 +314,11 @@ const auxdata = ref()
                         :text="col.text" :severity="col.severity" :rounded="col.rounded"
                         @click="$emit(col.event, $event, data)">
                     </Button>
+                </span>
+                <span v-else-if="col.type == 'array'" class="w-full">
+                    <span v-for="item, index in data[col.field]" :class="col.itemClass">
+                        {{ item }}
+                    </span>
                 </span>
                 <p v-else class="">
                     {{

@@ -17,7 +17,7 @@ class CategoryController extends Controller
     public function index()
     {
         $groups = Category::level('Grupo')->get();
-        $subgroups = Category::level('Sub Grupo')->get();
+        $subgroups = Category::level('Sub Grupo')->with('padre')->get();
         $categories = Category::has('padre')->with('padre', 'padre.padre')->where('level', 'Descripcion')
             ->get();
         return Inertia::render('WareHouse/Categories', [

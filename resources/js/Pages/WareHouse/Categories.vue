@@ -7,6 +7,8 @@ import { router } from '@inertiajs/vue3';
 import CustomInput from '@/Components/CustomInput.vue';
 import Toast from 'primevue/toast';
 import { useToast } from "primevue/usetoast";
+import TabPanel from 'primevue/tabpanel';
+import TabView from 'primevue/tabview';
 const toast = useToast();
 
 const props = defineProps({
@@ -29,13 +31,21 @@ const form = ref({
     errors: {}
 })
 
-const columnas = [
-    { field: 'name', header: 'Nombre', filter:true },
-    { field: 'padre.name', header: 'Sub Grupo' },
-    { field: 'padre.letter', header: 'Letra' },
-    { field: 'padre.padre.name', header: 'Grupo', sortable: true },
-    { field: 'padre.padre.letter', header: 'Letra' },
+const columnasDescripcion = [
+    { field: 'name', header: 'Nombre', filter: true },
+    { field: 'padre.name', header: 'Función', filter: true },
+    { field: 'padre.padre.name', header: 'Categoria', filter: true, sortable: true },
 ]
+const columnasGrupos = [
+    { field: 'name', header: 'Nombre', filter: true },
+    { field: 'letter', header: 'Letra', filter: true, },
+]
+const columnasSubgrupos = [
+    { field: 'name', header: 'Nombre', filter: true },
+    { field: 'padre.name', header: 'Categoria', filter: true, },
+    { field: 'letter', header: 'Letra', filter: true, },
+]
+
 
 const actions = [
     { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
@@ -43,22 +53,29 @@ const actions = [
 
 const modalType = ref('Nuevo')
 
-const showModal = (event, data) => {
+const showModal = (event, data, type) => {
+    console.log(event)
     if (data == null) {
         modalType.value = 'Nuevo'
         form.value = { error: false, errors: {} }
-        form.value.level = 'Grupo'
+        form.value.level = type
         modalVisible.value = true
     } else {
         form.value = { error: false, errors: {} }
         modalType.value = 'Editar'
-        form.value.id=data.id
+        form.value.id = data.id
         form.value.name = data.name
         form.value.level = data.level
-        form.value.group = data.padre.padre
-        form.value.letter = data.letter
-        form.value.sub_group = data.padre
-        delete form.value.sub_group.padre
+        if (data.level == 'Descripcion') {
+            form.value.group = data.padre.padre
+            form.value.sub_group = data.padre
+            delete form.value.sub_group.padre
+        } else if (data.level == 'Sub Grupo') {
+            form.value.group = data.padre
+            form.value.letter = data.letter
+        } else {
+            form.value.letter = data.letter
+        }
         form.calibration = data.calibration == 0 ? false : true
         modalVisible.value = true
     }
@@ -103,7 +120,7 @@ const save = () => {
                 }
             })
         } else {
-            router.put(route('categories.update', form.value.id),form.value, {
+            router.put(route('categories.update', form.value.id), form.value, {
                 onSuccess: () => {
                     form.value.loading = false
                     toast.add({ summary: 'Actualizado', life: 2000 });
@@ -126,13 +143,53 @@ const save = () => {
 
 <template>
     <AppLayout>
-        <div class="h-[89vh] overflow-y-auto">
-            <CustomDataTable :rowsDefault="20" :data="categories" title="Categorias" :columnas="columnas" :actions="actions"
-                @edit="showModal">
-                <template #buttonHeader>
-                    <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal" />
-                </template>
-            </CustomDataTable>
+        <div class="">
+            <TabView class="tabview-custom" :scrollable="true" :pt="{
+                nav: '!flex !justify-between'
+            }">
+                <TabPanel :pt="{
+                    root: 'w-full', content: '!h-[78vh]'
+                }">
+                    <template #header>
+                        <span class="flex justify-between w-full">
+                            <span class="text-lg font-bold">Descripción</span>
+                            <Button v-tooltip.left="'Agregar descripción'" @click="showModal(null, null, 'Descripcion')"
+                                icon="fa-solid fa-plus" />
+                        </span>
+                    </template>
+                    <CustomDataTable :rowsDefault="20" :data="categories" :columnas="columnasDescripcion" :actions="actions"
+                        @edit="showModal">
+                    </CustomDataTable>
+                </TabPanel>
+                <TabPanel :pt="{
+                    root: 'w-full', content: '!h-[78vh]'
+                }">
+                    <template #header>
+                        <span class="flex justify-between w-full">
+                            <span class="text-lg font-bold"> Grupos</span>
+                            <Button v-tooltip.left="'Agregar grupo'" @click="showModal(null, null, 'Grupo')"
+                                icon="fa-solid fa-plus" />
+                        </span>
+                    </template>
+                    <CustomDataTable :rowsDefault="20" :data="groups" :columnas="columnasGrupos" :actions="actions"
+                        @edit="showModal">
+                    </CustomDataTable>
+                </TabPanel>
+                <TabPanel :pt="{
+                    root: 'w-full', content: '!h-[78vh]'
+                }">
+                    <template #header>
+                        <span class="flex justify-between w-full">
+                            <span class="text-lg font-bold"> Subgrupos</span>
+                            <Button v-tooltip.left="'Agregar subgrupo'" @click="showModal(null, null, 'Subgrupo')"
+                                icon="fa-solid fa-plus" />
+                        </span>
+                    </template>
+                    <CustomDataTable :rowsDefault="20" :data="subgroups" :columnas="columnasSubgrupos" :actions="actions"
+                        @edit="showModal">
+                    </CustomDataTable>
+                </TabPanel>
+            </TabView>
         </div>
     </AppLayout>
     <CustomModal v-model:visible="modalVisible">
@@ -147,13 +204,14 @@ const save = () => {
         <template #body>
             <span class="grid grid-cols-2 gap-2">
                 <CustomInput label="Tipo" v-model:input="form.level" type="dropdown" placeholder="Selecciona una categoria"
-                    :options="['Grupo', 'Sub Grupo', 'Descripcion']"></CustomInput>
-                <CustomInput label="Grupo" id="group" v-if="form.level != 'Grupo'" v-model:input="form.group" type="dropdown"
-                    placeholder="Selecciona un grupo" :options="groups" optionLabel="name"
+                    :options="['Grupo', 'Sub Grupo', 'Descripcion']" :disabled=true></CustomInput>
+                <CustomInput label="Grupo" id="group" v-if="form.level != 'Grupo'" v-model:input="form.group"
+                    type="dropdown" placeholder="Selecciona un grupo" :options="groups" optionLabel="name"
                     :invalid="form.errors.group ? true : false" :errorMessage="form.errors.group"></CustomInput>
                 <CustomInput label="Sub Grupo" id="subgroup" v-if="form.level != 'Grupo' && form.level != 'Sub Grupo'"
                     v-model:input="form.sub_group" type="dropdown" placeholder="Selecciona una categoria"
-                    :options="subgroups.filter((subgroup)=>subgroup.category_id==form.group.id)" optionLabel="name" :invalid="form.errors.sub_group ? true : false"
+                    :options="form.group ? subgroups.filter((subgroup) => subgroup.category_id == form.group.id) : []"
+                    optionLabel="name" :invalid="form.errors.sub_group ? true : false"
                     :errorMessage="form.errors.sub_group"></CustomInput>
                 <CustomInput label="Nombre" id="name" v-model:input="form.name" placeholder="Nombre para mostrar"
                     :invalid="form.errors.name ? true : false" :errorMessage="form.errors.name"></CustomInput>
@@ -166,8 +224,8 @@ const save = () => {
             </span>
         </template>
         <template #footer>
-            <Button severity="primary" outlined :label="modalType=='Nuevo'?'Guardar':'Actualizar'" icon="fa-solid fa-floppy-disk"
-                @click="save()" :loading="form.loading" />
+            <Button severity="primary" outlined :label="modalType == 'Nuevo' ? 'Guardar' : 'Actualizar'"
+                icon="fa-solid fa-floppy-disk" @click="save()" :loading="form.loading" />
             <Button severity="danger" outlined label="Cancelar" icon="fa-regular fa-circle-xmark"
                 @click="modalVisible = false" />
         </template>
