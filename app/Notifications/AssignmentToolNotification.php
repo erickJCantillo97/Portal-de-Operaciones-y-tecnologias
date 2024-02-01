@@ -8,9 +8,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AssignmentToolNotification extends Notification implements ShouldQueue
+class AssignmentToolNotification extends Notification
 {
-    use Queueable;
+    // use Queueable;
 
     protected $employee;
 
@@ -24,7 +24,7 @@ class AssignmentToolNotification extends Notification implements ShouldQueue
     public function __construct($employee, $tools, $subject = null)
     {
         $this->employee = $employee;
-        $this->tools = $tools ? Tool::whereIn('id', $tools)->get()->toArray() : [];
+        $this->tools = Tool::whereIn('id', $tools)->get();
         $this->subject = $subject;
     }
 
@@ -45,11 +45,10 @@ class AssignmentToolNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                     ->subject($this->subject)
-                    ->view('assignmentEmail', [
+                    ->view('emails/assignmentEmail', [
                         'employee' => $this->employee,
                         'tools' => $this->tools
-                    ])
-                    ->line('¡Gracias por su atención!');
+                    ]);
     }
 
     /**

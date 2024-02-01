@@ -16,6 +16,8 @@ class Tool extends Model implements Auditable
 
     protected $guarded = [];
 
+    protected $appends = ['name'];
+
     protected static function booted(): void
     {
         static::addGlobalScope(new GerenciaScope);
@@ -34,5 +36,10 @@ class Tool extends Model implements Auditable
     public function asignaciones()
     {
         return $this->HasMany(AssignmentTool::class, 'tool_id');
+    }
+
+    public function getNameAttribute()
+    {
+        return $this->category->name;
     }
 }

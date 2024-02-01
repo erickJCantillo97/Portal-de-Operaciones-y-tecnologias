@@ -26,6 +26,7 @@ const form = ref({
 })
 
 const columnas = [
+    { field: 'name', header: 'Nombre' },
     { field: 'code', header: 'Codigo' },
     { field: 'serial', header: 'Serial' },
     { field: 'SAP_code', header: 'Codigo SAP' },
@@ -49,8 +50,8 @@ const showModal = (event, data) => {
     } else {
         form.value = { error: false, errors: {} }
         modalType.value = 'Editar'
-        form.value.id=data.id
-        form.value.category=data.category
+        form.value.id = data.id
+        form.value.category = data.category
         delete form.value.category.padre
         form.value.is_small = data.is_small == 0 ? false : true
         form.value.serial = data.serial
@@ -100,8 +101,8 @@ const save = () => {
             })
         }
     } else {
-        form.value.error=true
-        form.value.errors.category="Seleccione una categoria"
+        form.value.error = true
+        form.value.errors.category = "Seleccione una categoria"
         toast.add({ summary: 'Seleccione una categoria', life: 2000 });
         form.value.loading = false
     }
@@ -126,13 +127,13 @@ const save = () => {
         </template>
         <template #titulo>
             <span class="text-lg font-bold text-white">
-                {{ modalType }}
+                {{ modalType }} Equipo
             </span>
         </template>
         <template #body>
             <span class="grid grid-cols-3 gap-2">
-                <CustomInput label="Categoria" id="category" v-model:input="form.category" type="dropdown"
-                    placeholder="Selecciona una categoria" :options="categories" optionLabel="name"
+                <CustomInput label="Descripción" id="category" v-model:input="form.category" type="dropdown"
+                    placeholder="Selecciona una Descripción" :options="categories" optionLabel="name"
                     :invalid="form.errors.category ? true : false" :errorMessage="form.errors.category" />
                 <CustomInput label="Serial" id="serial" v-model:input="form.serial" placeholder="Serial del equipo"
                     :invalid="form.errors.serial ? true : false" :errorMessage="form.errors.serial" />
