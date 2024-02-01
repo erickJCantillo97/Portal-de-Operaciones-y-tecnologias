@@ -17,11 +17,21 @@ const props = defineProps({
     default: []
   },
   projects: Array,
+  tools: Array
 })
 
 onMounted(() => {
   getPersonal()
 })
+
+const personal = ref()
+const toolsList = ref()
+const openDialog = ref(false)
+const selectedEmployee = ref()
+const selectedSupervisor = ref()
+const selectedProject = ref()
+const selectedTools = ref([])
+const email = ref()
 
 const getPersonal = async () => {
   await axios.get(route('personal.activos'))
@@ -29,6 +39,8 @@ const getPersonal = async () => {
       personal.value = res.data.personal
     })
 }
+
+
 
 const columnas = [
   { field: 'tool_id', header: 'Equipo' },
@@ -42,14 +54,6 @@ const actions = [
   { event: 'delete', severity: 'danger', icon: 'fa-regular fa-trash-can', text: true, outlined: false, rounded: false },
   // { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
 ]
-
-const personal = ref()
-const openDialog = ref(false)
-const selectedEmployee = ref()
-const selectedSupervisor = ref()
-const selectedProject = ref()
-const selectedTools = ref([])
-const email = ref()
 
 const form = useForm({
   email: null,
@@ -75,7 +79,7 @@ const submit = () => {
   router.post(route('assignmentTool.store'),
     {
       employee_id: selectedEmployee.value.Num_SAP,
-      employee_name: selectedEmployee.value.Apellidos_Nombres,
+      employee_name: selectedEmployee.value.Nombres_Apellidos,
       supervisor_id: selectedSupervisor.value.Num_SAP,
       project_id: selectedProject.value.id,
       email: form.email,
@@ -147,13 +151,15 @@ const fakeTools = [
 
   <CustomModal v-model:visible="openDialog" :closable="false">
     <template #icon>
-      <i class="fa-solid fa-file-contract"></i>
+      <span class="material-symbols-outlined font-semibold text-3xl">
+        construction
+      </span>
     </template>
     <template #titulo>
       <p>Asignar Equipo</p>
     </template>
     <template #body>
-      <section class="grid grid-cols-2 gap-6">
+      <section class="grid grid-cols-2 gap-4">
         <!--CAMPO SELECCIÓN DE PERSONA (personal)-->
         <CustomInput type="dropdown" label="Seleccionar Persona" :options="personal" v-model:input="selectedEmployee"
           optionLabel="Nombres_Apellidos" placeholder="Seleccione Personal" showClear />
@@ -167,13 +173,13 @@ const fakeTools = [
           v-model:input="selectedProject" placeholder="Seleccione Proyecto" showClear />
 
         <!--CAMPO CORREO (tools)-->
-        <CustomInput label="Correo" placeholder="correo@ejemplo.com" v-model:input="form.email"
+        <CustomInput label="Correo" placeholder="correocorporativo@cotecmar.com" v-model:input="form.email"
           :invalid="$attrs.errors.email != null" :errorMessage="$attrs.errors.email" />
 
         <!--CAMPO SELECCIÓN DE EQUIPOS (tools)-->
         <div class="col-span-2">
           <label class="text-md font-semibold">Seleccionar Equipos</label>
-          <Listbox v-model="form.tools" :options="fakeTools" multiple filter optionLabel="name" optionValue="id"
+          <Listbox v-model="form.tools" :options="tools" multiple filter optionLabel="category.name" optionValue="id"
             :emptyMessage="loading ? 'Cargando equipos, espere un momento por favor...' : 'No se encuentran resultados.'"
             filterPlaceholder="Seleccione el/los equipo(s) para asignar." class="w-full md:w-14rem"
             :virtualScrollerOptions="{ itemSize: 38 }" listStyle="height:15rem" :pt="{

@@ -223,14 +223,17 @@ const navigation = [
             {
                 name: 'Categorías',
                 href: 'categories.index',
+                dev: true
             },
             {
                 name: 'Equipos y Herramientas',
                 href: 'tools.index',
+                dev: true
             },
             {
                 name: 'Asignaciones',
                 href: 'assignmentTool.index',
+                dev: true
             },
         ],
         icon: WrenchScrewdriverIcon,

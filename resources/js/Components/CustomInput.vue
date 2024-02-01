@@ -140,7 +140,7 @@ const input = defineModel('input', {
 </script>
 <template>
     <div class="flex flex-col">
-        <label v-if="label && !floatLabel" :for="id" class="-mb-0.5">{{ label }}</label>
+        <label v-if="label && !floatLabel" :for="id" class="mb-0.5">{{ label }}</label>
         <span :class="!(label && !floatLabel) ? 'p-float-label' : ''">
             <FileUpload v-if="type == 'file'" mode="basic" name="demo[]" :multiple="false" :accept="acceptFile" :maxFileSize
                 @input="input = $event.target.files[0]" class="w-full h-8" customUpload />
@@ -152,7 +152,7 @@ const input = defineModel('input', {
             <Dropdown v-else-if="type == 'dropdown'" :id :disabled :placeholder :options :optionLabel :loading showClear
                 :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''" v-model="input"
                 :aria-describedby="id + '-help'" class="w-full" :pt="{
-                    root: '!h-8 ',
+                    root: '!h-8',
                     input: '!py-0 !flex !items-center !text-sm !font-normal',
                     item: '!py-1 !px-3 !text-sm !font-normal',
                     filterInput: '!h-8'
