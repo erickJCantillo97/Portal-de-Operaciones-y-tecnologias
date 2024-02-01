@@ -21,6 +21,14 @@ const props = defineProps({
     closeOnEscape: {
         type: Boolean,
         default: true
+    },
+    icon: {
+        type: String,
+        default: null
+    },
+    titulo: {
+        type: String,
+        default: null
     }
 })
 const visible = defineModel('visible')
@@ -36,8 +44,12 @@ const visible = defineModel('visible')
         }">
         <template #header>
             <div class="flex items-center space-x-2 text-white">
-                <slot name="icon" />
-                <slot name="titulo" />
+                <i v-if="icon" :class="icon" />
+                <slot v-else name="icon" />
+                <span v-if="titulo" class="text-xl font-bold">
+                    {{ titulo }}
+                </span>
+                <slot v-else name="titulo" />
             </div>
         </template>
         <template #default>

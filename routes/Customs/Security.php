@@ -15,7 +15,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::resource('permissions', PermissionController::class);
 
     Route::get('',  function () {
-        $users = User::with('roles')->orderBy('gerencia')->get()->map(function ($user) {
+        $users = User::with('roles','roles.permissions')->orderBy('gerencia')->get()->map(function ($user) {
             $roles = collect($user['roles'])->pluck('name')->toArray();
             return [
                 'name' => $user['name'],
@@ -23,6 +23,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
                 'cargo' => $user['cargo'],
                 'gerencia' => $user['gerencia'],
                 'roles' => count($roles) == 0 ? ["Sin rol"] : $roles,
+                'rolesObj'=>$user['roles']
             ];
         });
         $roles = Role::with('permissions')->get()->map(function ($r) {
