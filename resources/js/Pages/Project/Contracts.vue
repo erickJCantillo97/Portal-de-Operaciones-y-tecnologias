@@ -187,7 +187,6 @@ const formatCurrency = (valor, moneda) => {
                     {{ formData.contract.id ? 'Actualizar ' : 'Guardar' }}
                 </Button>
             </template>
-
         </CustomModal>
 
     </AppLayout>
