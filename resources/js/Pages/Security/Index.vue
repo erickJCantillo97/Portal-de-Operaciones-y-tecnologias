@@ -16,7 +16,7 @@ const columnas = [
             secundary: { field: 'cargo' }
         }
     },
-    // { field: 'roles', header: 'Roles' },
+    { field: 'roles', header: 'Roles',type:'array', filter:true, itemClass:'border px-2 border-primary rounded-lg' },
     { field: 'gerencia', header: 'Gerencia' },
     // { field: 'status', header: 'Estado' }, 
 ]
