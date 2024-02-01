@@ -33,17 +33,17 @@ const form = ref({
 
 const columnasDescripcion = [
     { field: 'name', header: 'Nombre', filter: true },
-    { field: 'padre.name', header: 'Sub Grupo', filter: true },
-    { field: 'padre.padre.name', header: 'Grupo',filter: true, sortable: true },
+    { field: 'padre.name', header: 'Función', filter: true },
+    { field: 'padre.padre.name', header: 'Categoria', filter: true, sortable: true },
 ]
 const columnasGrupos = [
     { field: 'name', header: 'Nombre', filter: true },
-    { field: 'letter', header: 'Letra',filter: true, },
+    { field: 'letter', header: 'Letra', filter: true, },
 ]
 const columnasSubgrupos = [
     { field: 'name', header: 'Nombre', filter: true },
-    { field: 'padre.name', header: 'Sub Grupo',filter: true, },
-    { field: 'letter', header: 'Letra',filter: true, },
+    { field: 'padre.name', header: 'Categoria', filter: true, },
+    { field: 'letter', header: 'Letra', filter: true, },
 ]
 
 
@@ -66,14 +66,14 @@ const showModal = (event, data, type) => {
         form.value.id = data.id
         form.value.name = data.name
         form.value.level = data.level
-        if (data.level == 'Descripcion') { 
-            form.value.group = data.padre.padre 
+        if (data.level == 'Descripcion') {
+            form.value.group = data.padre.padre
             form.value.sub_group = data.padre
             delete form.value.sub_group.padre
-        }else if(data.level == 'Sub Grupo'){
-            form.value.group =data.padre
+        } else if (data.level == 'Sub Grupo') {
+            form.value.group = data.padre
             form.value.letter = data.letter
-        }else{
+        } else {
             form.value.letter = data.letter
         }
         form.calibration = data.calibration == 0 ? false : true
