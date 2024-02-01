@@ -152,8 +152,8 @@ const save = () => {
                 }">
                     <template #header>
                         <span class="flex justify-between w-full">
-                            <span class="text-lg font-bold">Descripcion</span>
-                            <Button v-tooltip.left="'Agregar descripcion'" @click="showModal(null, null, 'Descripcion')"
+                            <span class="text-lg font-bold">Descripción</span>
+                            <Button v-tooltip.left="'Agregar descripción'" @click="showModal(null, null, 'Descripcion')"
                                 icon="fa-solid fa-plus" />
                         </span>
                     </template>
