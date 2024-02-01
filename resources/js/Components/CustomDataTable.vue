@@ -297,12 +297,12 @@ const auxdata = ref()
                         onerror="this.src='/svg/cotecmar-logo.svg'"
                         class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16 object-cover" draggable="false" />
                     <div>
-                        <p class="font-bold text-sm ">{{
+                        <p class="font-bold text-sm" v-if="col.objectRows.primary">{{
                             col.objectRows.primary.subfield ?
                             data[col.objectRows.primary.field][col.objectRows.primary.subfield] :
                             data[col.objectRows.primary.field]
                         }} </p>
-                        <p class="text-xs italic">{{
+                        <p class="text-xs italic" v-if="col.objectRows.secundary">{{
                             col.objectRows.secundary.subfield ?
                             data[col.objectRows.secundary.field][col.objectRows.secundary.subfield] :
                             data[col.objectRows.secundary.field]
