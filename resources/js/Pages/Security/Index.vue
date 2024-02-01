@@ -40,20 +40,22 @@ const userDetalis = (event, data) => {
                 </p>
             </div>
             <div class="grid grid-cols-4 gap-8 m-4">
-                <div class="shadow-lg rounded-lg p-1 bg-gray-50" v-for="rol in  roles ">
+                <div class="shadow-lg rounded-lg p-1 bg-gray-50" v-for="rol in   roles  ">
                     <div class="flex px-2">
                         <div class="flex justify-between w-full">
                             <span class="text-sm text-gray-600">Total {{ rol.permissions.length }} Permisos</span>
                             <span class="flex">
-                                <img :src="user.photo" v-for="user of rol.users" alt="" :title="user.short_name"
-                                    class="rounded-full size-8 object-cover -mr-2 hover:mr-0 hover:scale-150 border-2 border-white">
+                                <img :src="user.photo" v-for="(user, index) of  rol.users " alt="" :title="user.short_name"
+                                    class="rounded-full size-6 object-cover -mr-2 hover:mr-0 hover:scale-150 border-2 border-white"
+                                    :class="index > 1 ? 'hidden' : ''">
+                                <span v-if="rol.users.length > 1"
+                                    class="rounded-full size-6 object-cover cursor-default text-center items-center hover:mr-0 hover:scale-150 border-2 border-white bg-gray-700 text-white">
+                                    +{{ rol.users.length - 2 }} </span>
                             </span>
                         </div>
                     </div>
-                    <div class="text-gray-900 font-extrabold text-xl mt-2 flex justify-between">
-                        <div class="flex justify-between">
-                            <span>{{ rol.name }}</span>
-                        </div>
+                    <div class="text-gray-900 font-extrabold text-xl mt-2 flex justify-between ml-2">
+                        <span>{{ rol.name }}</span>
                         <div>
                             <Button icon="fa fa-pencil" v-tooltip.bottom="'Editar Rol'" text></Button>
                             <Button severity="danger" v-tooltip.bottom="'Eliminar Rol'" icon="fa fa-trash-can"
