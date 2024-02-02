@@ -15,12 +15,30 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        // Role::create(['name' => 'Super Admin']);
-        // Role::create(['name' => 'Administrador']);
+        Role::create(['name' => 'Super Admin']);
+        Role::create(['name' => 'Administrador']);
 
-        User::where('username', 'gbuelvas')->first()->assignRole('Super Admin');
-        User::where('username', 'ecantillo')->first()->assignRole('Super Admin');
-        User::where('username', 'rgutierrez')->first()->assignRole('Super Admin');
+         User::create([
+            'name' => 'Giovany Enrique Buelvas Jaspe',
+            'username' => 'gbuelvas',
+            'identificacion' => 1047229183,
+            'password' => '$2y$10$faXMcfVndQHzJLKIM0mUc.Oiz/FPuqxLkbMkd1kYchRaKmB1jupui',
+            'guid' => '972be66b-708e-4556-8bc3-2e750f334f10',
+        ])->assignRole('Super Admin');;
+         User::create([
+            'name' => 'Erik Jose Cantillo Jimenez',
+            'username' => 'ecantillo',
+            'identificacion' => 1047496054,
+            'password' => '$2y$10$Cac1FjtkYdIZQ8C71aruHus.p7GDJVo1f9qUOKlRaGQ0DLiCXDXge',
+            'guid' => 'b3a6ddfe-aec9-42d7-b863-3147ccfe7b94',
+        ])->assignRole('Super Admin');;
+         User::create([
+            'name' => 'Ronny Gutierrez Vitola',
+            'username' => 'rgutierrez',
+            'identificacion' => 1143359697,
+            'password' => '$2y$10$U9tlAaKzSr74yctVCCNqE.B7NpzNPRvC8Tb7SEfjewY7SCDdOA7RK',
+            'guid' => '82b3de25-2e73-4c2d-96bc-47162a1d9626',
+        ])->assignRole('Super Admin');;
 
         $permisos = [
             // Permisos para funciones de la APP

@@ -25,13 +25,11 @@ onMounted(() => {
 })
 
 const personal = ref()
-const toolsList = ref()
 const openDialog = ref(false)
 const selectedEmployee = ref()
 const selectedSupervisor = ref()
 const selectedProject = ref()
-const selectedTools = ref([])
-const email = ref()
+
 
 const getPersonal = async () => {
   await axios.get(route('personal.activos'))
@@ -107,42 +105,6 @@ const clearModal = () => {
   form.reset()
 }
 
-//Fake Tools
-const fakeTools = [
-  {
-    id: 1,
-    name: 'Kit de Primeros Auxilios'
-  },
-  {
-    id: 2,
-    name: 'Cartucho M-32'
-  },
-  {
-    id: 3,
-    name: 'Subfusil de Carga Rápida'
-  },
-  {
-    id: 4,
-    name: 'Chaleco Antibalas'
-  },
-  {
-    id: 5,
-    name: 'Bomba de Humo'
-  },
-  {
-    id: 6,
-    name: 'Fusil de Asalto MK-40'
-  },
-  {
-    id: 7,
-    name: 'Granada de Punto'
-  },
-  {
-    id: 8,
-    name: 'Rifle Francotirador'
-  },
-
-]
 </script>
 
 <template>

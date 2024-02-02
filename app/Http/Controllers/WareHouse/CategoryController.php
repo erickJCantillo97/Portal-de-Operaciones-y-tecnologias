@@ -17,7 +17,7 @@ class CategoryController extends Controller
     public function index()
     {
         $groups = Category::level('Grupo')->get();
-        $subgroups = Category::level('Sub Grupo')->with('padre')->get();
+        $subgroups = Category::level('Subgrupo')->with('padre')->get();
         $categories = Category::has('padre')->with('padre', 'padre.padre')->where('level', 'Descripcion')
             ->get();
         return Inertia::render('WareHouse/Categories', [
@@ -30,17 +30,18 @@ class CategoryController extends Controller
 
     public function getDataAnterior()
     {
-        $cas = DB::connection('sqlsrv_anterior')->table('categorias')->get();
-        foreach ($cas as $c) {
-            $padre = DB::connection('sqlsrv_anterior')->table('categorias')->where('id', $c->categoria_id)->first();
-            Category::create([
-                'user_id' => auth()->user()->id,
-                'name' => $c->name,
-                'letter' => $c->letra,
-                'level' => $c->nivel,
-                'category_id' =>  $padre != null ? (Category::where('name', $padre->name)->first()->id ?? 0) : 0,
-            ]);
-        }
+        // $cas = DB::connection('sqlsrv_anterior')->table('categorias')->get();
+        // foreach ($cas as $c) {
+        //     $padre = DB::connection('sqlsrv_anterior')->table('categorias')->where('id', $c->categoria_id)->first();
+        //     Category::create([
+        //         'user_id' => auth()->user()->id,
+        //         'name' => $c->name,
+        //         'letter' => $c->letra,
+        //         'level' => $c->nivel,
+        //         'category_id' =>  $padre != null ? (Category::where('name', $padre->name)->first()->id ?? 0) : 0,
+        //     ]);
+        // }
+        Category::where('level', 'Sub Grupo')->update(['level' => 'Subgrupo']);
         return Category::get();
     }
 
