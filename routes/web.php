@@ -27,6 +27,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use App\Mail\AssignmentToolsMail;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -278,4 +280,10 @@ Route::get('prueba_notificacion', function () {
     $user = UserNotify::where('id', Auth::user()->id)->first();
     Notification::route('mail', [$user->email => $user->short_name])->notify(new QuoteNotify($user, $quote, 'asignament'));
     // Auth::user()->notify(new QuoteNotify($user, $quote, ''));
+});
+
+Route::get('/mailable', function () {
+    $data = 'Hello';
+
+    return new App\Mail\AssignmentToolsMail($data);
 });

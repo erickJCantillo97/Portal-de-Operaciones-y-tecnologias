@@ -117,10 +117,10 @@ return [
     */
 
     'markdown' => [
-        'theme' => 'default',
+        'theme' => 'assignmentsTools',
 
         'paths' => [
-            resource_path('views/vendor/mail.html'),
+            resource_path('views/vendor/mail'),
         ],
     ],
 
