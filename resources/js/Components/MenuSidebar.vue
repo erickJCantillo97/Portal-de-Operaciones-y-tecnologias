@@ -4,13 +4,13 @@
         <div class="h-full bg-white dark:bg-dark">
             <div class="flex items-center justify-center px-2 py-3">
                 <div class="flex items-center main-logo shrink-0">
-                    <ApplicationLogo class="justify-center" :letras="true" :width-logo="50" :height-logo="50"/>
+                    <ApplicationLogo class="justify-center" :letras="true" :width-logo="50" :height-logo="50" />
                 </div>
             </div>
 
-            <nav class="h-[calc(100vh-80px)] relative">
+            <nav class="h-[calc(100vh-80px)] relative overflow-y-auto">
                 <ul role="list" class="relative font-semibold space-y-0.5 p-4 py-0">
-                    <li class="nav-item">
+                    <li class="">
                         <ul>
                             <li v-for="item in navigation" :key="item.name" class=" nav-item">
                                 <Link v-if="!item.children" v-show="item.show" :href="route(item.href)" class="group">
@@ -37,17 +37,19 @@
                                     </div>
                                 </button>
                                 <vue-collapsible :isOpen="activeDropdown === item.name">
-                                    <ul class="text-gray-500 sub-menu dark:text-white" v-for="children of item.children">
-                                        <li>
-                                            <Link :href="children.dev ? '#' : route(children.href)">
-                                            <span class="">
-                                                <p :class="children.dev ? '-mb-2' : ''">{{ children.name }}</p>
-                                                <small v-if="children.dev" class="text-xs text-red-300 animate-pulse">
-                                                    En desarrollo
-                                                </small>
-                                            </span>
-                                            </Link>
-                                        </li>
+                                    <ul class="text-gray-500 sub-menu dark:text-white">
+                                        <span v-for="children of item.children">
+                                            <li v-if="!children.dev || debug">
+                                                <Link :href="route(children.href)">
+                                                <span class="">
+                                                    <p :class="children.dev ? '-mb-2' : ''">{{ children.name }}</p>
+                                                    <small v-if="children.dev" class="text-xs text-red-300 animate-pulse">
+                                                        En desarrollo
+                                                    </small>
+                                                </span>
+                                                </Link>
+                                            </li>
+                                        </span>
                                     </ul>
                                 </vue-collapsible>
                             </li>
@@ -85,7 +87,8 @@ const navigation = [
         href: 'dashboard',
         icon: HomeIcon,
         current: true,
-        show: true
+        show: true,
+        dev: false
     },
     {
         name: 'Gestion de Personal',
