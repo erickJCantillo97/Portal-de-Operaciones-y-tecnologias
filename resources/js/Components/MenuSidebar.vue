@@ -4,10 +4,7 @@
         <div class="h-full bg-white dark:bg-dark">
             <div class="flex items-center justify-center px-2 py-3">
                 <div class="flex items-center main-logo shrink-0">
-                    <ApplicationLogo class="justify-center" :letras="true" :width-logo="50" :height-logo="50">
-                    </ApplicationLogo>
-                    <!-- <span
-                        class="ml-2 text-2xl font-semibold align-middle lg:inline dark:text-white-light text-primary">COTECMAR</span> -->
+                    <ApplicationLogo class="justify-center" :letras="true" :width-logo="50" :height-logo="50"/>
                 </div>
             </div>
 
@@ -78,7 +75,7 @@ import {
     UsersIcon,
     WrenchScrewdriverIcon
 } from '@heroicons/vue/24/outline'
-
+const debug = import.meta.env.VITE_APP_DEBUG
 const { hasRole } = usePermissions();
 const activeDropdown = ref();
 
@@ -223,7 +220,6 @@ const navigation = [
             {
                 name: 'Categorías',
                 href: 'categories.index',
-                dev: true
             },
             {
                 name: 'Equipos y Herramientas',
