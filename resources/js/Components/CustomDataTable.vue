@@ -315,10 +315,11 @@ const auxdata = ref()
                         @click="$emit(col.event, $event, data)">
                     </Button>
                 </span>
-                <span v-else-if="col.type == 'array'" class="w-full">
-                    <span v-for="item, index in data[col.field]" :class="col.itemClass">
+                <span v-else-if="col.type == 'array'" class="w-full flex space-x-1">
+                    <p v-for="item, index in data[col.field]" 
+                    :class="col.itemsClass.find((itemClass) => itemClass.text == item)?.class ?? col.itemClass">
                         {{ item }}
-                    </span>
+                </p>
                 </span>
                 <p v-else class="">
                     {{
