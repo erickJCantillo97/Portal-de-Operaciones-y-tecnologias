@@ -69,8 +69,7 @@ const showModal = (event, data, type) => {
         if (data.level == 'Descripcion') {
             form.value.group = data.padre.padre
             form.value.sub_group = data.padre
-            delete form.value.sub_group.padre
-        } else if (data.level == 'Sub Grupo') {
+        } else if (data.level == 'Subgrupo') {
             form.value.group = data.padre
             form.value.letter = data.letter
         } else {
@@ -204,18 +203,18 @@ const save = () => {
         <template #body>
             <span class="grid grid-cols-2 gap-2">
                 <CustomInput label="Tipo" v-model:input="form.level" type="dropdown" placeholder="Selecciona una categoria"
-                    :options="['Grupo', 'Sub Grupo', 'Descripcion']" :disabled=true></CustomInput>
+                    :options="['Grupo', 'Subgrupo', 'Descripcion']" :disabled=true></CustomInput>
                 <CustomInput label="Grupo" id="group" v-if="form.level != 'Grupo'" v-model:input="form.group"
                     type="dropdown" placeholder="Selecciona un grupo" :options="groups" optionLabel="name"
                     :invalid="form.errors.group ? true : false" :errorMessage="form.errors.group"></CustomInput>
-                <CustomInput label="Sub Grupo" id="subgroup" v-if="form.level != 'Grupo' && form.level != 'Sub Grupo'"
+                <CustomInput label="Sub Grupo" id="subgroup" v-if="form.level == 'Descripcion'"
                     v-model:input="form.sub_group" type="dropdown" placeholder="Selecciona una categoria"
                     :options="form.group ? subgroups.filter((subgroup) => subgroup.category_id == form.group.id) : []"
                     optionLabel="name" :invalid="form.errors.sub_group ? true : false"
                     :errorMessage="form.errors.sub_group"></CustomInput>
                 <CustomInput label="Nombre" id="name" v-model:input="form.name" placeholder="Nombre para mostrar"
                     :invalid="form.errors.name ? true : false" :errorMessage="form.errors.name"></CustomInput>
-                <CustomInput label="Letra" id="letter" v-if="form.level == 'Grupo' || form.level == 'Sub Grupo'"
+                <CustomInput label="Letra" id="letter" v-if="form.level == 'Grupo' || form.level == 'Subgrupo'"
                     v-model:input="form.letter" :invalid="form.errors.letter ? true : false"
                     :errorMessage="form.errors.letter" placeholder="Letra que lo identificara">
                 </CustomInput>
