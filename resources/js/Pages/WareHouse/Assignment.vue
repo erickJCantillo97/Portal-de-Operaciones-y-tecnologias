@@ -29,20 +29,24 @@ const openDialog = ref(false)
 const selectedEmployee = ref()
 const selectedSupervisor = ref()
 const selectedProject = ref()
+const loading = ref(true)
 
 
 const getPersonal = async () => {
   await axios.get(route('personal.activos'))
     .then(res => {
       personal.value = res.data.personal
+      loading.value = false
     })
 }
 
 const columnas = [
-  { field: 'tool_id', header: 'Equipo' },
-  { field: 'employee_id', header: 'Empleado' },
-  { field: 'supervisor_id', header: 'Supervisor' },
-  { field: 'project_id', header: 'Proyecto' },
+  { field: 'project_id', header: 'Proyecto', filter: true, sortable: true },
+  { field: 'employee_name', header: 'Empleado', filter: true, sortable: true },
+  { field: 'tool.name', header: 'Equipo', filter: true, sortable: true },
+  { field: 'tool.serial', header: 'Serial', filter: true, sortable: true },
+  { field: 'tool.code', header: 'Codigo interno', filter: true, sortable: true },
+  { field: 'assigment_date', header: 'Fecha de Prestamo', type: "date", filter: true, sortable: true },
 ]
 
 const actions = [
@@ -97,6 +101,7 @@ const clearModal = () => {
   form.reset()
 }
 
+
 </script>
 
 <template>
@@ -121,12 +126,13 @@ const clearModal = () => {
     <template #body>
       <section class="grid grid-cols-2 gap-4">
         <!--CAMPO SELECCIÓN DE PERSONA (personal)-->
-        <CustomInput type="dropdown" label="Seleccionar Persona" :options="personal" v-model:input="selectedEmployee"
-          optionLabel="Nombres_Apellidos" placeholder="Seleccione Personal" showClear />
+        <CustomInput type="dropdown" :loading label="Seleccionar Persona" :options="personal"
+          v-model:input="selectedEmployee" optionLabel="Nombres_Apellidos" placeholder="Seleccione Personal" showClear />
 
         <!--CAMPO SELECCIÓN DE SUPERVISOR (supervisor)-->
-        <CustomInput type="dropdown" label="Seleccionar Supervisor" :options="personal" optionLabel="Nombres_Apellidos"
-          v-model:input="selectedSupervisor" placeholder="Seleccione Supervisor" showClear />
+        <CustomInput type="dropdown" :loading label="Seleccionar Supervisor" :options="personal"
+          optionLabel="Nombres_Apellidos" v-model:input="selectedSupervisor" placeholder="Seleccione Supervisor"
+          showClear />
 
         <!--CAMPO SELECCIÓN DE PROYECTOS (projects)-->
         <CustomInput type="dropdown" label="Seleccionar Proyectos" :options="projects" optionLabel="name"

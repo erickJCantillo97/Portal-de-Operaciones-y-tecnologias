@@ -13,4 +13,5 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::resource('assignmentTool', AssignmentToolController::class);
 
     Route::get('categorias_anteriores', [CategoryController::class, 'getDataAnterior']);
+    Route::get('equipos_anteriores', [ToolController::class, 'getDataAnterior']);
 });

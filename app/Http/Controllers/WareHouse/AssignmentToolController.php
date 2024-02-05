@@ -8,6 +8,7 @@ use App\Models\WareHouse\AssignmentTool;
 use App\Models\WareHouse\Tool;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\AssignmentToolNotification;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Exception;
@@ -19,9 +20,9 @@ class AssignmentToolController extends Controller
      */
     public function index()
     {
-        $assignmentsTool = AssignmentTool::get();
+        $assignmentsTool = AssignmentTool::with('tool')->get();
         $projects = Project::orderBy('created_at', 'DESC')->get();
-        $tools = Tool::with('category','category.padre', 'category.padre.padre')->get();
+        $tools = Tool::where('estado', '<>', 'ASIGNADO')->with('category')->get();
 
         return Inertia::render('WareHouse/Assignment', compact('assignmentsTool', 'projects', 'tools'));
     }
@@ -50,12 +51,28 @@ class AssignmentToolController extends Controller
         try {
             $validateData['user_id'] = auth()->user()->id;
             $validateData['gerencia'] = auth()->user()->gerencia;
+            foreach ($validateData['tools'] as $tool) {
+                AssignmentTool::create([
+                    'tool_id' =>  $tool,
+                    'employee_name' => $request->employee_name,
+                    'employee_id' => $validateData['employee_id'],
+                    'project_id' => $validateData['project_id'],
+                    'supervisor_id' => $validateData['supervisor_id'],
+                    'user_deliver' => $validateData['user_id'],
+                    'location' => '1',
+                    'assigment_date' => Carbon::now(),
+                    'gerencia' => $validateData['gerencia'],
+                ]);
 
-            // AssignmentTool::create($validateData);
+                Tool::find($tool)->update(['estado' => 'ASIGNADO']);
+            }
 
-            Notification::route('mail', [ auth()->user()->username.'@cotecmar.com' => auth()->user()->short_name, $request->email => $request->employee_name])
-            ->notify(new AssignmentToolNotification($request->employee_name, $request->tools,
-            'Le han asignado Equipo(s)'));
+            // Notification::route('mail', [auth()->user()->username . '@cotecmar.com' => auth()->user()->short_name, $request->email => $request->employee_name])
+            //     ->notify(new AssignmentToolNotification(
+            //         $request->employee_name,
+            //         $request->tools,
+            //         'Le han asignado Equipo(s)'
+            //     ));
         } catch (Exception $e) {
             dd($e);
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);

@@ -20,4 +20,9 @@ class AssignmentTool extends Model implements Auditable
     {
         static::addGlobalScope(new GerenciaScope);
     }
+
+    public function tool()
+    {
+        return $this->belongsTo(Tool::class);
+    }
 }
