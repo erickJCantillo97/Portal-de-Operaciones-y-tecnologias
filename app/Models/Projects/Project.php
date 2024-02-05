@@ -37,13 +37,13 @@ class Project extends Model implements Auditable
         return $this->hasMany(ProjectsShip::class);
     }
 
-    public function status(): Attribute
-    {
-        return Attribute::make(
-            set: fn ($value) => $value,
-            get: fn ($value) => $value ?? 'SIN ESTADO',
-        );
-    }
+    // public function status(): Attribute
+    // {
+    //     return Attribute::make(
+    //         set: fn ($value) => $value,
+    //         get: fn ($value) => $value,
+    //     );
+    // }
 
     public function tasks()
     {
@@ -57,7 +57,7 @@ class Project extends Model implements Auditable
     public function costSale(): Attribute
     {
         return Attribute::make(
-            set: fn ($value) => $value,
+            set: fn ($value) => is_array($value) ? $value[0] : $value,
             get: fn ($value) => [$value == 0 ? ($this->contract->quote->total_cost ?? 0) : $value, $this->contract->quote->coin ?? 'COP'],
         );
     }

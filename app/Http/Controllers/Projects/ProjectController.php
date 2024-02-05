@@ -154,7 +154,7 @@ class ProjectController extends Controller
             'status' => 'nullable',
             'scope' => 'nullable',
             'supervisor' => 'nullable',
-            'cost_sale' => 'nullable|numeric|gt:-1',
+            'cost_sale' => 'nullable',
             'description' => 'nullable',
             'gerencia' => 'nullable',
             'start_date' => 'nullable',
@@ -169,7 +169,7 @@ class ProjectController extends Controller
         try {
             $project->update($validateData);
         } catch (Exception $e) {
-            // dd($e);
+            dd($e);
             return back()->withErrors(['message', 'Ocurrió un Error Al Actualizar El Proyecto: ' . $e->getMessage()], 500);
         }
     }
