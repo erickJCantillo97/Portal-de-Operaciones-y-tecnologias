@@ -24,7 +24,7 @@ class AssignmentToolController extends Controller
     {
         $assignmentsTool = AssignmentTool::with('tool')->get();
         $projects = Project::orderBy('created_at', 'DESC')->get();
-        $tools = Tool::where('estado', '<>', 'ASIGNADO')->with('category')->get();
+        $tools = Tool::where('estado', '!=', 'ASIGNADO')->with('category')->get();
 
         return Inertia::render('WareHouse/Assignment', compact('assignmentsTool', 'projects', 'tools'));
     }
@@ -81,7 +81,7 @@ class AssignmentToolController extends Controller
             // ->notify(new AssignmentToolNotification($request->employee_name, $request->tools,
             // 'Le han asignado Equipo(s)'));
 
-            Mail::to( auth()->user()->username.'@cotecmar.com' )->send(
+            Mail::to(auth()->user()->username . '@cotecmar.com')->send(
                 new AssignmentToolsMail($request->employee_name, $request->tools, 'Le han asignado Equipo(s)')
             );
 

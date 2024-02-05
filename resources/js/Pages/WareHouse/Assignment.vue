@@ -76,25 +76,25 @@ const deleteAssignment = (event, data) => {
 }
 
 const submit = () => {
-  try{
+  try {
     router.post(route('assignmentTool.store'),
-    {
-      employee_id: selectedEmployee.value.Num_SAP,
-      employee_name: selectedEmployee.value.Nombres_Apellidos,
-      supervisor_id: selectedSupervisor.value.Num_SAP,
-      project_id: selectedProject.value.id,
-      email: form.email,
-      tools: form.tools
-    },
-    {
-      onSuccess: () => {
-        toast(`¡Asignación creada exitosamente!`, 'success')
-        clearModal()
+      {
+        employee_id: selectedEmployee.value.Num_SAP,
+        employee_name: selectedEmployee.value.Nombres_Apellidos,
+        supervisor_id: selectedSupervisor.value.Num_SAP,
+        project_id: selectedProject.value.id,
+        email: form.email,
+        tools: form.tools
       },
-      onError: (error) => {
-        toast(`Ha ocurrido un error al guardar las asignaciones; ERROR: ${error.message}`, 'error')
-      }
-    })
+      {
+        onSuccess: () => {
+          toast(`¡Asignación creada exitosamente!`, 'success')
+          clearModal()
+        },
+        onError: (error) => {
+          toast(`Ha ocurrido un error al guardar las asignaciones; ERROR: ${error.message}`, 'error')
+        }
+      })
   } catch (e) {
     toast(e.message, 'error')
   }
@@ -104,9 +104,9 @@ const clearModal = () => {
   openDialog.value = false
 
   selectedEmployee.value = [],
-  selectedSupervisor.value = [],
-  selectedProject.value = [],
-  form.reset()
+    selectedSupervisor.value = [],
+    selectedProject.value = [],
+    form.reset()
 }
 
 
@@ -154,7 +154,7 @@ const clearModal = () => {
         <!--CAMPO SELECCIÓN DE EQUIPOS (tools)-->
         <div class="col-span-2">
           <label class="text-md font-semibold">Seleccionar Equipos</label>
-          <Listbox v-model="form.tools" :options="fakeTools" multiple filter optionLabel="name" optionValue="id"
+          <Listbox v-model="form.tools" :options="tools" multiple filter optionLabel="name" optionValue="id"
             :emptyMessage="loading ? 'Cargando equipos, espere un momento por favor...' : 'No se encuentran resultados.'"
             filterPlaceholder="Seleccione el/los equipo(s) para asignar." class="w-full md:w-14rem"
             :virtualScrollerOptions="{ itemSize: 38 }" listStyle="height:15rem" :pt="{

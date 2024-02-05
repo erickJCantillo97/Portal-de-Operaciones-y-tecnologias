@@ -119,6 +119,7 @@ class PersonalController extends Controller
                 'Num_SAP' => (int) $person['Num_SAP'],
                 'Fecha_Final' => $person['Fecha_Final'],
                 'Costo_Hora' => $person['Costo_Hora'],
+                'Correo' => $person['Correo'],
                 'Costo_Mes' => $person['Costo_Mes'],
                 'Oficina' => $person['Oficina'],
                 'Nombres_Apellidos' => $person['Nombres_Apellidos'],
