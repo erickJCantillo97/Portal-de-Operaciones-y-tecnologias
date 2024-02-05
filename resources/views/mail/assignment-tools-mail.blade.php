@@ -1,15 +1,15 @@
-@component('mail::message' , ['inner_footer_url' => 'http://www.top.cotecmar.com'])
+@component('mail::message' , ['inner_footer_url' => 'http://top.cotecmar.com'])
 
 ## Señor {{$employee}}
 
-le Han asignado las siguientes herramientas
+Le han asignado las siguientes herramientas
 {{--Tabla--}}
-## lista de herramimentas:
+## Lista de herramientas:
 @component('mail::table')
 | Herramienta   | Serial        | Codigo Interno |
 | ------------- |:-------------:| --------:|
 @foreach ($tools as $tool)
-| {{ $tool->name }}  | {{$tool->serial}}      | {{$tool->code}}      |
+| {{ $tool->name }}  | {{ $tool->serial }}      | {{ $tool->code }}      |
 @endforeach
 @endcomponent
 @endcomponent
