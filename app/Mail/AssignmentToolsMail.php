@@ -19,7 +19,7 @@ class AssignmentToolsMail extends Mailable
 
     public $employee;
 
-    public $tools ;
+    public $tools;
 
     // public $theme = "assignmentsTools.css";
 
@@ -32,10 +32,10 @@ class AssignmentToolsMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct($data)
+    public function __construct($employee, $tools = [0])
     {
-        $this->data;
-        $this->tools = ['Arma de fuego', 'Changon'];
+        $this->employee = $employee;
+        $this->tools = Tool::whereIn('id', $tools)->get();
     }
 
     // public function __construct($employee, $tools, $subject = null)
@@ -52,7 +52,7 @@ class AssignmentToolsMail extends Mailable
     {
         return new Envelope(
             // subject: $this->subject,
-            subject: 'Hello Dear!',
+            subject: 'Nueva Asiganacion de Equipos',
         );
     }
 

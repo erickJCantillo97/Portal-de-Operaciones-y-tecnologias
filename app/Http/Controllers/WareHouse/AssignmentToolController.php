@@ -71,21 +71,10 @@ class AssignmentToolController extends Controller
                 Tool::find($tool)->update(['estado' => 'ASIGNADO']);
             }
 
-            // Notification::route('mail', [auth()->user()->username . '@cotecmar.com' => auth()->user()->short_name, $request->email => $request->employee_name])
-            //     ->notify(new AssignmentToolNotification(
-            //         $request->employee_name,
-            //         $request->tools,
-            //         'Le han asignado Equipo(s)'
-            //     ));
-            // Mail::route('mail', [ auth()->user()->username.'@cotecmar.com' => auth()->user()->short_name, $request->email => $request->employee_name])
-            // ->notify(new AssignmentToolNotification($request->employee_name, $request->tools,
-            // 'Le han asignado Equipo(s)'));
-
-            Mail::to(auth()->user()->username . '@cotecmar.com')->send(
-                new AssignmentToolsMail($request->employee_name, $request->tools, 'Le han asignado Equipo(s)')
+            Mail::to([auth()->user()->username . '@cotecmar.com', 'rgutierrez@cotecmar.com'])->send(
+                new AssignmentToolsMail($request->employee_name, $request->tools)
             );
 
-            // dd('Mail send successfully.');
 
         } catch (Exception $e) {
             dd($e);
