@@ -76,7 +76,8 @@ const deleteAssignment = (event, data) => {
 }
 
 const submit = () => {
-  router.post(route('assignmentTool.store'),
+  try{
+    router.post(route('assignmentTool.store'),
     {
       employee_id: selectedEmployee.value.Num_SAP,
       employee_name: selectedEmployee.value.Nombres_Apellidos,
@@ -94,10 +95,17 @@ const submit = () => {
         toast(`Ha ocurrido un error al guardar las asignaciones; ERROR: ${error.message}`, 'error')
       }
     })
+  } catch (e) {
+    toast(e.message, 'error')
+  }
 }
 
 const clearModal = () => {
   openDialog.value = false
+
+  selectedEmployee.value = [],
+  selectedSupervisor.value = [],
+  selectedProject.value = [],
   form.reset()
 }
 
@@ -136,7 +144,8 @@ const clearModal = () => {
 
         <!--CAMPO SELECCIÓN DE PROYECTOS (projects)-->
         <CustomInput type="dropdown" label="Seleccionar Proyectos" :options="projects" optionLabel="name"
-          v-model:input="selectedProject" placeholder="Seleccione Proyecto" showClear />
+          v-model:input="selectedProject" placeholder="Seleccione Proyecto" showClear
+          :invalid="$attrs.errors.project_id != null" :errorMessage="$attrs.errors.project_id" />
 
         <!--CAMPO CORREO (tools)-->
         <CustomInput label="Correo" placeholder="correocorporativo@cotecmar.com" v-model:input="form.email"
@@ -145,7 +154,7 @@ const clearModal = () => {
         <!--CAMPO SELECCIÓN DE EQUIPOS (tools)-->
         <div class="col-span-2">
           <label class="text-md font-semibold">Seleccionar Equipos</label>
-          <Listbox v-model="form.tools" :options="tools" multiple filter optionLabel="category.name" optionValue="id"
+          <Listbox v-model="form.tools" :options="fakeTools" multiple filter optionLabel="name" optionValue="id"
             :emptyMessage="loading ? 'Cargando equipos, espere un momento por favor...' : 'No se encuentran resultados.'"
             filterPlaceholder="Seleccione el/los equipo(s) para asignar." class="w-full md:w-14rem"
             :virtualScrollerOptions="{ itemSize: 38 }" listStyle="height:15rem" :pt="{

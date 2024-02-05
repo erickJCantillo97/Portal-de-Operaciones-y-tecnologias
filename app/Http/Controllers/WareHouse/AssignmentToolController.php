@@ -9,6 +9,8 @@ use App\Models\WareHouse\Tool;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\AssignmentToolNotification;
 use Carbon\Carbon;
+use App\Mail\AssignmentToolsMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Exception;
@@ -44,8 +46,10 @@ class AssignmentToolController extends Controller
             'employee_id' => 'required',
             'supervisor_id' => 'required',
             'project_id' => 'required',
-            'tools' => 'required|array',
+            'tools' => 'nullable|array',
             'email' => 'required|email'
+        ], [
+            'project_id' => 'Es requerido',
         ]);
         //correo user, username, correo persona, nombre persona
         try {
@@ -73,6 +77,16 @@ class AssignmentToolController extends Controller
             //         $request->tools,
             //         'Le han asignado Equipo(s)'
             //     ));
+            // Mail::route('mail', [ auth()->user()->username.'@cotecmar.com' => auth()->user()->short_name, $request->email => $request->employee_name])
+            // ->notify(new AssignmentToolNotification($request->employee_name, $request->tools,
+            // 'Le han asignado Equipo(s)'));
+
+            Mail::to( auth()->user()->username.'@cotecmar.com' )->send(
+                new AssignmentToolsMail($request->employee_name, $request->tools, 'Le han asignado Equipo(s)')
+            );
+
+            // dd('Mail send successfully.');
+
         } catch (Exception $e) {
             dd($e);
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
