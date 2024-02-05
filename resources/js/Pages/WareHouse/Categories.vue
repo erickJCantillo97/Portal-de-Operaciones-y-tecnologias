@@ -102,7 +102,7 @@ const save = () => {
     }
     if (!form.value.error) {
         form.value.loading = true
-        form.value.category_id = form.value.level == 'Grupo' ? 0 : form.value.level == 'Sub Grupo' ? form.value.group.id : form.value.sub_group.id
+        form.value.category_id = form.value.level == 'Grupo' ? 0 : form.value.level == 'Subgrupo' ? form.value.group.id : form.value.sub_group.id
 
         if (modalType.value == 'Nuevo') {
             router.post(route('categories.store'), form.value, {

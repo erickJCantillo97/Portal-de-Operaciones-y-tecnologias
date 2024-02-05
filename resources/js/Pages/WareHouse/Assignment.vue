@@ -29,20 +29,24 @@ const openDialog = ref(false)
 const selectedEmployee = ref()
 const selectedSupervisor = ref()
 const selectedProject = ref()
+const loading = ref(true)
 
 
 const getPersonal = async () => {
   await axios.get(route('personal.activos'))
     .then(res => {
       personal.value = res.data.personal
+      loading.value = false
     })
 }
 
 const columnas = [
-  { field: 'tool_id', header: 'Equipo' },
-  { field: 'employee_id', header: 'Empleado' },
-  { field: 'supervisor_id', header: 'Supervisor' },
-  { field: 'project_id', header: 'Proyecto' },
+  { field: 'project_id', header: 'Proyecto', filter: true, sortable: true },
+  { field: 'employee_name', header: 'Empleado', filter: true, sortable: true },
+  { field: 'tool.name', header: 'Equipo', filter: true, sortable: true },
+  { field: 'tool.serial', header: 'Serial', filter: true, sortable: true },
+  { field: 'tool.code', header: 'Codigo interno', filter: true, sortable: true },
+  { field: 'assigment_date', header: 'Fecha de Prestamo', type: "date", filter: true, sortable: true },
 ]
 
 const actions = [
@@ -72,25 +76,25 @@ const deleteAssignment = (event, data) => {
 }
 
 const submit = () => {
-  try{
+  try {
     router.post(route('assignmentTool.store'),
-    {
-      employee_id: selectedEmployee.value.Num_SAP,
-      employee_name: selectedEmployee.value.Nombres_Apellidos,
-      supervisor_id: selectedSupervisor.value.Num_SAP,
-      project_id: selectedProject.value.id,
-      email: form.email,
-      tools: form.tools
-    },
-    {
-      onSuccess: () => {
-        toast(`¡Asignación creada exitosamente!`, 'success')
-        clearModal()
+      {
+        employee_id: selectedEmployee.value.Num_SAP,
+        employee_name: selectedEmployee.value.Nombres_Apellidos,
+        supervisor_id: selectedSupervisor.value.Num_SAP,
+        project_id: selectedProject.value.id,
+        email: form.email,
+        tools: form.tools
       },
-      onError: (error) => {
-        toast(`Ha ocurrido un error al guardar las asignaciones; ERROR: ${error.message}`, 'error')
-      }
-    })
+      {
+        onSuccess: () => {
+          toast(`¡Asignación creada exitosamente!`, 'success')
+          clearModal()
+        },
+        onError: (error) => {
+          toast(`Ha ocurrido un error al guardar las asignaciones; ERROR: ${error.message}`, 'error')
+        }
+      })
   } catch (e) {
     toast(e.message, 'error')
   }
@@ -100,10 +104,11 @@ const clearModal = () => {
   openDialog.value = false
 
   selectedEmployee.value = [],
-  selectedSupervisor.value = [],
-  selectedProject.value = [],
-  form.reset()
+    selectedSupervisor.value = [],
+    selectedProject.value = [],
+    form.reset()
 }
+
 
 </script>
 
@@ -129,12 +134,13 @@ const clearModal = () => {
     <template #body>
       <section class="grid grid-cols-2 gap-4">
         <!--CAMPO SELECCIÓN DE PERSONA (personal)-->
-        <CustomInput type="dropdown" label="Seleccionar Persona" :options="personal" v-model:input="selectedEmployee"
-          optionLabel="Nombres_Apellidos" placeholder="Seleccione Personal" showClear />
+        <CustomInput type="dropdown" :loading label="Seleccionar Persona" :options="personal"
+          v-model:input="selectedEmployee" optionLabel="Nombres_Apellidos" placeholder="Seleccione Personal" showClear />
 
         <!--CAMPO SELECCIÓN DE SUPERVISOR (supervisor)-->
-        <CustomInput type="dropdown" label="Seleccionar Supervisor" :options="personal" optionLabel="Nombres_Apellidos"
-          v-model:input="selectedSupervisor" placeholder="Seleccione Supervisor" showClear />
+        <CustomInput type="dropdown" :loading label="Seleccionar Supervisor" :options="personal"
+          optionLabel="Nombres_Apellidos" v-model:input="selectedSupervisor" placeholder="Seleccione Supervisor"
+          showClear />
 
         <!--CAMPO SELECCIÓN DE PROYECTOS (projects)-->
         <CustomInput type="dropdown" label="Seleccionar Proyectos" :options="projects" optionLabel="name"
@@ -148,7 +154,7 @@ const clearModal = () => {
         <!--CAMPO SELECCIÓN DE EQUIPOS (tools)-->
         <div class="col-span-2">
           <label class="text-md font-semibold">Seleccionar Equipos</label>
-          <Listbox v-model="form.tools" :options="fakeTools" multiple filter optionLabel="name" optionValue="id"
+          <Listbox v-model="form.tools" :options="tools" multiple filter optionLabel="name" optionValue="id"
             :emptyMessage="loading ? 'Cargando equipos, espere un momento por favor...' : 'No se encuentran resultados.'"
             filterPlaceholder="Seleccione el/los equipo(s) para asignar." class="w-full md:w-14rem"
             :virtualScrollerOptions="{ itemSize: 38 }" listStyle="height:15rem" :pt="{

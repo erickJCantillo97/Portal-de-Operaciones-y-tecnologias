@@ -9,6 +9,7 @@ use DateTime;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ToolController extends Controller
@@ -18,7 +19,7 @@ class ToolController extends Controller
      */
     public function index()
     {
-        $tools = Tool::with('category','category.padre', 'category.padre.padre')->get();
+        $tools = Tool::with('category', 'category.padre', 'category.padre.padre')->orderBy('category_id')->get();
         $categories = Category::has('padre')->where('level', 'Descripcion')
             ->get();
         return Inertia::render('WareHouse/Tools', [
@@ -27,6 +28,29 @@ class ToolController extends Controller
         ]);
     }
 
+
+
+    public function getDataAnterior()
+    {
+        $equipos = DB::connection('sqlsrv_anterior')->table('equipos')->get();
+        foreach ($equipos as $e) {
+            Tool::create([
+                'responsible_id' => auth()->user()->id,
+                'category_id' => Category::where('level', 'Descripcion')->where('name', $e->name)->first()->id,
+                'gerencia' => auth()->user()->gerencia,
+                'serial' => $e->serial,
+                'code' => $e->codigo_interno,
+                'SAP_code' => $e->codigo_SAP,
+                'value' => $e->valor_compra,
+                'entry_date' => $e->fecha_ingreso,
+                'is_small' => $e->es_pequeño,
+                'estado' => $e->estado == 'PRESTADO' ? 'ASIGNAADO' : $e->estado,
+                'estado_operativo' => $e->estado_operativo
+            ]);
+        }
+        Category::where('level', 'Sub Grupo')->update(['level' => 'Subgrupo']);
+        return Category::get();
+    }
     /**
      * Show the form for creating a new resource.
      */
@@ -101,7 +125,7 @@ class ToolController extends Controller
     {
         $validateData = $request->validate([
             'category_id' => 'required',
-            'serial' => 'required|unique:tools,serial,'.$tool->id,
+            'serial' => 'required|unique:tools,serial,' . $tool->id,
             'SAP_code' => 'nullable|string',
             'value' => 'required',
             'brand' => 'nullable',

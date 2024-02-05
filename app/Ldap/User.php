@@ -40,4 +40,7 @@ class User extends Model
 
         return "data:$mime;base64,$image";
     }
+
+
+
 }
