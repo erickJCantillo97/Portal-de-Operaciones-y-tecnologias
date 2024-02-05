@@ -1,35 +1,13 @@
-@component('mail::message')
-# Introduction
+@component('mail::message' , ['inner_footer_url' => 'http://www.top.cotecmar.com'])
 
-The body of your message.
-
-
-<img src="https://minciencias.gov.co/sites/default/files/cotecmar.png" class="logo" alt="Laravel Logo">
-
-@component('mail::button', ['url' => '', 'color' => 'red', 'align' => 'left'], )
-    <i>Ingresar</i>
-@endcomponent
-@foreach ($tools as $tool)
-@component('mail::panel')
-    Equipo: {{$tool}}
-@endcomponent
-@endforeach
-
-## Equipos:
-
+{{--Tabla--}}
+## Equipos Asignados:
 @component('mail::table')
-| Laravel       | Table         | Example  |
+| Herramienta   | Serial        | Cantidad |
 | ------------- |:-------------:| --------:|
-| Col 2 is      | Centered      | $10      |
+@foreach ($tools as $tool)
+| {{ $tool }}  | Centered      | $10      |
+@endforeach
 | Col 3 is      | Right-Aligned | $20      |
 @endcomponent
-
-
-@component('mail::subcopy')
-    This is a subcopy component
-@endcomponent
-
-
-Para más información visitar: <br>
-{{ config('app.name') }}
 @endcomponent

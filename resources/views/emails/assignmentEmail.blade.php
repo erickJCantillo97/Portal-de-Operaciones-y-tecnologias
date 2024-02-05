@@ -36,8 +36,8 @@
             padding-bottom: 2rem;
             padding-top: 2.5rem;
             box-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-            background-color: #ffffff;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            background-color: #ffffff;
 
             @media (min-width: 640px) {
                 padding-left: 2.5rem;

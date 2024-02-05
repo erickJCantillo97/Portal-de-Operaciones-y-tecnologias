@@ -19,6 +19,8 @@ class AssignmentToolsMail extends Mailable
 
     public $employee;
 
+    public $tools ;
+
     // public $theme = "assignmentsTools.css";
 
     // public $theme = 'assignmentsTools';
@@ -33,6 +35,7 @@ class AssignmentToolsMail extends Mailable
     public function __construct($data)
     {
         $this->data;
+        $this->tools = ['Arma de fuego', 'Changon'];
     }
 
     // public function __construct($employee, $tools, $subject = null)
@@ -60,11 +63,6 @@ class AssignmentToolsMail extends Mailable
     {
         return new Content(
             markdown: 'mail.assignment-tools-mail',
-            with: [
-                // 'employee' => $this->employee,
-                'tools' => ['Arma de fuego', 'Changon'],
-                'data' => $this->data,
-            ]
         );
     }
 
