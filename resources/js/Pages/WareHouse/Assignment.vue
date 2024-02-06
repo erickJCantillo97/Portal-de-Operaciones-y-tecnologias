@@ -6,7 +6,10 @@ import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomModal from '@/Components/CustomModal.vue'
 import CustomInput from '@/Components/CustomInput.vue'
+import RadioGroups from '@/Components/RadioGroups.vue'
 import Listbox from 'primevue/listbox'
+import RadioButton from 'primevue/radiobutton'
+import Textarea from 'primevue/textarea'
 
 const { toast } = useSweetalert()
 const { confirmDelete } = useSweetalert()
@@ -24,6 +27,7 @@ onMounted(() => {
   getPersonal()
 })
 
+// V-models de Asignación de Equipos
 const personal = ref()
 const openDialog = ref(false)
 const selectedEmployee = ref({})
@@ -31,6 +35,11 @@ const selectedSupervisor = ref()
 const selectedProject = ref()
 const loading = ref(true)
 
+//V-models de Descarga de Equipos
+const openDialog2 = ref(false)
+const toolStatus = ref()
+const descriptionValue = ref()
+const active = ref(true)
 
 const getPersonal = async () => {
   await axios.get(route('personal.activos'))
@@ -51,7 +60,7 @@ const columnas = [
 ]
 
 const actions = [
-  { event: 'download', severity: 'info', icon: 'fa-solid fa-download', text: true, outlined: false, rounded: false },
+  { event: 'download', severity: 'warning', icon: 'fa-regular fa-circle-xmark', text: true, outlined: false, rounded: false },
   { event: 'delete', severity: 'danger', icon: 'fa-regular fa-trash-can', text: true, outlined: false, rounded: false },
   // { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
 ]
@@ -66,10 +75,7 @@ const createAssignmentsTool = () => {
 }
 
 const downloadAssignment = () => {
-  alert('Descargando...')
-  setTimeout(() => {
-    alert('Archivo Descargado! 😁')
-  }, 5000)
+  openDialog2.value = true
 }
 
 const deleteAssignment = (event, data) => {
@@ -110,7 +116,10 @@ const clearModal = () => {
     form.reset()
 }
 
-
+const clearModal2 = () => {
+  openDialog2.value = false
+  form.reset()
+}
 </script>
 
 <template>
@@ -125,6 +134,7 @@ const clearModal = () => {
     </div>
   </AppLayout>
 
+  <!--Modal Asignación de Equipos-->
   <CustomModal v-model:visible="openDialog" :closable="false">
     <template #icon>
       <span class="material-symbols-outlined font-semibold text-3xl">
@@ -168,6 +178,36 @@ const clearModal = () => {
     </template>
     <template #footer>
       <Button label="Cancelar" icon="fa-regular fa-circle-xmark" severity="danger" outlined @click="clearModal()" />
+      <Button label="Guardar" icon="fa-solid fa-floppy-disk" severity="success" outlined :loading="false"
+        @click="submit()" />
+    </template>
+  </CustomModal>
+
+  <!--Modal Descargar Herramienta-->
+  <CustomModal v-model:visible="openDialog2" :closable="false">
+    <template #icon>
+      <span class="material-symbols-outlined font-semibold text-3xl">
+        construction
+      </span>
+    </template>
+    <template #titulo>
+      <p>Descargar Equipo</p>
+    </template>
+    <template #body>
+      <section class="grid grid-cols-4 gap-4 p-2 [&>div>p]:text-xs [&>div>p]:text-gray-500 [&>div>p]:italic">
+        <!--CAMPO SELECCIÓN DE PERSONA (personal)-->
+        <RadioGroups v-model="toolStatus" class="col-span-4" />
+        <div class="col-span-4">
+          <label>Descripción de Estado de la herramienta</label>
+          <Textarea v-model="descriptionValue" rows="5" col="10" placeholder="Agregue una descripción al grupo" autoResize
+            :pt="{
+              root: '!w-full !text-sm'
+            }" />
+        </div>
+      </section>
+    </template>
+    <template #footer>
+      <Button label="Cancelar" icon="fa-regular fa-circle-xmark" severity="danger" outlined @click="clearModal2()" />
       <Button label="Guardar" icon="fa-solid fa-floppy-disk" severity="success" outlined :loading="false"
         @click="submit()" />
     </template>
