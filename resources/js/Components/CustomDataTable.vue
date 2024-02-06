@@ -316,8 +316,8 @@ const auxdata = ref()
                     </div>
                 </span>
                 <span v-else-if="col.type == 'button'" class="w-full">
-                    <Button :label="String(data[col.field])" class="w-full" :icon="col.icon" :outlined="col.outlined"
-                        :text="col.text" :severity="col.severity" :rounded="col.rounded"
+                    <Button :label="String(data[col.field])" class="w-full" :class="col.rowclass" :icon="col.icon"
+                        :outlined="col.outlined" :text="col.text" :severity="col.severity" :rounded="col.rounded"
                         @click="$emit(col.event, $event, data)">
                     </Button>
                 </span>
