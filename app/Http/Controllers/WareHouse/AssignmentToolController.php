@@ -22,7 +22,7 @@ class AssignmentToolController extends Controller
      */
     public function index()
     {
-        $assignmentsTool = AssignmentTool::with('tool')->get();
+        $assignmentsTool = AssignmentTool::with('tool', 'project')->get();
         $projects = Project::orderBy('created_at', 'DESC')->get();
         $tools = Tool::where('estado', '!=', 'ASIGNADO')->with('category')->get();
 
@@ -74,8 +74,6 @@ class AssignmentToolController extends Controller
             Mail::to([auth()->user()->username . '@cotecmar.com', 'rgutierrez@cotecmar.com'])->send(
                 new AssignmentToolsMail($request->employee_name, $request->tools)
             );
-
-
         } catch (Exception $e) {
             dd($e);
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
@@ -104,11 +102,18 @@ class AssignmentToolController extends Controller
     public function update(Request $request, AssignmentTool $assignmentTool)
     {
         $validateData = $request->validate([
-            //
+            'status' => 'required',
+            'observation' => 'nullable|string'
         ]);
 
         try {
-            $assignmentTool->update($validateData);
+            $assignmentTool->update([
+                'status' => 'DEVULETO',
+                'observation' => $validateData['observation']
+            ]);
+            $assignmentTool->tool->update([
+                'estado' => $validateData['status'],
+            ]);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }

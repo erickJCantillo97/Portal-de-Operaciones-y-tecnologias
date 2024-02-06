@@ -26,7 +26,7 @@ onMounted(() => {
 
 const personal = ref()
 const openDialog = ref(false)
-const selectedEmployee = ref()
+const selectedEmployee = ref({})
 const selectedSupervisor = ref()
 const selectedProject = ref()
 const loading = ref(true)
@@ -41,11 +41,12 @@ const getPersonal = async () => {
 }
 
 const columnas = [
-  { field: 'project_id', header: 'Proyecto', filter: true, sortable: true },
+  { field: 'project.name', header: 'Proyecto', filter: true, sortable: true },
   { field: 'employee_name', header: 'Empleado', filter: true, sortable: true },
   { field: 'tool.name', header: 'Equipo', filter: true, sortable: true },
   { field: 'tool.serial', header: 'Serial', filter: true, sortable: true },
-  { field: 'tool.code', header: 'Codigo interno', filter: true, sortable: true },
+  { field: 'tool.code', header: 'Codigo Interno', filter: true, sortable: true },
+  { field: 'tool.estado', header: 'Estado ', filter: true, sortable: true },
   { field: 'assigment_date', header: 'Fecha de Prestamo', type: "date", filter: true, sortable: true },
 ]
 
@@ -56,7 +57,7 @@ const actions = [
 ]
 
 const form = useForm({
-  email: null,
+  email: '',
   tools: null,
 })
 
@@ -83,7 +84,7 @@ const submit = () => {
         employee_name: selectedEmployee.value.Nombres_Apellidos,
         supervisor_id: selectedSupervisor.value.Num_SAP,
         project_id: selectedProject.value.id,
-        email: form.email,
+        email: selectedEmployee.value.Correo,
         tools: form.tools
       },
       {
@@ -114,12 +115,14 @@ const clearModal = () => {
 
 <template>
   <AppLayout>
-    <CustomDataTable :data="assignmentsTool" title="Asignaciones" :rows-default="15" :columnas="columnas"
-      :actions="actions" @download="downloadAssignment()" @delete="deleteAssignment()">
-      <template #buttonHeader>
-        <Button @click="createAssignmentsTool()" label="Nuevo" icon="fa-solid fa-plus" outlined />
-      </template>
-    </CustomDataTable>
+    <div class="w-full h-[89vh] overflow-y-auto">
+      <CustomDataTable :data="assignmentsTool" title="Asignaciones" :rows-default="15" :columnas="columnas"
+        :actions="actions" @download="downloadAssignment()" @delete="deleteAssignment()">
+        <template #buttonHeader>
+          <Button @click="createAssignmentsTool()" label="Nuevo" icon="fa-solid fa-plus" outlined />
+        </template>
+      </CustomDataTable>
+    </div>
   </AppLayout>
 
   <CustomModal v-model:visible="openDialog" :closable="false">
@@ -148,7 +151,7 @@ const clearModal = () => {
           :invalid="$attrs.errors.project_id != null" :errorMessage="$attrs.errors.project_id" />
 
         <!--CAMPO CORREO (tools)-->
-        <CustomInput label="Correo" placeholder="correocorporativo@cotecmar.com" v-model:input="form.email"
+        <CustomInput label="Correo" placeholder="correocorporativo@cotecmar.com" v-model:input="selectedEmployee.Correo"
           :invalid="$attrs.errors.email != null" :errorMessage="$attrs.errors.email" />
 
         <!--CAMPO SELECCIÓN DE EQUIPOS (tools)-->

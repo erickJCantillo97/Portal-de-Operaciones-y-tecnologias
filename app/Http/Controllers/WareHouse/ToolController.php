@@ -20,7 +20,7 @@ class ToolController extends Controller
     public function index()
     {
         $tools = Tool::with('category', 'category.padre', 'category.padre.padre')->orderBy('category_id')->get();
-        $categories = Category::has('padre')->where('level', 'Descripcion')
+        $categories = Category::has('padre')->with('padre', 'padre.padre')->where('level', 'Descripcion')
             ->get();
         return Inertia::render('WareHouse/Tools', [
             'tools' => $tools,
