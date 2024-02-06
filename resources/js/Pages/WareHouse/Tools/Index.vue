@@ -26,18 +26,26 @@ const form = ref({
 })
 
 const columnas = [
-    { field: 'name', header: 'Nombre' },
-    { field: 'code', header: 'Codigo' },
-    { field: 'serial', header: 'Serial' },
-    { field: 'SAP_code', header: 'Codigo SAP' },
-    { field: 'value', header: 'Costo', type: 'currency', class: 'w-32', },
-    { field: 'estado', header: 'Disponibilidad' },
-    { field: 'estado_operativo', header: 'Operatividad' },
+    { field: 'name', header: 'Nombre', filter: true, sortable: true },
+    { field: 'code', header: 'Codigo', filter: true, sortable: true },
+    { field: 'serial', header: 'Serial', filter: true, sortable: true },
+    { field: 'estado_operativo', header: 'Operatividad', filter: true, sortable: true },
+    { field: 'estado', header: 'Disponibilidad', filter: true, sortable: true },
 ]
 
-const actions = [
-    { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
+const filterButtons = [
+    { field: 'estado_operativo', label: 'OPERATIVA', data: 'OPERATIVA', severity: 'success' },
+    { field: 'estado_operativo', label: 'CON LIMITACIONES', data: 'CON LIMITACIONES', severity: 'warning' },
+    { field: 'estado_operativo', label: 'FUERA DE SERVICIO', data: 'FUERA DE SERVICIO', severity: 'danger' },
+    { field: 'estado_operativo', label: 'BAJA ', data: 'BAJA', severity: 'danger' },
 ]
+
+const getTotalStatus = (status) => {
+    return props.tools.filter(obj => obj.estado_operativo == status).length
+}
+
+const actions = [
+    { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },]
 
 const showModal = (event, data) => {
     if (data == null) {
@@ -52,13 +60,13 @@ const showModal = (event, data) => {
         modalType.value = 'Editar'
         form.value.id = data.id
         form.value.category = data.category
-        delete form.value.category.padre
         form.value.is_small = data.is_small == 0 ? false : true
         form.value.serial = data.serial
         form.value.SAP_code = data.SAP_code
         form.value.value = parseInt(data.value)
         form.value.brand = data.brand
         form.value.entry_date = data.entry_date
+        form.value.estado_operativo = data.estado_operativo
         form.value.description = data.description
         form.value.imagen = data.imagen
         modalVisible.value = true
@@ -108,13 +116,15 @@ const save = () => {
     }
 }
 
+
+
 </script>
 
 <template>
     <AppLayout>
         <div class="w-full h-[89vh] overflow-y-auto">
-            <CustomDataTable :rowsDefault="20" title="Herramientas y equipos" :data="tools" :columnas="columnas"
-                :actions="actions" @edit="showModal">
+            <CustomDataTable :rowsDefault="100" title="Herramientas y equipos" :data="tools" :columnas="columnas"
+                :actions="actions" @edit="showModal" :filterButtons="filterButtons">
                 <template #buttonHeader>
                     <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal" />
                 </template>
@@ -142,14 +152,23 @@ const save = () => {
                 <CustomInput label="Valor" id="value" type="number" mode="currency" v-model:input="form.value"
                     placeholder="Valor del equipo" :invalid="form.errors.value ? true : false"
                     :errorMessage="form.errors.value" />
+
                 <CustomInput label="Marca" id="brand" v-model:input="form.brand" placeholder="Marca del equipo"
                     :invalid="form.errors.brand ? true : false" :errorMessage="form.errors.brand" />
+
                 <CustomInput label="Fecha de entrada" id="entry_date" v-model:input="form.entry_date" type="date"
                     placeholder="Selecciona una categoria" :options="categories" optionLabel="name"
                     :invalid="form.errors.entry_date ? true : false" :errorMessage="form.errors.entry_date" />
+
                 <CustomInput label="Es pequeño?" type="tooglebutton" id="is_small" v-model:input="form.is_small"
                     placeholder="Nombre para mostrar" :invalid="form.errors.is_small ? true : false"
                     :errorMessage="form.errors.is_small" />
+
+                <CustomInput label="estado_operativo" id="estado_operativo" v-model:input="form.estado_operativo"
+                    type="dropdown" placeholder="Selecciona un estado_operativo"
+                    :options="['OPERATIVA', 'CON LIMITACIONES', 'FUERA DE SERVICIO', 'BAJA']"
+                    :invalid="form.errors.estado_operativo ? true : false" :errorMessage="form.errors.estado_operativo" />
+
                 <CustomInput label="Imagen" type="file" id="imagen" v-model:input="form.imagen"
                     placeholder="Nombre para mostrar" :invalid="form.errors.imagen ? true : false"
                     :errorMessage="form.errors.imagen" />

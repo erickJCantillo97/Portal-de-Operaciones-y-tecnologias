@@ -2,6 +2,7 @@
 
 namespace App\Models\WareHouse;
 
+use App\Models\Projects\Project;
 use App\Models\Scopes\GerenciaScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,5 +25,10 @@ class AssignmentTool extends Model implements Auditable
     public function tool()
     {
         return $this->belongsTo(Tool::class);
+    }
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
     }
 }

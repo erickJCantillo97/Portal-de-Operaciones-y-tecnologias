@@ -90,6 +90,10 @@ initFilters()
 onMounted(() => {
     initFilters()
 })
+
+const getTotalStatus = (field, data) => {
+    return props.data.filter(obj => obj[field] == data).length
+}
 const clearFilter = () => {
     initFilters();
 };
@@ -175,7 +179,9 @@ const auxdata = ref()
                             <InputText v-model="filters.global.value" type="search" size="small" placeholder="Buscar" />
                         </span>
                         <span v-if="props.filterButtons && filterOK" class="p-buttonset">
-                            <Button v-for="button in props.filterButtons" :label=button.label :severity=button.severity
+                            <Button v-for="button in props.filterButtons"
+                                :label="button.label + ': ' + getTotalStatus(button.field, button.data)"
+                                :severity=button.severity
                                 @click="filters[button.field].value == button.data ? filters[button.field].value = null : filters[button.field].value = button.data"
                                 :outlined="filters[button.field].value != button.data" icon="" />
                         </span>
@@ -316,10 +322,10 @@ const auxdata = ref()
                     </Button>
                 </span>
                 <span v-else-if="col.type == 'array'" class="w-full flex space-x-1">
-                    <p v-for="item, index in data[col.field]" 
-                    :class="col.itemsClass.find((itemClass) => itemClass.text == item)?.class ?? col.itemClass">
+                    <p v-for="item, index in data[col.field]"
+                        :class="col.itemsClass.find((itemClass) => itemClass.text == item)?.class ?? col.itemClass">
                         {{ item }}
-                </p>
+                    </p>
                 </span>
                 <p v-else class="">
                     {{
