@@ -107,7 +107,7 @@ class ToolController extends Controller
      */
     public function show(Tool $tool)
     {
-        //
+        return $tool;
     }
 
     /**

@@ -26,7 +26,7 @@ const form = ref({
 })
 
 const columnas = [
-    { field: 'name', header: 'Nombre', filter: true, sortable: true },
+    { field: 'name', header: 'Nombre', rowclass: "underline !text-left", sortable: true, filter: true, type: 'button', event: 'goTool', severity: 'info', text: true },
     { field: 'code', header: 'Codigo', filter: true, sortable: true },
     { field: 'serial', header: 'Serial', filter: true, sortable: true },
     { field: 'estado_operativo', header: 'Operatividad', filter: true, sortable: true },
@@ -40,9 +40,7 @@ const filterButtons = [
     { field: 'estado_operativo', label: 'BAJA ', data: 'BAJA', severity: 'danger' },
 ]
 
-const getTotalStatus = (status) => {
-    return props.tools.filter(obj => obj.estado_operativo == status).length
-}
+
 
 const actions = [
     { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },]
@@ -71,6 +69,11 @@ const showModal = (event, data) => {
         form.value.imagen = data.imagen
         modalVisible.value = true
     }
+}
+
+const goTool = (event, data) => {
+    router.get(route('tools.show', data.id))
+
 }
 
 const save = () => {
@@ -116,15 +119,13 @@ const save = () => {
     }
 }
 
-
-
 </script>
 
 <template>
     <AppLayout>
         <div class="w-full h-[89vh] overflow-y-auto">
             <CustomDataTable :rowsDefault="100" title="Herramientas y equipos" :data="tools" :columnas="columnas"
-                :actions="actions" @edit="showModal" :filterButtons="filterButtons">
+                :actions="actions" @edit="showModal" @goTool="goTool" :filterButtons="filterButtons">
                 <template #buttonHeader>
                     <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal" />
                 </template>
