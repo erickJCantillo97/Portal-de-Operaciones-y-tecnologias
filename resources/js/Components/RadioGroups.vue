@@ -44,7 +44,7 @@ const selectedToolStatus = defineModel()
 
 <template>
   <RadioGroup v-model="selectedToolStatus">
-    <div class="mt-4 grid grid-cols-8 gap-x-2">
+    <div class="mt-2 grid grid-cols-8 gap-x-2">
       <RadioGroupOption class="col-span-2" as="template" v-for="item in toolStatus" :key="item.id" :value="item"
         v-slot="{ active, checked }">
         <div

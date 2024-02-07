@@ -73,6 +73,7 @@ class ToolController extends Controller
             'entry_date' => 'required|date',
             'is_small' => 'nullable',
             'description' => 'nullable|string',
+            'estado_operativo' => 'nullable|string',
             'imagen' => 'nullable'
         ]);
 
@@ -132,6 +133,7 @@ class ToolController extends Controller
             'entry_date' => 'required|date',
             'is_small' => 'nullable',
             'description' => 'nullable|string',
+            'estado_operativo' => 'nullable|string',
             'imagen' => 'nullable'
         ]);
 
