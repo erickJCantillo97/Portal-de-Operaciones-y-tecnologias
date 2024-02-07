@@ -107,7 +107,11 @@ class ToolController extends Controller
      */
     public function show(Tool $tool)
     {
-        return $tool;
+        try {
+        return Inertia::render('WareHouse/Tools/ToolDetails', ['tool' => Tool::with('category','category.padre', 'category.padre.padre')->where('id', $tool->id)->first()]);
+    } catch (Exception $e) {
+        return back()->withErrors(['message', 'Error al cargar la página' . $e]);
+    }
     }
 
     /**

@@ -26,7 +26,7 @@ const form = ref({
 })
 
 const columnas = [
-    { field: 'name', header: 'Nombre', rowclass: "underline !text-left", sortable: true, filter: true, type: 'button', event: 'goTool', severity: 'info', text: true },
+    { field: 'name', header: 'Nombre', rowClass: "underline !text-left", sortable: true, filter: true, type: 'button', event: 'goToToolDetails', severity: 'info', text: true },
     { field: 'code', header: 'Codigo', filter: true, sortable: true },
     { field: 'serial', header: 'Serial', filter: true, sortable: true },
     { field: 'estado_operativo', header: 'Operatividad', filter: true, sortable: true },
@@ -39,8 +39,6 @@ const filterButtons = [
     { field: 'estado_operativo', label: 'FUERA DE SERVICIO', data: 'FUERA DE SERVICIO', severity: 'danger' },
     { field: 'estado_operativo', label: 'BAJA ', data: 'BAJA', severity: 'danger' },
 ]
-
-
 
 const actions = [
     { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },]
@@ -71,9 +69,12 @@ const showModal = (event, data) => {
     }
 }
 
-const goTool = (event, data) => {
-    router.get(route('tools.show', data.id))
-
+const goToToolDetails = (event, data) => {
+    try {
+        router.get(route('tools.show', data.id))
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 const save = () => {
@@ -125,7 +126,7 @@ const save = () => {
     <AppLayout>
         <div class="w-full h-[89vh] overflow-y-auto">
             <CustomDataTable :rowsDefault="100" title="Herramientas y equipos" :data="tools" :columnas="columnas"
-                :actions="actions" @edit="showModal" @goTool="goTool" :filterButtons="filterButtons">
+                :actions="actions" @edit="showModal" @goToToolDetails="goToToolDetails" :filterButtons="filterButtons">
                 <template #buttonHeader>
                     <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal" />
                 </template>
