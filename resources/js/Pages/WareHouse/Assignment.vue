@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useForm, router } from '@inertiajs/vue3'
 import { useSweetalert } from '@/composable/sweetAlert'
 import AppLayout from '@/Layouts/AppLayout.vue'
@@ -9,8 +9,9 @@ import CustomInput from '@/Components/CustomInput.vue'
 import RadioGroups from '@/Components/RadioGroups.vue'
 import Listbox from 'primevue/listbox'
 import Textarea from 'primevue/textarea'
-
-const { toast } = useSweetalert()
+import Toast from 'primevue/toast';
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 const { confirmDelete } = useSweetalert()
 
 const props = defineProps({
@@ -38,7 +39,7 @@ const loading = ref(true)
 const openDialog2 = ref(false)
 const toolStatus = ref()
 const descriptionValue = ref()
-const active = ref(true)
+const toolDownload = ref(true)
 
 const getPersonal = async () => {
   await axios.get(route('personal.activos'))
@@ -54,7 +55,7 @@ const columnas = [
   { field: 'tool.name', header: 'Equipo', filter: true, sortable: true },
   { field: 'tool.serial', header: 'Serial', filter: true, sortable: true },
   { field: 'tool.code', header: 'Codigo Interno', filter: true, sortable: true },
-  { field: 'tool.estado', header: 'Estado ', filter: true, sortable: true },
+  { field: 'status', header: 'Estado ', filter: true, sortable: true },
   { field: 'assigment_date', header: 'Fecha de Prestamo', type: "date", filter: true, sortable: true },
 ]
 
@@ -73,8 +74,10 @@ const createAssignmentsTool = () => {
   openDialog.value = true
 }
 
-const downloadAssignment = () => {
+const downloadAssignment = (event, data) => {
   openDialog2.value = true
+  console.log(data)
+  toolDownload.value = data
 }
 
 const deleteAssignment = (event, data) => {
@@ -94,21 +97,32 @@ const submit = () => {
       },
       {
         onSuccess: () => {
-          toast(`¡Asignación creada exitosamente!`, 'success')
+          // toast(`¡Asignación creada exitosamente!`, 'success')
           clearModal()
         },
         onError: (error) => {
-          toast(`Ha ocurrido un error al guardar las asignaciones; ERROR: ${error.message}`, 'error')
+          // toast(`Ha ocurrido un error al guardar las asignaciones; ERROR: ${error.message}`, 'error')
         }
       })
   } catch (e) {
-    toast(e.message, 'error')
+    // toast(e.message, 'error')
   }
+}
+
+const submitDownload = () => {
+  router.put(route('assignmentTool.update', toolDownload.value.id), {
+    status: toolStatus.value.title,
+    observation: descriptionValue.value
+  }, {
+    onSuccess: () => {
+      toast.add({ summary: 'Asignación Descargada', life: 2000 });
+      clearModal2()
+    }
+  });
 }
 
 const clearModal = () => {
   openDialog.value = false
-
   selectedEmployee.value = [],
     selectedSupervisor.value = [],
     selectedProject.value = [],
@@ -125,7 +139,7 @@ const clearModal2 = () => {
   <AppLayout>
     <div class="w-full h-[89vh] overflow-y-auto">
       <CustomDataTable :data="assignmentsTool" title="Asignaciones" :rows-default="15" :columnas="columnas"
-        :actions="actions" @download="downloadAssignment()" @delete="deleteAssignment()">
+        :actions="actions" @download="downloadAssignment" @delete="deleteAssignment">
         <template #buttonHeader>
           <Button @click="createAssignmentsTool()" label="Nuevo" icon="fa-solid fa-plus" outlined />
         </template>
@@ -190,12 +204,17 @@ const clearModal2 = () => {
       </span>
     </template>
     <template #titulo>
-      <p>Descargar Equipo</p>
+      <p>Descargar Equipo {{ toolDownload.tool.name }} de {{ toolDownload.employee_name }}</p>
     </template>
     <template #body>
-      <section class="grid grid-cols-4 gap-4 p-2 [&>div>p]:text-xs [&>div>p]:text-gray-500 [&>div>p]:italic">
-        <!--CAMPO SELECCIÓN DE PERSONA (personal)-->
-        <RadioGroups v-model="toolStatus" class="col-span-4" />
+      <section class="p-2 [&>div>p]:text-xs [&>div>p]:text-gray-500 [&>div>p]:italic">
+        <div class="mb-4">
+          <label>Estado de la herramienta <span class="text-red-700 italic mt-2 font-serif">*</span></label>
+          <RadioGroups v-model="toolStatus" />
+          <span class="text-red-700 text-xs italic mt-2 font-serif" v-if="!toolStatus">{{
+            $page.props.errors.status
+          }}</span>
+        </div>
         <div class="col-span-4">
           <label>Descripción de Estado de la herramienta</label>
           <Textarea v-model="descriptionValue" rows="5" col="10" placeholder="Agregue una descripción al grupo" autoResize
@@ -208,7 +227,18 @@ const clearModal2 = () => {
     <template #footer>
       <Button label="Cancelar" icon="fa-regular fa-circle-xmark" severity="danger" outlined @click="clearModal2()" />
       <Button label="Guardar" icon="fa-solid fa-floppy-disk" severity="success" outlined :loading="false"
-        @click="submit()" />
+        @click="submitDownload()" />
     </template>
   </CustomModal>
+
+  <Toast position="bottom-center" :pt="{
+    root: '!h-10 !w-64',
+    container: {
+      class: form.error ? '!bg-danger !h-10 !rounded-lg' : '!bg-primary !h-10 !rounded-lg'
+    },
+    content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
+    buttonContainer: '!hidden',
+    icon: '!hidden',
+    detail: '!hidden'
+  }" />
 </template>

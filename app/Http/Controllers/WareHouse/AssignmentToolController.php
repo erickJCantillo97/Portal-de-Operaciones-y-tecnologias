@@ -22,7 +22,7 @@ class AssignmentToolController extends Controller
      */
     public function index()
     {
-        $assignmentsTool = AssignmentTool::with('tool', 'project')->get();
+        $assignmentsTool = AssignmentTool::where('status', 'ASIGNADO')->with('tool', 'project')->get();
         $projects = Project::orderBy('created_at', 'DESC')->get();
         $tools = Tool::where('estado', '!=', 'ASIGNADO')->with('category')->get();
 
@@ -108,11 +108,12 @@ class AssignmentToolController extends Controller
 
         try {
             $assignmentTool->update([
-                'status' => 'DEVULETO',
-                'observation' => $validateData['observation']
+                'status' => 'DISPONIBLE',
+                'observation' => $validateData['observation'] ?? ''
             ]);
             $assignmentTool->tool->update([
-                'estado' => $validateData['status'],
+                'estado_operativo' => strtoupper($validateData['status']),
+                'estado' => 'DISPONIBLE'
             ]);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
