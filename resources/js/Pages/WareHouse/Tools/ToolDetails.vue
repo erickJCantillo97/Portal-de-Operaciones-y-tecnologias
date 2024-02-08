@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import Galleria from 'primevue/galleria'
@@ -119,11 +119,11 @@ const formatCurrency = (valor, moneda) => {
 </style> -->
 
 <template>
-  <main class="flex max-w-full max-h-screen flex-col justify-center overflow-hidden bg-gray-800 py-6 sm:py-12">
+  <main class="flex flex-col max-w-full max-h-screen justify-center overflow-hidden bg-gray-800 md:py-6">
     <section
-      class="grid grid-cols-4 w-[70rem] h-[80vh] space-x-6 bg-white px-6 pt-10 pb-8 shadow-lg shadow-gray-600 ring-1 ring-gray-900/5 sm:mx-auto sm:rounded-lg sm:px-10">
+      class="grid grid-cols-1 h-screen overflow-y-auto space-y-6 bg-white px-6 pt-2  shadow-lg shadow-gray-600 ring-1 ring-gray-900/5 sm:w-[70rem] md:h-screen md:grid-cols-4 md:space-x-6 md:mx-auto md:rounded-lg md:pb-8 md:px-10 md:pt-10">
       <!--Tool Details-->
-      <article class="col-span-2">
+      <article class="col-span-1 md:col-span-2">
         <div class="flex text-sm font-medium items-center">
           <!-- <dt class="text-gray-500">Equipo:</dt> -->
           <i class="fa-solid fa-screwdriver-wrench text-blue-700"></i>
@@ -141,7 +141,7 @@ const formatCurrency = (valor, moneda) => {
             Gerencia: {{ tool.gerencia }}
           </h2>
         </div>
-        <TabView :pt="{
+        <TabView :scrollable="true" :pt="{
           nav: '!flex !justify-between'
         }">
           <TabPanel header="Detalles del Equipo" :pt="{
@@ -218,15 +218,15 @@ const formatCurrency = (valor, moneda) => {
             </p>
           </TabPanel>
         </TabView>
-        <Button class="w-full mt-1" label="Ver más" rounded small />
+        <Button class="w-full mt-1 md:mt-1" label="Reasignar" rounded small />
       </article>
       <!--Galería-->
-      <article class="flex col-span-2 justify-center items-center">
+      <article class="flex col-span-1 md:flex md:col-span-2 md:justify-center md:items-center">
         <!-- <img :src="images.src" class="size-[24rem] rounded-lg shadow-md object-cover" alt="tool-image"> -->
-        <Galleria :value="imageSrc" :responsiveOptions="responsiveOptions" :numVisible="5" indicatorsPosition="bottom"
+        <Galleria :value="imageSrc" :responsiveOptions="responsiveOptions" numVisible="5" indicatorsPosition="bottom"
           :circular="true" :autoPlay="true" :transitionInterval="2000" :showThumbnails="false" :showIndicators="true"
           :changeItemOnIndicatorHover="true" containerStyle="max-width: 640px" :pt="{
-            root: '!border !border-gray-200 !rounded-lg',
+            itemContainer: '!border !border-gray-200 !rounded-lg',
             indicatorButton: '!bg-blue-800'
             // thumbnailItemsContainer: '!opacity-0',
           }">
