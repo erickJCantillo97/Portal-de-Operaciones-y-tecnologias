@@ -188,6 +188,5 @@ const formatCurrency = (valor, moneda) => {
                 </Button>
             </template>
         </CustomModal>
-
     </AppLayout>
 </template>
