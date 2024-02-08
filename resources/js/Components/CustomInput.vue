@@ -9,6 +9,8 @@ import Checkbox from 'primevue/checkbox';
 
 import { ref } from 'vue';
 import ToggleButton from 'primevue/togglebutton';
+import RadioButton from 'primevue/radiobutton';
+import Calendar from 'primevue/calendar';
 
 const props = defineProps({
     //general
@@ -111,6 +113,10 @@ const props = defineProps({
         type: Number,
         default: 1000000
     },
+    multiple: {
+        type: Boolean,
+        default: false
+    },
     onLabel: {
         type: String,
         default: 'Si'
@@ -119,6 +125,18 @@ const props = defineProps({
         type: String,
         default: 'No'
     },
+    required: {
+        type: Boolean,
+        default: false
+    },
+    minDate: {
+        type: Date,
+        default: null
+    },
+    maxDate: {
+        type: Date,
+        default: null
+    }
 })
 
 const countries = ref()
@@ -140,14 +158,15 @@ const input = defineModel('input', {
 </script>
 <template>
     <div class="flex flex-col">
-        <label v-if="label && !floatLabel" :for="id" class="mb-0.5">{{ label }}</label>
+        <label v-if="label && !floatLabel" :for="id" class="mb-0.5 font-bold">{{ label }}</label>
         <span :class="!(label && !floatLabel) ? 'p-float-label' : ''">
-            <FileUpload v-if="type == 'file'" mode="basic" name="demo[]" :multiple="false" :accept="acceptFile" :maxFileSize
+            <FileUpload v-if="type == 'file'" mode="basic" :multiple :accept="acceptFile" :maxFileSize
                 @input="input = $event.target.files[0]" class="w-full h-8" customUpload />
             <InputNumber v-else-if="type == 'number'" :id :disabled :placeholder :minFractionDigits :maxFractionDigits
                 class="w-full" :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'"
-                :useGrouping="mode == 'currency' ? '' : useGrouping" :currency="currency" :mode="mode" :suffix :prefix />
-            <Textarea v-else-if="type == 'textarea'" :id :disabled :placeholder class="w-full"
+                :required :useGrouping="mode == 'currency' ? '' : useGrouping" :currency="currency" :mode="mode" :suffix
+                :prefix />
+            <Textarea v-else-if="type == 'textarea'" :id :disabled rows="4" class="w-full" :required
                 :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
             <Dropdown v-else-if="type == 'dropdown'" :id :disabled :placeholder :options :optionLabel :loading showClear
                 :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''" v-model="input"
@@ -192,14 +211,34 @@ const input = defineModel('input', {
                     filterInput: '!h-8',
                     header: '!h-min !py-0.5'
                 }" />
-            <Checkbox v-else-if="type == 'checkbox'" v-model="input" :binary="true" />
+            <span v-else-if="type == 'groupcheckbox'">
+                <div class="card flex flex-wrap justify-content-center gap-3">
+                    <div class="flex h-8 space-x-1 items-center" v-for="option in options" :key="option.key">
+                        <Checkbox v-model="input" :inputId="option.key" name="category" :value="option.name" />
+                        <label :for="option.key">{{ option.name }}</label>
+                    </div>
+                </div>
+            </span>
             <ToggleButton v-else-if="type == 'tooglebutton'" v-model="input" :onLabel :offLabel :pt="{
                 root: '!h-8'
             }" />
+            <span v-else-if="type == 'radiobutton'" class="w-full flex"
+                :class="options.length > 2 ? 'justify-between' : 'space-x-4'">
+                <div v-for="option in options" :key="option.key" class="flex items-center">
+                    <RadioButton v-model="input" :inputId="option.key" name="dynamic" :value="option.name" />
+                    <label :for="option.key" class="ml-2">{{ option.name }}</label>
+                </div>
+            </span>
+            <span v-else-if="type == 'datetime'">
+                <Calendar :id v-model="input" :minDate :maxDate showTime hourFormat="24" showIcon dateFormat="dd/mm/yy" :pt="{
+                    root: '!w-full',
+                    input: '!h-8'
+                }" />
+            </span>
             <span v-else :class="(loading || icon) ? 'p-input-icon-left' : ''" class="w-full">
                 <i v-if="(loading || icon)" :class="loading ? 'pi pi-spin pi-spinner' : icon" />
                 <InputText size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''" v-model="input" :type
-                    :aria-describedby="id + '-help'" class="w-full" />
+                    :required :aria-describedby="id + '-help'" class="w-full" />
             </span>
             <label v-if="floatLabel && label" :for="id" class="">{{ label }}</label>
         </span>
