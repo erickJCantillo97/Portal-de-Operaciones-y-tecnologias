@@ -6,6 +6,9 @@ import Projects from "@/Pages/Dashboards/Projects/Projects.vue";
 import Quotes from "@/Pages/Dashboards/Quotes.vue";
 import CustomUpload from "@/Components/CustomUpload.vue";
 
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
+
 const props = defineProps({
     projects: Array,
     contracts: Array,
@@ -31,8 +34,7 @@ const props = defineProps({
             </div>
             <Quotes v-if="$page.props.auth.user.oficina == 'DEPPC'" />
             <!-- <Projects v-else /> -->
-            <CustomUpload labelButton="Subir archivo" mode="advanced"/>
+            <CustomUpload mode="advanced" :multiple="true" url="prueba"/>
         </div>
-
     </AppLayout>
 </template>

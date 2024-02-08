@@ -275,12 +275,13 @@ Route::get('clases_anterior', function () {
     }
 });
 
-Route::get('prueba_notificacion', function () {
-    $quote = Quote::with('version', 'version.quoteTypeShips')->where('id', 1)->first();
-    $user = UserNotify::where('id', Auth::user()->id)->first();
-    Notification::route('mail', [$user->email => $user->short_name])->notify(new QuoteNotify($user, $quote, 'asignament'));
+Route::post('/prueba', function () {
+    // return back()->withErrors('success','');
+    // $quote = Quote::with('version', 'version.quoteTypeShips')->where('id', 1)->first();
+    // $user = UserNotify::where('id', Auth::user()->id)->first();
+    // Notification::route('mail', [$user->email => $user->short_name])->notify(new QuoteNotify($user, $quote, 'asignament'));
     // Auth::user()->notify(new QuoteNotify($user, $quote, ''));
-});
+})->name('prueba');
 
 Route::get('/mailable', function () {
     $data = 'Hello';
