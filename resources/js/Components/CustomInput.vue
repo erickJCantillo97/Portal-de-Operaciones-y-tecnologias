@@ -111,13 +111,13 @@ const props = defineProps({
         type: Number,
         default: 1000000
     },
-    onLabel:{
-        type:String,
-        default:'Si'
+    onLabel: {
+        type: String,
+        default: 'Si'
     },
-    offLabel:{
-        type:String,
-        default:'No'
+    offLabel: {
+        type: String,
+        default: 'No'
     },
 })
 
@@ -192,10 +192,10 @@ const input = defineModel('input', {
                     filterInput: '!h-8',
                     header: '!h-min !py-0.5'
                 }" />
-                <Checkbox v-else-if="type == 'checkbox'" v-model="input" :binary="true" />
-                <ToggleButton v-else-if="type == 'tooglebutton'" v-model="input" :onLabel :offLabel :pt="{
-                    root:'!h-8'
-                }"/>
+            <Checkbox v-else-if="type == 'checkbox'" v-model="input" :binary="true" />
+            <ToggleButton v-else-if="type == 'tooglebutton'" v-model="input" :onLabel :offLabel :pt="{
+                root: '!h-8'
+            }" />
             <span v-else :class="(loading || icon) ? 'p-input-icon-left' : ''" class="w-full">
                 <i v-if="(loading || icon)" :class="loading ? 'pi pi-spin pi-spinner' : icon" />
                 <InputText size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''" v-model="input" :type

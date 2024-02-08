@@ -12,6 +12,9 @@ import Textarea from 'primevue/textarea'
 import ToggleButton from 'primevue/togglebutton'
 import Loading from '@/Components/Loading.vue'
 import NoContentToShow from '@/Components/NoContentToShow.vue'
+import CustomDataTable from '@/Components/CustomDataTable.vue'
+import CustomInput from '@/Components/CustomInput.vue'
+import CustomModal from '@/Components/CustomModal.vue'
 import { FormWizard, TabContent } from 'vue3-form-wizard'
 import 'vue3-form-wizard/dist/style.css'
 
@@ -26,6 +29,10 @@ const props = defineProps({
     authorizations: Array,
     quotes: Array,
     ships: Array,
+    tools: {
+        type: Array,
+        default: []
+    }
     // 'typeShips': Array,
 })
 
@@ -53,6 +60,39 @@ const searchShips = () => {
         ship.type_ship.name.toLowerCase().includes(searchWord)
     )
 }
+
+//#regio CustomDataTable
+const columnas = [
+    { field: 'name', header: 'Nombre', rowClass: "underline !text-left", sortable: true, filter: true, type: 'button', event: 'goToToolDetails', severity: 'info', text: true },
+    { field: 'code', header: 'Codigo', filter: true, sortable: true },
+    { field: 'serial', header: 'Serial', filter: true, sortable: true },
+    { field: 'estado_operativo', header: 'Operatividad', filter: true, sortable: true },
+    { field: 'estado', header: 'Disponibilidad', filter: true, sortable: true },
+]
+
+const filterButtons = [
+    { field: 'estado_operativo', label: 'OPERATIVA', data: 'OPERATIVA', severity: 'success' },
+    { field: 'estado_operativo', label: 'CON LIMITACIONES', data: 'CON LIMITACIONES', severity: 'warning' },
+    { field: 'estado_operativo', label: 'FUERA DE SERVICIO', data: 'FUERA DE SERVICIO', severity: 'danger' },
+    { field: 'estado_operativo', label: 'BAJA ', data: 'BAJA', severity: 'danger' },
+]
+
+const actions = [
+    { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },]
+
+//v-models Formulario de Hitos
+const goalTitle = ref()
+const goalDate = ref()
+const goalValue = ref()
+const goalType = ref()
+const goalAdvance = ref()
+const goalInvoice = ref()
+const openDialog = ref(false)
+
+const showModal = () => {
+    openDialog.value = true
+}
+//#endregion
 
 //#region ENUMS
 //Tipo de Proyecto
@@ -239,16 +279,11 @@ const getProjectsPropsForEdit = () => {
 //     }
 // })
 
-
-
 function formatDateTime24h(date) {
     return new Date(date).toLocaleString('es-CO',
         { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 }
-
-
 </script>
-
 <style scoped>
 .form-wizard {
     padding-left: 20%;
@@ -474,7 +509,7 @@ function formatDateTime24h(date) {
                     </tab-content>
 
                     <!--BUQUES-->
-                    <tab-content title="Buques" icon="fa-solid fa-ship">
+                    <tab-content title="Buques" icon="fa-solid fa-ship" :before-change="beforeChange">
                         <div class="flex w-full gap-2 pb-4">
                             <input v-if="props.ships != 0" type="search" v-model="keyword" @input="searchShips()"
                                 class="rounded-lg border-2 border-gray-200 w-full placeholder:italic"
@@ -515,8 +550,50 @@ function formatDateTime24h(date) {
                             </ul>
                         </section>
                     </tab-content>
+                    <tab-content title="Hitos" icon="fa-solid fa-list-check">
+                        <div class="w-full h-[89vh] overflow-y-auto">
+                            <CustomDataTable :rowsDefault="100" title="Herramientas y equipos" :data="tools"
+                                :columnas="columnas" :actions="actions" @edit="showModal" :filterButtons="filterButtons">
+                                <template #buttonHeader>
+                                    <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal()" />
+                                </template>
+                            </CustomDataTable>
+                        </div>
+                    </tab-content>
                 </form-wizard>
             </section>
         </main>
+        <CustomModal v-model:visible="openDialog" width="30rem">
+            <template #icon>
+                <i class="fa-solid text-white fa-list-check"></i>
+            </template>
+            <template #titulo>
+                <span class="text-lg font-bold text-white">
+                    Agregar Hito
+                </span>
+            </template>
+            <template #body>
+                <section class="relative space-y-2 p-2">
+                    <CustomInput label="Título del Hito" id="category" type="text" v-model:input="goalTitle"
+                        placeholder="Escriba título del hito" />
+                    <CustomInput label="Fecha de Hito" id="category" type="date" v-model:input="goalDate"
+                        placeholder="Escriba fecha de hito" />
+                    <CustomInput label="Valor del Hito" id="value" type="number" mode="currency"
+                        v-model:input="goalValue" placeholder="Escriba el valor del hito" />
+                    <CustomInput label="Seleccione tipo de Hito" id="category" type="dropdown" v-model:input="goalType"
+                        placeholder="Escriba el tipo de hito" />
+                    <CustomInput label="Hito Facturado" id="category" type="dropdown" v-model:input="goalInvoice"
+                        placeholder="seleccionar " />
+                    <CustomInput label="Avance" id="category" type="number" v-model:input="goalAdvance"
+                        placeholder="Escriba el avance del hito" />
+
+                </section>
+            </template>
+            <template #footer>
+                <Button severity="success" outlined label="Guardar" icon="fa-solid fa-floppy-disk" @click="save()" />
+                <Button severity="danger" outlined label="Cancelar" icon="fa-regular fa-circle-xmark"
+                    @click="openDialog = false" />
+            </template>
+        </CustomModal>
     </AppLayout>
 </template>

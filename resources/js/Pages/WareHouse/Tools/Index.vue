@@ -1,13 +1,14 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import CustomDataTable from '@/Components/CustomDataTable.vue';
-import CustomModal from '@/Components/CustomModal.vue';
-import { ref } from 'vue';
-import { router } from '@inertiajs/vue3';
-import CustomInput from '@/Components/CustomInput.vue';
-import Toast from 'primevue/toast';
-import { useToast } from "primevue/usetoast";
-const toast = useToast();
+import AppLayout from '@/Layouts/AppLayout.vue'
+import CustomDataTable from '@/Components/CustomDataTable.vue'
+import CustomModal from '@/Components/CustomModal.vue'
+import { ref } from 'vue'
+import { router } from '@inertiajs/vue3'
+import CustomInput from '@/Components/CustomInput.vue'
+import Toast from 'primevue/toast'
+import { useToast } from "primevue/usetoast"
+
+const toast = useToast()
 const props = defineProps({
     tools: {
         type: Array,
@@ -17,7 +18,8 @@ const props = defineProps({
         type: Array,
         default: []
     },
-});
+})
+
 const modalVisible = ref(false)
 const modalType = ref('Nuevo')
 
@@ -87,12 +89,12 @@ const save = () => {
             router.post(route('tools.store'), form.value, {
                 onSuccess: () => {
                     form.value.loading = false
-                    toast.add({ summary: 'Guardado', life: 2000 });
+                    toast.add({ summary: 'Guardado', life: 2000 })
                     modalVisible.value = false
                 },
                 onError: (e) => {
                     form.value.loading = false
-                    toast.add({ summary: 'Error al guardar', life: 2000 });
+                    toast.add({ summary: 'Error al guardar', life: 2000 })
                     form.value.error = true
                     form.value.errors = e
                 }
@@ -101,12 +103,12 @@ const save = () => {
             router.put(route('tools.update', form.value.id), form.value, {
                 onSuccess: () => {
                     form.value.loading = false
-                    toast.add({ summary: 'Actualizado', life: 2000 });
+                    toast.add({ summary: 'Actualizado', life: 2000 })
                     modalVisible.value = false
                 },
                 onError: (e) => {
                     form.value.loading = false
-                    toast.add({ summary: 'Error al actualizar', life: 2000 });
+                    toast.add({ summary: 'Error al actualizar', life: 2000 })
                     form.value.error = true
                     form.value.errors = e
                 }
@@ -115,7 +117,7 @@ const save = () => {
     } else {
         form.value.error = true
         form.value.errors.category = "Seleccione una categoria"
-        toast.add({ summary: 'Seleccione una categoria', life: 2000 });
+        toast.add({ summary: 'Seleccione una categoria', life: 2000 })
         form.value.loading = false
     }
 }
@@ -143,7 +145,7 @@ const save = () => {
             </span>
         </template>
         <template #body>
-            <span class="grid grid-cols-3 gap-2">
+            <section class="grid grid-cols-3 gap-2">
                 <CustomInput label="Descripción" id="category" v-model:input="form.category" type="dropdown"
                     placeholder="Selecciona una Descripción" :options="categories" optionLabel="name"
                     :invalid="form.errors.category ? true : false" :errorMessage="form.errors.category" />
@@ -174,7 +176,7 @@ const save = () => {
                 <CustomInput label="Imagen" type="file" id="imagen" v-model:input="form.imagen"
                     placeholder="Nombre para mostrar" :invalid="form.errors.imagen ? true : false"
                     :errorMessage="form.errors.imagen" />
-            </span>
+            </section>
             <CustomInput label="Descripción" type="textarea" id="description" v-model:input="form.description"
                 placeholder="Descripcion de la herramienta" :invalid="form.errors.description ? true : false"
                 :errorMessage="form.errors.description" />
