@@ -21,7 +21,7 @@
                                     </h3>
                                 </div>
                                 </Link>
-                                <button v-else type="button" class="w-full nav-link group"
+                                <button v-else type="button" v-show="item.show" class="w-full nav-link group"
                                     :class="{ active: activeDropdown === item.name }"
                                     @click="activeDropdown === item.name ? (activeDropdown = null) : (activeDropdown = item.name)">
                                     <div class="flex items-center">
@@ -216,12 +216,13 @@ const navigation = [
     {
         name: 'Sugerencias',
         icon: CalendarIcon,
+        show: hasPermission('suggestion reader'),
         children: [
             {
                 name: 'Ver sugerencias',
                 href: 'suggestion.index',
                 // dev: true,
-                show: true,
+                show: hasPermission('suggestion reader'),
             },
         ],
     },

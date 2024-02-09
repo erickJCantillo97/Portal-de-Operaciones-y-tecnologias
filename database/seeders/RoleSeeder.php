@@ -18,6 +18,6 @@ class RoleSeeder extends Seeder
         // Role::create(['name' => 'Visitante']);
         // Role::create(['name' => 'Cliente']);
 
-        User::where('username', 'gbuelvas')->first()->assignRole('Administrador');
+        Role::where('name', 'Super Admin')->first()->givePermissionTo('customer read');
     }
 }
