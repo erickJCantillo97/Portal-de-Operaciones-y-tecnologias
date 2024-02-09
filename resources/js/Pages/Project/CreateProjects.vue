@@ -66,35 +66,16 @@ const searchShips = () => {
 
 //#regio CustomDataTable
 const columnas = [
-<<<<<<< HEAD
-    { field: 'name', header: 'Nombre', rowClass: "underline !text-left", sortable: true, filter: true, type: 'button', event: 'goToProjectOverview', severity: 'info', text: true },
-    { field: 'code', header: 'Codigo', filter: true, sortable: true },
-    { field: 'serial', header: 'Serial', filter: true, sortable: true },
-    { field: 'estado_operativo', header: 'Operatividad', filter: true, sortable: true },
-    { field: 'estado', header: 'Disponibilidad', filter: true, sortable: true },
-=======
     { field: 'title', header: 'Nombre', sortable: true, filter: true, },
     { field: 'value', header: 'Valor', filter: true, sortable: true, type: 'currency', class: 'w-64' },
     { field: 'type', header: 'Tipo de Hito', filter: true, sortable: true },
     { field: 'end_date', header: 'Fecha de terminación', filter: true, sortable: true },
->>>>>>> 80d3d11a114e278a25a8422cfbbe58c67396a398
 ]
 
 
 const actions = [
     { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },]
 
-<<<<<<< HEAD
-//v-models Formulario de Hitos
-const milestoneTitle = ref()
-const milestoneDate = ref()
-const milestoneValue = ref()
-const milestoneType = ref()
-const milestoneAdvance = ref()
-const milestoneInvoice = ref()
-=======
-
->>>>>>> 80d3d11a114e278a25a8422cfbbe58c67396a398
 const openDialog = ref(false)
 
 const showModal = () => {
