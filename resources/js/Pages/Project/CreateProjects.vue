@@ -4,7 +4,6 @@ import { ref, onMounted, computed } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
 import { FilterMatchMode, FilterOperator } from 'primevue/api'
 import { ClockIcon } from '@heroicons/vue/24/outline'
-import { useSweetalert } from '@/composable/sweetAlert'
 import axios from 'axios'
 import Dropdown from 'primevue/dropdown'
 import TextInput from '../../Components/TextInput.vue'
@@ -17,8 +16,11 @@ import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
 import { FormWizard, TabContent } from 'vue3-form-wizard'
 import 'vue3-form-wizard/dist/style.css'
+import Toast from 'primevue/toast';
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 
-const { toast } = useSweetalert()
+
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
@@ -29,6 +31,7 @@ const props = defineProps({
     authorizations: Array,
     quotes: Array,
     ships: Array,
+    milestones: Array,
     tools: {
         type: Array,
         default: []
@@ -63,30 +66,17 @@ const searchShips = () => {
 
 //#regio CustomDataTable
 const columnas = [
-    { field: 'name', header: 'Nombre', rowClass: "underline !text-left", sortable: true, filter: true, type: 'button', event: 'goToToolDetails', severity: 'info', text: true },
-    { field: 'code', header: 'Codigo', filter: true, sortable: true },
-    { field: 'serial', header: 'Serial', filter: true, sortable: true },
-    { field: 'estado_operativo', header: 'Operatividad', filter: true, sortable: true },
-    { field: 'estado', header: 'Disponibilidad', filter: true, sortable: true },
+    { field: 'title', header: 'Nombre', sortable: true, filter: true, },
+    { field: 'value', header: 'Valor', filter: true, sortable: true, type: 'currency', class: 'w-64' },
+    { field: 'type', header: 'Tipo de Hito', filter: true, sortable: true },
+    { field: 'end_date', header: 'Fecha de terminación', filter: true, sortable: true },
 ]
 
-const filterButtons = [
-    { field: 'estado_operativo', label: 'OPERATIVA', data: 'OPERATIVA', severity: 'success' },
-    { field: 'estado_operativo', label: 'CON LIMITACIONES', data: 'CON LIMITACIONES', severity: 'warning' },
-    { field: 'estado_operativo', label: 'FUERA DE SERVICIO', data: 'FUERA DE SERVICIO', severity: 'danger' },
-    { field: 'estado_operativo', label: 'BAJA ', data: 'BAJA', severity: 'danger' },
-]
 
 const actions = [
     { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },]
 
-//v-models Formulario de Hitos
-const goalTitle = ref()
-const goalDate = ref()
-const goalValue = ref()
-const goalType = ref()
-const goalAdvance = ref()
-const goalInvoice = ref()
+
 const openDialog = ref(false)
 
 const showModal = () => {
@@ -195,11 +185,10 @@ const beforeChange = async () => {
 
     try {
         if (!projectIdRef.value) {
-            console.log(projectIdRef.value)
             await axios.post(route('projects.store'), formData)
                 .then((res) => {
                     projectIdRef.value = res.data.project_id
-                    toast('Proyecto creado exitosamente!', 'success')
+                    toast.add({ summary: 'Guardado', life: 2000 });
                     switchTabsStates = true
                 })
             return switchTabsStates
@@ -207,21 +196,21 @@ const beforeChange = async () => {
             formData.shift = shiftSelect.value
             await axios.put(route('projects.update', projectIdRef.value), formData)
                 .then((res) => {
-                    toast('Proyecto actualizado exitosamente!', 'success')
+                    toast.add({ summary: 'Guardado', life: 2000 });
                     switchTabsStates = true
                 })
             return switchTabsStates
             // return true
         }
     } catch (error) {
-        toast(error.message)
+        toast.add({ summary: 'Error', life: 2000 });
     }
 }
 
 const submit = async () => {
     // TO DO store onComplete()
     // return false
-    toast('Proyecto creado exitosamente!', 'success')
+    // toast('Proyecto creado exitosamente!', 'success')
     router.post(route('project.add.ships', projectIdRef.value), {
         ships: selectedShips.value
     });
@@ -249,6 +238,26 @@ const submit = async () => {
     // return false
 }
 
+const formMilestone = useForm({
+    title: '',
+    value: '',
+    end_date: new Date(),
+    type: '',
+    project_id: 12,
+    invoiced: false,
+    advance: 0
+});
+
+const save = () => {
+    formMilestone.project_id = projectIdRef.value;
+    formMilestone.post(route('milestones.store'), {
+        onSuccess: () => {
+            toast.add({ summary: 'Hito Guardado', life: 2000 });
+            openDialog.value = false;
+        }
+    })
+}
+
 const getShift = () => {
     axios.get(route('shift.index'))
         .then(response => {
@@ -265,19 +274,6 @@ const getProjectsPropsForEdit = () => {
     typeSelect.value = { name: props.project?.type ?? '' }
 }
 
-// router.put(route('projects.update', formData.id), formData, {
-//     preserveScroll: true,
-//     onSuccess: (res) => {
-//         open.value = false
-//         toast('¡Proyecto actualizado exitosamente!', 'success')
-//     },
-//     onError: (errors) => {
-//         toast('¡Ups! Ha surgido un error', 'error')
-//     },
-//     onFinish: visit => {
-//         loading.value = false
-//     }
-// })
 
 function formatDateTime24h(date) {
     return new Date(date).toLocaleString('es-CO',
@@ -552,8 +548,8 @@ function formatDateTime24h(date) {
                     </tab-content>
                     <tab-content title="Hitos" icon="fa-solid fa-list-check">
                         <div class="w-full h-[89vh] overflow-y-auto">
-                            <CustomDataTable :rowsDefault="100" title="Herramientas y equipos" :data="tools"
-                                :columnas="columnas" :actions="actions" @edit="showModal" :filterButtons="filterButtons">
+                            <CustomDataTable :rowsDefault="100" :data="milestones" :columnas="columnas" :actions="actions"
+                                @edit="showModal" :filter="false" :showHeader="false">
                                 <template #buttonHeader>
                                     <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal()" />
                                 </template>
@@ -574,17 +570,18 @@ function formatDateTime24h(date) {
             </template>
             <template #body>
                 <section class="relative space-y-2 p-2">
-                    <CustomInput label="Título del Hito" id="category" type="text" v-model:input="goalTitle"
+                    <CustomInput label="Título del Hito" id="category" type="text" v-model:input="formMilestone.title"
                         placeholder="Escriba título del hito" />
-                    <CustomInput label="Fecha de Hito" id="category" type="date" v-model:input="goalDate"
+                    <CustomInput label="Fecha de Hito" id="category" type="date" v-model:input="formMilestone.end_date"
                         placeholder="Escriba fecha de hito" />
                     <CustomInput label="Valor del Hito" id="value" type="number" mode="currency"
-                        v-model:input="goalValue" placeholder="Escriba el valor del hito" />
-                    <CustomInput label="Seleccione tipo de Hito" id="category" type="dropdown" v-model:input="goalType"
-                        placeholder="Escriba el tipo de hito" />
-                    <CustomInput label="Hito Facturado" id="category" type="dropdown" v-model:input="goalInvoice"
+                        v-model:input="formMilestone.value" placeholder="Escriba el valor del hito" />
+                    <CustomInput label="Seleccione tipo de Hito" id="category" type="dropdown"
+                        v-model:input="formMilestone.type" placeholder="Escriba el tipo de hito"
+                        :options="['Pago Anticipado', 'Avance Obra']" />
+                    <CustomInput label="Hito Facturado" id="category" type="dropdown" v-model:input="formMilestone.invoiced"
                         placeholder="seleccionar " />
-                    <CustomInput label="Avance" id="category" type="number" v-model:input="goalAdvance"
+                    <CustomInput label="Avance" id="category" type="number" v-model:input="formMilestone.advance"
                         placeholder="Escriba el avance del hito" />
 
                 </section>
@@ -596,4 +593,14 @@ function formatDateTime24h(date) {
             </template>
         </CustomModal>
     </AppLayout>
+    <Toast position="bottom-center" :pt="{
+        root: '!h-10 !w-64',
+        container: {
+            class: '!bg-primary !h-10 !rounded-lg'
+        },
+        content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
+        buttonContainer: '!hidden',
+        icon: '!hidden',
+        detail: '!hidden'
+    }" />
 </template>

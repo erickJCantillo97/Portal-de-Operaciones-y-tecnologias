@@ -39,7 +39,7 @@
                                 <vue-collapsible :isOpen="activeDropdown === item.name">
                                     <ul class="text-gray-500 sub-menu dark:text-white">
                                         <span v-for="children of item.children">
-                                            <li v-if="!children.dev || debug">
+                                            <li v-if="(!children.dev || debug) && children.show">
                                                 <Link :href="route(children.href)">
                                                 <span class="">
                                                     <p :class="children.dev ? '-mb-2' : ''">{{ children.name }}</p>
@@ -78,7 +78,7 @@ import {
     WrenchScrewdriverIcon
 } from '@heroicons/vue/24/outline'
 const debug = import.meta.env.VITE_APP_DEBUG
-const { hasRole } = usePermissions();
+const { hasRole, hasPermission } = usePermissions();
 const activeDropdown = ref();
 
 const navigation = [
@@ -99,21 +99,25 @@ const navigation = [
                 name: 'Mi Personal',
                 href: 'personal.index',
                 // dev: true
+                show: true,
             },
             {
                 name: 'Programación',
                 href: 'programming',
                 // dev: true
+                show: true,
             },
             {
                 name: 'Parte Actual',
                 href: 'personal.index',
-                dev: true
+                dev: true,
+                show: true,
             },
             {
                 name: 'Solicitudes',
                 href: 'personal.index',
-                dev: true
+                dev: true,
+                show: true,
             },
             {
                 name: 'Personal Activo',
@@ -133,17 +137,20 @@ const navigation = [
             {
                 name: 'Parte de Personal',
                 href: 'dashboard',
-                dev: true
+                dev: true,
+                show: true,
             },
             {
                 name: 'Planilla',
                 href: 'programming',
-                dev: true
+                dev: true,
+                show: true,
             },
             {
                 name: 'Novedades',
                 href: 'personal.index',
-                dev: true
+                dev: true,
+                show: true,
             },
             // { name: 'Programación', href: '#' },
             // { name: 'Parte Diario', href: '#' },
@@ -158,17 +165,20 @@ const navigation = [
             {
                 name: 'Proyectos',
                 href: 'projects.index',
-                // dev: true
+                // dev: true,
+                show: true,
             }, //gerencia (auth()->user()gerencia)
             {
                 name: 'Unidades',
                 href: 'ships.index',
-                // dev: true
+                // dev: true,
+                show: true,
             },
             {
                 name: 'Clases',
                 href: 'typeShips.index',
-                // dev: true
+                // dev: true,
+                show: true,
             },
         ],
     },
@@ -180,22 +190,26 @@ const navigation = [
             {
                 name: 'Clientes',
                 href: 'customers.index',
-                // dev: true
+                // dev: true,
+                show: hasPermission(['customer read']),
             },
             {
                 name: 'Contratos',
                 href: 'contracts.index',
-                // dev: true
+                // dev: true,
+                show: true,
             },
             {
                 name: 'Autorizaciones',
                 href: 'authorizations.index',
-                dev: true
+                dev: true,
+                show: true,
             },
             {
                 name: 'Estimaciones',
                 href: 'quotes.index',
-                // dev: true
+                // dev: true,
+                show: true,
             },
         ],
     },
@@ -206,7 +220,8 @@ const navigation = [
             {
                 name: 'Ver sugerencias',
                 href: 'suggestion.index',
-                // dev: true
+                // dev: true,
+                show: true,
             },
         ],
     },
@@ -223,16 +238,19 @@ const navigation = [
             {
                 name: 'Categorías',
                 href: 'categories.index',
+                show: true,
             },
             {
                 name: 'Equipos y Herramientas',
                 href: 'tools.index',
-                dev: true
+                dev: true,
+                show: true,
             },
             {
                 name: 'Asignaciones',
                 href: 'assignmentTool.index',
-                dev: true
+                dev: true,
+                show: true,
             },
         ],
         icon: WrenchScrewdriverIcon,

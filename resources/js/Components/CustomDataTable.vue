@@ -61,6 +61,10 @@ const props = defineProps({
     rowsDefault: {
         type: Number,
         defaul: 10
+    },
+    showHeader: {
+        type: Boolean,
+        default: true
     }
 })
 
@@ -134,6 +138,9 @@ const formatCurrency = (valor, moneda) => {
     }
 }
 
+
+
+
 const auxdata = ref()
 //#endregion
 </script>
@@ -170,7 +177,7 @@ const auxdata = ref()
                         <slot name="buttonHeader" />
                     </span>
                 </span>
-                <div class="flex items-center " :class="filter ? 'justify-between' : 'justify-end'">
+                <div class="flex items-center " :class="filter ? 'justify-between' : 'justify-end'" v-if="showHeader">
                     <div class="space-x-2" v-if="filter">
                         <Button label="Quitar filtros" @click="clearFilter()" outlined
                             icon="fa-solid fa-filter-circle-xmark" />

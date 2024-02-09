@@ -18,7 +18,7 @@ return new class extends Migration
             $table->double('value');
             $table->date('end_date');
             $table->string('type');
-            $table->boolean('invoiced');
+            $table->boolean('invoiced')->default(0);
             $table->double('advance')->default(0);
             $table->timestamps();
             $table->softDeletes();
