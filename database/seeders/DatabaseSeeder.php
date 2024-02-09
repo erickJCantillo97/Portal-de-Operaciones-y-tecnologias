@@ -83,9 +83,7 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Suggestion edit', 'guard_name' => 'web'],
             ['name' => 'suggestion delete', 'guard_name' => 'web'],
         ];
-        foreach ($permisos as $p) {
-            Role::where('name', 'Super Admin')->first()->givePermissionTo($p['name']);
-        }
+
         // \App\Models\User::factory(10)->create();
 
         // \App\Models\User::factory()->create([

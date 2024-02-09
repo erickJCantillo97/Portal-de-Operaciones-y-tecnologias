@@ -77,10 +77,12 @@ import {
     UsersIcon,
     WrenchScrewdriverIcon
 } from '@heroicons/vue/24/outline'
+import { usePage } from "@inertiajs/vue3"
+
 const debug = import.meta.env.VITE_APP_DEBUG
 const { hasRole, hasPermission } = usePermissions();
 const activeDropdown = ref();
-
+console.log(hasPermission(['customer read']));
 const navigation = [
     {
         name: 'Dashboard',
@@ -94,6 +96,7 @@ const navigation = [
         name: 'Gestion de Personal',
         icon: UsersIcon,
         current: false,
+        show: true,
         children: [
             {
                 name: 'Mi Personal',
@@ -105,7 +108,7 @@ const navigation = [
                 name: 'Programación',
                 href: 'programming',
                 // dev: true
-                show: true,
+                show: hasPermission(''),
             },
             {
                 name: 'Parte Actual',
@@ -186,6 +189,7 @@ const navigation = [
         name: 'Gestión Comercial',
         icon: CreditCardIcon,
         current: false,
+        show: true,
         children: [
             {
                 name: 'Clientes',
@@ -235,23 +239,24 @@ const navigation = [
     },
     {
         name: 'Almacén',
+        show: hasPermission(['category read']),
         children: [
             {
                 name: 'Categorías',
                 href: 'categories.index',
-                show: true,
+                show: hasPermission(['category read']),
             },
             {
                 name: 'Equipos y Herramientas',
                 href: 'tools.index',
                 dev: true,
-                show: true,
+                show: hasPermission('tool read'),
             },
             {
                 name: 'Asignaciones',
                 href: 'assignmentTool.index',
                 dev: true,
-                show: true,
+                show: hasPermission('assignmentTool read'),
             },
         ],
         icon: WrenchScrewdriverIcon,
