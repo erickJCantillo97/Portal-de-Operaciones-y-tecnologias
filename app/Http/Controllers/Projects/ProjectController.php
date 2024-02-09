@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Projects;
 use App\Http\Controllers\Controller;
 use App\Models\Projects\Authorization;
 use App\Models\Projects\Contract;
+use App\Models\Projects\Milestone;
 use App\Models\Projects\Project;
 use App\Models\Projects\ProjectsShip;
 use App\Models\Projects\Ship;
@@ -39,6 +40,7 @@ class ProjectController extends Controller
         $authorizations = Authorization::orderBy('contract_id')->get();
         $quotes = Quote::get();
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
+
         // return $ships;
         return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes', 'ships'));
     }
@@ -139,6 +141,7 @@ class ProjectController extends Controller
         $contracts = Contract::get();
         $authorizations = Authorization::orderBy('contract_id')->get();
         $quotes = Quote::get();
+        $milestones = Milestone::where('project_id', $project->id)->get();
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
 
         return Inertia::render(
@@ -149,7 +152,8 @@ class ProjectController extends Controller
                 'contracts' => $contracts,
                 'authorizations' => $authorizations,
                 'quotes' => $quotes,
-                'ships' => $ships
+                'ships' => $ships,
+                'milestones' => $milestones
             ]
         );
     }

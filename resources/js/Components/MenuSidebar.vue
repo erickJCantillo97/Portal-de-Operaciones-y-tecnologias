@@ -21,7 +21,7 @@
                                     </h3>
                                 </div>
                                 </Link>
-                                <button v-else type="button" class="w-full nav-link group"
+                                <button v-else type="button" v-show="item.show" class="w-full nav-link group"
                                     :class="{ active: activeDropdown === item.name }"
                                     @click="activeDropdown === item.name ? (activeDropdown = null) : (activeDropdown = item.name)">
                                     <div class="flex items-center">
@@ -39,7 +39,7 @@
                                 <vue-collapsible :isOpen="activeDropdown === item.name">
                                     <ul class="text-gray-500 sub-menu dark:text-white">
                                         <span v-for="children of item.children">
-                                            <li v-if="!children.dev || debug">
+                                            <li v-if="(!children.dev || debug) && children.show">
                                                 <Link :href="route(children.href)">
                                                 <span class="">
                                                     <p :class="children.dev ? '-mb-2' : ''">{{ children.name }}</p>
@@ -77,10 +77,12 @@ import {
     UsersIcon,
     WrenchScrewdriverIcon
 } from '@heroicons/vue/24/outline'
-const debug = import.meta.env.VITE_APP_DEBUG
-const { hasRole } = usePermissions();
-const activeDropdown = ref();
+import { usePage } from "@inertiajs/vue3"
 
+const debug = import.meta.env.VITE_APP_DEBUG
+const { hasRole, hasPermission } = usePermissions();
+const activeDropdown = ref();
+console.log(hasPermission(['customer read']));
 const navigation = [
     {
         name: 'Dashboard',
@@ -94,26 +96,31 @@ const navigation = [
         name: 'Gestion de Personal',
         icon: UsersIcon,
         current: false,
+        show: true,
         children: [
             {
                 name: 'Mi Personal',
                 href: 'personal.index',
                 // dev: true
+                show: true,
             },
             {
                 name: 'Programación',
                 href: 'programming',
                 // dev: true
+                show: hasPermission(''),
             },
             {
                 name: 'Parte Actual',
                 href: 'personal.index',
-                dev: true
+                dev: true,
+                show: true,
             },
             {
                 name: 'Solicitudes',
                 href: 'personal.index',
-                dev: true
+                dev: true,
+                show: true,
             },
             {
                 name: 'Personal Activo',
@@ -133,17 +140,20 @@ const navigation = [
             {
                 name: 'Parte de Personal',
                 href: 'dashboard',
-                dev: true
+                dev: true,
+                show: true,
             },
             {
                 name: 'Planilla',
                 href: 'programming',
-                dev: true
+                dev: true,
+                show: true,
             },
             {
                 name: 'Novedades',
                 href: 'personal.index',
-                dev: true
+                dev: true,
+                show: true,
             },
             // { name: 'Programación', href: '#' },
             // { name: 'Parte Diario', href: '#' },
@@ -158,17 +168,20 @@ const navigation = [
             {
                 name: 'Proyectos',
                 href: 'projects.index',
-                // dev: true
+                // dev: true,
+                show: true,
             }, //gerencia (auth()->user()gerencia)
             {
                 name: 'Unidades',
                 href: 'ships.index',
-                // dev: true
+                // dev: true,
+                show: true,
             },
             {
                 name: 'Clases',
                 href: 'typeShips.index',
-                // dev: true
+                // dev: true,
+                show: true,
             },
         ],
     },
@@ -176,37 +189,44 @@ const navigation = [
         name: 'Gestión Comercial',
         icon: CreditCardIcon,
         current: false,
+        show: true,
         children: [
             {
                 name: 'Clientes',
                 href: 'customers.index',
-                // dev: true
+                // dev: true,
+                show: hasPermission(['customer read']),
             },
             {
                 name: 'Contratos',
                 href: 'contracts.index',
-                // dev: true
+                // dev: true,
+                show: true,
             },
             {
                 name: 'Autorizaciones',
                 href: 'authorizations.index',
-                dev: true
+                dev: true,
+                show: true,
             },
             {
                 name: 'Estimaciones',
                 href: 'quotes.index',
-                // dev: true
+                // dev: true,
+                show: true,
             },
         ],
     },
     {
         name: 'Sugerencias',
         icon: CalendarIcon,
+        show: hasPermission('suggestion reader'),
         children: [
             {
                 name: 'Ver sugerencias',
                 href: 'suggestion.index',
-                // dev: true
+                // dev: true,
+                show: hasPermission('suggestion reader'),
             },
         ],
     },
@@ -219,20 +239,24 @@ const navigation = [
     },
     {
         name: 'Almacén',
+        show: hasPermission(['category read']),
         children: [
             {
                 name: 'Categorías',
                 href: 'categories.index',
+                show: hasPermission(['category read']),
             },
             {
                 name: 'Equipos y Herramientas',
                 href: 'tools.index',
-                dev: true
+                dev: true,
+                show: hasPermission('tool read'),
             },
             {
                 name: 'Asignaciones',
                 href: 'assignmentTool.index',
-                dev: true
+                dev: true,
+                show: hasPermission('assignmentTool read'),
             },
         ],
         icon: WrenchScrewdriverIcon,

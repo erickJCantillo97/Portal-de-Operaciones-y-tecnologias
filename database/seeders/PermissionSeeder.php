@@ -18,21 +18,21 @@ class PermissionSeeder extends Seeder
         Role::create(['name' => 'Super Admin']);
         Role::create(['name' => 'Administrador']);
 
-         User::create([
+        User::create([
             'name' => 'Giovany Enrique Buelvas Jaspe',
             'username' => 'gbuelvas',
             'identificacion' => 1047229183,
             'password' => '$2y$10$faXMcfVndQHzJLKIM0mUc.Oiz/FPuqxLkbMkd1kYchRaKmB1jupui',
             'guid' => '972be66b-708e-4556-8bc3-2e750f334f10',
         ])->assignRole('Super Admin');;
-         User::create([
+        User::create([
             'name' => 'Erik Jose Cantillo Jimenez',
             'username' => 'ecantillo',
             'identificacion' => 1047496054,
             'password' => '$2y$10$Cac1FjtkYdIZQ8C71aruHus.p7GDJVo1f9qUOKlRaGQ0DLiCXDXge',
             'guid' => 'b3a6ddfe-aec9-42d7-b863-3147ccfe7b94',
         ])->assignRole('Super Admin');;
-         User::create([
+        User::create([
             'name' => 'Ronny Gutierrez Vitola',
             'username' => 'rgutierrez',
             'identificacion' => 1143359697,
@@ -113,7 +113,7 @@ class PermissionSeeder extends Seeder
             # code...
             $p = Permission::create($permiso);
             $role = Role::where('name', 'Super Admin')->first();
-            $role->syncPermissions($p);
+            $role->givePermissionTo($p['name']);
         }
     }
 }

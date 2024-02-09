@@ -191,17 +191,17 @@ const columnas = [
     { field: 'contract.contract_id', header: 'Gerencia', filter: true, sortable: true },
     { field: 'cost_sale', header: 'Costo de Venta', type: 'currency', filter: true, sortable: true },
     { field: 'end_date', header: 'Fecha Finalización', filter: true, sortable: true },
-    {
-        field: 'status', header: 'Estado', filter: true, sortable: true, type: 'tag', filtertype: 'EQUALS',
-        severitys: [
-            { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'info', class: '' },
-            { text: 'CONSTRUCCIÓN', severity: 'info', class: '' },
-            { text: 'DISEÑO', severity: 'warning', class: '' },
-            { text: 'GARANTIA', severity: 'info', class: '' },
-            { text: 'SERVICIO POSTVENTA', severity: 'success', class: '' },
-            { text: 'SIN ESTADO', severity: 'danger', class: 'animate-pulse' }
-        ]
-    },
+    // {
+    //     field: 'status', header: 'Estado', filter: true, sortable: true, type: 'tag', filtertype: 'EQUALS',
+    //     severitys: [
+    //         { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'info', class: '' },
+    //         { text: 'CONSTRUCCIÓN', severity: 'info', class: '' },
+    //         { text: 'DISEÑO', severity: 'warning', class: '' },
+    //         { text: 'GARANTIA', severity: 'info', class: '' },
+    //         { text: 'SERVICIO POSTVENTA', severity: 'success', class: '' },
+    //         { text: 'SIN ESTADO', severity: 'danger', class: 'animate-pulse' }
+    //     ]
+    // },
 ]
 
 const buttons = [

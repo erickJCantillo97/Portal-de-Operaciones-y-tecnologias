@@ -4,6 +4,10 @@ import UserHeader from "@/Components/sections/UserHeader.vue";
 import QuotesCard from "@/Pages/Dashboards/Quotes/QuotesCards.vue";
 import Projects from "@/Pages/Dashboards/Projects/Projects.vue";
 import Quotes from "@/Pages/Dashboards/Quotes.vue";
+import CustomUpload from "@/Components/CustomUpload.vue";
+
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 
 const props = defineProps({
     projects: Array,
@@ -29,8 +33,8 @@ const props = defineProps({
                 <QuotesCard class="col-span-1" :showIndicators="false" v-if="$page.props.auth.user.oficina == 'DEPPC'" />
             </div>
             <Quotes v-if="$page.props.auth.user.oficina == 'DEPPC'" />
-            <Projects v-else />
+            <!-- <Projects v-else /> -->
+            <!-- <CustomUpload mode="advanced" :multiple="true" accept=".xlsx,.xls" url="prueba"/> -->
         </div>
-
     </AppLayout>
 </template>
