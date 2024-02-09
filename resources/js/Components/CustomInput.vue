@@ -12,8 +12,14 @@ import ToggleButton from 'primevue/togglebutton';
 import RadioButton from 'primevue/radiobutton';
 import Calendar from 'primevue/calendar';
 
+const checked = ref(false);
+
 const props = defineProps({
     //general
+    autoResize: {
+        type: Boolean,
+        default: false
+    },
     type: {
         type: String,
         default: 'text'

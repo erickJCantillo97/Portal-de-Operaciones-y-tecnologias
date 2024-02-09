@@ -108,6 +108,21 @@ class ProjectController extends Controller
         return response()->json($taskProject);
     }
 
+    /**
+     * Display the specified resource.
+     */
+    public function goToProjectOverview(Project $project)
+    {
+        try {
+        return Inertia::render('Project/ProjectOverview',
+        [
+            'project' => Project::findOrFail($project->id)
+        ]);
+        } catch (Exception $e) {
+            return back()->withErrors(['message', 'Error al cargar la página' . $e]);
+        }
+    }
+
     public function addShips(Request $request, Project $project)
     {
         foreach ($request->ships as $ship) {

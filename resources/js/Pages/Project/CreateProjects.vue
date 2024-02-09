@@ -44,7 +44,7 @@ const props = defineProps({
 })
 
 //#region Referencias (v-model)
-const checked = ref(true)
+const checked = ref(false)
 const contractSelect = ref()
 const authorizationSelect = ref()
 const quoteSelect = ref()
@@ -79,7 +79,6 @@ const columnas = [
 
 const actions = [
     { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },]
-
 
 const openDialog = ref(false)
 
@@ -545,8 +544,14 @@ function formatDateTime24h(date) {
                     </tab-content>
                     <tab-content title="Hitos" icon="fa-solid fa-list-check">
                         <div class="w-full h-[89vh] overflow-y-auto">
+<<<<<<< HEAD
+                            <CustomDataTable :rowsDefault="100" title="Herramientas y equipos" :data="tools"
+                                :columnas="columnas" :actions="actions" @edit="showModal"
+                                @goToProjectOverview="goToProjectOverview" :filterButtons="filterButtons">
+=======
                             <CustomDataTable :rowsDefault="100" :data="milestones" :columnas="columnas" :actions="actions"
                                 @edit="showModal" :filter="false" :showHeader="false">
+>>>>>>> 80d3d11a114e278a25a8422cfbbe58c67396a398
                                 <template #buttonHeader>
                                     <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal()" />
                                 </template>
@@ -556,7 +561,7 @@ function formatDateTime24h(date) {
                 </form-wizard>
             </section>
         </main>
-        <CustomModal v-model:visible="openDialog" width="30rem">
+        <CustomModal v-model:visible="openDialog" width="30rem" :closable="false">
             <template #icon>
                 <i class="fa-solid text-white fa-list-check"></i>
             </template>
@@ -567,6 +572,28 @@ function formatDateTime24h(date) {
             </template>
             <template #body>
                 <section class="relative space-y-2 p-2">
+<<<<<<< HEAD
+                    <CustomInput label="Título del Hito" id="category" type="textarea" v-model:input="milestoneTitle"
+                        placeholder="Escriba título del hito" autoResize />
+                    <CustomInput label="Fecha de Hito" id="category" type="date" v-model:input="milestoneDate"
+                        placeholder="Escriba fecha de hito" />
+                    <CustomInput label="Valor del Hito" id="value" type="number" mode="currency"
+                        v-model:input="milestoneValue" placeholder="Escriba el valor del hito" />
+                    <CustomInput label="Seleccione tipo de Hito" id="category" type="dropdown"                            v-model:input="milestoneType" placeholder="Escriba el tipo de hito" />
+                    <div class="flex justify-center items-center">
+                        <ToggleButton v-model="milestoneInvoice" onLabel="Hito Facturado" offLabel="Hito No Facturado" :pt="{
+                            root: ({ props }) => ({
+                                class:
+                                    [
+                                        '!p-1 !text-sm',
+                                        props.modelValue ? '!bg-teal-400 !text-white' : '!bg-red-400 !text-white'
+                                    ]
+                            })
+                        }" />
+                    </div>
+                    <CustomInput v-if="milestoneInvoice" label="Avance" id="category" type="number"
+                        v-model:input="milestoneAdvance" placeholder="Escriba el avance del hito" />
+=======
                     <CustomInput label="Título del Hito" id="category" type="text" v-model:input="formMilestone.title"
                         placeholder="Escriba título del hito" />
                     <CustomInput label="Fecha de Hito" id="category" type="date" v-model:input="formMilestone.end_date"
@@ -581,6 +608,7 @@ function formatDateTime24h(date) {
                     <CustomInput label="Avance" id="category" type="number" v-model:input="formMilestone.advance"
                         placeholder="Escriba el avance del hito" />
 
+>>>>>>> 80d3d11a114e278a25a8422cfbbe58c67396a398
                 </section>
             </template>
             <template #footer>

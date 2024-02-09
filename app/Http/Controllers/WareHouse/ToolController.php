@@ -102,17 +102,21 @@ class ToolController extends Controller
         return $categoria->padre->padre->letter . "" . $categoria->padre->letter . "" . date_format(new DateTime($data['entry_date']), "y") . "01" . str_pad(($valor + 1), 3, '0', STR_PAD_LEFT);
     }
 
-
     /**
      * Display the specified resource.
      */
     public function show(Tool $tool)
     {
         try {
-        return Inertia::render('WareHouse/Tools/ToolDetails', ['tool' => Tool::with('category','category.padre', 'category.padre.padre')->where('id', $tool->id)->first()]);
-    } catch (Exception $e) {
-        return back()->withErrors(['message', 'Error al cargar la página' . $e]);
-    }
+        return Inertia::render('WareHouse/Tools/ToolOverview',
+        [
+            'tool' => Tool::with('category','category.padre', 'category.padre.padre')
+            ->where('id', $tool->id)
+            ->first()
+        ]);
+        } catch (Exception $e) {
+            return back()->withErrors(['message', 'Error al cargar la página' . $e]);
+        }
     }
 
     /**
