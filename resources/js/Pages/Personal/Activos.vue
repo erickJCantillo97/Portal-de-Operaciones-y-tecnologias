@@ -47,7 +47,8 @@ function formatDate(date) {
             </div>
             <!--DATATABLE-->
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="personal" v-model:filters="filters"
-                dataKey="id" filterDisplay="menu" :globalFilterFields="['Nombres_Apellidos', 'name', 'type', 'email']"
+                dataKey="id" filterDisplay="menu"
+                :globalFilterFields="['Nombres_Apellidos', 'Cargo', 'name', 'type', 'email']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -83,6 +84,7 @@ function formatDate(date) {
                         <UserTable :user="slotProps.data"></UserTable>
                     </template>
                 </Column>
+                <Column field="Cargo" header="cargo" sortable></Column>
                 <Column field="Oficina" header="Departamento" sortable></Column>
                 <Column field="Fecha_Final" header="Fin Contrato" sortable>
                     <template #body="slotProps">

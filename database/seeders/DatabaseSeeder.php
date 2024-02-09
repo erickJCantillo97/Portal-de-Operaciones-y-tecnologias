@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Laravel\Jetstream\Rules\Role;
+use Spatie\Permission\Models\Role as ModelsRole;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,6 +15,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(PermissionSeeder::class);
+        ModelsRole::create([
+            'name' => 'Super Admin'
+        ]);
         // \App\Models\User::factory(10)->create();
 
         // \App\Models\User::factory()->create([
