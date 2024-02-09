@@ -34,7 +34,7 @@ const props = defineProps({
             </div>
             <Quotes v-if="$page.props.auth.user.oficina == 'DEPPC'" />
             <!-- <Projects v-else /> -->
-            <CustomUpload mode="advanced" :multiple="true" url="prueba"/>
+            <!-- <CustomUpload mode="advanced" :multiple="true" accept=".xlsx,.xls" url="prueba"/> -->
         </div>
     </AppLayout>
 </template>

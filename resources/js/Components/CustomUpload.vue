@@ -5,7 +5,7 @@ import { ref } from 'vue';
 import FileUpload from 'primevue/fileupload';
 import Empty from './Empty.vue';
 import Badge from 'primevue/badge';
-import { useForm } from '@inertiajs/vue3';
+import { router, useForm } from '@inertiajs/vue3';
 import { useToast } from "primevue/usetoast";
 import Loading from './Loading.vue';
 import Toast from 'primevue/toast';
@@ -19,6 +19,22 @@ const props = defineProps({
     iconButton: {
         type: String,
         default: 'fa-solid fa-cloud-arrow-up'
+    },
+    severity: {
+        type: String,
+        default: 'primary'
+    },
+    text: {
+        type: Boolean,
+        default: false
+    },
+    outlined: {
+        type: Boolean,
+        default: false
+    },
+    classButton: {
+        type: String,
+        default: ''
     },
     titleModal: {
         type: String,
@@ -74,27 +90,27 @@ const formatSize = (bytes) => {
     return `${formattedSize} ${sizes[i]}`;
 }
 
-const formFiles = useForm({
-    files: null
-})
+const loading = ref(false)
 const uploadArchives = (event) => {
-    formFiles.transform((data) => ({
-        ...data,
-        files: event.files
-    })).post(route(props.url), {
+    loading.value = true
+    let files
+    files = props.multiple ? event.files : event.files[0]
+    router.post(route(props.url), { files }, {
         onSuccess: () => {
-            toast.add({ severity: 'success', group: "customToast", text:'Guardado con exito', life:2000 })
+            toast.add({ severity: 'success', group: "customToast", text: 'Guardado con exito', life: 2000 })
+            loading.value = false
+            visible.value = false
         },
         onError: (e) => {
             console.log(e)
-            toast.add({ severity: 'error', group: "customToast", text:'Error al guardar' , life:2000})
+            toast.add({ severity: 'error', group: "customToast", text: 'Error al guardar', life: 2000 })
+            loading.value = false
         }
     })
 }
-
 </script>
 <template>
-    <Button :label="labelButton" :icon="iconButton" @click="visible = true" />
+    <Button :class="classButton" :outlined :severity :label="labelButton" :icon="iconButton" @click="visible = true" />
     <CustomModal v-model:visible="visible" width="30rem" :icon="iconModal" :titulo="titleModal">
         <template #body>
             <FileUpload :mode :accept :maxFileSize :multiple customUpload @uploader="uploadArchives">
@@ -115,18 +131,19 @@ const uploadArchives = (event) => {
                         <div class="grid p-0 sm:p-1 gap-3">
                             <div v-for="(file, index) of files" :key="file.name + file.type + file.size"
                                 class="flex w-full justify-between items-center hover:bg-gray-100 p-1">
-                                <span class="flex space-x-2">
+                                <span class="flex space-x-2 cursor-default" v-tooltip.left="file.name">
                                     <span class="w-24 h-14 flex items-center justify-center">
                                         <img v-if="file.type.includes('image')" role="presentation" :alt="file.name"
                                             :src="file.objectURL" />
-                                        <i v-else-if="file.type.includes('application/pdf')"
-                                            class="fa-solid fa-file-pdf text-6xl text-primary" />
+                                        <i v-else-if="file.type.includes('pdf')"
+                                            class="fa-solid fa-file-pdf text-6xl text-red-600" />
                                         <i v-else-if="file.type == 'text/plain'"
-                                            class="fa-solid fa-file-lines text-6xl  text-primary" />
-                                        <i v-else-if="file.type.includes('spreadsheet')"
-                                            class="fa-solid fa-file-excel text-6xl  text-primary" />
+                                            class="fa-regular fa-file-lines text-6xl  text-gray-600" />
+                                        <i v-else-if="file.type.includes('spreadsheet') || file.type.includes('excel')"
+                                            class="fa-solid fa-file-excel text-6xl  text-green-600" />
                                         <i v-else-if="file.type.includes('word')"
                                             class="fa-solid fa-file-word text-6xl  text-primary" />
+                                        <i v-else class="fa-solid fa-file text-6xl  text-gray-600" />
                                     </span>
                                     <span>
                                         <p class="font-semibold text-sm truncate w-48">{{ file.name }}</p>
@@ -134,7 +151,7 @@ const uploadArchives = (event) => {
                                         <Badge value="Pendiente" severity="warning" />
                                     </span>
                                 </span>
-                                <Button icon="fa-solid fa-trash-can"
+                                <Button icon="fa-solid fa-trash-can" v-tooltip.rigth="'Quitar de la cola'"
                                     @click="onRemoveTemplatingFile(file, removeFileCallback, index)" text
                                     severity="danger" />
                             </div>
@@ -142,15 +159,16 @@ const uploadArchives = (event) => {
                     </div>
                 </template>
                 <template #empty>
-                    <Loading v-if="formFiles.processing" message="Subiendo..." />
+                    <Loading v-if="loading" message="Subiendo..." />
                     <Empty v-else message="Arrastra aqui" />
                 </template>
             </FileUpload>
         </template>
     </CustomModal>
-    <Toast position="bottom-center" group="customToast" :pt="{ content: '!py-1 !items-center !flex !justify-between !px-3 ', }">
+    <Toast position="bottom-center" group="customToast"
+        :pt="{ content: '!py-1 !items-center !flex !justify-between !px-3 ', }">
         <template #message="slotProps">
-            <i v-if="slotProps.message.icon" class="text-3xl" :class="slotProps.message.icon"/>
+            <i v-if="slotProps.message.icon" class="text-3xl" :class="slotProps.message.icon" />
             <i v-else class="text-3xl"
                 :class="slotProps.message.severity == 'error' ? 'fa-solid fa-xmark' : slotProps.message.severity == 'success' ? 'fa-solid fa-check' : slotProps.message.severity == 'info' ? 'fa-solid fa-circle-info' : slotProps.message.severity == 'warn' ? 'fa-solid fa-triangle-exclamation' : null" />
             <div class="flex items-center space-x-2">

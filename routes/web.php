@@ -275,7 +275,8 @@ Route::get('clases_anterior', function () {
     }
 });
 
-Route::post('/prueba', function () {
+Route::post('/prueba', function (Request $request) {
+    // dd($request->all());
     // return back()->withErrors('success','');
     // $quote = Quote::with('version', 'version.quoteTypeShips')->where('id', 1)->first();
     // $user = UserNotify::where('id', Auth::user()->id)->first();
