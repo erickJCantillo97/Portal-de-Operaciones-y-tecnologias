@@ -14,9 +14,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('getAvgManurities', [DashboardEstimacionesController::class, 'getAvgManurities'])->name('get.avg.manurities');
     Route::get('getEstimatorData', [DashboardEstimacionesController::class, 'getEstimatorData'])->name('get.estimator.data');
     Route::get('getQuotesCountry', [DashboardEstimacionesController::class, 'getQuotesCountry'])->name('get.quotes.country');
-
-
+    
     /*  Projects */
-
     Route::get('projectActive', [DashboardProjectsController::class, 'projectActive'])->name('project.active');
 });

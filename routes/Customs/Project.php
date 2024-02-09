@@ -3,6 +3,7 @@
 use App\Http\Controllers\Projects\AuthorizationController;
 use App\Http\Controllers\Projects\ContractController;
 use App\Http\Controllers\Projects\CustomerController;
+use App\Http\Controllers\Projects\MilestoneController;
 use App\Http\Controllers\Projects\ProgrammingController;
 use App\Http\Controllers\Projects\ProjectController;
 use App\Http\Controllers\Projects\QuoteController;
@@ -63,4 +64,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     //CRUD Programming
 
+    /// CRUD HITOS
+
+    Route::resource('milestones', MilestoneController::class);
 });
