@@ -10,8 +10,14 @@ import Checkbox from 'primevue/checkbox';
 import { ref } from 'vue';
 import ToggleButton from 'primevue/togglebutton';
 
+const checked = ref(false);
+
 const props = defineProps({
     //general
+    autoResize: {
+        type: Boolean,
+        default: false
+    },
     type: {
         type: String,
         default: 'text'
@@ -147,7 +153,7 @@ const input = defineModel('input', {
             <InputNumber v-else-if="type == 'number'" :id :disabled :placeholder :minFractionDigits :maxFractionDigits
                 class="w-full" :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'"
                 :useGrouping="mode == 'currency' ? '' : useGrouping" :currency="currency" :mode="mode" :suffix :prefix />
-            <Textarea v-else-if="type == 'textarea'" :id :disabled :placeholder class="w-full"
+            <Textarea v-else-if="type == 'textarea'" :id :disabled :placeholder :autoResize class="w-full"
                 :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
             <Dropdown v-else-if="type == 'dropdown'" :id :disabled :placeholder :options :optionLabel :loading showClear
                 :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''" v-model="input"
@@ -193,8 +199,10 @@ const input = defineModel('input', {
                     header: '!h-min !py-0.5'
                 }" />
             <Checkbox v-else-if="type == 'checkbox'" v-model="input" :binary="true" />
-            <ToggleButton v-else-if="type == 'tooglebutton'" v-model="input" :onLabel :offLabel :pt="{
-                root: '!h-8'
+            <ToggleButton v-else-if="type == 'tooglebutton'" v-model="checked" :onLabel :offLabel :pt="{
+                root: {
+                    class: ['w-30rem', { 'bg-teal-400 border-white': checked }]
+                }
             }" />
             <span v-else :class="(loading || icon) ? 'p-input-icon-left' : ''" class="w-full">
                 <i v-if="(loading || icon)" :class="loading ? 'pi pi-spin pi-spinner' : icon" />

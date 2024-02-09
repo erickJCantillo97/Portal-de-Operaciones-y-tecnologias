@@ -28,7 +28,7 @@ const form = ref({
 })
 
 const columnas = [
-    { field: 'name', header: 'Nombre', rowClass: "underline !text-left", sortable: true, filter: true, type: 'button', event: 'goToToolDetails', severity: 'info', text: true },
+    { field: 'name', header: 'Nombre', rowClass: "underline !text-left", sortable: true, filter: true, type: 'button', event: 'goToToolOverview', severity: 'info', text: true },
     { field: 'code', header: 'Codigo', filter: true, sortable: true },
     { field: 'serial', header: 'Serial', filter: true, sortable: true },
     { field: 'estado_operativo', header: 'Operatividad', filter: true, sortable: true },
@@ -71,7 +71,7 @@ const showModal = (event, data) => {
     }
 }
 
-const goToToolDetails = (event, data) => {
+const goToToolOverview = (event, data) => {
     try {
         router.get(route('tools.show', data.id))
     } catch (error) {
@@ -128,7 +128,7 @@ const save = () => {
     <AppLayout>
         <div class="w-full h-[89vh] overflow-y-auto">
             <CustomDataTable :rowsDefault="100" title="Herramientas y equipos" :data="tools" :columnas="columnas"
-                :actions="actions" @edit="showModal" @goToToolDetails="goToToolDetails" :filterButtons="filterButtons">
+                :actions="actions" @edit="showModal" @goToToolOverview="goToToolOverview" :filterButtons="filterButtons">
                 <template #buttonHeader>
                     <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal" />
                 </template>

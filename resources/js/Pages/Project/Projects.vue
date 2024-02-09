@@ -71,7 +71,6 @@ const clearError = () => {
 }
 
 // Formatear el número en moneda (USD)
-
 const items = [{
     title: 'Crear cronograma nuevo',
     description: 'Aqui podra crear un cronograma vacio',
@@ -103,7 +102,6 @@ const items = [{
 },
 ]
 //#region subida de documentos
-
 const files = ref([])
 const fileup = ref(Math.random() * (10))
 
@@ -127,7 +125,6 @@ const formatSize = (bytes) => {
 
     return `${formattedSize} ${sizeType[i]}`;
 }
-
 
 const uploadForm = useForm({
     files: [],
@@ -183,15 +180,13 @@ const showPdf = (event, data) => {
         archivo.value = URL.createObjectURL(file)
     })
 }
-
-
 //#endregion
 
-
+//#region CustomDataTable
 const columnas = [
     // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
     { field: 'SAP_code', header: 'Código SAP', filter: true, sortable: true },
-    { field: 'name', header: 'Nombre', filter: true, sortable: true },
+    { field: 'name', header: 'Nombre', rowClass: "underline !text-left", filter: true, sortable: true, type: 'button', event: 'goToProjectOverview', severity: 'info', text: true },
     { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true },
     { field: 'contract.contract_id', header: 'Gerencia', filter: true, sortable: true },
     { field: 'cost_sale', header: 'Costo de Venta', type: 'currency', filter: true, sortable: true },
@@ -209,13 +204,20 @@ const columnas = [
     },
 ]
 
-//#region Botones de CustomDatatable
 const buttons = [
     { event: 'addDoc', severity: 'primary', class: '', icon: 'fa-solid fa-cloud-arrow-up', text: true, outlined: false, rounded: false },
     { event: 'addAct', severity: 'primary', class: '', icon: 'fa-regular fa-calendar-plus', text: true, outlined: false, rounded: false },
     { event: 'editClic', severity: 'primary', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
     { event: 'deleteClic', severity: 'danger', icon: 'fa-regular fa-trash-can', class: '!h-8', text: true, outlined: false, rounded: false },
 ]
+
+const goToProjectOverview = (event, data) => {
+    try {
+        router.get(route('projects.goToProjectOverview', data.id))
+    } catch (error) {
+        console.log(error)
+    }
+}
 //#endregion
 
 </script>
@@ -224,7 +226,7 @@ const buttons = [
     <AppLayout>
         <div class="w-full h-[89vh] overflow-y-auto">
             <CustomDataTable title="Proyectos" :data="projects" :rows-default="100" :columnas="columnas" :actions="buttons"
-                @addDoc="addDoc" @addAct="addAct" @editClic="editClic" @deleteClic="deleteClic">
+                @addDoc="addDoc" @addAct="addAct" @editClic="editClic" @deleteClic="deleteClic" @goToProjectOverview="goToProjectOverview">
                 <template #buttonHeader>
                     <Button @click="addItem" severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
                 </template>

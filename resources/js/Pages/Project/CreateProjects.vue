@@ -37,7 +37,7 @@ const props = defineProps({
 })
 
 //#region Referencias (v-model)
-const checked = ref(true)
+const checked = ref(false)
 const contractSelect = ref()
 const authorizationSelect = ref()
 const quoteSelect = ref()
@@ -63,7 +63,7 @@ const searchShips = () => {
 
 //#regio CustomDataTable
 const columnas = [
-    { field: 'name', header: 'Nombre', rowClass: "underline !text-left", sortable: true, filter: true, type: 'button', event: 'goToToolDetails', severity: 'info', text: true },
+    { field: 'name', header: 'Nombre', rowClass: "underline !text-left", sortable: true, filter: true, type: 'button', event: 'goToProjectOverview', severity: 'info', text: true },
     { field: 'code', header: 'Codigo', filter: true, sortable: true },
     { field: 'serial', header: 'Serial', filter: true, sortable: true },
     { field: 'estado_operativo', header: 'Operatividad', filter: true, sortable: true },
@@ -81,12 +81,12 @@ const actions = [
     { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },]
 
 //v-models Formulario de Hitos
-const goalTitle = ref()
-const goalDate = ref()
-const goalValue = ref()
-const goalType = ref()
-const goalAdvance = ref()
-const goalInvoice = ref()
+const milestoneTitle = ref()
+const milestoneDate = ref()
+const milestoneValue = ref()
+const milestoneType = ref()
+const milestoneAdvance = ref()
+const milestoneInvoice = ref()
 const openDialog = ref(false)
 
 const showModal = () => {
@@ -553,7 +553,8 @@ function formatDateTime24h(date) {
                     <tab-content title="Hitos" icon="fa-solid fa-list-check">
                         <div class="w-full h-[89vh] overflow-y-auto">
                             <CustomDataTable :rowsDefault="100" title="Herramientas y equipos" :data="tools"
-                                :columnas="columnas" :actions="actions" @edit="showModal" :filterButtons="filterButtons">
+                                :columnas="columnas" :actions="actions" @edit="showModal"
+                                @goToProjectOverview="goToProjectOverview" :filterButtons="filterButtons">
                                 <template #buttonHeader>
                                     <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal()" />
                                 </template>
@@ -563,7 +564,7 @@ function formatDateTime24h(date) {
                 </form-wizard>
             </section>
         </main>
-        <CustomModal v-model:visible="openDialog" width="30rem">
+        <CustomModal v-model:visible="openDialog" width="30rem" :closable="false">
             <template #icon>
                 <i class="fa-solid text-white fa-list-check"></i>
             </template>
@@ -574,19 +575,26 @@ function formatDateTime24h(date) {
             </template>
             <template #body>
                 <section class="relative space-y-2 p-2">
-                    <CustomInput label="Título del Hito" id="category" type="text" v-model:input="goalTitle"
-                        placeholder="Escriba título del hito" />
-                    <CustomInput label="Fecha de Hito" id="category" type="date" v-model:input="goalDate"
+                    <CustomInput label="Título del Hito" id="category" type="textarea" v-model:input="milestoneTitle"
+                        placeholder="Escriba título del hito" autoResize />
+                    <CustomInput label="Fecha de Hito" id="category" type="date" v-model:input="milestoneDate"
                         placeholder="Escriba fecha de hito" />
                     <CustomInput label="Valor del Hito" id="value" type="number" mode="currency"
-                        v-model:input="goalValue" placeholder="Escriba el valor del hito" />
-                    <CustomInput label="Seleccione tipo de Hito" id="category" type="dropdown" v-model:input="goalType"
-                        placeholder="Escriba el tipo de hito" />
-                    <CustomInput label="Hito Facturado" id="category" type="dropdown" v-model:input="goalInvoice"
-                        placeholder="seleccionar " />
-                    <CustomInput label="Avance" id="category" type="number" v-model:input="goalAdvance"
-                        placeholder="Escriba el avance del hito" />
-
+                        v-model:input="milestoneValue" placeholder="Escriba el valor del hito" />
+                    <CustomInput label="Seleccione tipo de Hito" id="category" type="dropdown"                            v-model:input="milestoneType" placeholder="Escriba el tipo de hito" />
+                    <div class="flex justify-center items-center">
+                        <ToggleButton v-model="milestoneInvoice" onLabel="Hito Facturado" offLabel="Hito No Facturado" :pt="{
+                            root: ({ props }) => ({
+                                class:
+                                    [
+                                        '!p-1 !text-sm',
+                                        props.modelValue ? '!bg-teal-400 !text-white' : '!bg-red-400 !text-white'
+                                    ]
+                            })
+                        }" />
+                    </div>
+                    <CustomInput v-if="milestoneInvoice" label="Avance" id="category" type="number"
+                        v-model:input="milestoneAdvance" placeholder="Escriba el avance del hito" />
                 </section>
             </template>
             <template #footer>
