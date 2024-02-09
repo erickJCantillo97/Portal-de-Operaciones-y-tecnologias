@@ -129,10 +129,10 @@ const rowClick = (event) => {
     visibleSidebar.value = true
 }
 const columns = [
-    { field: 'name', header: 'Nombre', sortable: true },
+    { field: 'name', header: 'Nombre', sortable: true, filter: true },
     { field: 'count_ships', header: 'Cascos', class: 'w-24', rowclass: "underline", sortable: true, filter: true, type: 'button', event: 'showHull', severity: 'info', text: true },
     { field: 'type', header: 'Tipo' },
-    { field: 'hull_material', header: 'Material del casco', filter: true },
+    { field: 'hull_material', header: 'Material del casco', filter: true, sortable: true },
     { field: 'length', header: 'Eslora' },
     { field: 'breadth', header: 'Manga' },
 ];

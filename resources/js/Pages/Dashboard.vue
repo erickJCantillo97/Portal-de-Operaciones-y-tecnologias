@@ -4,7 +4,7 @@ import UserHeader from "@/Components/sections/UserHeader.vue";
 import QuotesCard from "@/Pages/Dashboards/Quotes/QuotesCards.vue";
 import Projects from "@/Pages/Dashboards/Projects/Projects.vue";
 import Quotes from "@/Pages/Dashboards/Quotes.vue";
-import CustomUpload from "@/Components/CustomUpload.vue";
+
 
 import { useToast } from "primevue/usetoast";
 const toast = useToast();

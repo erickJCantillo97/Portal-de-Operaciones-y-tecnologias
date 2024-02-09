@@ -10,6 +10,7 @@ import TextInput from '../../Components/TextInput.vue'
 import Textarea from 'primevue/textarea'
 import ToggleButton from 'primevue/togglebutton'
 import Loading from '@/Components/Loading.vue'
+import CustomUpload from "@/Components/CustomUpload.vue";
 import NoContentToShow from '@/Components/NoContentToShow.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
@@ -31,7 +32,10 @@ const props = defineProps({
     authorizations: Array,
     quotes: Array,
     ships: Array,
-    milestones: Array,
+    milestones: {
+        type: Array,
+        default: []
+    },
     tools: {
         type: Array,
         default: []
@@ -208,34 +212,11 @@ const beforeChange = async () => {
 }
 
 const submit = async () => {
-    // TO DO store onComplete()
-    // return false
-    // toast('Proyecto creado exitosamente!', 'success')
     router.post(route('project.add.ships', projectIdRef.value), {
         ships: selectedShips.value
     });
     router.get(route('projects.index'));
-    // try {
-    //     formData.ships = selectedShips.value
-    //     if (!projectIdRef) {
-    //         await axios.post(route('projects.store', projectIdRef), formData)
-    //             .then((res) => {
-    //                 switchTabsStates = i
-    //             })
-    //         return switchTabsStates
-    //     } else {
-    //         await axios.put(route('projects.update', projectIdRef), formData)
-    //             .then((res) => {
-    //                 toast('Proyecto actualizado exitosamente!', 'success')
-    //                 switchTabsStates = true
-    //             })
-    //         return switchTabsStates
-    //         // return true
-    //     }
-    // } catch (error) {
-    //     toast(error.message)
-    // }
-    // return false
+
 }
 
 const formMilestone = useForm({
@@ -295,6 +276,22 @@ function formatDateTime24h(date) {
                     Agregar Proyecto
                 </h2>
             </header>
+            <div v-if="props.project" class="space-x-4 justify-end flex w-full my-4">
+
+                <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" :multiple="true"
+                    icon-button="fa-solid fa-chart-bar" labelButton="Subir Estructura" accept=".xlsx,.xls" url="prueba" />
+
+                <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Presupuesto del proyecto"
+                    icon-button="fa-solid fa-hand-holding-dollar" labelButton="Subir Presupuesto" accept=".xlsx,.xls"
+                    url="prueba" severity="success" />
+
+                <CustomUpload mode="advanced" :multiple="true" titleModal="Subir el avance planeado del proyecto"
+                    labelButton="Subir Curva S" accept=".xlsx,.xls" url="prueba" severity="info" />
+
+                <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Costos ejecutados por el proyecto"
+                    icon-button="fa-solid fa-money-bill-trend-up" labelButton="Subir Costos Ejecutados" accept=".xlsx,.xls"
+                    url="prueba" severity="danger" />
+            </div>
             <section class="grid grid-cols-1 p-2">
                 <!-- AQUÍ VA EL CONTENIDO DEL FORMULARIO-->
                 <form-wizard @on-complete="submit()" stepSize="md" color="#2E3092" nextButtonText="Siguiente"

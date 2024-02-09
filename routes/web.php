@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Mail\AssignmentToolsMail;
+use App\Models\Projects\Contract;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
@@ -248,6 +249,7 @@ Route::get('estmaciones_anterior', function () {
     }
 });
 Route::get('clases_anterior', function () {
+  
     $data =  DB::connection('sqlsrv_anterior')->table('clases')->get();
     foreach ($data as $clase) {
         TypeShip::firstOrCreate([
@@ -262,7 +264,6 @@ Route::get('clases_anterior', function () {
             'full_load' => $clase->full_load,
             'light_ship' => $clase->light_ship,
             'power_total' => $clase->potencia_total_kw,
-            'power_total' => $clase->power_total,
             'propulsion_type' => $clase->tipo_propulsion,
             'velocity' => $clase->velocidad,
             'autonomy' => $clase->autonomias,
@@ -271,6 +272,28 @@ Route::get('clases_anterior', function () {
             'CGT' => $clase->CGT,
             'bollard_pull' => $clase->bollard_pull,
             'clasification' => $clase->clasificacion,
+        ]);
+    }
+});
+Route::get('contratos_anterior', function () {
+    // Contract::truncate();
+    $data =  DB::connection('sqlsrv_anterior')->table('contratos')->get();
+    foreach ($data as $clase) {
+        $cliente = DB::connection('sqlsrv_anterior')->table('clientes')->where('id', $clase->cliente_id)->first();
+        $id = null;
+        if ($cliente) {
+            $id = Customer::where('name', $cliente->nombre_cliente)->first()->id ?? null;
+        }
+        Contract::firstOrCreate([
+            'customer_id' => $id,
+            'contract_id' => $clase->contrato_id,
+            'subject' => $clase->objeto,
+            'gerencia' => 'GECON',
+            'type_of_sale' => $clase->tipo_venta == 'VENTA FINANCIADA' ? 'FINANCIADA' : $clase->tipo_venta,
+            'supervisor' => $clase->supervisor,
+            'start_date' => $clase->fecha_inicio,
+            'end_date' => $clase->fecha_fin,
+            'state' => $clase->estado,
         ]);
     }
 });
