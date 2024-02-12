@@ -30,9 +30,9 @@ const props = defineProps({
         <div class="overflow-y-scroll">
             <div class="grid grid-cols-1  md:grid-cols-2 max-w-full">
                 <UserHeader class="col-span-1" />
-                <QuotesCard class="col-span-1" :showIndicators="false" v-if="$page.props.auth.user.oficina == 'DEEST'" />
+                <QuotesCard class="col-span-1" :showIndicators="false" v-if="$page.props.auth.user.oficina == 'DEPPC'" />
             </div>
-            <Quotes v-if="$page.props.auth.user.oficina == 'DEEST'" />
+            <Quotes v-if="$page.props.auth.user.oficina == 'DEPPC'" />
             <!-- <Projects v-else /> -->
             <!-- <CustomUpload mode="advanced" :multiple="true" accept=".xlsx,.xls" url="prueba"/> -->
         </div>

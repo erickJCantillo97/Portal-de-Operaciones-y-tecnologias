@@ -29,6 +29,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Mail\AssignmentToolsMail;
 use App\Models\Projects\Contract;
+use App\Models\Projects\ProjectsShip;
+use App\Models\Projects\Ship;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
@@ -249,7 +251,7 @@ Route::get('estmaciones_anterior', function () {
     }
 });
 Route::get('clases_anterior', function () {
-  
+
     $data =  DB::connection('sqlsrv_anterior')->table('clases')->get();
     foreach ($data as $clase) {
         TypeShip::firstOrCreate([
@@ -294,6 +296,48 @@ Route::get('contratos_anterior', function () {
             'start_date' => $clase->fecha_inicio,
             'end_date' => $clase->fecha_fin,
             'state' => $clase->estado,
+        ]);
+    }
+});
+
+Route::get('proyectos_anterior', function () {
+    // Contract::truncate();
+    Ship::truncate();
+    $data =  DB::connection('sqlsrv_anterior')->table('proyectos')->get();
+    foreach ($data as $proyecto) {
+
+
+        $clase = DB::connection('sqlsrv_anterior')->table('clases')->where('id', $proyecto->clase_id)->first();
+        $contrato = DB::connection('sqlsrv_anterior')->table('contratos')->where('id', $proyecto->contrato_id)->first();
+        $contrato_id = null;
+        if ($contrato) {
+            $contrato_id = Contract::where('contract_id', $contrato->contrato_id)->first()->id ?? null;
+        }
+        $p = Project::firstOrNew([
+            'SAP_code' => $proyecto->codigo_SAP
+        ]);
+        $p->name = $proyecto->name;
+        $p->contract_id = $contrato_id;
+        $p->type = $proyecto->tipo_proyecto == 'PROYECTO DE VENTA' ? 'PROYECTO DE VENTA (ARTEFACTO NAVAL)' : ($proyecto->tipo_proyecto == 'PROYECTO DE INVERSIÓN DE BUQUE' ? 'PROYECTO DE INVERSIÓN (ARTEFACTO NAVAL)' : $proyecto->tipo_proyecto);
+        $p->status = $proyecto->estado_proyecto == [] ?  null : $proyecto->estado_proyecto;
+        $p->scope = $proyecto->alcance == 'CO DESARROLL DISEÑO Y CONSTRUCCIÓN' ?  'CO DESARROLLO DISEÑO Y CONSTRUCCIÓN' : $proyecto->alcance;
+        $p->observations = $proyecto->observacions;
+        $p->gerencia = 'GECON';
+        $p->save();
+        $clase_id = null;
+        if ($clase) {
+            $clase_id = TypeShip::where('name', $clase->name)->first()->id ?? null;
+        }
+
+        $s = Ship::firstOrCreate([
+            'idHull' => $proyecto->casco,
+            'name' => $proyecto->name,
+            'acronyms' => $proyecto->siglas_proyecto,
+            'type_ship_id' => $clase_id
+        ]);
+        ProjectsShip::firstOrCreate([
+            'project_id' => $p->id,
+            'ship_id' => $s->id
         ]);
     }
 });

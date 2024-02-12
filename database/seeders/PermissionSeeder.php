@@ -107,6 +107,9 @@ class PermissionSeeder extends Seeder
             ['name' => 'suggestion read', 'guard_name' => 'web'],
             ['name' => 'Suggestion edit', 'guard_name' => 'web'],
             ['name' => 'suggestion delete', 'guard_name' => 'web'],
+
+            ['name' => 'dashboard projcets view', 'guard_name' => 'web'],
+            ['name' => 'dashboard projcets view', 'guard_name' => 'web']
         ];
 
         foreach ($permisos as $key => $permiso) {

@@ -185,7 +185,7 @@ const showPdf = (event, data) => {
 //#region CustomDataTable
 const columnas = [
     // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
-    { field: 'name', header: 'Nombre', rowClass: "underline !text-left", filter: true, sortable: true, type: 'button', event: 'goToProjectOverview', severity: 'info', text: true },
+    { field: 'name', header: 'Nombre', rowClass: "underline !text-left !text-sm", filter: true, sortable: true, type: 'button', event: 'goToProjectOverview', severity: 'info', text: true, },
     { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true },
     { field: 'contract.contract_id', header: 'Contrato', filter: true, sortable: true },
     { field: 'cost_sale', header: 'Costo de Venta', type: 'currency', filter: true, sortable: true },

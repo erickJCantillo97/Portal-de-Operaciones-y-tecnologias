@@ -12,32 +12,8 @@ use Spatie\Permission\Models\Role;
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::resource('roles', RoleController::class);
-    Route::resource('permissions', PermissionController::class);
-
-    Route::get('',  function () {
-        $users = User::with('roles','roles.permissions')->orderBy('gerencia')->get()->map(function ($user) {
-            $roles = collect($user['roles'])->pluck('name')->toArray();
-            return [
-                'name' => $user['name'],
-                'photo' => $user['photo'],
-                'cargo' => $user['cargo'],
-                'gerencia' => $user['gerencia'],
-                'roles' => count($roles) == 0 ? ["Sin rol"] : $roles,
-                'rolesObj'=>$user['roles']
-            ];
-        });
-        $roles = Role::with('permissions')->get()->map(function ($r) {
-            return [
-                'id' => $r['id'],
-                'name' => $r['name'],
-                'users' => User::role($r['name'])->get(),
-                'permissions' => $r['permissions']
-            ];
-        });
-        $permisos = Permission::orderBy('name')->get();
-
-        return Inertia::render('Security/Index', [
-            'users' => $users, 'roles' => $roles, 'permisos' => $permisos
-        ]);
-    })->name('security');
+    Route::resource('permissions', PermissionController::class)->except('index');
+    Route::get('assignmentRoleToUser',  [RoleController::class, 'assignmentRoleToUser'])->name('assignment.role.user');
+    Route::get('removeRoleToUser',  [RoleController::class, 'removeRoleToUser'])->name('remove.role.user');
+    Route::get('',  [PermissionController::class, 'index'])->name('security');
 });

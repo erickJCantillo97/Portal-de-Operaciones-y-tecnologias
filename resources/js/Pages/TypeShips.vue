@@ -13,6 +13,7 @@ import OverlayPanel from 'primevue/overlaypanel';
 import axios from 'axios';
 import Card from 'primevue/card'
 import Tag from 'primevue/tag';
+import { Link } from '@inertiajs/vue3';
 const { toast } = useSweetalert();
 const { confirmDelete } = useSweetalert();
 
@@ -297,10 +298,11 @@ const showHull = (event, data) => {
             <p v-if="dataSidebar.clasification" class="">{{ dataSidebar.clasification }}</p>
         </span>
         <p v-if="dataSidebar.projects.length > 0" class="font-bold text-center">Proyectos</p>
-        <span v-for="(project, index) in dataSidebar.projects" :key="index" class="grid gap-y-2">
+        <span v-for="(project, index) in dataSidebar.projects" :key="index" class="grid gap-y-2 my-2">
             <div class="border-2 p-1 rounded-lg cursor-default">
                 <span class="flex justify-between items-center">
-                    <span v-tooltip.left="'Nombre del proyecto'" class="font-bold"> {{ project.name }}</span>
+                    <Link :href="route('projects.goToProjectOverview', project.id)" v-tooltip.left="'Nombre del proyecto'"
+                        class="font-bold"> {{ project.name }}</Link>
                     <span v-tooltip.top="'Codigo SAP'" class="text-sm">{{ project.SAP_code }}</span>
                 </span>
                 <span class="text-xs" v-tooltip.top="'Tipo de proyecto'">{{ project.type }}</span>

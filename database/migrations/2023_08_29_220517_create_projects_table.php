@@ -53,7 +53,7 @@ return new class extends Migration
             )->nullable(); //Alcance del projecto
             $table->string('supervisor')->nullable();
             $table->double('cost_sale')->nullable();
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             $table->string('gerencia');
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();

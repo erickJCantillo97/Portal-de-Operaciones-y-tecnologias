@@ -62,7 +62,7 @@ class ProjectController extends Controller
             'scope' => 'nullable',
             'supervisor' => 'nullable',
             'cost_sale' => 'nullable|numeric',
-            'description' => 'nullable',
+            'observations' => 'nullable',
             'start_date' => 'nullable',
             'end_date' => 'nullable',
             'hoursPerDay' => 'nullable',
@@ -114,10 +114,12 @@ class ProjectController extends Controller
     public function goToProjectOverview(Project $project)
     {
         try {
-        return Inertia::render('Project/ProjectOverview',
-        [
-            'project' => Project::findOrFail($project->id)
-        ]);
+            return Inertia::render(
+                'Project/ProjectOverview',
+                [
+                    'project' => Project::findOrFail($project->id)
+                ]
+            );
         } catch (Exception $e) {
             return back()->withErrors(['message', 'Error al cargar la página' . $e]);
         }
@@ -174,7 +176,7 @@ class ProjectController extends Controller
             'scope' => 'nullable',
             'supervisor' => 'nullable',
             'cost_sale' => 'nullable',
-            'description' => 'nullable',
+            'observations' => 'nullable',
             'gerencia' => 'nullable',
             'start_date' => 'nullable',
             'end_date' => 'nullable',
