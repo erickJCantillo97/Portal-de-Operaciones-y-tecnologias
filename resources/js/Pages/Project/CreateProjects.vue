@@ -134,7 +134,7 @@ const formData = useForm({
     scope: props.project?.scope ?? null, //ENUMS
     supervisor: props.project?.supervisor ?? '',
     cost_sale: props.project?.cost_sale ?? '0',
-    description: props.project?.description ?? '',
+    observations: props.project?.observations ?? '',
     start_date: props.project?.start_date ?? '',
     end_date: props.project?.end_date ?? '',
     hoursPerDay: props.project?.hoursPerDay ?? '8.5',
@@ -411,7 +411,7 @@ function formatDateTime24h(date) {
                             </div>
 
                             <!--CAMPO COSTO DE VENTA (cost_sale)-->
-                            <TextInput label="Costo de Venta" type="number" :placeholder="'Escriba el costo de venta'"
+                            <TextInput label="Valor Venta" type="number" :placeholder="'Escriba el valor de venta'"
                                 v-model="formData.cost_sale" :error="router.page.props.errors.cost_sale">
                             </TextInput>
 
@@ -419,7 +419,7 @@ function formatDateTime24h(date) {
                             <div class="col-span-2">
                                 <label class="text-sm font-bold text-gray-900">Descripción</label>
                                 <Textarea class="text-sm text-gray-500 placeholder:text-sm italic"
-                                    placeholder="Descripción del proyecto..." v-model="formData.description" rows="1"
+                                    placeholder="Descripción del proyecto..." v-model="formData.observations" rows="1"
                                     cols="143" autoResize :pt="{
                                         root: '!w-full'
                                     }" />

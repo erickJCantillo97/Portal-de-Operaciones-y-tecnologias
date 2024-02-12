@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Security;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -33,6 +34,7 @@ class RoleController extends Controller
         $validateData = $request->validate(
             [
                 'name' => 'required|unique:roles,name',
+                'description' => 'required',
             ]
         );
         try {
@@ -47,12 +49,29 @@ class RoleController extends Controller
         }
     }
 
+    public function assignmentRoleToUser($role, User $user)
+    {
+        try {
+            $user->assignRole($role);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error: ' . $e);
+        }
+    }
+
+    public function removeRoleToUser($role, User $user)
+    {
+        try {
+            $user->removeRole($role);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error: ' . $e);
+        }
+    }
+
     /**
      * Display the specified resource.
      */
     public function show(Role $role)
     {
-        
     }
 
     /**
@@ -68,7 +87,22 @@ class RoleController extends Controller
      */
     public function update(Request $request, Role $role)
     {
-        //
+        $validateData = $request->validate(
+            [
+                'name' => 'required|unique:roles,name',
+                'description' => 'required',
+            ]
+        );
+        try {
+            $validateData['guard_name'] = 'web';
+            $permisos =  collect($request->permisos)->map(function ($permiso) {
+                return $permiso['name'];
+            });
+            $role->update($validateData);
+            $role->syncPermissions($permisos);
+        } catch (\Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error: ' . $e);
+        }
     }
 
     /**

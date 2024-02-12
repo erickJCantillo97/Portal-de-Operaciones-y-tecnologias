@@ -103,9 +103,7 @@ const columnas = ref([
             secundary: { field: 'type_ship', subfield: 'name' }
         }
     },
-    { field: 'idHull', header: 'N° CASCO' },
-    { field: 'quilla', header: 'QUILLAS' },
-    { field: 'pantoque', header: 'PANTOQUE' },
+    { field: 'idHull', header: 'N° CASCO', filter: true, sortable: true },
     { field: 'acronyms', header: 'SIGLAS' },
 ])
 const buttons = ref([

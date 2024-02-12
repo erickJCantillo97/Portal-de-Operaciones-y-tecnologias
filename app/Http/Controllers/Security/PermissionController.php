@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Security;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -15,7 +17,30 @@ class PermissionController extends Controller
      */
     public function index()
     {
-        //
+        $users = User::with('roles', 'roles.permissions')->orderBy('gerencia')->get()->map(function ($user) {
+            $roles = collect($user['roles'])->pluck('name')->toArray();
+            return [
+                'name' => $user['name'],
+                'photo' => $user['photo'],
+                'cargo' => $user['cargo'],
+                'gerencia' => $user['gerencia'],
+                'roles' => count($roles) == 0 ? ["Sin rol"] : $roles,
+                'rolesObj' => $user['roles']
+            ];
+        });
+        $roles = Role::with('permissions')->get()->map(function ($r) {
+            return [
+                'id' => $r['id'],
+                'name' => $r['name'],
+                'users' => User::role($r['name'])->get(),
+                'permissions' => $r['permissions']
+            ];
+        });
+        $permisos = Permission::orderBy('name')->get();
+
+        return Inertia::render('Security/Index', [
+            'users' => $users, 'roles' => $roles, 'permisos' => $permisos
+        ]);
     }
 
     /**
@@ -33,14 +58,14 @@ class PermissionController extends Controller
     {
         $validateData = $request->validate(
             [
-                'name'=>'required|unique:permissions,name',
+                'name' => 'required|unique:permissions,name',
             ]
         );
         $validateData['guard_name'] = 'web';
         $roles =  collect($request->roles)->map(function ($permiso) {
             return $permiso['name'];
         });
-        try{
+        try {
 
             $permiso = Permission::create($validateData);
 
@@ -48,8 +73,8 @@ class PermissionController extends Controller
                 $r = Role::where('name', $role)->first();
                 $r->givePermissionTo($permiso);
             }
-        }catch (Exception $e) {
-            return back()->withErrors('message' , 'Ocurrio un Error: '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error: ' . $e);
         }
     }
 
@@ -82,10 +107,10 @@ class PermissionController extends Controller
      */
     public function destroy(Permission $permission)
     {
-        try{
+        try {
             $permission->delete();
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error: '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error: ' . $e);
         }
     }
 }
