@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Security;
 
 use App\Http\Controllers\Controller;
-use App\Ldap\User;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
