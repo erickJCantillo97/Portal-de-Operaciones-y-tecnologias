@@ -125,7 +125,8 @@ const navigation = [
             {
                 name: 'Personal Activo',
                 href: 'personal.activos',
-                dev: false
+                dev: false,
+                show: true
             },
             // { name: 'Programación', href: '#' },
             // { name: 'Parte Diario', href: '#' },
@@ -164,13 +165,14 @@ const navigation = [
         name: 'Gestión de Proyectos',
         icon: FolderIcon,
         current: false,
+        show: true,
         children: [
             {
                 name: 'Proyectos',
                 href: 'projects.index',
                 // dev: true,
                 show: true,
-            }, //gerencia (auth()->user()gerencia)
+            },
             {
                 name: 'Unidades',
                 href: 'ships.index',

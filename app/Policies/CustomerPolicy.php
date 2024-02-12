@@ -29,7 +29,7 @@ class CustomerPolicy
      */
     public function create(User $user): bool
     {
-        //
+        return $user->hasPermissionTo('customer create');
     }
 
     /**

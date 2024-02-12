@@ -185,11 +185,11 @@ const showPdf = (event, data) => {
 //#region CustomDataTable
 const columnas = [
     // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
-    { field: 'SAP_code', header: 'Código SAP', filter: true, sortable: true },
     { field: 'name', header: 'Nombre', rowClass: "underline !text-left", filter: true, sortable: true, type: 'button', event: 'goToProjectOverview', severity: 'info', text: true },
     { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true },
-    { field: 'contract.contract_id', header: 'Gerencia', filter: true, sortable: true },
+    { field: 'contract.contract_id', header: 'Contrato', filter: true, sortable: true },
     { field: 'cost_sale', header: 'Costo de Venta', type: 'currency', filter: true, sortable: true },
+    { field: 'SAP_code', header: 'Código SAP', filter: true, sortable: true },
     { field: 'end_date', header: 'Fecha Finalización', filter: true, sortable: true },
     // {
     //     field: 'status', header: 'Estado', filter: true, sortable: true, type: 'tag', filtertype: 'EQUALS',
@@ -226,7 +226,8 @@ const goToProjectOverview = (event, data) => {
     <AppLayout>
         <div class="w-full h-[89vh] overflow-y-auto">
             <CustomDataTable title="Proyectos" :data="projects" :rows-default="100" :columnas="columnas" :actions="buttons"
-                @addDoc="addDoc" @addAct="addAct" @editClic="editClic" @deleteClic="deleteClic" @goToProjectOverview="goToProjectOverview">
+                @addDoc="addDoc" @addAct="addAct" @editClic="editClic" @deleteClic="deleteClic"
+                @goToProjectOverview="goToProjectOverview">
                 <template #buttonHeader>
                     <Button @click="addItem" severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
                 </template>

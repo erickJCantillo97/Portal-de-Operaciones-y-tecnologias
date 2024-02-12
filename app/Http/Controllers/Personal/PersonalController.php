@@ -124,7 +124,7 @@ class PersonalController extends Controller
                 'Oficina' => $person['Oficina'],
                 'Nombres_Apellidos' => $person['Nombres_Apellidos'],
                 'Cargo' => $person['Cargo'],
-                'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
+                // 'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
             ];
         });
         if ($request->expectsJson()) {

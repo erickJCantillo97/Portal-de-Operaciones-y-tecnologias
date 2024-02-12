@@ -23,54 +23,6 @@ const imageSrc = [
     thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria2s.jpg',
     alt: 'image-1'
   },
-  {
-    id: 3,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria3.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria3s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 4,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria4.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria4s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 5,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria5.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria5s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 6,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria6.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria6s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 7,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria7.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria7s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 8,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria8.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria8s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 9,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria9.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria9s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 10,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria10.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria10s.jpg',
-    alt: 'image-1'
-  }
 ]
 
 const responsiveOptions = ref([
@@ -94,16 +46,16 @@ const formatCurrency = (valor, moneda) => {
 }
 </script>
 <template>
-  <main class="flex flex-col max-w-full max-h-screen justify-center overflow-hidden bg-gray-800 md:py-6">
+  <main class="flex flex-col max-w-full justify-center  bg-gray-800 min-h-screen overflow-hidden">
     <section
-      class="grid grid-cols-1 basis-3/4 h-[70vh] overflow-y-auto space-y-6 bg-white px-6 pt-2 shadow-lg shadow-gray-600 ring-1 ring-gray-900/5 sm:w-[70rem] md:h-[70hv] md:grid-cols-4 md:space-x-6 md:mx-auto md:rounded-lg md:pb-8 md:px-10 md:pt-10">
+      class="grid grid-cols-1 mx-4 overflow-y-auto space-y-6 bg-white px-6 pt-2 shadow-lg shadow-gray-600 ring-1 ring-gray-900/5  md:space-x-6  md:rounded-lg  md:px-10 h-[90vh]">
       <!--Tool Details-->
-      <article class="col-span-1 md:col-span-2">
+      <article class="">
         <div class="flex text-sm font-medium items-center">
           <!-- <dt class="text-gray-500">Equipo:</dt> -->
           <i class="fa-solid fa-screwdriver-wrench text-blue-700"></i>
           <h1 class="text-lg font-semibold text-blue-800 px-4 uppercase">
-            {{ project.name }}
+            {{ project.name }} - {{ project.SAP_code }}
           </h1>
         </div>
         <div>
@@ -112,12 +64,12 @@ const formatCurrency = (valor, moneda) => {
           </h2>
         </div>
         <TabView :scrollable="true" :pt="{
-          nav: '!flex !justify-between'
+          nav: '!flex'
         }">
           <TabPanel header="Información del Proyecto" :pt="{
-            content: '!h-[18rem] !p-2 !overflow-y-auto'
+            root: 'w-full',
           }">
-            <div class="custom border border-solid rounded-lg p-2 mb-2">
+            <div class=" custom border border-solid rounded-lg p-2 mb-2">
               <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
                 <div class="flex justify-between py-3 text-sm font-medium">
                   <dt class="text-gray-900">Código SAP:</dt>
@@ -126,43 +78,17 @@ const formatCurrency = (valor, moneda) => {
               </dl>
             </div>
           </TabPanel>
-          <TabPanel header="Información del Contrato" :pt="{
-            content: '!h-[18rem] !p-2 !overflow-y-auto'
+          <TabPanel header="Dashboard" :pt="{
+            root: 'w-full'
           }">
             <p class="m-0">
-              Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam
-              rem
-              aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt
-              explicabo.
-              Nemo enim
-              ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos
-              qui ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
+              Aqui va el Dashboard
             </p>
           </TabPanel>
         </TabView>
-        <Button class="w-full mt-1 md:mt-1" label="Reasignar" rounded small />
       </article>
       <!--Galería-->
-      <article class="flex col-span-1 md:flex md:col-span-2 md:justify-center md:items-center">
-        <!-- <img :src="images.src" class="size-[24rem] rounded-lg shadow-md object-cover" alt="tool-image"> -->
-        <Galleria :value="imageSrc" :responsiveOptions="responsiveOptions" numVisible="5" indicatorsPosition="bottom"
-          :circular="true" :autoPlay="true" :transitionInterval="2000" :showThumbnails="false" :showIndicators="true"
-          :changeItemOnIndicatorHover="true" containerStyle="max-width: 640px" :pt="{
-            itemContainer: '!border !border-gray-200 !rounded-lg',
-            indicatorButton: '!bg-blue-800'
-            // thumbnailItemsContainer: '!opacity-0',
-          }">
-          <template #item="slotProps">
-            <img :src="slotProps.item.src" :alt="slotProps.item.alt" />
-          </template>
-          <template #thumbnail="slotProps">
-            <img :src="slotProps.item.thumb" :alt="slotProps.item.alt" style="width: 100%;" />
-          </template>
-        </Galleria>
-      </article>
-    </section>
-    <section class="w-96 h-96 bg-gray-200">
-      <h2>Características Técnicas</h2>
+
     </section>
     <!-- <Footer fontSize="sm" fontColor="white" marginTop="4" /> -->
   </main>

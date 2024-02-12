@@ -10,6 +10,7 @@ import TextInput from '../../Components/TextInput.vue'
 import Textarea from 'primevue/textarea'
 import ToggleButton from 'primevue/togglebutton'
 import Loading from '@/Components/Loading.vue'
+import CustomUpload from "@/Components/CustomUpload.vue";
 import NoContentToShow from '@/Components/NoContentToShow.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
@@ -31,7 +32,10 @@ const props = defineProps({
     authorizations: Array,
     quotes: Array,
     ships: Array,
-    milestones: Array,
+    milestones: {
+        type: Array,
+        default: []
+    },
     tools: {
         type: Array,
         default: []
@@ -207,34 +211,11 @@ const beforeChange = async () => {
 }
 
 const submit = async () => {
-    // TO DO store onComplete()
-    // return false
-    // toast('Proyecto creado exitosamente!', 'success')
     router.post(route('project.add.ships', projectIdRef.value), {
         ships: selectedShips.value
     });
     router.get(route('projects.index'));
-    // try {
-    //     formData.ships = selectedShips.value
-    //     if (!projectIdRef) {
-    //         await axios.post(route('projects.store', projectIdRef), formData)
-    //             .then((res) => {
-    //                 switchTabsStates = i
-    //             })
-    //         return switchTabsStates
-    //     } else {
-    //         await axios.put(route('projects.update', projectIdRef), formData)
-    //             .then((res) => {
-    //                 toast('Proyecto actualizado exitosamente!', 'success')
-    //                 switchTabsStates = true
-    //             })
-    //         return switchTabsStates
-    //         // return true
-    //     }
-    // } catch (error) {
-    //     toast(error.message)
-    // }
-    // return false
+
 }
 
 const formMilestone = useForm({
@@ -294,6 +275,22 @@ function formatDateTime24h(date) {
                     Agregar Proyecto
                 </h2>
             </header>
+            <div v-if="props.project" class="space-x-4 justify-end flex w-full my-4">
+
+                <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" :multiple="true"
+                    icon-button="fa-solid fa-chart-bar" labelButton="Subir Estructura" accept=".xlsx,.xls" url="prueba" />
+
+                <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Presupuesto del proyecto"
+                    icon-button="fa-solid fa-hand-holding-dollar" labelButton="Subir Presupuesto" accept=".xlsx,.xls"
+                    url="prueba" severity="success" />
+
+                <CustomUpload mode="advanced" :multiple="true" titleModal="Subir el avance planeado del proyecto"
+                    labelButton="Subir Curva S" accept=".xlsx,.xls" url="prueba" severity="info" />
+
+                <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Costos ejecutados por el proyecto"
+                    icon-button="fa-solid fa-money-bill-trend-up" labelButton="Subir Costos Ejecutados" accept=".xlsx,.xls"
+                    url="prueba" severity="danger" />
+            </div>
             <section class="grid grid-cols-1 p-2">
                 <!-- AQUÍ VA EL CONTENIDO DEL FORMULARIO-->
                 <form-wizard @on-complete="submit()" stepSize="md" color="#2E3092" nextButtonText="Siguiente"
@@ -547,9 +544,9 @@ function formatDateTime24h(date) {
                     </tab-content>
                     <tab-content title="Hitos" icon="fa-solid fa-list-check">
                         <div class="w-full h-[89vh] overflow-y-auto">
-                            <CustomDataTable :rowsDefault="100" title="Herramientas y equipos" :data="tools"
-                                :columnas="columnas" :actions="actions" @edit="showModal"
-                                @goToProjectOverview="goToProjectOverview" :filterButtons="filterButtons">
+                            <CustomDataTable :rowsDefault="100" :data="milestones" :columnas="columnas" :actions="actions"
+                                @edit="showModal" :filter="false" :showHeader="false">
+
                                 <template #buttonHeader>
                                     <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal()" />
                                 </template>
@@ -569,7 +566,7 @@ function formatDateTime24h(date) {
                 </span>
             </template>
             <template #body>
-                <section class="relative space-y-2 p-2">
+                <section class="relative space-y-6 p-2">
                     <CustomInput label="Título del Hito" id="category" type="text" v-model:input="formMilestone.title"
                         placeholder="Escriba título del hito" />
                     <CustomInput label="Fecha de Hito" id="category" type="date" v-model:input="formMilestone.end_date"
@@ -579,10 +576,21 @@ function formatDateTime24h(date) {
                     <CustomInput label="Seleccione tipo de Hito" id="category" type="dropdown"
                         v-model:input="formMilestone.type" placeholder="Escriba el tipo de hito"
                         :options="['Pago Anticipado', 'Avance Obra']" />
-                    <CustomInput label="Hito Facturado" id="category" type="dropdown" v-model:input="formMilestone.invoiced"
-                        placeholder="seleccionar " />
-                    <CustomInput label="Avance" id="category" type="number" v-model:input="formMilestone.advance"
-                        placeholder="Escriba el avance del hito" />
+
+                    <div class="flex space-x-4 items-center">
+                        <label for="" class="mb-0.5 font-bold">Avance del HITO: </label>
+                        <ToggleButton v-model="formMilestone.invoiced" onLabel="100%" offLabel="0%" :pt="{
+                            root: ({ props }) => ({
+                                class:
+                                    [
+                                        '!p-1 !text-sm',
+                                        props.modelValue ? '!bg-teal-700 !text-white' : '!bg-danger !text-white'
+                                    ]
+                            })
+                        }" />
+                    </div>
+
+
 
                 </section>
             </template>
