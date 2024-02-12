@@ -44,7 +44,7 @@ const props = defineProps({
 })
 
 //#region Referencias (v-model)
-const checked = ref(false)
+const checked = ref(true)
 const contractSelect = ref()
 const authorizationSelect = ref()
 const quoteSelect = ref()
@@ -509,10 +509,14 @@ function formatDateTime24h(date) {
                             <ToggleButton v-if="props.ships != 0" v-model="checked" onLabel="Seleccionar todo"
                                 offLabel="Deseleccionar todo" onIcon="pi pi-check-square" offIcon="pi pi-stop"
                                 aria-label="Do you confirm" @click="selectAllShips()" :pt="{
-                                    root: '!w-56 !h-full !border-blue-800 !bg-transparent',
-                                    label: '!text-blue-900',
-                                    icon: '!text-blue-900',
-                                    // label: props.text ? 'Seleccionar Todo' : 'Deseleccionar Todo'
+                                    root: ({ props }) => ({
+                                        class:
+                                            [
+                                                '!w-56 !h-full !border-blue-800 !bg-transparent',
+                                                props.modelValue ? '!bg-blue-900 !text-white' : '!bg-red-600 !text-white'
+                                            ]
+                                    }),
+                                    icon: '!text-white'
                                 }" />
                         </div>
                         <section
@@ -543,10 +547,9 @@ function formatDateTime24h(date) {
                         </section>
                     </tab-content>
                     <tab-content title="Hitos" icon="fa-solid fa-list-check">
-                        <div class="w-full h-[89vh] overflow-y-auto">
-                            <CustomDataTable :rowsDefault="100" :data="milestones" :columnas="columnas" :actions="actions"
+                        <div class="w-full overflow-y-auto">
+                            <CustomDataTable :rowsDefault="5" :data="milestones" :columnas="columnas" :actions="actions"
                                 @edit="showModal" :filter="false" :showHeader="false">
-
                                 <template #buttonHeader>
                                     <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal()" />
                                 </template>
@@ -589,9 +592,6 @@ function formatDateTime24h(date) {
                             })
                         }" />
                     </div>
-
-
-
                 </section>
             </template>
             <template #footer>

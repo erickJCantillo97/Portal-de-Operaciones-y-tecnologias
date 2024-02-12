@@ -18,19 +18,17 @@ class ShipController extends Controller
      */
     public function index(Request $request)
     {
-
         if (isset($request->id)) {
 
             $ships = Ship::with('customer', 'typeShip')->where('customer_id', $request->id)->get();
-
-            // dd($ships);
-            return Inertia::render(
-                'Project/Ships',
-                [
+            $data = [
                     'ships' => $ships,
                     'customer' => Customer::find($request->id),
                     'typeShips' => TypeShip::get(),
-                ]
+            ];
+            // dd($ships);
+            return Inertia::render('Project/Ships',
+                $data
             );
         }
 
@@ -103,7 +101,7 @@ class ShipController extends Controller
         //
     }
 
-    
+
 
     /**
      * Update the specified resource in storage.

@@ -116,7 +116,7 @@ class ProjectController extends Controller
         try {
         return Inertia::render('Project/ProjectOverview',
         [
-            'project' => Project::findOrFail($project->id)
+            'project' => Project::with('projectShip', 'contract')->findOrFail($project->id)
         ]);
         } catch (Exception $e) {
             return back()->withErrors(['message', 'Error al cargar la página' . $e]);

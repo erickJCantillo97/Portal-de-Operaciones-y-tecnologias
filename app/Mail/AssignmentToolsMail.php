@@ -24,12 +24,6 @@ class AssignmentToolsMail extends Mailable
 
     public $date;
 
-    // public $theme = "assignmentsTools.css";
-
-    // public $theme = 'assignmentsTools';
-
-
-
     public $subject;
 
     /**
@@ -42,13 +36,6 @@ class AssignmentToolsMail extends Mailable
         $this->date = Carbon::now()->format('d/m/Y');
     }
 
-    // public function __construct($employee, $tools, $subject = null)
-    // {
-    //     $this->employee = $employee;
-    //     $this->tools = Tool::whereIn('id', $tools)->get();
-    //     $this->subject = $subject;
-    // }
-
     /**
      * Get the message envelope.
      */
@@ -56,7 +43,7 @@ class AssignmentToolsMail extends Mailable
     {
         return new Envelope(
             // subject: $this->subject,
-            subject: 'Nueva Asiganacion de Equipos',
+            subject: 'Nueva Asignacion de Equipos',
         );
     }
 
