@@ -34,6 +34,10 @@ const props = defineProps({
         type: Array,
         default: []
     },
+    showAdd: {
+        type: Boolean,
+        default: false
+    },
     filter: {
         type: Boolean,
         default: true
@@ -175,11 +179,12 @@ const auxdata = ref()
                     </p>
                     <span class="space-x-1">
                         <slot name="buttonHeader" />
+                        <Button v-if="showAdd" v-tooltip="'Añadir registro'" @click="$emit('rowClic', $event)" severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
                     </span>
                 </span>
                 <div class="flex items-center " :class="filter ? 'justify-between' : 'justify-end'" v-if="showHeader">
                     <div class="space-x-2" v-if="filter">
-                        <Button label="Quitar filtros" @click="clearFilter()" outlined
+                        <Button v-tooltip.top="'Quitar filtros'" @click="clearFilter()" outlined
                             icon="fa-solid fa-filter-circle-xmark" />
                         <span class="p-input-icon-left">
                             <i class="fa-solid fa-magnifying-glass"></i>
@@ -195,8 +200,8 @@ const auxdata = ref()
                     </div>
                     <div class="space-x-2">
                         <Button v-if="exportRute != ''" @click="exportar" icon="fa-solid fa-file-excel" class="!w-8" />
-                        <MultiSelect v-if="showColumns" v-model="columnasSelect" display="chip" :options="props.columnas"
-                            optionLabel="header" placeholder="Selecciona columnas a mostrar" class="md:w-20rem w-min h-8"
+                        <MultiSelect  v-if="showColumns" v-model="columnasSelect" display="chip" :options="props.columnas"
+                            optionLabel="header" placeholder="Selecciona columnas a mostrar" class="w-min h-8"
                             :pt="{
                                 root: '!border-0 !ring-0',
                                 trigger: '!hidden',
@@ -208,7 +213,7 @@ const auxdata = ref()
                             }
                                 ">
                             <template #value>
-                                <Button icon="fa-solid fa-eye" text class="!w-8" />
+                                <Button v-tooltip="'Ver u ocultar columnas'" icon="fa-solid fa-eye" text class="!w-8" />
                             </template>
                         </MultiSelect>
                     </div>

@@ -142,6 +142,10 @@ const props = defineProps({
     maxDate: {
         type: Date,
         default: null
+    },
+    rowsTextarea:{
+        type: Number,
+        default: 4
     }
 })
 
@@ -172,7 +176,7 @@ const input = defineModel('input', {
                 class="w-full" :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'"
                 :required :useGrouping="mode == 'currency' ? '' : useGrouping" :currency="currency" :mode="mode" :suffix
                 :prefix />
-            <Textarea v-else-if="type == 'textarea'" :id :disabled rows="4" class="w-full" :required
+            <Textarea v-else-if="type == 'textarea'" :id :disabled :rows="rowsTextarea" class="w-full" :required
                 :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
             <Dropdown v-else-if="type == 'dropdown'" :id :disabled :placeholder :options :optionLabel :loading showClear
                 :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''" v-model="input"
