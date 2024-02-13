@@ -15,9 +15,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(PermissionSeeder::class);
-        ModelsRole::create([
-            'name' => 'Super Admin'
-        ]);
+        // ModelsRole::create([
+        //     'name' => 'Super Admin'
+        // ]);
         // \App\Models\User::factory(10)->create();
 
         // \App\Models\User::factory()->create([

@@ -101,8 +101,10 @@ const columnas = ref([
             photo: { field: 'file' },
             primary: { field: 'name' },
             secundary: { field: 'type_ship', subfield: 'name' }
-        }
+        },
+        filter: true, sortable: true
     },
+    { field: 'type_ship.name', header: 'clase', filter: true, sortable: true },
     { field: 'idHull', header: 'N° CASCO', filter: true, sortable: true },
     { field: 'acronyms', header: 'SIGLAS' },
 ])
