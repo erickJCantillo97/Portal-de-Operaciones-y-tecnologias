@@ -1,5 +1,5 @@
 <script>
-import * as echarts from 'echarts/core';
+import * as echarts from 'echarts/core'
 import {
   TitleComponent,
   ToolboxComponent,
@@ -8,10 +8,10 @@ import {
   VisualMapComponent,
   DataZoomComponent,
   MarkLineComponent,
-} from 'echarts/components';
-import { LineChart } from 'echarts/charts';
-import { UniversalTransition } from 'echarts/features';
-import { CanvasRenderer } from 'echarts/renderers';
+} from 'echarts/components'
+import { LineChart } from 'echarts/charts'
+import { UniversalTransition } from 'echarts/features'
+import { CanvasRenderer } from 'echarts/renderers'
 
 echarts.use([
   TitleComponent,
@@ -24,19 +24,19 @@ echarts.use([
   LineChart,
   CanvasRenderer,
   UniversalTransition,
-]);
+])
 
 export default {
   mounted() {
-    this.initChart();
+    this.initChart()
   },
   props: {
     series: Array
   },
   methods: {
     initChart() {
-      const chartDom = document.getElementById('main');
-      const myChart = echarts.init(chartDom);
+      const chartDom = document.getElementById('main')
+      const myChart = echarts.init(chartDom)
 
       myChart.setOption(
         ({
@@ -138,7 +138,7 @@ export default {
             }
           }
         })
-      );
+      )
     },
   },
   data() {
@@ -167,9 +167,9 @@ export default {
       variations: [ 19, 13, 13, 13, 2, 16, 4, 0, 0, 1, 8, 1, 0, -4, 4, 2, 23, 13, 5 ]
     }
   }
-};
+}
 </script>
 
 <template>
-  <div id="main" style="height: 400px;" :series="series"></div>
+  <div id="main" style="height: 400px" :series="series"></div>
 </template>

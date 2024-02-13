@@ -197,7 +197,7 @@ const contractsList = () => {
         <div class="ml-1">
             <div class="max-w-full p-3 md:max-w-full">
                 <!--:key="showGraph" permite Re-renderizar un componente hijo 👇🏼-->
-                <PieChart :title="title" :series="series" :key="showGraph"></PieChart>
+                <PieChart :title="title" :series="series" :key="showGraph" />
             </div>
         </div>
     </div>
