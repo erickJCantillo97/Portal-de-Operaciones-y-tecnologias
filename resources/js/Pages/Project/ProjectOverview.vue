@@ -6,7 +6,7 @@ import Galleria from 'primevue/galleria'
 import Footer from '@/Components/Footer.vue'
 
 const props = defineProps({
-  project: Object,
+  project: Object
 })
 
 const images = ref()
@@ -46,7 +46,7 @@ const formatCurrency = (valor, moneda) => {
 }
 </script>
 <template>
-  <main class="flex flex-col max-w-full justify-center  bg-gray-800 min-h-screen overflow-hidden">
+  <main class="flex flex-col max-w-full justify-center bg-gray-800 min-h-screen overflow-hidden">
     <section
       class="grid grid-cols-1 mx-4 overflow-y-auto space-y-6 bg-white px-6 pt-2 shadow-lg shadow-gray-600 ring-1 ring-gray-900/5  md:space-x-6  md:rounded-lg  md:px-10 h-[90vh]">
       <!--Project Details-->
@@ -109,8 +109,20 @@ const formatCurrency = (valor, moneda) => {
                   <div class="custom border border-solid rounded-lg p-2 mb-2">
                     <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
                       <div class="flex justify-between py-3 text-sm font-medium">
-                        <dt class="text-gray-900">Nombre del Contrato:</dt>
+                        <dt class="text-gray-900">No. del Contrato:</dt>
                         <dd class="text-gray-500 uppercase">{{ project.contract.contract_id }}</dd>
+                      </div>
+                      <div class="flex justify-between py-3 text-sm font-medium">
+                        <dt class="text-gray-900">Estado del Contrato:</dt>
+                        <dd class="text-gray-500 uppercase">{{ project.contract.state }}</dd>
+                      </div>
+                      <div class="flex justify-between py-3 text-sm font-medium">
+                        <dt class="text-gray-900">Cliente:</dt>
+                        <dd class="text-gray-500 uppercase">{{ project.contract.customer_id }}</dd>
+                      </div>
+                      <div class="flex justify-between py-3 text-sm font-medium">
+                        <dt class="text-gray-900">Precio de Venta:</dt>
+                        <dd class="text-gray-500 uppercase">{{ formatCurrency(project.contract.price , 'COP') }}</dd>
                       </div>
                       <div class="flex justify-between py-3 text-sm font-medium">
                         <dt class="text-gray-900">Fecha de Inicio:</dt>
@@ -121,33 +133,9 @@ const formatCurrency = (valor, moneda) => {
                         <dd class="text-gray-500 uppercase">{{ project.contract.end_date }}</dd>
                       </div>
                       <div class="flex justify-between py-3 text-sm font-medium">
-                        <dt class="text-gray-900">Estado del Contrato :</dt>
-                        <dd class="text-gray-500 uppercase">{{ project.contract.state }}</dd>
+                        <dt class="text-gray-900">Tipo de Venta:</dt>
+                        <dd class="text-gray-500 uppercase">{{ project.contract.type_of_sale }}</dd>
                       </div>
-                      <!-- <div class="flex justify-between py-3 text-sm font-medium">
-                    <dt class="text-gray-900">Estado:</dt>
-                    <dd class="text-gray-500 uppercase">{{ tool.gerencia }}</dd>
-                  </div>
-                  <div class="flex justify-between py-3 text-sm font-medium">
-                    <dt class="text-gray-900">Cliente:</dt>
-                    <dd class="text-gray-500 uppercase">{{ formatCurrency(tool.value, 'COP') }}</dd>
-                  </div>
-                  <div class="flex justify-between py-3 text-sm font-medium">
-                    <dt class="text-gray-900">Precio de Venta:</dt>
-                    <dd class="text-gray-500 uppercase">{{ tool.entry_date }}</dd>
-                  </div>
-                  <div class="flex justify-between py-3 text-sm font-medium">
-                    <dt class="text-gray-900">Fecha Inicio:</dt>
-                    <dd class="p-2 bg-emerald-400 rounded-lg text-white text-xs animate-pulse">{{ tool.estado }}</dd>
-                  </div>
-                  <div class="flex justify-between py-3 text-sm font-medium">
-                    <dt class="text-gray-900">Fecha Fin:</dt>
-                    <dd class="text-gray-500 uppercase">{{ tool.estado_operativo }}</dd>
-                  </div>
-                  <div class="flex justify-between py-3 text-sm font-medium">
-                    <dt class="text-gray-900">Tipo de Venta:</dt>
-                    <dd class="text-gray-500 uppercase">{{ tool.category.name }}</dd>
-                  </div> -->
                     </dl>
                   </div>
                 </TabPanel>
@@ -174,6 +162,6 @@ const formatCurrency = (valor, moneda) => {
       <!--Galería-->
 
     </section>
-    <!-- <Footer fontSize="sm" fontColor="white" marginTop="4" /> -->
+    <Footer fontSize="sm" fontColor="white" marginTop="4" />
   </main>
 </template>
