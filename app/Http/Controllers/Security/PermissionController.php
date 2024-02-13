@@ -31,7 +31,8 @@ class PermissionController extends Controller
         $roles = Role::with('permissions')->get()->map(function ($r) {
             return [
                 'id' => $r['id'],
-                'name' => $r['name'],
+                'name' => explode('-', $r['name'])[0],
+                'description' => $r['descriptions'],
                 'users' => User::role($r['name'])->get(),
                 'permissions' => $r['permissions']
             ];
