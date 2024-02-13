@@ -20,6 +20,7 @@ class PermissionController extends Controller
         $users = User::with('roles', 'roles.permissions')->orderBy('gerencia')->get()->map(function ($user) {
             $roles = collect($user['roles'])->pluck('name')->toArray();
             return [
+                'id' => $user['id'],
                 'name' => $user['name'],
                 'photo' => $user['photo'],
                 'cargo' => $user['cargo'],
@@ -31,7 +32,7 @@ class PermissionController extends Controller
         $roles = Role::with('permissions')->get()->map(function ($r) {
             return [
                 'id' => $r['id'],
-                'name' => explode('-', $r['name'])[0],
+                'name' => explode('%TOP%', $r['name'])[0],
                 'description' => $r['descriptions'],
                 'users' => User::role($r['name'])->get(),
                 'permissions' => $r['permissions']

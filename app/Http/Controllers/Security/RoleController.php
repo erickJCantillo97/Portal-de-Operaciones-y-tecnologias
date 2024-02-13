@@ -49,18 +49,26 @@ class RoleController extends Controller
         }
     }
 
-    public function assignmentRoleToUser($role, User $user)
+    public function assignmentRoleToUser(Request $request, User $user)
     {
+        $request->validate([
+            'role' => 'required'
+        ]);
         try {
+            $role = $request->role . '%TOP%' . auth()->user()->gerente;
             $user->assignRole($role);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error: ' . $e);
         }
     }
 
-    public function removeRoleToUser($role, User $user)
+    public function removeRoleToUser(Request $request, User $user)
     {
+        $request->validate([
+            'role' => 'required'
+        ]);
         try {
+            $role = $request->role . '%TOP%' . auth()->user()->gerente;
             $user->removeRole($role);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error: ' . $e);

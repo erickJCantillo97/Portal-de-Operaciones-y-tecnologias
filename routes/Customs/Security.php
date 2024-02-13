@@ -13,7 +13,7 @@ use Spatie\Permission\Models\Role;
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class)->except('index');
-    Route::get('assignmentRoleToUser',  [RoleController::class, 'assignmentRoleToUser'])->name('assignment.role.user');
-    Route::get('removeRoleToUser',  [RoleController::class, 'removeRoleToUser'])->name('remove.role.user');
+    Route::post('assignmentRoleToUser/{$user}',  [RoleController::class, 'assignmentRoleToUser'])->name('assignment.role.user');
+    Route::post('removeRoleToUser/{$user}',  [RoleController::class, 'removeRoleToUser'])->name('remove.role.user');
     Route::get('',  [PermissionController::class, 'index'])->name('security');
 });
