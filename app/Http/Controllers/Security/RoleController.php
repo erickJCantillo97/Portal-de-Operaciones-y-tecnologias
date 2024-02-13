@@ -39,7 +39,7 @@ class RoleController extends Controller
         );
         try {
             $validateData['guard_name'] = 'web';
-            $permisos =  collect($request->permisos)->map(function ($permiso) {
+            $permisos =  collect($request->permissions)->map(function ($permiso) {
                 return $permiso['name'];
             });
             $role = Role::create($validateData);
@@ -97,13 +97,13 @@ class RoleController extends Controller
     {
         $validateData = $request->validate(
             [
-                'name' => 'required|unique:roles,name',
+                'name' => 'required|unique:roles,name,'.$role->id,
                 'description' => 'required',
             ]
         );
         try {
             $validateData['guard_name'] = 'web';
-            $permisos =  collect($request->permisos)->map(function ($permiso) {
+            $permisos =  collect($request->permissions)->map(function ($permiso) {
                 return $permiso['name'];
             });
             $role->update($validateData);
