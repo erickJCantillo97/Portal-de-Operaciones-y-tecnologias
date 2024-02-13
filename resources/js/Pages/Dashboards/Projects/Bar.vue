@@ -6,45 +6,39 @@ import "echarts";
 
 
 const option = ref({
-  title: {
-    text: 'World Population'
-  },
   tooltip: {
     trigger: 'axis',
     axisPointer: {
       type: 'shadow'
     }
   },
-
-  legend: {},
   xAxis: {
     type: 'value',
-    boundaryGap: [0, 0.01]
   },
   yAxis: {
     type: 'category',
-    data: ['Brazil', 'Indonesia',]
+    data: ['avance']
   },
   series: [
     {
-      name: '2011',
+      name: 'planeado',
       type: 'bar',
-      data: [18203, 289]
+      data: [40]
     },
     {
-      name: '2012',
+      name: 'Ejecutado',
       type: 'bar',
-      data: [19325, 23]
+      data: [45]
     }
   ]
 })
 </script>
 <style scoped>
 .chart {
-  height: 300px;
-  background-color: #000;
+  height: 100px;
+  width: 450px;
 }
 </style>
 <template>
-  <v-chart class="chart" style="width: 500px;" :option="option" />
+  <v-chart class="chart" :option="option" />
 </template>

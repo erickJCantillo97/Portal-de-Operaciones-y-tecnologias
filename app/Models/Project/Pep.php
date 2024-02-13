@@ -21,10 +21,6 @@ class Pep extends Model implements Auditable
         return  $this->belongsTo(Pep::class, 'pep_id');
     }
 
-    
-
-
-
     public function getPepsAttribute()
     {
         return Pep::where('pep_id', '=', $this->id)->get();
