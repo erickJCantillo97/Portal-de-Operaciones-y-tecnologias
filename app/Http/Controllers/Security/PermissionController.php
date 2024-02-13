@@ -30,7 +30,9 @@ class PermissionController extends Controller
                     return explode('%TOP%', $role)[0];
                 }),
                 'rolesObj' => collect($user['roles'])->map(function ($role) {
-                    return explode('%TOP%', $role)[0];
+                    return [
+                        'id' => $role['id'],
+                        'name'=> explode('%TOP%', $role['name'])[0]];
                 }),
             ];
         });
@@ -39,7 +41,7 @@ class PermissionController extends Controller
             return [
                 'id' => $r['id'],
                 'name' => explode('%TOP%', $r['name'])[0],
-                'description' => $r['descriptions'],
+                'description' => $r['description'],
                 'users' => User::role($r['name'])->get(),
                 'permissions' => $r['permissions']
             ];
