@@ -9,6 +9,8 @@ import Listbox from 'primevue/listbox';
 import Empty from '@/Components/Empty.vue';
 import { router, useForm, usePage } from '@inertiajs/vue3';
 import { useSweetalert } from '@/composable/sweetAlert'
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 const { confirmDelete } = useSweetalert();
 const props = defineProps({
     users: Array,
@@ -41,26 +43,47 @@ const buttons = [
 const modalUserDetails = ref(false)
 const userSelect = ref({})
 
-const userDetalis = (event, data) => {
+function userDetalis(event, data) {
     modalUserDetails.value = true
-    userSelect.value = data
+    Object.assign(userSelect.value, data)
 }
-const rolAdd = ref(null)
-const rolDelete = ref(null)
 
+const rolAdd = ref(null)
+const rolDel = ref(null)
+const processing = ref(false)
 const userRolUpdate = (option) => {
+    processing.value = true
     if (option == 'add') {
-        router.post(route('', userSelect.value.id), { role: rolAdd.name }, {
+        router.post(route('assignment.role.user', userSelect.value.id), { role: rolAdd.value.name }, {
             onSuccess: (s) => {
-                console.log(s)
-                rolAdd.value=null
+                userSelect.value.rolesObj.push({ id: rolAdd.value.id, name: rolAdd.value.name })
+                rolAdd.value = null
+                processing.value = false
+                toast.add({ severity: 'success', group: "customToast", text: 'Rol agregado con exito', life: 2000 })
             },
             onError: (e) => {
-                console.log(e)
+                processing.value = false
+                toast.add({ severity: 'error', group: "customToast", text: 'Ocurrio un error, reintente', life: 2000 })
+            }
+        })
+    } else if (option == 'del') {
+        router.post(route('remove.role.user', userSelect.value.id), { role: rolDel.value.name }, {
+            onSuccess: (s) => {
+                userSelect.value.rolesObj.splice(userSelect.value.rolesObj.findIndex(role => role.id === rolDel.value.id && role.name === rolDel.value.name), 1)
+                rolDel.value = null
+                processing.value = false
+                toast.add({ severity: 'success', group: "customToast", text: 'Rol removido con exito', life: 2000 })
+            },
+            onError: (e) => {
+                processing.value = false
+                toast.add({ severity: 'error', group: "customToast", text: 'Ocurrio un error, reintente', life: 2000 })
             }
         })
     }
+}
 
+const rolesFilter = () => {
+    return props.roles.filter(rol => !userSelect.value.rolesObj.some(userRol => rol.name === userRol.name));
 }
 
 //#region crud Roles 
@@ -91,11 +114,11 @@ const saveRol = () => {
     })
     ).post(route('roles.store'), {
         onSuccess: (s) => {
-            console.log(s)
+            toast.add({ severity: 'success', group: "customToast", text: 'Rol creado con exito', life: 2000 })
             rol.reset()
         },
         onError: (e) => {
-            console.log(e)
+            toast.add({ severity: 'error', group: "customToast", text: 'Ocurrio un error', life: 2000 })
         }
     })
 }
@@ -106,11 +129,11 @@ const updateRol = () => {
     }))
     rol.put(route('roles.update', rol.id), {
         onSuccess: (s) => {
-            console.log(s)
+            toast.add({ severity: 'success', group: "customToast", text: 'Rol actualizado con exito', life: 2000 })
             rol.reset()
         },
         onError: (e) => {
-            console.log(e)
+            toast.add({ severity: 'error', group: "customToast", text: 'Ocurrio un error', life: 2000 })
         }
     })
 }
@@ -157,7 +180,7 @@ function filter() {
                 </p>
             </div>
             <div class="grid grid-cols-4 gap-8 m-4">
-                <div class="shadow-lg rounded-lg p-1 bg-gray-50" v-for="rol in   roles  ">
+                <div v-tooltip.top="rol.description" class="cursor-default shadow-lg rounded-lg p-1 bg-gray-50" v-for="rol in roles">
                     <div class="flex px-2">
                         <div class="flex justify-between w-full">
                             <span class="text-sm text-gray-600">Total {{ rol.permissions.length }} Permisos</span>
@@ -173,7 +196,7 @@ function filter() {
                     </div>
                     <div class="text-gray-900 font-extrabold text-xl mt-2 flex justify-between ml-2">
                         <span>{{ rol.name }}</span>
-                        <div>
+                        <div v-if="!(rol.name == 'Super Admin')">
                             <Button icon="fa fa-pencil" v-tooltip.bottom="'Editar Rol'" :loading="rol.processing"
                                 @click="openModalRol(rol)" text></Button>
                             <Button severity="danger" v-tooltip.bottom="'Eliminar Rol'" :loading="rol.processing"
@@ -205,7 +228,7 @@ function filter() {
                         Roles actuales
                     </p>
                     <div class="p-1">
-                        <Listbox v-model="rolDelete" :options="userSelect.rolesObj" filter optionLabel="name"
+                        <Listbox v-model="rolDel" :options="userSelect.rolesObj" filter optionLabel="name"
                             class="w-full h-full md:w-14rem" :pt="{
                                 list: '!h-[25vh]',
                                 header: '!p-1',
@@ -216,11 +239,11 @@ function filter() {
                     </div>
                 </div>
                 <span class="flex flex-col w-10 justify-center gap-2">
-                    <Button v-tooltip.top="'Agregar rol'" @click="userRolUpdate('add')" icon="fa-solid fa-angle-left"
+                    <Button :loading="processing" :disabled="rolAdd==null" v-tooltip.top="'Agregar rol'" @click="userRolUpdate('add')" icon="fa-solid fa-angle-left"
                         severity="success" text outlined />
                     <!-- <Button v-tooltip.top="'Agregar todos los roles'" icon="fa-solid fa-angles-left" severity="success" text
                         outlined /> -->
-                    <Button v-tooltip.top="'Quitar rol'" @click="userRolUpdate('del')" icon="fa-solid fa-angle-right"
+                    <Button :loading="processing" :disabled="rolDel==null" v-tooltip.top="'Quitar rol'" @click="userRolUpdate('del')" icon="fa-solid fa-angle-right"
                         severity="danger" text outlined />
                     <!-- <Button v-tooltip.top="'Quitar todos los roles'" icon="fa-solid fa-angles-right" severity="danger" text
                         outlined /> -->
@@ -231,8 +254,7 @@ function filter() {
                     </p>
                     <div class="p-1">
                         <Listbox v-model="rolAdd" filter optionLabel="name" class="w-full md:w-14rem"
-                            :options="roles.filter((rol) => { return !userSelect.rolesObj.some((userRol) => { return rol.name === userRol.name }) })"
-                            :pt="{
+                            :options="rolesFilter()" :pt="{
                                 list: '!h-[25vh]',
                                 header: '!p-1',
                                 filterInput: '!h-8',
@@ -241,7 +263,6 @@ function filter() {
                     </div>
                 </div>
             </div>
-            {{ userSelect }}
         </template>
     </CustomModal>
     <!-- #endregion -->
@@ -281,4 +302,5 @@ function filter() {
         </template>
     </CustomModal>
     <!-- endregion -->
+
 </template>

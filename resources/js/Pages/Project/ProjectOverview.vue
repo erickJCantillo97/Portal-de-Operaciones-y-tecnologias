@@ -38,6 +38,15 @@ const imageSrc = [
   },
 ]
 
+const severitys = [
+  { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'primary', class: '' },
+  { text: 'CONSTRUCCIÓN', severity: 'success', class: '' },
+  { text: 'DISEÑO', severity: 'info', class: '' },
+  { text: 'GARANTIA', severity: 'warning', class: '' },
+  { text: 'SERVICIO POSTVENTA', severity: 'success', class: '' },
+  { text: 'SIN ESTADO', severity: 'danger', class: 'animate-pulse' }
+]
+
 const responsiveOptions = ref([
   {
     breakpoint: '1300px',
@@ -87,34 +96,29 @@ td {
             root: 'w-full',
           }">
             <div class="grid grid-cols-2 gap-2">
-              <div class="col-span-1 rounded-lg p-2 mb-2 w-full bg-gray-800 border border-solid">
+              <div class="col-span-1 rounded-lg p-2 mb-2 w-full border border-solid">
                 <div class="flex text-sm font-medium justify-center items-center">
-                  <i class="fa-solid fa-screwdriver-wrench text-white"></i>
-                  <h1 class="text-lg font-semibold text-white px-4 uppercase">
+                  <i class="fa-solid fa-ship "></i>
+                  <h1 class="text-lg font-semibold  px-4 uppercase">
                     {{ project.name }} - {{ project.SAP_code }}
                   </h1>
                 </div>
                 <div class="flex justify-center items-center">
-                  <h2 class="text-sm font-semibold text-blue-500 italic">
-                    INFORMACIÓN DEL PROYECTO
-                  </h2>
                 </div>
-                <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
+                <dl class="divide-y flex space-x-4 divide-gray-200 border-b border-t border-gray-200 items-center">
+                  <Tag :severity="severitys.find((severity) => severity.text == project.status).severity"
+                    :value="'EN ' + project.status"></Tag>
                   <div class="flex py-3 text-xs font-medium">
-                    <dt class="text-white">No. del Casco:</dt>
-                    <dd class="text-gray-400 uppercase">&nbsp;{{ project.manager }}</dd>
-                  </div>
-                  <div class="flex py-3 text-xs font-medium">
-                    <dt class="text-white">Alcance:</dt>
+                    <dt class="">Alcance:</dt>
                     <dd class="text-gray-400 uppercase">&nbsp;{{ project.scope }}</dd>
                   </div>
                   <div class="flex py-3 text-xs font-medium">
-                    <dt class="text-white">Tipo de Proyecto:</dt>
+                    <dt class="">Tipo de Proyecto:</dt>
                     <dd class="text-gray-400 uppercase">&nbsp;{{ project.type }}</dd>
                   </div>
                 </dl>
                 <div>
-                  <h2 class="text-sm text-white italic">
+                  <h2 class="text-sm  italic">
                     {{ project.description }}
                   </h2>
                 </div>
@@ -126,7 +130,8 @@ td {
               </div>
               <TabView :scrollable="true" :pt="{
                 nav: '!flex !justify-between'
-              }">
+              }
+                ">
                 <TabPanel header="Información del Contrato" :pt="{
                   root: 'w-full',
                 }">

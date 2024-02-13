@@ -5,6 +5,7 @@ namespace App\Models\Projects;
 use App\Models\Scopes\GerenciaScope;
 use App\Models\Shift;
 use App\Models\VirtualTask;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -60,5 +61,10 @@ class Project extends Model implements Auditable
             set: fn ($value) => is_array($value) ? $value[0] : $value,
             get: fn ($value) => [$value == 0 ? ($this->contract->quote->total_cost ?? 0) : $value, $this->contract->quote->coin ?? 'COP'],
         );
+    }
+
+    public function scopeActive(Builder $query)
+    {
+        $query->whereIn('status', ['CONSTRUCCIÓN', 'DISEÑO Y CONSTRUCCIÓN']);
     }
 }

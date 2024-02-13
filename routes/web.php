@@ -2,6 +2,7 @@
 
 use App\Events\TestWebsocket;
 use App\Http\Controllers\Dashboard\DashboardEstimacionesController;
+use App\Http\Controllers\DatabaseBackController;
 use App\Http\Controllers\Suggestion\SuggestionController;
 use App\Ldap\User;
 use App\Models\User as UserNotify;
@@ -342,14 +343,8 @@ Route::get('proyectos_anterior', function () {
     }
 });
 
-Route::post('/prueba', function (Request $request) {
-    // dd($request->all());
-    // return back()->withErrors('success','');
-    // $quote = Quote::with('version', 'version.quoteTypeShips')->where('id', 1)->first();
-    // $user = UserNotify::where('id', Auth::user()->id)->first();
-    // Notification::route('mail', [$user->email => $user->short_name])->notify(new QuoteNotify($user, $quote, 'asignament'));
-    // Auth::user()->notify(new QuoteNotify($user, $quote, ''));
-})->name('prueba');
+Route::get('peps_anteriores', [DatabaseBackController::class, 'getPep']);
+
 
 Route::get('/mailable', function () {
     $data = 'Hello';

@@ -190,19 +190,28 @@ const columnas = [
     { field: 'contract.contract_id', header: 'Contrato', filter: true, sortable: true },
     { field: 'cost_sale', header: 'Costo de Venta', type: 'currency', filter: true, sortable: true },
     { field: 'SAP_code', header: 'Código SAP', filter: true, sortable: true },
-    { field: 'end_date', header: 'Fecha Finalización', filter: true, sortable: true },
-    // {
-    //     field: 'status', header: 'Estado', filter: true, sortable: true, type: 'tag', filtertype: 'EQUALS',
-    //     severitys: [
-    //         { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'info', class: '' },
-    //         { text: 'CONSTRUCCIÓN', severity: 'info', class: '' },
-    //         { text: 'DISEÑO', severity: 'warning', class: '' },
-    //         { text: 'GARANTIA', severity: 'info', class: '' },
-    //         { text: 'SERVICIO POSTVENTA', severity: 'success', class: '' },
-    //         { text: 'SIN ESTADO', severity: 'danger', class: 'animate-pulse' }
-    //     ]
-    // },
+    { field: 'contract.end_date', header: 'Fecha Finalización', filter: true, sortable: true },
+    {
+        field: 'status', header: 'Estado', filter: true, sortable: true, type: 'tag', filtertype: 'EQUALS',
+        severitys: [
+            { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'primary', class: '' },
+            { text: 'CONSTRUCCIÓN', severity: 'success', class: '' },
+            { text: 'DISEÑO', severity: 'info', class: '' },
+            { text: 'GARANTIA', severity: 'warning', class: '' },
+            { text: 'SERVICIO POSTVENTA', severity: 'success', class: '' },
+            { text: 'SIN ESTADO', severity: 'danger', class: 'animate-pulse' }
+        ]
+    },
 ]
+
+const filterButtons = [
+    { field: 'status', label: 'CONSTRUCCIÓN', data: 'CONSTRUCCIÓN', severity: 'success' },
+    { field: 'status', label: 'DISEÑO Y CONSTRUCCIÓN', data: 'DISEÑO Y CONSTRUCCIÓN', severity: 'primary' },
+    { field: 'status', label: 'DISEÑO', data: 'DISEÑO', severity: 'info' },
+    { field: 'status', label: 'GARANTIA ', data: 'GARANTIA', severity: 'warning' },
+]
+
+
 
 const buttons = [
     { event: 'addDoc', severity: 'primary', class: '', icon: 'fa-solid fa-cloud-arrow-up', text: true, outlined: false, rounded: false },
@@ -225,9 +234,9 @@ const goToProjectOverview = (event, data) => {
 <template>
     <AppLayout>
         <div class="w-full h-[89vh] overflow-y-auto">
-            <CustomDataTable title="Proyectos" :data="projects" :rows-default="100" :columnas="columnas" :actions="buttons"
-                @addDoc="addDoc" @addAct="addAct" @editClic="editClic" @deleteClic="deleteClic"
-                @goToProjectOverview="goToProjectOverview">
+            <CustomDataTable title="Proyectos" :filterButtons="filterButtons" :data="projects" :rows-default="100"
+                :columnas="columnas" :actions="buttons" @addDoc="addDoc" @addAct="addAct" @editClic="editClic"
+                @deleteClic="deleteClic" @goToProjectOverview="goToProjectOverview">
                 <template #buttonHeader>
                     <Button @click="addItem" severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
                 </template>

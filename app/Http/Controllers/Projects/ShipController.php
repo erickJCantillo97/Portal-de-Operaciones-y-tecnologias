@@ -20,19 +20,20 @@ class ShipController extends Controller
     {
         if (isset($request->id)) {
 
-            $ships = Ship::with('customer', 'typeShip')->where('customer_id', $request->id)->get();
+            $ships = Ship::with('customer', 'typeShip', 'projectsShip')->where('customer_id', $request->id)->get();
             $data = [
-                    'ships' => $ships,
-                    'customer' => Customer::find($request->id),
-                    'typeShips' => TypeShip::get(),
+                'ships' => $ships,
+                'customer' => Customer::find($request->id),
+                'typeShips' => TypeShip::get(),
             ];
-            // dd($ships);
-            return Inertia::render('Project/Ships',
+            return Inertia::render(
+                'Project/Ships',
                 $data
             );
         }
 
-        $ships = Ship::with('customer', 'typeShip')->orderBy('name')->get();
+        $ships = Ship::with('customer', 'typeShip', 'projectsShip')->orderBy('name')->get();
+
 
         if ($request->expectsJson()) {
             return response()->json([

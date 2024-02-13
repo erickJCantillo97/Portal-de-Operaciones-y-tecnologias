@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Budget\BudgetController;
 use App\Http\Controllers\Projects\AuthorizationController;
 use App\Http\Controllers\Projects\ContractController;
 use App\Http\Controllers\Projects\CustomerController;
@@ -54,6 +55,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('ships/update/{ship}', [ShipController::class, 'update'])->name('ships.update');
     //CRUD Ships
     Route::resource('ships', ShipController::class)->except('update');
+
+    Route::get('budget', [BudgetController::class, 'index'])->name('budget.index');
 
     //CRUD Customers
     Route::resource('customers', CustomerController::class);
