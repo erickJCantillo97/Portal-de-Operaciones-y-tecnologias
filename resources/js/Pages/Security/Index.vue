@@ -7,7 +7,7 @@ import CustomModal from '@/Components/CustomModal.vue';
 import { ref } from 'vue';
 import Listbox from 'primevue/listbox';
 import Empty from '@/Components/Empty.vue';
-import { useForm } from '@inertiajs/vue3';
+import { router, useForm, usePage } from '@inertiajs/vue3';
 import { useSweetalert } from '@/composable/sweetAlert'
 const { confirmDelete } = useSweetalert();
 const props = defineProps({
@@ -39,37 +39,72 @@ const buttons = [
 ]
 
 const modalUserDetails = ref(false)
-const userSelect = ref()
+const userSelect = ref({})
+
 const userDetalis = (event, data) => {
     modalUserDetails.value = true
     userSelect.value = data
 }
-const rolSelect = ref(null)
-const rolSelectUser = ref(null)
+const rolAdd = ref(null)
+const rolDelete = ref(null)
 
+const userRolUpdate = (option) => {
+    if (option == 'add') {
+        router.post(route('', userSelect.value.id), { role: rolAdd.name }, {
+            onSuccess: (s) => {
+                console.log(s)
+                rolAdd.value=null
+            },
+            onError: (e) => {
+                console.log(e)
+            }
+        })
+    }
+
+}
+
+//#region crud Roles 
 const modalRol = ref(false)
 const rol = useForm({
     id: null,
     name: null,
-    details: null,
+    description: null,
     permissions: []
 })
 
+
 const openModalRol = (r) => {
     rol.reset()
-    console.log(r)
     if (r != null) {
         rol.id = r.id
         rol.name = r.name
-        rol.details = r.details
+        rol.description = r.description
         Object.assign(rol.permissions, r.permissions)
     }
     modalRol.value = true
 }
 
 const saveRol = () => {
-
-    rol.post(route(''), {
+    rol.transform((data) => ({
+        ...data,
+        name: data.name + '%TOP%' + usePage().props.auth.user.gerencia
+    })
+    ).post(route('roles.store'), {
+        onSuccess: (s) => {
+            console.log(s)
+            rol.reset()
+        },
+        onError: (e) => {
+            console.log(e)
+        }
+    })
+}
+const updateRol = () => {
+    rol.transform((data) => ({
+        ...data,
+        name: data.name + '%TOP%' + usePage().props.auth.user.gerencia
+    }))
+    rol.put(route('roles.update', rol.id), {
         onSuccess: (s) => {
             console.log(s)
             rol.reset()
@@ -83,10 +118,9 @@ const saveRol = () => {
 const deleteRol = async (id) => {
     rol.reset()
     rol.processing = true
-    await confirmDelete(id, 'rol', 'ruta')
+    await confirmDelete(id, 'Rol', 'roles')
     rol.processing = false
 }
-
 
 
 const permissionsClic = async (permiso) => {
@@ -109,6 +143,7 @@ function filter() {
         return permisosFiltrados
     }
 }
+//#endregion
 
 </script>
 <template>
@@ -139,16 +174,16 @@ function filter() {
                     <div class="text-gray-900 font-extrabold text-xl mt-2 flex justify-between ml-2">
                         <span>{{ rol.name }}</span>
                         <div>
-                            <Button icon="fa fa-pencil" v-tooltip.bottom="'Editar Rol'" :loading="rol.processing" @click="openModalRol(rol)"
-                                text></Button>
-                            <Button severity="danger" v-tooltip.bottom="'Eliminar Rol'" :loading="rol.processing" @click="deleteRol(rol)"
-                                icon="fa fa-trash-can" text></Button>
+                            <Button icon="fa fa-pencil" v-tooltip.bottom="'Editar Rol'" :loading="rol.processing"
+                                @click="openModalRol(rol)" text></Button>
+                            <Button severity="danger" v-tooltip.bottom="'Eliminar Rol'" :loading="rol.processing"
+                                @click="deleteRol(rol)" icon="fa fa-trash-can" text></Button>
                         </div>
                     </div>
                 </div>
                 <div class="shadow-lg rounded-lg p-4 bg-gray-50 flex space-x-10">
                     <img src="/images/men.gif" alt="" class="h-12">
-                    <span class="flex items-center" >
+                    <span class="flex items-center">
                         <Button label="Nuevo Rol" icon="fa fa-plus" @click="openModalRol()" />
                         <!-- <p class="mt-2 text-sm text-gray-700 italic">Añadir si no Existe el Rol</p> -->
                     </span>
@@ -170,7 +205,7 @@ function filter() {
                         Roles actuales
                     </p>
                     <div class="p-1">
-                        <Listbox v-model="rolSelectUser" :options="userSelect.rolesObj" filter optionLabel="name"
+                        <Listbox v-model="rolDelete" :options="userSelect.rolesObj" filter optionLabel="name"
                             class="w-full h-full md:w-14rem" :pt="{
                                 list: '!h-[25vh]',
                                 header: '!p-1',
@@ -181,19 +216,21 @@ function filter() {
                     </div>
                 </div>
                 <span class="flex flex-col w-10 justify-center gap-2">
-                    <Button v-tooltip.top="'Agregar rol'" icon="fa-solid fa-angle-left" severity="success" text outlined />
-                    <Button v-tooltip.top="'Agregar todos los roles'" icon="fa-solid fa-angles-left" severity="success" text
-                        outlined />
-                    <Button v-tooltip.top="'Quitar rol'" icon="fa-solid fa-angle-right" severity="danger" text outlined />
-                    <Button v-tooltip.top="'Quitar todos los roles'" icon="fa-solid fa-angles-right" severity="danger" text
-                        outlined />
+                    <Button v-tooltip.top="'Agregar rol'" @click="userRolUpdate('add')" icon="fa-solid fa-angle-left"
+                        severity="success" text outlined />
+                    <!-- <Button v-tooltip.top="'Agregar todos los roles'" icon="fa-solid fa-angles-left" severity="success" text
+                        outlined /> -->
+                    <Button v-tooltip.top="'Quitar rol'" @click="userRolUpdate('del')" icon="fa-solid fa-angle-right"
+                        severity="danger" text outlined />
+                    <!-- <Button v-tooltip.top="'Quitar todos los roles'" icon="fa-solid fa-angles-right" severity="danger" text
+                        outlined /> -->
                 </span>
                 <div class="border w-full text-center rounded-lg">
                     <p class="w-full text-center font-bold border-b">
                         Roles para agregar
                     </p>
                     <div class="p-1">
-                        <Listbox v-model="rolSelect" filter optionLabel="name" class="w-full md:w-14rem"
+                        <Listbox v-model="rolAdd" filter optionLabel="name" class="w-full md:w-14rem"
                             :options="roles.filter((rol) => { return !userSelect.rolesObj.some((userRol) => { return rol.name === userRol.name }) })"
                             :pt="{
                                 list: '!h-[25vh]',
@@ -203,109 +240,43 @@ function filter() {
                             }" />
                     </div>
                 </div>
-                <!-- <div class="space-y-1 border text-center rounded-lg">
-                    <p class="w-full text-center font-bold border-b">
-                        {{
-                            rolSelectUser ? 'Permisos del rol ' + rolSelectUser.name : 'Permisos del usuario'
-                        }}
-                    </p>
-                    <div v-if="rolSelectUser" class="p-1">
-                        <Listbox v-model="rolSelectUser" :options="rolSelectUser.permissions" filter optionLabel="name"
-                            class="w-full h-full md:w-14rem" :pt="{
-                                list: '!h-[25vh]',
-                                header: '!p-1',
-                                filterInput: '!h-8',
-                                item: '!h-8 !p-1 !flex !justify-center'
-                            }">
-                        </Listbox>
-                    </div>
-                    <div v-else v-for="role in userSelect.rolesObj" class="h-[30vh] overflow-y-auto">
-                        <p class="text-sm uppercase" v-for="permission in role.permissions">
-                            {{ permission.name }}
-                        </p>
-                    </div>
-                </div> -->
             </div>
-            <!-- <span class="grid grid-cols-2 gap-3 py-0.5">
-                <span class="flex justify-center gap-2">
-                    <Button icon="fa-solid fa-angle-up" severity="success" text outlined />
-                    <Button icon="fa-solid fa-angles-up" severity="success" text outlined />
-                    <Button icon="fa-solid fa-angle-down" severity="danger" text outlined />
-                    <Button icon="fa-solid fa-angles-down" severity="danger" text outlined />
-                </span>
-                <span class="flex justify-center gap-2">
-                    <Button icon="fa-solid fa-angle-up" severity="success" text outlined />
-                    <Button icon="fa-solid fa-angles-up" severity="success" text outlined />
-                    <Button icon="fa-solid fa-angle-down" severity="danger" text outlined />
-                    <Button icon="fa-solid fa-angles-down" severity="danger" text outlined />
-                </span>
-            </span> -->
-            <!-- <div class="grid grid-cols-2 gap-3 mb-1">
-                <div class="border text-center rounded-lg">
-                    <p class="w-full text-center font-bold border-b">
-                        Roles para agregar
-                    </p>
-                    <div class="p-1">
-                        <Listbox v-model="rolSelect" :options="roles" filter optionLabel="name" class="w-full md:w-14rem"
-                            :pt="{
-                                list: '!h-[25vh]',
-                                header: '!p-1',
-                                filterInput: '!h-8',
-                                item: '!h-8 !p-1 !flex !justify-center'
-                            }" />
-                    </div>
-                </div>
-                <div class="border text-center rounded-lg">
-                    <p class="w-full text-center font-bold border-b">
-                        {{
-                            rolSelect ? 'Permisos del rol ' + rolSelect.name : 'Todos los permisos'
-                        }}
-                    </p>
-                    <div class="p-1">
-                        <Listbox v-model="rolSelect" :options="rolSelect ? rolSelect.permissions : permisos" filter
-                            optionLabel="name" class="w-full md:w-14rem" :pt="{
-                                list: '!h-[25vh]',
-                                header: '!p-1',
-                                filterInput: '!h-8',
-                                item: '!h-8 !p-1 !flex !justify-center'
-                            }" />
-                    </div>
-                </div>
-            </div> -->
+            {{ userSelect }}
         </template>
     </CustomModal>
     <!-- #endregion -->
+
     <!-- #region añadir rol -->
     <CustomModal v-model:visible="modalRol" width="70vw" :titulo="rol.id ? 'Actualizar rol' : 'Guardar nuevo rol'"
         icon="fa-solid fa-user-tag">
         <template #body>
             <CustomInput v-model:input="rol.name" class="w-full" label="Nombre del rol"
                 :invalid="rol.errors.name ? true : false" :errorMessage="rol.errors.name" />
-            <CustomInput v-model:input="rol.details" :rowsTextarea="2" class="w-full" label="Descripcion"
-                :invalid="rol.errors.details ? true : false" :errorMessage="rol.errors.details" type="textarea" />
+            <CustomInput v-model:input="rol.description" :rowsTextarea="2" class="w-full" label="Descripcion"
+                :invalid="rol.errors.description ? true : false" :errorMessage="rol.errors.description" type="textarea" />
             <!-- {{ rol.permissions }} -->
-            <div class="mt-3 border p-1 rounded-md">
-                <span class="flex items-center space-x-3">
-                    <p class="font-bold">Permisos</p>
+            <div class="mt-3 border rounded-md">
+                <div class="flex items-center space-x-3 border-b shadow-md py-1">
+                    <p class="font-bold ml-2">Permisos</p>
                     <CustomInput v-model:input="permissionsfilter" icon="fa-solid fa-magnifying-glass" :rowsTextarea="2"
                         class="w-40" type="search" />
-                </span>
-                <div class="p-1 grid grid-cols-4 gap-1 h-[30vh] overflow-y-auto">
-                    <span v-if="filter().length > 0"
+                </div>
+                <li class="grid p-1 grid-cols-4 gap-1 h-[35vh] overflow-y-auto">
+                    <ul v-if="filter().length > 0"
                         class="border h-6 text-center capitalize border-success flex justify-center items-center rounded-md cursor-pointer"
                         :class="rol.permissions.find((permission) => permission.name === permiso.name) ? 'bg-success fa-regular fa-circle-check text-white' : 'bg-success-light'"
                         v-for="permiso in filter()" @click="permissionsClic(permiso)">
                         <p class="font-sans ml-1">{{ permiso.name }}</p>
-                    </span>
+                    </ul>
                     <div v-else class="w-full col-span-4">
                         <Empty message="Sin resultados" />
                     </div>
-                </div>
+                </li>
             </div>
         </template>
         <template #footer>
-            <Button severity="danger" label="Cancelar" :disabled="rol.processing" />
-            <Button severity="success" :label="rol.id ? 'Actualizar' : 'Guardar'" @click="saveRol()"
+            <Button severity="danger" label="Cancelar" :disabled="rol.processing" @click="modalRol = false" />
+            <Button severity="success" :label="rol.id ? 'Actualizar' : 'Guardar'" @click="rol.id ? updateRol() : saveRol()"
                 :loading="rol.processing" />
         </template>
     </CustomModal>
