@@ -55,7 +55,7 @@ class RoleController extends Controller
             'role' => 'required'
         ]);
         try {
-            $role = $request->role . '%TOP%' . auth()->user()->gerente;
+            $role = $request->role . '%TOP%' . auth()->user()->gerencia;
             $user->assignRole($role);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error: ' . $e);
@@ -68,7 +68,7 @@ class RoleController extends Controller
             'role' => 'required'
         ]);
         try {
-            $role = $request->role . '%TOP%' . auth()->user()->gerente;
+            $role = $request->role . '%TOP%' . auth()->user()->gerencia;
             $user->removeRole($role);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error: ' . $e);
