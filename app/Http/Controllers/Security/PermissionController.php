@@ -19,16 +19,22 @@ class PermissionController extends Controller
     {
         $users = User::with('roles', 'roles.permissions')->orderBy('gerencia')->get()->map(function ($user) {
             $roles = collect($user['roles'])->pluck('name')->toArray();
+
             return [
                 'id' => $user['id'],
                 'name' => $user['name'],
                 'photo' => $user['photo'],
                 'cargo' => $user['cargo'],
                 'gerencia' => $user['gerencia'],
-                'roles' => count($roles) == 0 ? ["Sin rol"] : $roles,
-                'rolesObj' => $user['roles']
+                'roles' => count($roles) == 0 ? ["Sin rol"] :  collect($roles)->map(function ($role) {
+                    return explode('%TOP%', $role)[0];
+                }),
+                'rolesObj' => collect($user['roles'])->map(function ($role) {
+                    return explode('%TOP%', $role)[0];
+                }),
             ];
         });
+
         $roles = Role::with('permissions')->get()->map(function ($r) {
             return [
                 'id' => $r['id'],

@@ -5,6 +5,7 @@ namespace App\Models\Scopes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+use Spatie\Permission\Models\Role;
 
 class GerenciaScope implements Scope
 {
@@ -13,7 +14,8 @@ class GerenciaScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        if (!auth()->user()->hasRole('Super Admin'))
+        $role = Role::first()->name;
+        if (!auth()->user()->hasRole($role))
             $builder->where('gerencia', auth()->user()->gerencia);
     }
 }

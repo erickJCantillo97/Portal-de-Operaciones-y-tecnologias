@@ -228,7 +228,7 @@
                 </Dialog>
             </TransitionRoot>
         </main>
-
+        <Footer fontSize="xs" fontColor="white" marginTop="0" class="bg-gray-500 py-1" />
     </div>
 </template>
 
@@ -250,6 +250,7 @@ import Button from '@/Components/Button.vue'
 import html2canvas from 'html2canvas'
 import RadioButton from 'primevue/radiobutton'
 import DolarTRM from "@/Components/DolarTRM.vue"
+import Footer from "@/Components/Footer.vue"
 import FlyoutNotificationsMenu from '@/Components/FlyoutNotificationsMenu.vue'
 import { useSweetalert } from '@/composable/sweetAlert'
 const { toast } = useSweetalert()

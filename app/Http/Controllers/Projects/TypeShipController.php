@@ -97,7 +97,6 @@ class TypeShipController extends Controller
 
         $projectsID =  ProjectsShip::whereIn('ship_id', $shipsId)->distinct()->pluck('project_id')->toArray();
 
-
         return response()->json([
             'project' => Project::whereIn('id', $projectsID)->get()
         ], 200);

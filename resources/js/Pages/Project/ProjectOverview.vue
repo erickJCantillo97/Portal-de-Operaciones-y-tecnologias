@@ -122,7 +122,7 @@ const formatCurrency = (valor, moneda) => {
                       </div>
                       <div class="flex justify-between py-3 text-sm font-medium">
                         <dt class="text-gray-900">Precio de Venta:</dt>
-                        <dd class="text-gray-500 uppercase">{{ formatCurrency(project.contract.price , 'COP') }}</dd>
+                        <dd class="text-gray-500 uppercase">{{ formatCurrency(project.contract.price, 'COP') }}</dd>
                       </div>
                       <div class="flex justify-between py-3 text-sm font-medium">
                         <dt class="text-gray-900">Fecha de Inicio:</dt>
@@ -162,6 +162,6 @@ const formatCurrency = (valor, moneda) => {
       <!--Galería-->
 
     </section>
-    <Footer fontSize="sm" fontColor="white" marginTop="4" />
+    <Footer fontSize="sm" fontColor="white" marginTop="0" />
   </main>
 </template>
