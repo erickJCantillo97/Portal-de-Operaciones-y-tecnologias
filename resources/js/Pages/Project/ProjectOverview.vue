@@ -9,17 +9,6 @@ const props = defineProps({
   project: Object,
 })
 
-onMounted(() => {
-  getShips()
-})
-
-const getShips = async () => {
-  await axios.get(route('ships.index'))
-    .then(res => {
-      console.log(res.data)
-    })
-}
-
 const images = ref()
 const imageSrc = [
   {
@@ -112,16 +101,28 @@ const formatCurrency = (valor, moneda) => {
                 <TabPanel header="Información del Contrato" :pt="{
                   root: 'w-full',
                 }">
-                  <div class="w-full p-2">
-                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem, in quae. Fuga laborum magnam
-                      magni quisquam placeat quo, quae, ad quod eveniet dolorum, velit cum culpa rerum ipsa enim vel.
+                  <div class="w-full p-2 uppercase text-justify">
+                    <p>
+                      {{ project.contract.subject }}
                     </p>
                   </div>
                   <div class="custom border border-solid rounded-lg p-2 mb-2">
                     <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
                       <div class="flex justify-between py-3 text-sm font-medium">
                         <dt class="text-gray-900">Nombre del Contrato:</dt>
-                        <dd class="text-gray-500 uppercase">{{ project.contract.name }}</dd>
+                        <dd class="text-gray-500 uppercase">{{ project.contract.contract_id }}</dd>
+                      </div>
+                      <div class="flex justify-between py-3 text-sm font-medium">
+                        <dt class="text-gray-900">Fecha de Inicio:</dt>
+                        <dd class="text-gray-500 uppercase">{{ project.contract.start_date }}</dd>
+                      </div>
+                      <div class="flex justify-between py-3 text-sm font-medium">
+                        <dt class="text-gray-900">Fecha de Fin:</dt>
+                        <dd class="text-gray-500 uppercase">{{ project.contract.end_date }}</dd>
+                      </div>
+                      <div class="flex justify-between py-3 text-sm font-medium">
+                        <dt class="text-gray-900">Estado del Contrato :</dt>
+                        <dd class="text-gray-500 uppercase">{{ project.contract.state }}</dd>
                       </div>
                       <!-- <div class="flex justify-between py-3 text-sm font-medium">
                     <dt class="text-gray-900">Estado:</dt>
