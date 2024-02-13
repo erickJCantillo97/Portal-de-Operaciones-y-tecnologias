@@ -39,7 +39,7 @@ class PermissionController extends Controller
             return [
                 'id' => $r['id'],
                 'name' => explode('%TOP%', $r['name'])[0],
-                'description' => $r['descriptions'],
+                'description' => $r['description'],
                 'users' => User::role($r['name'])->get(),
                 'permissions' => $r['permissions']
             ];

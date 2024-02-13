@@ -4,7 +4,7 @@ import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import Galleria from 'primevue/galleria'
 import Footer from '@/Components/Footer.vue'
-
+import Tag from 'primevue/tag'
 const props = defineProps({
   project: Object
 })
@@ -23,6 +23,15 @@ const imageSrc = [
     thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria2s.jpg',
     alt: 'image-1'
   },
+]
+
+const severitys = [
+  { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'primary', class: '' },
+  { text: 'CONSTRUCCIÓN', severity: 'success', class: '' },
+  { text: 'DISEÑO', severity: 'info', class: '' },
+  { text: 'GARANTIA', severity: 'warning', class: '' },
+  { text: 'SERVICIO POSTVENTA', severity: 'success', class: '' },
+  { text: 'SIN ESTADO', severity: 'danger', class: 'animate-pulse' }
 ]
 
 const responsiveOptions = ref([
@@ -48,7 +57,7 @@ const formatCurrency = (valor, moneda) => {
 <template>
   <main class="flex flex-col max-w-full justify-center bg-gray-800 min-h-screen overflow-hidden">
     <section
-      class="grid grid-cols-1 mx-4 overflow-y-auto space-y-6 bg-white px-6 pt-2 shadow-lg shadow-gray-600 ring-1 ring-gray-900/5  md:space-x-6  md:rounded-lg  md:px-10 h-[90vh]">
+      class="grid grid-cols-1 mx-4 overflow-y-auto space-y-6 bg-white px-6 pt-2 shadow-lg shadow-gray-600 ring-1 ring-gray-900/5  md:space-x-6  md:rounded-lg  md:px-10 h-[98vh]">
       <!--Project Details-->
       <article class="">
         <TabView :scrollable="true" :pt="{
@@ -58,34 +67,29 @@ const formatCurrency = (valor, moneda) => {
             root: 'w-full',
           }">
             <div class="grid grid-cols-2 gap-2">
-              <div class="col-span-1 rounded-lg p-2 mb-2 w-full bg-gray-800 border border-solid">
+              <div class="col-span-1 rounded-lg p-2 mb-2 w-full border border-solid">
                 <div class="flex text-sm font-medium justify-center items-center">
-                  <i class="fa-solid fa-screwdriver-wrench text-white"></i>
-                  <h1 class="text-lg font-semibold text-white px-4 uppercase">
+                  <i class="fa-solid fa-ship "></i>
+                  <h1 class="text-lg font-semibold  px-4 uppercase">
                     {{ project.name }} - {{ project.SAP_code }}
                   </h1>
                 </div>
                 <div class="flex justify-center items-center">
-                  <h2 class="text-sm font-semibold text-blue-500 italic">
-                    INFORMACIÓN DEL PROYECTO
-                  </h2>
                 </div>
-                <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
+                <dl class="divide-y flex space-x-4 divide-gray-200 border-b border-t border-gray-200 items-center">
+                  <Tag :severity="severitys.find((severity) => severity.text == project.status).severity"
+                    :value="'EN ' + project.status"></Tag>
                   <div class="flex py-3 text-xs font-medium">
-                    <dt class="text-white">No. del Casco:</dt>
-                    <dd class="text-gray-400 uppercase">&nbsp;{{ project.manager }}</dd>
-                  </div>
-                  <div class="flex py-3 text-xs font-medium">
-                    <dt class="text-white">Alcance:</dt>
+                    <dt class="">Alcance:</dt>
                     <dd class="text-gray-400 uppercase">&nbsp;{{ project.scope }}</dd>
                   </div>
                   <div class="flex py-3 text-xs font-medium">
-                    <dt class="text-white">Tipo de Proyecto:</dt>
+                    <dt class="">Tipo de Proyecto:</dt>
                     <dd class="text-gray-400 uppercase">&nbsp;{{ project.type }}</dd>
                   </div>
                 </dl>
                 <div>
-                  <h2 class="text-sm text-white italic">
+                  <h2 class="text-sm  italic">
                     {{ project.description }}
                   </h2>
                 </div>
@@ -97,10 +101,12 @@ const formatCurrency = (valor, moneda) => {
               </div>
               <TabView :scrollable="true" :pt="{
                 nav: '!flex !justify-between'
-              }">
+              }
+                ">
                 <TabPanel header="Información del Contrato" :pt="{
                   root: 'w-full',
-                }">
+                }
+                  ">
                   <div class="w-full p-2 uppercase text-justify">
                     <p>
                       {{ project.contract.subject }}
@@ -141,7 +147,8 @@ const formatCurrency = (valor, moneda) => {
                 </TabPanel>
                 <TabPanel header="Características Técnicas" :pt="{
                   root: 'w-full',
-                }">
+                }
+                  ">
 
                 </TabPanel>
               </TabView>
@@ -152,7 +159,8 @@ const formatCurrency = (valor, moneda) => {
           </TabPanel>
           <TabPanel header="Dashboard" :pt="{
             root: 'w-full'
-          }">
+          }
+            ">
             <p class="m-0">
               Aqui va el Dashboard
             </p>
@@ -162,6 +170,6 @@ const formatCurrency = (valor, moneda) => {
       <!--Galería-->
 
     </section>
-    <Footer fontSize="sm" fontColor="white" marginTop="0" />
+    <Footer fontSize="sm" fontColor="white" class="bg-gray-500 rounded-t-md" />
   </main>
 </template>

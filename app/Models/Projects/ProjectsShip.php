@@ -17,16 +17,16 @@ class ProjectsShip extends Model implements Auditable
 
     public function project()
     {
-        return $this->belongsTo(Project::class());
+        return $this->belongsTo(Project::class);
     }
 
     public function customer()
     {
-        return $this->belongsTo(Customer::class());
+        return $this->belongsTo(Customer::class);
     }
 
     public function ship()
     {
-        return $this->belongsTo(Ship::class());
+        return $this->belongsTo(Ship::class);
     }
 }
