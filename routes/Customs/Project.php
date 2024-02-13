@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\Budget\BudgetController;
+
 use App\Http\Controllers\Projects\AuthorizationController;
+use App\Http\Controllers\Projects\Budget\BudgetController;
 use App\Http\Controllers\Projects\ContractController;
 use App\Http\Controllers\Projects\CustomerController;
 use App\Http\Controllers\Projects\MilestoneController;
@@ -57,6 +58,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::resource('ships', ShipController::class)->except('update');
 
     Route::get('budget', [BudgetController::class, 'index'])->name('budget.index');
+    Route::get('getDetailsBudget/{project}', [BudgetController::class, 'getDetailsBudget'])->name('get.details.budget');
 
     //CRUD Customers
     Route::resource('customers', CustomerController::class);

@@ -11,7 +11,22 @@ class Pep extends Model implements Auditable
 {
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
-    use SoftDeletes;
 
     protected $guarded = [];
+
+    protected $appends = ['peps'];
+
+    public function pep()
+    {
+        return  $this->belongsTo(Pep::class, 'pep_id');
+    }
+
+    
+
+
+
+    public function getPepsAttribute()
+    {
+        return Pep::where('pep_id', '=', $this->id)->get();
+    }
 }

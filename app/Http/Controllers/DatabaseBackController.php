@@ -11,13 +11,19 @@ class DatabaseBackController extends Controller
 
     public function getPep()
     {
+        Pep::truncate();
         $data =  DB::connection('sqlsrv_anterior')->table('peps')->get();
         foreach ($data as $pep) {
             $casco = DB::connection('sqlsrv_anterior')->table('proyectos')->where('id', $pep->proyecto_id)->first()->casco;
             $project = Ship::where('idHull', $casco)->first()->projectsShip[0]['project_id'];
+            $pepPadre = DB::connection('sqlsrv_anterior')->table('peps')->where('id', $pep->pep_id)->first();
+            $pep_id = null;
+            if ($pepPadre) {
+                $pep_id = Pep::where('grafo_id', $pepPadre->grafo_id)->first()->id ?? null;
+            }
             Pep::create([
                 'project_id' => $project,
-                'pep_id' => $pep->pep_id,
+                'pep_id' => $pep_id,
                 'identification' => $pep->identificacion,
                 'grafo_id' => $pep->grafo_id,
                 'materials' => $pep->materiales_presupestados,
