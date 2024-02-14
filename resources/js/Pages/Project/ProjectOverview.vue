@@ -84,6 +84,23 @@ const captureAndDownloadImage = async () => {
     link.click()
   })
 }
+
+const getDays = (startDate, endData) => {
+  var date_1 = new Date(startDate)
+  var date_2 = new Date(endData)
+
+  // Calcular la diferencia en milisegundos
+  var diffMiliseconds = date_2 - date_1
+
+  // Calcular la diferencia en días
+  var milisecondsPerDay = 24 * 60 * 60 * 1000; // Número de milisegundos en un día
+  return Math.round(diffMiliseconds / milisecondsPerDay)
+}
+
+const calculatePercentage = (data, total) => {
+  var number = (data / total) * 100
+  return number.toFixed(0)
+}
 </script>
 <style scoped>
 table {
@@ -314,30 +331,42 @@ td {
             <div class="w-full md:w-1/3 grid grid-cols-4 text-xs rounded-xl md:mx-2 mt-4 md:mt-0 ">
               <!--  Primera fila -->
               <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">DIAS EJECUTADOS </div>
-              <div class="border text-center border-gray-800"> 444 </div>
+              <div class="border text-center border-gray-800">
+                {{ getDays(project.contract.start_date, new Date()) }}
+              </div>
               <div class="border text-center border-gray-800">
                 <div
-                  class="bg-sky-300 text-xs align-self-center font-extrabold opacity-60 h-full text-black text-center p-0.5">
-                  14%
+                  class="bg-sky-300 text-xs align-self-center font-extrabold opacity-60 h-full text-black text-center p-0.5"
+                  :style="'width: ' + calculatePercentage(getDays(project.contract.start_date, new Date()),
+                    getDays(project.contract.start_date, project.contract.end_date)) + '%'">
+                  {{ calculatePercentage(getDays(project.contract.start_date, new Date()),
+                    getDays(project.contract.start_date, project.contract.end_date)) }}%
                 </div>
               </div>
               <!-- Segunda fila -->
               <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">DIAS RESTANTES </div>
-              <div class="border text-center border-gray-800">2164</div>
+              <div class="border text-center border-gray-800">
+                {{ getDays(new Date(), project.contract.end_date) }}
+              </div>
               <div class="border text-center border-gray-800 ">
                 <div
-                  class="bg-teal-900 text-xs align-self-center font-extrabold opacity-60 h-full text-white text-center p-0.5">
-                  83%
+                  class="bg-teal-900 text-xs align-self-center font-extrabold opacity-60 h-full text-white text-center p-0.5"
+                  :style="'width: ' + calculatePercentage(getDays(new Date(), project.contract.end_date),
+                    getDays(project.contract.start_date, project.contract.end_date)) + '%'">
+                  {{ calculatePercentage(getDays(new Date(), project.contract.end_date),
+                    getDays(project.contract.start_date, project.contract.end_date)) }}%
                 </div>
               </div>
               <!-- Tercera fila -->
               <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">TOTAL DIAS PROYECTO</div>
-              <div class="border text-center border-gray-800 col-span-2">2608</div>
+              <div class="border text-center border-gray-800 col-span-2">
+                {{ getDays(project.contract.start_date, project.contract.end_date) }}
+              </div>
             </div>
           </div>
           <!-- OTROS DATOS -->
           <div class="grid grid-cols-2 gap-2">
-            <div class="bottom-0">
+            <div class="border border-b-gray-300 rounded-lg shadow-xs">
               <div class="flex justify-center items-center p-1 mb-1 bg-blue-800 text-white">
                 <h2 class="font-semibold">GESTIÓN DEL CRONOGRAMA</h2>
               </div>
@@ -415,11 +444,11 @@ td {
                     <li>4. Ensamble bloque 5740-5640-5540-1130-2320</li>
                   </ul>
                 </div>
-                <div class="flex justify-end items-center w-full">
+                <!-- <div class="flex justify-end items-center w-full">
                   <img
                     src="https://assets.asana.biz/transform/5d0217e1-a08d-4e8c-a8cb-616e658f434e/inline-project-management-critical-path-method-2-es-2x"
                     alt="picture" class="h-48 object-fill">
-                </div>
+                </div> -->
               </div>
             </article>
 

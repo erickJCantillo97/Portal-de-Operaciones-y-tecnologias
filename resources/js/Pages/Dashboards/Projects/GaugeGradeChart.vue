@@ -23,21 +23,19 @@ const props = defineProps({
 echarts.use([GaugeChart, CanvasRenderer])
 
 const option = ref({
-  width: 1,
-  height: 1,
   series: [
     {
       type: 'gauge',
       startAngle: 180,
       endAngle: 0,
       center: ['50%', '75%'],
-      radius: '90%',
+      radius: '100%',
       min: 0,
       max: 2,
       splitNumber: 4,
       axisLine: {
         lineStyle: {
-          width: 6,
+          width: 10,
           color: [
             [0.25, '#FF6E76'],
             [0.49, '#FDDD60'],
@@ -47,15 +45,15 @@ const option = ref({
       },
       pointer: {
         icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z',
-        length: '12%',
-        width: 10,
+        length: '20%',
+        width: 16,
         offsetCenter: [0, '-30%'],
         itemStyle: {
           color: 'inherit'
         }
       },
       axisTick: {
-        length: 2,
+        length: 3,
         lineStyle: {
           color: 'inherit',
           width: 2
@@ -88,20 +86,6 @@ const option = ref({
         valueAnimation: true,
         color: 'inherit'
       },
-      toolbox: {
-        show: true,
-        showTitle: false,
-        feature: {
-          saveAsImage: {
-            show: true,
-            title: 'Save As Image'
-          },
-          dataView: {
-            show: true,
-            title: 'Data View'
-          }
-        }
-      },
       data: [
         {
           value: 0.8,
@@ -114,10 +98,11 @@ const option = ref({
 </script>
 <style scoped>
 .chart {
-  height: 150px;
   width: 100%;
 }
 </style>
 <template>
-  <v-chart class="chart" :option="option"></v-chart>
+  <div class="chart">
+    <v-chart :option="option"></v-chart>
+  </div>
 </template>
