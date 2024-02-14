@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project\Grafo;
+use App\Models\Project\Operation;
 use App\Models\Project\Pep;
 use App\Models\Projects\Ship;
 use Illuminate\Support\Facades\DB;
@@ -60,6 +61,33 @@ class DatabaseBackController extends Controller
                 'materials_ejecutados' => $grafo->materiales_ejecutados,
                 'labor_ejecutados' => $grafo->mano_obra_ejecutados,
                 'services_ejecutados' => $grafo->servicios_ejecutados,
+            ]);
+        }
+    }
+    public function getOperations()
+    {
+        Operation::truncate();
+        $data =  DB::connection('sqlsrv_anterior')->table('operacions')->get();
+        foreach ($data as $operacion) {
+            $casco = DB::connection('sqlsrv_anterior')->table('proyectos')->where('id', $operacion->proyecto_id)->first()->casco;
+            $project = Ship::where('idHull', $casco)->first()->projectsShip[0]['project_id'];
+
+            $grafo_padre = DB::connection('sqlsrv_anterior')->table('grafos')->where('id', $operacion->grafo)->first();
+            $grafo = null;
+            if ($grafo_padre) {
+                $grafo = Grafo::where('grafo_id', $grafo_padre->grafo_id)->first()->id ?? null;
+            }
+            Operation::firstOrCreate([
+                'project_id' => $project,
+                'grafo' => $grafo,
+                'identification' => $operacion->identificacion,
+                'grafo_id' => $operacion->grafo_id,
+                'materials' => $operacion->materiales_presupestados,
+                'labor' => $operacion->mano_obra,
+                'services' => $operacion->servicios,
+                'materials_ejecutados' => $operacion->materiales_ejecutados,
+                'labor_ejecutados' => $operacion->mano_obra_ejecutados,
+                'services_ejecutados' => $operacion->servicios_ejecutados,
             ]);
         }
     }
