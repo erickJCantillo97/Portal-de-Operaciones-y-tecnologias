@@ -91,4 +91,8 @@ class DatabaseBackController extends Controller
             ]);
         }
     }
+
+    public function getTools()
+    {
+    }
 }
