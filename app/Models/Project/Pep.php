@@ -14,7 +14,7 @@ class Pep extends Model implements Auditable
 
     protected $guarded = [];
 
-    protected $appends = ['peps'];
+    protected $appends = ['peps', 'grafos'];
 
     public function pep()
     {
@@ -24,5 +24,10 @@ class Pep extends Model implements Auditable
     public function getPepsAttribute()
     {
         return Pep::where('pep_id', '=', $this->id)->get();
+    }
+
+    public function getGrafosAttribute()
+    {
+        return Grafo::where('pep_id', '=', $this->id)->get();
     }
 }

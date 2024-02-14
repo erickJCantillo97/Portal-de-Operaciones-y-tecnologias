@@ -344,6 +344,7 @@ Route::get('proyectos_anterior', function () {
 });
 
 Route::get('peps_anteriores', [DatabaseBackController::class, 'getPep']);
+Route::get('grafos-anteriores', [DatabaseBackController::class, 'getGrafos']);
 
 
 Route::get('/mailable', function () {
