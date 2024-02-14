@@ -12,9 +12,12 @@ import MiniCardInfo from '@/Components/MiniCardInfo.vue'
 import Bar from '@/Pages/Dashboards/Projects/Bar.vue'
 import S_Curve from '@/Pages/Dashboards/Projects/S_Curve.vue'
 import GaugeGradeChart from '@/Pages/Dashboards/Projects/GaugeGradeChart.vue'
+import Accordion from 'primevue/accordion';
+import AccordionTab from 'primevue/accordiontab';
 
 const props = defineProps({
-  project: Object
+  project: Object,
+  ships: Array
 })
 
 onMounted(() => {
@@ -178,83 +181,12 @@ td {
                 root: 'w-full',
                 content: '!h-[28rem] !p-2 !overflow-y-auto'
               }">
+                <Accordion :activeIndex="0">
+                  <AccordionTab v-for="ship in ships" :key="ship.id" :header="ship.name">
+                    <p class="m-0">{{ ship.type_ship }}</p>
+                  </AccordionTab>
+                </Accordion>
 
-                <div class="custom border border-solid rounded-lg p-2 mb-2">
-                  <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Tipo de Buque:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.contract_id }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Empresa Diseñadora:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.state }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Material del Casco:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.customer_id }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Tipo de Polución:</dt>
-                      <dd class="text-gray-500 uppercase">{{ formatCurrency(project.contract.price, 'COP') }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Alcance:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.start_date }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Autonomía:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.end_date }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">GT:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.type_of_sale }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">CGT:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.contract_id }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Eslora:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.state }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Manga:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.customer_id }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Tripulación Máxima:</dt>
-                      <dd class="text-gray-500 uppercase">{{ formatCurrency(project.contract.price, 'COP') }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Light Ship:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.start_date }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Full Load:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.end_date }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Diseño Calado:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.type_of_sale }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Bollard Pull:</dt>
-                      <dd class="text-gray-500 uppercase">{{ formatCurrency(project.contract.price, 'COP') }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Puntal:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.start_date }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Velocidad Máxima:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.end_date }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Potencia:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.type_of_sale }}</dd>
-                    </div>
-                  </dl>
-                </div>
               </TabPanel>
             </TabView>
             <!-- <div class="col-span-1 rounded-lg p-2 mb-2 w-full h-full bg-gray-500 border border-solid">

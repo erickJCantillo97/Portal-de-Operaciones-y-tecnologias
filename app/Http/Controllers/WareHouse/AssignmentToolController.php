@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class AssignmentToolController extends Controller
 {
@@ -27,6 +28,35 @@ class AssignmentToolController extends Controller
         $tools = Tool::where('estado', '!=', 'ASIGNADO')->with('category')->get();
 
         return Inertia::render('WareHouse/Assignment', compact('assignmentsTool', 'projects', 'tools'));
+    }
+
+    public function getDataAnterior()
+    {
+        AssignmentTool::truncate();
+        $equipos = DB::connection('sqlsrv_anterior')->table('asignacions')->get();
+        foreach ($equipos as $e) {
+            $empleado = collect(searchEmpleados('Num_SAP', $e->persona_id))->first();
+            $equipo =  DB::connection('sqlsrv_anterior')->table('equipos')->where('id', $e->equipo_id)->first();
+            if ($equipo && $e->estado == 'ASIGNADO') {
+                $tool = Tool::where('code', $equipo->codigo_interno)->first();
+                if ($tool) {
+                    AssignmentTool::firstorCreate([
+                        'tool_id' => $tool->id,
+                        'employee_id' => $e->persona_id,
+                        'project_id' => $e->proyecto_id,
+                        'supervisor_id' => $e->supervisor_id,
+                        'user_deliver' => $e->almacenista_entrega,
+                        'location' => 0,
+                        'assigment_date' => $e->fecha_prestamo,
+                        'status' => $e->estado,
+                        'employee_name' => $empleado['Nombres_Apellidos'],
+                        'gerencia' => 'GECON'
+                    ]);
+                }
+            }
+        }
+        // Category::where('level', 'Sub Grupo')->update(['level' => 'Subgrupo']);
+        return AssignmentTool::get();
     }
 
     /**
