@@ -42,7 +42,7 @@ const filter = () => {
             only: ['suggestions'],
             onSuccess: () => {
                 loading.value = false
-                suggestionSelect.value=null
+                suggestionSelect.value = null
             }
         }
     )
@@ -60,27 +60,28 @@ const toggle = (event) => {
 <template>
     <AppLayout>
         <div class="flex justify-between h-10 min-w-full p-1 border-b border-gray-200">
-                <button :class="type == null && date == null ? 'bg-primary text-white scale-105' : ''"
-                    class="w-8 border rounded-md shadow-xl text-primary hover:text-white border-primary alturah8 pi pi-filter-slash hover:bg-primary"
-                    @click="type = null date = null filter()">
-                </button>
-                <div class="shadow-xl w-72">
-                    <button type="button" @click="type = 'Sugerencia' filter()"
-                        :class="type == 'Sugerencia' ? 'bg-primary text-white scale-105' : ''"
-                        class="relative inline-flex items-center justify-center w-1/3 text-sm font-semibold border border-r-0 hover:text-white hover:border-r hover:bg-primary hover:scale-105 text-primary alturah8 rounded-l-md 0 border-primary focus:z-10">
-                        Sugerencias</button>
-                    <button type="button" @click="type = 'Opinion' filter()"
-                        :class="type == 'Opinion' ? 'bg-primary text-white scale-105' : ''"
-                        class="relative inline-flex items-center justify-center w-1/3 text-sm font-semibold border hover:text-white text-primary alturah8 border-primary hover:bg-primary hover:scale-105 focus:z-10">
-                        Opinion</button>
-                    <button type="button" @click="type = 'Error' filter()"
-                        :class="type == 'Error' ? 'bg-danger text-white scale-105' : ''"
-                        class="relative inline-flex items-center justify-center w-1/3 text-sm font-semibold border border-danger hover:text-white text-danger alturah8 rounded-r-md hover:bg-danger hover:scale-105 focus:z-10">
-                        Errores</button>
-                </div>
-                <input :class="date != null ? 'bg-primary text-white scale-105 border-white fill-white' : ''"
-                    class="relative inline-flex items-center justify-center text-sm font-semibold border rounded-md shadow-xl text-primary alturah8 border-primary hover:scale-105 focus:z-10"
-                    type="date" name="date" id="date" v-model="date" :max="today" @change="filter()">
+            <button :class="type == null && date == null ? 'bg-primary text-white scale-105' : ''"
+                class="w-8 border rounded-md shadow-xl text-primary hover:text-white border-primary alturah8 pi pi-filter-slash hover:bg-primary"
+                @click="type = null;
+                date = null; filter()">
+            </button>
+            <div class="shadow-xl w-72">
+                <button type="button" @click="type = 'Sugerencia'; filter()"
+                    :class="type == 'Sugerencia' ? 'bg-primary text-white scale-105' : ''"
+                    class="relative inline-flex items-center justify-center w-1/3 text-sm font-semibold border border-r-0 hover:text-white hover:border-r hover:bg-primary hover:scale-105 text-primary alturah8 rounded-l-md 0 border-primary focus:z-10">
+                    Sugerencias</button>
+                <button type="button" @click="type = 'Opinion'; filter()"
+                    :class="type == 'Opinion' ? 'bg-primary text-white scale-105' : ''"
+                    class="relative inline-flex items-center justify-center w-1/3 text-sm font-semibold border hover:text-white text-primary alturah8 border-primary hover:bg-primary hover:scale-105 focus:z-10">
+                    Opinion</button>
+                <button type="button" @click="type = 'Error'; filter()"
+                    :class="type == 'Error' ? 'bg-danger text-white scale-105' : ''"
+                    class="relative inline-flex items-center justify-center w-1/3 text-sm font-semibold border border-danger hover:text-white text-danger alturah8 rounded-r-md hover:bg-danger hover:scale-105 focus:z-10">
+                    Errores</button>
+            </div>
+            <input :class="date != null ? 'bg-primary text-white scale-105 border-white fill-white' : ''"
+                class="relative inline-flex items-center justify-center text-sm font-semibold border rounded-md shadow-xl text-primary alturah8 border-primary hover:scale-105 focus:z-10"
+                type="date" name="date" id="date" v-model="date" :max="today" @change="filter()">
         </div>
         <div class="flex max-w-full max-h-full min-w-full min-h-full" v-if="!loading">
             <div class="grid grid-cols-3" v-if="props.suggestions.length > 0">
@@ -132,7 +133,8 @@ const toggle = (event) => {
                     <div class="grid grid-cols-2 gap-2 ">
                         <div class="grid grid-cols-4 gap-1 border border-red-500">
                             <span class="flex items-center col-span-1 text-primary">URL:</span>
-                            <p class="flex items-center max-w-full col-span-3 break-all">{{ suggestionSelect.urlAddress }}</p>
+                            <p class="flex items-center max-w-full col-span-3 break-all">{{ suggestionSelect.urlAddress }}
+                            </p>
                             <span class="flex items-center col-span-1 text-primary">Tipo:</span>
                             <p class="flex items-center col-span-3">{{ suggestionSelect.type }}</p>
                             <span class="flex items-center col-span-1 text-primary">Usuario:</span>
@@ -176,7 +178,8 @@ const toggle = (event) => {
                             </div>
                             <span class="flex items-center col-span-1 text-primary">Fecha:</span>
                             <p class="flex items-center col-span-3">{{ formatDateTime24h(suggestionSelect.created_at) }}</p>
-                            <span class="flex items-center col-span-1 text-primary" v-if="suggestionSelect.type == 'Error'">Estado:</span>
+                            <span class="flex items-center col-span-1 text-primary"
+                                v-if="suggestionSelect.type == 'Error'">Estado:</span>
                             <span v-if="suggestionSelect.type == 'Error'"
                                 class="flex items-center justify-center col-span-3 font-medium rounded-md "
                                 :class="suggestionSelect.status == 1 ? 'bg-red-100 text-danger' : 'bg-green-100 text-success'">
@@ -209,15 +212,15 @@ const toggle = (event) => {
                     </div>
                 </div>
                 <div class="flex flex-col items-center justify-center w-full h-full col-span-2 px-2 " v-else>
-                    <Loading message="Seleccione un reporte"/>
+                    <Loading message="Seleccione un reporte" />
                 </div>
             </div>
             <div v-else class="flex flex-col items-center justify-center w-full h-full pt-10">
-                <Loading message="No hay reportes que mostrar"/>
+                <Loading message="No hay reportes que mostrar" />
             </div>
         </div>
         <div v-else class="flex flex-col items-center justify-center px-2 pt-10">
-            <Loading message="Cargando reportes"/>
+            <Loading message="Cargando reportes" />
         </div>
     </AppLayout>
 </template>
