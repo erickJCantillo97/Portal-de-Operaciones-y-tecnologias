@@ -1,9 +1,7 @@
 <script setup>
-
 import { ref } from 'vue'
 import VChart from 'vue-echarts'
-import "echarts";
-
+import "echarts"
 
 const option = ref({
   tooltip: {
@@ -12,16 +10,24 @@ const option = ref({
       type: 'shadow'
     }
   },
+  label: {
+    show: true,
+    position: 'right',
+    valueAnimation: true,
+    formatter: function (val) {
+      return new Intl.NumberFormat().format(Number(val.value).toFixed(2)) + '%';
+    }
+  },
   xAxis: {
     type: 'value',
   },
   yAxis: {
     type: 'category',
-    data: ['avance']
+    data: ['Avance']
   },
   series: [
     {
-      name: 'planeado',
+      name: 'Planeado',
       type: 'bar',
       data: [40]
     },
@@ -36,7 +42,7 @@ const option = ref({
 <style scoped>
 .chart {
   height: 100px;
-  width: 450px;
+  width: 100%;
 }
 </style>
 <template>

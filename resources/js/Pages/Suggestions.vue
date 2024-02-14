@@ -1,11 +1,11 @@
 <script setup>
-import AppLayout from "@/Layouts/AppLayout.vue";
-import { router } from '@inertiajs/vue3';
-import Image from 'primevue/image';
-import OverlayPanel from 'primevue/overlaypanel';
-import { ref } from 'vue';
+import AppLayout from "@/Layouts/AppLayout.vue"
+import { router } from '@inertiajs/vue3'
+import Image from 'primevue/image'
+import OverlayPanel from 'primevue/overlaypanel'
+import { ref } from 'vue'
 import { useSweetalert } from '@/composable/sweetAlert'
-import Loading from "@/Components/Loading.vue";
+import Loading from "@/Components/Loading.vue"
 
 const props = defineProps({
     suggestions: Array,
@@ -14,8 +14,9 @@ const props = defineProps({
         default: false
     }
 })
-const op = ref();
-const { toast } = useSweetalert();
+
+const op = ref()
+const { toast } = useSweetalert()
 const suggestionSelect = ref()
 const loading = ref(false)
 const date = ref(null)
@@ -24,7 +25,7 @@ const type = ref(null)
 const updateSuggestion = (s, n) => {
     router.put(route('suggestion.update', s), { answer: n }, {
         onSuccess: () => {
-            toast('¡Respuesta guardada!', 'success');
+            toast('¡Respuesta guardada!', 'success')
         }
     })
 }
@@ -53,7 +54,7 @@ function formatDateTime24h(dateTime) {
 }
 
 const toggle = (event) => {
-    op.value.toggle(event);
+    op.value.toggle(event)
 }
 </script>
 <template>
@@ -61,18 +62,18 @@ const toggle = (event) => {
         <div class="flex justify-between h-10 min-w-full p-1 border-b border-gray-200">
                 <button :class="type == null && date == null ? 'bg-primary text-white scale-105' : ''"
                     class="w-8 border rounded-md shadow-xl text-primary hover:text-white border-primary alturah8 pi pi-filter-slash hover:bg-primary"
-                    @click="type = null; date = null; filter()">
+                    @click="type = null date = null filter()">
                 </button>
                 <div class="shadow-xl w-72">
-                    <button type="button" @click="type = 'Sugerencia'; filter()"
+                    <button type="button" @click="type = 'Sugerencia' filter()"
                         :class="type == 'Sugerencia' ? 'bg-primary text-white scale-105' : ''"
                         class="relative inline-flex items-center justify-center w-1/3 text-sm font-semibold border border-r-0 hover:text-white hover:border-r hover:bg-primary hover:scale-105 text-primary alturah8 rounded-l-md 0 border-primary focus:z-10">
                         Sugerencias</button>
-                    <button type="button" @click="type = 'Opinion'; filter()"
+                    <button type="button" @click="type = 'Opinion' filter()"
                         :class="type == 'Opinion' ? 'bg-primary text-white scale-105' : ''"
                         class="relative inline-flex items-center justify-center w-1/3 text-sm font-semibold border hover:text-white text-primary alturah8 border-primary hover:bg-primary hover:scale-105 focus:z-10">
                         Opinion</button>
-                    <button type="button" @click="type = 'Error'; filter()"
+                    <button type="button" @click="type = 'Error' filter()"
                         :class="type == 'Error' ? 'bg-danger text-white scale-105' : ''"
                         class="relative inline-flex items-center justify-center w-1/3 text-sm font-semibold border border-danger hover:text-white text-danger alturah8 rounded-r-md hover:bg-danger hover:scale-105 focus:z-10">
                         Errores</button>
@@ -220,4 +221,3 @@ const toggle = (event) => {
         </div>
     </AppLayout>
 </template>
-
