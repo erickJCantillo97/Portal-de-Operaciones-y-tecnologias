@@ -43,12 +43,31 @@ Valores formatter:
 {@[n]}: the value of a dimension at the index of n, for example, {@[3]} refers the value at dimensions[3].
 */
 const option = ref({
-  title: props.title,
+  title: {
+    text: 'Curva S'
+  },
+  toolbox: {
+    show: true,
+    showTitle: true,
+    feature: {
+      saveAsImage: {
+        how: true,
+        title: 'Guardar como imagen'
+      },
+      dataZoom: {
+        yAxisIndex: 'none'
+      }
+    }
+  },
+  tooltip: {
+    trigger: 'axis'
+  },
   xAxis: {
     type: 'category',
-    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    data: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom']
   },
   yAxis: {
+    show: false,
     type: 'value'
   },
   series: [
@@ -56,17 +75,20 @@ const option = ref({
       data: [150, 230, 224, 218, 135, 147, 260],
       type: 'line'
     }
-  ]
+  ],
+  width: 300,
+  height: 100,
 })
 </script>
 <style scoped>
 .chart {
-  width: 18rem;
-  height: 16.8rem;
-  background-color: aqua;
+  height: 12rem;
+  width: 100%;
   /* El gr4fico ocupa todo el espacio disponible */
 }
 </style>
 <template>
-  <v-chart height="300" width="300" :option="option" />
+  <div class="chart">
+    <v-chart :option="option" />
+  </div>
 </template>

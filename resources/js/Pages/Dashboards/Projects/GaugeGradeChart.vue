@@ -23,6 +23,8 @@ const props = defineProps({
 echarts.use([GaugeChart, CanvasRenderer])
 
 const option = ref({
+  width: 1,
+  height: 1,
   series: [
     {
       type: 'gauge',
@@ -31,15 +33,14 @@ const option = ref({
       center: ['50%', '75%'],
       radius: '90%',
       min: 0,
-      max: 1,
-      splitNumber: 8,
+      max: 2,
+      splitNumber: 4,
       axisLine: {
         lineStyle: {
           width: 6,
           color: [
             [0.25, '#FF6E76'],
-            [0.5, '#FDDD60'],
-            [0.75, '#58D9F9'],
+            [0.49, '#FDDD60'],
             [1, '#7CFFB2']
           ]
         }
@@ -47,69 +48,64 @@ const option = ref({
       pointer: {
         icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z',
         length: '12%',
-        width: 20,
-        offsetCenter: [0, '-60%'],
+        width: 10,
+        offsetCenter: [0, '-30%'],
         itemStyle: {
-          color: 'auto'
+          color: 'inherit'
         }
       },
       axisTick: {
-        length: 12,
+        length: 2,
         lineStyle: {
-          color: 'auto',
+          color: 'inherit',
           width: 2
         }
       },
       splitLine: {
-        length: 20,
+        length: 10,
         lineStyle: {
-          color: 'auto',
-          width: 5
+          color: 'inherit',
+          width: 2
         }
       },
       axisLabel: {
         color: '#464646',
-        fontSize: 20,
-        distance: -60,
+        fontSize: 12,
+        distance: -30,
         rotate: 'tangential',
-        formatter: function (value) {
-          if (value === 0.875) {
-            return '0'
-          } else if (value === 0.625) {
-            return '0.8'
-          } else if (value === 0.375) {
-            return '0.8'
-          } else if (value === 0.625) {
-            return '0.8'
-          } else if (value === 0.375) {
-            return '0.8'
-          } else if (value === 0.625) {
-            return '0.8'
-          } else if (value === 0.375) {
-            return '0.4'
-          } else if (value === 0.125) {
-            return '0'
-          }
-          return ''
-        }
+
       },
       title: {
-        offsetCenter: [0, '-10%'],
-        fontSize: 20
+        offsetCenter: [0, '30%'],
+        fontSize: 15
       },
       detail: {
-        fontSize: 30,
-        offsetCenter: [0, '-35%'],
-        valueAnimation: true,
+        fontSize: 14,
+        offsetCenter: [0, 0],
         formatter: function (value) {
-          return Math.round(value * 100) + ''
+          return new Intl.NumberFormat().format(Number(value).toFixed(2))
         },
+        valueAnimation: true,
         color: 'inherit'
+      },
+      toolbox: {
+        show: true,
+        showTitle: false,
+        feature: {
+          saveAsImage: {
+            show: true,
+            title: 'Save As Image'
+          },
+          dataView: {
+            show: true,
+            title: 'Data View'
+          }
+        }
       },
       data: [
         {
-          value: 0.01,
-          name: 'SPI'
+          value: 0.8,
+          name: 'CPI'
         }
       ]
     }
@@ -118,7 +114,8 @@ const option = ref({
 </script>
 <style scoped>
 .chart {
-  width: 300px;
+  height: 150px;
+  width: 100%;
 }
 </style>
 <template>
