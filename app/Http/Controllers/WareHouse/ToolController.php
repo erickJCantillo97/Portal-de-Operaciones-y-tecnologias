@@ -20,15 +20,12 @@ class ToolController extends Controller
     public function index()
     {
         $tools = Tool::with('category', 'category.padre', 'category.padre.padre')->orderBy('category_id')->get();
-        $categories = Category::has('padre')->with('padre', 'padre.padre')->where('level', 'Descripcion')
-            ->get();
+        $categories = Category::has('padre')->with('padre', 'padre.padre')->where('level', 'Descripcion')->get();
         return Inertia::render('WareHouse/Tools/Index', [
             'tools' => $tools,
             'categories' => $categories,
         ]);
     }
-
-
 
     public function getDataAnterior()
     {
@@ -108,12 +105,14 @@ class ToolController extends Controller
     public function show(Tool $tool)
     {
         try {
-        return Inertia::render('WareHouse/Tools/ToolOverview',
-        [
-            'tool' => Tool::with('category','category.padre', 'category.padre.padre')
-            ->where('id', $tool->id)
-            ->first()
-        ]);
+            return Inertia::render(
+                'WareHouse/Tools/ToolOverview',
+                [
+                    'tool' => Tool::with('category', 'category.padre', 'category.padre.padre')
+                        ->where('id', $tool->id)
+                        ->first()
+                ]
+            );
         } catch (Exception $e) {
             return back()->withErrors(['message', 'Error al cargar la página' . $e]);
         }
