@@ -12,10 +12,13 @@ import MiniCardInfo from '@/Components/MiniCardInfo.vue'
 import Bar from '@/Pages/Dashboards/Projects/Bar.vue'
 import S_Curve from '@/Pages/Dashboards/Projects/S_Curve.vue'
 import GaugeGradeChart from '@/Pages/Dashboards/Projects/GaugeGradeChart.vue'
+import Accordion from 'primevue/accordion';
+import AccordionTab from 'primevue/accordiontab';
 import html2canvas from 'html2canvas'
 
 const props = defineProps({
-  project: Object
+  project: Object,
+  ships: Array
 })
 
 onMounted(() => {
@@ -207,6 +210,12 @@ td {
                 root: 'w-full',
                 content: '!h-[28rem] !p-2 !overflow-y-auto'
               }">
+                <Accordion :activeIndex="0">
+                  <AccordionTab v-for="ship in ships" :key="ship.id" :header="ship.name">
+                    <p class="m-0">{{ ship.type_ship }}</p>
+                  </AccordionTab>
+                </Accordion>
+
                 <div class="custom border border-solid rounded-lg p-2 mb-2">
                   <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
                     <div class="flex justify-between py-3 text-sm font-medium">

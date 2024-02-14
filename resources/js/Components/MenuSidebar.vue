@@ -251,13 +251,13 @@ const navigation = [
             {
                 name: 'Equipos y Herramientas',
                 href: 'tools.index',
-                dev: true,
+                dev: false,
                 show: hasPermission('tool read'),
             },
             {
                 name: 'Asignaciones',
                 href: 'assignmentTool.index',
-                dev: true,
+                dev: false,
                 show: hasPermission('assignmentTool read'),
             },
         ],

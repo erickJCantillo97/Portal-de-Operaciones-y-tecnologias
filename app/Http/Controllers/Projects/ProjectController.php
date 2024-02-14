@@ -114,10 +114,15 @@ class ProjectController extends Controller
     public function goToProjectOverview(Project $project)
     {
         try {
-        return Inertia::render('Project/ProjectOverview',
-        [
-            'project' => Project::with('projectShip', 'contract')->findOrFail($project->id)
-        ]);
+            $ships_ids = ProjectsShip::where('project_id', $project->id)->pluck('ship_id')->toArray();
+            $ships = Ship::with('typeShip')->whereIn('id', $ships_ids)->get();
+            return Inertia::render(
+                'Project/ProjectOverview',
+                [
+                    'project' => Project::with('projectShip', 'contract')->findOrFail($project->id),
+                    'ships' => $ships
+                ]
+            );
         } catch (Exception $e) {
             return back()->withErrors(['message', 'Error al cargar la página' . $e]);
         }
