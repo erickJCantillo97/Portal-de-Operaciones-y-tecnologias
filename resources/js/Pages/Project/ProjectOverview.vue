@@ -81,6 +81,23 @@ const captureAndDownloadImage = async () => {
     link.click()
   })
 }
+
+const getDays = (startDate, endData) => {
+  var date_1 = new Date(startDate)
+  var date_2 = new Date(endData)
+
+  // Calcular la diferencia en milisegundos
+  var diffMiliseconds = date_2 - date_1
+
+  // Calcular la diferencia en días
+  var milisecondsPerDay = 24 * 60 * 60 * 1000; // Número de milisegundos en un día
+  return Math.round(diffMiliseconds / milisecondsPerDay)
+}
+
+const calculatePercentage = (data, total) => {
+  var number = (data / total) * 100
+  return number.toFixed(0)
+}
 </script>
 <style scoped>
 table {
@@ -99,8 +116,7 @@ td {
 </style>
 <template>
   <main class="flex flex-col max-w-full justify-center bg-gray-800 min-h-screen overflow-hidden">
-    <div
-      class="overflow-y-auto space-y-6 bg-white px-6 pt-0.5 divide-x-[500px] md:space-x-6  md:px-10 h-screen">
+    <div class="overflow-y-auto space-y-6 bg-white px-6 pt-0.5 divide-x-[500px] md:space-x-6  md:px-10 h-screen">
       <!--Project Details-->
       <TabView :scrollable="true" :pt="{
         nav: '!flex !justify-between'
@@ -278,196 +294,208 @@ td {
           root: '!w-full !bottom-0'
         }">
           <!-- <span id="contentToCapture" class="w-full"> -->
-            <!-- TABLAS -->
-            <div class="block md:flex justify-between pb-1">
-              <!--TABLA 1-->
-              <div class="w-full md:w-2/3 grid grid-cols-4 text-xs rounded-xl">
-                <!-- primera fila -->
-                <div class="col-span-2 border text-center border-gray-800 bg-gray-100">Gerente: Ronny Gutierrez</div>
-                <div class="border text-center border-gray-800 bg-sky-100 font-bold">N° CONTRATO</div>
-                <div class="border text-center border-gray-800">{{ project.contract.contract_id }}</div>
+          <!-- TABLAS -->
+          <div class="block md:flex justify-between pb-1">
+            <!--TABLA 1-->
+            <div class="w-full md:w-2/3 grid grid-cols-4 text-xs rounded-xl">
+              <!-- primera fila -->
+              <div class="col-span-2 border text-center border-gray-800 bg-gray-100">Gerente: Ronny Gutierrez</div>
+              <div class="border text-center border-gray-800 bg-sky-100 font-bold">N° CONTRATO</div>
+              <div class="border text-center border-gray-800">{{ project.contract.contract_id }}</div>
 
-                <!-- Segunda fila -->
-                <div class="border text-center border-gray-800 bg-gray-100">FECHA REPORTE: </div>
-                <div class="border text-center border-gray-800"> {{ Moment().format('DD/MM/YYYY') }}</div>
-                <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE INICIO </div>
-                <div class="border text-center border-gray-800">{{
-                  Moment(project.contract.start_date).format('DD/MM/YYYY') }}</div>
+              <!-- Segunda fila -->
+              <div class="border text-center border-gray-800 bg-gray-100">FECHA REPORTE: </div>
+              <div class="border text-center border-gray-800"> {{ Moment().format('DD/MM/YYYY') }}</div>
+              <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE INICIO </div>
+              <div class="border text-center border-gray-800">{{
+                Moment(project.contract.start_date).format('DD/MM/YYYY') }}</div>
 
-                <!-- Tercera fila -->
-                <div class="border text-center border-gray-800 bg-gray-100">SEMANA: </div>
-                <div class="border text-center border-gray-800"> WK - 2410</div>
-                <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE FIN </div>
-                <div class="border text-center border-gray-800">{{ Moment(project.contract.end_date).format('DD/MM/YYYY')
-                }}</div>
+              <!-- Tercera fila -->
+              <div class="border text-center border-gray-800 bg-gray-100">SEMANA: </div>
+              <div class="border text-center border-gray-800"> WK - 2410</div>
+              <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE FIN </div>
+              <div class="border text-center border-gray-800">{{ Moment(project.contract.end_date).format('DD/MM/YYYY')
+              }}</div>
+            </div>
+
+            <!--TABLA 2-->
+            <div class="w-full md:w-1/3 grid grid-cols-4 text-xs rounded-xl md:mx-2 mt-4 md:mt-0 ">
+              <!--  Primera fila -->
+              <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">DIAS EJECUTADOS </div>
+              <div class="border text-center border-gray-800">
+                {{ getDays(project.contract.start_date, new Date()) }}
               </div>
-
-              <!--TABLA 2-->
-              <div class="w-full md:w-1/3 grid grid-cols-4 text-xs rounded-xl md:mx-2 mt-4 md:mt-0 ">
-                <!--  Primera fila -->
-                <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">DIAS EJECUTADOS </div>
-                <div class="border text-center border-gray-800"> 444 </div>
-                <div class="border text-center border-gray-800">
-                  <div
-                    class="bg-sky-300 text-xs align-self-center font-extrabold opacity-60 h-full text-black text-center p-0.5">
-                    14%
-                  </div>
+              <div class="border text-center border-gray-800">
+                <div
+                  class="bg-sky-300 text-xs align-self-center font-extrabold opacity-60 h-full text-black text-center p-0.5"
+                  :style="'width: ' + calculatePercentage(getDays(project.contract.start_date, new Date()),
+                    getDays(project.contract.start_date, project.contract.end_date)) + '%'">
+                  {{ calculatePercentage(getDays(project.contract.start_date, new Date()),
+                    getDays(project.contract.start_date, project.contract.end_date)) }}%
                 </div>
-                <!-- Segunda fila -->
-                <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">DIAS RESTANTES </div>
-                <div class="border text-center border-gray-800">2164</div>
-                <div class="border text-center border-gray-800 ">
-                  <div
-                    class="bg-teal-900 text-xs align-self-center font-extrabold opacity-60 h-full text-white text-center p-0.5">
-                    83%
-                  </div>
+              </div>
+              <!-- Segunda fila -->
+              <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">DIAS RESTANTES </div>
+              <div class="border text-center border-gray-800">
+                {{ getDays(new Date(), project.contract.end_date) }}
+              </div>
+              <div class="border text-center border-gray-800 ">
+                <div
+                  class="bg-teal-900 text-xs align-self-center font-extrabold opacity-60 h-full text-white text-center p-0.5"
+                  :style="'width: ' + calculatePercentage(getDays(new Date(), project.contract.end_date),
+                    getDays(project.contract.start_date, project.contract.end_date)) + '%'">
+                  {{ calculatePercentage(getDays(new Date(), project.contract.end_date),
+                    getDays(project.contract.start_date, project.contract.end_date)) }}%
                 </div>
-                <!-- Tercera fila -->
-                <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">TOTAL DIAS PROYECTO</div>
-                <div class="border text-center border-gray-800 col-span-2">2608</div>
+              </div>
+              <!-- Tercera fila -->
+              <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">TOTAL DIAS PROYECTO</div>
+              <div class="border text-center border-gray-800 col-span-2">
+                {{ getDays(project.contract.start_date, project.contract.end_date) }}
               </div>
             </div>
-            <!-- OTROS DATOS -->
-            <div class="grid grid-cols-2 gap-2">
-              <div class="bottom-0">
-                <div class="flex justify-center items-center p-1 mb-1 bg-blue-800 text-white">
-                  <h2 class="font-semibold">GESTIÓN DEL CRONOGRAMA</h2>
-                </div>
-                  <Bar :key="showLineChart" />
-                  <div class="flex justify-center w-full">
-                    <GaugeGradeChart :key="showLineChart" />
-                    <S_Curve :title="Horarios" :key="showLineChart" />
-                  </div>
+          </div>
+          <!-- OTROS DATOS -->
+          <div class="grid grid-cols-2 gap-2">
+            <div class="border border-b-gray-300 rounded-lg shadow-xs">
+              <div class="flex justify-center items-center p-1 mb-1 bg-blue-800 text-white">
+                <h2 class="font-semibold">GESTIÓN DEL CRONOGRAMA</h2>
               </div>
+              <Bar :key="showLineChart" />
+              <div class="flex justify-center w-full">
+                <GaugeGradeChart :key="showLineChart" />
+                <S_Curve :title="Horarios" :key="showLineChart" />
+              </div>
+            </div>
 
-              <!-- TABLA: GESTIÓN DE LOS COSTOS -->
-              <article>
-                <div class="flex justify-center items-center p-1 mb-1 bg-blue-800 text-white">
-                  <h2 class="font-semibold">GESTIÓN DE LOS COSTOS</h2>
+            <!-- TABLA: GESTIÓN DE LOS COSTOS -->
+            <article>
+              <div class="flex justify-center items-center p-1 mb-1 bg-blue-800 text-white">
+                <h2 class="font-semibold">GESTIÓN DE LOS COSTOS</h2>
+              </div>
+              <!-- MINICARDS INFO -->
+              <div class="grid grid-cols-2 w-full">
+                <div class="grid grid-cols-2">
+                  <MiniCardInfo title="Presupuesto" :value="191520456373" :valueProgressBar="50" />
+                  <MiniCardInfo title="Presupuesto" :value="191520456373" :valueProgressBar="35" />
+                  <MiniCardInfo title="Presupuesto" :value="191520456373" :valueProgressBar="10" />
+                  <MiniCardInfo title="Presupuesto" :value="191520456373" :valueProgressBar="90" />
                 </div>
-                <!-- MINICARDS INFO -->
-                <div class="grid grid-cols-2 w-full">
-                  <div class="grid grid-cols-2">
-                    <MiniCardInfo title="Presupuesto" :value="191520456373" :valueProgressBar="50" />
-                    <MiniCardInfo title="Presupuesto" :value="191520456373" :valueProgressBar="35" />
-                    <MiniCardInfo title="Presupuesto" :value="191520456373" :valueProgressBar="10" />
-                    <MiniCardInfo title="Presupuesto" :value="191520456373" :valueProgressBar="90" />
-                  </div>
-                  <GaugeGradeChart :key="showLineChart" />
-                </div>
-                <div>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th class="bg-slate-300"></th>
-                        <th class="bg-sky-100">MATERIALES</th>
-                        <th class="bg-sky-100">MANO DE OBRA</th>
-                        <th class="bg-sky-100">SERVICIOS</th>
-                        <th class="bg-sky-100">TOTAL</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td class="text-left font-semibold bg-sky-100">PRESUPUESTO</td>
-                        <td>{{ Moment().format('DD/MM/YYYY') }}</td>
-                        <td>$110.000.000</td>
-                        <td>$110.000.000</td>
-                        <td>$110.000.000</td>
-                      </tr>
-                      <tr>
-                        <td class="text-left font-semibold bg-sky-100">CONSUMO ACTUAL</td>
-                        <td>{{ Moment().format('DD/MM/YYYY') }}</td>
-                        <td>$110.000.000</td>
-                        <td>$110.000.000</td>
-                        <td>$110.000.000</td>
-                      </tr>
-                      <tr>
-                        <td class="text-left font-semibold bg-sky-100">DISPONIBLE</td>
-                        <td>{{ Moment().format('DD/MM/YYYY') }}</td>
-                        <td>$110.000.000</td>
-                        <td>$110.000.000</td>
-                        <td>$110.000.000</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </article>
-
-              <!-- TABLA: ACTIVIDADES/NOVEDADES DE LA SEMANA -->
-              <article>
-                <div class="flex justify-center items-center p-1 mb-1 bg-blue-800 text-white">
-                  <h2 class="font-semibold">ACTIVIDADES/NOVEDADES DE LA SEMANA</h2>
-                </div>
-                <div class="flex gap-2">
-                  <div class="w-full ">
-                    <ul class="[&>li]:text-xs [&>li]:font-semibold space-y-2">
-                      <li>1. Bloque de Láminas bloque 5650</li>
-                      <li>2. Corte de perfiles bloque 5550</li>
-                      <li>3. Armado de previas bloque 2320</li>
-                      <li>4. Ensamble bloque 5740-5640-5540-1130-2320</li>
-                    </ul>
-                  </div>
-                  <div class="flex justify-end items-center w-full">
-                    <img
-                      src="https://assets.asana.biz/transform/5d0217e1-a08d-4e8c-a8cb-616e658f434e/inline-project-management-critical-path-method-2-es-2x"
-                      alt="picture" class="h-48 object-fill">
-                  </div>
-                </div>
-              </article>
-
-              <!-- TABLA: HITOS CONTRACTUALES -->
-              <article class="overflow-y-auto">
-                <div class="flex justify-center items-center p-1 mb-2 bg-blue-800 text-white">
-                  <h2 class="font-semibold">HITOS CONTRACTUALES</h2>
-                </div>
+                <GaugeGradeChart :key="showLineChart" />
+              </div>
+              <div>
                 <table>
                   <thead>
                     <tr>
-                      <th class="uppercase bg-sky-100" style="width:27rem">Hitos</th>
-                      <th class="uppercase bg-sky-100">Fecha</th>
-                      <th class="uppercase bg-sky-100">Monto</th>
+                      <th class="bg-slate-300"></th>
+                      <th class="bg-sky-100">MATERIALES</th>
+                      <th class="bg-sky-100">MANO DE OBRA</th>
+                      <th class="bg-sky-100">SERVICIOS</th>
+                      <th class="bg-sky-100">TOTAL</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td class="text-left font-semibold ">PAGO ANTICIPADO</td>
+                      <td class="text-left font-semibold bg-sky-100">PRESUPUESTO</td>
                       <td>{{ Moment().format('DD/MM/YYYY') }}</td>
+                      <td>$110.000.000</td>
+                      <td>$110.000.000</td>
                       <td>$110.000.000</td>
                     </tr>
                     <tr>
-                      <td class="text-left font-semibold ">Nombre del hito</td>
+                      <td class="text-left font-semibold bg-sky-100">CONSUMO ACTUAL</td>
                       <td>{{ Moment().format('DD/MM/YYYY') }}</td>
+                      <td>$110.000.000</td>
+                      <td>$110.000.000</td>
                       <td>$110.000.000</td>
                     </tr>
                     <tr>
-                      <td class="text-left font-semibold ">Nombre del hito</td>
+                      <td class="text-left font-semibold bg-sky-100">DISPONIBLE</td>
                       <td>{{ Moment().format('DD/MM/YYYY') }}</td>
                       <td>$110.000.000</td>
-                    </tr>
-                    <tr>
-                      <td class="text-left font-semibold ">Nombre del hito</td>
-                      <td>{{ Moment().format('DD/MM/YYYY') }}</td>
                       <td>$110.000.000</td>
-                    </tr>
-                    <tr>
-                      <td class="text-left font-semibold ">Nombre del hito</td>
-                      <td>{{ Moment().format('DD/MM/YYYY') }}</td>
-                      <td>$110.000.000</td>
-                    </tr>
-                    <!-- <tr>
-                      <td>Columna 1, Fila 6</td>
-                      <td>Columna 2, Fila 6</td>
-                      <td>Columna 3, Fila 6</td>
-                    </tr> -->
-                    <tr>
-                      <td class="font-semibold bg-sky-100">TOTAL</td>
-                      <td></td>
                       <td>$110.000.000</td>
                     </tr>
                   </tbody>
                 </table>
-              </article>
-            </div>
+              </div>
+            </article>
+
+            <!-- TABLA: ACTIVIDADES/NOVEDADES DE LA SEMANA -->
+            <article>
+              <div class="flex justify-center items-center p-1 mb-1 bg-blue-800 text-white">
+                <h2 class="font-semibold">ACTIVIDADES/NOVEDADES DE LA SEMANA</h2>
+              </div>
+              <div class="flex gap-2">
+                <div class="w-full ">
+                  <ul class="[&>li]:text-xs [&>li]:font-semibold space-y-2">
+                    <li>1. Bloque de Láminas bloque 5650</li>
+                    <li>2. Corte de perfiles bloque 5550</li>
+                    <li>3. Armado de previas bloque 2320</li>
+                    <li>4. Ensamble bloque 5740-5640-5540-1130-2320</li>
+                  </ul>
+                </div>
+                <!-- <div class="flex justify-end items-center w-full">
+                  <img
+                    src="https://assets.asana.biz/transform/5d0217e1-a08d-4e8c-a8cb-616e658f434e/inline-project-management-critical-path-method-2-es-2x"
+                    alt="picture" class="h-48 object-fill">
+                </div> -->
+              </div>
+            </article>
+
+            <!-- TABLA: HITOS CONTRACTUALES -->
+            <article class="overflow-y-auto">
+              <div class="flex justify-center items-center p-1 mb-2 bg-blue-800 text-white">
+                <h2 class="font-semibold">HITOS CONTRACTUALES</h2>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th class="uppercase bg-sky-100" style="width:27rem">Hitos</th>
+                    <th class="uppercase bg-sky-100">Fecha</th>
+                    <th class="uppercase bg-sky-100">Monto</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-left font-semibold ">PAGO ANTICIPADO</td>
+                    <td>{{ Moment().format('DD/MM/YYYY') }}</td>
+                    <td>$110.000.000</td>
+                  </tr>
+                  <tr>
+                    <td class="text-left font-semibold ">Nombre del hito</td>
+                    <td>{{ Moment().format('DD/MM/YYYY') }}</td>
+                    <td>$110.000.000</td>
+                  </tr>
+                  <tr>
+                    <td class="text-left font-semibold ">Nombre del hito</td>
+                    <td>{{ Moment().format('DD/MM/YYYY') }}</td>
+                    <td>$110.000.000</td>
+                  </tr>
+                  <tr>
+                    <td class="text-left font-semibold ">Nombre del hito</td>
+                    <td>{{ Moment().format('DD/MM/YYYY') }}</td>
+                    <td>$110.000.000</td>
+                  </tr>
+                  <tr>
+                    <td class="text-left font-semibold ">Nombre del hito</td>
+                    <td>{{ Moment().format('DD/MM/YYYY') }}</td>
+                    <td>$110.000.000</td>
+                  </tr>
+                  <!-- <tr>
+                      <td>Columna 1, Fila 6</td>
+                      <td>Columna 2, Fila 6</td>
+                      <td>Columna 3, Fila 6</td>
+                    </tr> -->
+                  <tr>
+                    <td class="font-semibold bg-sky-100">TOTAL</td>
+                    <td></td>
+                    <td>$110.000.000</td>
+                  </tr>
+                </tbody>
+              </table>
+            </article>
+          </div>
           <!-- </span> -->
         </TabPanel>
       </TabView>
