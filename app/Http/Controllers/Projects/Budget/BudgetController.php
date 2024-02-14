@@ -25,11 +25,6 @@ class BudgetController extends Controller
 
         return response()->json([
             'peps' => $pepsPrincipales,
-            'presupuestos' => [
-                'materiales' => $pepsPrincipales->sum('materials'),
-                'mdo' => $pepsPrincipales->sum('labor'),
-                'servicios' => $pepsPrincipales->sum('services')
-            ],
         ]);
     }
 }
