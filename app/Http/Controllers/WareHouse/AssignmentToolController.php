@@ -101,7 +101,7 @@ class AssignmentToolController extends Controller
                 Tool::find($tool)->update(['estado' => 'ASIGNADO']);
             }
 
-            Mail::to([auth()->user()->username . '@cotecmar.com', 'rgutierrez@cotecmar.com'])->send(
+            Mail::to([auth()->user()->username . '@cotecmar.com', $request->email])->send(
                 new AssignmentToolsMail($request->employee_name, $request->tools)
             );
         } catch (Exception $e) {

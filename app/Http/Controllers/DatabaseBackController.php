@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project\Grafo;
 use App\Models\Project\Operation;
 use App\Models\Project\Pep;
+use App\Models\Projects\Milestone;
 use App\Models\Projects\Ship;
 use Illuminate\Support\Facades\DB;
 
@@ -92,7 +93,21 @@ class DatabaseBackController extends Controller
         }
     }
 
-    public function getTools()
+    public function getHitos()
     {
+        Operation::truncate();
+        $data =  DB::connection('sqlsrv_anterior')->table('hitos')->get();
+        foreach ($data as $hito) {
+            $casco = DB::connection('sqlsrv_anterior')->table('proyectos')->where('id', $hito->proyecto_id)->first()->casco;
+            $project = Ship::where('idHull', $casco)->first()->projectsShip[0]['project_id'];
+            Milestone::firstOrCreate([
+                'project_id' => $project,
+                'title' => $hito->title,
+                'value' => $hito->valor,
+                'end_date' => $hito->fecha_terminacion,
+                'type' => $hito->tipo_hito,
+                'advance' => $hito->avance,
+            ]);
+        }
     }
 }

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('end_date');
             $table->string('type');
             $table->boolean('invoiced')->default(0);
-            $table->double('advance')->default(0);
+            $table->double('advancadvancece')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

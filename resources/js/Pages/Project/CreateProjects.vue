@@ -230,6 +230,7 @@ const formMilestone = useForm({
 
 const save = () => {
     formMilestone.project_id = projectIdRef.value;
+    
     formMilestone.post(route('milestones.store'), {
         onSuccess: () => {
             toast.add({ summary: 'Hito Guardado', life: 2000 });
