@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
+use App\Models\Project\ProgressProjectWeek;
 use App\Models\Projects\Authorization;
 use App\Models\Projects\Contract;
 use App\Models\Projects\Milestone;
@@ -116,11 +117,14 @@ class ProjectController extends Controller
         try {
             $ships_ids = ProjectsShip::where('project_id', $project->id)->pluck('ship_id')->toArray();
             $ships = Ship::with('typeShip')->whereIn('id', $ships_ids)->get();
+            $semana = ProgressProjectWeek::where('project_id', $project->id)->where('real_progress', '<>', 0)->orderBy('week', 'DESC')->first();
+
             return Inertia::render(
                 'Project/ProjectOverview',
                 [
                     'project' => Project::with('projectShip', 'contract', 'milestone')->findOrFail($project->id),
-                    'ships' => $ships
+                    'ships' => $ships,
+                    'semana' => $semana
                 ]
             );
         } catch (Exception $e) {

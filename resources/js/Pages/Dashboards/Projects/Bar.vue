@@ -2,6 +2,11 @@
 import { ref } from 'vue'
 import VChart from 'vue-echarts'
 import "echarts"
+const props = defineProps({
+  planeado: Number,
+  real: Number
+})
+
 
 const option = ref({
   tooltip: {
@@ -29,12 +34,12 @@ const option = ref({
     {
       name: 'Planeado',
       type: 'bar',
-      data: [40]
+      data: [props.planeado]
     },
     {
       name: 'Ejecutado',
       type: 'bar',
-      data: [45]
+      data: [props.real]
     }
   ]
 })

@@ -41,7 +41,8 @@ class ProgressProjectWeekController extends Controller
             $year = explode('-', $validateData['week'])[0];
             $week_number = str_replace('W', '', explode('-', $validateData['week'])[1]);
             $validateData['week'] = substr($year, -2) . $week_number;
-            ProgressProjectWeek::create($validateData);
+
+            ProgressProjectWeek::where('week', $validateData['week'])->update($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }

@@ -265,9 +265,9 @@ const avance = useForm({
     SPI: null
 })
 const guardarAvance = () => {
-    avance.post(route(''), {
+    avance.post(route('ProgressProjectWeek.store'), {
         onSuccess: () => {
-
+            toast.add({ summary: 'Avance Guardado', life: 2000 });
         },
         onError: () => {
 
