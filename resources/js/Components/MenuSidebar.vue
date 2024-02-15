@@ -174,6 +174,12 @@ const navigation = [
                 show: true,
             },
             {
+                name: 'Presupuestos',
+                href: 'budget.index',
+                dev: true,
+                show: true,
+            },
+            {
                 name: 'Unidades',
                 href: 'ships.index',
                 // dev: true,
