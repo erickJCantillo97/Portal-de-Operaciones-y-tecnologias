@@ -14,7 +14,7 @@ const toast = useToast();
 const props = defineProps({
     labelButton: {
         type: String,
-        default: 'Subir archivo'
+        default: null
     },
     iconButton: {
         type: String,
@@ -63,6 +63,10 @@ const props = defineProps({
     url: {
         type: String,
         default: null
+    },
+    tooltip:{
+        type:String,
+        default:null
     }
 });
 const visible = ref(false)
@@ -110,7 +114,7 @@ const uploadArchives = (event) => {
 }
 </script>
 <template>
-    <Button :class="classButton" :outlined :severity :label="labelButton" :icon="iconButton" @click="visible = true" />
+    <Button v-tooltip.top="tooltip" :class="classButton" :outlined :severity :label="labelButton" :icon="iconButton" @click="visible = true" />
     <CustomModal v-model:visible="visible" width="30rem" :icon="iconModal" :titulo="titleModal">
         <template #body>
             <FileUpload :mode :accept :maxFileSize :multiple customUpload @uploader="uploadArchives">

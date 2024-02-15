@@ -192,7 +192,7 @@ const columnas = [
     { field: 'SAP_code', header: 'Código SAP', filter: true, sortable: true },
     { field: 'contract.end_date', header: 'Fecha Finalización', filter: true, sortable: true },
     {
-        field: 'status', header: 'Estado', filter: true, sortable: true, type: 'tag', filtertype: 'EQUALS',
+        field: 'status', header: 'Estado', filter: true, sortable: true, type: 'tag', filtertype: 'EQUALS', visible:false,
         severitys: [
             { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'primary', class: '' },
             { text: 'CONSTRUCCIÓN', severity: 'success', class: '' },

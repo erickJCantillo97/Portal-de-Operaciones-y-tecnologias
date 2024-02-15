@@ -93,6 +93,14 @@ const props = defineProps({
         type: String,
         default: null
     },
+    max:{
+        type:Number,
+        default:null
+    },
+    min:{
+        type:Number,
+        default:null
+    },
     //tipo dropdown y multiselect
     options: {
         type: Array,
@@ -172,7 +180,7 @@ const input = defineModel('input', {
         <span :class="!(label && !floatLabel) ? 'p-float-label' : ''">
             <FileUpload v-if="type == 'file'" mode="basic" :multiple :accept="acceptFile" :maxFileSize
                 @input="input = $event.target.files[0]" class="w-full h-8" customUpload />
-            <InputNumber v-else-if="type == 'number'" :id :disabled :placeholder :minFractionDigits :maxFractionDigits
+            <InputNumber v-else-if="type == 'number'" :max :min :id :disabled :placeholder :minFractionDigits :maxFractionDigits
                 class="w-full" :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'"
                 :required :useGrouping="mode == 'currency' ? '' : useGrouping" :currency="currency" :mode="mode" :suffix
                 :prefix />

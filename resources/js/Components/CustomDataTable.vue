@@ -179,7 +179,8 @@ const auxdata = ref()
                     </p>
                     <span class="space-x-1">
                         <slot name="buttonHeader" />
-                        <Button v-if="showAdd" v-tooltip="'Añadir registro'" @click="$emit('addClic', $event)" severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
+                        <Button v-if="showAdd" v-tooltip.left="'Añadir registro'" @click="$emit('addClic', $event)"
+                            severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
                     </span>
                 </span>
                 <div class="flex items-center " :class="filter ? 'justify-between' : 'justify-end'" v-if="showHeader">
@@ -200,9 +201,8 @@ const auxdata = ref()
                     </div>
                     <div class="space-x-2">
                         <Button v-if="exportRute != ''" @click="exportar" icon="fa-solid fa-file-excel" class="!w-8" />
-                        <MultiSelect  v-if="showColumns" v-model="columnasSelect" display="chip" :options="props.columnas"
-                            optionLabel="header" placeholder="Selecciona columnas a mostrar" class="w-min h-8"
-                            :pt="{
+                        <MultiSelect v-if="showColumns" v-model="columnasSelect" display="chip" :options="props.columnas"
+                            optionLabel="header" placeholder="Selecciona columnas a mostrar" class="w-min h-8" :pt="{
                                 root: '!border-0 !ring-0',
                                 trigger: '!hidden',
                                 labelContainer: '!p-0 ',
@@ -262,91 +262,90 @@ const auxdata = ref()
         <!-- #endregion -->
 
         <!-- #region Columnas -->
+        <span v-for="col, index  in columnasSelect">
+            <Column v-if="col.visible==null || col.visible==true" :field="col.field" :filterField="col.field" :class="col.class" :sortable="col.sortable"
+                :show-filter-match-modes="false" :filterMenuStyle="{ width: '16rem' }" :frozen="col.frozen" :pt="{
+                    headerContent: { class: '!h-8' },
+                    headerCell: { class: '!p-0.5' }
+                }
+                    ">
+                <template #header>
+                    <span class="text-sm text-primary uppercase font-bold">{{ col.header }}</span>
+                </template>
+                <template #filtericon>
+                    <i class="fa-solid fa-filter"></i>
+                </template>
+                <template #sorticon="{ sortOrder, sorted }">
+                    <i :class="sorted ? sortOrder == 1 ? 'fa-solid fa-arrow-up-1-9' : 'fa-solid fa-arrow-up-9-1' : 'fa-solid fa-sort'"
+                        class="text-gray-500 flex justify-center items-center ml-1 h-5 w-5"></i>
+                </template>
 
-        <Column v-for="col, index  in columnasSelect" :field="col.field" :filterField="col.field" :class="col.class"
-            :sortable="col.sortable" :show-filter-match-modes="false" :filterMenuStyle="{ width: '16rem' }"
-            :frozen="col.frozen" :pt="{
-                headerContent: { class: '!h-8' },
-                headerCell: { class: '!p-0.5' }
-            }
-                ">
-            <template #header>
-                <span class="text-sm text-primary uppercase font-bold">{{ col.header }}</span>
-            </template>
-            <template #filtericon>
-                <i class="fa-solid fa-filter"></i>
-            </template>
-            <template #sorticon="{ sortOrder, sorted }">
-                <i :class="sorted ? sortOrder == 1 ? 'fa-solid fa-arrow-up-1-9' : 'fa-solid fa-arrow-up-9-1' : 'fa-solid fa-sort'"
-                    class="text-gray-500 flex justify-center items-center ml-1 h-5 w-5"></i>
-            </template>
+                <template #filter="{ filterModel }" v-if="col.filter">
+                    <input v-if="col.type == 'date'" class="w-full rounded-md p-column-filter" type="date"
+                        v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
+                    <InputNumber v-else-if="col.type == 'number'" v-model="filterModel.value" class="p-column-filter"
+                        placeholder="Numero a buscar" />
+                    <Dropdown v-else-if="col.type == 'tag' || col.type == 'customtag'" v-model="filterModel.value"
+                        :options="col.severitys.map(option => option.text)" placeholder="Selecciona una opcion"
+                        class="p-column-filter w-full md:w-14rem" showClear />
+                    <InputText v-else v-model="filterModel.value" type="text" class="p-column-filter"
+                        placeholder="Escriba algo para buscar" />
+                </template>
 
-            <template #filter="{ filterModel }" v-if="col.filter">
-                <input v-if="col.type == 'date'" class="w-full rounded-md p-column-filter" type="date"
-                    v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
-                <InputNumber v-else-if="col.type == 'number'" v-model="filterModel.value" class="p-column-filter"
-                    placeholder="Numero a buscar" />
-                <Dropdown v-else-if="col.type == 'tag' || col.type == 'customtag'" v-model="filterModel.value"
-                    :options="col.severitys.map(option => option.text)" placeholder="Selecciona una opcion"
-                    class="p-column-filter w-full md:w-14rem" showClear />
-                <InputText v-else v-model="filterModel.value" type="text" class="p-column-filter"
-                    placeholder="Escriba algo para buscar" />
-            </template>
-
-            <template #body="{ data }" v-if="col.field.indexOf('.') == -1">
-                <p v-if="col.type == 'date'" class="text-left">
-                    {{ formatDate(data[col.field]) }}
-                </p>
-                <p v-else-if="col.type == 'currency'" class="text-right">
-                    {{ formatCurrency(data[col.field], !Array.isArray(data[col.field]) ? 'COP'
-                        : data[col.field][1]) }}
-                </p>
-                <p v-else-if="col.type == 'customtag'"
-                    :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
-                    class="text-center rounded-lg px-2 py-1">
-                    {{ data[col.field] }}
-                </p>
-                <Tag v-else-if="col.type == 'tag'" class="w-full truncate" :title="data[col.field]"
-                    :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
-                    :severity="col.severitys.find((severity) => severity.text == data[col.field]).severity"
-                    :value="data[col.field]" />
-                <span v-else-if="col.type == 'object'" class="flex items-center space-x-2 w-full">
-                    <img v-if="col.objectRows.photo" :src="data[col.objectRows.photo.field]" alt="Image"
-                        onerror="this.src='/svg/cotecmar-logo.svg'"
-                        class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16 object-cover" draggable="false" />
-                    <div>
-                        <p class="font-bold text-sm" v-if="col.objectRows.primary">{{
-                            col.objectRows.primary.subfield ?
-                            data[col.objectRows.primary.field][col.objectRows.primary.subfield] :
-                            data[col.objectRows.primary.field]
-                        }} </p>
-                        <p class="text-xs italic" v-if="col.objectRows.secundary">{{
-                            col.objectRows.secundary.subfield ?
-                            data[col.objectRows.secundary.field][col.objectRows.secundary.subfield] :
-                            data[col.objectRows.secundary.field]
-                        }} </p>
-                    </div>
-                </span>
-                <span v-else-if="col.type == 'button'" class="w-full">
-                    <Button :label="String(data[col.field])" class="w-full" :class="col.rowClass" :icon="col.icon"
-                        :outlined="col.outlined" :text="col.text" :severity="col.severity" :rounded="col.rounded"
-                        @click="$emit(col.event, $event, data)">
-                    </Button>
-                </span>
-                <span v-else-if="col.type == 'array'" class="w-full flex space-x-1">
-                    <p v-for="item, index in data[col.field]"
-                        :class="col.itemsClass.find((itemClass) => itemClass.text == item)?.class ?? col.itemClass">
-                        {{ item }}
+                <template #body="{ data }" v-if="col.field.indexOf('.') == -1">
+                    <p v-if="col.type == 'date'" class="text-left">
+                        {{ formatDate(data[col.field]) }}
                     </p>
-                </span>
-                <p v-else class="">
-                    {{
-                        data[col.field]
-                    }}
-                </p>
-            </template>
-        </Column>
-
+                    <p v-else-if="col.type == 'currency'" class="text-right">
+                        {{ formatCurrency(data[col.field], !Array.isArray(data[col.field]) ? 'COP'
+                            : data[col.field][1]) }}
+                    </p>
+                    <p v-else-if="col.type == 'customtag'"
+                        :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
+                        class="text-center rounded-lg px-2 py-1">
+                        {{ data[col.field] }}
+                    </p>
+                    <Tag v-else-if="col.type == 'tag'" class="w-full truncate" :title="data[col.field]"
+                        :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
+                        :severity="col.severitys.find((severity) => severity.text == data[col.field]).severity"
+                        :value="data[col.field]" />
+                    <span v-else-if="col.type == 'object'" class="flex items-center space-x-2 w-full">
+                        <img v-if="col.objectRows.photo" :src="data[col.objectRows.photo.field]" alt="Image"
+                            onerror="this.src='/svg/cotecmar-logo.svg'"
+                            class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16 object-cover" draggable="false" />
+                        <div>
+                            <p class="font-bold text-sm" v-if="col.objectRows.primary">{{
+                                col.objectRows.primary.subfield ?
+                                data[col.objectRows.primary.field][col.objectRows.primary.subfield] :
+                                data[col.objectRows.primary.field]
+                            }} </p>
+                            <p class="text-xs italic" v-if="col.objectRows.secundary">{{
+                                col.objectRows.secundary.subfield ?
+                                data[col.objectRows.secundary.field][col.objectRows.secundary.subfield] :
+                                data[col.objectRows.secundary.field]
+                            }} </p>
+                        </div>
+                    </span>
+                    <span v-else-if="col.type == 'button'" class="w-full">
+                        <Button :label="String(data[col.field])" class="w-full" :class="col.rowClass" :icon="col.icon"
+                            :outlined="col.outlined" :text="col.text" :severity="col.severity" :rounded="col.rounded"
+                            @click="$emit(col.event, $event, data)">
+                        </Button>
+                    </span>
+                    <span v-else-if="col.type == 'array'" class="w-full flex space-x-1">
+                        <p v-for="item, index in data[col.field]"
+                            :class="col.itemsClass.find((itemClass) => itemClass.text == item)?.class ?? col.itemClass">
+                            {{ item }}
+                        </p>
+                    </span>
+                    <p v-else class="">
+                        {{
+                            data[col.field]
+                        }}
+                    </p>
+                </template>
+            </Column>
+        </span>
         <Column frozen alignFrozen=" right" class="w-[8%]" v-if="props.actions.length > 0">
             <template #body="{ data }">
                 <div class="flex items-center justify-center w-full">
