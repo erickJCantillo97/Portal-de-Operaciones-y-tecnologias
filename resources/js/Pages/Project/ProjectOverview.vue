@@ -2,12 +2,7 @@
 import { ref, onMounted } from 'vue'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import ColumnGroup from 'primevue/columngroup'
-import Row from 'primevue/row'
 import Moment from 'moment'
-import Footer from '@/Components/Footer.vue'
 import MiniCardInfo from '@/Components/MiniCardInfo.vue'
 import Bar from '@/Pages/Dashboards/Projects/Bar.vue'
 import S_Curve from '@/Pages/Dashboards/Projects/S_Curve.vue'
@@ -229,13 +224,13 @@ td {
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Tipo de Buque:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.type != null ? ship.type_ship.type : 'SIN DEFINIR'}}
+                            {{ ship.idHull }} {{ ship.type_ship.type != null ? ship.type_ship.type : 'SIN DEFINIR' }}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Empresa Diseñadora:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.disinger != null ? ship.type_ship.disinger  : 'SIN DEFINIR'}}
+                            {{ ship.type_ship.disinger != null ? ship.type_ship.disinger : 'SIN DEFINIR' }}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
@@ -265,7 +260,7 @@ td {
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">GT:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.GT != null ? ship.type_ship.GT : 'SIN DEFINIR'}}
+                            {{ ship.type_ship.GT != null ? ship.type_ship.GT : 'SIN DEFINIR' }}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
@@ -276,7 +271,7 @@ td {
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Eslora:</dt>
-                          <dd class="text-gray-500 uppercase">  
+                          <dd class="text-gray-500 uppercase">
                             {{ ship.type_ship.length != null ? ship.type_ship.length : 'SIN DEFINIR' }}
                           </dd>
                         </div>

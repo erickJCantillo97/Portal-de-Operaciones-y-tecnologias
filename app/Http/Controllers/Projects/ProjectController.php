@@ -119,7 +119,7 @@ class ProjectController extends Controller
             return Inertia::render(
                 'Project/ProjectOverview',
                 [
-                    'project' => Project::with('projectShip', 'contract')->findOrFail($project->id),
+                    'project' => Project::with('projectShip', 'contract', 'milestone')->findOrFail($project->id),
                     'ships' => $ships
                 ]
             );
