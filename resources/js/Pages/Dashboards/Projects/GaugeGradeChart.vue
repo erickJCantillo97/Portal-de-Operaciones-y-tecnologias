@@ -14,6 +14,8 @@ const props = defineProps({
     type: Array,
     default: null
   },
+  title: String,
+  value: Number,
   legend: {
     type: Array,
     default: null
@@ -88,8 +90,8 @@ const option = ref({
       },
       data: [
         {
-          value: 0.8,
-          name: 'CPI'
+          value: props.value,
+          name: props.title
         }
       ]
     }

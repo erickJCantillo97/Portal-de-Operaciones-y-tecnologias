@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::create('progress_project_weeks', function (Blueprint $table) {
             $table->id();
-            
+            $table->bigInteger('project_id')->index()->unsigned();
+            $table->string('week');
+            $table->date('date')->nullable();
+            $table->double('planned_progress');
+            $table->double('real_progress')->nullable();
+            $table->double('CPI')->nullable();
+            $table->double('SPI')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

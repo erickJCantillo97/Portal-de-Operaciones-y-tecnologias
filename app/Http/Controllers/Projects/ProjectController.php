@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
+use App\Models\Project\ProgressProjectWeek;
 use App\Models\Projects\Authorization;
 use App\Models\Projects\Contract;
 use App\Models\Projects\Milestone;

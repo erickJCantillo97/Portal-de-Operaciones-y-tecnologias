@@ -1,6 +1,6 @@
 <?php
 
-
+use App\Http\Controllers\ProgressProjectWeekController;
 use App\Http\Controllers\Projects\AuthorizationController;
 use App\Http\Controllers\Projects\Budget\BudgetController;
 use App\Http\Controllers\Projects\ContractController;
@@ -37,6 +37,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     //CRUD Projects
     Route::resource('projects', ProjectController::class);
+    Route::resource('ProgressProjectWeek', ProgressProjectWeekController::class);
     Route::get('project-overview/{project}', [ProjectController::class, 'goToProjectOverview'])->name('projects.goToProjectOverview');
 
     Route::post('projects/addShips/{project}', [ProjectController::class, 'addShips'])->name('project.add.ships');

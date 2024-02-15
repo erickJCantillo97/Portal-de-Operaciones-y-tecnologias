@@ -38,6 +38,11 @@ class Project extends Model implements Auditable
         return $this->hasMany(ProjectsShip::class);
     }
 
+    public function milestone()
+    {
+        return $this->hasMany(Milestone::class);
+    }
+
     // public function status(): Attribute
     // {
     //     return Attribute::make(

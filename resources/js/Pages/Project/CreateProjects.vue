@@ -21,11 +21,6 @@ import Toast from 'primevue/toast';
 import { useToast } from "primevue/usetoast";
 const toast = useToast();
 
-
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-})
-
 const props = defineProps({
     project: Object,
     contracts: Array,
@@ -68,7 +63,7 @@ const searchShips = () => {
     )
 }
 
-//#regio CustomDataTable
+//#region CustomDataTable
 const columnas = [
     { field: 'title', header: 'Nombre', sortable: true, filter: true, },
     { field: 'value', header: 'Valor', filter: true, sortable: true, type: 'currency', class: 'w-64' },
@@ -230,6 +225,7 @@ const formMilestone = useForm({
 
 const save = () => {
     formMilestone.project_id = projectIdRef.value;
+
     formMilestone.post(route('milestones.store'), {
         onSuccess: () => {
             toast.add({ summary: 'Hito Guardado', life: 2000 });
@@ -259,39 +255,53 @@ function formatDateTime24h(date) {
     return new Date(date).toLocaleString('es-CO',
         { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 }
-</script>
-<style scoped>
-.form-wizard {
-    padding-left: 20%;
+
+const modalProgress = ref(false)
+const avance = useForm({
+    project_id: props.project.id,
+    week: null,
+    real_progress: null,
+    CPI: null,
+    SPI: null
+})
+const guardarAvance = () => {
+    avance.post(route('ProgressProjectWeek.store'), {
+        onSuccess: () => {
+            toast.add({ summary: 'Avance Guardado', life: 2000 });
+        },
+        onError: () => {
+
+        }
+    })
 }
-</style>
+
+</script>
 <template>
     <AppLayout>
-
-        <Head title="Agregar Proyecto" />
-        <main class="px-8 min-h-full overflow-y-scroll custom-scroll">
-            <header class="w-full">
-                <h2 class="text-lg font-semibold mb-4 text-primary text-center lg:text-2xl">
-                    Agregar Proyecto
+        <main class="px-2 overflow-y-scroll">
+            <header class="w-full flex justify-between">
+                <h2 class="text-lg font-semibold mb-4 w-full text-primary lg:text-2xl">
+                    {{ project ? 'Editar proyecto' : 'Nuevo proyecto' }}
                 </h2>
+                <div v-if="props.project" class="space-x-4 justify-end flex w-full">
+                    <Button icon="fa-solid fa-list-check" severity="secondary" v-tooltip.top="'Avance del proyecto'"
+                        @click="modalProgress = true" />
+                    <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" :multiple="true"
+                        icon-button="fa-solid fa-chart-bar" tooltip="Subir Estructura" accept=".xlsx,.xls" url="prueba" />
+
+                    <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Presupuesto del proyecto"
+                        icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
+                        url="prueba" severity="success" />
+
+                    <CustomUpload mode="advanced" :multiple="true" titleModal="Subir el avance planeado del proyecto"
+                        tooltip="Subir Curva S" accept=".xlsx,.xls" url="prueba" severity="info" />
+
+                    <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Costos ejecutados por el proyecto"
+                        icon-button="fa-solid fa-money-bill-trend-up" tooltip="Subir Costos Ejecutados" accept=".xlsx,.xls"
+                        url="prueba" severity="danger" />
+                </div>
             </header>
-            <div v-if="props.project" class="space-x-4 justify-end flex w-full my-4">
-
-                <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" :multiple="true"
-                    icon-button="fa-solid fa-chart-bar" labelButton="Subir Estructura" accept=".xlsx,.xls" url="prueba" />
-
-                <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Presupuesto del proyecto"
-                    icon-button="fa-solid fa-hand-holding-dollar" labelButton="Subir Presupuesto" accept=".xlsx,.xls"
-                    url="prueba" severity="success" />
-
-                <CustomUpload mode="advanced" :multiple="true" titleModal="Subir el avance planeado del proyecto"
-                    labelButton="Subir Curva S" accept=".xlsx,.xls" url="prueba" severity="info" />
-
-                <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Costos ejecutados por el proyecto"
-                    icon-button="fa-solid fa-money-bill-trend-up" labelButton="Subir Costos Ejecutados" accept=".xlsx,.xls"
-                    url="prueba" severity="danger" />
-            </div>
-            <section class="grid grid-cols-1 p-2">
+            <section class="p-2">
                 <!-- AQUÍ VA EL CONTENIDO DEL FORMULARIO-->
                 <form-wizard @on-complete="submit()" stepSize="md" color="#2E3092" nextButtonText="Siguiente"
                     backButtonText="Regresar" finishButtonText="Guardar">
@@ -300,74 +310,42 @@ function formatDateTime24h(date) {
                         :before-change="beforeChange">
                         <section class="border gap-4 border-gray-200 rounded-lg p-4 grid grid-cols-2">
                             <!--CAMPO NOMBRE DEL PROYECTO (name)-->
-                            <TextInput type="text" label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
-                                v-model="formData.name" :error="$page.props.errors.name">
-                            </TextInput>
-
+                            <CustomInput label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
+                                v-model:input="formData.name" :errorMessage="$page.props.errors.name"
+                                :invalid="$page.props.errors.name ? true : false" />
                             <!--CAMPO CÓDIGO DE SAP (SAP_code)-->
-                            <TextInput type="text" label="Código SAP" placeholder="Escriba el código de SAP"
-                                v-model="formData.SAP_code" :error="$page.props.errors.SAP_code">
-                            </TextInput>
-
+                            <CustomInput label="Código SAP" placeholder="Escriba el código de SAP"
+                                v-model:input="formData.SAP_code" :errorMessage="$page.props.errors.SAP_code"
+                                :invalid="$page.props.errors.SAP_code ? true : false" />
                             <!--CAMPO ALCANCE DEL PROYECTO (scope)-->
-                            <div>
-                                <label class="text-sm font-medium">Alcance del Proyecto</label>
-                                <Dropdown class="h-10" :options="scopeOptions" v-model="scopeSelect" showClear
-                                    optionLabel="name" placeholder="Seleccione Alcance del Proyecto" :pt="{
-                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
-                                        input: '!text-sm',
-                                        filterInput: '!text-gray-300',
-                                        item: ({ context }) => ({
-                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
-                                        })
-                                    }">
-                                </Dropdown>
-                            </div>
+                            <CustomInput label="Alcance del Proyecto" type="dropdown"
+                                placeholder="Seleccione Alcance del Proyecto" optionLabel="name" v-model:input="scopeSelect"
+                                showClear :options="scopeOptions" :errorMessage="$page.props.errors.scope"
+                                :invalid="$page.props.errors.scope ? true : false" />
+                            <CustomInput label="Contrato" type="dropdown" placeholder="Seleccione Alcance del Proyecto"
+                                optionLabel="contract_id" v-model:input="contractSelect" showClear :options="contracts"
+                                :errorMessage="$page.props.errors.contract_id"
+                                :invalid="$page.props.errors.contract_id ? true : false" />
+                            <CustomInput label="Autorizaciones" type="dropdown" placeholder="Seleccione Autorización"
+                                optionLabel="name" v-model:input="authorizationSelect" showClear :options="authorizations"
+                                :errorMessage="$page.props.errors.authorization_id"
+                                :invalid="$page.props.errors.authorization_id ? true : false" />
+                            <CustomInput label="Estimaciones" type="dropdown" placeholder="Seleccione Estimación"
+                                optionLabel="name" v-model:input="quoteSelect" showClear :options="quotes"
+                                :errorMessage="$page.props.errors.quote_id"
+                                :invalid="$page.props.errors.quote_id ? true : false" />
 
-                            <!--CAMPO CONTRATO (contract)-->
-                            <div>
-                                <label class="text-sm font-medium">Contrato</label>
-                                <Dropdown class="h-10" :options="contracts" v-model="contractSelect" showClear
-                                    optionLabel="contract_id" placeholder="Seleccione Contrato" :pt="{
-                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
-                                        input: '!text-sm',
-                                        filterInput: '!text-gray-300',
-                                        item: ({ context }) => ({
-                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
-                                        })
-                                    }">
-                                </Dropdown>
-                            </div>
-
-                            <!--CAMPO AUTORIZACIONES (authorization)-->
-                            <div>
-                                <label class="text-sm font-medium">Autorizaciones</label>
-                                <Dropdown class="h-10" :options="authorizations" v-model="authorizationSelect" showClear
-                                    optionLabel="name" placeholder="Seleccione Autorización" :pt="{
-                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
-                                        input: '!text-sm',
-                                        filterInput: '!text-gray-300',
-                                        item: ({ context }) => ({
-                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
-                                        })
-                                    }">
-                                </Dropdown>
-                            </div>
-
-                            <!--CAMPO ESTIMACIÓN (quote)-->
-                            <div>
-                                <label class="text-sm font-medium">Estimaciones</label>
-                                <Dropdown class="h-10" :options="quotes" v-model="quoteSelect" showClear optionLabel="name"
-                                    placeholder="Seleccione Estimación" :pt="{
-                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
-                                        input: '!text-sm',
-                                        filterInput: '!text-gray-300',
-                                        item: ({ context }) => ({
-                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
-                                        })
-                                    }">
-                                </Dropdown>
-                            </div>
+                            <label class="text-sm font-medium">Estimaciones</label>
+                            <Dropdown class="h-10" :options="quotes" v-model="quoteSelect" showClear optionLabel="name"
+                                placeholder="Seleccione Estimación" :pt="{
+                                    root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
+                                    input: '!text-sm',
+                                    filterInput: '!text-gray-300',
+                                    item: ({ context }) => ({
+                                        class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
+                                    })
+                                }">
+                            </Dropdown>
                         </section>
                     </tab-content>
 
@@ -376,12 +354,23 @@ function formatDateTime24h(date) {
                         :before-change="beforeChange">
                         <section class="grid grid-cols-2 border gap-4 border-gray-200 rounded-lg p-4">
                             <!--CAMPO SUPERVISOR (supervisor)-->
-                            <TextInput label="Supervisor" type="text" :placeholder="'Nombre del supervisor'"
+                            <CustomInput label="Supervisor" placeholder="Nombre del supervisor"
+                                v-model:input="formData.supervisor" :errorMessage="router.page.props.errors.supervisor"
+                                :invalid="router.page.props.errors.supervisor ? true : false" />
+
+                            <!-- <TextInput label="Supervisor" type="text" :placeholder="'Nombre del supervisor'"
                                 v-model="formData.supervisor" :error="router.page.props.errors.supervisor">
-                            </TextInput>
+                            </TextInput> -->
+
 
                             <!--CAMPO TIPO DE PROYECTO (type)-->
-                            <div>
+
+                            <CustomInput label="Tipo de Proyecto" type="dropdown"
+                                placeholder="Seleccione Alcance del Proyecto" optionLabel="name" v-model:input="typeSelect"
+                                showClear :options="typeOptions" :errorMessage="$page.props.errors.type"
+                                :invalid="$page.props.errors.type ? true : false" />
+
+                            <!-- <div>
                                 <p class="text-sm font-medium mb-0.5">Tipo de Proyecto</p>
                                 <Dropdown class="h-10" :options="typeOptions" v-model="typeSelect" showClear
                                     optionLabel="name" placeholder="Seleccione Tipo de Proyecto" :pt="{
@@ -393,10 +382,16 @@ function formatDateTime24h(date) {
                                         })
                                     }">
                                 </Dropdown>
-                            </div>
+                            </div> -->
 
-                            <!--CAMPO ESTADO DEL PROYECTO (state)-->
-                            <div>
+                            <!--CAMPO ESTADO DEL PROYECTO (status)-->
+                            <CustomInput label="Estado del Proyecto" type="dropdown"
+                                placeholder="Seleccione Alcance del Proyecto" optionLabel="name"
+                                v-model:input="statusSelect" showClear :options="statusOptions"
+                                :errorMessage="$page.props.errors.status"
+                                :invalid="$page.props.errors.status ? true : false" />
+
+                            <!-- <div>
                                 <label class="text-sm font-medium">Estado del Proyecto</label>
                                 <Dropdown class="h-10" :options="statusOptions" v-model="statusSelect" showClear
                                     optionLabel="name" placeholder="Seleccione Estado del Proyecto" :pt="{
@@ -408,22 +403,30 @@ function formatDateTime24h(date) {
                                         })
                                     }">
                                 </Dropdown>
-                            </div>
+                            </div> -->
 
                             <!--CAMPO COSTO DE VENTA (cost_sale)-->
-                            <TextInput label="Valor Venta" type="number" :placeholder="'Escriba el valor de venta'"
+                            <CustomInput label="Valor Venta" :disabled="true" type="number" mode="currency"
+                                :currency="formData.cost_sale[1]" v-model:input="formData.cost_sale[0]"
+                                :errorMessage="router.page.props.errors.supervisor"
+                                :invalid="router.page.props.errors.supervisor ? true : false" />
+                            <!-- <TextInput label="Valor Venta" type="number" :placeholder="'Escriba el valor de venta'"
                                 v-model="formData.cost_sale" :error="router.page.props.errors.cost_sale">
-                            </TextInput>
+                            </TextInput> -->
 
                             <!--CAMPO DESCRIPCIÓN (description)-->
-                            <div class="col-span-2">
+                            <CustomInput type="textarea" v-model:input="formData.observations" class="col-span-2"
+                                label="Descripción" :rowsTextarea="1" placeholder="Descripción del proyecto..."
+                                :errorMessage="router.page.props.errors.observations"
+                                :invalid="router.page.props.errors.observations ? true : false" />
+                            <!-- <div class="col-span-2">
                                 <label class="text-sm font-bold text-gray-900">Descripción</label>
                                 <Textarea class="text-sm text-gray-500 placeholder:text-sm italic"
                                     placeholder="Descripción del proyecto..." v-model="formData.observations" rows="1"
                                     cols="143" autoResize :pt="{
                                         root: '!w-full'
                                     }" />
-                            </div>
+                            </div> -->
                         </section>
                     </tab-content>
 
@@ -431,43 +434,40 @@ function formatDateTime24h(date) {
                     <tab-content title="Planeación del Proyecto" icon="fa-solid fa-calendar-check"
                         :before-change="beforeChange">
                         <section class="flex border gap-6 border-gray-200 rounded-lg p-4">
-                            <div class="grid grid-cols-6 gap-6 w-full">
-                                <div class="col-span-3 space-y-4">
+                            <div class="grid grid-cols-2 gap-6 w-full">
+                                <div class="space-y-4">
                                     <!--CAMPO FECHA INICIO-->
-                                    <TextInput class="text-left" type="date" label="Fecha De Inicio"
-                                        v-model="formData.start_date" :error="$page.props.errors.start_date"
-                                        :disabled="!contractSelect">
-                                    </TextInput>
-
+                                    <CustomInput type="date" label="Fecha De Inicio" v-model:input="formData.start_date"
+                                        :errorMessage="$page.props.errors.start_date" :disabled="!contractSelect"
+                                        :invalid="router.page.props.errors.start_date ? true : false" />
                                     <!--CAMPO FECHA FINALIZACIÓN-->
-                                    <TextInput class="text-left" type="date" label="Fecha de Finalización"
-                                        v-model="formData.end_date" :error="$page.props.errors.end_date"
-                                        :disabled="!contractSelect">
-                                    </TextInput>
+                                    <CustomInput type="date" label="Fecha de Finalización" v-model:input="formData.end_date"
+                                        :errorMessage="$page.props.errors.end_date" :disabled="!contractSelect"
+                                        :invalid="router.page.props.errors.end_date ? true : false" />
 
-                                    <div class="flex col-span-3 gap-6">
+                                    <div class="gap-6 grid grid-cols-3">
                                         <!--CAMPO HORAS POR DÍA (hoursPerDay)-->
-                                        <TextInput class="text-left" label="Horas por Dia"
-                                            :placeholder="'Escriba Número de Horas por Dia'" v-model="formData.hoursPerDay"
-                                            :error="router.page.props.errors.hoursPerDay">
-                                        </TextInput>
+                                        <CustomInput label="Horas por Dia" :placeholder="'Escriba Número de Horas por Dia'"
+                                            v-model:input="formData.hoursPerDay"
+                                            :invalid="router.page.props.errors.hoursPerDay ? true : false"
+                                            :errorMessage="router.page.props.errors.hoursPerDay" />
 
                                         <!--CAMPO DIAS POR SEMANA (daysPerWeek)-->
-                                        <TextInput class="text-left" label="Dias por Semana"
-                                            :placeholder="'Escriba Numero de Horas por Dia'" v-model="formData.daysPerWeek"
-                                            :error="router.page.props.errors.daysPerWeek">
-                                        </TextInput>
+                                        <CustomInput label="Dias por Semana"
+                                            :placeholder="'Escriba Numero de Horas por Dia'"
+                                            v-model:input="formData.daysPerWeek"
+                                            :invalid="router.page.props.errors.daysPerWeek ? true : false"
+                                            :errorMessage="router.page.props.errors.daysPerWeek" />
 
                                         <!--CAMPO DIAS POR MES (daysPerMonth)-->
-                                        <TextInput class="text-left" label="Dias por Mes"
-                                            :placeholder="'Escriba Número de Horas por Dia'" v-model="formData.daysPerMonth"
-                                            :error="router.page.props.errors.daysPerMonth">
-                                        </TextInput>
+                                        <CustomInput label="Dias por Mes" :placeholder="'Escriba Número de Horas por Dia'"
+                                            v-model:input="formData.daysPerMonth"
+                                            :invalid="router.page.props.errors.daysPerMonth ? true : false"
+                                            :errorMessage="router.page.props.errors.daysPerMonth" />
                                     </div>
                                 </div>
-
                                 <!--CAMPO TURNO (shift)-->
-                                <div class="col-span-3">
+                                <div class="">
                                     <label class="text-sm font-bold text-gray-900">Seleccione el Turno</label>
                                     <div
                                         class="w-full h-52 overflow-y-auto custom-scroll border-2 border-gray-300 rounded-lg p-2 focus hover:border-blue-500">
@@ -549,58 +549,69 @@ function formatDateTime24h(date) {
                     <tab-content title="Hitos" icon="fa-solid fa-list-check">
                         <div class="w-full overflow-y-auto">
                             <CustomDataTable :rowsDefault="5" :data="milestones" :columnas="columnas" :actions="actions"
-                                @edit="showModal" :filter="false" :showHeader="false">
-                                <template #buttonHeader>
-                                    <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal()" />
-                                </template>
-                            </CustomDataTable>
+                                @edit="showModal" :filter="false" :showHeader="false" showAdd="true"
+                                @addClic="showModal()" />
                         </div>
                     </tab-content>
                 </form-wizard>
             </section>
         </main>
-        <CustomModal v-model:visible="openDialog" width="30rem" :closable="false">
-            <template #icon>
-                <i class="fa-solid text-white fa-list-check"></i>
-            </template>
-            <template #titulo>
-                <span class="text-lg font-bold text-white">
-                    Agregar Hito
-                </span>
-            </template>
-            <template #body>
-                <section class="relative space-y-6 p-2">
-                    <CustomInput label="Título del Hito" id="category" type="text" v-model:input="formMilestone.title"
-                        placeholder="Escriba título del hito" />
-                    <CustomInput label="Fecha de Hito" id="category" type="date" v-model:input="formMilestone.end_date"
-                        placeholder="Escriba fecha de hito" />
-                    <CustomInput label="Valor del Hito" id="value" type="number" mode="currency"
-                        v-model:input="formMilestone.value" placeholder="Escriba el valor del hito" />
-                    <CustomInput label="Seleccione tipo de Hito" id="category" type="dropdown"
-                        v-model:input="formMilestone.type" placeholder="Escriba el tipo de hito"
-                        :options="['Pago Anticipado', 'Avance Obra']" />
-
-                    <div class="flex space-x-4 items-center">
-                        <label for="" class="mb-0.5 font-bold">Avance del HITO: </label>
-                        <ToggleButton v-model="formMilestone.invoiced" onLabel="100%" offLabel="0%" :pt="{
-                            root: ({ props }) => ({
-                                class:
-                                    [
-                                        '!p-1 !text-sm',
-                                        props.modelValue ? '!bg-teal-700 !text-white' : '!bg-danger !text-white'
-                                    ]
-                            })
-                        }" />
-                    </div>
-                </section>
-            </template>
-            <template #footer>
-                <Button severity="success" outlined label="Guardar" icon="fa-solid fa-floppy-disk" @click="save()" />
-                <Button severity="danger" outlined label="Cancelar" icon="fa-regular fa-circle-xmark"
-                    @click="openDialog = false" />
-            </template>
-        </CustomModal>
     </AppLayout>
+    <CustomModal v-model:visible="openDialog" width="30rem" :closable="false">
+        <template #icon>
+            <i class="fa-solid text-white fa-list-check"></i>
+        </template>
+        <template #titulo>
+            <span class="text-lg font-bold text-white">
+                Agregar Hito
+            </span>
+        </template>
+        <template #body>
+            <section class="relative space-y-6 p-2">
+                <CustomInput label="Título del Hito" id="category" type="text" v-model:input="formMilestone.title"
+                    placeholder="Escriba título del hito" />
+                <CustomInput label="Fecha de Hito" id="category" type="date" v-model:input="formMilestone.end_date"
+                    placeholder="Escriba fecha de hito" />
+                <CustomInput label="Valor del Hito" id="value" type="number" mode="currency"
+                    v-model:input="formMilestone.value" placeholder="Escriba el valor del hito" />
+                <CustomInput label="Seleccione tipo de Hito" id="category" type="dropdown"
+                    v-model:input="formMilestone.type" placeholder="Escriba el tipo de hito"
+                    :options="['Pago Anticipado', 'Avance Obra']" />
+
+                <div class="flex space-x-4 items-center">
+                    <label for="" class="mb-0.5 font-bold">Avance del HITO: </label>
+                    <ToggleButton v-model="formMilestone.invoiced" onLabel="100%" offLabel="0%" :pt="{
+                        root: ({ props }) => ({
+                            class:
+                                [
+                                    '!p-1 !text-sm',
+                                    props.modelValue ? '!bg-teal-700 !text-white' : '!bg-danger !text-white'
+                                ]
+                        })
+                    }" />
+                </div>
+            </section>
+        </template>
+        <template #footer>
+            <Button severity="success" outlined label="Guardar" icon="fa-solid fa-floppy-disk" @click="save()" />
+            <Button severity="danger" outlined label="Cancelar" icon="fa-regular fa-circle-xmark"
+                @click="openDialog = false" />
+        </template>
+    </CustomModal>
+    <CustomModal v-model:visible="modalProgress" titulo="Avance del proyecto" width="30vw" icon="fa-solid fa-list-check">
+        <template #body>
+            <CustomInput label="Semana" type="week" v-model:input="avance.week" />
+            {{ avance.semana }}
+            <CustomInput label="Porcentaje de avance" v-model:input="avance.real_progress" maxFractionDigits="2"
+                type="number" :max="100" :min="0" suffix="%" />
+            <CustomInput label="CPI" v-model:input="avance.CPI" />
+            <CustomInput label="SPI" v-model:input="avance.SPI" />
+        </template>
+        <template #footer>
+            <Button label="Guardar" severity="success" :loading="avance.processing" @click="guardarAvance()" />
+            <Button label="Cerrar" severity="danger" :disabled="!avance.processing" @click="modalProgress = false" />
+        </template>
+    </CustomModal>
     <Toast position="bottom-center" :pt="{
         root: '!h-10 !w-64',
         container: {

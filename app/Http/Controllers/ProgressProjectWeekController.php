@@ -30,13 +30,21 @@ class ProgressProjectWeekController extends Controller
     public function store(Request $request)
     {
         $validateData = $request->validate([
-            //
+            'project_id' => 'required',
+            'week' => 'required',
+            'real_progress' => 'required',
+            'CPI' => 'required',
+            'SPI' => 'required',
         ]);
 
-        try{
-            ProgressProjectWeek::create($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+        try {
+            $year = explode('-', $validateData['week'])[0];
+            $week_number = str_replace('W', '', explode('-', $validateData['week'])[1]);
+            $validateData['week'] = substr($year, -2) . $week_number;
+
+            ProgressProjectWeek::where('week', $validateData['week'])->update($validateData);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
     }
 
@@ -65,10 +73,10 @@ class ProgressProjectWeekController extends Controller
             //
         ]);
 
-        try{
+        try {
             $progressProjectWeek->update($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -77,10 +85,10 @@ class ProgressProjectWeekController extends Controller
      */
     public function destroy(ProgressProjectWeek $progressProjectWeek)
     {
-        try{
+        try {
             $progressProjectWeek->delete();
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }

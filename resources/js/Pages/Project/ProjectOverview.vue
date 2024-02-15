@@ -2,12 +2,7 @@
 import { ref, onMounted } from 'vue'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import ColumnGroup from 'primevue/columngroup'
-import Row from 'primevue/row'
 import Moment from 'moment'
-import Footer from '@/Components/Footer.vue'
 import MiniCardInfo from '@/Components/MiniCardInfo.vue'
 import DescriptionItem from '@/Components/DescriptionItem.vue'
 import Bar from '@/Pages/Dashboards/Projects/Bar.vue'
@@ -19,7 +14,8 @@ import html2canvas from 'html2canvas'
 
 const props = defineProps({
   project: Object,
-  ships: Array
+  ships: Array,
+  semana: Object
 })
 
 const showLineChart = ref(0)
@@ -324,7 +320,7 @@ td {
 
               <!-- Tercera fila -->
               <div class="border text-center border-gray-800 bg-gray-100">SEMANA: </div>
-              <div class="border text-center border-gray-800"> WK - 2410</div>
+              <div class="border text-center border-gray-800"> {{ semana.week }}</div>
               <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE FIN </div>
               <div class="border text-center border-gray-800">{{ Moment(project.contract.end_date).format('DD/MM/YYYY')
               }}</div>
@@ -373,10 +369,10 @@ td {
               <div class="flex justify-center items-center p-1 mb-1 bg-blue-800 text-white">
                 <h2 class="font-semibold">GESTIÓN DEL CRONOGRAMA</h2>
               </div>
-              <Bar :key="showLineChart" />
+              <Bar :key="showLineChart" :planeado='semana.planned_progress' :real="semana.real_progress" />
               <div class="flex justify-center w-full">
-                <GaugeGradeChart :key="showLineChart" />
-                <S_Curve :title="Horarios" :key="showLineChart" />
+                <GaugeGradeChart :key="showLineChart" title="SPI" :value="semana.SPI" />
+                <S_Curve :title="'Horarios'" :key="showLineChart" />
               </div>
             </div>
 
@@ -393,7 +389,7 @@ td {
                   <MiniCardInfo title="Presupuesto" :value="191520456373" :valueProgressBar="10" />
                   <MiniCardInfo title="Presupuesto" :value="191520456373" :valueProgressBar="90" />
                 </div>
-                <GaugeGradeChart :key="showLineChart" />
+                <GaugeGradeChart :key="showLineChart" title="CPI" :value="semana.CPI" />
               </div>
               <div>
                 <table>
