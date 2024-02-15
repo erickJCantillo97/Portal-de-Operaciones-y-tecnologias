@@ -54,7 +54,7 @@ const props = defineProps({
     },
     maxFileSize: {
         type: Number,
-        default: 1000000
+        default: 1000000000
     },
     multiple: {
         type: Boolean,
@@ -64,9 +64,9 @@ const props = defineProps({
         type: String,
         default: null
     },
-    tooltip:{
-        type:String,
-        default:null
+    tooltip: {
+        type: String,
+        default: null
     }
 });
 const visible = ref(false)
@@ -114,7 +114,8 @@ const uploadArchives = (event) => {
 }
 </script>
 <template>
-    <Button v-tooltip.top="tooltip" :class="classButton" :outlined :severity :label="labelButton" :icon="iconButton" @click="visible = true" />
+    <Button v-tooltip.top="tooltip" :class="classButton" :outlined :severity :label="labelButton" :icon="iconButton"
+        @click="visible = true" />
     <CustomModal v-model:visible="visible" width="30rem" :icon="iconModal" :titulo="titleModal">
         <template #body>
             <FileUpload :mode :accept :maxFileSize :multiple customUpload @uploader="uploadArchives">

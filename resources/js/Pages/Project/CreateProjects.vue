@@ -251,8 +251,6 @@ function formatDateTime24h(date) {
         { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 }
 
-
-
 const modalProgress = ref(false)
 const avance = useForm({
     project_id: props.project.id,
@@ -262,7 +260,7 @@ const avance = useForm({
     SPI: null
 })
 const guardarAvance = () => {
-    avance.post(route(''), {
+    avance.post(route('ProgressProjectWeek.store'), {
         onSuccess: () => {
             toast.add({ severity: 'success', text: 'Avance guardado', life: 2000 });
         },
@@ -353,64 +351,18 @@ const items = ref([
                                 optionLabel="name" v-model:input="quoteSelect" showClear :options="quotes"
                                 :errorMessage="$page.props.errors.quote_id"
                                 :invalid="$page.props.errors.quote_id ? true : false" />
-                            <!-- <div>
-                                <label class="text-sm font-medium">Alcance del Proyecto</label>
-                                <Dropdown class="h-10" :options="scopeOptions" v-model="scopeSelect" showClear
-                                    optionLabel="name" placeholder="Seleccione Alcance del Proyecto" :pt="{
-                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
-                                        input: '!text-sm',
-                                        filterInput: '!text-gray-300',
-                                        item: ({ context }) => ({
-                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
-                                        })
-                                    }">
-                                </Dropdown>
-                            </div> -->
 
-                            <!--CAMPO CONTRATO (contract)-->
-                            <!-- <div>
-                                <label class="text-sm font-medium">Contrato</label>
-                                <Dropdown class="h-10" :options="contracts" v-model="contractSelect" showClear
-                                    optionLabel="contract_id" placeholder="Seleccione Contrato" :pt="{
-                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
-                                        input: '!text-sm',
-                                        filterInput: '!text-gray-300',
-                                        item: ({ context }) => ({
-                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
-                                        })
-                                    }">
-                                </Dropdown>
-                            </div> -->
-
-                            <!--CAMPO AUTORIZACIONES (authorization)-->
-                            <!-- <div>
-                                <label class="text-sm font-medium">Autorizaciones</label>
-                                <Dropdown class="h-10" :options="authorizations" v-model="authorizationSelect" showClear
-                                    optionLabel="name" placeholder="Seleccione Autorización" :pt="{
-                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
-                                        input: '!text-sm',
-                                        filterInput: '!text-gray-300',
-                                        item: ({ context }) => ({
-                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
-                                        })
-                                    }">
-                                </Dropdown>
-                            </div> -->
-
-                            <!--CAMPO ESTIMACIÓN (quote)-->
-                            <!-- <div>
-                                <label class="text-sm font-medium">Estimaciones</label>
-                                <Dropdown class="h-10" :options="quotes" v-model="quoteSelect" showClear optionLabel="name"
-                                    placeholder="Seleccione Estimación" :pt="{
-                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
-                                        input: '!text-sm',
-                                        filterInput: '!text-gray-300',
-                                        item: ({ context }) => ({
-                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
-                                        })
-                                    }">
-                                </Dropdown>
-                            </div> -->
+                            <label class="text-sm font-medium">Estimaciones</label>
+                            <Dropdown class="h-10" :options="quotes" v-model="quoteSelect" showClear optionLabel="name"
+                                placeholder="Seleccione Estimación" :pt="{
+                                    root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
+                                    input: '!text-sm',
+                                    filterInput: '!text-gray-300',
+                                    item: ({ context }) => ({
+                                        class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
+                                    })
+                                }">
+                            </Dropdown>
                         </section>
                     </tab-content>
                     <!--DATOS DEL PROYECTO-->
@@ -664,7 +616,7 @@ const items = ref([
         <template #body>
             <CustomInput label="Semana" type="week" v-model:input="avance.week" />
             {{ avance.semana }}
-            <CustomInput label="Porcentaje de avance" maxFractionDigits="2" v-model:input="avance.real_progress"
+            <CustomInput label="Porcentaje de avance" :maxFractionDigits="2" v-model:input="avance.real_progress"
                 type="number" :max="100" :min="0" suffix="%" />
             <CustomInput label="CPI" v-model:input="avance.CPI" />
             <CustomInput label="SPI" v-model:input="avance.SPI" />

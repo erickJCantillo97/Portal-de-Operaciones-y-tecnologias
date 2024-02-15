@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
+use App\Models\Project\ProgressProjectWeek;
 use App\Models\Projects\Authorization;
 use App\Models\Projects\Contract;
 use App\Models\Projects\Milestone;
@@ -116,11 +117,13 @@ class ProjectController extends Controller
         try {
             $ships_ids = ProjectsShip::where('project_id', $project->id)->pluck('ship_id')->toArray();
             $ships = Ship::with('typeShip')->whereIn('id', $ships_ids)->get();
-            return Inertia::render(
-                'Project/ProjectOverview',
+            $milestones = Milestone::where('project_id', $project->id)->get();
+
+            return Inertia::render('Project/ProjectOverview',
                 [
-                    'project' => Project::with('projectShip', 'contract', 'milestone')->findOrFail($project->id),
-                    'ships' => $ships
+                    'project' => Project::with('projectShip', 'contract')->findOrFail($project->id),
+                    'ships' => $ships,
+                    'milestones' => $milestones
                 ]
             );
         } catch (Exception $e) {
@@ -149,8 +152,7 @@ class ProjectController extends Controller
         $milestones = Milestone::where('project_id', $project->id)->get();
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
 
-        return Inertia::render(
-            'Project/CreateProjects',
+        return Inertia::render('Project/CreateProjects',
             [
                 'project' => $project,
                 'project_id' => $project->id,
