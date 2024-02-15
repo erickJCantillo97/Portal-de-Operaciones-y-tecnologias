@@ -38,6 +38,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     //CRUD Projects
     Route::resource('projects', ProjectController::class);
     Route::resource('ProgressProjectWeek', ProgressProjectWeekController::class);
+
+    Route::get('ProgressWeek/getData', [ProgressProjectWeekController::class, 'getData'])->name('progressProjectWeek.get.data');
+
     Route::get('project-overview/{project}', [ProjectController::class, 'goToProjectOverview'])->name('projects.goToProjectOverview');
 
     Route::post('projects/addShips/{project}', [ProjectController::class, 'addShips'])->name('project.add.ships');

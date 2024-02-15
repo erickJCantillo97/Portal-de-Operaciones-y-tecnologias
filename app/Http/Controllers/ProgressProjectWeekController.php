@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project\ProgressProjectWeek;
 use Exception;
 use Illuminate\Http\Request;
+use Laravel\Prompts\Progress;
 
 class ProgressProjectWeekController extends Controller
 {
@@ -53,7 +54,18 @@ class ProgressProjectWeekController extends Controller
      */
     public function show(ProgressProjectWeek $progressProjectWeek)
     {
-        //
+    }
+
+    public function getData(Request $request)
+    {
+        $semanas = ProgressProjectWeek::where('project_id', $request->project)->pluck('week')->toArray();
+        $planeado = ProgressProjectWeek::where('project_id', $request->project)->pluck('planned_progress')->toArray();
+        $ejecutado = ProgressProjectWeek::where('project_id', $request->project)->pluck('real_progress')->toArray();
+        return response()->json([
+            'labels' => $semanas,
+            'planeado' => $planeado,
+            'ejecutado' => $ejecutado,
+        ], 200);
     }
 
     /**
