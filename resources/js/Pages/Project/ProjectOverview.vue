@@ -229,108 +229,108 @@ td {
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Tipo de Buque:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.type == null ? ship.type_ship.type : 'SIN DEFINIR'}}
+                            {{ ship.type_ship.type != null ? ship.type_ship.type : 'SIN DEFINIR'}}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Empresa Diseñadora:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.disinger == null ? ship.type_ship.disinger  : 'SIN DEFINIR'}}
+                            {{ ship.type_ship.disinger != null ? ship.type_ship.disinger  : 'SIN DEFINIR'}}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Material del Casco:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.hull_material == null ? ship.type_ship.hull_material : 'SIN DEFINIR' }}
+                            {{ ship.type_ship.hull_material != null ? ship.type_ship.hull_material : 'SIN DEFINIR' }}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Tipo de Propulsión:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.propulsion_type == null ? ship.type_ship.propulsion_type : 'SIN DEFINIR' }}
+                            {{ ship.type_ship.propulsion_type != null ? ship.type_ship.propulsion_type : 'SIN DEFINIR' }}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Alcance:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.autonomy == null ? ship.type_ship.autonomy : 'SIN DEFINIR' }}
+                            {{ ship.type_ship.autonomy != null ? ship.type_ship.autonomy : 'SIN DEFINIR' }}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Autonomía:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.autonomias == null ? ship.type_ship.autonomias : 'SIN DEFINIR' }}
+                            {{ ship.type_ship.autonomias != null ? ship.type_ship.autonomias : 'SIN DEFINIR' }}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">GT:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.GT == null ? ship.type_ship.GT : 'SIN DEFINIR'}}
+                            {{ ship.type_ship.GT != null ? ship.type_ship.GT : 'SIN DEFINIR'}}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">CGT:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.CGT == null ? ship.type_ship.CGT : 'SIN DEFINIR' }}
+                            {{ ship.type_ship.CGT != null ? ship.type_ship.CGT : 'SIN DEFINIR' }}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Eslora:</dt>
-                          <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.length == null ? ship.type_ship.length : 'SIN DEFINIR' }}
+                          <dd class="text-gray-500 uppercase">  
+                            {{ ship.type_ship.length != null ? ship.type_ship.length : 'SIN DEFINIR' }}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Manga:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.breadth == null ? ship.type_ship.breadth : 'SIN DEFINIR' }}
+                            {{ ship.type_ship.breadth != null ? ship.type_ship.breadth : 'SIN DEFINIR' }}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Tripulación Máxima:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.crew == null ? ship.type_ship.crew : 'SIN DEFINIR' }}
+                            {{ ship.type_ship.crew != null ? ship.type_ship.crew : 'SIN DEFINIR' }}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Light Ship:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.light_ship == null ? ship.type_ship.light_ship : 'SIN DEFINIR' }}
+                            {{ ship.type_ship.light_ship != null ? ship.type_ship.light_ship : 'SIN DEFINIR' }}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Full Load:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.full_load == null ? ship.type_ship.full_load : 'SIN DEFINIR' }}
+                            {{ ship.type_ship.full_load != null ? ship.type_ship.full_load : 'SIN DEFINIR' }}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Diseño Calado:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.draught == null ? ship.type_ship.draught : 'SIN DEFINIR' }}
+                            {{ ship.type_ship.draught != null ? ship.type_ship.draught : 'SIN DEFINIR' }}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Bollard Pull:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.bollard_pull == null ? ship.type_ship.bollard_pull : 'SIN DEFINIR' }}
+                            {{ ship.type_ship.bollard_pull != null ? ship.type_ship.bollard_pull : 'SIN DEFINIR' }}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Puntal:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.depth == null ? ship.type_ship.depth : 'SIN DEFINIR' }}
+                            {{ ship.type_ship.depth != null ? ship.type_ship.depth : 'SIN DEFINIR' }}
                           </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Velocidad Máxima:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.velocity == null ? ship.type_ship.velocity : 'SIN DEFINIR' }}</dd>
+                            {{ ship.type_ship.velocity != null ? ship.type_ship.velocity : 'SIN DEFINIR' }}</dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-900">Potencia:</dt>
                           <dd class="text-gray-500 uppercase">
-                            {{ ship.type_ship.power_total == null ? ship.type_ship.power_total : 'SIN DEFINIR' }}</dd>
+                            {{ ship.type_ship.power_total != null ? ship.type_ship.power_total : 'SIN DEFINIR' }}</dd>
                         </div>
                       </dl>
                     </div>
