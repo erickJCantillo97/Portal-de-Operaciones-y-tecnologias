@@ -50,7 +50,7 @@ const getPersonal = async () => {
 }
 
 const columnas = [
-  { field: 'project.name', header: 'Proyecto', filter: true, sortable: true },
+  // { field: 'project.name', header: 'Proyecto', filter: true, sortable: true },
   { field: 'employee_name', header: 'Empleado', filter: true, sortable: true },
   { field: 'tool.name', header: 'Equipo', filter: true, sortable: true },
   { field: 'tool.serial', header: 'Serial', filter: true, sortable: true },

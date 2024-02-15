@@ -130,7 +130,7 @@ const createGroup = () => {
             descriptionValue.value = ''
             // form.members = []
             // showGroupDialog.value = false
-            showCreateGroupSection = false
+            showCreateGroupSection.value = false
             toast(`¡Grupo "${teamworkName.value}" creado exitosamente!`, 'success')
         },
         onError: (error) => {
@@ -147,7 +147,7 @@ const editGroup = () => {
             descriptionValue.value = ''
             // form.members = []
             // showGroupDialog.value = false
-            showCreateGroupSection = false
+            showCreateGroupSection.value = false
             toast(`¡Grupo "${teamworkName.value}" creado exitosamente!`, 'success')
         },
         onError: (error) => {
@@ -164,7 +164,7 @@ const deleteGroup = () => {
             descriptionValue.value = ''
             // form.members = []
             // showGroupDialog.value = false
-            showCreateGroupSection = false
+            showCreateGroupSection.value = false
             toast(`¡Grupo "${teamworkName.value}" creado exitosamente!`, 'success')
         },
         onError: (error) => {

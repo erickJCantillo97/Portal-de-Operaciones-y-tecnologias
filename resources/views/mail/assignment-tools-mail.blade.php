@@ -1,5 +1,5 @@
 @component('mail::message', ['inner_footer_url' => 'http://www.top.cotecmar.com'])
-# Señor {{ $employee }}
+# Señor(a) {{ $employee }}
 
 Se acaba de registrar una asignación de equipos y/o herramientas a su nombre el dia
 {{ $date }}
