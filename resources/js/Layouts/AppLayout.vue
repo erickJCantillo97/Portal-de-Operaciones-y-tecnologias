@@ -66,7 +66,7 @@
                 </div>
             </div>
             <div
-                class="max-h-[90vh] flex flex-col min-h-[90vh] p-1 gap-1 border border-gray-200 bg-white rounded-lg shadow-2xl g-white sm:ml-20 sm:mr-1">
+                class="max-h-[85vh] flex flex-col min-h-[85vh] p-1 gap-1 border border-gray-200 bg-white rounded-lg shadow-2xl g-white sm:ml-20 sm:mr-1">
                 <slot />
             </div>
             <div class="fixed right-[-5px] z-50 w-10 top-1/4 animate-pulse" data-html2canvas-ignore>
