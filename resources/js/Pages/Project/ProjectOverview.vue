@@ -2,12 +2,7 @@
 import { ref, onMounted } from 'vue'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import ColumnGroup from 'primevue/columngroup'
-import Row from 'primevue/row'
 import Moment from 'moment'
-import Footer from '@/Components/Footer.vue'
 import MiniCardInfo from '@/Components/MiniCardInfo.vue'
 import Bar from '@/Pages/Dashboards/Projects/Bar.vue'
 import S_Curve from '@/Pages/Dashboards/Projects/S_Curve.vue'
@@ -86,20 +81,29 @@ const captureAndDownloadImage = async () => {
 }
 
 const getDays = (startDate, endData) => {
-  var date_1 = new Date(startDate)
-  var date_2 = new Date(endData)
+  let date_1 = new Date(startDate)
+  let date_2 = new Date(endData)
 
   // Calcular la diferencia en milisegundos
-  var diffMiliseconds = date_2 - date_1
+  let diffMiliseconds = date_2 - date_1
 
   // Calcular la diferencia en días
-  var milisecondsPerDay = 24 * 60 * 60 * 1000; // Número de milisegundos en un día
+  let milisecondsPerDay = 24 * 60 * 60 * 1000; // Número de milisegundos en un día
   return Math.round(diffMiliseconds / milisecondsPerDay)
 }
 
 const calculatePercentage = (data, total) => {
-  var number = (data / total) * 100
-  return number.toFixed(0)
+  let percentage = (data / total) * 100;
+
+  if (percentage > 100) {
+    percentage = 100;
+  }
+
+  if (percentage < 0) {
+    percentage = 0;
+  }
+
+  return percentage.toFixed(0);
 }
 </script>
 <style scoped>
@@ -164,6 +168,7 @@ td {
               nav: '!flex !justify-between'
             }
               ">
+              <!-- INFORMACIÓN DEL PROYECTO -->
               <TabPanel header="Información del Contrato" :pt="{
                 root: 'w-full',
               }">
@@ -206,92 +211,126 @@ td {
                   </dl>
                 </div>
               </TabPanel>
+
+              <!-- BUQUES -->
               <TabPanel header="Buques" :pt="{
                 root: 'w-full',
                 content: '!h-[28rem] !p-2 !overflow-y-auto'
               }">
                 <Accordion :activeIndex="0">
                   <AccordionTab v-for="ship in ships" :key="ship.id" :header="ship.name">
-                    <p class="m-0">{{ ship.type_ship }}</p>
+                    <div class="custom border border-solid rounded-lg p-2 mb-2">
+                      <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">Tipo de Buque:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.idHull }} {{ ship.type_ship.type != null ? ship.type_ship.type : 'SIN DEFINIR' }}
+                          </dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">Empresa Diseñadora:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.disinger != null ? ship.type_ship.disinger : 'SIN DEFINIR' }}
+                          </dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">Material del Casco:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.hull_material != null ? ship.type_ship.hull_material : 'SIN DEFINIR' }}
+                          </dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">Tipo de Propulsión:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.propulsion_type != null ? ship.type_ship.propulsion_type : 'SIN DEFINIR' }}
+                          </dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">Alcance:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.autonomy != null ? ship.type_ship.autonomy : 'SIN DEFINIR' }}
+                          </dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">Autonomía:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.autonomias != null ? ship.type_ship.autonomias : 'SIN DEFINIR' }}
+                          </dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">GT:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.GT != null ? ship.type_ship.GT : 'SIN DEFINIR' }}
+                          </dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">CGT:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.CGT != null ? ship.type_ship.CGT : 'SIN DEFINIR' }}
+                          </dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">Eslora:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.length != null ? ship.type_ship.length : 'SIN DEFINIR' }}
+                          </dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">Manga:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.breadth != null ? ship.type_ship.breadth : 'SIN DEFINIR' }}
+                          </dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">Tripulación Máxima:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.crew != null ? ship.type_ship.crew : 'SIN DEFINIR' }}
+                          </dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">Light Ship:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.light_ship != null ? ship.type_ship.light_ship : 'SIN DEFINIR' }}
+                          </dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">Full Load:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.full_load != null ? ship.type_ship.full_load : 'SIN DEFINIR' }}
+                          </dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">Diseño Calado:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.draught != null ? ship.type_ship.draught : 'SIN DEFINIR' }}
+                          </dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">Bollard Pull:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.bollard_pull != null ? ship.type_ship.bollard_pull : 'SIN DEFINIR' }}
+                          </dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">Puntal:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.depth != null ? ship.type_ship.depth : 'SIN DEFINIR' }}
+                          </dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">Velocidad Máxima:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.velocity != null ? ship.type_ship.velocity : 'SIN DEFINIR' }}</dd>
+                        </div>
+                        <div class="flex justify-between py-3 text-sm font-medium">
+                          <dt class="text-gray-900">Potencia:</dt>
+                          <dd class="text-gray-500 uppercase">
+                            {{ ship.type_ship.power_total != null ? ship.type_ship.power_total : 'SIN DEFINIR' }}</dd>
+                        </div>
+                      </dl>
+                    </div>
                   </AccordionTab>
                 </Accordion>
-
-                <div class="custom border border-solid rounded-lg p-2 mb-2">
-                  <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Tipo de Buque:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.contract_id }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Empresa Diseñadora:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.state }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Material del Casco:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.customer_id }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Tipo de Polución:</dt>
-                      <dd class="text-gray-500 uppercase">{{ formatCurrency(project.contract.price, 'COP') }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Alcance:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.start_date }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Autonomía:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.end_date }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">GT:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.type_of_sale }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">CGT:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.contract_id }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Eslora:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.state }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Manga:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.customer_id }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Tripulación Máxima:</dt>
-                      <dd class="text-gray-500 uppercase">{{ formatCurrency(project.contract.price, 'COP') }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Light Ship:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.start_date }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Full Load:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.end_date }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Diseño Calado:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.type_of_sale }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Bollard Pull:</dt>
-                      <dd class="text-gray-500 uppercase">{{ formatCurrency(project.contract.price, 'COP') }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Puntal:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.start_date }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Velocidad Máxima:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.end_date }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Potencia:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.type_of_sale }}</dd>
-                    </div>
-                  </dl>
-                </div>
               </TabPanel>
             </TabView>
             <!-- <div class="col-span-1 rounded-lg p-2 mb-2 w-full h-full bg-gray-500 border border-solid">
@@ -344,7 +383,7 @@ td {
                 </div>
               </div>
               <!-- Segunda fila -->
-              <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">DIAS RESTANTES </div>
+              <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2">DIAS RESTANTES </div>
               <div class="border text-center border-gray-800">
                 {{ getDays(new Date(), project.contract.end_date) }}
               </div>
@@ -352,7 +391,7 @@ td {
                 <div
                   class="bg-teal-900 text-xs align-self-center font-extrabold opacity-60 h-full text-white text-center p-0.5"
                   :style="'width: ' + calculatePercentage(getDays(new Date(), project.contract.end_date),
-                    getDays(project.contract.start_date, project.contract.end_date)) + '%'">
+                    getDays(project.contract.start_date, project.contract.end_date)) + '%;color:black;'">
                   {{ calculatePercentage(getDays(new Date(), project.contract.end_date),
                     getDays(project.contract.start_date, project.contract.end_date)) }}%
                 </div>
