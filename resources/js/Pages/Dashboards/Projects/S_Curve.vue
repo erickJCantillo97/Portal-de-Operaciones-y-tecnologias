@@ -10,29 +10,19 @@ import VChart from 'vue-echarts'
 import axios from 'axios'
 
 const props = defineProps({
-  title: {
-    type: Object,
-    default: null
-  },
-  series: {
-    type: Array,
-    default: null
-  },
-  legend: {
-    type: Array,
-    default: null
-  }
+  project: Number
 })
 const avance = ref([])
 const planeado = ref([])
 const labels = ref([])
 onMounted(() => {
   axios.get(route('progressProjectWeek.get.data', {
-    project: 135
+    project: props.project
   })).then((res) => {
     labels.value = res.data.labels.map(x => "WK " + x)
     avance.value = res.data.ejecutado.map(x => x == 0 ? null : Number.parseFloat(x).toFixed(2))
-    planeado.value = res.data.ejecutado.map(x => x == 0 ? null : Number.parseFloat(x).toFixed(2))
+    planeado.value = res.data.planeado.map(x => x == 0 ? null : Number.parseFloat(x).toFixed(2))
+    console.log(res.data)
   });
 })
 
@@ -86,13 +76,13 @@ const option = ref({
   },
   series: [
     {
-      name: 'Ejecutado',
-      data: avance,
+      name: 'Planeado',
+      data: planeado,
       type: 'line'
     },
     {
-      name: 'Planeado',
-      data: planeado,
+      name: 'Ejecutado',
+      data: avance,
       type: 'line'
     }
   ],

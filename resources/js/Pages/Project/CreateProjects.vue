@@ -262,7 +262,7 @@ const avance = useForm({
 const guardarAvance = () => {
     avance.post(route('ProgressProjectWeek.store'), {
         onSuccess: () => {
-            toast.add({ severity: 'success', text: 'Avance guardado', life: 2000 });
+            toast.add({ severity: 'success', group: 'customToast', text: 'Avance guardado', life: 2000 });
         },
         onError: () => {
             toast.add({ severity: 'error', group: 'customToast', text: 'Hubo un error, reintente', life: 2000 });
@@ -291,7 +291,7 @@ const items = ref([
         icon: 'fa-solid fa-list-check'
     }
 ]);
- const active =ref(2)
+const active = ref(2)
 </script>
 <template>
     <AppLayout>
@@ -618,7 +618,8 @@ const items = ref([
             {{ avance.semana }}
             <CustomInput label="Porcentaje de avance" :maxFractionDigits="2" v-model:input="avance.real_progress"
                 type="number" :max="100" :min="0" suffix="%" />
-            <CustomInput label="CPI" v-model:input="avance.CPI" />
+            <CustomInput label="CPI" v-model:input="avance.CPI" :errorMessage="avance.errors.CPI"
+                :invalid="avance.errors.CPI ? true : false" />
             <CustomInput label="SPI" v-model:input="avance.SPI" />
         </template>
         <template #footer>
