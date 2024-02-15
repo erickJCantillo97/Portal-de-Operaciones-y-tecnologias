@@ -225,7 +225,7 @@ const formMilestone = useForm({
 
 const save = () => {
     formMilestone.project_id = projectIdRef.value;
-    
+
     formMilestone.post(route('milestones.store'), {
         onSuccess: () => {
             toast.add({ summary: 'Hito Guardado', life: 2000 });
@@ -256,15 +256,13 @@ function formatDateTime24h(date) {
         { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 }
 
-
-
 const modalProgress = ref(false)
 const avance = useForm({
-    project_id:props.project.id,
+    project_id: props.project.id,
     week: null,
     real_progress: null,
-    CPI:null,
-    SPI:null
+    CPI: null,
+    SPI: null
 })
 const guardarAvance = () => {
     avance.post(route(''), {
@@ -336,64 +334,18 @@ const guardarAvance = () => {
                                 optionLabel="name" v-model:input="quoteSelect" showClear :options="quotes"
                                 :errorMessage="$page.props.errors.quote_id"
                                 :invalid="$page.props.errors.quote_id ? true : false" />
-                            <!-- <div>
-                                <label class="text-sm font-medium">Alcance del Proyecto</label>
-                                <Dropdown class="h-10" :options="scopeOptions" v-model="scopeSelect" showClear
-                                    optionLabel="name" placeholder="Seleccione Alcance del Proyecto" :pt="{
-                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
-                                        input: '!text-sm',
-                                        filterInput: '!text-gray-300',
-                                        item: ({ context }) => ({
-                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
-                                        })
-                                    }">
-                                </Dropdown>
-                            </div> -->
 
-                            <!--CAMPO CONTRATO (contract)-->
-                            <!-- <div>
-                                <label class="text-sm font-medium">Contrato</label>
-                                <Dropdown class="h-10" :options="contracts" v-model="contractSelect" showClear
-                                    optionLabel="contract_id" placeholder="Seleccione Contrato" :pt="{
-                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
-                                        input: '!text-sm',
-                                        filterInput: '!text-gray-300',
-                                        item: ({ context }) => ({
-                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
-                                        })
-                                    }">
-                                </Dropdown>
-                            </div> -->
-
-                            <!--CAMPO AUTORIZACIONES (authorization)-->
-                            <!-- <div>
-                                <label class="text-sm font-medium">Autorizaciones</label>
-                                <Dropdown class="h-10" :options="authorizations" v-model="authorizationSelect" showClear
-                                    optionLabel="name" placeholder="Seleccione Autorización" :pt="{
-                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
-                                        input: '!text-sm',
-                                        filterInput: '!text-gray-300',
-                                        item: ({ context }) => ({
-                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
-                                        })
-                                    }">
-                                </Dropdown>
-                            </div> -->
-
-                            <!--CAMPO ESTIMACIÓN (quote)-->
-                            <!-- <div>
-                                <label class="text-sm font-medium">Estimaciones</label>
-                                <Dropdown class="h-10" :options="quotes" v-model="quoteSelect" showClear optionLabel="name"
-                                    placeholder="Seleccione Estimación" :pt="{
-                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
-                                        input: '!text-sm',
-                                        filterInput: '!text-gray-300',
-                                        item: ({ context }) => ({
-                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
-                                        })
-                                    }">
-                                </Dropdown>
-                            </div> -->
+                            <label class="text-sm font-medium">Estimaciones</label>
+                            <Dropdown class="h-10" :options="quotes" v-model="quoteSelect" showClear optionLabel="name"
+                                placeholder="Seleccione Estimación" :pt="{
+                                    root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
+                                    input: '!text-sm',
+                                    filterInput: '!text-gray-300',
+                                    item: ({ context }) => ({
+                                        class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
+                                    })
+                                }">
+                            </Dropdown>
                         </section>
                     </tab-content>
 
@@ -597,7 +549,8 @@ const guardarAvance = () => {
                     <tab-content title="Hitos" icon="fa-solid fa-list-check">
                         <div class="w-full overflow-y-auto">
                             <CustomDataTable :rowsDefault="5" :data="milestones" :columnas="columnas" :actions="actions"
-                                @edit="showModal" :filter="false" :showHeader="false" showAdd="true" @addClic="showModal()"/>
+                                @edit="showModal" :filter="false" :showHeader="false" showAdd="true"
+                                @addClic="showModal()" />
                         </div>
                     </tab-content>
                 </form-wizard>
@@ -649,8 +602,8 @@ const guardarAvance = () => {
         <template #body>
             <CustomInput label="Semana" type="week" v-model:input="avance.week" />
             {{ avance.semana }}
-            <CustomInput label="Porcentaje de avance" v-model:input="avance.real_progress" type="number" :max="100" :min="0"
-                suffix="%" />
+            <CustomInput label="Porcentaje de avance" v-model:input="avance.real_progress" maxFractionDigits="2"
+                type="number" :max="100" :min="0" suffix="%" />
             <CustomInput label="CPI" v-model:input="avance.CPI" />
             <CustomInput label="SPI" v-model:input="avance.SPI" />
         </template>
