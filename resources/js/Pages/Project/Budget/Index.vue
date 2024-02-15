@@ -6,8 +6,6 @@ import AccordionBudget from '@/Pages/Project/Budget/Components/AccordionBudget.v
 import Dropdown from 'primevue/dropdown';
 import { ref } from 'vue';
 
-
-
 const props = defineProps({
     projects: Array,
 })
@@ -67,7 +65,6 @@ const formatCurrency = (valor, moneda) => {
 }
 const option = ref('total')
 
-const avance = ref(75)
 </script>
 
 <template>

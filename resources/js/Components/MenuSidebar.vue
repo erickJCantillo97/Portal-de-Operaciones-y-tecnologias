@@ -82,7 +82,7 @@ import { usePage } from "@inertiajs/vue3"
 const debug = import.meta.env.VITE_APP_DEBUG
 const { hasRole, hasPermission } = usePermissions();
 const activeDropdown = ref();
-console.log(hasPermission(['customer read']));
+// console.log(hasPermission(['customer read']));
 const navigation = [
     {
         name: 'Dashboard',
