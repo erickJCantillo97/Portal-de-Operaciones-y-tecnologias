@@ -1,13 +1,9 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue'
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
-import { FilterMatchMode, FilterOperator } from 'primevue/api'
 import { ClockIcon } from '@heroicons/vue/24/outline'
 import axios from 'axios'
-import Dropdown from 'primevue/dropdown'
-import TextInput from '../../Components/TextInput.vue'
-import Textarea from 'primevue/textarea'
 import ToggleButton from 'primevue/togglebutton'
 import Loading from '@/Components/Loading.vue'
 import CustomUpload from "@/Components/CustomUpload.vue";
@@ -120,22 +116,22 @@ const scopeOptions = ref([
 const formData = useForm({
     id: props.project?.id ?? null,
     name: props.project?.name ?? '',
-    contract_id: props.project?.contract_id ?? '0',
-    authorization_id: props.project?.authorization_id ?? '0',
-    quote_id: props.project?.quote_id ?? '0',
+    contract_id: props.project?.contract_id ?? null,
+    authorization_id: props.project?.authorization_id ?? null,
+    quote_id: props.project?.quote_id ?? null,
     type: props.project?.type ?? null, //ENUMS
     SAP_code: props.project?.SAP_code ?? null,
     status: props.project?.status ?? null, //ENUMS
     scope: props.project?.scope ?? null, //ENUMS
-    supervisor: props.project?.supervisor ?? '',
-    cost_sale: props.project?.cost_sale ?? '0',
-    observations: props.project?.observations ?? '',
-    start_date: props.project?.start_date ?? '',
-    end_date: props.project?.end_date ?? '',
-    hoursPerDay: props.project?.hoursPerDay ?? '8.5',
-    daysPerWeek: props.project?.daysPerWeek ?? '5',
-    daysPerMonth: props.project?.daysPerMonth ?? '20',
-    shift: props.project != null ? props.project.shift : '0'
+    supervisor: props.project?.supervisor ?? null,
+    cost_sale: props.project?.cost_sale ?? [0, 'COP'],
+    observations: props.project?.observations ?? null,
+    start_date: props.project?.start_date ?? null,
+    end_date: props.project?.end_date ?? null,
+    hoursPerDay: parseFloat(props.project?.hoursPerDay ?? 8.5),
+    daysPerWeek: parseInt(props.project?.daysPerWeek ?? 5),
+    daysPerMonth: parseInt(props.project?.daysPerMonth ?? 20),
+    shift: props.project != null ? props.project.shift : null
 })
 //#endregion
 
@@ -171,7 +167,7 @@ const cancelCreateProject = () => {
 
 /* SUBMIT*/
 // const isSaved = ref(false)
-const projectIdRef = ref(null)
+const projectIdRef = ref(props.project.id)
 
 const beforeChange = async () => {
     formData.type = typeSelect.value?.name ?? null
@@ -225,7 +221,6 @@ const formMilestone = useForm({
 
 const save = () => {
     formMilestone.project_id = projectIdRef.value;
-    
     formMilestone.post(route('milestones.store'), {
         onSuccess: () => {
             toast.add({ summary: 'Hito Guardado', life: 2000 });
@@ -260,23 +255,45 @@ function formatDateTime24h(date) {
 
 const modalProgress = ref(false)
 const avance = useForm({
-    project_id:props.project.id,
+    project_id: props.project.id,
     week: null,
     real_progress: null,
-    CPI:null,
-    SPI:null
+    CPI: null,
+    SPI: null
 })
 const guardarAvance = () => {
     avance.post(route(''), {
         onSuccess: () => {
-
+            toast.add({ severity: 'success', text: 'Avance guardado', life: 2000 });
         },
         onError: () => {
-
+            toast.add({ severity: 'error', group: 'customToast', text: 'Hubo un error, reintente', life: 2000 });
         }
     })
 }
-
+const items = ref([
+    {
+        label: 'Información Contractual',
+        icon: 'fa-solid fa-file-signature'
+    },
+    {
+        label: 'Datos del Proyecto',
+        icon: 'fa-solid fa-diagram-project'
+    },
+    {
+        label: 'Planeación del Proyecto',
+        icon: 'fa-solid fa-calendar-check'
+    },
+    {
+        label: 'Buques',
+        icon: 'fa-solid fa-ship'
+    },
+    {
+        label: 'Hitos',
+        icon: 'fa-solid fa-list-check'
+    }
+]);
+ const active =ref(2)
 </script>
 <template>
     <AppLayout>
@@ -396,7 +413,6 @@ const guardarAvance = () => {
                             </div> -->
                         </section>
                     </tab-content>
-
                     <!--DATOS DEL PROYECTO-->
                     <tab-content title="Datos del Proyecto" icon="fa-solid fa-diagram-project"
                         :before-change="beforeChange">
@@ -477,7 +493,6 @@ const guardarAvance = () => {
                             </div> -->
                         </section>
                     </tab-content>
-
                     <!--PLANEACIÓN DEL PROYECTO-->
                     <tab-content title="Planeación del Proyecto" icon="fa-solid fa-calendar-check"
                         :before-change="beforeChange">
@@ -495,27 +510,27 @@ const guardarAvance = () => {
 
                                     <div class="gap-6 grid grid-cols-3">
                                         <!--CAMPO HORAS POR DÍA (hoursPerDay)-->
-                                        <CustomInput label="Horas por Dia" :placeholder="'Escriba Número de Horas por Dia'"
-                                            v-model:input="formData.hoursPerDay"
+                                        <CustomInput label="Horas por Dia" type="number"
+                                            v-model:input="formData.hoursPerDay" :min="0" :maxFractionDigits="2"
                                             :invalid="router.page.props.errors.hoursPerDay ? true : false"
                                             :errorMessage="router.page.props.errors.hoursPerDay" />
 
                                         <!--CAMPO DIAS POR SEMANA (daysPerWeek)-->
-                                        <CustomInput label="Dias por Semana"
-                                            :placeholder="'Escriba Numero de Horas por Dia'"
-                                            v-model:input="formData.daysPerWeek"
+                                        <CustomInput label="Dias por Semana" type="number"
+                                            v-model:input="formData.daysPerWeek" :min="0" :max="7"
                                             :invalid="router.page.props.errors.daysPerWeek ? true : false"
                                             :errorMessage="router.page.props.errors.daysPerWeek" />
 
                                         <!--CAMPO DIAS POR MES (daysPerMonth)-->
-                                        <CustomInput label="Dias por Mes" :placeholder="'Escriba Número de Horas por Dia'"
-                                            v-model:input="formData.daysPerMonth"
+                                        <CustomInput label="Dias por Mes" v-model:input="formData.daysPerMonth"
+                                            type="number" :min="0" :max="31"
                                             :invalid="router.page.props.errors.daysPerMonth ? true : false"
                                             :errorMessage="router.page.props.errors.daysPerMonth" />
                                     </div>
                                 </div>
                                 <!--CAMPO TURNO (shift)-->
                                 <div class="">
+                                    <Listbox :options="shiftOptions"></Listbox>
                                     <label class="text-sm font-bold text-gray-900">Seleccione el Turno</label>
                                     <div
                                         class="w-full h-52 overflow-y-auto custom-scroll border-2 border-gray-300 rounded-lg p-2 focus hover:border-blue-500">
@@ -547,7 +562,6 @@ const guardarAvance = () => {
                             </div>
                         </section>
                     </tab-content>
-
                     <!--BUQUES-->
                     <tab-content title="Buques" icon="fa-solid fa-ship" :before-change="beforeChange">
                         <div class="flex w-full gap-2 pb-4">
@@ -597,7 +611,8 @@ const guardarAvance = () => {
                     <tab-content title="Hitos" icon="fa-solid fa-list-check">
                         <div class="w-full overflow-y-auto">
                             <CustomDataTable :rowsDefault="5" :data="milestones" :columnas="columnas" :actions="actions"
-                                @edit="showModal" :filter="false" :showHeader="false" showAdd="true" @addClic="showModal()"/>
+                                @edit="showModal" :filter="false" :showHeader="false" :showAdd="true"
+                                @addClic="showModal()" />
                         </div>
                     </tab-content>
                 </form-wizard>
@@ -649,14 +664,14 @@ const guardarAvance = () => {
         <template #body>
             <CustomInput label="Semana" type="week" v-model:input="avance.week" />
             {{ avance.semana }}
-            <CustomInput label="Porcentaje de avance" v-model:input="avance.real_progress" type="number" :max="100" :min="0"
-                suffix="%" />
+            <CustomInput label="Porcentaje de avance" maxFractionDigits="2" v-model:input="avance.real_progress"
+                type="number" :max="100" :min="0" suffix="%" />
             <CustomInput label="CPI" v-model:input="avance.CPI" />
             <CustomInput label="SPI" v-model:input="avance.SPI" />
         </template>
         <template #footer>
             <Button label="Guardar" severity="success" :loading="avance.processing" @click="guardarAvance()" />
-            <Button label="Cerrar" severity="danger" :disabled="!avance.processing" @click="modalProgress = false" />
+            <Button label="Cerrar" severity="danger" @click="modalProgress = false" />
         </template>
     </CustomModal>
     <Toast position="bottom-center" :pt="{
