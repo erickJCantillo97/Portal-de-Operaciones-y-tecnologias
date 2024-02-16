@@ -29,7 +29,7 @@ const formatCurrency = (valor, moneda) => {
 }
 </script>
 <template>
-  <div class="flex flex-wrap justify-center items-center w-36 h-14 bg-slate-100 p-2 m-2 shadow-md">
+  <div class="block text-center h-14 bg-slate-100 p-2 shadow-md">
     <h3 class="text-xs font-semibold">{{ props.title }}</h3>
     <p class="text-xs">{{ formatCurrency(props.value, 'COP') }}</p>
     <ProgressBar :value="valueProgressBar" showValue :pt="{

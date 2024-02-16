@@ -63,6 +63,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::resource('ships', ShipController::class)->except('update');
 
     Route::get('budget', [BudgetController::class, 'index'])->name('budget.index');
+
+    Route::get('getbudgetProject/{project}', [BudgetController::class, 'getbudgetProject'])->name('budget.project');
+    
     Route::get('getDetailsBudget/{project}', [BudgetController::class, 'getDetailsBudget'])->name('get.details.budget');
 
     //CRUD Customers
@@ -76,7 +79,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     //CRUD Programming
 
     /// CRUD HITOS
-
     Route::resource('milestones', MilestoneController::class);
     Route::resource('weektask', WeekTaskController::class);
 });
