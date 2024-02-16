@@ -71,7 +71,7 @@ const props = defineProps({
     },
     minFractionDigits: {
         type: Number,
-        default: 0
+        default: null
     },
     maxFractionDigits: {
         type: Number,
@@ -183,7 +183,7 @@ const input = defineModel('input', {
             <InputNumber v-else-if="type == 'number'" :max :min :id :disabled :placeholder :minFractionDigits :maxFractionDigits
                 class="w-full" :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'"
                 :required :useGrouping="mode == 'currency' ? '' : useGrouping" :currency="currency" :mode="mode" :suffix
-                :prefix />
+                :prefix :pt="{input:'!w-full'}" />
             <Textarea v-else-if="type == 'textarea'" :id :disabled :rows="rowsTextarea" class="w-full" :required
                 :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
             <Dropdown v-else-if="type == 'dropdown'" :id :disabled :placeholder :options :optionLabel :loading showClear

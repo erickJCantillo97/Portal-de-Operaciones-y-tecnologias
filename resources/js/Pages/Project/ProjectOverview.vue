@@ -11,7 +11,7 @@ import GaugeGradeChart from '@/Pages/Dashboards/Projects/GaugeGradeChart.vue'
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import html2canvas from 'html2canvas'
-
+import Tag from 'primevue/tag'
 const props = defineProps({
   project: Object,
   ships: Array,
@@ -82,22 +82,6 @@ const shipField = [
   'power_total'
 ]
 
-const images = ref()
-const imageSrc = [
-  {
-    id: 1,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria1.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria1s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 2,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria2.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria2s.jpg',
-    alt: 'image-1'
-  },
-]
-
 const severitys = [
   { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'primary', class: '' },
   { text: 'CONSTRUCCIÓN', severity: 'success', class: '' },
@@ -107,16 +91,6 @@ const severitys = [
   { text: 'SIN ESTADO', severity: 'danger', class: 'animate-pulse' }
 ]
 
-const responsiveOptions = ref([
-  {
-    breakpoint: '1300px',
-    numVisible: 4
-  },
-  {
-    breakpoint: '575px',
-    numVisible: 1
-  }
-])
 
 const formatCurrency = (valor, moneda) => {
   if (valor == undefined || valor == null) {
@@ -167,6 +141,10 @@ const calculatePercentage = (data, total) => {
 
   return percentage.toFixed(0);
 }
+
+const facturado = props.project.milestone.filter(hito => hito.advance == 100)
+  .reduce((sum, hito) => sum + parseInt(hito.value), 0);
+
 </script>
 <style scoped>
 table {
@@ -184,8 +162,8 @@ td {
 }
 </style>
 <template>
-  <main class="flex flex-col max-w-full justify-center bg-gray-800 min-h-screen overflow-hidden">
-    <div class="overflow-y-auto space-y-6 bg-white px-6 pt-0.5 divide-x-[500px] md:space-x-6  md:px-10 h-screen">
+  <main class="flex flex-col max-w-full justify-center  min-h-screen overflow-hidden">
+    <div class="overflow-y-auto space-y-6  pt-0.5 divide-x-[500px] md:space-x-6  h-screen">
       <!--Project Details-->
       <TabView :scrollable="true" :pt="{
         nav: '!flex !justify-between'
@@ -193,7 +171,7 @@ td {
         <TabPanel header="Información del Proyecto" :pt="{
           root: 'w-full',
         }">
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-2 gap-2 h-[90vh]">
             <div class="col-span-1 rounded-lg p-2 mb-2 w-full border border-solid">
               <div class="flex text-sm font-medium justify-center items-center">
                 <i class="fa-solid fa-ship "></i>
@@ -234,7 +212,7 @@ td {
               <TabPanel header="Información del Contrato" :pt="{
                 root: 'w-full',
               }">
-                <div class="w-full p-2 first-letter:uppercase text-justify">
+                <div class="w-full p-2 first-letter:uppercase text-justify ">
                   <p>{{ project.contract.subject ? project.contract.subject : 'SIN DEFINIR' }}
                   </p>
                 </div>
@@ -285,10 +263,20 @@ td {
               <!-- BUQUES -->
               <TabPanel header="Buques" :pt="{
                 root: 'w-full',
-                content: '!h-[28rem] !p-2 !overflow-y-auto'
+                content: '!h-[80vh] !p-2 !overflow-y-auto'
               }">
                 <Accordion :activeIndex="0">
-                  <AccordionTab v-for="ship in ships" :key="ship.id" :header="ship.name">
+                  <AccordionTab v-for="(ship, index) in  ships " :key="ship.id">
+                    <template #header>
+                      <div class=" align-items-center gap-2 w-full block space-y-2">
+                        <span class="font-bold white-space-nowrap">{{ index + 1 }}. {{ ship.name }}</span>
+                        <div class="flex justify-start space-x-2">
+                          <Tag v-tooltip.bottom="'Numero de Casco'" :value="ship.idHull" severity="info"></Tag>
+                          <Tag v-tooltip.bottom="'Clase'" :value="ship.type_ship.name" severity="success"></Tag>
+                          <Tag v-tooltip.bottom="'Tipo de Buque'" :value="ship.type_ship.type" severity="primary"></Tag>
+                        </div>
+                      </div>
+                    </template>
                     <div class="border border-solid rounded-lg p-2 mb-2">
                       <DescriptionItem :data="ship.type_ship" :label="shipLabel" :field="shipField" />
                     </div>
@@ -298,16 +286,17 @@ td {
             </TabView>
           </div>
         </TabPanel>
-        <TabPanel header="Dashboard" :pt="{
+        <TabPanel v-if="semana" header="Dashboard" :pt="{
           root: '!w-full !bottom-0'
-        }">
+        }
+          ">
           <!-- <span id="contentToCapture" class="w-full"> -->
           <!-- TABLAS -->
           <div class="block md:flex justify-between pb-1">
             <!--TABLA 1-->
             <div class="w-full md:w-2/3 grid grid-cols-4 text-xs rounded-xl">
               <!-- primera fila -->
-              <div class="col-span-2 border text-center border-gray-800 bg-gray-100">Gerente: Ronny Gutierrez</div>
+              <div class="col-span-2 border text-center border-gray-800 bg-gray-100">Gerente: {{ project.supervisor }}</div>
               <div class="border text-center border-gray-800 bg-sky-100 font-bold">N° CONTRATO</div>
               <div class="border text-center border-gray-800">{{ project.contract.contract_id }}</div>
 
@@ -337,7 +326,8 @@ td {
                 <div
                   class="bg-sky-300 text-xs align-self-center font-extrabold opacity-60 h-full text-black text-center p-0.5"
                   :style="'width: ' + calculatePercentage(getDays(project.contract.start_date, new Date()),
-                    getDays(project.contract.start_date, project.contract.end_date)) + '%'">
+                    getDays(project.contract.start_date, project.contract.end_date)) + '%'
+                    ">
                   {{ calculatePercentage(getDays(project.contract.start_date, new Date()),
                     getDays(project.contract.start_date, project.contract.end_date)) }}%
                 </div>
@@ -351,7 +341,8 @@ td {
                 <div
                   class="bg-teal-900 text-xs align-self-center font-extrabold opacity-60 h-full text-white text-center p-0.5"
                   :style="'width: ' + calculatePercentage(getDays(new Date(), project.contract.end_date),
-                    getDays(project.contract.start_date, project.contract.end_date)) + '%;color:black;'">
+                    getDays(project.contract.start_date, project.contract.end_date)) + '%;color:black;'
+                    ">
                   {{ calculatePercentage(getDays(new Date(), project.contract.end_date),
                     getDays(project.contract.start_date, project.contract.end_date)) }}%
                 </div>
@@ -366,19 +357,19 @@ td {
           <!-- OTROS DATOS -->
           <div class="grid grid-cols-2 gap-2">
             <div class="border border-b-gray-300 rounded-lg shadow-xs">
-              <div class="flex justify-center items-center p-1 mb-1 bg-blue-800 text-white">
+              <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
                 <h2 class="font-semibold">GESTIÓN DEL CRONOGRAMA</h2>
               </div>
               <Bar :key="showLineChart" :planeado='semana.planned_progress' :real="semana.real_progress" />
               <div class="flex justify-center w-full">
                 <GaugeGradeChart :key="showLineChart" title="SPI" :value="semana.SPI" />
-                <S_Curve :title="'Horarios'" :key="showLineChart" />
+                <S_Curve :project="project.id" :key="showLineChart" />
               </div>
             </div>
 
             <!-- TABLA: GESTIÓN DE LOS COSTOS -->
             <article>
-              <div class="flex justify-center items-center p-1 mb-1 bg-blue-800 text-white">
+              <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
                 <h2 class="font-semibold">GESTIÓN DE LOS COSTOS</h2>
               </div>
               <!-- MINICARDS INFO -->
@@ -431,17 +422,12 @@ td {
 
             <!-- TABLA: ACTIVIDADES/NOVEDADES DE LA SEMANA -->
             <article>
-              <div class="flex justify-center items-center p-1 mb-1 bg-blue-800 text-white">
+              <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
                 <h2 class="font-semibold">ACTIVIDADES/NOVEDADES DE LA SEMANA</h2>
               </div>
               <div class="flex gap-2">
                 <div class="w-full ">
-                  <ul class="[&>li]:text-xs [&>li]:font-semibold space-y-2">
-                    <li>1. Bloque de Láminas bloque 5650</li>
-                    <li>2. Corte de perfiles bloque 5550</li>
-                    <li>3. Armado de previas bloque 2320</li>
-                    <li>4. Ensamble bloque 5740-5640-5540-1130-2320</li>
-                  </ul>
+
                 </div>
                 <!-- <div class="flex justify-end items-center w-full">
                   <img
@@ -453,9 +439,11 @@ td {
 
             <!-- TABLA: HITOS CONTRACTUALES -->
             <article class="overflow-y-auto">
-              <div class="flex justify-center items-center p-1 mb-2 bg-blue-800 text-white">
+              <div class="flex justify-center items-center p-0.5  bg-blue-800 text-white">
                 <h2 class="font-semibold">HITOS CONTRACTUALES</h2>
               </div>
+              <p class="w-full text-start text-primary italic my-1 font-bold">Valor facturado {{
+                formatCurrency(facturado) }}</p>
               <table>
                 <thead>
                   <tr>
@@ -464,52 +452,15 @@ td {
                     <th class="uppercase bg-sky-100">Monto</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
+                <tbody v-for="hito in project.milestone">
+                  <tr v-if="hito.advance != 100">
                     <td class="text-left font-semibold ">
-                      {{ project.milestones != null ? project.milestones : 'SIN DEFINIR' }}
+                      {{ hito.title }}
                     </td>
-                    <td>{{ Moment().format('DD/MM/YYYY') }}</td>
-                    <td>$0</td>
+                    <td>{{ Moment().format(hito.end_date) }}</td>
+                    <td>{{ formatCurrency(hito.value, 'COP') }}</td>
                   </tr>
-                  <tr>
-                    <td class="text-left font-semibold ">
-                      {{ project.milestones != null ? project.milestones : 'SIN DEFINIR' }}
-                    </td>
-                    <td>{{ Moment().format('DD/MM/YYYY') }}</td>
-                    <td>$0</td>
-                  </tr>
-                  <tr>
-                    <td class="text-left font-semibold ">
-                      {{ project.milestones != null ? project.milestones : 'SIN DEFINIR' }}
-                    </td>
-                    <td>{{ Moment().format('DD/MM/YYYY') }}</td>
-                    <td>$0</td>
-                  </tr>
-                  <tr>
-                    <td class="text-left font-semibold ">
-                      {{ project.milestones != null ? project.milestones : 'SIN DEFINIR' }}
-                    </td>
-                    <td>{{ Moment().format('DD/MM/YYYY') }}</td>
-                    <td>$0</td>
-                  </tr>
-                  <tr>
-                    <td class="text-left font-semibold ">
-                      {{ project.milestones != null ? project.milestones : 'SIN DEFINIR' }}
-                    </td>
-                    <td>{{ Moment().format('DD/MM/YYYY') }}</td>
-                    <td>$0</td>
-                  </tr>
-                  <!-- <tr>
-                      <td>Columna 1, Fila 6</td>
-                      <td>Columna 2, Fila 6</td>
-                      <td>Columna 3, Fila 6</td>
-                    </tr> -->
-                  <tr>
-                    <td class="font-semibold bg-sky-100">TOTAL</td>
-                    <td></td>
-                    <td>$110.000.000</td>
-                  </tr>
+
                 </tbody>
               </table>
             </article>

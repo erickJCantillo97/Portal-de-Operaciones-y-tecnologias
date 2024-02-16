@@ -25,6 +25,14 @@ const option = ref({
   },
   xAxis: {
     type: 'value',
+    max: 100,
+    position: 'top',
+    splitLine: {
+      lineStyle: {
+        type: 'dashed'
+      }
+    },
+
   },
   yAxis: {
     type: 'category',
@@ -32,13 +40,16 @@ const option = ref({
   },
   series: [
     {
+
       name: 'Planeado',
       type: 'bar',
-      data: [props.planeado]
+      data: [props.planeado],
+      showBackground: true,
     },
     {
       name: 'Ejecutado',
       type: 'bar',
+      showBackground: true,
       data: [props.real]
     }
   ]

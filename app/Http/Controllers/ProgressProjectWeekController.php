@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project\ProgressProjectWeek;
 use Exception;
 use Illuminate\Http\Request;
+use Laravel\Prompts\Progress;
 
 class ProgressProjectWeekController extends Controller
 {
@@ -33,8 +34,8 @@ class ProgressProjectWeekController extends Controller
             'project_id' => 'required',
             'week' => 'required',
             'real_progress' => 'required',
-            'CPI' => 'required',
-            'SPI' => 'required',
+            'CPI' => 'required|numeric',
+            'SPI' => 'required|numeric',
         ]);
 
         try {
@@ -42,7 +43,7 @@ class ProgressProjectWeekController extends Controller
             $week_number = str_replace('W', '', explode('-', $validateData['week'])[1]);
             $validateData['week'] = substr($year, -2) . $week_number;
 
-            ProgressProjectWeek::where('week', $validateData['week'])->update($validateData);
+            ProgressProjectWeek::where('project_id', $validateData['project_id'])->where('week', $validateData['week'])->update($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
@@ -53,7 +54,19 @@ class ProgressProjectWeekController extends Controller
      */
     public function show(ProgressProjectWeek $progressProjectWeek)
     {
-        //
+    }
+
+    public function getData(Request $request)
+    {
+        $semanas = ProgressProjectWeek::where('project_id', $request->project)->pluck('week')->toArray();
+        $planeado = ProgressProjectWeek::where('project_id', $request->project)->pluck('planned_progress')->toArray();
+
+        $ejecutado = ProgressProjectWeek::where('project_id', $request->project)->pluck('real_progress')->toArray();
+        return response()->json([
+            'labels' => $semanas,
+            'planeado' => $planeado,
+            'ejecutado' => $ejecutado,
+        ], 200);
     }
 
     /**
