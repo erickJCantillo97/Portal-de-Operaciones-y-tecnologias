@@ -186,13 +186,13 @@ const showPdf = (event, data) => {
 const columnas = [
     // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
     { field: 'name', header: 'Nombre', rowClass: "underline !text-left !text-sm", filter: true, sortable: true, type: 'button', event: 'goToProjectOverview', severity: 'info', text: true, },
-    { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true },
+    { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true, visible: false },
     { field: 'contract.contract_id', header: 'Contrato', filter: true, sortable: true },
     { field: 'cost_sale', header: 'Costo de Venta', type: 'currency', filter: true, sortable: true },
     { field: 'SAP_code', header: 'Código SAP', filter: true, sortable: true },
     { field: 'contract.end_date', header: 'Fecha Finalización', filter: true, sortable: true },
     {
-        field: 'status', header: 'Estado', filter: true, sortable: true, type: 'tag', filtertype: 'EQUALS', visible:false,
+        field: 'status', header: 'Estado', filter: true, sortable: true, type: 'tag', filtertype: 'EQUALS', visible: false,
         severitys: [
             { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'primary', class: '' },
             { text: 'CONSTRUCCIÓN', severity: 'success', class: '' },

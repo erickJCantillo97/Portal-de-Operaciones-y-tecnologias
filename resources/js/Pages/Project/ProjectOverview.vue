@@ -12,10 +12,26 @@ import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import html2canvas from 'html2canvas'
 import Tag from 'primevue/tag'
+
 const props = defineProps({
   project: Object,
   ships: Array,
   semana: Object
+})
+const budge = ref({
+  materials: 0,
+  labor: 0,
+  servicies: 0,
+  total: 0
+})
+
+onMounted(() => {
+  axios.get(route('budget.project', props.project.id)).then((res) => {
+    budge.value.materials = res.data.materials
+    budge.value.labor = res.data.labor
+    budge.value.services = res.data.services
+    budge.value.total = res.data.total
+  })
 })
 
 const showLineChart = ref(0)
@@ -168,6 +184,188 @@ td {
       <TabView :scrollable="true" :pt="{
         nav: '!flex !justify-between'
       }">
+
+        <TabPanel v-if="semana" header="Dashboard" :pt="{
+          root: '!w-full !bottom-0'
+        }
+          ">
+          <!-- <span id="contentToCapture" class="w-full"> -->
+          <!-- TABLAS -->
+          <div class="block md:flex justify-between pb-1">
+            <!--TABLA 1-->
+            <div class="w-full md:w-2/3 grid grid-cols-4 text-xs rounded-xl">
+              <!-- primera fila -->
+              <div class="col-span-2 border text-center border-gray-800 bg-gray-100">Gerente: {{ project.supervisor }}
+              </div>
+              <div class="border text-center border-gray-800 bg-sky-100 font-bold">N° CONTRATO</div>
+              <div class="border text-center border-gray-800">{{ project.contract.contract_id }}</div>
+
+              <!-- Segunda fila -->
+              <div class="border text-center border-gray-800 bg-gray-100">FECHA REPORTE: </div>
+              <div class="border text-center border-gray-800"> {{ Moment().format('DD/MM/YYYY') }}</div>
+              <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE INICIO </div>
+              <div class="border text-center border-gray-800">{{
+                Moment(project.contract.start_date).format('DD/MM/YYYY') }}</div>
+
+              <!-- Tercera fila -->
+              <div class="border text-center border-gray-800 bg-gray-100">SEMANA: </div>
+              <div class="border text-center border-gray-800"> {{ semana.week }}</div>
+              <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE FIN </div>
+              <div class="border text-center border-gray-800">{{ Moment(project.contract.end_date).format('DD/MM/YYYY')
+              }}</div>
+            </div>
+
+            <!--TABLA 2-->
+            <div class="w-full md:w-1/3 grid grid-cols-4 text-xs rounded-xl md:mx-2 mt-4 md:mt-0 ">
+              <!--  Primera fila -->
+              <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">DIAS EJECUTADOS </div>
+              <div class="border text-center border-gray-800">
+                {{ getDays(project.contract.start_date, new Date()) }}
+              </div>
+              <div class="border text-center border-gray-800">
+                <div
+                  class="bg-sky-300 text-xs align-self-center font-extrabold opacity-60 h-full text-black text-center p-0.5"
+                  :style="'width: ' + calculatePercentage(getDays(project.contract.start_date, new Date()),
+                    getDays(project.contract.start_date, project.contract.end_date)) + '%'
+                    ">
+                  {{ calculatePercentage(getDays(project.contract.start_date, new Date()),
+                    getDays(project.contract.start_date, project.contract.end_date)) }}%
+                </div>
+              </div>
+              <!-- Segunda fila -->
+              <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2">DIAS RESTANTES </div>
+              <div class="border text-center border-gray-800">
+                {{ getDays(new Date(), project.contract.end_date) }}
+              </div>
+              <div class="border text-center border-gray-800 ">
+                <div
+                  class="bg-teal-900 text-xs align-self-center font-extrabold opacity-60 h-full text-white text-center p-0.5"
+                  :style="'width: ' + calculatePercentage(getDays(new Date(), project.contract.end_date),
+                    getDays(project.contract.start_date, project.contract.end_date)) + '%;color:black;'
+                    ">
+                  {{ calculatePercentage(getDays(new Date(), project.contract.end_date),
+                    getDays(project.contract.start_date, project.contract.end_date)) }}%
+                </div>
+              </div>
+              <!-- Tercera fila -->
+              <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">TOTAL DIAS PROYECTO</div>
+              <div class="border text-center border-gray-800 col-span-2">
+                {{ getDays(project.contract.start_date, project.contract.end_date) }}
+              </div>
+            </div>
+          </div>
+          <!-- OTROS DATOS -->
+          <div class="grid grid-cols-2 gap-2">
+            <div class="border border-b-gray-300 rounded-lg shadow-xs">
+              <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
+                <h2 class="font-semibold">GESTIÓN DEL CRONOGRAMA</h2>
+              </div>
+              <Bar :key="showLineChart" :planeado='semana.planned_progress' :real="semana.real_progress" />
+              <div class="flex justify-center w-full">
+                <GaugeGradeChart :key="showLineChart" title="SPI" :value="semana.SPI" />
+                <S_Curve :project="project.id" :key="showLineChart" />
+              </div>
+            </div>
+
+            <!-- TABLA: GESTIÓN DE LOS COSTOS -->
+            <article>
+              <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
+                <h2 class="font-semibold">GESTIÓN DE LOS COSTOS</h2>
+              </div>
+              <!-- MINICARDS INFO -->
+              <div class="grid grid-cols-2 w-full">
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                  <MiniCardInfo title="Presupuesto" :value="budge.total" :valueProgressBar="50" />
+                  <MiniCardInfo title="Ejecutado" :value="191520456373" :valueProgressBar="35" />
+                  <MiniCardInfo title="Disponible" :value="191520456373" :valueProgressBar="10" />
+                </div>
+                <GaugeGradeChart :key="showLineChart" title="CPI" :value="semana.CPI" />
+              </div>
+              <div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="bg-slate-300"></th>
+                      <th class="bg-sky-100">MATERIALES</th>
+                      <th class="bg-sky-100">MANO DE OBRA</th>
+                      <th class="bg-sky-100">SERVICIOS</th>
+                      <th class="bg-sky-100">TOTAL</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="text-left font-semibold bg-sky-100">PRESUPUESTO</td>
+                      <td>{{ formatCurrency(budge.materials) }}</td>
+                      <td>{{ formatCurrency(budge.labor) }}</td>
+                      <td>{{ formatCurrency(budge.services) }}</td>
+                      <td>{{ formatCurrency(budge.total) }}</td>
+                    </tr>
+                    <tr>
+                      <td class="text-left font-semibold bg-sky-100">CONSUMO ACTUAL</td>
+                      <td>{{ Moment().format('DD/MM/YYYY') }}</td>
+                      <td>$110.000.000</td>
+                      <td>$110.000.000</td>
+                      <td>$110.000.000</td>
+                    </tr>
+                    <tr>
+                      <td class="text-left font-semibold bg-sky-100">DISPONIBLE</td>
+                      <td>{{ Moment().format('DD/MM/YYYY') }}</td>
+                      <td>$110.000.000</td>
+                      <td>$110.000.000</td>
+                      <td>$110.000.000</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <!-- TABLA: ACTIVIDADES/NOVEDADES DE LA SEMANA -->
+            <article>
+              <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
+                <h2 class="font-semibold">ACTIVIDADES/NOVEDADES DE LA SEMANA</h2>
+              </div>
+              <div class="flex gap-2">
+                <div class="w-full ">
+
+                </div>
+                <!-- <div class="flex justify-end items-center w-full">
+                  <img
+                    src="https://assets.asana.biz/transform/5d0217e1-a08d-4e8c-a8cb-616e658f434e/inline-project-management-critical-path-method-2-es-2x"
+                    alt="picture" class="h-48 object-fill">
+                </div> -->
+              </div>
+            </article>
+
+            <!-- TABLA: HITOS CONTRACTUALES -->
+            <article class="overflow-y-auto">
+              <div class="flex justify-center items-center p-0.5  bg-blue-800 text-white">
+                <h2 class="font-semibold">HITOS CONTRACTUALES</h2>
+              </div>
+              <p class="w-full text-start text-primary italic my-1 font-bold">Valor facturado {{
+                formatCurrency(facturado) }}</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th class="uppercase bg-sky-100" style="width:27rem">Hitos</th>
+                    <th class="uppercase bg-sky-100">Fecha</th>
+                    <th class="uppercase bg-sky-100">Monto</th>
+                  </tr>
+                </thead>
+                <tbody v-for="hito in project.milestone">
+                  <tr v-if="hito.advance != 100">
+                    <td class="text-left font-semibold ">
+                      {{ hito.title }}
+                    </td>
+                    <td>{{ Moment().format(hito.end_date) }}</td>
+                    <td>{{ formatCurrency(hito.value, 'COP') }}</td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </article>
+          </div>
+          <!-- </span> -->
+        </TabPanel>
         <TabPanel header="Información del Proyecto" :pt="{
           root: 'w-full',
         }">
@@ -286,189 +484,7 @@ td {
             </TabView>
           </div>
         </TabPanel>
-        <TabPanel v-if="semana" header="Dashboard" :pt="{
-          root: '!w-full !bottom-0'
-        }
-          ">
-          <!-- <span id="contentToCapture" class="w-full"> -->
-          <!-- TABLAS -->
-          <div class="block md:flex justify-between pb-1">
-            <!--TABLA 1-->
-            <div class="w-full md:w-2/3 grid grid-cols-4 text-xs rounded-xl">
-              <!-- primera fila -->
-              <div class="col-span-2 border text-center border-gray-800 bg-gray-100">Gerente: {{ project.supervisor }}</div>
-              <div class="border text-center border-gray-800 bg-sky-100 font-bold">N° CONTRATO</div>
-              <div class="border text-center border-gray-800">{{ project.contract.contract_id }}</div>
-
-              <!-- Segunda fila -->
-              <div class="border text-center border-gray-800 bg-gray-100">FECHA REPORTE: </div>
-              <div class="border text-center border-gray-800"> {{ Moment().format('DD/MM/YYYY') }}</div>
-              <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE INICIO </div>
-              <div class="border text-center border-gray-800">{{
-                Moment(project.contract.start_date).format('DD/MM/YYYY') }}</div>
-
-              <!-- Tercera fila -->
-              <div class="border text-center border-gray-800 bg-gray-100">SEMANA: </div>
-              <div class="border text-center border-gray-800"> {{ semana.week }}</div>
-              <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE FIN </div>
-              <div class="border text-center border-gray-800">{{ Moment(project.contract.end_date).format('DD/MM/YYYY')
-              }}</div>
-            </div>
-
-            <!--TABLA 2-->
-            <div class="w-full md:w-1/3 grid grid-cols-4 text-xs rounded-xl md:mx-2 mt-4 md:mt-0 ">
-              <!--  Primera fila -->
-              <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">DIAS EJECUTADOS </div>
-              <div class="border text-center border-gray-800">
-                {{ getDays(project.contract.start_date, new Date()) }}
-              </div>
-              <div class="border text-center border-gray-800">
-                <div
-                  class="bg-sky-300 text-xs align-self-center font-extrabold opacity-60 h-full text-black text-center p-0.5"
-                  :style="'width: ' + calculatePercentage(getDays(project.contract.start_date, new Date()),
-                    getDays(project.contract.start_date, project.contract.end_date)) + '%'
-                    ">
-                  {{ calculatePercentage(getDays(project.contract.start_date, new Date()),
-                    getDays(project.contract.start_date, project.contract.end_date)) }}%
-                </div>
-              </div>
-              <!-- Segunda fila -->
-              <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2">DIAS RESTANTES </div>
-              <div class="border text-center border-gray-800">
-                {{ getDays(new Date(), project.contract.end_date) }}
-              </div>
-              <div class="border text-center border-gray-800 ">
-                <div
-                  class="bg-teal-900 text-xs align-self-center font-extrabold opacity-60 h-full text-white text-center p-0.5"
-                  :style="'width: ' + calculatePercentage(getDays(new Date(), project.contract.end_date),
-                    getDays(project.contract.start_date, project.contract.end_date)) + '%;color:black;'
-                    ">
-                  {{ calculatePercentage(getDays(new Date(), project.contract.end_date),
-                    getDays(project.contract.start_date, project.contract.end_date)) }}%
-                </div>
-              </div>
-              <!-- Tercera fila -->
-              <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">TOTAL DIAS PROYECTO</div>
-              <div class="border text-center border-gray-800 col-span-2">
-                {{ getDays(project.contract.start_date, project.contract.end_date) }}
-              </div>
-            </div>
-          </div>
-          <!-- OTROS DATOS -->
-          <div class="grid grid-cols-2 gap-2">
-            <div class="border border-b-gray-300 rounded-lg shadow-xs">
-              <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
-                <h2 class="font-semibold">GESTIÓN DEL CRONOGRAMA</h2>
-              </div>
-              <Bar :key="showLineChart" :planeado='semana.planned_progress' :real="semana.real_progress" />
-              <div class="flex justify-center w-full">
-                <GaugeGradeChart :key="showLineChart" title="SPI" :value="semana.SPI" />
-                <S_Curve :project="project.id" :key="showLineChart" />
-              </div>
-            </div>
-
-            <!-- TABLA: GESTIÓN DE LOS COSTOS -->
-            <article>
-              <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
-                <h2 class="font-semibold">GESTIÓN DE LOS COSTOS</h2>
-              </div>
-              <!-- MINICARDS INFO -->
-              <div class="grid grid-cols-2 w-full">
-                <div class="grid grid-cols-2">
-                  <MiniCardInfo title="Presupuesto" :value="191520456373" :valueProgressBar="50" />
-                  <MiniCardInfo title="Presupuesto" :value="191520456373" :valueProgressBar="35" />
-                  <MiniCardInfo title="Presupuesto" :value="191520456373" :valueProgressBar="10" />
-                  <MiniCardInfo title="Presupuesto" :value="191520456373" :valueProgressBar="90" />
-                </div>
-                <GaugeGradeChart :key="showLineChart" title="CPI" :value="semana.CPI" />
-              </div>
-              <div>
-                <table>
-                  <thead>
-                    <tr>
-                      <th class="bg-slate-300"></th>
-                      <th class="bg-sky-100">MATERIALES</th>
-                      <th class="bg-sky-100">MANO DE OBRA</th>
-                      <th class="bg-sky-100">SERVICIOS</th>
-                      <th class="bg-sky-100">TOTAL</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td class="text-left font-semibold bg-sky-100">PRESUPUESTO</td>
-                      <td>{{ Moment().format('DD/MM/YYYY') }}</td>
-                      <td>$110.000.000</td>
-                      <td>$110.000.000</td>
-                      <td>$110.000.000</td>
-                    </tr>
-                    <tr>
-                      <td class="text-left font-semibold bg-sky-100">CONSUMO ACTUAL</td>
-                      <td>{{ Moment().format('DD/MM/YYYY') }}</td>
-                      <td>$110.000.000</td>
-                      <td>$110.000.000</td>
-                      <td>$110.000.000</td>
-                    </tr>
-                    <tr>
-                      <td class="text-left font-semibold bg-sky-100">DISPONIBLE</td>
-                      <td>{{ Moment().format('DD/MM/YYYY') }}</td>
-                      <td>$110.000.000</td>
-                      <td>$110.000.000</td>
-                      <td>$110.000.000</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </article>
-
-            <!-- TABLA: ACTIVIDADES/NOVEDADES DE LA SEMANA -->
-            <article>
-              <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
-                <h2 class="font-semibold">ACTIVIDADES/NOVEDADES DE LA SEMANA</h2>
-              </div>
-              <div class="flex gap-2">
-                <div class="w-full ">
-
-                </div>
-                <!-- <div class="flex justify-end items-center w-full">
-                  <img
-                    src="https://assets.asana.biz/transform/5d0217e1-a08d-4e8c-a8cb-616e658f434e/inline-project-management-critical-path-method-2-es-2x"
-                    alt="picture" class="h-48 object-fill">
-                </div> -->
-              </div>
-            </article>
-
-            <!-- TABLA: HITOS CONTRACTUALES -->
-            <article class="overflow-y-auto">
-              <div class="flex justify-center items-center p-0.5  bg-blue-800 text-white">
-                <h2 class="font-semibold">HITOS CONTRACTUALES</h2>
-              </div>
-              <p class="w-full text-start text-primary italic my-1 font-bold">Valor facturado {{
-                formatCurrency(facturado) }}</p>
-              <table>
-                <thead>
-                  <tr>
-                    <th class="uppercase bg-sky-100" style="width:27rem">Hitos</th>
-                    <th class="uppercase bg-sky-100">Fecha</th>
-                    <th class="uppercase bg-sky-100">Monto</th>
-                  </tr>
-                </thead>
-                <tbody v-for="hito in project.milestone">
-                  <tr v-if="hito.advance != 100">
-                    <td class="text-left font-semibold ">
-                      {{ hito.title }}
-                    </td>
-                    <td>{{ Moment().format(hito.end_date) }}</td>
-                    <td>{{ formatCurrency(hito.value, 'COP') }}</td>
-                  </tr>
-
-                </tbody>
-              </table>
-            </article>
-          </div>
-          <!-- </span> -->
-        </TabPanel>
       </TabView>
-      <button @click="showLineChart++">Descargar Imagen</button>
     </div>
     <!-- <Footer fontSize="sm" fontColor="white" marginTop="0" /> -->
   </main>
