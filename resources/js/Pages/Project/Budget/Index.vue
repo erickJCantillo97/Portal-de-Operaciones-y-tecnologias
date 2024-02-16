@@ -22,7 +22,7 @@ const totales = ref({
     labor_ejecutados: 0,
     services_ejecutados: 0,
 })
-const projectSelect = async() => {
+const projectSelect = async () => {
     peps.value = null
     totales.value = {
         materials: 0,
@@ -32,7 +32,7 @@ const projectSelect = async() => {
         labor_ejecutados: 0,
         services_ejecutados: 0,
     }
-    loading.value=true
+    loading.value = true
     try {
         await axios.get(route('get.details.budget', project.value.id)).then((res) => {
             // console.log(Object.values(res.data.peps))
@@ -45,13 +45,13 @@ const projectSelect = async() => {
                 totales.value.labor = totales.value.labor + parseInt(element.labor)
                 totales.value.services = totales.value.services + parseInt(element.services)
             });
-            console.log(totales.value)
-            loading.value=false
+            console.log(peps.value)
+            loading.value = false
         })
     } catch (e) {
         peps.value = null
         console.log(e)
-        loading.value=false
+        loading.value = false
     }
 }
 
@@ -94,9 +94,9 @@ const option = ref('total')
                             <p class="w-full text-center  !text-sm">{{ formatCurrency(totales.materials_ejecutados) }}</p>
                             <div class="w-full h-4 border rounded-full bg-gray-400"
                                 :style="!(option == 'material') ? 'border: var(--primary-color)' : ''">
-                                <div style="backgroundColor: var(--primary-color);he"
-                                    :class="'w-[' + parseInt((totales.materials_ejecutados / totales.materials) * 0.01) + '%]'"
-                                    class="h-full text-center text-xs text-white rounded-full">
+                                <div style="backgroundColor: var(--primary-color);"
+                                    :style="'width:' + parseInt((totales.materials_ejecutados / totales.materials) * 0.01) + '%;'"
+                                    class="h-full text-center text-xs text-white max-w-full rounded-full">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">
                                     {{ parseInt((totales.materials_ejecutados / totales.materials) * 0.01) }}%
@@ -110,9 +110,9 @@ const option = ref('total')
                             <p class="w-full text-center font-bold">Mano de obra</p>
                             <p class="w-full text-center !text-sm">{{ formatCurrency(totales.labor_ejecutados) }}</p>
                             <div class="w-full h-4 border rounded-full bg-gray-400"
-                                :style="!(option == 'material') ? 'border: var(--primary-color)' : ''">
+                                :style="!(option == 'obra') ? 'border: var(--primary-color)' : ''">
                                 <div style="backgroundColor: var(--primary-color);"
-                                    :class="'w-[' + parseInt((totales.labor_ejecutados / totales.labor) * 0.01) + '%]'"
+                                    :class="'w-[' + (parseInt((totales.labor_ejecutados / totales.labor) * 0.01) + 1) + '%]'"
                                     class="h-full text-center text-xs text-white rounded-full ">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">
@@ -127,9 +127,9 @@ const option = ref('total')
                             <p class="w-full text-center font-bold">Servicios</p>
                             <p class="w-full text-center !text-sm">{{ formatCurrency(totales.services_ejecutados) }}</p>
                             <div class="w-full h-4 border rounded-full bg-gray-400"
-                                :style="!(option == 'material') ? 'border: var(--primary-color)' : ''">
+                                :style="!(option == 'servicio') ? 'border: var(--primary-color)' : ''">
                                 <div style="backgroundColor: var(--primary-color);"
-                                    :class="'w-[' + parseInt((totales.services_ejecutados / totales.services) * 0.01) + '%]'"
+                                    :class="'w-[' + (parseInt((totales.services_ejecutados / totales.services) * 0.01) + 1) + '%]'"
                                     class="h-full text-center text-xs text-white rounded-full ">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">
@@ -139,16 +139,16 @@ const option = ref('total')
                         </span>
                     </Button>
                     <Button :outlined="!(option == 'total')" :key="(totales.services_ejecutados +
-                        totales.materials_ejecutados + totales.labor_ejecutados + totales.services_ejecutados)"
-                        @click="option = 'total'" class="min-h-16">
+                        totales.materials_ejecutados + totales.labor_ejecutados)
+                        " @click="option = 'total'" class="min-h-16">
                         <span class="w-full -mt-1">
                             <p class="w-full text-center font-bold">Total</p>
                             <p class="w-full text-center !text-sm">{{ formatCurrency(totales.services_ejecutados +
-                                totales.materials_ejecutados + totales.labor_ejecutados + totales.services_ejecutados) }}
+                                totales.materials_ejecutados + totales.labor_ejecutados) }}
                             </p>
                             <div class="w-full h-4 border rounded-full bg-gray-400" style="border;: var(--primary-color)">
                                 <div style="backgroundColor: var(--primary-color);"
-                                    :class="'w-[' + parseInt((totales.services_ejecutados + totales.materials_ejecutados + totales.labor_ejecutados) / (totales.services + totales.materials + totales.labor)) * 0.01 + '%]'"
+                                    :class="'w-[' + (parseInt((totales.services_ejecutados + totales.materials_ejecutados + totales.labor_ejecutados) / (totales.services + totales.materials + totales.labor)) * 0.01 + 1) + '%]'"
                                     class="h-full text-center text-xs text-white rounded-full ">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">{{
@@ -170,11 +170,11 @@ const option = ref('total')
             <div class="sm:max-h-[60vh] overflow-y-auto">
                 <AccordionBudget :data="peps" :option="option" />
             </div>
-            <div v-if="!peps&&!loading" class="h-[60%] flex items-center">
-            <Empty message="Seleccione un proyecto"></Empty>
+            <div v-if="!peps && !loading" class="h-[60%] flex items-center">
+                <Empty message="Seleccione un proyecto"></Empty>
             </div>
             <div v-if="loading" class="h-[60%] flex items-center">
-            <Loading message="Cargando presupuestos, dependiendo del proyecto puede demorar un poco"></Loading>
+                <Loading message="Cargando presupuestos, dependiendo del proyecto puede demorar un poco"></Loading>
             </div>
         </div>
     </AppLayout>
