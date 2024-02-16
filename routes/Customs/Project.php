@@ -13,6 +13,7 @@ use App\Http\Controllers\Projects\ShipController;
 use App\Http\Controllers\Projects\TypeShipController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\WeekTaskController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
@@ -77,4 +78,5 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     /// CRUD HITOS
 
     Route::resource('milestones', MilestoneController::class);
+    Route::resource('weektask', WeekTaskController::class);
 });
