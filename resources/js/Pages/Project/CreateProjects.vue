@@ -5,6 +5,7 @@ import { router, useForm } from '@inertiajs/vue3'
 import { ClockIcon } from '@heroicons/vue/24/outline'
 import axios from 'axios'
 import ToggleButton from 'primevue/togglebutton'
+import Listbox from 'primevue/listbox';
 import Loading from '@/Components/Loading.vue'
 import CustomUpload from "@/Components/CustomUpload.vue";
 import NoContentToShow from '@/Components/NoContentToShow.vue'
@@ -269,29 +270,6 @@ const guardarAvance = () => {
         }
     })
 }
-const items = ref([
-    {
-        label: 'Información Contractual',
-        icon: 'fa-solid fa-file-signature'
-    },
-    {
-        label: 'Datos del Proyecto',
-        icon: 'fa-solid fa-diagram-project'
-    },
-    {
-        label: 'Planeación del Proyecto',
-        icon: 'fa-solid fa-calendar-check'
-    },
-    {
-        label: 'Buques',
-        icon: 'fa-solid fa-ship'
-    },
-    {
-        label: 'Hitos',
-        icon: 'fa-solid fa-list-check'
-    }
-]);
- const active =ref(2)
 </script>
 <template>
     <AppLayout>
@@ -351,18 +329,6 @@ const items = ref([
                                 optionLabel="name" v-model:input="quoteSelect" showClear :options="quotes"
                                 :errorMessage="$page.props.errors.quote_id"
                                 :invalid="$page.props.errors.quote_id ? true : false" />
-
-                            <label class="text-sm font-medium">Estimaciones</label>
-                            <Dropdown class="h-10" :options="quotes" v-model="quoteSelect" showClear optionLabel="name"
-                                placeholder="Seleccione Estimación" :pt="{
-                                    root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
-                                    input: '!text-sm',
-                                    filterInput: '!text-gray-300',
-                                    item: ({ context }) => ({
-                                        class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
-                                    })
-                                }">
-                            </Dropdown>
                         </section>
                     </tab-content>
                     <!--DATOS DEL PROYECTO-->
@@ -482,9 +448,17 @@ const items = ref([
                                 </div>
                                 <!--CAMPO TURNO (shift)-->
                                 <div class="">
-                                    <Listbox :options="shiftOptions"></Listbox>
-                                    <label class="text-sm font-bold text-gray-900">Seleccione el Turno</label>
-                                    <div
+                                    <label class="text-sm mb-0.5 font-bold text-gray-900">Seleccione el Turno</label>
+                                    <Listbox :options="shiftOptions" optionLabel="name" filter :pt="{
+                                        list:'!h-52',
+                                        filterInput:'!h-8',
+                                        header:'!p-1'
+                                    }">
+                                        <template #option="slotProps">
+                                            {{ slotProps.option.name }}
+                                        </template>
+                                    </Listbox>
+                                    <!-- <div
                                         class="w-full h-52 overflow-y-auto custom-scroll border-2 border-gray-300 rounded-lg p-2 focus hover:border-blue-500">
                                         <div class="flex justify-center">
                                             <Loading v-if="showLoading" message="Cargando Turnos" class="mt-12" />
@@ -509,7 +483,7 @@ const items = ref([
                                                 </div>
                                             </div>
                                         </ul>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </section>
