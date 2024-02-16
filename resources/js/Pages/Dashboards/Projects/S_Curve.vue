@@ -1,26 +1,29 @@
 <script setup>
 import * as echarts from 'echarts/core'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { UniversalTransition } from 'echarts/features'
 import { LineChart } from 'echarts/charts'
 import { GridComponent } from 'echarts/components'
 import VChart from 'vue-echarts'
+import axios from 'axios'
 
 const props = defineProps({
-  title: {
-    type: Object,
-    default: null
-  },
-  series: {
-    type: Array,
-    default: null
-  },
-  legend: {
-    type: Array,
-    default: null
-  }
+  project: Number
+})
+const avance = ref([])
+const planeado = ref([])
+const labels = ref([])
+onMounted(() => {
+  axios.get(route('progressProjectWeek.get.data', {
+    project: props.project
+  })).then((res) => {
+    labels.value = res.data.labels.map(x => "WK " + x)
+    avance.value = res.data.ejecutado.map(x => x == 0 ? null : Number.parseFloat(x).toFixed(2))
+    planeado.value = res.data.planeado.map(x => x == 0 ? null : Number.parseFloat(x).toFixed(2))
+    console.log(res.data)
+  });
 })
 
 echarts.use([
@@ -64,7 +67,8 @@ const option = ref({
   },
   xAxis: {
     type: 'category',
-    data: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom']
+    boundaryGap: false,
+    data: labels
   },
   yAxis: {
     show: false,
@@ -72,7 +76,13 @@ const option = ref({
   },
   series: [
     {
-      data: [150, 230, 224, 218, 135, 147, 260],
+      name: 'Planeado',
+      data: planeado,
+      type: 'line'
+    },
+    {
+      name: 'Ejecutado',
+      data: avance,
       type: 'line'
     }
   ],
