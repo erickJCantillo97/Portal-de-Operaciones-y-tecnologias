@@ -8,7 +8,6 @@ use App\Models\Project\Operation;
 use App\Models\Project\Pep;
 use App\Models\Project\VirtualPep;
 use App\Models\Projects\Project;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class BudgetController extends Controller
@@ -18,7 +17,7 @@ class BudgetController extends Controller
         $projects = Project::active()->get();
 
         return Inertia::render('Project/Budget/Index', [
-            'projects' => $projects
+            'projects' => $projects,
         ]);
     }
 
@@ -38,12 +37,12 @@ class BudgetController extends Controller
         $labor = Pep::where('pep_id', $pep->id)->sum('labor');
         $materials = Pep::where('pep_id', $pep->id)->sum('materials');
         $services = Pep::where('pep_id', $pep->id)->sum('services');
-        dd($labor_ejecutado);
+
         return response()->json([
             'labor' => $labor,
             'materials' => $materials,
             'services' => $services,
-            'total' => ($labor + $materials + $services)
+            'total' => ($labor + $materials + $services),
         ]);
     }
 }
