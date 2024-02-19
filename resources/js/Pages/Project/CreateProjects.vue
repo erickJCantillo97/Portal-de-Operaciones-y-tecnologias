@@ -16,6 +16,9 @@ import { FormWizard, TabContent } from 'vue3-form-wizard'
 import 'vue3-form-wizard/dist/style.css'
 import Toast from 'primevue/toast';
 import { useToast } from "primevue/usetoast";
+import Empty from '@/Components/Empty.vue'
+import { useSweetalert } from '@/composable/sweetAlert'
+const { confirmDelete } = useSweetalert();
 const toast = useToast();
 
 const props = defineProps({
@@ -66,17 +69,14 @@ const columnas = [
     { field: 'value', header: 'Valor', filter: true, sortable: true, type: 'currency', class: 'w-64' },
     { field: 'type', header: 'Tipo de Hito', filter: true, sortable: true },
     { field: 'end_date', header: 'Fecha de terminación', filter: true, sortable: true },
+    { field: 'advance', header: 'Avance', type: 'number', filter: true, sortable: true },
 ]
 
 
 const actions = [
-    { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },]
+    { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
+    { event: 'delete', severity: 'danger', icon: 'fa-solid fa-trash-can', text: true, outlined: false, rounded: false },]
 
-const openDialog = ref(false)
-
-const showModal = () => {
-    openDialog.value = true
-}
 //#endregion
 
 //#region ENUMS
@@ -210,24 +210,57 @@ const submit = async () => {
 
 }
 
+const openDialogHito = ref(false)
 const formMilestone = useForm({
-    title: '',
-    value: '',
-    end_date: new Date(),
-    type: '',
-    project_id: 12,
+    id: null,
+    title: null,
+    value: null,
+    end_date: null,
+    type: null,
+    project_id: props.project.id,
     invoiced: false,
-    advance: 0
+    advance: false
 });
 
+const showModal = (event, data) => {
+    if (data) {
+        Object.assign(formMilestone, data)
+        formMilestone.advance = formMilestone.advance == 0 ? false : true
+    } else {
+        formMilestone.reset()
+    }
+    openDialogHito.value = true
+}
+
+const delMilestone = (event, data) => {
+    confirmDelete(data.id, 'hito', 'milestones')
+}
+
 const save = () => {
-    formMilestone.project_id = projectIdRef.value;
-    formMilestone.post(route('milestones.store'), {
-        onSuccess: () => {
-            toast.add({ summary: 'Hito Guardado', life: 2000 });
-            openDialog.value = false;
-        }
-    })
+    formMilestone.advance = formMilestone.advance == false ? 0 : 100
+    if (formMilestone.id) {
+        formMilestone.put(route('milestones.update', formMilestone.id), {
+            onSuccess: () => {
+                formMilestone.reset()
+                toast.add({ summary: 'Hito Guardado', life: 2000 });
+                openDialogHito.value = false;
+            },
+            onError: (e) => {
+                console.log(e)
+            }
+        })
+    } else {
+        formMilestone.post(route('milestones.store'), {
+            onSuccess: () => {
+                formMilestone.reset()
+                toast.add({ summary: 'Hito Guardado', life: 2000 });
+                openDialogHito.value = false;
+            },
+            onError: (e) => {
+                console.log(e)
+            }
+        })
+    }
 }
 
 const getShift = () => {
@@ -246,12 +279,12 @@ const getProjectsPropsForEdit = () => {
     typeSelect.value = { name: props.project?.type ?? '' }
 }
 
-
 function formatDateTime24h(date) {
     return new Date(date).toLocaleString('es-CO',
         { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 }
 
+//#region Avance proyectos
 const modalProgress = ref(false)
 const avance = useForm({
     project_id: props.project.id,
@@ -270,6 +303,44 @@ const guardarAvance = () => {
         }
     })
 }
+//#endregion
+
+
+//#region Tareas semanales
+
+const modalWeekTask = ref()
+const weekTask = useForm({
+    id: null,
+    task: null,
+    week: null
+})
+const saveweekTask = () => {
+    if (weekTask.id) {
+        formMilestone.put(route('weektask.update', formMilestone.id), {
+            onSuccess: () => {
+                formMilestone.reset()
+                toast.add({ summary: 'Hito Guardado', life: 2000 });
+                openDialogHito.value = false;
+            },
+            onError: (e) => {
+                console.log(e)
+            }
+        })
+    } else {
+        formMilestone.post(route('weektask.store'), {
+            onSuccess: () => {
+                formMilestone.reset()
+                toast.add({ summary: 'Hito Guardado', life: 2000 });
+                openDialogHito.value = false;
+            },
+            onError: (e) => {
+                console.log(e)
+            }
+        })
+    }
+}
+
+
 </script>
 <template>
     <AppLayout>
@@ -279,7 +350,9 @@ const guardarAvance = () => {
                     {{ project ? 'Editar proyecto' : 'Nuevo proyecto' }}
                 </h2>
                 <div v-if="props.project" class="space-x-4 justify-end flex w-full">
-                    <Button icon="fa-solid fa-list-check" severity="secondary" v-tooltip.top="'Avance del proyecto'"
+                    <Button icon="fa-solid fa-list-check" severity="help" v-tooltip.top="'Tareas de la semana'"
+                        @click="modalWeekTask = true" />
+                    <Button icon="fa-solid fa-gauge-high" severity="secondary" v-tooltip.top="'Avance del proyecto'"
                         @click="modalProgress = true" />
                     <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" :multiple="true"
                         icon-button="fa-solid fa-chart-bar" tooltip="Subir Estructura" accept=".xlsx,.xls" url="prueba" />
@@ -450,12 +523,47 @@ const guardarAvance = () => {
                                 <div class="">
                                     <label class="text-sm mb-0.5 font-bold text-gray-900">Seleccione el Turno</label>
                                     <Listbox :options="shiftOptions" optionLabel="name" filter :pt="{
-                                        list:'!h-52',
-                                        filterInput:'!h-8',
-                                        header:'!p-1'
+                                        list: '!h-40 !p-1',
+                                        item: ({ props, state, context }) => ({
+                                            class: '!h-10 !p-0 !rounded-md hover:!bg-primary-light'
+                                        }),
+                                        filterInput: '!h-8',
+                                        header: '!p-1'
                                     }">
                                         <template #option="slotProps">
-                                            {{ slotProps.option.name }}
+                                            <div class=" h-full grid grid-cols-4 border px-1 rounded-md ">
+                                                <span class="flex justify-between items-center overflow-hidden">
+                                                    <p
+                                                        class="text-overflow h-full overflow-y-auto flex text-sm font-bold items-center">
+                                                        {{ slotProps.option.name }}</p>
+                                                    <i class="fa-regular fa-clock"></i>
+                                                </span>
+                                                <div class="text-xs items-center text-center col-span-3 grid grid-cols-4">
+                                                    <span>
+                                                        <p class="font-bold">Hora Inicio</p>
+                                                        <p>{{ formatDateTime24h(slotProps.option.startShift) }}
+                                                        </p>
+                                                    </span>
+                                                    <span>
+                                                        <p class="font-bold">Hora Fin</p>
+                                                        <p>{{ formatDateTime24h(slotProps.option.endShift) }}</p>
+                                                    </span>
+                                                    <span>
+                                                        <p class="font-bold">Descanso</p>
+                                                        <p>{{ slotProps.option.timeBreak }}h</p>
+                                                    </span>
+                                                    <span>
+                                                        <p class="font-bold">H. Laborales</p>
+                                                        <p> {{ parseFloat(slotProps.option.hours).toFixed(1) }}h</p>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template #empty>
+                                            <Empty message="No hay turnos para mostrar"></Empty>
+                                        </template>
+                                        <template #emptyfilter>
+                                            <Empty message="No se encuentran turnos"></Empty>
                                         </template>
                                     </Listbox>
                                     <!-- <div
@@ -470,7 +578,7 @@ const guardarAvance = () => {
                                                 :class="shiftSelect == shift.id ? 'bg-blue-900 text-white' : 'hover:bg-gray-200'"
                                                 class="flex justify-between items-center text-xs space-x-6 p-2 w-full cursor-pointer rounded-lg">
                                                 <div>
-                                                    <p class=" text-xs font-bold">{{ shift.name }}:</p>
+                                                    <p class="text-xs font-bold">{{ shift.name }}:</p>
                                                 </div>
                                                 <div class="flex italic">
                                                     <ClockIcon class="size-4" />
@@ -537,23 +645,16 @@ const guardarAvance = () => {
                     <tab-content title="Hitos" icon="fa-solid fa-list-check">
                         <div class="w-full overflow-y-auto">
                             <CustomDataTable :rowsDefault="5" :data="milestones" :columnas="columnas" :actions="actions"
-                                @edit="showModal" :filter="false" :showHeader="false" :showAdd="true"
-                                @addClic="showModal()" />
+                                @edit="showModal" :filter="false" :showHeader="false" :showAdd="true" @addClic="showModal"
+                                @delete="delMilestone" />
                         </div>
                     </tab-content>
                 </form-wizard>
             </section>
         </main>
     </AppLayout>
-    <CustomModal v-model:visible="openDialog" width="30rem" :closable="false">
-        <template #icon>
-            <i class="fa-solid text-white fa-list-check"></i>
-        </template>
-        <template #titulo>
-            <span class="text-lg font-bold text-white">
-                Agregar Hito
-            </span>
-        </template>
+    <CustomModal v-model:visible="openDialogHito" width="30rem" :titulo="formMilestone.id ? 'Editar hito' : 'Agregar Hito'"
+        icon="fa-solid fa-list-check">
         <template #body>
             <section class="relative space-y-6 p-2">
                 <CustomInput label="Título del Hito" id="category" type="text" v-model:input="formMilestone.title"
@@ -568,7 +669,7 @@ const guardarAvance = () => {
 
                 <div class="flex space-x-4 items-center">
                     <label for="" class="mb-0.5 font-bold">Avance del HITO: </label>
-                    <ToggleButton v-model="formMilestone.invoiced" onLabel="100%" offLabel="0%" :pt="{
+                    <ToggleButton v-model="formMilestone.advance" onLabel="100%" offLabel="0%" :pt="{
                         root: ({ props }) => ({
                             class:
                                 [
@@ -581,15 +682,16 @@ const guardarAvance = () => {
             </section>
         </template>
         <template #footer>
-            <Button severity="success" outlined label="Guardar" icon="fa-solid fa-floppy-disk" @click="save()" />
+            <Button severity="success" outlined :label="formMilestone.id ? 'Actualizar' : 'Agregar'"
+                icon="fa-solid fa-floppy-disk" @click="save()" />
             <Button severity="danger" outlined label="Cancelar" icon="fa-regular fa-circle-xmark"
-                @click="openDialog = false" />
+                @click="openDialogHito = false" />
         </template>
     </CustomModal>
-    <CustomModal v-model:visible="modalProgress" titulo="Avance del proyecto" width="30vw" icon="fa-solid fa-list-check">
+
+    <CustomModal v-model:visible="modalProgress" titulo="Avance del proyecto" width="30vw" icon="fa-solid fa-bars-progress">
         <template #body>
             <CustomInput label="Semana" type="week" v-model:input="avance.week" />
-            {{ avance.semana }}
             <CustomInput label="Porcentaje de avance" :maxFractionDigits="2" v-model:input="avance.real_progress"
                 type="number" :max="100" :min="0" suffix="%" />
             <CustomInput label="CPI" v-model:input="avance.CPI" :errorMessage="avance.errors.CPI"
@@ -601,6 +703,28 @@ const guardarAvance = () => {
             <Button label="Cerrar" severity="danger" @click="modalProgress = false" />
         </template>
     </CustomModal>
+
+    <CustomModal v-model:visible="modalWeekTask" titulo="Tareas semanales" width="70vw" icon="fa-solid fa-list-check">
+        <template #body>
+            <div class="grid grid-cols-4 gap-2">
+                <span class="col-span-3 grid gap-2 grid-cols-2 h-min max-h-64 overflow-y-auto justify-center ">
+                    <div class="flex items-center p-1 justify-between border rounded-md" v-for="task in weekTasks" >
+                        <p>{{ task.task }}</p>
+                        <div class="min-w-20 flex items-center">
+                            <Button  rounded text severity="danger" icon="fa-solid fa-trash-can"/>
+                            <Button rounded text severity="warning" icon="fa-solid fa-pen" />
+                        </div>
+                    </div>
+                </span>
+                <span class="flex flex-col justify-end">
+                    <CustomInput label="Semana" type="week" v-model:input="weekTask.week" />
+                    <CustomInput label="Tarea" type="textarea" v-model:input="weekTask.task" />
+                    <Button label="Añadir" severity="success" :loading="weekTask.processing" @click="saveweekTask()" />
+                </span>
+            </div>
+        </template>
+    </CustomModal>
+
     <Toast position="bottom-center" :pt="{
         root: '!h-10 !w-64',
         container: {

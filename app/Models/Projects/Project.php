@@ -2,6 +2,7 @@
 
 namespace App\Models\Projects;
 
+use App\Models\Project\WeekTask;
 use App\Models\Scopes\GerenciaScope;
 use App\Models\Shift;
 use App\Models\VirtualTask;
@@ -36,6 +37,10 @@ class Project extends Model implements Auditable
     public function projectShip()
     {
         return $this->hasMany(ProjectsShip::class);
+    }
+    public function weekTask()
+    {
+        return $this->hasMany(WeekTask::class);
     }
 
     public function milestone()

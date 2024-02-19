@@ -7,14 +7,15 @@ import { UniversalTransition } from 'echarts/features'
 import { LineChart } from 'echarts/charts'
 import { GridComponent } from 'echarts/components'
 import VChart from 'vue-echarts'
-import axios from 'axios'
 
 const props = defineProps({
   project: Number
 })
+
 const avance = ref([])
 const planeado = ref([])
 const labels = ref([])
+
 onMounted(() => {
   axios.get(route('progressProjectWeek.get.data', {
     project: props.project
@@ -63,7 +64,14 @@ const option = ref({
     }
   },
   tooltip: {
-    trigger: 'axis'
+    trigger: 'axis',
+    formatter: (params => {
+      let tooltip = ''
+      params.map(param => {
+        tooltip += param.name + '<br>' + param.marker + ' ' + param.seriesName + ': ' + Intl.NumberFormat().format(Number(param.value).toFixed(2)) + '%<br>'
+      })
+      return tooltip;
+    })
   },
   xAxis: {
     type: 'category',
@@ -76,11 +84,14 @@ const option = ref({
   },
   series: [
     {
+      showSymbol: false,
       name: 'Planeado',
       data: planeado,
       type: 'line'
     },
     {
+      showSymbol: false,
+      areaStyle: {},
       name: 'Ejecutado',
       data: avance,
       type: 'line'

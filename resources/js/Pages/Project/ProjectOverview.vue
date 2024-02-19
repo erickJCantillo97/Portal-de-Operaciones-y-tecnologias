@@ -5,11 +5,14 @@ import TabPanel from 'primevue/tabpanel'
 import Moment from 'moment'
 import MiniCardInfo from '@/Components/MiniCardInfo.vue'
 import DescriptionItem from '@/Components/DescriptionItem.vue'
+import Footer from '@/Components/Footer.vue'
+import Loading from '@/Components/Loading.vue'
 import Bar from '@/Pages/Dashboards/Projects/Bar.vue'
 import S_Curve from '@/Pages/Dashboards/Projects/S_Curve.vue'
 import GaugeGradeChart from '@/Pages/Dashboards/Projects/GaugeGradeChart.vue'
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
+import Galleria from 'primevue/galleria';
 import html2canvas from 'html2canvas'
 import Tag from 'primevue/tag'
 
@@ -18,6 +21,7 @@ const props = defineProps({
   ships: Array,
   semana: Object
 })
+
 const budge = ref({
   materials: 0,
   labor: 0,
@@ -29,16 +33,11 @@ const budge = ref({
 })
 
 onMounted(() => {
-  axios.get(route('budget.project', props.project.id)).then((res) => {
-    budge.value.materials = res.data.materials
-    budge.value.labor = res.data.labor
-    budge.value.services = res.data.services
-    budge.value.total = res.data.total
-    budge.value.materials_ejecutados = res.data.materials_ejecutados
-    budge.value.labor_ejecutados = res.data.labor_ejecutados
-    budge.value.services_ejecutados = res.data.services_ejecutados
-  })
+  getBudges()
 })
+
+const loadingDashboard = ref(true)
+const showDashboard = ref(false)
 
 const showLineChart = ref(0)
 
@@ -104,6 +103,70 @@ const shipField = [
   'power_total'
 ]
 
+const images = ref()
+const imageSrc = [
+  {
+    id: 1,
+    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria1.jpg',
+    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria1s.jpg',
+    alt: 'image-1'
+  },
+  {
+    id: 2,
+    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria2.jpg',
+    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria2s.jpg',
+    alt: 'image-1'
+  },
+  {
+    id: 3,
+    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria3.jpg',
+    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria3s.jpg',
+    alt: 'image-1'
+  },
+  {
+    id: 4,
+    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria4.jpg',
+    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria4s.jpg',
+    alt: 'image-1'
+  },
+  {
+    id: 5,
+    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria5.jpg',
+    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria5s.jpg',
+    alt: 'image-1'
+  },
+  {
+    id: 6,
+    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria6.jpg',
+    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria6s.jpg',
+    alt: 'image-1'
+  },
+  {
+    id: 7,
+    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria7.jpg',
+    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria7s.jpg',
+    alt: 'image-1'
+  },
+  {
+    id: 8,
+    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria8.jpg',
+    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria8s.jpg',
+    alt: 'image-1'
+  },
+  {
+    id: 9,
+    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria9.jpg',
+    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria9s.jpg',
+    alt: 'image-1'
+  },
+  {
+    id: 10,
+    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria10.jpg',
+    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria10s.jpg',
+    alt: 'image-1'
+  }
+]
+
 const severitys = [
   { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'primary', class: '' },
   { text: 'CONSTRUCCIÓN', severity: 'success', class: '' },
@@ -113,7 +176,6 @@ const severitys = [
   { text: 'SIN ESTADO', severity: 'danger', class: 'animate-pulse' }
 ]
 
-
 const formatCurrency = (valor, moneda) => {
   if (valor == undefined || valor == null) {
     return 'Sin definir'
@@ -121,6 +183,17 @@ const formatCurrency = (valor, moneda) => {
     return parseInt(valor).toLocaleString('es-CO',
       { style: 'currency', currency: moneda == null ? 'COP' : moneda, maximumFractionDigits: 0 })
   }
+}
+
+const getBudges = async () => {
+  await axios.get(route('budget.project', props.project.id))
+    .then((res) => {
+      budge.value.materials = res.data.materials
+      budge.value.labor = res.data.labor
+      budge.value.services = res.data.services
+      budge.value.total = res.data.total
+      showLineChart.value++
+    })
 }
 
 const captureAndDownloadImage = async () => {
@@ -167,6 +240,20 @@ const calculatePercentage = (data, total) => {
 const facturado = props.project.milestone.filter(hito => hito.advance == 100)
   .reduce((sum, hito) => sum + parseInt(hito.value), 0);
 
+const panelClass = (props, parent, index) => {
+  return [
+    {
+      '!bg-blue-200': parent.state.d_activeIndex === index
+    }
+  ]
+}
+
+const toggleTabClicked = (event) => {
+  setTimeout(() => {
+    loadingDashboard.value = false
+    showDashboard.value = true
+  }, 1)
+}
 </script>
 <style scoped>
 table {
@@ -184,196 +271,13 @@ td {
 }
 </style>
 <template>
-  <main class="flex flex-col max-w-full justify-center  min-h-screen overflow-hidden">
-    <div class="overflow-y-auto space-y-6  pt-0.5 divide-x-[500px] md:space-x-6  h-screen">
+  <main class="flex flex-col max-w-full justify-center min-h-screen overflow-hidden">
+    <section class="space-y-6  pt-0.5 md:space-x-6 h-screen">
       <!--Project Details-->
-      <TabView :scrollable="true" :pt="{
+      <TabView @tab-click="toggleTabClicked($event)" :scrollable="true" :pt="{
         nav: '!flex !justify-between'
       }">
-
-        <TabPanel v-if="semana" header="Dashboard" :pt="{
-          root: '!w-full !bottom-0'
-        }
-          ">
-          <!-- <span id="contentToCapture" class="w-full"> -->
-          <!-- TABLAS -->
-          <div class="block md:flex justify-between pb-1">
-            <!--TABLA 1-->
-            <div class="w-full md:w-2/3 grid grid-cols-4 text-xs rounded-xl">
-              <!-- primera fila -->
-              <div class="col-span-2 border text-center border-gray-800 bg-gray-100">Gerente: {{ project.supervisor }}
-              </div>
-              <div class="border text-center border-gray-800 bg-sky-100 font-bold">N° CONTRATO</div>
-              <div class="border text-center border-gray-800">{{ project.contract.contract_id }}</div>
-
-              <!-- Segunda fila -->
-              <div class="border text-center border-gray-800 bg-gray-100">FECHA REPORTE: </div>
-              <div class="border text-center border-gray-800"> {{ Moment().format('DD/MM/YYYY') }}</div>
-              <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE INICIO </div>
-              <div class="border text-center border-gray-800">{{
-                Moment(project.contract.start_date).format('DD/MM/YYYY') }}</div>
-
-              <!-- Tercera fila -->
-              <div class="border text-center border-gray-800 bg-gray-100">SEMANA: </div>
-              <div class="border text-center border-gray-800"> {{ semana.week }}</div>
-              <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE FIN </div>
-              <div class="border text-center border-gray-800">{{ Moment(project.contract.end_date).format('DD/MM/YYYY')
-              }}</div>
-            </div>
-
-            <!--TABLA 2-->
-            <div class="w-full md:w-1/3 grid grid-cols-4 text-xs rounded-xl md:mx-2 mt-4 md:mt-0 ">
-              <!--  Primera fila -->
-              <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">DIAS EJECUTADOS </div>
-              <div class="border text-center border-gray-800">
-                {{ getDays(project.contract.start_date, new Date()) }}
-              </div>
-              <div class="border text-center border-gray-800">
-                <div
-                  class="bg-sky-300 text-xs align-self-center font-extrabold opacity-60 h-full text-black text-center p-0.5"
-                  :style="'width: ' + calculatePercentage(getDays(project.contract.start_date, new Date()),
-                    getDays(project.contract.start_date, project.contract.end_date)) + '%'
-                    ">
-                  {{ calculatePercentage(getDays(project.contract.start_date, new Date()),
-                    getDays(project.contract.start_date, project.contract.end_date)) }}%
-                </div>
-              </div>
-              <!-- Segunda fila -->
-              <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2">DIAS RESTANTES </div>
-              <div class="border text-center border-gray-800">
-                {{ getDays(new Date(), project.contract.end_date) }}
-              </div>
-              <div class="border text-center border-gray-800 ">
-                <div
-                  class="bg-teal-900 text-xs align-self-center font-extrabold opacity-60 h-full text-white text-center p-0.5"
-                  :style="'width: ' + calculatePercentage(getDays(new Date(), project.contract.end_date),
-                    getDays(project.contract.start_date, project.contract.end_date)) + '%;color:black;'
-                    ">
-                  {{ calculatePercentage(getDays(new Date(), project.contract.end_date),
-                    getDays(project.contract.start_date, project.contract.end_date)) }}%
-                </div>
-              </div>
-              <!-- Tercera fila -->
-              <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">TOTAL DIAS PROYECTO</div>
-              <div class="border text-center border-gray-800 col-span-2">
-                {{ getDays(project.contract.start_date, project.contract.end_date) }}
-              </div>
-            </div>
-          </div>
-          <!-- OTROS DATOS -->
-          <div class="grid grid-cols-2 gap-2">
-            <div class="border border-b-gray-300 rounded-lg shadow-xs">
-              <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
-                <h2 class="font-semibold">GESTIÓN DEL CRONOGRAMA</h2>
-              </div>
-              <Bar :key="showLineChart" :planeado='semana.planned_progress' :real="semana.real_progress" />
-              <div class="flex justify-center w-full">
-                <GaugeGradeChart :key="showLineChart" title="SPI" :value="semana.SPI" />
-                <S_Curve :project="project.id" :key="showLineChart" />
-              </div>
-            </div>
-
-            <!-- TABLA: GESTIÓN DE LOS COSTOS -->
-            <article>
-              <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
-                <h2 class="font-semibold">GESTIÓN DE LOS COSTOS</h2>
-              </div>
-              <!-- MINICARDS INFO -->
-              <div class="grid grid-cols-2 w-full">
-                <div class="grid grid-cols-2 gap-2 mb-2">
-                  <MiniCardInfo title="Presupuesto" :value="budge.total" :valueProgressBar="50" />
-                  <MiniCardInfo title="Ejecutado" :value="191520456373" :valueProgressBar="35" />
-                  <MiniCardInfo title="Disponible" :value="191520456373" :valueProgressBar="10" />
-                </div>
-                <GaugeGradeChart :key="showLineChart" title="CPI" :value="semana.CPI" />
-              </div>
-              <div>
-                <table>
-                  <thead>
-                    <tr>
-                      <th class="bg-slate-300"></th>
-                      <th class="bg-sky-100">MATERIALES</th>
-                      <th class="bg-sky-100">MANO DE OBRA</th>
-                      <th class="bg-sky-100">SERVICIOS</th>
-                      <th class="bg-sky-100">TOTAL</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td class="text-left font-semibold bg-sky-100">PRESUPUESTO</td>
-                      <td>{{ formatCurrency(budge.materials) }}</td>
-                      <td>{{ formatCurrency(budge.labor) }}</td>
-                      <td>{{ formatCurrency(budge.services) }}</td>
-                      <td>{{ formatCurrency(budge.total) }}</td>
-                    </tr>
-                    <tr>
-                      <td class="text-left font-semibold bg-sky-100">CONSUMO ACTUAL</td>
-                      <td>{{ formatCurrency(budge.materials_ejecutados) }}</td>
-                      <td>{{ formatCurrency(budge.labor_ejecutados) }}</td>
-                      <td>{{ formatCurrency(budge.services_ejecutados) }}</td>
-                      <td>{{ formatCurrency(budge.materials_ejecutados + budge.labor_ejecutados +
-                        budge.services_ejecutados) }}</td>
-                    </tr>
-                    <tr>
-                      <td class="text-left font-semibold bg-sky-100">DISPONIBLE</td>
-                      <td>{{ formatCurrency(budge.materials - budge.materials_ejecutados) }}</td>
-                      <td>{{ formatCurrency(budge.labor - budge.labor_ejecutados) }}</td>
-                      <td>{{ formatCurrency(budge.services - budge.services_ejecutados) }}</td>
-                      <td>$110.000.000</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </article>
-
-            <!-- TABLA: ACTIVIDADES/NOVEDADES DE LA SEMANA -->
-            <article>
-              <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
-                <h2 class="font-semibold">ACTIVIDADES/NOVEDADES DE LA SEMANA</h2>
-              </div>
-              <div class="flex gap-2">
-                <div class="w-full ">
-
-                </div>
-                <!-- <div class="flex justify-end items-center w-full">
-                  <img
-                    src="https://assets.asana.biz/transform/5d0217e1-a08d-4e8c-a8cb-616e658f434e/inline-project-management-critical-path-method-2-es-2x"
-                    alt="picture" class="h-48 object-fill">
-                </div> -->
-              </div>
-            </article>
-
-            <!-- TABLA: HITOS CONTRACTUALES -->
-            <article class="overflow-y-auto">
-              <div class="flex justify-center items-center p-0.5  bg-blue-800 text-white">
-                <h2 class="font-semibold">HITOS CONTRACTUALES</h2>
-              </div>
-              <p class="w-full text-start text-primary italic my-1 font-bold">Valor facturado {{
-                formatCurrency(facturado) }}</p>
-              <table>
-                <thead>
-                  <tr>
-                    <th class="uppercase bg-sky-100" style="width:27rem">Hitos</th>
-                    <th class="uppercase bg-sky-100">Fecha</th>
-                    <th class="uppercase bg-sky-100">Monto</th>
-                  </tr>
-                </thead>
-                <tbody v-for="hito in project.milestone">
-                  <tr v-if="hito.advance != 100">
-                    <td class="text-left font-semibold ">
-                      {{ hito.title }}
-                    </td>
-                    <td>{{ Moment().format(hito.end_date) }}</td>
-                    <td>{{ formatCurrency(hito.value, 'COP') }}</td>
-                  </tr>
-
-                </tbody>
-              </table>
-            </article>
-          </div>
-          <!-- </span> -->
-        </TabPanel>
-        <TabPanel header="Información del Proyecto" :pt="{
+        <TabPanel header="Información del Proyecto" :activeIndex="0" :pt="{
           root: 'w-full',
         }">
           <div class="grid grid-cols-2 gap-2 h-[90vh]">
@@ -403,13 +307,32 @@ td {
                   {{ project.description }}
                 </h2>
               </div>
-              <div class="w-full h-full">
+              <!-- <div class="w-full h-full">
                 <img :src="'https://primefaces.org/cdn/primevue/images/galleria/galleria2.jpg'"
                   onerror="this.src='/public/images/generic-boat.png'" :alt="`${project.file}`"
                   class="object-cover object-center w-full h-[20rem] mr-1" />
-              </div>
+              </div> -->
+              <!--Galería-->
+              <article class="flex col-span-1 md:flex md:col-span-2 md:justify-center md:items-center">
+                <!-- <img :src="images.src" class="size-[24rem] rounded-lg shadow-md object-cover" alt="tool-image"> -->
+                <Galleria :value="imageSrc" :responsiveOptions="responsiveOptions" numVisible="5"
+                  indicatorsPosition="bottom" :circular="true" :autoPlay="true" :transitionInterval="2000"
+                  :showThumbnails="false" :showIndicators="true" :changeItemOnIndicatorHover="true"
+                  containerStyle="max-width: 640px" :pt="{
+                    itemContainer: '!border !border-gray-200 !rounded-lg',
+                    indicatorButton: '!bg-blue-800'
+                    // thumbnailItemsContainer: '!opacity-0',
+                  }">
+                  <template #item="slotProps">
+                    <img :src="slotProps.item.src" :alt="slotProps.item.alt" />
+                  </template>
+                  <template #thumbnail="slotProps">
+                    <img :src="slotProps.item.thumb" :alt="slotProps.item.alt" style="width: 100%;" />
+                  </template>
+                </Galleria>
+              </article>
             </div>
-            <TabView :scrollable="true" :pt="{
+            <TabView @tab-click="console.log($event)" :scrollable="true" :pt="{
               nav: '!flex !justify-between'
             }
               ">
@@ -423,55 +346,20 @@ td {
                 </div>
                 <div class="border border-solid rounded-lg p-2 mb-2">
                   <DescriptionItem :data="project.contract" :label="contractLabel" :field="contractField" />
-                  <!-- <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">No. del Contrato:</dt>
-                      <dd class="text-gray-500 uppercase">
-                        {{ project.contract.contract_id ? project.contract.contract_id : 'SIN DEFINIR' }}
-                      </dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Estado del Contrato:</dt>
-                      <dd class="p-2 bg-emerald-400 rounded-lg text-white text-xs animate-pulse">
-                        {{ project.contract.state ? project.contract.state : 'SIN DEFINIR' }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Cliente:</dt>
-                      <dd class="text-gray-500 uppercase">
-                        {{ project.contract.customer_id ? project.contract.customer_id : 'SIN DEFINIR' }}
-                      </dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Precio de Venta:</dt>
-                      <dd class="text-gray-500 uppercase">
-                        {{ formatCurrency(project.contract.price, 'COP') }}
-                      </dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Fecha de Inicio:</dt>
-                      <dd class="text-gray-500 uppercase">
-                        {{ project.contract.start_date ? project.contract.start_date : 'SIN DEFINIR' }}
-                      </dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Fecha de Fin:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.end_date ? : 'SIN DEFINIR' }}</dd>
-                    </div>
-                    <div class="flex justify-between py-3 text-sm font-medium">
-                      <dt class="text-gray-900">Tipo de Venta:</dt>
-                      <dd class="text-gray-500 uppercase">{{ project.contract.type_of_sale ? : 'SIN DEFINIR' }}</dd>
-                    </div>
-                  </dl> -->
                 </div>
               </TabPanel>
 
               <!-- BUQUES -->
               <TabPanel header="Buques" :pt="{
-                root: 'w-full',
+                root: '!w-full ',
                 content: '!h-[80vh] !p-2 !overflow-y-auto'
               }">
-                <Accordion :activeIndex="0">
-                  <AccordionTab v-for="(ship, index) in  ships " :key="ship.id">
+                <Accordion>
+                  <AccordionTab :activeIndex="0" v-for="(ship, index) in ships " :key="ship.id" :pt="{
+                    headerAction: ({ props, parent }) => ({
+                      class: ['!sticky !top-0', panelClass(props, parent, index)]
+                    })
+                  }">
                     <template #header>
                       <div class=" align-items-center gap-2 w-full block space-y-2">
                         <span class="font-bold white-space-nowrap">{{ index + 1 }}. {{ ship.name }}</span>
@@ -491,8 +379,186 @@ td {
             </TabView>
           </div>
         </TabPanel>
+        <TabPanel v-if="semana" header="Dashboard" :activeIndex="1" :pt="{
+          root: '!w-full !bottom-0'
+        }
+          ">
+          <!-- <span id="contentToCapture" class="w-full"> -->
+          <article v-if="loadingDashboard" class="h-screen w-full flex flex-col justify-center items-center col-span-6">
+            <Loading message="Generando Dashboard" />
+          </article>
+          <article v-if="showDashboard">
+            <!-- TABLAS -->
+            <div class="block md:flex justify-between pb-1">
+              <!--TABLA 1-->
+              <div class="w-full md:w-2/3 grid grid-cols-4 text-xs rounded-xl">
+                <!-- primera fila -->
+                <div class="col-span-2 border text-center border-gray-800 bg-gray-100">Gerente: {{ project.supervisor }}
+                </div>
+                <div class="border text-center border-gray-800 bg-sky-100 font-bold">N° CONTRATO</div>
+                <div class="border text-center border-gray-800">{{ project.contract.contract_id }}</div>
+
+                <!-- Segunda fila -->
+                <div class="border text-center border-gray-800 bg-gray-100">FECHA REPORTE: </div>
+                <div class="border text-center border-gray-800"> {{ Moment().format('DD/MM/YYYY') }}</div>
+                <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE INICIO </div>
+                <div class="border text-center border-gray-800">{{
+                  Moment(project.contract.start_date).format('DD/MM/YYYY') }}</div>
+
+                <!-- Tercera fila -->
+                <div class="border text-center border-gray-800 bg-gray-100">SEMANA: </div>
+                <div class="border text-center border-gray-800"> {{ semana.week }}</div>
+                <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE FIN </div>
+                <div class="border text-center border-gray-800">{{
+                  Moment(project.contract.end_date).format('DD/MM/YYYY')
+                }}</div>
+              </div>
+
+              <!--TABLA 2-->
+              <div class="w-full md:w-1/3 grid grid-cols-4 text-xs rounded-xl md:mx-2 mt-4 md:mt-0 ">
+                <!--  Primera fila -->
+                <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">DIAS EJECUTADOS </div>
+                <div class="border text-center border-gray-800">
+                  {{ getDays(project.contract.start_date, new Date()) }}
+                </div>
+                <div class="border text-center border-gray-800">
+                  <div
+                    class="bg-sky-300 text-xs align-self-center font-extrabold opacity-60 h-full text-black text-center p-0.5"
+                    :style="'width: ' + calculatePercentage(getDays(project.contract.start_date, new Date()),
+                      getDays(project.contract.start_date, project.contract.end_date)) + '%'
+                      ">
+                    {{ calculatePercentage(getDays(project.contract.start_date, new Date()),
+                      getDays(project.contract.start_date, project.contract.end_date)) }}%
+                  </div>
+                </div>
+                <!-- Segunda fila -->
+                <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2">DIAS RESTANTES </div>
+                <div class="border text-center border-gray-800">
+                  {{ getDays(new Date(), project.contract.end_date) }}
+                </div>
+                <div class="border text-center border-gray-800 ">
+                  <div
+                    class="bg-teal-900 text-xs align-self-center font-extrabold opacity-60 h-full text-white text-center p-0.5"
+                    :style="'width: ' + calculatePercentage(getDays(new Date(), project.contract.end_date),
+                      getDays(project.contract.start_date, project.contract.end_date)) + '%;color:black;'
+                      ">
+                    {{ calculatePercentage(getDays(new Date(), project.contract.end_date),
+                      getDays(project.contract.start_date, project.contract.end_date)) }}%
+                  </div>
+                </div>
+                <!-- Tercera fila -->
+                <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">TOTAL DIAS PROYECTO
+                </div>
+                <div class="border text-center border-gray-800 col-span-2">
+                  {{ getDays(project.contract.start_date, project.contract.end_date) }}
+                </div>
+              </div>
+            </div>
+            <!-- OTROS DATOS -->
+            <div class="grid grid-cols-2 gap-2">
+              <div class="border border-b-gray-300 rounded-lg shadow-xs">
+                <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
+                  <h2 class="font-semibold">GESTIÓN DEL CRONOGRAMA</h2>
+                </div>
+                <Bar :key="showLineChart" :planeado='semana.planned_progress' :real="semana.real_progress" />
+                <div class="flex justify-center w-full">
+                  <GaugeGradeChart :key="showLineChart" title="SPI" :value="semana.SPI" />
+                  <S_Curve :project="project.id" :key="showLineChart" />
+                </div>
+              </div>
+
+              <!-- TABLA: GESTIÓN DE LOS COSTOS -->
+              <article>
+                <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
+                  <h2 class="font-semibold">GESTIÓN DE LOS COSTOS</h2>
+                </div>
+                <!-- MINICARDS INFO -->
+                <div class="grid grid-cols-2 w-full">
+                  <div class="grid grid-cols-2 gap-2 mb-2">
+                    <MiniCardInfo title="Presupuesto" :value="budge.total" :valueProgressBar="50" />
+                    <MiniCardInfo title="Ejecutado" :value="191520456373" :valueProgressBar="35" />
+                    <MiniCardInfo title="Disponible" :value="191520456373" :valueProgressBar="10" />
+                  </div>
+                  <GaugeGradeChart :key="showLineChart" title="CPI" :value="semana.CPI" />
+                </div>
+                <div>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th class="bg-slate-300"></th>
+                        <th class="bg-sky-100">MATERIALES</th>
+                        <th class="bg-sky-100">MANO DE OBRA</th>
+                        <th class="bg-sky-100">SERVICIOS</th>
+                        <th class="bg-sky-100">TOTAL</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="text-left font-semibold bg-sky-100">PRESUPUESTO</td>
+                        <td>{{ formatCurrency(budge.materials) }}</td>
+                        <td>{{ formatCurrency(budge.labor) }}</td>
+                        <td>{{ formatCurrency(budge.services) }}</td>
+                        <td>{{ formatCurrency(budge.total) }}</td>
+                      </tr>
+                      <tr>
+                        <td class="text-left font-semibold bg-sky-100">CONSUMO ACTUAL</td>
+                        <td>{{ Moment().format('DD/MM/YYYY') }}</td>
+                        <td>$110.000.000</td>
+                        <td>$110.000.000</td>
+                        <td>$110.000.000</td>
+                      </tr>
+                      <tr>
+                        <td class="text-left font-semibold bg-sky-100">DISPONIBLE</td>
+                        <td>{{ Moment().format('DD/MM/YYYY') }}</td>
+                        <td>$110.000.000</td>
+                        <td>$110.000.000</td>
+                        <td>$110.000.000</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+
+              <!-- TABLA: ACTIVIDADES/NOVEDADES DE LA SEMANA -->
+              <article>
+                <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
+                  <h2 class="font-semibold">ACTIVIDADES/NOVEDADES DE LA SEMANA</h2>
+                </div>
+              </article>
+
+              <!-- TABLA: HITOS CONTRACTUALES -->
+              <article class="overflow-y-auto">
+                <div class="flex justify-center items-center p-0.5  bg-blue-800 text-white">
+                  <h2 class="font-semibold">HITOS CONTRACTUALES</h2>
+                </div>
+                <p class="w-full text-sm text-center text-primary bg-yellow-100 italic my-1 font-bold">
+                  VALOR FACTURADO: {{ formatCurrency(facturado) }}
+                </p>
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="uppercase bg-sky-100" style="width:27rem">Hitos</th>
+                      <th class="uppercase bg-sky-100">Fecha</th>
+                      <th class="uppercase bg-sky-100">Monto</th>
+                    </tr>
+                  </thead>
+                  <tbody v-for="hito in project.milestone">
+                    <tr v-if="hito.advance != 100">
+                      <td class="text-left font-semibold ">
+                        {{ hito.title }}
+                      </td>
+                      <td>{{ Moment().format(hito.end_date) }}</td>
+                      <td>{{ formatCurrency(hito.value, 'COP') }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </article>
+            </div>
+            <!-- </span> -->
+          </article>
+        </TabPanel>
       </TabView>
-    </div>
-    <!-- <Footer fontSize="sm" fontColor="white" marginTop="0" /> -->
+    </section>
   </main>
+  <!-- <Footer fontSize="sm" fontColor="white" marginTop="0" /> -->
 </template>

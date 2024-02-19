@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project\ProgressProjectWeek;
+use App\Models\Project\WeekTask;
 use App\Models\Projects\Authorization;
 use App\Models\Projects\Contract;
 use App\Models\Projects\Milestone;
@@ -152,7 +153,7 @@ class ProjectController extends Controller
         $quotes = Quote::get();
         $milestones = Milestone::where('project_id', $project->id)->get();
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
-
+        WeekTask::where('project_id', $project->id)->where();
         return Inertia::render(
             'Project/CreateProjects',
             [
