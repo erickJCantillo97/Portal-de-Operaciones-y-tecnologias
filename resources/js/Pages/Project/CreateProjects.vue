@@ -168,7 +168,7 @@ const cancelCreateProject = () => {
 
 /* SUBMIT*/
 // const isSaved = ref(false)
-const projectIdRef = ref(props.project.id)
+const projectIdRef = ref(props.project?.id ?? null)
 
 const beforeChange = async () => {
     formData.type = typeSelect.value?.name ?? null
@@ -217,7 +217,7 @@ const formMilestone = useForm({
     value: null,
     end_date: null,
     type: null,
-    project_id: props.project.id,
+    project_id: props.project?.id ?? null,
     invoiced: false,
     advance: false
 });
@@ -287,7 +287,7 @@ function formatDateTime24h(date) {
 //#region Avance proyectos
 const modalProgress = ref(false)
 const avance = useForm({
-    project_id: props.project.id,
+    project_id: props.project?.id ?? null,
     week: null,
     real_progress: null,
     CPI: null,

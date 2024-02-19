@@ -5,6 +5,8 @@ import AppLayout from '@/Layouts/AppLayout.vue'
 import AccordionBudget from '@/Pages/Project/Budget/Components/AccordionBudget.vue'
 import Dropdown from 'primevue/dropdown';
 import { ref } from 'vue';
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 
 const props = defineProps({
     projects: Array,
@@ -35,7 +37,6 @@ const projectSelect = async () => {
     loading.value = true
     try {
         await axios.get(route('get.details.budget', project.value.id)).then((res) => {
-            // console.log(Object.values(res.data.peps))
             peps.value = Object.values(res.data.peps)
             peps.value.forEach(element => {
                 totales.value.materials_ejecutados = totales.value.materials_ejecutados + parseInt(element.materials_ejecutados)
@@ -45,11 +46,11 @@ const projectSelect = async () => {
                 totales.value.labor = totales.value.labor + parseInt(element.labor)
                 totales.value.services = totales.value.services + parseInt(element.services)
             });
-            console.log(peps.value)
             loading.value = false
         })
     } catch (e) {
         peps.value = null
+        toast.add({ text: 'El proyecto no tiene presupuesto asignado', severity: 'error', life: 3000, group: 'customToast' })
         console.log(e)
         loading.value = false
     }
@@ -92,14 +93,14 @@ const option = ref('total')
                         <span class="w-full -mt-1">
                             <p class="w-full text-center font-bold">Materiales</p>
                             <p class="w-full text-center  !text-sm">{{ formatCurrency(totales.materials_ejecutados) }}</p>
-                            <div class="w-full h-4 border rounded-full bg-gray-400"
+                            <div class="w-full h-4 border rounded-sm bg-gray-400"
                                 :style="!(option == 'material') ? 'border: var(--primary-color)' : ''">
                                 <div style="backgroundColor: var(--primary-color);"
-                                    :style="'width:' + parseInt((totales.materials_ejecutados / totales.materials) * 0.01) + '%;'"
-                                    class="h-full text-center text-xs text-white max-w-full rounded-full">
+                                    :style="'width:' + parseInt((totales.materials_ejecutados / totales.materials) / 100) + '%;'"
+                                    class="h-full text-center text-xs rounded-sm text-white max-w-full">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">
-                                    {{ parseInt((totales.materials_ejecutados / totales.materials) * 0.01) }}%
+                                    {{ parseFloat((totales.materials_ejecutados / totales.materials) / 100).toFixed(2) }}%
                                 </p>
                             </div>
                         </span>
@@ -109,14 +110,14 @@ const option = ref('total')
                         <span class="w-full -mt-1">
                             <p class="w-full text-center font-bold">Mano de obra</p>
                             <p class="w-full text-center !text-sm">{{ formatCurrency(totales.labor_ejecutados) }}</p>
-                            <div class="w-full h-4 border rounded-full bg-gray-400"
+                            <div class="w-full h-4 border rounded-sm bg-gray-400"
                                 :style="!(option == 'obra') ? 'border: var(--primary-color)' : ''">
                                 <div style="backgroundColor: var(--primary-color);"
-                                    :class="'w-[' + (parseInt((totales.labor_ejecutados / totales.labor) * 0.01) + 1) + '%]'"
-                                    class="h-full text-center text-xs text-white rounded-full ">
+                                    :style="'width:' + (parseInt((totales.labor_ejecutados / totales.labor) / 100)) + '%'"
+                                    class="h-full text-center text-xs rounded-sm text-white">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">
-                                    {{ parseInt((totales.labor_ejecutados / totales.labor) * 0.01) }}%
+                                    {{ parseFloat((totales.labor_ejecutados / totales.labor) / 100).toFixed(2) }}%
                                 </p>
                             </div>
                         </span>
@@ -126,14 +127,14 @@ const option = ref('total')
                         <span class="w-full -mt-1">
                             <p class="w-full text-center font-bold">Servicios</p>
                             <p class="w-full text-center !text-sm">{{ formatCurrency(totales.services_ejecutados) }}</p>
-                            <div class="w-full h-4 border rounded-full bg-gray-400"
+                            <div class="w-full h-4 border rounded-sm bg-gray-400"
                                 :style="!(option == 'servicio') ? 'border: var(--primary-color)' : ''">
                                 <div style="backgroundColor: var(--primary-color);"
-                                    :class="'w-[' + (parseInt((totales.services_ejecutados / totales.services) * 0.01) + 1) + '%]'"
-                                    class="h-full text-center text-xs text-white rounded-full ">
+                                    :style="'width:' + (parseInt((totales.services_ejecutados / totales.services) / 100)) + '%'"
+                                    class="h-full text-center text-xs rounded-sm text-white  ">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">
-                                    {{ parseInt((totales.services_ejecutados / totales.services) * 0.01) }}%
+                                    {{ parseFloat((totales.services_ejecutados / totales.services) / 100).toFixed(2) }}%
                                 </p>
                             </div>
                         </span>
@@ -146,15 +147,15 @@ const option = ref('total')
                             <p class="w-full text-center !text-sm">{{ formatCurrency(totales.services_ejecutados +
                                 totales.materials_ejecutados + totales.labor_ejecutados) }}
                             </p>
-                            <div class="w-full h-4 border rounded-full bg-gray-400" style="border;: var(--primary-color)">
+                            <div class="w-full h-4 border  rounded-sm bg-gray-400" style="border;: var(--primary-color)">
                                 <div style="backgroundColor: var(--primary-color);"
-                                    :class="'w-[' + (parseInt((totales.services_ejecutados + totales.materials_ejecutados + totales.labor_ejecutados) / (totales.services + totales.materials + totales.labor)) * 0.01 + 1) + '%]'"
-                                    class="h-full text-center text-xs text-white rounded-full ">
+                                    :style="'width:' + (parseInt((totales.services_ejecutados + totales.materials_ejecutados + totales.labor_ejecutados) / (totales.services + totales.materials + totales.labor)) * 0.01) + '%'"
+                                    class="h-full text-center text-xs text-white rounded-sm ">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">{{
-                                    parseInt((totales.services_ejecutados + totales.materials_ejecutados +
-                                        totales.labor_ejecutados) / (totales.services + totales.materials + totales.labor)) *
-                                    0.01
+                                    parseFloat(((totales.services_ejecutados + totales.materials_ejecutados +
+                                        totales.labor_ejecutados) / (totales.services + totales.materials +
+                                            totales.labor)) / 100).toFixed(2)
                                 }}%</p>
                             </div>
                         </span>
