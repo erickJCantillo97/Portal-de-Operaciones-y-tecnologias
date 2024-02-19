@@ -27,9 +27,7 @@ onMounted(() => {
     <CardSkeleton v-if="showCardSkeleton" />
     <div class="block space-y-2 h-72 p-1 overflow-y-auto">
       <div v-for="person in  people" :key="person.email"
-        class="relative flex items-center space-x-3 rounded-lg shadow-xl bg-white p-2 border-0"
-        v-tooltip="'Proceso: 3 \n Entregada: 5 \n Pendiente por Firma: 1 \n Firmada: 6 \n No Firmada: 1 \n Contratada: 2'"
-        type="text">
+        class="relative flex items-center space-x-3 rounded-lg shadow-xl bg-white p-2 border-0" type="text">
         <div class="flex-shrink-0">
           <img class="size-10 object-cover rounded-full" :src="person.photo" alt="" />
         </div>

@@ -29,13 +29,8 @@ const formatCurrency = (valor, moneda) => {
 }
 </script>
 <template>
-  <div class="block text-center h-14 bg-slate-100 p-2 shadow-md">
-    <h3 class="text-xs font-semibold">{{ props.title }}</h3>
-    <p class="text-xs">{{ formatCurrency(props.value, 'COP') }}</p>
-    <ProgressBar :value="valueProgressBar" showValue :pt="{
-      root: '!w-full !rounded-lg',
-      label: '!text-[2px]',
-      value: { style: { background: 'linear-gradient(to right, #8e2de2, #4a00e0)' } }
-    }" />
+  <div class="block text-center  space-y-1 bg-slate-100 p-2 shadow-md">
+    <h3 class="text-sm text-primary font-bold">{{ props.title }}</h3>
+    <p class="text-md font-semibold">{{ formatCurrency(props.value, 'COP') }}</p>
   </div>
 </template>

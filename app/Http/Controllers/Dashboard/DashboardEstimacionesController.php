@@ -24,7 +24,7 @@ class DashboardEstimacionesController extends Controller
             if (!Carbon::now()->isThursday()) {
                 return Carbon::parse($quote['status_date']) >= $ultimo_jueves && $status == $quote['get_status'];
             } else {
-                return Carbon::parse($quote['status_date']) >= $ultimo_jueves;
+                return Carbon::parse($quote['status_date']) >= $ultimo_jueves && $status == $quote['get_status'];
             }
         })->map(function ($quote) {
             return [
@@ -58,7 +58,15 @@ class DashboardEstimacionesController extends Controller
 
     public function getStatusWeek()
     {
-        $quotes = QuoteVersion::get()->groupBy('status')->map(function ($status) {
+        $quotes = QuoteVersion::get()->filter(function ($quote) {
+            $hoy = Carbon::now();
+            $ultimo_jueves = $hoy->previous(Carbon::THURSDAY);
+            if (!Carbon::now()->isThursday()) {
+                return Carbon::parse($quote['status_date']) >= $ultimo_jueves;
+            } else {
+                return Carbon::parse($quote['status_date']) >= $ultimo_jueves;
+            }
+        })->groupBy('status')->map(function ($status) {
             return [
                 'value' => count($status),
                 'status' => $status[0]['get_status']
