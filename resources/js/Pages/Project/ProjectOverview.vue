@@ -5,14 +5,14 @@ import TabPanel from 'primevue/tabpanel'
 import Moment from 'moment'
 import MiniCardInfo from '@/Components/MiniCardInfo.vue'
 import DescriptionItem from '@/Components/DescriptionItem.vue'
-import Footer from '@/Components/Footer.vue'
+import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 import Loading from '@/Components/Loading.vue'
 import Bar from '@/Pages/Dashboards/Projects/Bar.vue'
 import S_Curve from '@/Pages/Dashboards/Projects/S_Curve.vue'
 import GaugeGradeChart from '@/Pages/Dashboards/Projects/GaugeGradeChart.vue'
-import Accordion from 'primevue/accordion';
-import AccordionTab from 'primevue/accordiontab';
-import Galleria from 'primevue/galleria';
+import Accordion from 'primevue/accordion'
+import AccordionTab from 'primevue/accordiontab'
+import Image from 'primevue/image'
 import html2canvas from 'html2canvas'
 import Tag from 'primevue/tag'
 
@@ -100,7 +100,6 @@ const shipField = [
   'power_total'
 ]
 
-const images = ref()
 const imageSrc = [
   {
     id: 1,
@@ -163,6 +162,7 @@ const imageSrc = [
     alt: 'image-1'
   }
 ]
+const selectedImage = ref(imageSrc[0].src)
 
 const severitys = [
   { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'primary', class: '' },
@@ -251,6 +251,11 @@ const toggleTabClicked = (event) => {
     showDashboard.value = true
   }, 1)
 }
+
+const handleTabClick = (event) => {
+  // console.log(props.ships[event.index].file)
+  selectedImage.value = props.ships[event.index].file
+}
 </script>
 <style scoped>
 table {
@@ -304,32 +309,17 @@ td {
                   {{ project.description }}
                 </h2>
               </div>
-              <!-- <div class="w-full h-full">
-                <img :src="'https://primefaces.org/cdn/primevue/images/galleria/galleria2.jpg'"
-                  onerror="this.src='/public/images/generic-boat.png'" :alt="`${project.file}`"
-                  class="object-cover object-center w-full h-[20rem] mr-1" />
-              </div> -->
-              <!--Galería-->
-              <article class="flex col-span-1 md:flex md:col-span-2 md:justify-center md:items-center">
-                <!-- <img :src="images.src" class="size-[24rem] rounded-lg shadow-md object-cover" alt="tool-image"> -->
-                <Galleria :value="imageSrc" :responsiveOptions="responsiveOptions" numVisible="5"
-                  indicatorsPosition="bottom" :circular="true" :autoPlay="true" :transitionInterval="2000"
-                  :showThumbnails="false" :showIndicators="true" :changeItemOnIndicatorHover="true"
-                  containerStyle="max-width: 640px" :pt="{
-                    itemContainer: '!border !border-gray-200 !rounded-lg',
-                    indicatorButton: '!bg-blue-800'
-                    // thumbnailItemsContainer: '!opacity-0',
-                  }">
-                  <template #item="slotProps">
-                    <img :src="slotProps.item.src" :alt="slotProps.item.alt" />
-                  </template>
-                  <template #thumbnail="slotProps">
-                    <img :src="slotProps.item.thumb" :alt="slotProps.item.alt" style="width: 100%;" />
-                  </template>
-                </Galleria>
-              </article>
+              <div class="flex size-full justify-center">
+                <Image :src="selectedImage" v-if="selectedImage" :onerror="this.src = '/public/images/generic-boat.png'"
+                  alt="image" preview :pt="{
+                    mask: '!h-1rem'
+                  }" />
+                <div v-else class="flex justify-center mt-10">
+                  <ApplicationLogo height="350" width="350" />
+                </div>
+              </div>
             </div>
-            <TabView @tab-click="console.log($event)" :scrollable="true" :pt="{
+            <TabView :scrollable="true" :pt="{
               nav: '!flex !justify-between'
             }
               ">
@@ -351,7 +341,7 @@ td {
                 root: '!w-full ',
                 content: '!h-[80vh] !p-2 !overflow-y-auto'
               }">
-                <Accordion>
+                <Accordion @tab-click="handleTabClick($event)">
                   <AccordionTab :activeIndex="0" v-for="(ship, index) in ships " :key="ship.id" :pt="{
                     headerAction: ({ props, parent }) => ({
                       class: ['!sticky !top-0', panelClass(props, parent, index)]
