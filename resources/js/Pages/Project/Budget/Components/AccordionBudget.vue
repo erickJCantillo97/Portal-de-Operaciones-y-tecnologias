@@ -23,7 +23,7 @@ const formatCurrency = (valor, moneda) => {
 </script>
 
 <template>
-    <Accordion v-if="data" :activeIndex="0">
+    <Accordion v-if="data">
         <AccordionTab v-for="pep in data" :pt="{
             headerAction: '!p-1 !bg-gray-100 hover:!bg-primary-light',
             content: '!p-1 !py-2',
@@ -149,5 +149,6 @@ const formatCurrency = (valor, moneda) => {
                     </div>
                 </span>
             </div>
-    </AccordionTab>
-</Accordion></template>
+        </AccordionTab>
+    </Accordion>
+</template>

@@ -96,69 +96,8 @@ const shipField = [
   'power_total'
 ]
 
-const imageSrc = [
-  {
-    id: 1,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria1.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria1s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 2,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria2.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria2s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 3,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria3.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria3s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 4,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria4.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria4s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 5,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria5.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria5s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 6,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria6.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria6s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 7,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria7.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria7s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 8,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria8.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria8s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 9,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria9.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria9s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 10,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria10.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria10s.jpg',
-    alt: 'image-1'
-  }
-]
-const selectedImage = ref(imageSrc[0].src)
+
+const selectedImage = ref(props.ships[0].file)
 
 const severitys = [
   { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'primary', class: '' },
