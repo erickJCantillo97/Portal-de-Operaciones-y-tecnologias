@@ -63,7 +63,7 @@ class ProjectController extends Controller
             'status' => 'nullable',
             'scope' => 'nullable',
             'supervisor' => 'nullable',
-            'cost_sale' => 'nullable|numeric',
+            'cost_sale' => 'nullable',
             'observations' => 'nullable',
             'start_date' => 'nullable',
             'end_date' => 'nullable',

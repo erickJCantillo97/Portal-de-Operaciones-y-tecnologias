@@ -119,7 +119,7 @@ const formData = ref({
     status: props.project?.status ?? null, //ENUMS
     scope: props.project?.scope ?? null, //ENUMS
     supervisor: props.project?.supervisor ?? null,
-    // cost_sale: props.project?.cost_sale ?? [0, 'COP'],
+    cost_sale: props.project?.cost_sale ?? [0, 'COP'],
     observations: props.project?.observations ?? null,
     start_date: props.project?.start_date ?? null,
     end_date: props.project?.end_date ?? null,
@@ -381,9 +381,9 @@ const prueba = ref()
                                 :invalid="$page.props.errors.status ? true : false" />
 
                             <!--CAMPO COSTO DE VENTA (cost_sale)-->
-                            <CustomInput label="Valor Venta" :disabled="true" type="number" mode="currency"
-                                :currency="project.cost_sale[1]" v-model:input="project.cost_sale[0]"
-                                :errorMessage="router.page.props.errors.supervisor"
+                            <CustomInput label="Valor Venta" type="number" mode="currency"
+                                :currency="formData.cost_sale[1] == null ? 'COP' : formData.cost_sale[1]"
+                                v-model:input="formData.cost_sale[0]" :errorMessage="router.page.props.errors.supervisor"
                                 :invalid="router.page.props.errors.supervisor ? true : false" />
 
                             <!--CAMPO DESCRIPCIÓN (description)-->
