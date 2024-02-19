@@ -86,7 +86,7 @@ const formatCurrency = (valor, moneda) => {
                     </span>
                 </div>
             </template>
-            <div class="max-h-[50vh] overflow-y-auto">
+            <div class="max-h-[50vh] overflow-y-auto overflow-x-hidden">
                 <AccordionBudget v-if="pep.peps" :data="pep.peps" :option="option" />
                 <AccordionBudget v-if="pep.grafos" :data="pep.grafos" :option="option" level="grafo" />
                 <span v-if="level == 'grafo'">

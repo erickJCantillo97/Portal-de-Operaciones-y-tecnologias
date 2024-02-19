@@ -42,9 +42,15 @@ class ProjectController extends Controller
         $authorizations = Authorization::orderBy('contract_id')->get();
         $quotes = Quote::get();
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
-
+        $gerentes = getPersonalGerenciaOficina('GECON', 'DEGPC')->map(function ($estimador) {
+            return [
+                'user_id' => $estimador['Num_SAP'],
+                'name' => $estimador['Nombres_Apellidos'],
+                'email' => $estimador['Correo']
+            ];
+        })->toArray();
         // return $ships;
-        return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes', 'ships'));
+        return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes', 'ships', 'gerente'));
     }
 
     /**
@@ -63,7 +69,7 @@ class ProjectController extends Controller
             'status' => 'nullable',
             'scope' => 'nullable',
             'supervisor' => 'nullable',
-            'cost_sale' => 'nullable|numeric',
+            'cost_sale' => 'nullable',
             'observations' => 'nullable',
             'start_date' => 'nullable',
             'end_date' => 'nullable',
@@ -71,11 +77,11 @@ class ProjectController extends Controller
             'daysPerWeek' => 'nullable',
             'daysPerMonth' => 'nullable',
             'shift' => 'nullable',
+            // 'ships' => 'nullable|array'
         ]);
 
         try {
             $validateData['gerencia'] = auth()->user()->gerencia;
-
             $id = Project::create($validateData)->id;
             foreach ($request->ships as $ship) {
                 ProjectsShip::create([
@@ -153,7 +159,14 @@ class ProjectController extends Controller
         $quotes = Quote::get();
         $milestones = Milestone::where('project_id', $project->id)->get();
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
-        WeekTask::where('project_id', $project->id)->where();
+        $gerentes = getPersonalGerenciaOficina('GECON', 'DEGPC')->map(function ($estimador) {
+            return [
+                'user_id' => $estimador['Num_SAP'],
+                'name' => $estimador['Nombres_Apellidos'],
+                'email' => $estimador['Correo']
+            ];
+        })->toArray();
+        // WeekTask::where('project_id', $project->id)->where();
         return Inertia::render(
             'Project/CreateProjects',
             [
@@ -163,7 +176,8 @@ class ProjectController extends Controller
                 'authorizations' => $authorizations,
                 'quotes' => $quotes,
                 'ships' => $ships,
-                'milestones' => $milestones
+                'milestones' => $milestones,
+                'gerentes' => $gerentes
             ]
         );
     }
@@ -192,7 +206,8 @@ class ProjectController extends Controller
             'daysPerWeek' => 'nullable',
             'daysPerMonth' => 'nullable',
             'shift' => 'nullable',
-            'file' => 'nullable'
+            'file' => 'nullable',
+            // 'ships' => 'nullable|array'
         ]);
 
         try {

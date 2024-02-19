@@ -5,7 +5,7 @@ import { ref } from 'vue';
 import FileUpload from 'primevue/fileupload';
 import Empty from './Empty.vue';
 import Badge from 'primevue/badge';
-import { router, useForm } from '@inertiajs/vue3';
+import { router, useForm, usePage } from '@inertiajs/vue3';
 import { useToast } from "primevue/usetoast";
 import Loading from './Loading.vue';
 import Toast from 'primevue/toast';
@@ -94,24 +94,28 @@ const formatSize = (bytes) => {
     return `${formattedSize} ${sizes[i]}`;
 }
 
+const errors = ref()
+
 const loading = ref(false)
 const uploadArchives = (event) => {
     loading.value = true
     let files
     files = props.multiple ? event.files : event.files[0]
-    router.post(route(props.url), { files }, {
+    router.post(props.url, { docs: files }, {
         onSuccess: () => {
-            toast.add({ severity: 'success', group: "customToast", text: 'Guardado con exito', life: 2000 })
+            toast.add({ severity: 'success', group: "customToast", text: 'Archivo subido con exito', life: 2000 })
             loading.value = false
             visible.value = false
         },
         onError: (e) => {
-            console.log(e)
+            console.log(usePage().props.errorBags.default.errors)
+            errors.value = usePage().props.errorBags.default
             toast.add({ severity: 'error', group: "customToast", text: 'Error al guardar', life: 2000 })
             loading.value = false
         }
     })
 }
+
 </script>
 <template>
     <Button v-tooltip.top="tooltip" :class="classButton" :outlined :severity :label="labelButton" :icon="iconButton"
@@ -122,7 +126,7 @@ const uploadArchives = (event) => {
                 <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">
                     <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">
                         <div class="flex gap-2">
-                            <Button @click="chooseCallback()" icon="fa-solid fa-file-import" text
+                            <Button @click="chooseCallback(); errors = null" icon="fa-solid fa-file-import" text
                                 label="Seleccionar"></Button>
                             <Button @click="uploadEvent(uploadCallback)" icon="fa-solid fa-cloud-arrow-up" text
                                 label="Subir" severity="success" :disabled="!files || files.length === 0"></Button>
@@ -168,6 +172,15 @@ const uploadArchives = (event) => {
                     <Empty v-else message="Arrastra aqui" />
                 </template>
             </FileUpload>
+            <div v-if="errors" class="w-full p-1 text-red-600">
+                <p class="text-center font-bold">Hay errores en el archivo</p>
+                <div class="max-h-32 overflow-y-auto">
+                    <div class="flex space-x-2 items-center" v-for="error in errors">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <p>{{ error }}</p>
+                    </div>
+                </div>
+            </div>
         </template>
     </CustomModal>
     <Toast position="bottom-center" group="customToast"

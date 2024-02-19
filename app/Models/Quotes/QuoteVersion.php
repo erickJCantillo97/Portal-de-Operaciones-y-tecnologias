@@ -45,6 +45,8 @@ class QuoteVersion extends Model
         return $this->hasMany(QuoteTypeShip::class, 'quote_version_id');
     }
 
+
+
     public function getConsecutiveAttribute()
     {
         return str_pad($this->quote->consecutive ?? 1, 3, 0, STR_PAD_LEFT) . '-' . $this->version . '-' . Carbon::parse($this->expeted_answer_date)->format('Y');
@@ -66,7 +68,7 @@ class QuoteVersion extends Model
     }
     public function getTotalCostAttribute()
     {
-        return [$this->quoteTypeShips->sum('price_before_iva_original'), $this->coin];
+        return [$this->quoteTypeShips->sum('price_before_iva_original'), $this->coin === 'EURO' ?  'EUR' : $this->coin];
     }
 
     public function comments(): MorphMany

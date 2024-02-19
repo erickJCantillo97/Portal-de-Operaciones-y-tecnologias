@@ -110,6 +110,10 @@ const props = defineProps({
         typ: String,
         default: null
     },
+    optionValue: {
+        typ: String,
+        default: null
+    },
     showClear: {
         typ: Boolean,
         default: true
@@ -186,7 +190,7 @@ const input = defineModel('input', {
                 :prefix :pt="{input:'!w-full'}" />
             <Textarea v-else-if="type == 'textarea'" :id :disabled :rows="rowsTextarea" class="w-full" :required
                 :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
-            <Dropdown v-else-if="type == 'dropdown'" :id :disabled :placeholder :options :optionLabel :loading showClear
+            <Dropdown v-else-if="type == 'dropdown'" :optionValue :id :disabled :placeholder :options :optionLabel :loading showClear
                 :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''" v-model="input"
                 :aria-describedby="id + '-help'" class="w-full" :pt="{
                     root: '!h-8',
@@ -194,7 +198,7 @@ const input = defineModel('input', {
                     item: '!py-1 !px-3 !text-sm !font-normal',
                     filterInput: '!h-8'
                 }" />
-            <Dropdown v-else-if="type == 'country'" :id :disabled :placeholder filter resetFilterOnHide :options="countries"
+            <Dropdown v-else-if="type == 'country'" :optionValue :id :disabled :placeholder filter resetFilterOnHide :options="countries"
                 :loading :class="invalid ? 'p-invalid' : ''" v-model="input" optionLabel="translations.spa.common"
                 :aria-describedby="id + '-help'" class="w-full" :pt="{
                     root: '!h-8 ',
@@ -218,7 +222,7 @@ const input = defineModel('input', {
                     </div>
                 </template>
             </Dropdown>
-            <MultiSelect v-else-if="type == 'multiselect'" :id display="chip" v-model="input" :options :optionLabel :loading
+            <MultiSelect v-else-if="type == 'multiselect'" :optionValue  :id display="chip" v-model="input" :options :optionLabel :loading
                 :maxSelectedLabels :placeholder :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''"
                 class="w-full" :aria-describedby="id + '-help'" :pt="{
                     root: '!h-8',
