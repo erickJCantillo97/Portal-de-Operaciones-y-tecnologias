@@ -32,15 +32,23 @@ class BudgetController extends Controller
     public function getbudgetProject(Project $project)
     {
         $pep = Virtualpep::where('project_id', $project->id)->first();
-        $services_ejecutado = VirtualPep::where('project_id', $project->id)->get()->sum('services_ejecutados') + Grafo::where('project_id', $project->id)->get()->sum('services_ejecutados') + Operation::where('project_id', $project->id)->get()->sum('services_ejecutados');
         $labor = Pep::where('pep_id', $pep->id)->sum('labor');
         $materials = Pep::where('pep_id', $pep->id)->sum('materials');
         $services = Pep::where('pep_id', $pep->id)->sum('services');
+
+        $materials_ejecutados = VirtualPep::where('project_id', $project->id)->get()->sum('materials_ejecutados') + Grafo::where('project_id', $project->id)->get()->sum('materials_ejecutados') + Operation::where('project_id', $project->id)->get()->sum('materials_ejecutados');
+
+        $labor_ejecutados = VirtualPep::where('project_id', $project->id)->get()->sum('labor_ejecutados') + Grafo::where('project_id', $project->id)->get()->sum('labor_ejecutados') + Operation::where('project_id', $project->id)->get()->sum('labor_ejecutados');
+
+        $services_ejecutados = VirtualPep::where('project_id', $project->id)->get()->sum('services_ejecutados') + Grafo::where('project_id', $project->id)->get()->sum('services_ejecutados') + Operation::where('project_id', $project->id)->get()->sum('services_ejecutados');
         return response()->json([
             'labor' => $labor,
             'materials' => $materials,
             'services' => $services,
             'total' => ($labor + $materials + $services),
+            'materials_ejecutados' => $materials_ejecutados,
+            'labor_ejecutados' => $labor_ejecutados,
+            'serivices_ejecutados' => $services_ejecutados
         ]);
     }
 }

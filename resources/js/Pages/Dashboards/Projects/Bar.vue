@@ -27,9 +27,9 @@ const option = ref({
       type: 'shadow'
     },
     trigger: 'axis',
-    formatter: ((params) => {
+    formatter: (params => {
       let tooltip = ''
-      params.map((param) => {
+      params.map(param => {
         tooltip += param.name + '<br>' + param.marker + ' ' + param.seriesName + ': ' + Intl.NumberFormat().format(Number(param.value).toFixed(2)) + '%<br>'
       })
       return tooltip
@@ -39,7 +39,7 @@ const option = ref({
     show: true,
     position: 'right',
     valueAnimation: true,
-    formatter: ((val) => {
+    formatter: (val => {
       return new Intl.NumberFormat().format(Number(val.value).toFixed(2)) + '%'
     })
   },

@@ -65,11 +65,11 @@ const option = ref({
   },
   tooltip: {
     trigger: 'axis',
-    formatter: ((params) => {
+    formatter: (params => {
       let tooltip = ''
-      params.map((param => {
+      params.map(param => {
         tooltip += param.name + '<br>' + param.marker + ' ' + param.seriesName + ': ' + Intl.NumberFormat().format(Number(param.value).toFixed(2)) + '%<br>'
-      }))
+      })
       return tooltip;
     })
   },
