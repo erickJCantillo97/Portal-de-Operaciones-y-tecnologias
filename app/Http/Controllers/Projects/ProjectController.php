@@ -71,11 +71,11 @@ class ProjectController extends Controller
             'daysPerWeek' => 'nullable',
             'daysPerMonth' => 'nullable',
             'shift' => 'nullable',
+            'ships' => 'nullable|array'
         ]);
 
         try {
             $validateData['gerencia'] = auth()->user()->gerencia;
-
             $id = Project::create($validateData)->id;
             foreach ($request->ships as $ship) {
                 ProjectsShip::create([
@@ -192,7 +192,8 @@ class ProjectController extends Controller
             'daysPerWeek' => 'nullable',
             'daysPerMonth' => 'nullable',
             'shift' => 'nullable',
-            'file' => 'nullable'
+            'file' => 'nullable',
+            'ships' => 'nullable|array'
         ]);
 
         try {
