@@ -355,3 +355,7 @@ Route::get('/mailable', function () {
 
     return new App\Mail\AssignmentToolsMail($data);
 });
+Route::post('/prueba', function (Request $request) {
+
+    return back()->withErrors(['errors' => ['messaje', 'default1','messaje1', 'default2','messaje4', 'default4','messaje', 'default',]]);
+})->name('prueba');
