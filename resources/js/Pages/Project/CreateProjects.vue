@@ -6,7 +6,6 @@ import axios from 'axios'
 import ToggleButton from 'primevue/togglebutton'
 import Listbox from 'primevue/listbox';
 import CustomUpload from "@/Components/CustomUpload.vue";
-import NoContentToShow from '@/Components/NoContentToShow.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
@@ -34,14 +33,12 @@ const props = defineProps({
         default: []
     },
     weekTasks: Array,
+    gerentes: Object,
 })
 
 //#region Referencias (v-model)
 const authorizationSelect = ref()
 const selectedShips = ref([])
-const API_Ships = ref(props.ships)
-const filteredShips = ref(props.ships)
-const keyword = ref(null)
 const shiftOptions = ref([])
 const showLoading = ref(true)
 const showNoContent = ref(false)
@@ -107,7 +104,7 @@ const formData = ref({
     status: props.project?.status ?? null, //ENUMS
     scope: props.project?.scope ?? null, //ENUMS
     supervisor: props.project?.supervisor ?? null,
-    cost_sale: props.project?.cost_sale ?? [0, 'COP'],
+    cost_sale: props.project.cost_sale ? [parseInt(props.project.cost_sale[0]), props.project.cost_sale[1]] : [0, 'COP'],
     observations: props.project?.observations ?? null,
     start_date: props.project?.start_date ?? null,
     end_date: props.project?.end_date ?? null,
@@ -286,9 +283,9 @@ const saveweekTask = () => {
 </script>
 <template>
     <AppLayout>
-        <main class="px-2 overflow-y-scroll">
-            <header class="w-full flex justify-between">
-                <h2 class="text-lg font-semibold mb-4 w-full text-primary lg:text-2xl">
+        <div class="h-[89vh] overflow-y-auto flex flex-col ">
+            <div class="flex justify-between items-center px-2 h-12">
+                <h2 class="text-lg font-semibold w-full text-primary lg:text-2xl">
                     {{ project ? 'Editar proyecto' : 'Nuevo proyecto' }}
                 </h2>
                 <div v-if="props.project" class="space-x-4 justify-end flex w-full">
@@ -299,11 +296,15 @@ const saveweekTask = () => {
                     <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" icon-button="fa-solid fa-chart-bar"
                         tooltip="Subir Estructura" accept=".xlsx,.xls"
                         :url="route('upload.estructure', props.project.id)" />
+                    <!-- 
+                    <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Presupuesto del proyecto"
+                        icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
+                        url="prueba" severity="success" />
 
                     <CustomUpload mode="advanced" titleModal="Subir Presupuesto del proyecto"
                         icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
                         :url="route('upload.budget', props.project.id)" severity="success" />
-                    <!-- 
+                    
                     <CustomUpload mode="advanced" :multiple="true" titleModal="Subir el avance planeado del proyecto"
                         tooltip="Subir Curva S" accept=".xlsx,.xls" url="prueba" severity="info" />
 
@@ -311,156 +312,151 @@ const saveweekTask = () => {
                         icon-button="fa-solid fa-money-bill-trend-up" tooltip="Subir Costos Ejecutados" accept=".xlsx,.xls"
                         url="prueba" severity="danger" /> -->
                 </div>
-            </header>
-            <section class="p-2">
+            </div>
+            <div class="p-2 h-full">
                 <!-- AQUÍ VA EL CONTENIDO DEL FORMULARIO-->
-                <form-wizard @on-complete="submit()" stepSize="md" color="#2E3092" nextButtonText="Siguiente"
-                    backButtonText="Regresar" finishButtonText="Guardar">
+                <form-wizard @on-complete="submit()" stepSize="md" class="flex flex-col" color="#2E3092"
+                    nextButtonText="Siguiente" backButtonText="Regresar" finishButtonText="Guardar">
                     <!--INFORMACIÓN CONTRACTUAL-->
-                    <tab-content title="Información Contractual" icon="fa-solid fa-file-signature"
-                        :before-change="beforeChange">
-                        <section class="border gap-4 border-gray-200 rounded-lg p-4 grid grid-cols-2">
-                            <!--CAMPO NOMBRE DEL PROYECTO (name)-->
-                            <CustomInput label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
-                                v-model:input="formData.name" :errorMessage="$page.props.errors.name"
-                                :invalid="$page.props.errors.name ? true : false" />
-                            <!--CAMPO CÓDIGO DE SAP (SAP_code)-->
-                            <CustomInput label="Código SAP" placeholder="Escriba el código de SAP"
-                                v-model:input="formData.SAP_code" :errorMessage="$page.props.errors.SAP_code"
-                                :invalid="$page.props.errors.SAP_code ? true : false" />
-                            <!--CAMPO ALCANCE DEL PROYECTO (scope)-->
-                            <CustomInput label="Alcance del Proyecto" type="dropdown"
-                                placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.scope" showClear
-                                :options="scopeOptions" :errorMessage="$page.props.errors.scope"
-                                :invalid="$page.props.errors.scope ? true : false" />
-                            <CustomInput label="Contrato" type="dropdown" placeholder="Seleccione Alcance del Proyecto"
-                                optionValue="id" optionLabel="contract_id" v-model:input="formData.contract_id" showClear
-                                :options="contracts" />
-                            <CustomInput label="Autorizaciones" type="dropdown" placeholder="Seleccione Autorización"
-                                optionLabel="name" v-model:input="authorizationSelect" showClear :options="authorizations"
-                                :errorMessage="$page.props.errors.authorization_id"
-                                :invalid="$page.props.errors.authorization_id ? true : false" />
-                            <CustomInput label="Estimaciones" type="dropdown" placeholder="Seleccione Estimación"
-                                optionLabel="name" v-model:input="formData.quote_id" optionValue="id" showClear
-                                :options="quotes" :errorMessage="$page.props.errors.quote_id"
-                                :invalid="$page.props.errors.quote_id ? true : false" />
-                        </section>
+                    <tab-content title="Información Contractual"
+                        class="h-full border gap-4 border-gray-200 rounded-lg p-4 grid grid-cols-2"
+                        icon="fa-solid fa-file-signature" :before-change="beforeChange">
+                        <!--CAMPO NOMBRE DEL PROYECTO (name)-->
+                        <CustomInput label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
+                            v-model:input="formData.name" :errorMessage="$page.props.errors.name"
+                            :invalid="$page.props.errors.name ? true : false" />
+                        <!--CAMPO CÓDIGO DE SAP (SAP_code)-->
+                        <CustomInput label="Código SAP" placeholder="Escriba el código de SAP"
+                            v-model:input="formData.SAP_code" :errorMessage="$page.props.errors.SAP_code"
+                            :invalid="$page.props.errors.SAP_code ? true : false" />
+                        <!--CAMPO ALCANCE DEL PROYECTO (scope)-->
+                        <CustomInput label="Alcance del Proyecto" type="dropdown"
+                            placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.scope" showClear
+                            :options="scopeOptions" :errorMessage="$page.props.errors.scope"
+                            :invalid="$page.props.errors.scope ? true : false" />
+                        <CustomInput label="Contrato" type="dropdown" placeholder="Seleccione Alcance del Proyecto"
+                            optionValue="id" optionLabel="contract_id" v-model:input="formData.contract_id" showClear
+                            :options="contracts" />
+                        <CustomInput label="Autorizaciones" type="dropdown" placeholder="Seleccione Autorización"
+                            optionLabel="name" v-model:input="authorizationSelect" showClear :options="authorizations"
+                            :errorMessage="$page.props.errors.authorization_id"
+                            :invalid="$page.props.errors.authorization_id ? true : false" />
+                        <CustomInput label="Estimaciones" type="dropdown" placeholder="Seleccione Estimación"
+                            optionLabel="name" v-model:input="formData.quote_id" optionValue="id" showClear
+                            :options="quotes" :errorMessage="$page.props.errors.quote_id"
+                            :invalid="$page.props.errors.quote_id ? true : false" />
                     </tab-content>
                     <!--DATOS DEL PROYECTO-->
                     <tab-content title="Datos del Proyecto" icon="fa-solid fa-diagram-project"
-                        :before-change="beforeChange">
-                        <section class="grid grid-cols-2 border gap-4 border-gray-200 rounded-lg p-4">
-                            <!--CAMPO SUPERVISOR (supervisor)-->
-                            <CustomInput label="Supervisor" placeholder="Nombre del supervisor"
-                                v-model:input="formData.supervisor" />
+                        class="grid grid-cols-2 border gap-4 rounded-lg p-4" :before-change="beforeChange">
+                        <!--CAMPO SUPERVISOR (supervisor)-->
+                        <CustomInput label="Supervisor" placeholder="Nombre del supervisor" optionLabel="name"
+                            optionValue="name" :options="Object.values(gerentes)" type="dropdown"
+                            v-model:input="formData.supervisor" @change="console.log($event)" />
 
-                            <!--CAMPO TIPO DE PROYECTO (type)-->
+                        <!--CAMPO TIPO DE PROYECTO (type)-->
 
-                            <CustomInput label="Tipo de Proyecto" type="dropdown"
-                                placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.type" showClear
-                                :options="typeOptions" />
+                        <CustomInput label="Tipo de Proyecto" type="dropdown" placeholder="Seleccione Alcance del Proyecto"
+                            v-model:input="formData.type" showClear :options="typeOptions" />
 
-                            <!--CAMPO ESTADO DEL PROYECTO (status)-->
-                            <CustomInput label="Estado del Proyecto" type="dropdown"
-                                placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.status" showClear
-                                :options="statusOptions" />
+                        <!--CAMPO ESTADO DEL PROYECTO (status)-->
+                        <CustomInput label="Estado del Proyecto" type="dropdown"
+                            placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.status" showClear
+                            :options="statusOptions" />
 
-                            <!--CAMPO COSTO DE VENTA (cost_sale)-->
-                            <CustomInput label="Valor Venta" type="number" mode="currency"
-                                :currency="formData.cost_sale[1] == null ? 'COP' : formData.cost_sale[1]"
-                                v-model:input="formData.cost_sale[0]" />
+                        <!--CAMPO COSTO DE VENTA (cost_sale)-->
+                        <CustomInput label="Valor Venta" type="number" mode="currency"
+                            :currency="formData.cost_sale[1] == null ? 'COP' : formData.cost_sale[1]"
+                            v-model:input="formData.cost_sale[0]" />
 
-                            <!--CAMPO DESCRIPCIÓN (description)-->
-                            <CustomInput type="textarea" v-model:input="formData.observations" class="col-span-2"
-                                label="Descripción" :rowsTextarea="1" placeholder="Descripción del proyecto..." />
+                        <!--CAMPO DESCRIPCIÓN (description)-->
+                        <CustomInput type="textarea" v-model:input="formData.observations" class="col-span-2"
+                            label="Descripción" :rowsTextarea="1" placeholder="Descripción del proyecto..." />
 
-                        </section>
                     </tab-content>
                     <!--PLANEACIÓN DEL PROYECTO-->
                     <tab-content title="Planeación del Proyecto" icon="fa-solid fa-calendar-check"
-                        :before-change="beforeChange">
-                        <section class="flex border gap-6 border-gray-200 rounded-lg p-4">
-                            <div class="grid grid-cols-2 gap-6 w-full">
-                                <div class="space-y-4">
-                                    <!--CAMPO FECHA INICIO-->
-                                    <CustomInput type="date" label="Fecha De Inicio" v-model:input="formData.start_date"
-                                        :disabled="!contractSelect" />
-                                    <!--CAMPO FECHA FINALIZACIÓN-->
-                                    <CustomInput type="date" label="Fecha de Finalización" v-model:input="formData.end_date"
-                                        :disabled="!contractSelect" />
-                                    <div class="gap-6 grid grid-cols-3">
-                                        <!--CAMPO HORAS POR DÍA (hoursPerDay)-->
-                                        <CustomInput label="Horas por Dia" type="number"
-                                            v-model:input="formData.hoursPerDay" :min="0" :maxFractionDigits="2" />
+                        :before-change="beforeChange" class="flex border gap-6  rounded-lg p-4">
+                        <div class="grid grid-cols-2 gap-6 w-full">
+                            <div class="space-y-4">
+                                <!--CAMPO FECHA INICIO-->
+                                <CustomInput type="date" label="Fecha De Inicio" v-model:input="formData.start_date"
+                                    :disabled="!formData.contract_id" />
+                                <!--CAMPO FECHA FINALIZACIÓN-->
+                                <CustomInput type="date" label="Fecha de Finalización" v-model:input="formData.end_date"
+                                    :disabled="!formData.contract_id" />
+                                <div class="gap-6 grid grid-cols-3">
+                                    <!--CAMPO HORAS POR DÍA (hoursPerDay)-->
+                                    <CustomInput label="Horas por Dia" type="number" v-model:input="formData.hoursPerDay"
+                                        :min="0" :maxFractionDigits="2" />
 
-                                        <!--CAMPO DIAS POR SEMANA (daysPerWeek)-->
-                                        <CustomInput label="Dias por Semana" type="number"
-                                            v-model:input="formData.daysPerWeek" :min="0" :max="7" />
+                                    <!--CAMPO DIAS POR SEMANA (daysPerWeek)-->
+                                    <CustomInput label="Dias por Semana" type="number" v-model:input="formData.daysPerWeek"
+                                        :min="0" :max="7" />
 
-                                        <!--CAMPO DIAS POR MES (daysPerMonth)-->
-                                        <CustomInput label="Dias por Mes" v-model:input="formData.daysPerMonth"
-                                            type="number" :min="0" :max="31" />
-                                    </div>
-                                </div>
-                                <!--CAMPO TURNO (shift)-->
-                                <div class="">
-                                    <label class="text-sm mb-0.5 font-bold text-gray-900">Seleccione el Turno</label>
-                                    <Listbox :options="shiftOptions" optionValue="id" v-model="formData.shift"
-                                        optionLabel="name" filter :pt="{
-                                            list: '!h-40 !p-1',
-                                            item: '!h-10 !p-0 !rounded-md hover:!bg-primary-light',
-                                            filterInput: '!h-8',
-                                            header: '!p-1'
-                                        }">
-                                        <template #option="slotProps">
-                                            <div class=" h-full grid grid-cols-4 border px-1 rounded-md ">
-                                                <span class="flex justify-between items-center overflow-hidden">
-                                                    <p
-                                                        class="text-overflow h-full overflow-y-auto flex text-sm font-bold items-center">
-                                                        {{ slotProps.option.name }}</p>
-                                                    <i class="fa-regular fa-clock"></i>
-                                                </span>
-                                                <div class="text-xs items-center text-center col-span-3 grid grid-cols-4">
-                                                    <span>
-                                                        <p class="font-bold">Hora Inicio</p>
-                                                        <p>{{ formatDateTime24h(slotProps.option.startShift) }}
-                                                        </p>
-                                                    </span>
-                                                    <span>
-                                                        <p class="font-bold">Hora Fin</p>
-                                                        <p>{{ formatDateTime24h(slotProps.option.endShift) }}</p>
-                                                    </span>
-                                                    <span>
-                                                        <p class="font-bold">Descanso</p>
-                                                        <p>{{ slotProps.option.timeBreak }}h</p>
-                                                    </span>
-                                                    <span>
-                                                        <p class="font-bold">H. Laborales</p>
-                                                        <p> {{ parseFloat(slotProps.option.hours).toFixed(1) }}h</p>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </template>
-                                        <template #empty>
-                                            <Empty message="No hay turnos para mostrar"></Empty>
-                                        </template>
-                                        <template #emptyfilter>
-                                            <Empty message="No se encuentran turnos"></Empty>
-                                        </template>
-                                    </Listbox>
+                                    <!--CAMPO DIAS POR MES (daysPerMonth)-->
+                                    <CustomInput label="Dias por Mes" v-model:input="formData.daysPerMonth" type="number"
+                                        :min="0" :max="31" />
                                 </div>
                             </div>
-                        </section>
+                            <!--CAMPO TURNO (shift)-->
+                            <div class="">
+                                <label class="text-sm mb-0.5 font-bold text-gray-900">Seleccione el Turno</label>
+                                <Listbox :options="shiftOptions" optionValue="id" v-model="formData.shift"
+                                    optionLabel="name" filter :pt="{
+                                        list: '!h-40 !p-1',
+                                        item: '!h-10 !p-0 !rounded-md hover:!bg-primary-light',
+                                        filterInput: '!h-8',
+                                        header: '!p-1'
+                                    }">
+                                    <template #option="slotProps">
+                                        <div class=" h-full grid grid-cols-4 border px-1 rounded-md ">
+                                            <span class="flex justify-between items-center overflow-hidden">
+                                                <p
+                                                    class="text-overflow h-full overflow-y-auto flex text-sm font-bold items-center">
+                                                    {{ slotProps.option.name }}</p>
+                                                <i class="fa-regular fa-clock"></i>
+                                            </span>
+                                            <div class="text-xs items-center text-center col-span-3 grid grid-cols-4">
+                                                <span>
+                                                    <p class="font-bold">Hora Inicio</p>
+                                                    <p>{{ formatDateTime24h(slotProps.option.startShift) }}
+                                                    </p>
+                                                </span>
+                                                <span>
+                                                    <p class="font-bold">Hora Fin</p>
+                                                    <p>{{ formatDateTime24h(slotProps.option.endShift) }}</p>
+                                                </span>
+                                                <span>
+                                                    <p class="font-bold">Descanso</p>
+                                                    <p>{{ slotProps.option.timeBreak }}h</p>
+                                                </span>
+                                                <span>
+                                                    <p class="font-bold">H. Laborales</p>
+                                                    <p> {{ parseFloat(slotProps.option.hours).toFixed(1) }}h</p>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <template #empty>
+                                        <Empty message="No hay turnos para mostrar"></Empty>
+                                    </template>
+                                    <template #emptyfilter>
+                                        <Empty message="No se encuentran turnos"></Empty>
+                                    </template>
+                                </Listbox>
+                            </div>
+                        </div>
                     </tab-content>
                     <!--BUQUES-->
                     <tab-content title="Buques" icon="fa-solid fa-ship" :before-change="beforeChange">
                         <Listbox :options="ships" v-model="formData.ships"
                             :filterFields="['name', 'idHull', 'type_ship.name']" filterPlaceholder="Filtrar Buques" multiple
                             filter optionLabel="name" :pt="{
-                                list: '!grid !grid-cols-3 !gap-1 !p-1 !max-h-56 h-56',
+                                list: '!grid !grid-cols-4 !gap-1 !p-1 !max-h-56 h-56',
                                 header: '!p-1',
                                 filterInput: '!h-8',
-                                item: '!h-min'
+                                item: '!h-min !rounded-lg'
                             }">
                             <template #option="slotProps">
                                 <div class="flex">
@@ -487,16 +483,14 @@ const saveweekTask = () => {
                             </template>
                         </Listbox>
                     </tab-content>
-                    <tab-content title="Hitos" icon="fa-solid fa-list-check">
-                        <div class="w-full overflow-y-auto">
-                            <CustomDataTable :rowsDefault="5" :data="milestones" :columnas="columnas" :actions="actions"
-                                @edit="showModal" :filter="false" :showHeader="false" :showAdd="true" @addClic="showModal"
-                                @delete="delMilestone" />
-                        </div>
+                    <tab-content title="Hitos" icon="fa-solid fa-list-check" class="w-full border h-full rounded-lg p-1 overflow-y-auto">
+                        <CustomDataTable :rowsDefault="5" :data="milestones" :columnas="columnas" :actions="actions"
+                            @edit="showModal" :filter="false" :showHeader="false" :showAdd="true" @addClic="showModal"
+                            @delete="delMilestone" />
                     </tab-content>
                 </form-wizard>
-            </section>
-        </main>
+            </div>
+        </div>
     </AppLayout>
 
     <CustomModal v-model:visible="openDialogHito" width="30rem" :titulo="formMilestone.id ? 'Editar hito' : 'Agregar Hito'"
