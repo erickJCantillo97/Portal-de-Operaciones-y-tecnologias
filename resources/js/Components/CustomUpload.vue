@@ -5,7 +5,7 @@ import { ref } from 'vue';
 import FileUpload from 'primevue/fileupload';
 import Empty from './Empty.vue';
 import Badge from 'primevue/badge';
-import { router, useForm, usePage } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 import { useToast } from "primevue/usetoast";
 import Loading from './Loading.vue';
 import Toast from 'primevue/toast';
@@ -118,7 +118,7 @@ const uploadArchives = (event) => {
 
 </script>
 <template>
-    <Button v-tooltip.top="tooltip" :class="classButton" :outlined :severity :label="labelButton" :icon="iconButton"
+    <Button v-tooltip.left="tooltip" :class="classButton" :outlined :severity :label="labelButton" :icon="iconButton"
         @click="visible = true" />
     <CustomModal v-model:visible="visible" width="30rem" :icon="iconModal" :titulo="titleModal">
         <template #body>
