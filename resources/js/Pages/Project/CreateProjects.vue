@@ -37,28 +37,17 @@ const props = defineProps({
 })
 
 //#region Referencias (v-model)
-const checked = ref(true)
 const contractSelect = ref()
 const authorizationSelect = ref()
-const quoteSelect = ref()
 const selectedShips = ref([])
 const API_Ships = ref(props.ships)
 const filteredShips = ref(props.ships)
 const keyword = ref(null)
-const shiftSelect = ref('1')
 const shiftOptions = ref([])
 const showLoading = ref(true)
 const showNoContent = ref(false)
 //#endregion
 
-const searchShips = () => {
-    const searchWord = keyword.value.toLowerCase().trim()
-    filteredShips.value = API_Ships.value.filter(ship =>
-        ship.name.toLowerCase().includes(searchWord) ||
-        ship.idHull.toLowerCase().includes(searchWord) ||
-        ship.type_ship.name.toLowerCase().includes(searchWord)
-    )
-}
 
 //#region CustomDataTable
 const columnas = [
@@ -78,22 +67,22 @@ const actions = [
 
 //#region ENUMS
 //Tipo de Proyecto
-const typeOptions = ref([
+const typeOptions = [
     'PROYECTO DE VENTA (ARTEFACTO NAVAL)',
     'PROYECTO DE VENTA (SERV. INDUSTRIA)',
     'PROYECTO DE VENTA (SUMINISTRO/SERVICIO)',
     'PROYECTO DE INVERSION INTERNA',
     'PROYECTO DE INVERSIÓN (ARTEFACTO NAVAL)'
-])
+]
 
 //Estado de Proyecto
-const statusOptions = ref([
+const statusOptions = [
     'DISEÑO Y CONSTRUCCIÓN',
     'CONSTRUCCIÓN',
     'DISEÑO',
     'GARANTIA',
     'SERVICIO POSTVENTA'
-])
+]
 
 //Alcance de Proyecto
 const scopeOptions = [
@@ -119,14 +108,16 @@ const formData = ref({
     status: props.project?.status ?? null, //ENUMS
     scope: props.project?.scope ?? null, //ENUMS
     supervisor: props.project?.supervisor ?? null,
-    // cost_sale: props.project?.cost_sale ?? [0, 'COP'],
+    cost_sale: props.project?.cost_sale ?? [0, 'COP'],
     observations: props.project?.observations ?? null,
     start_date: props.project?.start_date ?? null,
     end_date: props.project?.end_date ?? null,
     hoursPerDay: parseFloat(props.project?.hoursPerDay ?? 8.5),
     daysPerWeek: parseInt(props.project?.daysPerWeek ?? 5),
     daysPerMonth: parseInt(props.project?.daysPerMonth ?? 20),
-    shift: props.project != null ? parseInt(props.project.shift) : null
+    shift: props.project != null ? parseInt(props.project.shift) : null,
+    ships: props.project?.ships ?? null
+
 })
 //#endregion
 
@@ -381,9 +372,9 @@ const prueba = ref()
                                 :invalid="$page.props.errors.status ? true : false" />
 
                             <!--CAMPO COSTO DE VENTA (cost_sale)-->
-                            <CustomInput label="Valor Venta" :disabled="true" type="number" mode="currency"
-                                :currency="project.cost_sale[1]" v-model:input="project.cost_sale[0]"
-                                :errorMessage="router.page.props.errors.supervisor"
+                            <CustomInput label="Valor Venta" type="number" mode="currency"
+                                :currency="formData.cost_sale[1] == null ? 'COP' : formData.cost_sale[1]"
+                                v-model:input="formData.cost_sale[0]" :errorMessage="router.page.props.errors.supervisor"
                                 :invalid="router.page.props.errors.supervisor ? true : false" />
 
                             <!--CAMPO DESCRIPCIÓN (description)-->
@@ -488,8 +479,9 @@ const prueba = ref()
                                 offLabel="Deseleccionar todo" onIcon="pi pi-check-square" offIcon="pi pi-stop"
                                 aria-label="Do you confirm" @click="selectAllShips()" class="!h-8" />
                         </div> -->
-                        <Listbox :options="ships" v-model="prueba" :filterFields="['name', 'idHull', 'type_ship.name']"
-                            filterPlaceholder="Filtrar Buques" multiple filter optionLabel="name" :pt="{
+                        <Listbox :options="ships" v-model="formData.ships"
+                            :filterFields="['name', 'idHull', 'type_ship.name']" filterPlaceholder="Filtrar Buques" multiple
+                            filter optionLabel="name" :pt="{
                                 list: '!grid !grid-cols-3 !gap-1 !p-1 !max-h-56 h-56',
                                 header: '!p-1',
                                 filterInput: '!h-8',
@@ -502,44 +494,24 @@ const prueba = ref()
                                         class="object-cover object-center max-w-24 " />
                                     <div class="h-full flex flex-col">
                                         <li>
-                                            <p class="truncate">{{ slotProps.option.name }}</p>
+                                            <p class="truncate">
+                                                {{ slotProps.option.name }}
+                                            </p>
                                         </li>
                                         <li>
-                                            <p><span class="font-semibold">Casco:</span> {{ slotProps.option.idHull }}</p>
+                                            <p><span class="font-semibold">Casco:</span> 
+                                                {{ slotProps.option.idHull }}
+                                            </p>
                                         </li>
                                         <li>
-                                            <p><span class="font-semibold">Clase:</span> {{ slotProps.option.type_ship.name
-                                            }}
+                                            <p><span class="font-semibold">Clase:</span> 
+                                            {{ slotProps.option.type_ship.name }}
                                             </p>
                                         </li>
                                     </div>
                                 </div>
                             </template>
                         </Listbox>
-                        <!-- <section
-                            class="grid grid-cols-4 h-60 overflow-y-auto custom-scroll snap-y snap-mandatory sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2">
-                            <NoContentToShow v-if="props.ships == 0" subject="Buques" class="!mt-0" />
-                            <ul v-for="ship in filteredShips" :key="ship.id" v-else
-                                class="text-sm italic [&>li>p]:font-semibold snap-start">
-                                <div @click="toggleSelectShip(ship.id)" v-tooltip.top="ship.name"
-                                    :class="selectedShips.includes(ship.id) ? 'bg-blue-900 text-white' : 'hover:bg-blue-300'"
-                                    class="flex space-x-1 shadow-md rounded-sm cursor-pointer transition-all duration-200 hover:scale-[1.01] ease-in-out hover:shadow-md">
-                                    <img :src="ship.file" onerror="this.src='/images/generic-boat.png'"
-                                        class="object-cover object-center max-w-24" />
-                                    <div class="h-full flex flex-col">
-                                        <li>
-                                            <p class="truncate">{{ ship.name }}</p>
-                                        </li>
-                                        <li>
-                                            <p><span class="font-semibold">Casco:</span> {{ ship.idHull }}</p>
-                                        </li>
-                                        <li>
-                                            <p><span class="font-semibold">Clase:</span> {{ ship.type_ship.name }}</p>
-                                        </li>
-                                    </div>
-                                </div>
-                            </ul>
-                        </section> -->
                     </tab-content>
                     <tab-content title="Hitos" icon="fa-solid fa-list-check">
                         <div class="w-full overflow-y-auto">
