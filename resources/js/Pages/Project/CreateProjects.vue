@@ -37,7 +37,6 @@ const props = defineProps({
 })
 
 //#region Referencias (v-model)
-const contractSelect = ref()
 const authorizationSelect = ref()
 const selectedShips = ref([])
 const API_Ships = ref(props.ships)
@@ -284,7 +283,6 @@ const saveweekTask = () => {
     }
 }
 
-const prueba = ref()
 </script>
 <template>
     <AppLayout>
@@ -334,10 +332,8 @@ const prueba = ref()
                                 placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.scope" showClear
                                 :options="scopeOptions" :errorMessage="$page.props.errors.scope"
                                 :invalid="$page.props.errors.scope ? true : false" />
-                            <CustomInput label="Contrato" type="dropdown" placeholder="Seleccione Alcance del Proyecto"
-                                optionLabel="contract_id" v-model:input="contractSelect" showClear :options="contracts"
-                                :errorMessage="$page.props.errors.contract_id"
-                                :invalid="$page.props.errors.contract_id ? true : false" />
+                            <CustomInput label="Contrato" type="dropdown" placeholder="Seleccione Alcance del Proyecto" optionValue="id"
+                                optionLabel="contract_id" v-model:input="formData.contract_id" showClear :options="contracts"/>
                             <CustomInput label="Autorizaciones" type="dropdown" placeholder="Seleccione Autorización"
                                 optionLabel="name" v-model:input="authorizationSelect" showClear :options="authorizations"
                                 :errorMessage="$page.props.errors.authorization_id"
@@ -355,33 +351,27 @@ const prueba = ref()
                         <section class="grid grid-cols-2 border gap-4 border-gray-200 rounded-lg p-4">
                             <!--CAMPO SUPERVISOR (supervisor)-->
                             <CustomInput label="Supervisor" placeholder="Nombre del supervisor"
-                                v-model:input="formData.supervisor" :errorMessage="router.page.props.errors.supervisor"
-                                :invalid="router.page.props.errors.supervisor ? true : false" />
+                                v-model:input="formData.supervisor" />
 
                             <!--CAMPO TIPO DE PROYECTO (type)-->
 
                             <CustomInput label="Tipo de Proyecto" type="dropdown"
                                 placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.type" showClear
-                                :options="typeOptions" :errorMessage="$page.props.errors.type"
-                                :invalid="$page.props.errors.type ? true : false" />
+                                :options="typeOptions" />
 
                             <!--CAMPO ESTADO DEL PROYECTO (status)-->
                             <CustomInput label="Estado del Proyecto" type="dropdown"
                                 placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.status" showClear
-                                :options="statusOptions" :errorMessage="$page.props.errors.status"
-                                :invalid="$page.props.errors.status ? true : false" />
+                                :options="statusOptions" />
 
                             <!--CAMPO COSTO DE VENTA (cost_sale)-->
                             <CustomInput label="Valor Venta" type="number" mode="currency"
                                 :currency="formData.cost_sale[1] == null ? 'COP' : formData.cost_sale[1]"
-                                v-model:input="formData.cost_sale[0]" :errorMessage="router.page.props.errors.supervisor"
-                                :invalid="router.page.props.errors.supervisor ? true : false" />
+                                v-model:input="formData.cost_sale[0]" />
 
                             <!--CAMPO DESCRIPCIÓN (description)-->
                             <CustomInput type="textarea" v-model:input="formData.observations" class="col-span-2"
-                                label="Descripción" :rowsTextarea="1" placeholder="Descripción del proyecto..."
-                                :errorMessage="router.page.props.errors.observations"
-                                :invalid="router.page.props.errors.observations ? true : false" />
+                                label="Descripción" :rowsTextarea="1" placeholder="Descripción del proyecto..." />
 
                         </section>
                     </tab-content>
@@ -393,31 +383,23 @@ const prueba = ref()
                                 <div class="space-y-4">
                                     <!--CAMPO FECHA INICIO-->
                                     <CustomInput type="date" label="Fecha De Inicio" v-model:input="formData.start_date"
-                                        :errorMessage="$page.props.errors.start_date" :disabled="!contractSelect"
-                                        :invalid="router.page.props.errors.start_date ? true : false" />
+                                        :disabled="!contractSelect" />
                                     <!--CAMPO FECHA FINALIZACIÓN-->
                                     <CustomInput type="date" label="Fecha de Finalización" v-model:input="formData.end_date"
-                                        :errorMessage="$page.props.errors.end_date" :disabled="!contractSelect"
-                                        :invalid="router.page.props.errors.end_date ? true : false" />
-
+                                        :disabled="!contractSelect" />
                                     <div class="gap-6 grid grid-cols-3">
                                         <!--CAMPO HORAS POR DÍA (hoursPerDay)-->
                                         <CustomInput label="Horas por Dia" type="number"
                                             v-model:input="formData.hoursPerDay" :min="0" :maxFractionDigits="2"
-                                            :invalid="router.page.props.errors.hoursPerDay ? true : false"
-                                            :errorMessage="router.page.props.errors.hoursPerDay" />
+                                             />
 
                                         <!--CAMPO DIAS POR SEMANA (daysPerWeek)-->
                                         <CustomInput label="Dias por Semana" type="number"
-                                            v-model:input="formData.daysPerWeek" :min="0" :max="7"
-                                            :invalid="router.page.props.errors.daysPerWeek ? true : false"
-                                            :errorMessage="router.page.props.errors.daysPerWeek" />
+                                            v-model:input="formData.daysPerWeek" :min="0" :max="7"/>
 
                                         <!--CAMPO DIAS POR MES (daysPerMonth)-->
                                         <CustomInput label="Dias por Mes" v-model:input="formData.daysPerMonth"
-                                            type="number" :min="0" :max="31"
-                                            :invalid="router.page.props.errors.daysPerMonth ? true : false"
-                                            :errorMessage="router.page.props.errors.daysPerMonth" />
+                                            type="number" :min="0" :max="31"/>
                                     </div>
                                 </div>
                                 <!--CAMPO TURNO (shift)-->
@@ -472,13 +454,6 @@ const prueba = ref()
                     </tab-content>
                     <!--BUQUES-->
                     <tab-content title="Buques" icon="fa-solid fa-ship" :before-change="beforeChange">
-                        <!-- <div class="flex w-full justify-end pb-2 gap-2">
-                            <CustomInput v-if="props.ships != 0" type="search" v-model:input="keyword"
-                                @input="searchShips()" placeholder="Filtrar Buques" icon="fa-solid fa-magnifying-glass" />
-                            <ToggleButton v-if="props.ships != 0" v-model="checked" onLabel="Seleccionar todo"
-                                offLabel="Deseleccionar todo" onIcon="pi pi-check-square" offIcon="pi pi-stop"
-                                aria-label="Do you confirm" @click="selectAllShips()" class="!h-8" />
-                        </div> -->
                         <Listbox :options="ships" v-model="formData.ships"
                             :filterFields="['name', 'idHull', 'type_ship.name']" filterPlaceholder="Filtrar Buques" multiple
                             filter optionLabel="name" :pt="{
@@ -488,7 +463,6 @@ const prueba = ref()
                                 item: '!h-min'
                             }">
                             <template #option="slotProps">
-                                <!-- {{ slotProps.option }} -->
                                 <div class="flex">
                                     <img :src="slotProps.option.file" onerror="this.src='/images/generic-boat.png'"
                                         class="object-cover object-center max-w-24 " />
@@ -499,13 +473,13 @@ const prueba = ref()
                                             </p>
                                         </li>
                                         <li>
-                                            <p><span class="font-semibold">Casco:</span> 
+                                            <p><span class="font-semibold">Casco:</span>
                                                 {{ slotProps.option.idHull }}
                                             </p>
                                         </li>
                                         <li>
-                                            <p><span class="font-semibold">Clase:</span> 
-                                            {{ slotProps.option.type_ship.name }}
+                                            <p><span class="font-semibold">Clase:</span>
+                                                {{ slotProps.option.type_ship.name }}
                                             </p>
                                         </li>
                                     </div>
