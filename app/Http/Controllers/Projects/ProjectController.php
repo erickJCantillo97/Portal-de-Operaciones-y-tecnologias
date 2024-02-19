@@ -153,7 +153,7 @@ class ProjectController extends Controller
         $quotes = Quote::get();
         $milestones = Milestone::where('project_id', $project->id)->get();
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
-        WeekTask::where('project_id', $project->id)->where();
+        // WeekTask::where('project_id', $project->id)->where();
         return Inertia::render(
             'Project/CreateProjects',
             [

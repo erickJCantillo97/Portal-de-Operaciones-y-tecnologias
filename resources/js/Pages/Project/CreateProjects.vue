@@ -2,11 +2,9 @@
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { ref, onMounted } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
-import { ClockIcon } from '@heroicons/vue/24/outline'
 import axios from 'axios'
 import ToggleButton from 'primevue/togglebutton'
 import Listbox from 'primevue/listbox';
-import Loading from '@/Components/Loading.vue'
 import CustomUpload from "@/Components/CustomUpload.vue";
 import NoContentToShow from '@/Components/NoContentToShow.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
@@ -34,8 +32,8 @@ const props = defineProps({
     tools: {
         type: Array,
         default: []
-    }
-    // 'typeShips': Array,
+    },
+    weekTasks: Array,
 })
 
 //#region Referencias (v-model)
@@ -46,16 +44,15 @@ const quoteSelect = ref()
 const selectedShips = ref([])
 const API_Ships = ref(props.ships)
 const filteredShips = ref(props.ships)
-const keyword = ref('')
+const keyword = ref(null)
 const shiftSelect = ref('1')
-const shiftOptions = ref()
+const shiftOptions = ref([])
 const showLoading = ref(true)
 const showNoContent = ref(false)
 //#endregion
 
 const searchShips = () => {
     const searchWord = keyword.value.toLowerCase().trim()
-
     filteredShips.value = API_Ships.value.filter(ship =>
         ship.name.toLowerCase().includes(searchWord) ||
         ship.idHull.toLowerCase().includes(searchWord) ||
@@ -81,42 +78,39 @@ const actions = [
 
 //#region ENUMS
 //Tipo de Proyecto
-const typeSelect = ref()
 const typeOptions = ref([
-    { name: 'PROYECTO DE VENTA (ARTEFACTO NAVAL)' },
-    { name: 'PROYECTO DE VENTA (SERV. INDUSTRIA)' },
-    { name: 'PROYECTO DE VENTA (SUMINISTRO/SERVICIO)' },
-    { name: 'PROYECTO DE INVERSION INTERNA' },
-    { name: 'PROYECTO DE INVERSIÓN (ARTEFACTO NAVAL)' }
+    'PROYECTO DE VENTA (ARTEFACTO NAVAL)',
+    'PROYECTO DE VENTA (SERV. INDUSTRIA)',
+    'PROYECTO DE VENTA (SUMINISTRO/SERVICIO)',
+    'PROYECTO DE INVERSION INTERNA',
+    'PROYECTO DE INVERSIÓN (ARTEFACTO NAVAL)'
 ])
 
 //Estado de Proyecto
-const statusSelect = ref()
 const statusOptions = ref([
-    { name: 'DISEÑO Y CONSTRUCCIÓN' },
-    { name: 'CONSTRUCCIÓN' },
-    { name: 'DISEÑO' },
-    { name: 'GARANTIA' },
-    { name: 'SERVICIO POSTVENTA' }
+    'DISEÑO Y CONSTRUCCIÓN',
+    'CONSTRUCCIÓN',
+    'DISEÑO',
+    'GARANTIA',
+    'SERVICIO POSTVENTA'
 ])
 
 //Alcance de Proyecto
-const scopeSelect = ref()
-const scopeOptions = ref([
-    { name: 'ADQUISICIÓN Y ENTREGA' },
-    { name: 'CO DESARROLLO DISEÑO Y CONSTRUCCIÓN' },
-    { name: 'CO PRODUCCIÓN' },
-    { name: 'CONSTRUCCIÓN' },
-    { name: 'DISEÑO BUQUE' },
-    { name: 'DISEÑO Y CONSTRUCCIÓN' },
-    { name: 'SERVICIOS INDUSTRIALES' }
-])
+const scopeOptions = [
+    "ADQUISICIÓN Y ENTREGA",
+    "CO DESARROLLO DISEÑO Y CONSTRUCCIÓN",
+    "CO PRODUCCIÓN",
+    "CONSTRUCCIÓN",
+    "DISEÑO BUQUE",
+    "DISEÑO Y CONSTRUCCIÓN",
+    "SERVICIOS INDUSTRIALES"
+]
 //#endregion
 
 //#region UseForm
-const formData = useForm({
+const formData = ref({
     id: props.project?.id ?? null,
-    name: props.project?.name ?? '',
+    name: props.project?.name ?? null,
     contract_id: props.project?.contract_id ?? null,
     authorization_id: props.project?.authorization_id ?? null,
     quote_id: props.project?.quote_id ?? null,
@@ -125,79 +119,43 @@ const formData = useForm({
     status: props.project?.status ?? null, //ENUMS
     scope: props.project?.scope ?? null, //ENUMS
     supervisor: props.project?.supervisor ?? null,
-    cost_sale: props.project?.cost_sale ?? [0, 'COP'],
+    // cost_sale: props.project?.cost_sale ?? [0, 'COP'],
     observations: props.project?.observations ?? null,
     start_date: props.project?.start_date ?? null,
     end_date: props.project?.end_date ?? null,
     hoursPerDay: parseFloat(props.project?.hoursPerDay ?? 8.5),
     daysPerWeek: parseInt(props.project?.daysPerWeek ?? 5),
     daysPerMonth: parseInt(props.project?.daysPerMonth ?? 20),
-    shift: props.project != null ? props.project.shift : null
+    shift: props.project != null ? parseInt(props.project.shift) : null
 })
 //#endregion
 
 onMounted(() => {
     getShift()
-    getProjectsPropsForEdit()
+
 })
 
-const toggleSelectShip = (shipId) => {
-    if (selectedShips.value.includes(shipId)) {
-        selectedShips.value = selectedShips.value.filter(id => id !== shipId)
-    } else {
-        selectedShips.value = [...selectedShips.value, shipId]
-    }
-}
-
-const selectShiftList = (shiftId) => {
-    shiftSelect.value = shiftId
-}
-
-const selectAllShips = () => {
-    if (selectedShips.value.length == filteredShips.value.length) {
-        selectedShips.value = []
-    } else {
-        selectedShips.value = filteredShips.value.map(ship => ship.id)
-    }
-}
-
-//Cancelar Creación de Proyectos
-const cancelCreateProject = () => {
-    router.get(route('projects.index'))
-}
-
-/* SUBMIT*/
-// const isSaved = ref(false)
-const projectIdRef = ref(props.project?.id ?? null)
-
 const beforeChange = async () => {
-    formData.type = typeSelect.value?.name ?? null
-    formData.status = statusSelect.value?.name ?? null
-    formData.scope = scopeSelect.value?.name ?? null
-    formData.contract_id = contractSelect.value?.id ?? null
-    formData.ships = selectedShips.value
     let switchTabsStates = false
-
     try {
-        if (!projectIdRef.value) {
-            await axios.post(route('projects.store'), formData)
+        if (!formData.value.id) {
+            await axios.post(route('projects.store'), formData.value)
                 .then((res) => {
-                    projectIdRef.value = res.data.project_id
+                    formData.value.id = res.data.project_id
                     toast.add({ summary: 'Guardado', life: 2000 });
                     switchTabsStates = true
                 })
             return switchTabsStates
         } else {
-            formData.shift = shiftSelect.value
-            await axios.put(route('projects.update', projectIdRef.value), formData)
+            await axios.put(route('projects.update', formData.value.id), formData.value)
                 .then((res) => {
                     toast.add({ summary: 'Guardado', life: 2000 });
                     switchTabsStates = true
                 })
             return switchTabsStates
-            // return true
         }
     } catch (error) {
+        console.log(error)
         toast.add({ summary: 'Error', life: 2000 });
     }
 }
@@ -263,20 +221,15 @@ const save = () => {
     }
 }
 
+const shiftOption = ref()
 const getShift = () => {
     axios.get(route('shift.index'))
         .then(response => {
             shiftOptions.value = response.data[0]
+            shiftOption.value = shiftOptions.value.find(shift => shift.id == props.project.shift)
             showLoading.value = false
             shiftOptions.value == 0 ? showNoContent.value = true : shiftOptions.value
         })
-}
-
-const getProjectsPropsForEdit = () => {
-    projectIdRef.value = props.project?.id ?? null
-    scopeSelect.value = { name: props.project?.scope ?? '' }
-    statusSelect.value = { name: props.project?.status ?? '' }
-    typeSelect.value = { name: props.project?.type ?? '' }
 }
 
 function formatDateTime24h(date) {
@@ -340,7 +293,7 @@ const saveweekTask = () => {
     }
 }
 
-
+const prueba = ref()
 </script>
 <template>
     <AppLayout>
@@ -387,8 +340,8 @@ const saveweekTask = () => {
                                 :invalid="$page.props.errors.SAP_code ? true : false" />
                             <!--CAMPO ALCANCE DEL PROYECTO (scope)-->
                             <CustomInput label="Alcance del Proyecto" type="dropdown"
-                                placeholder="Seleccione Alcance del Proyecto" optionLabel="name" v-model:input="scopeSelect"
-                                showClear :options="scopeOptions" :errorMessage="$page.props.errors.scope"
+                                placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.scope" showClear
+                                :options="scopeOptions" :errorMessage="$page.props.errors.scope"
                                 :invalid="$page.props.errors.scope ? true : false" />
                             <CustomInput label="Contrato" type="dropdown" placeholder="Seleccione Alcance del Proyecto"
                                 optionLabel="contract_id" v-model:input="contractSelect" showClear :options="contracts"
@@ -398,9 +351,10 @@ const saveweekTask = () => {
                                 optionLabel="name" v-model:input="authorizationSelect" showClear :options="authorizations"
                                 :errorMessage="$page.props.errors.authorization_id"
                                 :invalid="$page.props.errors.authorization_id ? true : false" />
+                            {{ formData.quote_id }}
                             <CustomInput label="Estimaciones" type="dropdown" placeholder="Seleccione Estimación"
-                                optionLabel="name" v-model:input="quoteSelect" showClear :options="quotes"
-                                :errorMessage="$page.props.errors.quote_id"
+                                optionLabel="name" v-model:input="formData.quote_id" optionValue="id" showClear
+                                :options="quotes" :errorMessage="$page.props.errors.quote_id"
                                 :invalid="$page.props.errors.quote_id ? true : false" />
                         </section>
                     </tab-content>
@@ -413,75 +367,31 @@ const saveweekTask = () => {
                                 v-model:input="formData.supervisor" :errorMessage="router.page.props.errors.supervisor"
                                 :invalid="router.page.props.errors.supervisor ? true : false" />
 
-                            <!-- <TextInput label="Supervisor" type="text" :placeholder="'Nombre del supervisor'"
-                                v-model="formData.supervisor" :error="router.page.props.errors.supervisor">
-                            </TextInput> -->
-
-
                             <!--CAMPO TIPO DE PROYECTO (type)-->
 
                             <CustomInput label="Tipo de Proyecto" type="dropdown"
-                                placeholder="Seleccione Alcance del Proyecto" optionLabel="name" v-model:input="typeSelect"
-                                showClear :options="typeOptions" :errorMessage="$page.props.errors.type"
+                                placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.type" showClear
+                                :options="typeOptions" :errorMessage="$page.props.errors.type"
                                 :invalid="$page.props.errors.type ? true : false" />
-
-                            <!-- <div>
-                                <p class="text-sm font-medium mb-0.5">Tipo de Proyecto</p>
-                                <Dropdown class="h-10" :options="typeOptions" v-model="typeSelect" showClear
-                                    optionLabel="name" placeholder="Seleccione Tipo de Proyecto" :pt="{
-                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
-                                        input: '!text-sm',
-                                        filterInput: '!text-gray-300',
-                                        item: ({ context }) => ({
-                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
-                                        })
-                                    }">
-                                </Dropdown>
-                            </div> -->
 
                             <!--CAMPO ESTADO DEL PROYECTO (status)-->
                             <CustomInput label="Estado del Proyecto" type="dropdown"
-                                placeholder="Seleccione Alcance del Proyecto" optionLabel="name"
-                                v-model:input="statusSelect" showClear :options="statusOptions"
-                                :errorMessage="$page.props.errors.status"
+                                placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.status" showClear
+                                :options="statusOptions" :errorMessage="$page.props.errors.status"
                                 :invalid="$page.props.errors.status ? true : false" />
-
-                            <!-- <div>
-                                <label class="text-sm font-medium">Estado del Proyecto</label>
-                                <Dropdown class="h-10" :options="statusOptions" v-model="statusSelect" showClear
-                                    optionLabel="name" placeholder="Seleccione Estado del Proyecto" :pt="{
-                                        root: '!border !w-full !border-gray-400 !shadow-sm !focus:outline-0 !rounded-md',
-                                        input: '!text-sm',
-                                        filterInput: '!text-gray-300',
-                                        item: ({ context }) => ({
-                                            class: context.selected ? 'bg-primary' : context.focused ? 'bg-blue-100' : undefined
-                                        })
-                                    }">
-                                </Dropdown>
-                            </div> -->
 
                             <!--CAMPO COSTO DE VENTA (cost_sale)-->
                             <CustomInput label="Valor Venta" :disabled="true" type="number" mode="currency"
-                                :currency="formData.cost_sale[1]" v-model:input="formData.cost_sale[0]"
+                                :currency="project.cost_sale[1]" v-model:input="project.cost_sale[0]"
                                 :errorMessage="router.page.props.errors.supervisor"
                                 :invalid="router.page.props.errors.supervisor ? true : false" />
-                            <!-- <TextInput label="Valor Venta" type="number" :placeholder="'Escriba el valor de venta'"
-                                v-model="formData.cost_sale" :error="router.page.props.errors.cost_sale">
-                            </TextInput> -->
 
                             <!--CAMPO DESCRIPCIÓN (description)-->
                             <CustomInput type="textarea" v-model:input="formData.observations" class="col-span-2"
                                 label="Descripción" :rowsTextarea="1" placeholder="Descripción del proyecto..."
                                 :errorMessage="router.page.props.errors.observations"
                                 :invalid="router.page.props.errors.observations ? true : false" />
-                            <!-- <div class="col-span-2">
-                                <label class="text-sm font-bold text-gray-900">Descripción</label>
-                                <Textarea class="text-sm text-gray-500 placeholder:text-sm italic"
-                                    placeholder="Descripción del proyecto..." v-model="formData.observations" rows="1"
-                                    cols="143" autoResize :pt="{
-                                        root: '!w-full'
-                                    }" />
-                            </div> -->
+
                         </section>
                     </tab-content>
                     <!--PLANEACIÓN DEL PROYECTO-->
@@ -522,14 +432,13 @@ const saveweekTask = () => {
                                 <!--CAMPO TURNO (shift)-->
                                 <div class="">
                                     <label class="text-sm mb-0.5 font-bold text-gray-900">Seleccione el Turno</label>
-                                    <Listbox :options="shiftOptions" optionLabel="name" filter :pt="{
-                                        list: '!h-40 !p-1',
-                                        item: ({ props, state, context }) => ({
-                                            class: '!h-10 !p-0 !rounded-md hover:!bg-primary-light'
-                                        }),
-                                        filterInput: '!h-8',
-                                        header: '!p-1'
-                                    }">
+                                    <Listbox :options="shiftOptions" optionValue="id" v-model="formData.shift"
+                                        optionLabel="name" filter :pt="{
+                                            list: '!h-40 !p-1',
+                                            item: '!h-10 !p-0 !rounded-md hover:!bg-primary-light',
+                                            filterInput: '!h-8',
+                                            header: '!p-1'
+                                        }">
                                         <template #option="slotProps">
                                             <div class=" h-full grid grid-cols-4 border px-1 rounded-md ">
                                                 <span class="flex justify-between items-center overflow-hidden">
@@ -566,70 +475,60 @@ const saveweekTask = () => {
                                             <Empty message="No se encuentran turnos"></Empty>
                                         </template>
                                     </Listbox>
-                                    <!-- <div
-                                        class="w-full h-52 overflow-y-auto custom-scroll border-2 border-gray-300 rounded-lg p-2 focus hover:border-blue-500">
-                                        <div class="flex justify-center">
-                                            <Loading v-if="showLoading" message="Cargando Turnos" class="mt-12" />
-                                            <NoContentToShow v-if="showNoContent" subject="Turnos"
-                                                class="!size-64 !mt-6 !h-[20vh]" />
-                                        </div>
-                                        <ul v-for="shift in shiftOptions" :key="shift.id">
-                                            <div @click="selectShiftList(shift.id)"
-                                                :class="shiftSelect == shift.id ? 'bg-blue-900 text-white' : 'hover:bg-gray-200'"
-                                                class="flex justify-between items-center text-xs space-x-6 p-2 w-full cursor-pointer rounded-lg">
-                                                <div>
-                                                    <p class="text-xs font-bold">{{ shift.name }}:</p>
-                                                </div>
-                                                <div class="flex italic">
-                                                    <ClockIcon class="size-4" />
-                                                    <p><b>&nbsp Hora Inicio:</b> {{ formatDateTime24h(shift.startShift) }} -
-                                                    </p>
-                                                    <p>&nbsp <b>Hora Fin:</b> {{ formatDateTime24h(shift.endShift) }} - </p>
-                                                    <p>&nbsp <b>Descanso:</b> {{ shift.timeBreak }}h - </p>
-                                                    <p>&nbsp <b>H. Laborales:</b> {{ parseFloat(shift.hours).toFixed(1) }}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </ul>
-                                    </div> -->
                                 </div>
                             </div>
                         </section>
                     </tab-content>
                     <!--BUQUES-->
                     <tab-content title="Buques" icon="fa-solid fa-ship" :before-change="beforeChange">
-                        <div class="flex w-full gap-2 pb-4">
-                            <input v-if="props.ships != 0" type="search" v-model="keyword" @input="searchShips()"
-                                class="rounded-lg border-2 border-gray-200 w-full placeholder:italic"
-                                placeholder="Filtrar Buques" />
+                        <!-- <div class="flex w-full justify-end pb-2 gap-2">
+                            <CustomInput v-if="props.ships != 0" type="search" v-model:input="keyword"
+                                @input="searchShips()" placeholder="Filtrar Buques" icon="fa-solid fa-magnifying-glass" />
                             <ToggleButton v-if="props.ships != 0" v-model="checked" onLabel="Seleccionar todo"
                                 offLabel="Deseleccionar todo" onIcon="pi pi-check-square" offIcon="pi pi-stop"
-                                aria-label="Do you confirm" @click="selectAllShips()" :pt="{
-                                    root: ({ props }) => ({
-                                        class:
-                                            [
-                                                '!w-56 !h-full !border-blue-800 !bg-transparent',
-                                                props.modelValue ? '!bg-blue-900 !text-white' : '!bg-red-600 !text-white'
-                                            ]
-                                    }),
-                                    icon: '!text-white'
-                                }" />
-                        </div>
-                        <section
+                                aria-label="Do you confirm" @click="selectAllShips()" class="!h-8" />
+                        </div> -->
+                        <Listbox :options="ships" v-model="prueba" :filterFields="['name', 'idHull', 'type_ship.name']"
+                            filterPlaceholder="Filtrar Buques" multiple filter optionLabel="name" :pt="{
+                                list: '!grid !grid-cols-3 !gap-1 !p-1 !max-h-56 h-56',
+                                header: '!p-1',
+                                filterInput: '!h-8',
+                                item: '!h-min'
+                            }">
+                            <template #option="slotProps">
+                                <!-- {{ slotProps.option }} -->
+                                <div class="flex">
+                                    <img :src="slotProps.option.file" onerror="this.src='/images/generic-boat.png'"
+                                        class="object-cover object-center max-w-24 " />
+                                    <div class="h-full flex flex-col">
+                                        <li>
+                                            <p class="truncate">{{ slotProps.option.name }}</p>
+                                        </li>
+                                        <li>
+                                            <p><span class="font-semibold">Casco:</span> {{ slotProps.option.idHull }}</p>
+                                        </li>
+                                        <li>
+                                            <p><span class="font-semibold">Clase:</span> {{ slotProps.option.type_ship.name
+                                            }}
+                                            </p>
+                                        </li>
+                                    </div>
+                                </div>
+                            </template>
+                        </Listbox>
+                        <!-- <section
                             class="grid grid-cols-4 h-60 overflow-y-auto custom-scroll snap-y snap-mandatory sm:col-span-1 md:col-span-1 border gap-4 border-gray-200 rounded-lg p-4 mb-2">
                             <NoContentToShow v-if="props.ships == 0" subject="Buques" class="!mt-0" />
                             <ul v-for="ship in filteredShips" :key="ship.id" v-else
                                 class="text-sm italic [&>li>p]:font-semibold snap-start">
-                                <div @click="toggleSelectShip(ship.id)"
+                                <div @click="toggleSelectShip(ship.id)" v-tooltip.top="ship.name"
                                     :class="selectedShips.includes(ship.id) ? 'bg-blue-900 text-white' : 'hover:bg-blue-300'"
-                                    class="flex space-x-4 shadow-md rounded-sm cursor-pointer transition-all duration-200 hover:scale-[1.01] ease-in-out hover:shadow-md">
-                                    <div class="w-28">
-                                        <img :src="ship.file" onerror="this.src='/images/generic-boat.png'"
-                                            class="object-cover object-center w-full h-16 mr-1" />
-                                    </div>
-                                    <div>
+                                    class="flex space-x-1 shadow-md rounded-sm cursor-pointer transition-all duration-200 hover:scale-[1.01] ease-in-out hover:shadow-md">
+                                    <img :src="ship.file" onerror="this.src='/images/generic-boat.png'"
+                                        class="object-cover object-center max-w-24" />
+                                    <div class="h-full flex flex-col">
                                         <li>
-                                            <p><span class="font-semibold">Nombre:</span> {{ ship.name }}</p>
+                                            <p class="truncate">{{ ship.name }}</p>
                                         </li>
                                         <li>
                                             <p><span class="font-semibold">Casco:</span> {{ ship.idHull }}</p>
@@ -640,7 +539,7 @@ const saveweekTask = () => {
                                     </div>
                                 </div>
                             </ul>
-                        </section>
+                        </section> -->
                     </tab-content>
                     <tab-content title="Hitos" icon="fa-solid fa-list-check">
                         <div class="w-full overflow-y-auto">
@@ -653,6 +552,7 @@ const saveweekTask = () => {
             </section>
         </main>
     </AppLayout>
+
     <CustomModal v-model:visible="openDialogHito" width="30rem" :titulo="formMilestone.id ? 'Editar hito' : 'Agregar Hito'"
         icon="fa-solid fa-list-check">
         <template #body>
@@ -708,10 +608,10 @@ const saveweekTask = () => {
         <template #body>
             <div class="grid grid-cols-4 gap-2">
                 <span class="col-span-3 grid gap-2 grid-cols-2 h-min max-h-64 overflow-y-auto justify-center ">
-                    <div class="flex items-center p-1 justify-between border rounded-md" v-for="task in weekTasks" >
-                        <p>{{ task.task }}</p>
+                    <div class="flex items-center p-1 justify-between border rounded-md" v-for="weekTask in weekTasks">
+                        <p>{{ weekTask.task }}</p>
                         <div class="min-w-20 flex items-center">
-                            <Button  rounded text severity="danger" icon="fa-solid fa-trash-can"/>
+                            <Button rounded text severity="danger" icon="fa-solid fa-trash-can" />
                             <Button rounded text severity="warning" icon="fa-solid fa-pen" />
                         </div>
                     </div>
