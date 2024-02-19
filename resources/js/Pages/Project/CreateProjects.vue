@@ -301,6 +301,10 @@ const saveweekTask = () => {
                         icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
                         url="prueba" severity="success" />
 
+                    <CustomUpload mode="advanced" titleModal="Subir Presupuesto del proyecto"
+                        icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
+                        :url="route('upload.budget', props.project.id)" severity="success" />
+                    
                     <CustomUpload mode="advanced" :multiple="true" titleModal="Subir el avance planeado del proyecto"
                         tooltip="Subir Curva S" accept=".xlsx,.xls" url="prueba" severity="info" />
 
