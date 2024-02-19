@@ -5,7 +5,15 @@ import "echarts"
 
 const props = defineProps({
   planeado: Number,
-  real: Number
+  real: Number,
+  series: {
+    type: Array,
+    default: null
+  },
+  title: {
+    type: String,
+    required: true
+  }
 })
 
 /**
@@ -21,8 +29,8 @@ Valores formatter:
 {@[n]}: the value of a dimension at the index of n, for example, {@[3]} refers the value at dimensions[3].
 */
 const option = ref({
+  title: props.title,
   tooltip: {
-    // trigger: 'axis',
     axisPointer: {
       type: 'shadow'
     },
@@ -30,7 +38,8 @@ const option = ref({
     formatter: (params => {
       let tooltip = ''
       params.map(param => {
-        tooltip += param.name + '<br>' + param.marker + ' ' + param.seriesName + ': ' + Intl.NumberFormat().format(Number(param.value).toFixed(2)) + '%<br>'
+        tooltip += param.name + '<br>' + param.marker + ' ' + param.seriesName + ': '
+          + Intl.NumberFormat().format(Number(param.value).toFixed(2)) + '%<br>'
       })
       return tooltip
     })
@@ -52,7 +61,6 @@ const option = ref({
         type: 'dashed'
       }
     },
-
   },
   yAxis: {
     type: 'category',

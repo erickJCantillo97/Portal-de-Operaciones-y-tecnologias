@@ -23,8 +23,7 @@ onMounted(() => {
     labels.value = res.data.labels.map(x => "WK " + x)
     avance.value = res.data.ejecutado.map(x => x == 0 ? null : Number.parseFloat(x).toFixed(2))
     planeado.value = res.data.planeado.map(x => x == 0 ? null : Number.parseFloat(x).toFixed(2))
-    console.log(res.data)
-  });
+  })
 })
 
 echarts.use([
@@ -34,12 +33,16 @@ echarts.use([
   UniversalTransition
 ])
 
+const formatNumber = (value) => {
+  const formattedValue = Number(value).toFixed(2)
+  return isNaN(formattedValue) ? '-' : Intl.NumberFormat().format(formattedValue) + '%<br>'
+}
+
 /**
  * @rgutierrez
  * String template
 
 Valores formatter:
-
 {a}: series name.
 {b}: the name of a data item.
 {c}: the value of a data item.
@@ -66,11 +69,13 @@ const option = ref({
   tooltip: {
     trigger: 'axis',
     formatter: (params => {
-      let tooltip = ''
+      let tooltip = params[0].name + '<br>'
+
       params.map(param => {
-        tooltip += param.name + '<br>' + param.marker + ' ' + param.seriesName + ': ' + Intl.NumberFormat().format(Number(param.value).toFixed(2)) + '%<br>'
+        let setValue = formatNumber(param.value)
+        tooltip += param.marker + ' ' + param.seriesName + ': ' + setValue
       })
-      return tooltip;
+      return tooltip
     })
   },
   xAxis: {
