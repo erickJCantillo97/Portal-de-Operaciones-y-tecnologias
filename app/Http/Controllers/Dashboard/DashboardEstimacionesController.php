@@ -49,7 +49,6 @@ class DashboardEstimacionesController extends Controller
             ->groupBy('maturity')
             ->orderBy('maturity')
             ->get();
-
         return response()->json([
             'maturities' => $maturities,
             'status' => true
@@ -100,7 +99,6 @@ class DashboardEstimacionesController extends Controller
             ->groupBy('estimador_name')
             ->get()->map(function ($quote) {
                 $user = User::where('userprincipalname', trim($quote['estimador_name']) . '@cotecmar.com')->first();
-
                 return [
                     'average' => $quote['promedio'],
                     'quotes' => QuoteVersion::where('estimador_name', $quote['estimador_name'])->count(),

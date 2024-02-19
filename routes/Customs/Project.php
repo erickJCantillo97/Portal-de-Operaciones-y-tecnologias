@@ -65,8 +65,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('budget', [BudgetController::class, 'index'])->name('budget.index');
 
     Route::get('getbudgetProject/{project}', [BudgetController::class, 'getbudgetProject'])->name('budget.project');
-    
+
     Route::get('getDetailsBudget/{project}', [BudgetController::class, 'getDetailsBudget'])->name('get.details.budget');
+    Route::post('uploadEstructure/{project}', [BudgetController::class, 'uploadEstructure'])->name('upload.estructure');
 
     //CRUD Customers
     Route::resource('customers', CustomerController::class);

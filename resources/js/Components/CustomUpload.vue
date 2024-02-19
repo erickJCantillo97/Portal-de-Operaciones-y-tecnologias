@@ -101,7 +101,7 @@ const uploadArchives = (event) => {
     loading.value = true
     let files
     files = props.multiple ? event.files : event.files[0]
-    router.post(route(props.url), { files }, {
+    router.post(props.url, { docs: files }, {
         onSuccess: () => {
             toast.add({ severity: 'success', group: "customToast", text: 'Archivo subido con exito', life: 2000 })
             loading.value = false
@@ -109,7 +109,7 @@ const uploadArchives = (event) => {
         },
         onError: (e) => {
             console.log(usePage().props.errorBags.default.errors)
-            errors.value = usePage().props.errorBags.default.errors
+            errors.value = usePage().props.errorBags.default
             toast.add({ severity: 'error', group: "customToast", text: 'Error al guardar', life: 2000 })
             loading.value = false
         }
@@ -126,7 +126,7 @@ const uploadArchives = (event) => {
                 <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">
                     <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">
                         <div class="flex gap-2">
-                            <Button @click="chooseCallback();errors=null" icon="fa-solid fa-file-import" text
+                            <Button @click="chooseCallback(); errors = null" icon="fa-solid fa-file-import" text
                                 label="Seleccionar"></Button>
                             <Button @click="uploadEvent(uploadCallback)" icon="fa-solid fa-cloud-arrow-up" text
                                 label="Subir" severity="success" :disabled="!files || files.length === 0"></Button>

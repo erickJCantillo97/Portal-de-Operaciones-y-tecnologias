@@ -354,9 +354,9 @@ const saveweekTask = () => {
                         @click="modalWeekTask = true" />
                     <Button icon="fa-solid fa-gauge-high" severity="secondary" v-tooltip.top="'Avance del proyecto'"
                         @click="modalProgress = true" />
-                    <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" :multiple="true"
-                        icon-button="fa-solid fa-chart-bar" tooltip="Subir Estructura" accept=".xlsx,.xls" url="prueba" />
-
+                    <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" icon-button="fa-solid fa-chart-bar"
+                        tooltip="Subir Estructura" accept=".xlsx,.xls" :url="route('upload.estructure', projectIdRef)" />
+                    <!-- 
                     <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Presupuesto del proyecto"
                         icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
                         url="prueba" severity="success" />
@@ -366,7 +366,7 @@ const saveweekTask = () => {
 
                     <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Costos ejecutados por el proyecto"
                         icon-button="fa-solid fa-money-bill-trend-up" tooltip="Subir Costos Ejecutados" accept=".xlsx,.xls"
-                        url="prueba" severity="danger" />
+                        url="prueba" severity="danger" /> -->
                 </div>
             </header>
             <section class="p-2">
@@ -708,10 +708,10 @@ const saveweekTask = () => {
         <template #body>
             <div class="grid grid-cols-4 gap-2">
                 <span class="col-span-3 grid gap-2 grid-cols-2 h-min max-h-64 overflow-y-auto justify-center ">
-                    <div class="flex items-center p-1 justify-between border rounded-md" v-for="task in weekTasks" >
+                    <div class="flex items-center p-1 justify-between border rounded-md" v-for="task in weekTasks">
                         <p>{{ task.task }}</p>
                         <div class="min-w-20 flex items-center">
-                            <Button  rounded text severity="danger" icon="fa-solid fa-trash-can"/>
+                            <Button rounded text severity="danger" icon="fa-solid fa-trash-can" />
                             <Button rounded text severity="warning" icon="fa-solid fa-pen" />
                         </div>
                     </div>

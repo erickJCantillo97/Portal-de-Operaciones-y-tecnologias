@@ -108,7 +108,7 @@ const navigation = [
                 name: 'Programación',
                 href: 'programming',
                 // dev: true
-                show: hasPermission(''),
+                show: hasPermission('programming create'),
             },
             {
                 name: 'Parte Actual',
@@ -126,7 +126,7 @@ const navigation = [
                 name: 'Personal Activo',
                 href: 'personal.activos',
                 dev: false,
-                show: true
+                show: hasPermission('personal active view')
             },
             // { name: 'Programación', href: '#' },
             // { name: 'Parte Diario', href: '#' },
@@ -135,6 +135,7 @@ const navigation = [
     },
     {
         name: 'Planillación',
+        show: true,
         icon: IdentificationIcon,
         current: false,
         children: [
