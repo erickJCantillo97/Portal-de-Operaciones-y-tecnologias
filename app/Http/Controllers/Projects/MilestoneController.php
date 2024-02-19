@@ -69,7 +69,13 @@ class MilestoneController extends Controller
     public function update(Request $request, Milestone $milestone)
     {
         $validateData = $request->validate([
-            //
+            'title' => 'required',
+            'project_id' => 'required',
+            'value' => 'required',
+            'end_date' => 'required',
+            'type' => 'required',
+            'invoiced' => 'nullable',
+            'advance' => 'nullable|numeric',
         ]);
 
         try {
