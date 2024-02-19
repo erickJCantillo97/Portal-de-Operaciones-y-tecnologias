@@ -12,7 +12,7 @@ const columnas = [
     { field: 'total_cost', header: 'Precio', type: 'currency' },
 ]
 const filters = [
-    'Proceso', 'Entregada', 'Firmada', 'Pendiente por Firma'
+    'Proceso', 'Firmada', 'Pendiente por Firma', 'Contratada'
 ]
 const filter = ref('Proceso')
 const quotes = ref([])

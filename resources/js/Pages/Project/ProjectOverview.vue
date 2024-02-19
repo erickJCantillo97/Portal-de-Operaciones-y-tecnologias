@@ -22,7 +22,10 @@ const budge = ref({
   materials: 0,
   labor: 0,
   servicies: 0,
-  total: 0
+  total: 0,
+  materials_ejecutados: 0,
+  labor_ejecutados: 0,
+  services_ejecutados: 0
 })
 
 onMounted(() => {
@@ -31,6 +34,9 @@ onMounted(() => {
     budge.value.labor = res.data.labor
     budge.value.services = res.data.services
     budge.value.total = res.data.total
+    budge.value.materials_ejecutados = res.data.materials_ejecutados
+    budge.value.labor_ejecutados = res.data.labor_ejecutados
+    budge.value.services_ejecutados = res.data.services_ejecutados
   })
 })
 
@@ -302,16 +308,17 @@ td {
                     </tr>
                     <tr>
                       <td class="text-left font-semibold bg-sky-100">CONSUMO ACTUAL</td>
-                      <td>{{ Moment().format('DD/MM/YYYY') }}</td>
-                      <td>$110.000.000</td>
-                      <td>$110.000.000</td>
-                      <td>$110.000.000</td>
+                      <td>{{ formatCurrency(budge.materials_ejecutados) }}</td>
+                      <td>{{ formatCurrency(budge.labor_ejecutados) }}</td>
+                      <td>{{ formatCurrency(budge.services_ejecutados) }}</td>
+                      <td>{{ formatCurrency(budge.materials_ejecutados + budge.labor_ejecutados +
+                        budge.services_ejecutados) }}</td>
                     </tr>
                     <tr>
                       <td class="text-left font-semibold bg-sky-100">DISPONIBLE</td>
-                      <td>{{ Moment().format('DD/MM/YYYY') }}</td>
-                      <td>$110.000.000</td>
-                      <td>$110.000.000</td>
+                      <td>{{ formatCurrency(budge.materials - budge.materials_ejecutados) }}</td>
+                      <td>{{ formatCurrency(budge.labor - budge.labor_ejecutados) }}</td>
+                      <td>{{ formatCurrency(budge.services - budge.services_ejecutados) }}</td>
                       <td>$110.000.000</td>
                     </tr>
                   </tbody>
