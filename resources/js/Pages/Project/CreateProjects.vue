@@ -114,7 +114,7 @@ const formData = ref({
     hoursPerDay: parseFloat(props.project?.hoursPerDay ?? 8.5),
     daysPerWeek: parseInt(props.project?.daysPerWeek ?? 5),
     daysPerMonth: parseInt(props.project?.daysPerMonth ?? 20),
-    shift: parseInt(props.project?.shift)?? null,
+    shift: parseInt(props.project?.shift) ?? null,
     ships: props.project?.ships ?? null
 
 })
@@ -297,12 +297,13 @@ const saveweekTask = () => {
                     <Button icon="fa-solid fa-gauge-high" severity="secondary" v-tooltip.top="'Avance del proyecto'"
                         @click="modalProgress = true" />
                     <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" icon-button="fa-solid fa-chart-bar"
-                        tooltip="Subir Estructura" accept=".xlsx,.xls" :url="route('upload.estructure', props.project.id)" />
-                    <!-- 
-                    <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Presupuesto del proyecto"
-                        icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
-                        url="prueba" severity="success" />
+                        tooltip="Subir Estructura" accept=".xlsx,.xls"
+                        :url="route('upload.estructure', props.project.id)" />
 
+                    <CustomUpload mode="advanced" titleModal="Subir Presupuesto del proyecto"
+                        icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
+                        :url="route('upload.budget', props.project.id)" severity="success" />
+                    <!-- 
                     <CustomUpload mode="advanced" :multiple="true" titleModal="Subir el avance planeado del proyecto"
                         tooltip="Subir Curva S" accept=".xlsx,.xls" url="prueba" severity="info" />
 
@@ -332,8 +333,9 @@ const saveweekTask = () => {
                                 placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.scope" showClear
                                 :options="scopeOptions" :errorMessage="$page.props.errors.scope"
                                 :invalid="$page.props.errors.scope ? true : false" />
-                            <CustomInput label="Contrato" type="dropdown" placeholder="Seleccione Alcance del Proyecto" optionValue="id"
-                                optionLabel="contract_id" v-model:input="formData.contract_id" showClear :options="contracts"/>
+                            <CustomInput label="Contrato" type="dropdown" placeholder="Seleccione Alcance del Proyecto"
+                                optionValue="id" optionLabel="contract_id" v-model:input="formData.contract_id" showClear
+                                :options="contracts" />
                             <CustomInput label="Autorizaciones" type="dropdown" placeholder="Seleccione Autorización"
                                 optionLabel="name" v-model:input="authorizationSelect" showClear :options="authorizations"
                                 :errorMessage="$page.props.errors.authorization_id"
@@ -389,16 +391,15 @@ const saveweekTask = () => {
                                     <div class="gap-6 grid grid-cols-3">
                                         <!--CAMPO HORAS POR DÍA (hoursPerDay)-->
                                         <CustomInput label="Horas por Dia" type="number"
-                                            v-model:input="formData.hoursPerDay" :min="0" :maxFractionDigits="2"
-                                             />
+                                            v-model:input="formData.hoursPerDay" :min="0" :maxFractionDigits="2" />
 
                                         <!--CAMPO DIAS POR SEMANA (daysPerWeek)-->
                                         <CustomInput label="Dias por Semana" type="number"
-                                            v-model:input="formData.daysPerWeek" :min="0" :max="7"/>
+                                            v-model:input="formData.daysPerWeek" :min="0" :max="7" />
 
                                         <!--CAMPO DIAS POR MES (daysPerMonth)-->
                                         <CustomInput label="Dias por Mes" v-model:input="formData.daysPerMonth"
-                                            type="number" :min="0" :max="31"/>
+                                            type="number" :min="0" :max="31" />
                                     </div>
                                 </div>
                                 <!--CAMPO TURNO (shift)-->

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Projects\Budget;
 
 use App\Http\Controllers\Controller;
+use App\Imports\Budge\BudgetImport;
 use App\Imports\Budge\EstructureImport;
 use App\Models\Project\Grafo;
 use App\Models\Project\Operation;
@@ -61,6 +62,21 @@ class BudgetController extends Controller
         try {
             // dd($request->files->get('files'));
             Excel::import(new EstructureImport($project), $request->docs);
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            foreach ($failures as $failure) {
+                $failure->row(); // row that went wrong
+                $failure->attribute(); // either heading key (if using heading row concern) or column index
+                $failure->errors(); // Actual error messages from Laravel validator
+                $failure->values(); // The values of the row that has failed.
+            }
+        }
+    }
+
+    public function uploadGudget(Request $request, $project)
+    {
+        try {
+            Excel::import(new BudgetImport($project), $request->docs);
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
             foreach ($failures as $failure) {

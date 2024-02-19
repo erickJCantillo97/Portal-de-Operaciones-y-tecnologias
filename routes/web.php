@@ -212,6 +212,7 @@ Route::get('estmaciones_anterior', function () {
             'coin' => $estimacion->moneda_original,
             'file' => $estimacion->file,
         ]);
+        $quoteVersion->created_at = $estimacion->fecha;
         $quote->current_version_id = $quoteVersion->id;
         $quote->save();
         if ($estimacion->clase_id) {
