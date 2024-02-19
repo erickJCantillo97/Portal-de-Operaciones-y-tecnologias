@@ -48,7 +48,7 @@ class BudgetController extends Controller
             'total' => ($labor + $materials + $services),
             'materials_ejecutados' => $materials_ejecutados,
             'labor_ejecutados' => $labor_ejecutados,
-            'serivices_ejecutados' => $services_ejecutados
+            'services_ejecutados' => $services_ejecutados
         ]);
     }
 }

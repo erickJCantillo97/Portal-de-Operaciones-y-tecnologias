@@ -184,7 +184,7 @@ Route::get('clientes_anterior', function () {
 
 
 Route::get('estmaciones_anterior', function () {
-    $estimaciones =  DB::connection('sqlsrv_anterior')->table('estimacions')->whereYear('fecha_solicitud', 2023)->get();
+    $estimaciones =  DB::connection('sqlsrv_anterior')->table('estimacions')->get();
     foreach ($estimaciones as $estimacion) {
         if (Carbon::parse($estimacion->fecha_solicitud)->format('Y') == 2023) {
             $quote = Quote::where('consecutive', $estimacion->consecutivo)->first();

@@ -23,13 +23,6 @@ const props = defineProps({
 })
 
 const budge = ref({
-  materials: 0,
-  labor: 0,
-  servicies: 0,
-  total: 0,
-  materials_ejecutados: 0,
-  labor_ejecutados: 0,
-  services_ejecutados: 0
 })
 
 onMounted(() => {
@@ -186,13 +179,12 @@ const formatCurrency = (valor, moneda) => {
 }
 
 const getBudges = async () => {
+  loadingDashboard.value = true
   await axios.get(route('budget.project', props.project.id))
     .then((res) => {
-      budge.value.materials = res.data.materials
-      budge.value.labor = res.data.labor
-      budge.value.services = res.data.services
-      budge.value.total = res.data.total
+      budge.value = res.data
       showLineChart.value++
+      loadingDashboard.value = false
     })
 }
 
@@ -220,7 +212,7 @@ const getDays = (startDate, endData) => {
 
   // Calcular la diferencia en días
   let milisecondsPerDay = 24 * 60 * 60 * 1000; // Número de milisegundos en un día
-  return Math.round(diffMiliseconds / milisecondsPerDay)
+  return Math.round(diffMiliseconds / milisecondsPerDay) < 0 ? 0 : Math.round(diffMiliseconds / milisecondsPerDay)
 }
 
 const calculatePercentage = (data, total) => {
@@ -234,7 +226,7 @@ const calculatePercentage = (data, total) => {
     percentage = 0;
   }
 
-  return percentage.toFixed(0);
+  return percentage.toFixed(0) > 100 ? 0 : percentage.toFixed(0);
 }
 
 const facturado = props.project.milestone.filter(hito => hito.advance == 100)
@@ -250,7 +242,6 @@ const panelClass = (props, parent, index) => {
 
 const toggleTabClicked = (event) => {
   setTimeout(() => {
-    loadingDashboard.value = false
     showDashboard.value = true
   }, 1)
 }
@@ -396,11 +387,15 @@ td {
                 <div class="col-span-2 border text-center border-gray-800 bg-gray-100">Gerente: {{ project.supervisor }}
                 </div>
                 <div class="border text-center border-gray-800 bg-sky-100 font-bold">N° CONTRATO</div>
-                <div class="border text-center border-gray-800">{{ project.contract.contract_id }}</div>
+                <div class="border text-center border-gray-800"
+                  :class="project.contract.contract_id == null ? 'bg-red-400' : ''">{{
+                    project.contract?.contract_id ?? 'Sin Contrato Asignado' }}
+                </div>
 
                 <!-- Segunda fila -->
                 <div class="border text-center border-gray-800 bg-gray-100">FECHA REPORTE: </div>
-                <div class="border text-center border-gray-800"> {{ Moment().format('DD/MM/YYYY') }}</div>
+                <div class="border text-center border-gray-800"> {{
+                  Moment(project.contract.start_date).format('DD/MM/YYYY') }}</div>
                 <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE INICIO </div>
                 <div class="border text-center border-gray-800">{{
                   Moment(project.contract.start_date).format('DD/MM/YYYY') }}</div>
@@ -415,7 +410,8 @@ td {
               </div>
 
               <!--TABLA 2-->
-              <div class="w-full md:w-1/3 grid grid-cols-4 text-xs rounded-xl md:mx-2 mt-4 md:mt-0 ">
+              <div class="w-full md:w-1/3 grid grid-cols-4 text-xs rounded-xl md:mx-2 mt-4 md:mt-0 "
+                v-if="project.contract.start_date">
                 <!--  Primera fila -->
                 <div class="border text-center font-bold bg-sky-100 border-gray-800 col-span-2 ">DIAS EJECUTADOS </div>
                 <div class="border text-center border-gray-800">
@@ -476,8 +472,10 @@ td {
                 <div class="grid grid-cols-2 w-full">
                   <div class="grid grid-cols-2 gap-2 mb-2">
                     <MiniCardInfo title="Presupuesto" :value="budge.total" :valueProgressBar="50" />
-                    <MiniCardInfo title="Ejecutado" :value="191520456373" :valueProgressBar="35" />
-                    <MiniCardInfo title="Disponible" :value="191520456373" :valueProgressBar="10" />
+                    <MiniCardInfo title="Ejecutado" :value="budge.materials_ejecutados + budge.labor_ejecutados +
+                      budge.services_ejecutados" :valueProgressBar="35" />
+                    <MiniCardInfo title="Disponible" :value="budge.total - (budge.materials_ejecutados + budge.labor_ejecutados +
+                      budge.services_ejecutados)" :valueProgressBar="10" />
                   </div>
                   <GaugeGradeChart :key="showLineChart" title="CPI" :value="semana.CPI" />
                 </div>
@@ -502,17 +500,29 @@ td {
                       </tr>
                       <tr>
                         <td class="text-left font-semibold bg-sky-100">CONSUMO ACTUAL</td>
-                        <td>{{ Moment().format('DD/MM/YYYY') }}</td>
-                        <td>$110.000.000</td>
-                        <td>$110.000.000</td>
-                        <td>$110.000.000</td>
+                        <td>{{ formatCurrency(budge.materials_ejecutados) }}</td>
+                        <td>{{ formatCurrency(budge.labor_ejecutados) }}</td>
+                        <td>{{ formatCurrency(budge.services_ejecutados) }}</td>
+                        <td>{{ formatCurrency(budge.materials_ejecutados + budge.labor_ejecutados +
+                          budge.services_ejecutados) }}</td>
                       </tr>
                       <tr>
                         <td class="text-left font-semibold bg-sky-100">DISPONIBLE</td>
-                        <td>{{ Moment().format('DD/MM/YYYY') }}</td>
-                        <td>$110.000.000</td>
-                        <td>$110.000.000</td>
-                        <td>$110.000.000</td>
+                        <td class="font-bold"
+                          :class="budge.materials - budge.materials_ejecutados < 0 ? 'text-danger' : 'text-success'">{{
+                            formatCurrency(budge.materials - budge.materials_ejecutados)
+                          }}</td>
+                        <td class="font-bold"
+                          :class="budge.labor - budge.labor_ejecutados < 0 ? 'text-danger' : 'text-success'">{{
+                            formatCurrency(budge.labor - budge.labor_ejecutados) }}</td>
+                        <td class="font-bold"
+                          :class="budge.services - budge.services_ejecutados < 0 ? 'text-danger' : 'text-success'">{{
+                            formatCurrency(budge.services - budge.services_ejecutados)
+                          }}</td>
+                        <td class="font-bold text-success">{{ formatCurrency(budge.total -
+                          (budge.materials_ejecutados +
+                            budge.labor_ejecutados +
+                            budge.services_ejecutados)) }}</td>
                       </tr>
                     </tbody>
                   </table>
