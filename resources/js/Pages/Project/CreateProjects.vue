@@ -99,9 +99,9 @@ const scopeOptions = [
 const formData = ref({
     id: props.project?.id ?? null,
     name: props.project?.name ?? null,
-    contract_id: props.project?.contract_id ?? null,
-    authorization_id: props.project?.authorization_id ?? null,
-    quote_id: props.project?.quote_id ?? null,
+    contract_id: parseInt(props.project?.contract_id) ?? null,
+    authorization_id: parseInt(props.project?.authorization_id) ?? null,
+    quote_id: parseInt(props.project?.quote_id) ?? null,
     type: props.project?.type ?? null, //ENUMS
     SAP_code: props.project?.SAP_code ?? null,
     status: props.project?.status ?? null, //ENUMS
@@ -114,7 +114,7 @@ const formData = ref({
     hoursPerDay: parseFloat(props.project?.hoursPerDay ?? 8.5),
     daysPerWeek: parseInt(props.project?.daysPerWeek ?? 5),
     daysPerMonth: parseInt(props.project?.daysPerMonth ?? 20),
-    shift: props.project != null ? parseInt(props.project.shift) : null,
+    shift: parseInt(props.project?.shift)?? null,
     ships: props.project?.ships ?? null
 
 })
@@ -297,7 +297,7 @@ const saveweekTask = () => {
                     <Button icon="fa-solid fa-gauge-high" severity="secondary" v-tooltip.top="'Avance del proyecto'"
                         @click="modalProgress = true" />
                     <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" icon-button="fa-solid fa-chart-bar"
-                        tooltip="Subir Estructura" accept=".xlsx,.xls" :url="route('upload.estructure', projectIdRef)" />
+                        tooltip="Subir Estructura" accept=".xlsx,.xls" :url="route('upload.estructure', props.project.id)" />
                     <!-- 
                     <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Presupuesto del proyecto"
                         icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
@@ -338,7 +338,6 @@ const saveweekTask = () => {
                                 optionLabel="name" v-model:input="authorizationSelect" showClear :options="authorizations"
                                 :errorMessage="$page.props.errors.authorization_id"
                                 :invalid="$page.props.errors.authorization_id ? true : false" />
-                            {{ formData.quote_id }}
                             <CustomInput label="Estimaciones" type="dropdown" placeholder="Seleccione Estimación"
                                 optionLabel="name" v-model:input="formData.quote_id" optionValue="id" showClear
                                 :options="quotes" :errorMessage="$page.props.errors.quote_id"

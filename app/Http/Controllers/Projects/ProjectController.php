@@ -77,7 +77,7 @@ class ProjectController extends Controller
             'daysPerWeek' => 'nullable',
             'daysPerMonth' => 'nullable',
             'shift' => 'nullable',
-            'ships' => 'nullable|array'
+            // 'ships' => 'nullable|array'
         ]);
 
         try {
@@ -207,7 +207,7 @@ class ProjectController extends Controller
             'daysPerMonth' => 'nullable',
             'shift' => 'nullable',
             'file' => 'nullable',
-            'ships' => 'nullable|array'
+            // 'ships' => 'nullable|array'
         ]);
 
         try {
