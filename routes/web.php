@@ -186,68 +186,67 @@ Route::get('clientes_anterior', function () {
 Route::get('estmaciones_anterior', function () {
     $estimaciones =  DB::connection('sqlsrv_anterior')->table('estimacions')->get();
     foreach ($estimaciones as $estimacion) {
-        if (Carbon::parse($estimacion->fecha_solicitud)->format('Y') == 2023) {
-            $quote = Quote::where('consecutive', $estimacion->consecutivo)->first();
-            if (!$quote)
-                $quote = Quote::create([
-                    'gerencia' => auth()->user()->gerencia,
-                    'name' => $estimacion->nombre,
-                    'consecutive' => $estimacion->consecutivo,
-                    'user_id' =>  auth()->user()->id
-                ]);
-
-            $cliente = DB::connection('sqlsrv_anterior')->table('clientes')->where('id', $estimacion->cliente_id)->first();
-            $cliente_id = null;
-            if ($cliente) {
-                $cliente_id = Customer::where('name', $cliente->nombre_cliente)->first()->id;
-            }
-            $quoteVersion = QuoteVersion::FirstOrCreate([
-                'quote_id' => $quote->id,
-                'version' => $estimacion->version,
-                'estimador_id' => $estimacion->estimador_id,
-                'customer_id' =>  $cliente_id,
-                'expeted_answer_date' => $estimacion->fecha_respuesta_esperada,
-                'estimador_anaswer_date' => $estimacion->fecha_respuesta_estimador,
-                'offer_type' => $estimacion->tipo_oferta,
-                'estimador_name' => $estimacion->nombre_estimador,
-                'coin' => $estimacion->moneda_original,
-                'file' => $estimacion->file,
+        $quote = Quote::where('consecutive', $estimacion->consecutivo)->first();
+        if (!$quote)
+            $quote = Quote::create([
+                'gerencia' => auth()->user()->gerencia,
+                'name' => $estimacion->nombre,
+                'consecutive' => $estimacion->consecutivo,
+                'user_id' =>  auth()->user()->id
             ]);
-            $quote->current_version_id = $quoteVersion->id;
-            $quote->save();
-            if ($estimacion->clase_id) {
-                QuoteTypeShip::FirstOrCreate([
-                    'quote_version_id' => $quoteVersion->id,
-                    'type_ship_id' => $estimacion->clase_id,
-                    'name' => TypeShip::find($estimacion->clase_id)->name ?? 'Sin Clase',
-                    'scope' => $estimacion->alcance,
-                    'maturity' => $estimacion->madurez,
-                    'units' => $estimacion->cantidad,
-                    'iva' => $estimacion->iva,
-                    'white_paper' => $estimacion->documento_tecnico,
-                    'price_before_iva_original' => $estimacion->precio_antes_de_iva_original ?? 0,
-                ]);
-            }
-            $estado = 0;
-            $fecha = $estimacion->fecha_solicitud;
-            if ($estimacion->firmada) {
-                $estado = 3;
-                $fecha = $estimacion->fecha_firma;
-            } else if ($estimacion->fecha_pendiente_firma != null) {
-                $estado = 2;
-                $fecha = $estimacion->fecha_pendiente_firma;
-            } else if ($estimacion->fecha_respuesta_estimador != null) {
-                $estado = 1;
-                $fecha = $estimacion->fecha_respuesta_estimador;
-            }
-            if (isset($quote)) {
-                QuoteStatus::create([
-                    'quote_version_id' => $quoteVersion->id,
-                    'status' => $estado,
-                    'fecha' => $estado,
-                    'user_id' => auth()->user()->id
-                ]);
-            }
+
+        $cliente = DB::connection('sqlsrv_anterior')->table('clientes')->where('id', $estimacion->cliente_id)->first();
+        $cliente_id = null;
+        if ($cliente) {
+            $cliente_id = Customer::where('name', $cliente->nombre_cliente)->first()->id;
+        }
+        $quoteVersion = QuoteVersion::FirstOrCreate([
+            'quote_id' => $quote->id,
+            'version' => $estimacion->version,
+            'estimador_id' => $estimacion->estimador_id,
+            'customer_id' =>  $cliente_id,
+            'expeted_answer_date' => $estimacion->fecha_respuesta_esperada,
+            'estimador_anaswer_date' => $estimacion->fecha_respuesta_estimador,
+            'offer_type' => $estimacion->tipo_oferta,
+            'estimador_name' => $estimacion->nombre_estimador ?? 'Sin Estimador',
+            'coin' => $estimacion->moneda_original,
+            'file' => $estimacion->file,
+        ]);
+        $quote->current_version_id = $quoteVersion->id;
+        $quote->save();
+        if ($estimacion->clase_id) {
+            QuoteTypeShip::FirstOrCreate([
+                'quote_version_id' => $quoteVersion->id,
+                'type_ship_id' => $estimacion->clase_id,
+                'name' => TypeShip::find($estimacion->clase_id)->name ?? 'Sin Clase',
+                'scope' => $estimacion->alcance,
+                'maturity' => $estimacion->madurez,
+                'margin' => $estimacion->margen_estimado,
+                'units' => $estimacion->cantidad,
+                'iva' => $estimacion->iva,
+                'white_paper' => $estimacion->documento_tecnico,
+                'price_before_iva_original' => $estimacion->precio_antes_de_iva_original ?? 0,
+            ]);
+        }
+        $estado = 0;
+        $fecha = $estimacion->fecha_solicitud;
+        if ($estimacion->firmada) {
+            $estado = 3;
+            $fecha = $estimacion->fecha_firma;
+        } else if ($estimacion->fecha_pendiente_firma != null) {
+            $estado = 2;
+            $fecha = $estimacion->fecha_pendiente_firma;
+        } else if ($estimacion->fecha_respuesta_estimador != null) {
+            $estado = 1;
+            $fecha = $estimacion->fecha_respuesta_estimador;
+        }
+        if (isset($quote)) {
+            QuoteStatus::create([
+                'quote_version_id' => $quoteVersion->id,
+                'status' => $estado,
+                'fecha' => $estado,
+                'user_id' => auth()->user()->id
+            ]);
         }
     }
 });
@@ -357,5 +356,5 @@ Route::get('/mailable', function () {
 });
 Route::post('/prueba', function (Request $request) {
 
-    return back()->withErrors(['errors' => ['messaje', 'default1','messaje1', 'default2','messaje4', 'default4','messaje', 'default',]]);
+    return back()->withErrors(['errors' => ['messaje', 'default1', 'messaje1', 'default2', 'messaje4', 'default4', 'messaje', 'default',]]);
 })->name('prueba');

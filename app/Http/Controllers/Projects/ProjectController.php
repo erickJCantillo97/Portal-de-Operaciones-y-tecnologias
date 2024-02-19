@@ -42,9 +42,15 @@ class ProjectController extends Controller
         $authorizations = Authorization::orderBy('contract_id')->get();
         $quotes = Quote::get();
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
-
+        $gerentes = getPersonalGerenciaOficina('GECON', 'DEGPC')->map(function ($estimador) {
+            return [
+                'user_id' => $estimador['Num_SAP'],
+                'name' => $estimador['Nombres_Apellidos'],
+                'email' => $estimador['Correo']
+            ];
+        })->toArray();
         // return $ships;
-        return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes', 'ships'));
+        return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes', 'ships', 'gerente'));
     }
 
     /**
@@ -153,6 +159,13 @@ class ProjectController extends Controller
         $quotes = Quote::get();
         $milestones = Milestone::where('project_id', $project->id)->get();
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
+        $gerentes = getPersonalGerenciaOficina('GECON', 'DEGPC')->map(function ($estimador) {
+            return [
+                'user_id' => $estimador['Num_SAP'],
+                'name' => $estimador['Nombres_Apellidos'],
+                'email' => $estimador['Correo']
+            ];
+        })->toArray();
         // WeekTask::where('project_id', $project->id)->where();
         return Inertia::render(
             'Project/CreateProjects',
@@ -163,7 +176,8 @@ class ProjectController extends Controller
                 'authorizations' => $authorizations,
                 'quotes' => $quotes,
                 'ships' => $ships,
-                'milestones' => $milestones
+                'milestones' => $milestones,
+                'gerentes' => $gerentes
             ]
         );
     }

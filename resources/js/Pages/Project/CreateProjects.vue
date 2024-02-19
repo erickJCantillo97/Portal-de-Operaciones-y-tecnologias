@@ -296,9 +296,9 @@ const saveweekTask = () => {
                         @click="modalWeekTask = true" />
                     <Button icon="fa-solid fa-gauge-high" severity="secondary" v-tooltip.top="'Avance del proyecto'"
                         @click="modalProgress = true" />
-                    <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" :multiple="true"
-                        icon-button="fa-solid fa-chart-bar" tooltip="Subir Estructura" accept=".xlsx,.xls" url="prueba" />
-
+                    <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" icon-button="fa-solid fa-chart-bar"
+                        tooltip="Subir Estructura" accept=".xlsx,.xls" :url="route('upload.estructure', projectIdRef)" />
+                    <!-- 
                     <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Presupuesto del proyecto"
                         icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
                         url="prueba" severity="success" />
@@ -308,7 +308,7 @@ const saveweekTask = () => {
 
                     <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Costos ejecutados por el proyecto"
                         icon-button="fa-solid fa-money-bill-trend-up" tooltip="Subir Costos Ejecutados" accept=".xlsx,.xls"
-                        url="prueba" severity="danger" />
+                        url="prueba" severity="danger" /> -->
                 </div>
             </header>
             <section class="p-2">

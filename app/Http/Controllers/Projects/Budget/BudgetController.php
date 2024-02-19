@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Projects\Budget;
 
 use App\Http\Controllers\Controller;
+use App\Imports\Budge\EstructureImport;
 use App\Models\Project\Grafo;
 use App\Models\Project\Operation;
 use App\Models\Project\Pep;
 use App\Models\Project\VirtualPep;
 use App\Models\Projects\Project;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BudgetController extends Controller
 {
@@ -50,5 +53,22 @@ class BudgetController extends Controller
             'labor_ejecutados' => $labor_ejecutados,
             'services_ejecutados' => $services_ejecutados
         ]);
+    }
+
+
+    public function uploadEstructure(Request $request, $project)
+    {
+        try {
+            // dd($request->files->get('files'));
+            Excel::import(new EstructureImport($project), $request->docs);
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            foreach ($failures as $failure) {
+                $failure->row(); // row that went wrong
+                $failure->attribute(); // either heading key (if using heading row concern) or column index
+                $failure->errors(); // Actual error messages from Laravel validator
+                $failure->values(); // The values of the row that has failed.
+            }
+        }
     }
 }
