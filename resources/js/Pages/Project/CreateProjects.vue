@@ -116,7 +116,9 @@ const formData = ref({
 const wizard = ref()
 onMounted(() => {
     getShift()
-   
+    if (props.project) {
+        wizard.value.activateAll()
+    }
 })
 
 const beforeChange = async () => {
@@ -311,8 +313,8 @@ const saveweekTask = () => {
                     nextButtonText="Siguiente" backButtonText="Regresar" finishButtonText="Guardar" ref="wizard">
                     <!--INFORMACIÓN CONTRACTUAL-->
                     <tab-content title="Información Contractual" class="h-[45vh] overflow-y-auto"
-                        icon="fa-solid fa-file-signature" :before-change="beforeChange">
-                        <div class="border gap-4 border-gray-200 rounded-lg p-4 sm:grid sm:grid-cols-2">
+                        icon="fa-solid fa-file-signature" :beforeChange="beforeChange">
+                        <div class="border gap-4 border-gray-200 rounded-lg p-4 md:grid md:grid-cols-2">
                             <!--CAMPO NOMBRE DEL PROYECTO (name)-->
                             <CustomInput label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
                                 v-model:input="formData.name" :errorMessage="$page.props.errors.name"
