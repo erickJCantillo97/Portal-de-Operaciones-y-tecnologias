@@ -4,8 +4,6 @@ import VChart from 'vue-echarts'
 import "echarts"
 
 const props = defineProps({
-  planeado: Number,
-  real: Number,
   series: {
     type: Array,
     default: null
@@ -29,7 +27,9 @@ Valores formatter:
 {@[n]}: the value of a dimension at the index of n, for example, {@[3]} refers the value at dimensions[3].
 */
 const option = ref({
-  title: props.title,
+  title: {
+    text: props.title,
+  },
   tooltip: {
     axisPointer: {
       type: 'shadow'
@@ -55,7 +55,7 @@ const option = ref({
   xAxis: {
     type: 'value',
     max: 100,
-    position: 'top',
+    position: 'bottom',
     splitLine: {
       lineStyle: {
         type: 'dashed'
@@ -66,20 +66,21 @@ const option = ref({
     type: 'category',
     data: ['Avance']
   },
-  series: [
-    {
-      name: 'Planeado',
-      type: 'bar',
-      data: [props.planeado],
-      showBackground: true,
-    },
-    {
-      name: 'Ejecutado',
-      type: 'bar',
-      showBackground: true,
-      data: [props.real]
-    }
-  ]
+  series:
+    props.series
+    // {
+    //   name: 'Planeado',
+    //   type: 'bar',
+    //   data: [props.planeado],
+    //   showBackground: true,
+    // },
+    // {
+    //   name: 'Ejecutado',
+    //   type: 'bar',
+    //   showBackground: true,
+    //   data: [props.real]
+    // }
+
 })
 </script>
 <style scoped>
