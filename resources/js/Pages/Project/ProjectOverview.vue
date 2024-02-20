@@ -97,7 +97,7 @@ const shipField = [
 ]
 
 
-const selectedImage = ref(props.ships[0].file)
+const selectedImage = ref(props.ships[0]?.file ?? props.ships[0].type_ship.render)
 
 const severitys = [
   { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'primary', class: '' },
@@ -187,7 +187,7 @@ const toggleTabClicked = (event) => {
 
 const handleTabClick = (event) => {
   // console.log(props.ships[event.index].file)
-  selectedImage.value = props.ships[event.index].file
+  selectedImage.value = props.ships[event.index]?.file ?? props.ships[event.index].type_ship.render
 }
 </script>
 <style scoped>
@@ -242,11 +242,8 @@ td {
                   {{ project.description }}
                 </h2>
               </div>
-              <div class="flex size-full justify-center">
-                <Image :src="selectedImage" v-if="selectedImage" :onerror="this.src = '/public/images/generic-boat.png'"
-                  alt="image" preview :pt="{
-                    mask: '!h-1rem'
-                  }" />
+              <div class="flex7 size-full justify-center">
+                <Image :src="selectedImage" v-if="selectedImage != '/'" alt="image" preview />
                 <div v-else class="flex justify-center mt-10">
                   <ApplicationLogo height="350" width="350" />
                 </div>

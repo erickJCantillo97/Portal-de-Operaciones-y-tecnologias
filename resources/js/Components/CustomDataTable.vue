@@ -263,8 +263,9 @@ const auxdata = ref()
 
         <!-- #region Columnas -->
         <span v-for="col, index  in columnasSelect">
-            <Column v-if="col.visible==null || col.visible==true" :field="col.field" :filterField="col.field" :class="col.class" :sortable="col.sortable"
-                :show-filter-match-modes="false" :filterMenuStyle="{ width: '16rem' }" :frozen="col.frozen" :pt="{
+            <Column v-if="col.visible == null || col.visible == true" :field="col.field" :filterField="col.field"
+                :class="col.class" :sortable="col.sortable" :show-filter-match-modes="false"
+                :filterMenuStyle="{ width: '16rem' }" :frozen="col.frozen" :pt="{
                     headerContent: { class: '!h-8' },
                     headerCell: { class: '!p-0.5' }
                 }
@@ -310,8 +311,9 @@ const auxdata = ref()
                         :severity="col.severitys.find((severity) => severity.text == data[col.field]).severity"
                         :value="data[col.field]" />
                     <span v-else-if="col.type == 'object'" class="flex items-center space-x-2 w-full">
-                        <img v-if="col.objectRows.photo" :src="data[col.objectRows.photo.field]" alt="Image"
-                            onerror="this.src='/svg/cotecmar-logo.svg'"
+                        <img v-if="col.objectRows.photo"
+                            :src="data[col.objectRows.photo.field] == null ? '/' : data[col.objectRows.photo.field]"
+                            alt="Image" onerror="this.src='/svg/cotecmar-logo.svg'"
                             class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16 object-cover" draggable="false" />
                         <div>
                             <p class="font-bold text-sm" v-if="col.objectRows.primary">{{
