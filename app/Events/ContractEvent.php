@@ -22,6 +22,7 @@ class ContractEvent implements ShouldBroadcast
 
     public function __construct(Contract $contract, $type = 'created')
     {
+
         $this->type = $type;
 
         if ($type === 'created') {

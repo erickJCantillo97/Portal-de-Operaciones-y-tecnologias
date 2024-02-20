@@ -321,17 +321,16 @@ function formatDateTime24h(dateTime) {
         { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
 }
 
-const broadcastChannel = () => {
-    console.log('evente')
-    setTimeout(() => {
-
-        window.Echo.private('contracts')
-            .listen('.contracts-event', (e) => {
-                Push.create(e.message)
-            })
-    }, 200);
-}
-broadcastChannel()
+// const broadcastChannel = () => {
+//     setTimeout(() => {
+//         window.Echo.private('contracts')
+//             .listen('.contracts-event', (e) => {
+//                 console.log(e.message);
+//                 Push.create(e.message)
+//             })
+//     }, 200);
+// }
+// broadcastChannel()
 </script>
 <style scoped>
 .custom-image {
