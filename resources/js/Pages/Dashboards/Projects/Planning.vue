@@ -13,32 +13,39 @@ const props = defineProps({
 onMounted(() => {
   getData()
 })
-const projects = ref()
-
+const projects = ref([])
+const scatterSeries = ref([])
 const getData = () => {
   axios.get(route('progressProjectWeek.get.data.week')).then((res) => {
-    projects.value = res.data.idicators.map(p => p.project)
-
+    projects.value = res.data.indicators.map(p => p.project)
     series.value.push(
       {
         name: 'Planeado',
         type: 'bar',
-        data: res.data.idicators.map(p => p.planned_progress),
+        data: res.data.indicators.map(p => p.planned_progress),
         showBackground: true,
       },
       {
         name: 'real',
         type: 'bar',
-        data: res.data.idicators.map(p => p.real_progress),
+        data: res.data.indicators.map(p => p.real_progress),
         showBackground: true,
       },
     )
-
+    for (var i of res.data.indicators) {
+      scatterSeries.value.push({
+        name: i.project,
+        symbolSize: 10,
+        data: [
+          [i.indicators.CPI, i.indicators.SPI],
+        ],
+        type: 'scatter'
+        ,
+      })
+    }
     showLineChart.value++
   })
 }
-
-
 
 const showLineChart = ref(0)
 const series = ref([])
@@ -73,11 +80,8 @@ const series = ref([])
       </div>
       <div class="col-span-1">
         <!-- <AdvancedBar :key="showLineChart" title="Avance Proyectos en Ejecución" :series="series" /> -->
-        <SimpleScatterChart :key="showLineChart" title="Proyectos" />
+        <SimpleScatterChart :key="showLineChart" title="Proyectos" :series="scatterSeries" />
       </div>
     </div>
   </main>
-  <button type="button" @click="showLineChart++" class="border border-blue-500 rounded-lg p-2 hover:bg-blue-200">
-    Actualizar Gráficos
-  </button>
 </template>

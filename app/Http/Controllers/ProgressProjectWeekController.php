@@ -84,10 +84,10 @@ class ProgressProjectWeekController extends Controller
         }
 
         return response()->json([
-            'idicators' => collect($marks)->map(function ($p) {
+            'indicators' => collect($marks)->map(function ($p) {
                 return [
                     'project' => Project::find($p->project_id)->name,
-                    'idicators' => ['CPI' => $p->CPI, 'SPI' =>  $p->SPI],
+                    'indicators' => ['CPI' => $p->CPI, 'SPI' =>  $p->SPI],
                     'real_progress' => $p->real_progress,
                     'planned_progress' => $p->planned_progress
                 ];
