@@ -73,16 +73,26 @@ class ProgressProjectWeekController extends Controller
 
     public function getDataWeek(Request $request)
     {
-        $projects = Project::active()->pluck('id')->toArray();
-        $semanas = ProgressProjectWeek::where('real_progress', '<>', 0)->whereIn('project_id', $projects)->groupBy('project_id')->select('project_id', DB::raw("MAX(week) as week"))->get();
+        $projects = Project::active();
+        $projects_id = $projects->pluck('id')->toArray();
+        $semanas = ProgressProjectWeek::where('real_progress', '<>', 0)->whereIn('project_id', $projects_id)->groupBy('project_id')->select('project_id', DB::raw("MAX(week) as week"))->get();
+        $marks = [];
         $progress = [];
         foreach ($semanas as $semana) {
             $progre =  ProgressProjectWeek::where('project_id', $semana->project_id)->where('week', $semana->week)->first();
-            array_push($progress, $progre);
+            array_push($marks, $progre);
         }
 
         return response()->json([
-            'labels' => $progress,
+            'idicators' => collect($marks)->map(function ($p) {
+                return [
+                    'project' => Project::find($p->project_id)->name,
+                    'idicators' => ['CPI' => $p->CPI, 'SPI' =>  $p->SPI],
+                    'real_progress' => $p->real_progress,
+                    'planned_progress' => $p->planned_progress
+                ];
+            }),
+
         ], 200);
     }
 

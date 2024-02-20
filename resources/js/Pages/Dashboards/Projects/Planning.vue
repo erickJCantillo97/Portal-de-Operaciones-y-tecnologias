@@ -5,36 +5,56 @@ import GaugeGradeChart from '@/Pages/Dashboards/Projects/GaugeGradeChart.vue'
 import MiniCardInfo from '@/Components/MiniCardInfo.vue'
 
 const props = defineProps({
-  projects: {
-    type: Array,
-    default: null
-  },
+
 })
 
 onMounted(() => {
-  renderBarChart()
+  getData()
 })
+const projects = ref()
+
+const getData = () => {
+  axios.get(route('progressProjectWeek.get.data.week')).then((res) => {
+    projects.value = res.data.idicators.map(p => p.project)
+
+    series.value.push(
+      {
+        name: 'Planeado',
+        type: 'bar',
+        data: res.data.idicators.map(p => p.planned_progress),
+        showBackground: true,
+      },
+      {
+        name: 'real',
+        type: 'bar',
+        data: res.data.idicators.map(p => p.real_progress),
+        showBackground: true,
+      },
+    )
+
+    showLineChart.value++
+  })
+}
 
 const showLineChart = ref(0)
 const series = ref([])
 
-showLineChart.value++
 
-const renderBarChart = () => {
-  series.value.push(
-    {
-      name: 'Planeado',
-      type: 'bar',
-      data: [18203, 12343],
-      showBackground: true,
-    },
-    {
-      name: 'Ejecutado',
-      type: 'bar',
-      data: [19325, 12343],
-      showBackground: true,
-    })
-}
+// const renderBarChart = () => {
+//   series.value.push(
+//     {
+//       name: 'Planeado',
+//       type: 'bar',
+//       data: [18203, 12343],
+//       showBackground: true,
+//     },
+//     {
+//       name: 'Ejecutado',
+//       type: 'bar',
+//       data: [19325, 12343],
+//       showBackground: true,
+//     })
+// }
 </script>
 <template>
   <main class="h-screen">
@@ -60,10 +80,10 @@ const renderBarChart = () => {
     </div>
     <div class="grid grid-cols-2 gap-2 p-4">
       <div class="col-span-1">
-        <AdvancedBar :key="showLineChart" title="Avance Proyectos en Ejecución" :series="series" />
+        <AdvancedBar :key="showLineChart" title="Avance Proyectos en Ejecución " :series="series" :yAxisData="projects" />
       </div>
       <div class="col-span-1">
-        <AdvancedBar :key="showLineChart" title="Facturación" :series="series" :yAxisData="props.projects.name" />
+        <AdvancedBar :key="showLineChart" title="Facturación" :series="series" :yAxisData="projects" />
       </div>
     </div>
   </main>

@@ -35,7 +35,7 @@ const props = defineProps({
                 <QuotesCard class="col-span-1" :showIndicators="false" v-if="$page.props.auth.user.oficina == 'DEPPC'" />
             </div>
             <!-- <Quotes v-if="$page.props.auth.user.oficina == 'DEPPC'" /> -->
-            <Planning v-if="$page.props.auth.user.oficina == 'OFTIC'" :projects="props.projects" />
+            <Planning v-if="$page.props.auth.user.oficina == 'DEPPC'" :projects="props.projects" />
             <!-- <Projects v-else /> -->
             <!-- <CustomUpload mode="advanced" :multiple="true" accept=".xlsx,.xls" url="prueba"/> -->
         </div>

@@ -40,9 +40,9 @@ const option = ref({
     },
     trigger: 'axis',
     formatter: (params => {
-      let tooltip = ''
+      let tooltip = '<p style="font-weight: bold; font-size: 0.8rem">' + params[0].name + '</p>'
       params.map(param => {
-        tooltip += param.name + '<br>' + param.marker + ' ' + param.seriesName + ': '
+        tooltip += param.marker + ' ' + param.seriesName + ': '
           + Intl.NumberFormat().format(Number(param.value).toFixed(2)) + '%<br>'
       })
       return tooltip
@@ -56,6 +56,12 @@ const option = ref({
       return new Intl.NumberFormat().format(Number(val.value).toFixed(2)) + '%'
     })
   },
+  grid: {
+    left: '1%',
+    right: '1%',
+    bottom: '3%',
+    containLabel: true
+  },
   xAxis: {
     type: 'value',
     max: 100,
@@ -68,28 +74,20 @@ const option = ref({
   },
   yAxis: {
     type: 'category',
-    data: props.yAxisData
+    data: props.yAxisData,
+    axisLabel: {
+      fontWeight: 'bold',
+      fontSize: 10
+    },
   },
   series:
     props.series
-  // {
-  //   name: 'Planeado',
-  //   type: 'bar',
-  //   data: [props.planeado],
-  //   showBackground: true,
-  // },
-  // {
-  //   name: 'Ejecutado',
-  //   type: 'bar',
-  //   showBackground: true,
-  //   data: [props.real]
-  // }
 
 })
 </script>
 <style scoped>
 .chart {
-  height: 100px;
+  height: 300px;
   width: 100%;
 }
 </style>
