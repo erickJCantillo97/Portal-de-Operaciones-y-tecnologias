@@ -83,21 +83,21 @@ const showEdit = (event, dato) => {
     typeShip.type = dato.type
     typeShip.disinger = dato.disinger
     typeShip.hull_material = dato.hull_material //material del casco
-    typeShip.length = parseFloat(dato.length) //eslra
-    typeShip.breadth = parseFloat(dato.breadth) //Manga
-    typeShip.draught = parseFloat(dato.draught) //calado de diseño
-    typeShip.depth = parseFloat(dato.depth) //punta
-    typeShip.full_load = parseFloat(dato.full_load)
-    typeShip.light_ship = parseFloat(dato.light_ship)
-    typeShip.power_total = parseFloat(dato.power_total)
+    typeShip.length =dato.length? parseFloat(dato.length):null //eslra
+    typeShip.breadth = dato.breadth?parseFloat(dato.breadth):null //Manga
+    typeShip.draught = dato.draught?parseFloat(dato.draught):null //calado de diseño
+    typeShip.depth = dato.depth?parseFloat(dato.depth):null //punta
+    typeShip.full_load = dato.full_load?parseFloat(dato.full_load):null
+    typeShip.light_ship = dato.light_ship?parseFloat(dato.light_ship):null
+    typeShip.power_total = dato.power_total? parseFloat(dato.power_total):null
     typeShip.propulsion_type = dato.propulsion_type
-    typeShip.velocity = parseFloat(dato.velocity)
-    typeShip.autonomias = parseFloat(dato.autonomias)
-    typeShip.autonomy = parseFloat(dato.autonomy)
-    typeShip.crew = parseFloat(dato.crew)
-    typeShip.GT = dato.GT
-    typeShip.CGT = dato.CGT
-    typeShip.bollard_pull = dato.bollard_pull
+    typeShip.velocity = dato.velocity? parseFloat(dato.velocity):null
+    typeShip.autonomias = dato.autonomias? parseFloat(dato.autonomias):null
+    typeShip.autonomy = dato.autonomy? parseFloat(dato.autonomy):null
+    typeShip.crew = dato.crew? parseFloat(dato.crew):null
+    typeShip.GT = dato.GT?parseInt(dato.GT):null
+    typeShip.CGT = dato.CGT? parseInt(dato.CGT):null
+    typeShip.bollard_pull = dato.bollard_pull?parseInt(dato.bollard_pull):null
     typeShip.clasification = dato.clasification
     typeShip.render = dato.render
     modalType.value = 'edit'
@@ -159,7 +159,7 @@ const showHull = (event, data) => {
         <div class="h-[89vh] overflow-y-auto">
             <CustomDataTable :rows-default="100" :data="typeShips" :columnas="columns" :actions="buttons"
                 @showHull="showHull" @rowClic="rowClick" @showEdit="showEdit" title="Clases de buque"
-                @deleteClic="deleteClic">
+                @deleteClic="deleteClic" @addClic="showNew()" >
                 <template #buttonHeader>
                     <Button title="Nuevo" severity="success" label="Agregar" outlined class="!h-8" icon="fa-solid fa-plus"
                         @click="showNew()" />
