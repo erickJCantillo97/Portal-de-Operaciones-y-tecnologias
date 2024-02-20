@@ -6,27 +6,44 @@ use App\Models\Project\Grafo;
 use App\Models\Project\Operation;
 use App\Models\Project\Pep;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class BudgetImport implements ToCollection
+class BudgetImport implements ToCollection, WithChunkReading, WithHeadingRow
 {
+    public $proyecto;
+
+    public function __construct($proyecto)
+    {
+        ini_set('max_execution_time', 0);
+        $this->proyecto = $proyecto;
+    }
     /**
      * @param Collection $collection
      */
     public function collection(Collection $rows)
     {
+        Validator::make($rows->toArray(), [
+            '*.estructura_sap' => 'required',
+            '*.presupuesto_materiales' => 'nullable|numeric',
+            '*.presupuesto_mdo' => 'nullable|numeric',
+            '*.presupuesto_servicios' => 'nullable|numeric',
+        ])->validate();
+
         foreach ($rows as $row) {
-            $pep = Pep::where('grafo_id', $row['estructura_sap'])->first();
+            $pep = Pep::where('grafo_id', 'LIKE', $row['estructura_sap'])->first();
             if (!isset($pep)) {
-                $pep = Grafo::where('grafo_id', $row['estructura_sap'])->first();
+                $pep = Grafo::where('grafo_id', 'LIKE', $row['estructura_sap'])->first();
             }
             if (!isset($pep)) {
-                $pep = Operation::where('grafo_id', $row['estructura_sap'])->first();
+                $pep = Operation::where('grafo_id', 'LIKE', $row['estructura_sap'])->first();
             }
             if (isset($pep)) {
-                $pep->materiales_presupestados = $row['presupuesto_materiales'] ?? 0;
-                $pep->mano_obra =  $row['presupuesto_mdo'] ?? 0;
-                $pep->servicios =  $row['presupuesto_servicios'] ?? 0;
+                $pep->materials = $row['presupuesto_materiales'] ?? 0;
+                $pep->labor =  $row['presupuesto_mdo'] ?? 0;
+                $pep->services =  $row['presupuesto_servicios'] ?? 0;
                 $pep->save();
             }
         }

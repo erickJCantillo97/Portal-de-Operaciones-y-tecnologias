@@ -159,6 +159,7 @@ class ProjectController extends Controller
         $quotes = Quote::get();
         $milestones = Milestone::where('project_id', $project->id)->get();
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
+        $projectShips = ProjectsShip::with('ship')->where('project_id', $project->id)->get();
         $gerentes = getPersonalGerenciaOficina('GECON', 'DEGPC')->map(function ($estimador) {
             return [
                 'user_id' => $estimador['Num_SAP'],
@@ -177,7 +178,8 @@ class ProjectController extends Controller
                 'quotes' => $quotes,
                 'ships' => $ships,
                 'milestones' => $milestones,
-                'gerentes' => $gerentes
+                'gerentes' => $gerentes,
+                'projectShips' => $projectShips,
             ]
         );
     }
@@ -212,6 +214,12 @@ class ProjectController extends Controller
 
         try {
             $project->update($validateData);
+            foreach ($request->ships as $ship) {
+                ProjectsShip::create([
+                    'project_id' => $project->id,
+                    'ship_id' => $ship,
+                ]);
+            }
         } catch (Exception $e) {
             dd($e);
             return back()->withErrors(['message', 'Ocurrió un Error Al Actualizar El Proyecto: ' . $e->getMessage()], 500);

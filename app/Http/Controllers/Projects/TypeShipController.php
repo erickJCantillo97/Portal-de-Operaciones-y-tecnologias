@@ -148,6 +148,7 @@ class TypeShipController extends Controller
                     $validateData['name'] . '.' . $request->image->getClientOriginalExtension()
                 );
             }
+
             $typeShip->update($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
