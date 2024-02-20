@@ -7,13 +7,13 @@ import MiniCardInfo from '@/Components/MiniCardInfo.vue'
 import DescriptionItem from '@/Components/DescriptionItem.vue'
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 import Loading from '@/Components/Loading.vue'
-import Bar from '@/Pages/Dashboards/Projects/Bar.vue'
+import BasicBarChart from '@/Pages/Dashboards/Projects/BasicBarChart.vue'
 import S_Curve from '@/Pages/Dashboards/Projects/S_Curve.vue'
 import GaugeGradeChart from '@/Pages/Dashboards/Projects/GaugeGradeChart.vue'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
 import Image from 'primevue/image'
-import html2canvas from 'html2canvas'
+// import html2canvas from 'html2canvas'
 import Tag from 'primevue/tag'
 
 const props = defineProps({
@@ -27,12 +27,14 @@ const budge = ref({
 
 onMounted(() => {
   getBudges()
+  getDataSeriesBar()
 })
 
 const loadingDashboard = ref(true)
 const showDashboard = ref(false)
 
 const showLineChart = ref(0)
+const series = ref([])
 
 const contractLabel = [
   'No. de Contrato',
@@ -127,6 +129,23 @@ const getBudges = async () => {
     })
 }
 
+const getDataSeriesBar = () => {
+  series.value.push(
+    {
+      name: 'Planeado',
+      type: 'bar',
+      data: [props.semana.planned_progress],
+      showBackground: true,
+    },
+    {
+      name: 'Ejecutado',
+      type: 'bar',
+      showBackground: true,
+      data: [props.semana.real_progress]
+    })
+}
+
+//#region Utilities
 const captureAndDownloadImage = async () => {
   showLineChart.value++
   const contentToCapture = document.getElementById('contentToCapture')
@@ -170,6 +189,8 @@ const calculatePercentage = (data, total) => {
 
 const facturado = props.project.milestone.filter(hito => hito.advance == 100)
   .reduce((sum, hito) => sum + parseInt(hito.value), 0);
+const porFacturar = props.project.milestone.filter(hito => hito.advance != 100)
+  .reduce((sum, hito) => sum + parseInt(hito.value), 0);
 
 const panelClass = (props, parent, index) => {
   return [
@@ -189,6 +210,7 @@ const handleTabClick = (event) => {
   // console.log(props.ships[event.index].file)
   selectedImage.value = props.ships[event.index]?.file ?? props.ships[event.index].type_ship.render
 }
+//#endregion
 </script>
 <style scoped>
 table {
@@ -382,7 +404,7 @@ td {
                 <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
                   <h2 class="font-semibold">GESTIÓN DEL CRONOGRAMA</h2>
                 </div>
-                <Bar :key="showLineChart" :planeado='semana.planned_progress' :real="semana.real_progress" />
+                <BasicBarChart :key="showLineChart" :series="series" />
                 <div class="flex justify-center w-full">
                   <GaugeGradeChart :key="showLineChart" title="SPI" :value="semana.SPI" />
                   <S_Curve :project="project.id" :key="showLineChart" />
@@ -468,7 +490,7 @@ td {
                   <h2 class="font-semibold">HITOS CONTRACTUALES</h2>
                 </div>
                 <p class="w-full text-sm text-center text-primary bg-yellow-100 italic my-1 font-bold">
-                  VALOR FACTURADO: {{ formatCurrency(facturado) }}
+                  {{ formatCurrency(facturado) }} Facturados
                 </p>
                 <table>
                   <thead>
@@ -488,6 +510,9 @@ td {
                     </tr>
                   </tbody>
                 </table>
+                <p class="w-full text-sm text-center text-primary bg-yellow-100 italic my-1 font-bold">
+                  {{ formatCurrency(porFacturar) }} Por Facturar
+                </p>
               </article>
             </div>
             <!-- </span> -->

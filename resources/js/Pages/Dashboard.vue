@@ -14,7 +14,8 @@ const toast = useToast();
 const props = defineProps({
     projects: Array,
     contracts: Array
-});
+})
+
 // const broadcastChannel = () => {
 //     setTimeout(() => {
 //         window.Echo.private('testing')
@@ -33,8 +34,8 @@ const props = defineProps({
                 <UserHeader class="col-span-1" />
                 <QuotesCard class="col-span-1" :showIndicators="false" v-if="$page.props.auth.user.oficina == 'DEPPC'" />
             </div>
-            <!-- <Quotes v-if="$page.props.auth.user.oficina == 'DEPPC'" /> -->
-            <Planning v-if="$page.props.auth.user.oficina == 'OFTIC'" />
+            <Quotes v-if="$page.props.auth.user.oficina == 'DEEST'" />
+            <Planning v-if="$page.props.auth.user.oficina == 'DEPPC'" :projects="props.projects" />
             <!-- <Projects v-else /> -->
             <!-- <CustomUpload mode="advanced" :multiple="true" accept=".xlsx,.xls" url="prueba"/> -->
         </div>
