@@ -120,7 +120,7 @@ const uploadArchives = (event) => {
 <template>
     <Button v-tooltip.left="tooltip" :class="classButton" :outlined :severity :label="labelButton" :icon="iconButton"
         @click="visible = true" />
-    <CustomModal v-model:visible="visible" width="30rem" :icon="iconModal" :titulo="titleModal">
+    <CustomModal v-model:visible="visible" width="50rem" :icon="iconModal" :titulo="titleModal">
         <template #body>
             <FileUpload :mode :accept :maxFileSize :multiple customUpload @uploader="uploadArchives">
                 <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">
@@ -155,7 +155,7 @@ const uploadArchives = (event) => {
                                         <i v-else class="fa-solid fa-file text-6xl  text-gray-600" />
                                     </span>
                                     <span>
-                                        <p class="font-semibold text-sm truncate w-48">{{ file.name }}</p>
+                                        <p class="font-semibold text-sm truncate w-[35rem]">{{ file.name }}</p>
                                         <p class="text-xs">{{ formatSize(file.size) }}</p>
                                         <Badge value="Pendiente" severity="warning" />
                                     </span>
