@@ -25,11 +25,11 @@ class ContractEvent implements ShouldBroadcast
         $this->type = $type;
 
         if ($type === 'created') {
-            $this->message = 'Se ha creado el contrato:'."\n".$contract->name;
+            $this->message = 'Se ha creado el contrato:' . "\n" . $contract->contract_id;
         } elseif ($type === 'updated') {
-            $this->message = 'Se ha actualizado el contrato:'."\n".$contract->name;
+            $this->message = 'Se ha actualizado el contrato:' . "\n" . $contract->name;
         } elseif ($type === 'deleted') {
-            $this->message = 'Se ha eliminado el contrato:'."\n".$contract->name;
+            $this->message = 'Se ha eliminado el contrato:' . "\n" . $contract->name;
         }
     }
 
@@ -48,7 +48,7 @@ class ContractEvent implements ShouldBroadcast
 
     public function broadcastAs()
     {
-        return 'ContractsEvent';
+        return 'contracts-event';
         //return 'private_msg';
     }
 }

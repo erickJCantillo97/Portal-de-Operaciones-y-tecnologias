@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\ContractEvent;
 use App\Events\TestWebsocket;
 use App\Http\Controllers\Dashboard\DashboardEstimacionesController;
 use App\Http\Controllers\DatabaseBackController;
@@ -36,13 +37,13 @@ use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-
-    return Inertia::render('Auth/Login', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return event(new ContractEvent(Contract::first(), 'created'));
+    // return Inertia::render('Auth/Login', [
+    //     'canLogin' => Route::has('login'),
+    //     'canRegister' => Route::has('register'),
+    //     'laravelVersion' => Application::VERSION,
+    //     'phpVersion' => PHP_VERSION,
+    // ]);
 });
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
