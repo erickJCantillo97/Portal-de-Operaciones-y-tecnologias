@@ -38,14 +38,11 @@ const props = defineProps({
 
 //#region Referencias (v-model)
 const authorizationSelect = ref()
-const selectedShips = ref([])
 const shiftOptions = ref([])
-const showLoading = ref(true)
-const showNoContent = ref(false)
 //#endregion
 
 
-//#region CustomDataTable
+//#region CustomDataTable hitos
 const columnas = [
     { field: 'title', header: 'Nombre', sortable: true, filter: true, },
     { field: 'value', header: 'Valor', filter: true, sortable: true, type: 'currency', class: 'w-64' },
@@ -92,7 +89,7 @@ const scopeOptions = [
 ]
 //#endregion
 
-//#region UseForm
+//#region formData
 const formData = ref({
     id: props.project?.id ?? null,
     name: props.project?.name ?? null,
@@ -112,14 +109,14 @@ const formData = ref({
     daysPerWeek: parseInt(props.project?.daysPerWeek ?? 5),
     daysPerMonth: parseInt(props.project?.daysPerMonth ?? 20),
     shift: parseInt(props.project?.shift) ?? null,
-    ships: props.project?.ships ?? null
+    ships: props.project?.ships ?? []
 
 })
 //#endregion
-
+const wizard = ref()
 onMounted(() => {
     getShift()
-
+   
 })
 
 const beforeChange = async () => {
@@ -132,15 +129,14 @@ const beforeChange = async () => {
                     toast.add({ summary: 'Guardado', life: 2000 });
                     switchTabsStates = true
                 })
-            return switchTabsStates
         } else {
             await axios.put(route('projects.update', formData.value.id), formData.value)
                 .then((res) => {
-                    toast.add({ summary: 'Guardado', life: 2000 });
+                    toast.add({ summary: 'Actualizado', life: 2000 });
                     switchTabsStates = true
                 })
-            return switchTabsStates
         }
+        return switchTabsStates
     } catch (error) {
         console.log(error)
         toast.add({ summary: 'Error', life: 2000 });
@@ -148,10 +144,10 @@ const beforeChange = async () => {
 }
 
 const submit = async () => {
-    router.post(route('project.add.ships', projectIdRef.value), {
-        ships: selectedShips.value
-    });
-    router.get(route('projects.index'));
+    // router.post(route('project.add.ships', formData.id), {
+    //     ships: selectedShips.value
+    // });
+    // router.get(route('projects.index'));
 
 }
 
@@ -208,14 +204,10 @@ const save = () => {
     }
 }
 
-const shiftOption = ref()
 const getShift = () => {
     axios.get(route('shift.index'))
         .then(response => {
             shiftOptions.value = response.data[0]
-            shiftOption.value = shiftOptions.value.find(shift => shift.id == props.project.shift)
-            showLoading.value = false
-            shiftOptions.value == 0 ? showNoContent.value = true : shiftOptions.value
         })
 }
 
@@ -284,7 +276,7 @@ const saveweekTask = () => {
 <template>
     <AppLayout>
         <div class="h-[89vh] overflow-y-auto flex flex-col ">
-            <div class="flex justify-between items-center px-2 h-12">
+            <div class="flex justify-between items-center px-2 h-[8vh]">
                 <h2 class="text-lg font-semibold w-full text-primary lg:text-2xl">
                     {{ project ? 'Editar proyecto' : 'Nuevo proyecto' }}
                 </h2>
@@ -313,72 +305,76 @@ const saveweekTask = () => {
                         url="prueba" severity="danger" /> -->
                 </div>
             </div>
-            <div class="p-2 h-full">
+            <div class="p-2">
                 <!-- AQUÍ VA EL CONTENIDO DEL FORMULARIO-->
-                <form-wizard @on-complete="submit()" stepSize="md" class="flex flex-col" color="#2E3092"
-                    nextButtonText="Siguiente" backButtonText="Regresar" finishButtonText="Guardar">
+                <form-wizard @on-complete="submit()" stepSize="md" class="flex flex-col h-[75vh]" color="#2E3092"
+                    nextButtonText="Siguiente" backButtonText="Regresar" finishButtonText="Guardar" ref="wizard">
                     <!--INFORMACIÓN CONTRACTUAL-->
-                    <tab-content title="Información Contractual"
-                        class="h-full border gap-4 border-gray-200 rounded-lg p-4 grid grid-cols-2"
+                    <tab-content title="Información Contractual" class="h-[45vh] overflow-y-auto"
                         icon="fa-solid fa-file-signature" :before-change="beforeChange">
-                        <!--CAMPO NOMBRE DEL PROYECTO (name)-->
-                        <CustomInput label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
-                            v-model:input="formData.name" :errorMessage="$page.props.errors.name"
-                            :invalid="$page.props.errors.name ? true : false" />
-                        <!--CAMPO CÓDIGO DE SAP (SAP_code)-->
-                        <CustomInput label="Código SAP" placeholder="Escriba el código de SAP"
-                            v-model:input="formData.SAP_code" :errorMessage="$page.props.errors.SAP_code"
-                            :invalid="$page.props.errors.SAP_code ? true : false" />
-                        <!--CAMPO ALCANCE DEL PROYECTO (scope)-->
-                        <CustomInput label="Alcance del Proyecto" type="dropdown"
-                            placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.scope" showClear
-                            :options="scopeOptions" :errorMessage="$page.props.errors.scope"
-                            :invalid="$page.props.errors.scope ? true : false" />
-                        <CustomInput label="Contrato" type="dropdown" placeholder="Seleccione Alcance del Proyecto"
-                            optionValue="id" optionLabel="contract_id" v-model:input="formData.contract_id" showClear
-                            :options="contracts" />
-                        <CustomInput label="Autorizaciones" type="dropdown" placeholder="Seleccione Autorización"
-                            optionLabel="name" v-model:input="authorizationSelect" showClear :options="authorizations"
-                            :errorMessage="$page.props.errors.authorization_id"
-                            :invalid="$page.props.errors.authorization_id ? true : false" />
-                        <CustomInput label="Estimaciones" type="dropdown" placeholder="Seleccione Estimación"
-                            optionLabel="name" v-model:input="formData.quote_id" optionValue="id" showClear
-                            :options="quotes" :errorMessage="$page.props.errors.quote_id"
-                            :invalid="$page.props.errors.quote_id ? true : false" />
+                        <div class="border gap-4 border-gray-200 rounded-lg p-4 sm:grid sm:grid-cols-2">
+                            <!--CAMPO NOMBRE DEL PROYECTO (name)-->
+                            <CustomInput label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
+                                v-model:input="formData.name" :errorMessage="$page.props.errors.name"
+                                :invalid="$page.props.errors.name ? true : false" />
+                            <!--CAMPO CÓDIGO DE SAP (SAP_code)-->
+                            <CustomInput label="Código SAP" placeholder="Escriba el código de SAP"
+                                v-model:input="formData.SAP_code" :errorMessage="$page.props.errors.SAP_code"
+                                :invalid="$page.props.errors.SAP_code ? true : false" />
+                            <!--CAMPO ALCANCE DEL PROYECTO (scope)-->
+                            <CustomInput label="Alcance del Proyecto" type="dropdown"
+                                placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.scope" showClear
+                                :options="scopeOptions" :errorMessage="$page.props.errors.scope"
+                                :invalid="$page.props.errors.scope ? true : false" />
+                            <CustomInput label="Contrato" type="dropdown" placeholder="Seleccione Alcance del Proyecto"
+                                optionValue="id" optionLabel="contract_id" v-model:input="formData.contract_id" showClear
+                                :options="contracts" />
+                            <CustomInput label="Autorizaciones" type="dropdown" placeholder="Seleccione Autorización"
+                                optionLabel="name" v-model:input="authorizationSelect" showClear :options="authorizations"
+                                :errorMessage="$page.props.errors.authorization_id"
+                                :invalid="$page.props.errors.authorization_id ? true : false" />
+                            <CustomInput label="Estimaciones" type="dropdown" placeholder="Seleccione Estimación"
+                                optionLabel="name" v-model:input="formData.quote_id" optionValue="id" showClear
+                                :options="quotes" :errorMessage="$page.props.errors.quote_id"
+                                :invalid="$page.props.errors.quote_id ? true : false" />
+                        </div>
                     </tab-content>
                     <!--DATOS DEL PROYECTO-->
                     <tab-content title="Datos del Proyecto" icon="fa-solid fa-diagram-project"
-                        class="grid grid-cols-2 border gap-4 rounded-lg p-4" :before-change="beforeChange">
+                        class="h-[45vh] overflow-y-auto" :before-change="beforeChange">
                         <!--CAMPO SUPERVISOR (supervisor)-->
-                        <CustomInput label="Supervisor" placeholder="Nombre del supervisor" optionLabel="name"
-                            optionValue="name" :options="Object.values(gerentes)" type="dropdown"
-                            v-model:input="formData.supervisor" @change="console.log($event)" />
+                        <div class="sm:grid sm:grid-cols-2 border gap-4 rounded-lg p-4">
 
-                        <!--CAMPO TIPO DE PROYECTO (type)-->
+                            <CustomInput label="Supervisor" placeholder="Nombre del supervisor" optionLabel="name"
+                                optionValue="name" :options="Object.values(gerentes)" type="dropdown"
+                                v-model:input="formData.supervisor" @change="console.log($event)" />
 
-                        <CustomInput label="Tipo de Proyecto" type="dropdown" placeholder="Seleccione Alcance del Proyecto"
-                            v-model:input="formData.type" showClear :options="typeOptions" />
+                            <!--CAMPO TIPO DE PROYECTO (type)-->
 
-                        <!--CAMPO ESTADO DEL PROYECTO (status)-->
-                        <CustomInput label="Estado del Proyecto" type="dropdown"
-                            placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.status" showClear
-                            :options="statusOptions" />
+                            <CustomInput label="Tipo de Proyecto" type="dropdown"
+                                placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.type" showClear
+                                :options="typeOptions" />
 
-                        <!--CAMPO COSTO DE VENTA (cost_sale)-->
-                        <CustomInput label="Valor Venta" type="number" mode="currency"
-                            :currency="formData.cost_sale[1] == null ? 'COP' : formData.cost_sale[1]"
-                            v-model:input="formData.cost_sale[0]" />
+                            <!--CAMPO ESTADO DEL PROYECTO (status)-->
+                            <CustomInput label="Estado del Proyecto" type="dropdown"
+                                placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.status" showClear
+                                :options="statusOptions" />
 
-                        <!--CAMPO DESCRIPCIÓN (description)-->
-                        <CustomInput type="textarea" v-model:input="formData.observations" class="col-span-2"
-                            label="Descripción" :rowsTextarea="1" placeholder="Descripción del proyecto..." />
+                            <!--CAMPO COSTO DE VENTA (cost_sale)-->
+                            <CustomInput label="Valor Venta" type="number" mode="currency"
+                                :currency="formData.cost_sale[1] == null ? 'COP' : formData.cost_sale[1]"
+                                v-model:input="formData.cost_sale[0]" />
 
+                            <!--CAMPO DESCRIPCIÓN (description)-->
+                            <CustomInput type="textarea" v-model:input="formData.observations" class="col-span-2"
+                                label="Descripción" :rowsTextarea="1" placeholder="Descripción del proyecto..." />
+                        </div>
                     </tab-content>
                     <!--PLANEACIÓN DEL PROYECTO-->
                     <tab-content title="Planeación del Proyecto" icon="fa-solid fa-calendar-check"
-                        :before-change="beforeChange" class="flex border gap-6  rounded-lg p-4">
-                        <div class="grid grid-cols-2 gap-6 w-full">
-                            <div class="space-y-4">
+                        :before-change="beforeChange" class="h-[45vh] overflow-y-auto">
+                        <div class="sm:grid sm:grid-cols-2 gap-6 w-full border p-4 rounded-lg ">
+                            <div class="flex flex-col gap-4">
                                 <!--CAMPO FECHA INICIO-->
                                 <CustomInput type="date" label="Fecha De Inicio" v-model:input="formData.start_date"
                                     :disabled="!formData.contract_id" />
@@ -449,11 +445,11 @@ const saveweekTask = () => {
                         </div>
                     </tab-content>
                     <!--BUQUES-->
-                    <tab-content title="Buques" icon="fa-solid fa-ship" :before-change="beforeChange">
-                        <Listbox :options="ships" v-model="formData.ships"
+                    <tab-content title="Buques" icon="fa-solid fa-ship" :before-change="beforeChange" class="h-[45vh]">
+                        <Listbox :options="ships" v-model="formData.ships" optionValue="id"
                             :filterFields="['name', 'idHull', 'type_ship.name']" filterPlaceholder="Filtrar Buques" multiple
                             filter optionLabel="name" :pt="{
-                                list: '!grid !grid-cols-4 !gap-1 !p-1 !max-h-56 h-56',
+                                list: 'sm:!grid sm:!grid-cols-4 !gap-1 !p-1 !max-h-[40vh] h-[40vh]',
                                 header: '!p-1',
                                 filterInput: '!h-8',
                                 item: '!h-min !rounded-lg'
@@ -483,7 +479,8 @@ const saveweekTask = () => {
                             </template>
                         </Listbox>
                     </tab-content>
-                    <tab-content title="Hitos" icon="fa-solid fa-list-check" class="w-full border h-full rounded-lg p-1 overflow-y-auto">
+                    <tab-content title="Hitos" icon="fa-solid fa-list-check"
+                        class=" h-[45vh] w-full border rounded-lg p-1 overflow-y-auto">
                         <CustomDataTable :rowsDefault="5" :data="milestones" :columnas="columnas" :actions="actions"
                             @edit="showModal" :filter="false" :showHeader="false" :showAdd="true" @addClic="showModal"
                             @delete="delMilestone" />

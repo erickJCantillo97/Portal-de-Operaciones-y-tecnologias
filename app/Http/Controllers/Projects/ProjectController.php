@@ -212,6 +212,12 @@ class ProjectController extends Controller
 
         try {
             $project->update($validateData);
+            foreach ($request->ships as $ship) {
+                ProjectsShip::create([
+                    'project_id' => $project->id,
+                    'ship_id' => $ship,
+                ]);
+            }
         } catch (Exception $e) {
             dd($e);
             return back()->withErrors(['message', 'Ocurrió un Error Al Actualizar El Proyecto: ' . $e->getMessage()], 500);
