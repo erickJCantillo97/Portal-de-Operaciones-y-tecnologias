@@ -75,10 +75,10 @@ class ProjectsShipController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ProjectsShip $projectsShip)
+    public function destroy(ProjectsShip $projectship)
     {
         try{
-            $projectsShip->delete();
+            $projectship->delete();
         }catch(Exception $e){
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
