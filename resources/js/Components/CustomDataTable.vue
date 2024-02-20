@@ -271,7 +271,7 @@ const auxdata = ref()
                 }
                     ">
                 <template #header>
-                    <span class="text-sm text-primary uppercase font-bold">{{ col.header }}</span>
+                    <p class="text-sm text-primary uppercase font-bold truncate">{{ col.header }}</p>
                 </template>
                 <template #filtericon>
                     <i class="fa-solid fa-filter"></i>
@@ -329,7 +329,7 @@ const auxdata = ref()
                         </div>
                     </span>
                     <span v-else-if="col.type == 'button'" class="w-full">
-                        <Button :label="String(data[col.field])" class="w-full" :class="col.rowClass" :icon="col.icon"
+                        <Button :label="String(data[col.field])" class="w-full truncate" :class="col.rowClass" :icon="col.icon"
                             :outlined="col.outlined" :text="col.text" :severity="col.severity" :rounded="col.rounded"
                             @click="$emit(col.event, $event, data)">
                         </Button>
@@ -348,9 +348,9 @@ const auxdata = ref()
                 </template>
             </Column>
         </span>
-        <Column frozen alignFrozen=" right" class="w-[8%]" v-if="props.actions.length > 0">
+        <Column frozen alignFrozen="right" class="w-[8%]" v-if="props.actions.length > 0">
             <template #body="{ data }">
-                <div class="flex items-center justify-center w-full">
+                <div class="flex items-center justify-center w-full bg-white rounded-md shadow-sm">
                     <Button v-for="button in props.actions" @click="$emit(button.event, $event, data)" :text="button.text"
                         :severity="button.severity" :outlined="button.outlined" :rounded="button.rounded"
                         :icon="button.icon" :title="button.label" :class="button.class" />
