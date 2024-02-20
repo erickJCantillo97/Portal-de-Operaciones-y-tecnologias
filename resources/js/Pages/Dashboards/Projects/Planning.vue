@@ -24,6 +24,7 @@ const getData = () => {
         type: 'bar',
         data: res.data.indicators.map(p => p.planned_progress),
         showBackground: true,
+
       },
       {
         name: 'real',
@@ -35,12 +36,11 @@ const getData = () => {
     for (var i of res.data.indicators) {
       scatterSeries.value.push({
         name: i.project,
-        symbolSize: 10,
+        symbolSize: 20,
         data: [
           [i.indicators.CPI, i.indicators.SPI],
         ],
-        type: 'scatter'
-        ,
+        type: 'scatter',
       })
     }
     showLineChart.value++
