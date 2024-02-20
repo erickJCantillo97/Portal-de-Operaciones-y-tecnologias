@@ -237,7 +237,7 @@
             <i v-else class="text-3xl"
                 :class="slotProps.message.severity == 'error' ? 'fa-solid fa-xmark' : slotProps.message.severity == 'success' ? 'fa-solid fa-check' : slotProps.message.severity == 'info' ? 'fa-solid fa-circle-info' : slotProps.message.severity == 'warn' ? 'fa-solid fa-triangle-exclamation' : null" />
             <div class="flex items-center space-x-2">
-                <p class="">{{ slotProps.message.text }}</p>
+                <p class="font-bold text-lg">{{ slotProps.message.text }}</p>
             </div>
         </template>
     </Toast>

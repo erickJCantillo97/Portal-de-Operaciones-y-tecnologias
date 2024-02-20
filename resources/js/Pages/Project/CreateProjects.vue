@@ -11,7 +11,6 @@ import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
 import { FormWizard, TabContent } from 'vue3-form-wizard'
 import 'vue3-form-wizard/dist/style.css'
-import Toast from 'primevue/toast';
 import { useToast } from "primevue/usetoast";
 import Empty from '@/Components/Empty.vue'
 import { useSweetalert } from '@/composable/sweetAlert'
@@ -135,7 +134,7 @@ const beforeChange = async () => {
         } else {
             await axios.put(route('projects.update', formData.value.id), formData.value)
                 .then((res) => {
-                    toast.add({ severity: 'success', group: 'customToast', text: 'Actualizado', life: 2000 });
+                    toast.add({ severity: 'success', group: 'customToast', text: 'Actualizado',life: 2000 });
                     switchTabsStates = true
                 })
         }
@@ -183,7 +182,7 @@ const save = () => {
         formMilestone.put(route('milestones.update', formMilestone.id), {
             onSuccess: () => {
                 formMilestone.reset()
-                toast.add({ summary: 'Hito Guardado', life: 2000 });
+                toast.add({ severity: 'success', group: 'customToast', text: 'Hito actualizado', life: 2000 });
                 openDialogHito.value = false;
             },
             onError: (e) => {
@@ -194,7 +193,7 @@ const save = () => {
         formMilestone.post(route('milestones.store'), {
             onSuccess: () => {
                 formMilestone.reset()
-                toast.add({ summary: 'Hito Guardado', life: 2000 });
+                toast.add({ severity: 'success', group: 'customToast', text: 'Hito guardado', life: 2000 });
                 openDialogHito.value = false;
             },
             onError: (e) => {
@@ -610,14 +609,4 @@ const saveweekTask = () => {
         </template>
     </CustomModal>
 
-    <Toast position="bottom-center" :pt="{
-        root: '!h-10 !w-64',
-        container: {
-            class: '!bg-primary !h-10 !rounded-lg'
-        },
-        content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
-        buttonContainer: '!hidden',
-        icon: '!hidden',
-        detail: '!hidden'
-    }" />
 </template>
