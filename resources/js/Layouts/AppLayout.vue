@@ -265,6 +265,7 @@ import DolarTRM from "@/Components/DolarTRM.vue"
 import Footer from "@/Components/Footer.vue"
 import FlyoutNotificationsMenu from '@/Components/FlyoutNotificationsMenu.vue'
 import { useSweetalert } from '@/composable/sweetAlert'
+import "@/composable/push.min.js"
 const { toast } = useSweetalert()
 const menu = ref(false)
 const sugerencia = ref('')
@@ -319,6 +320,18 @@ function formatDateTime24h(dateTime) {
     return new Date(dateTime).toLocaleString('es-CO',
         { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
 }
+
+const broadcastChannel = () => {
+    console.log('evente')
+    setTimeout(() => {
+
+        window.Echo.private('contracts')
+            .listen('.contracts-event', (e) => {
+                Push.create(e.message)
+            })
+    }, 200);
+}
+broadcastChannel()
 </script>
 <style scoped>
 .custom-image {
