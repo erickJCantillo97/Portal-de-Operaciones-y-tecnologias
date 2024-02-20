@@ -38,7 +38,7 @@ class Ship extends Model implements Auditable
     protected function file(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => str_replace('//', '/', str_replace('public', 'storage', $value)),
+            get: fn ($value) =>   str_replace('//', '/', str_replace('public', 'storage', $value)),
             set: fn ($value) => $value,
         );
     }
