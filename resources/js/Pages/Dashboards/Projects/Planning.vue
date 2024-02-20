@@ -1,12 +1,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import AdvancedBar from '@/Pages/Dashboards/Projects/AdvancedBar.vue'
+import AdvancedBarChart from '@/Pages/Dashboards/Projects/AdvancedBarChart.vue'
 import GaugeGradeChart from '@/Pages/Dashboards/Projects/GaugeGradeChart.vue'
+import SimpleScatterChart from '@/Pages/Dashboards/Projects/SimpleScatterChart.vue'
 import MiniCardInfo from '@/Components/MiniCardInfo.vue'
 
 const props = defineProps({
 
 })
+
 
 onMounted(() => {
   getData()
@@ -36,25 +38,11 @@ const getData = () => {
   })
 }
 
+
+
 const showLineChart = ref(0)
 const series = ref([])
 
-
-// const renderBarChart = () => {
-//   series.value.push(
-//     {
-//       name: 'Planeado',
-//       type: 'bar',
-//       data: [18203, 12343],
-//       showBackground: true,
-//     },
-//     {
-//       name: 'Ejecutado',
-//       type: 'bar',
-//       data: [19325, 12343],
-//       showBackground: true,
-//     })
-// }
 </script>
 <template>
   <main class="h-screen">
@@ -80,10 +68,12 @@ const series = ref([])
     </div>
     <div class="grid grid-cols-2 gap-2 p-4">
       <div class="col-span-1">
-        <AdvancedBar :key="showLineChart" title="Avance Proyectos en Ejecución " :series="series" :yAxisData="projects" />
+        <AdvancedBarChart :key="showLineChart" title="Avance Proyectos en Ejecución " :series="series"
+          :yAxisData="projects" />
       </div>
       <div class="col-span-1">
-        <AdvancedBar :key="showLineChart" title="Facturación" :series="series" :yAxisData="projects" />
+        <!-- <AdvancedBar :key="showLineChart" title="Avance Proyectos en Ejecución" :series="series" /> -->
+        <SimpleScatterChart :key="showLineChart" title="Proyectos" />
       </div>
     </div>
   </main>

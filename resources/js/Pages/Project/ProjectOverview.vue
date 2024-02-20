@@ -7,7 +7,7 @@ import MiniCardInfo from '@/Components/MiniCardInfo.vue'
 import DescriptionItem from '@/Components/DescriptionItem.vue'
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 import Loading from '@/Components/Loading.vue'
-import BasicBar from '@/Pages/Dashboards/Projects/BasicBar.vue'
+import BasicBarChart from '@/Pages/Dashboards/Projects/BasicBarChart.vue'
 import S_Curve from '@/Pages/Dashboards/Projects/S_Curve.vue'
 import GaugeGradeChart from '@/Pages/Dashboards/Projects/GaugeGradeChart.vue'
 import Accordion from 'primevue/accordion'
@@ -404,7 +404,7 @@ td {
                 <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
                   <h2 class="font-semibold">GESTIÓN DEL CRONOGRAMA</h2>
                 </div>
-                <BasicBar :key="showLineChart" :series="series" />
+                <BasicBarChart :key="showLineChart" :series="series" />
                 <div class="flex justify-center w-full">
                   <GaugeGradeChart :key="showLineChart" title="SPI" :value="semana.SPI" />
                   <S_Curve :project="project.id" :key="showLineChart" />
