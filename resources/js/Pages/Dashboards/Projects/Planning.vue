@@ -1,19 +1,29 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import AdvancedBar from '@/Pages/Dashboards/Projects/AdvancedBar.vue'
+import AdvancedBarChart from '@/Pages/Dashboards/Projects/AdvancedBarChart.vue'
 import GaugeGradeChart from '@/Pages/Dashboards/Projects/GaugeGradeChart.vue'
+import SimpleScatterChart from '@/Pages/Dashboards/Projects/SimpleScatterChart.vue'
 import MiniCardInfo from '@/Components/MiniCardInfo.vue'
 
 const props = defineProps({
-  projects: {
-    type: Array,
-    default: null
-  },
+
 })
+
+const projects = ref()
+const projectsName = ref()
 
 onMounted(() => {
   renderBarChart()
+  getProjects()
 })
+
+const getProjects = () => {
+  axios.get(route('projects.index')).then((res) => {
+    projects.value = res.data.projects
+    console.log(res.data.projects);
+    projectsName.value = Object.values(res.data.projects.map(project => project.name))
+  })
+}
 
 const showLineChart = ref(0)
 const series = ref([])
@@ -60,10 +70,12 @@ const renderBarChart = () => {
     </div>
     <div class="grid grid-cols-2 gap-2 p-4">
       <div class="col-span-1">
-        <AdvancedBar :key="showLineChart" title="Avance Proyectos en Ejecución" :series="series" />
+        <AdvancedBarChart :key="showLineChart" title="Avance Proyectos en Ejecución" :series="series"
+          :yAxisData="projectsName" />
       </div>
       <div class="col-span-1">
-        <AdvancedBar :key="showLineChart" title="Facturación" :series="series" :yAxisData="props.projects.name" />
+        <!-- <AdvancedBar :key="showLineChart" title="Avance Proyectos en Ejecución" :series="series" /> -->
+        <SimpleScatterChart :key="showLineChart" title="Proyectos" />
       </div>
     </div>
   </main>
