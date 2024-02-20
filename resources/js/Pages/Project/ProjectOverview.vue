@@ -170,6 +170,8 @@ const calculatePercentage = (data, total) => {
 
 const facturado = props.project.milestone.filter(hito => hito.advance == 100)
   .reduce((sum, hito) => sum + parseInt(hito.value), 0);
+const porFacturar = props.project.milestone.filter(hito => hito.advance != 100)
+  .reduce((sum, hito) => sum + parseInt(hito.value), 0);
 
 const panelClass = (props, parent, index) => {
   return [
@@ -468,7 +470,7 @@ td {
                   <h2 class="font-semibold">HITOS CONTRACTUALES</h2>
                 </div>
                 <p class="w-full text-sm text-center text-primary bg-yellow-100 italic my-1 font-bold">
-                  VALOR FACTURADO: {{ formatCurrency(facturado) }}
+                  {{ formatCurrency(facturado) }} Facturados
                 </p>
                 <table>
                   <thead>
@@ -488,6 +490,9 @@ td {
                     </tr>
                   </tbody>
                 </table>
+                <p class="w-full text-sm text-center text-primary bg-yellow-100 italic my-1 font-bold">
+                  {{ formatCurrency(porFacturar) }} Por Facturar
+                </p>
               </article>
             </div>
             <!-- </span> -->

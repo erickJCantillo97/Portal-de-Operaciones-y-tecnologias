@@ -36,6 +36,17 @@ class BudgetController extends Controller
     public function getbudgetProject(Project $project)
     {
         $pep = Virtualpep::where('project_id', $project->id)->first();
+        if (!$pep) {
+            return response()->json([
+                'labor' => 0,
+                'materials' => 0,
+                'services' => 0,
+                'total' => 0,
+                'materials_ejecutados' => 0,
+                'labor_ejecutados' => 0,
+                'services_ejecutados' => 0,
+            ]);
+        }
         $labor = Pep::where('pep_id', $pep->id)->sum('labor');
         $materials = Pep::where('pep_id', $pep->id)->sum('materials');
         $services = Pep::where('pep_id', $pep->id)->sum('services');
