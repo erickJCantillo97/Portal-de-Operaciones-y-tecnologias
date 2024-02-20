@@ -1,16 +1,44 @@
 <script setup>
-import { ref } from 'vue'
-import Bar from '@/Pages/Dashboards/Projects/Bar.vue'
+import { ref, onMounted } from 'vue'
+import AdvancedBar from '@/Pages/Dashboards/Projects/AdvancedBar.vue'
 import GaugeGradeChart from '@/Pages/Dashboards/Projects/GaugeGradeChart.vue'
-import S_Curve from '@/Pages/Dashboards/Projects/S_Curve.vue'
 import MiniCardInfo from '@/Components/MiniCardInfo.vue'
 
-const showLineChart = ref(0)
+const props = defineProps({
+  projects: {
+    type: Array,
+    default: null
+  },
+})
 
+onMounted(() => {
+  renderBarChart()
+})
+
+const showLineChart = ref(0)
+const series = ref([])
+
+showLineChart.value++
+
+const renderBarChart = () => {
+  series.value.push(
+    {
+      name: 'Planeado',
+      type: 'bar',
+      data: [18203, 12343],
+      showBackground: true,
+    },
+    {
+      name: 'Ejecutado',
+      type: 'bar',
+      data: [19325, 12343],
+      showBackground: true,
+    })
+}
 </script>
 <template>
-  <main>
-    <div class="grid grid-cols-4 gap-2 mb-2">
+  <main class="h-screen">
+    <div class="grid grid-cols-4 gap-2 mb-8">
       <div class="col-span-2 border border-gray-200 rounded-lg shadow-sm">
         <div class="flex justify-center items-center p-1 rounded-t-lg bg-blue-800 text-white">
           <h2 class="text-md font-semibold">PROMEDIO</h2>
@@ -30,9 +58,15 @@ const showLineChart = ref(0)
         </div>
       </div>
     </div>
+    <div class="grid grid-cols-2 gap-2 p-4">
+      <div class="col-span-1">
+        <AdvancedBar :key="showLineChart" title="Avance Proyectos en Ejecución" :series="series" />
+      </div>
+      <div class="col-span-1">
+        <AdvancedBar :key="showLineChart" title="Facturación" :series="series" :yAxisData="props.projects.name" />
+      </div>
+    </div>
   </main>
-  <Bar :key="showLineChart" />
-  <!-- <S_Curve :project="project.id" :key="showLineChart" /> -->
   <button type="button" @click="showLineChart++" class="border border-blue-500 rounded-lg p-2 hover:bg-blue-200">
     Actualizar Gráficos
   </button>

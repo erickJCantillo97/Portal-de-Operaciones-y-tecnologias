@@ -7,13 +7,13 @@ import MiniCardInfo from '@/Components/MiniCardInfo.vue'
 import DescriptionItem from '@/Components/DescriptionItem.vue'
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 import Loading from '@/Components/Loading.vue'
-import Bar from '@/Pages/Dashboards/Projects/Bar.vue'
+import BasicBar from '@/Pages/Dashboards/Projects/BasicBar.vue'
 import S_Curve from '@/Pages/Dashboards/Projects/S_Curve.vue'
 import GaugeGradeChart from '@/Pages/Dashboards/Projects/GaugeGradeChart.vue'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
 import Image from 'primevue/image'
-import html2canvas from 'html2canvas'
+// import html2canvas from 'html2canvas'
 import Tag from 'primevue/tag'
 
 const props = defineProps({
@@ -27,12 +27,14 @@ const budge = ref({
 
 onMounted(() => {
   getBudges()
+  getDataSeriesBar()
 })
 
 const loadingDashboard = ref(true)
 const showDashboard = ref(false)
 
 const showLineChart = ref(0)
+const series = ref([])
 
 const contractLabel = [
   'No. de Contrato',
@@ -188,6 +190,23 @@ const getBudges = async () => {
     })
 }
 
+const getDataSeriesBar = () => {
+  series.value.push(
+    {
+      name: 'Planeado',
+      type: 'bar',
+      data: [props.semana.planned_progress],
+      showBackground: true,
+    },
+    {
+      name: 'Ejecutado',
+      type: 'bar',
+      showBackground: true,
+      data: [props.semana.real_progress]
+    })
+}
+
+//#region Utilities
 const captureAndDownloadImage = async () => {
   showLineChart.value++
   const contentToCapture = document.getElementById('contentToCapture')
@@ -250,6 +269,7 @@ const handleTabClick = (event) => {
   // console.log(props.ships[event.index].file)
   selectedImage.value = props.ships[event.index].file
 }
+//#endregion
 </script>
 <style scoped>
 table {
@@ -446,7 +466,7 @@ td {
                 <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
                   <h2 class="font-semibold">GESTIÓN DEL CRONOGRAMA</h2>
                 </div>
-                <Bar :key="showLineChart" :planeado='semana.planned_progress' :real="semana.real_progress" />
+                <BasicBar :key="showLineChart" :series="series" />
                 <div class="flex justify-center w-full">
                   <GaugeGradeChart :key="showLineChart" title="SPI" :value="semana.SPI" />
                   <S_Curve :project="project.id" :key="showLineChart" />
