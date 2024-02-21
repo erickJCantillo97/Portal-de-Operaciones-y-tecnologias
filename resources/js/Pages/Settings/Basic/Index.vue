@@ -2,17 +2,16 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref } from 'vue'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
-import { ChevronUpIcon } from '@heroicons/vue/20/solid'
 import ConstructiveGrupo from './../Components/SWBS/ConstructiveGrupo.vue';
 import Systems from './../Components/SWBS/Systems.vue';
 import SubSystems from './../Components/SWBS/SubSystems.vue';
 import Processes from './../Components/SWBS/Processes.vue';
 import BaseActivities from './../Components/SWBS/BaseActivities.vue';
-import { KeyIcon, SquaresPlusIcon, ClockIcon, UserGroupIcon } from '@heroicons/vue/24/outline'
-import Gerencias from './../Components/Gerencias.vue';
+import { KeyIcon, SquaresPlusIcon, ClockIcon } from '@heroicons/vue/24/outline'
 import Shifts from './../Components/Shifts.vue';
-import Suggestions from './../../Suggestions.vue';
 import CustomUpload from '@/Components/CustomUpload.vue';
+import Gerencias from '../Components/Gerencias.vue';
+import Warehouses from '../Components/Warehouses.vue';
 const menu = ref('VB')
 const navigation = [
     { name: 'Variables Basicas', value: 'VB', icon: SquaresPlusIcon, current: true },
@@ -21,11 +20,12 @@ const navigation = [
     // { name: 'Sugerencias', value: 'SU', icon: UserGroupIcon, current: false },
     // { name: 'Clases de Costo', value: 'CC', icon: SquaresPlusIcon, current: false },
 ]
+
 </script>
 
 <template>
     <AppLayout>
-        <div class="p-2 -mt-4 lg:grid lg:grid-cols-12 lg:gap-x-2">
+        <div class="p-2 lg:grid lg:grid-cols-12 lg:gap-x-2">
             <aside class="px-2 py-6 sm:px-6 lg:col-span-2 lg:px-0 lg:py-0">
                 <nav class="space-y-1">
                     <a v-for="item in navigation" :key="item.name"
@@ -39,7 +39,7 @@ const navigation = [
                 </nav>
             </aside>
 
-            <div class="max-h-screen space-y-6 sm:px-6 lg:col-span-10 lg:px-0">
+            <div class="space-y-6 sm:px-6 lg:col-span-10 lg:px-0">
                 <div class="w-full">
                     <div class="w-full p-2 mx-auto bg-white rounded-2xl" v-if="menu == 'VB'">
                         <div>
@@ -51,19 +51,19 @@ const navigation = [
                         </div>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-white uppercase bg-primary  rounded-lg  focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between w-full items-center px-4 py-2 text-sm font-medium text-left text-white uppercase bg-primary  rounded-lg  focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Gerencias</span>
-                                <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''" class="w-5 h-5 text-white" />
+                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
-                            <DisclosurePanel class="pt-4 pb-2 text-sm text-gray-500">
+                            <DisclosurePanel class="pt-4 pb-2 h-[50vh] text-sm text-gray-500">
                                 <Gerencias></Gerencias>
                             </DisclosurePanel>
                         </Disclosure>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-white uppercase bg-primary  rounded-lg  focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between w-full px-4 py-2 items-center text-sm font-medium text-left text-white uppercase bg-primary  rounded-lg  focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Clases de Costo</span>
-                                <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''" class="w-5 h-5 text-white" />
+                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
                             <DisclosurePanel class="pt-4 pb-2 text-sm text-gray-500">
                                 <div class="flex justify-center">
@@ -71,6 +71,16 @@ const navigation = [
                                         titleModal="Clases de costo" tooltip="Subir Clases" accept=".xlsx,.xls"
                                         :url="route('dashboard')" severity="success" />
                                 </div>
+                            </DisclosurePanel>
+                        </Disclosure>
+                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
+                            <DisclosureButton
+                                class="flex justify-between w-full items-center px-4 py-2 text-sm font-medium text-left text-white uppercase bg-primary  rounded-lg  focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                <span>Almacenes</span>
+                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
+                            </DisclosureButton>
+                            <DisclosurePanel class="pt-4 pb-2 h-[50vh] text-sm text-gray-500">
+                                <Warehouses></Warehouses>
                             </DisclosurePanel>
                         </Disclosure>
                     </div>
@@ -83,10 +93,9 @@ const navigation = [
                         </div>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Grupos Constructivos</span>
-                                <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''"
-                                    class="w-5 h-5 text-purple-500" />
+                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
                             <DisclosurePanel class="pb-2 text-sm text-gray-500">
                                 <ConstructiveGrupo></ConstructiveGrupo>
@@ -94,10 +103,9 @@ const navigation = [
                         </Disclosure>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Sistemas</span>
-                                <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''"
-                                    class="w-5 h-5 text-purple-500" />
+                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
                             <DisclosurePanel class="pb-2 text-sm text-gray-500">
                                 <Systems></Systems>
@@ -105,10 +113,9 @@ const navigation = [
                         </Disclosure>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Sub-Sistemas</span>
-                                <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''"
-                                    class="w-5 h-5 text-purple-500" />
+                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
                             <DisclosurePanel class="pb-2 text-sm text-gray-500">
                                 <SubSystems></SubSystems>
@@ -116,10 +123,9 @@ const navigation = [
                         </Disclosure>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Proceso</span>
-                                <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''"
-                                    class="w-5 h-5 text-purple-500" />
+                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
                             <DisclosurePanel class="pb-2 text-sm text-gray-500">
                                 <Processes></Processes>
@@ -127,10 +133,9 @@ const navigation = [
                         </Disclosure>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Actividades basicas</span>
-                                <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''"
-                                    class="w-5 h-5 text-purple-500" />
+                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
                             <DisclosurePanel class="pb-2 text-sm text-gray-500">
                                 <BaseActivities></BaseActivities>
@@ -145,20 +150,19 @@ const navigation = [
                         </div>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-white uppercase bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white uppercase bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Horarios</span>
-                                <ChevronUpIcon :class="open ? 'rotate-180 transform' : ''"
-                                    class="w-5 h-5 text-purple-500" />
+                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
                             <DisclosurePanel class="pt-4 pb-2 text-sm text-gray-500">
                                 <Shifts />
                             </DisclosurePanel>
                         </Disclosure>
                     </div>
-
                 </div>
             </div>
         </div>
         <!--  -->
     </AppLayout>
+    
 </template>

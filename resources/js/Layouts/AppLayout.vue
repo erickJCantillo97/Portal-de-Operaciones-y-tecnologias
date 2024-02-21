@@ -241,6 +241,7 @@
             </div>
         </template>
     </Toast>
+    <ConfirmPopup></ConfirmPopup>
 </template>
 
 <script setup>
@@ -261,6 +262,7 @@ import Button from '@/Components/Button.vue'
 import html2canvas from 'html2canvas'
 import RadioButton from 'primevue/radiobutton'
 import Toast from 'primevue/toast'
+import ConfirmPopup from 'primevue/confirmpopup';
 import DolarTRM from "@/Components/DolarTRM.vue"
 import Footer from "@/Components/Footer.vue"
 import FlyoutNotificationsMenu from '@/Components/FlyoutNotificationsMenu.vue'
