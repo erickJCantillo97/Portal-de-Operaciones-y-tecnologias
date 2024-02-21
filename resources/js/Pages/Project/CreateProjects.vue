@@ -1,7 +1,6 @@
 <script setup>
 const { confirmDelete } = useSweetalert()
 const toast = useToast()
-import 'vue3-form-wizard/dist/style.css'
 import { FormWizard, TabContent } from 'vue3-form-wizard'
 import { ref, onMounted } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
