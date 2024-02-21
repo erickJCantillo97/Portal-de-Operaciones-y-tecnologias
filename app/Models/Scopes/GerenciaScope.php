@@ -15,7 +15,7 @@ class GerenciaScope implements Scope
     public function apply(Builder $builder, Model $model): void
     {
         $role = Role::first()->name;
-        if (!auth()->user()->hasRole($role))
+        if (auth()->user() && !auth()->user()->hasRole($role))
             $builder->where('gerencia', auth()->user()->gerencia);
     }
 }

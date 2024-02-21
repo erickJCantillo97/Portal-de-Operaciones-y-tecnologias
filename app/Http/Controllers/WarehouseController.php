@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Projects\ProjectsShip;
+use App\Models\Warehouse;
 use Exception;
 use Illuminate\Http\Request;
 
-class ProjectsShipController extends Controller
+class WarehouseController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+        $warehouse = Warehouse::all();
+        return response()->json($warehouse);
         //
     }
 
@@ -30,11 +32,12 @@ class ProjectsShipController extends Controller
     public function store(Request $request)
     {
         $validateData = $request->validate([
-            //
+            'name' => 'required',
         ]);
-
+        $validateData['gerencia'] = auth()->user()->gerencia;
+        $validateData['department'] = auth()->user()->oficina;
         try{
-            ProjectsShip::create($validateData);
+            Warehouse::create($validateData);
         }catch(Exception $e){
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
@@ -43,7 +46,7 @@ class ProjectsShipController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ProjectsShip $projectsShip)
+    public function show(Warehouse $warehouse)
     {
         //
     }
@@ -51,7 +54,7 @@ class ProjectsShipController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ProjectsShip $projectsShip)
+    public function edit(Warehouse $warehouse)
     {
         //
     }
@@ -59,14 +62,14 @@ class ProjectsShipController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ProjectsShip $projectsShip)
+    public function update(Request $request, Warehouse $warehouse)
     {
         $validateData = $request->validate([
-            //
+            'name'=> 'required',
         ]);
 
         try{
-            $projectsShip->update($validateData);
+            $warehouse->update($validateData);
         }catch(Exception $e){
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
@@ -75,10 +78,10 @@ class ProjectsShipController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ProjectsShip $projectship)
+    public function destroy(Warehouse $warehouse)
     {
         try{
-            $projectship->delete();
+            $warehouse->delete();
         }catch(Exception $e){
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }

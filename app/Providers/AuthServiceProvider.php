@@ -5,7 +5,9 @@ namespace App\Providers;
 // use Illuminate\Support\Facades\Gate;
 
 use App\Models\Projects\Customer;
+use App\Models\Schedule;
 use App\Policies\CustomerPolicy;
+use App\Policies\SchedulePolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Fortify;
@@ -17,7 +19,9 @@ class AuthServiceProvider extends ServiceProvider
      *
      * @var array<class-string, class-string>
      */
-    protected $policies = [];
+    protected $policies = [
+        Schedule::class => SchedulePolicy::class
+    ];
 
     /**
      * Register any authentication / authorization services.

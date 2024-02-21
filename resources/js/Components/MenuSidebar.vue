@@ -66,6 +66,7 @@ import { ref } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 import { usePermissions } from '@/composable/permission';
+const { hasRole, hasPermission } = usePermissions();
 import VueCollapsible from 'vue-height-collapsible/vue3';
 import {
     CalendarIcon,
@@ -80,7 +81,6 @@ import {
 import { usePage } from "@inertiajs/vue3"
 
 const debug = import.meta.env.VITE_APP_DEBUG
-const { hasRole, hasPermission } = usePermissions();
 const activeDropdown = ref();
 // console.log(hasPermission(['customer read']));
 const navigation = [
@@ -166,13 +166,13 @@ const navigation = [
         name: 'Gestión de Proyectos',
         icon: FolderIcon,
         current: false,
-        show: true,
+        show: hasPermission('projects read'),
         children: [
             {
                 name: 'Proyectos',
                 href: 'projects.index',
                 // dev: true,
-                show: true,
+                show: hasPermission('projects read'),
             },
             {
                 name: 'Presupuestos',
@@ -184,13 +184,13 @@ const navigation = [
                 name: 'Unidades',
                 href: 'ships.index',
                 // dev: true,
-                show: true,
+                show: hasPermission('ship read'),
             },
             {
                 name: 'Clases',
                 href: 'typeShips.index',
                 // dev: true,
-                show: true,
+                show: hasPermission('typeShip read'),
             },
         ],
     },
@@ -210,7 +210,7 @@ const navigation = [
                 name: 'Contratos',
                 href: 'contracts.index',
                 // dev: true,
-                show: true,
+                show: hasPermission(['conttract read']),
             },
             {
                 name: 'Autorizaciones',
@@ -222,7 +222,7 @@ const navigation = [
                 name: 'Estimaciones',
                 href: 'quotes.index',
                 // dev: true,
-                show: true,
+                show: hasPermission(['quote read']),
             },
         ],
     },
@@ -244,7 +244,7 @@ const navigation = [
         href: 'get.projectsGD',
         icon: DocumentDuplicateIcon,
         current: true,
-        show: true
+        show: false
     },
     {
         name: 'Almacén',

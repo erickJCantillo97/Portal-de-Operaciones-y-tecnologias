@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\ContractEvent;
 use App\Events\TestWebsocket;
 use App\Http\Controllers\Dashboard\DashboardEstimacionesController;
 use App\Http\Controllers\DatabaseBackController;
@@ -36,7 +37,6 @@ use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-
     return Inertia::render('Auth/Login', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -212,7 +212,7 @@ Route::get('estmaciones_anterior', function () {
             'coin' => $estimacion->moneda_original,
             'file' => $estimacion->file,
         ]);
-        $quoteVersion->created_at = $estimacion->fecha;
+        $quoteVersion->created_at = $estimacion->fecha_solicitud;
         $quote->current_version_id = $quoteVersion->id;
         $quote->save();
         if ($estimacion->clase_id) {
@@ -245,7 +245,7 @@ Route::get('estmaciones_anterior', function () {
             QuoteStatus::create([
                 'quote_version_id' => $quoteVersion->id,
                 'status' => $estado,
-                'fecha' => $estado,
+                'fecha' => $fecha,
                 'user_id' => auth()->user()->id
             ]);
         }

@@ -11,9 +11,12 @@ use App\Http\Controllers\Projects\ProjectController;
 use App\Http\Controllers\Projects\QuoteController;
 use App\Http\Controllers\Projects\ShipController;
 use App\Http\Controllers\Projects\TypeShipController;
+use App\Http\Controllers\ProjectsShipController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\WeekTaskController;
+use App\Models\Projects\ProjectsShip;
+use App\Models\Schedule;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
@@ -24,7 +27,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('/ScheduleWizard/{project}', [ScheduleController::class, 'wizard'])->name('wizard');
 
-    Route::get('/ScheduleCreate/{project}', [ScheduleController::class, 'create'])->name('createSchedule.create');
+    Route::get('/ScheduleCreate/{project}', [ScheduleController::class, 'create'])->name('createSchedule.create')->can('create', Schedule::class);
 
     Route::get('getAssignmentsTask/{task}', [ScheduleController::class, 'getAssignmentsTask'])->name('get.assignments.task');
 
@@ -38,6 +41,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     //CRUD Projects
     Route::resource('projects', ProjectController::class);
+
     Route::resource('ProgressProjectWeek', ProgressProjectWeekController::class);
 
     Route::get('ProgressWeek/getDataProject', [ProgressProjectWeekController::class, 'getDataProject'])->name('progressProjectWeek.get.data');
@@ -85,4 +89,5 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     /// CRUD HITOS
     Route::resource('milestones', MilestoneController::class);
     Route::resource('weektask', WeekTaskController::class);
+    Route::resource('projectships', ProjectsShipController::class);
 });

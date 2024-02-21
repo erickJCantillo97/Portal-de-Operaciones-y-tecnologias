@@ -11,7 +11,9 @@ import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
-import CustomUpload from "@/Components/CustomUpload.vue"
+import { FormWizard, TabContent } from 'vue3-form-wizard'
+import 'vue3-form-wizard/dist/style.css'
+import { useToast } from "primevue/usetoast";
 import Empty from '@/Components/Empty.vue'
 import Listbox from 'primevue/listbox'
 import Toast from 'primevue/toast'
@@ -33,6 +35,10 @@ const props = defineProps({
     },
     weekTasks: Array,
     gerentes: Object,
+    projectShips: {
+        type: Array,
+        default: []
+    }
 })
 
 //#region Referencias (v-model)
@@ -100,7 +106,7 @@ const formData = ref({
     status: props.project?.status ?? null, //ENUMS
     scope: props.project?.scope ?? null, //ENUMS
     supervisor: props.project?.supervisor ?? null,
-    cost_sale: props.project.cost_sale ? [parseInt(props.project.cost_sale[0]), props.project.cost_sale[1]] : [0, 'COP'],
+    cost_sale: props.project?.cost_sale ?? [0, 'COP'],
     observations: props.project?.observations ?? null,
     start_date: props.project?.start_date ?? null,
     end_date: props.project?.end_date ?? null,
@@ -127,29 +133,26 @@ const beforeChange = async () => {
             await axios.post(route('projects.store'), formData.value)
                 .then((res) => {
                     formData.value.id = res.data.project_id
-                    toast.add({ summary: 'Guardado', life: 2000 });
+                    toast.add({ severity: 'success', group: 'customToast', text: 'Guardado', life: 2000 });
                     switchTabsStates = true
                 })
         } else {
             await axios.put(route('projects.update', formData.value.id), formData.value)
                 .then((res) => {
-                    toast.add({ summary: 'Actualizado', life: 2000 });
+                    toast.add({ severity: 'success', group: 'customToast', text: 'Actualizado', life: 2000 });
                     switchTabsStates = true
                 })
         }
         return switchTabsStates
     } catch (error) {
         console.log(error)
-        toast.add({ summary: 'Error', life: 2000 });
+        toast.add({ severity: 'error', group: 'customToast', text: 'Hubo un error', life: 2000 });
     }
 }
 
-const submit = async () => {
-    // router.post(route('project.add.ships', formData.id), {
-    //     ships: selectedShips.value
-    // });
-    // router.get(route('projects.index'));
-
+const finish = (msg) => {
+    toast.add({ severity: 'success', group: 'customToast', text: msg, life: 2000 });
+    router.get(route('projects.index'))
 }
 
 const openDialogHito = ref(false)
@@ -184,7 +187,7 @@ const save = () => {
         formMilestone.put(route('milestones.update', formMilestone.id), {
             onSuccess: () => {
                 formMilestone.reset()
-                toast.add({ summary: 'Hito Guardado', life: 2000 });
+                toast.add({ severity: 'success', group: 'customToast', text: 'Hito actualizado', life: 2000 });
                 openDialogHito.value = false;
             },
             onError: (e) => {
@@ -195,7 +198,7 @@ const save = () => {
         formMilestone.post(route('milestones.store'), {
             onSuccess: () => {
                 formMilestone.reset()
-                toast.add({ summary: 'Hito Guardado', life: 2000 });
+                toast.add({ severity: 'success', group: 'customToast', text: 'Hito guardado', life: 2000 });
                 openDialogHito.value = false;
             },
             onError: (e) => {
@@ -232,6 +235,7 @@ const guardarAvance = () => {
             toast.add({ severity: 'success', group: 'customToast', text: 'Avance guardado', life: 2000 });
         },
         onError: () => {
+            console.log(e)
             toast.add({ severity: 'error', group: 'customToast', text: 'Hubo un error, reintente', life: 2000 });
         }
     })
@@ -252,10 +256,11 @@ const saveweekTask = () => {
         formMilestone.put(route('weektask.update', formMilestone.id), {
             onSuccess: () => {
                 formMilestone.reset()
-                toast.add({ summary: 'Hito Guardado', life: 2000 });
+                toast.add({ severity: 'success', group: 'customToast', text: 'Hito Guardado', life: 2000 });
                 openDialogHito.value = false;
             },
             onError: (e) => {
+                toast.add({ severity: 'error', group: 'customToast', text: 'Hubo un error, reintente', life: 2000 });
                 console.log(e)
             }
         })
@@ -267,6 +272,7 @@ const saveweekTask = () => {
                 openDialogHito.value = false;
             },
             onError: (e) => {
+                toast.add({ severity: 'error', group: 'customToast', text: 'Hubo un error, reintente', life: 2000 });
                 console.log(e)
             }
         })
@@ -278,17 +284,21 @@ const saveweekTask = () => {
     <AppLayout>
         <div class="h-[89vh] overflow-y-auto flex flex-col ">
             <div class="flex justify-between items-center px-2 h-[8vh]">
-                <h2 class="text-lg font-semibold w-full text-primary lg:text-2xl">
-                    {{ project ? 'Editar proyecto' : 'Nuevo proyecto' }}
-                </h2>
-                <div v-if="props.project" class="space-x-4 justify-end flex w-full">
+                <span class="w-full flex space-x-1">
+                    <Button v-tooltip="'Volver a proyectos'" text raised rounded icon="fa-solid fa-arrow-left"
+                        @click="finish('Saliendo')" />
+                    <h2 class="text-lg font-semibold w-full text-primary lg:text-2xl">
+                        {{ project ? project.name : 'Nuevo proyecto' }}
+                    </h2>
+
+                </span>
+                <div v-if="project" class="space-x-4 justify-end flex w-full">
                     <Button icon="fa-solid fa-list-check" severity="help" v-tooltip.top="'Tareas de la semana'"
                         @click="modalWeekTask = true" />
                     <Button icon="fa-solid fa-gauge-high" severity="secondary" v-tooltip.top="'Avance del proyecto'"
                         @click="modalProgress = true" />
                     <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" icon-button="fa-solid fa-chart-bar"
-                        tooltip="Subir Estructura" accept=".xlsx,.xls"
-                        :url="route('upload.estructure', props.project.id)" />
+                        tooltip="Subir Estructura" accept=".xlsx,.xls" :url="route('upload.estructure', project.id)" />
                     <!--
                     <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Presupuesto del proyecto"
                         icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
@@ -308,8 +318,9 @@ const saveweekTask = () => {
             </div>
             <div class="p-2">
                 <!-- AQUÍ VA EL CONTENIDO DEL FORMULARIO-->
-                <form-wizard @on-complete="submit()" stepSize="md" class="flex flex-col h-[75vh]" color="#2E3092"
-                    nextButtonText="Siguiente" backButtonText="Regresar" finishButtonText="Guardar" ref="wizard">
+                <form-wizard @onComplete="finish('Guardado y saliendo')" stepSize="md" class="flex flex-col h-[75vh]"
+                    color="#2E3092" nextButtonText="Siguiente" backButtonText="Regresar" finishButtonText="Guardar y salir"
+                    ref="wizard">
                     <!--INFORMACIÓN CONTRACTUAL-->
                     <tab-content title="Información Contractual" class="h-[45vh] overflow-y-auto"
                         icon="fa-solid fa-file-signature" :beforeChange="beforeChange">
@@ -346,7 +357,7 @@ const saveweekTask = () => {
                         <!--CAMPO SUPERVISOR (supervisor)-->
                         <div class="sm:grid sm:grid-cols-2 border gap-4 rounded-lg p-4">
 
-                            <CustomInput label="Supervisor" placeholder="Nombre del supervisor" optionLabel="name"
+                            <CustomInput label="Gerente" placeholder="Nombre del Gerente" optionLabel="name"
                                 optionValue="name" :options="Object.values(gerentes)" type="dropdown"
                                 v-model:input="formData.supervisor" @change="console.log($event)" />
 
@@ -446,39 +457,72 @@ const saveweekTask = () => {
                         </div>
                     </tab-content>
                     <!--BUQUES-->
-                    <tab-content title="Buques" icon="fa-solid fa-ship" :before-change="beforeChange" class="h-[45vh]">
-                        <Listbox :options="ships" v-model="formData.ships" optionValue="id"
-                            :filterFields="['name', 'idHull', 'type_ship.name']" filterPlaceholder="Filtrar Buques" multiple
-                            filter optionLabel="name" :pt="{
-                                list: 'sm:!grid sm:!grid-cols-4 !gap-1 !p-1 !max-h-[40vh] h-[40vh]',
-                                header: '!p-1',
-                                filterInput: '!h-8',
-                                item: '!h-min !rounded-lg'
-                            }">
-                            <template #option="slotProps">
-                                <div class="flex">
-                                    <img :src="slotProps.option.file" onerror="this.src='/images/generic-boat.png'"
-                                        class="object-cover object-center max-w-24 " />
-                                    <div class="h-full flex flex-col">
-                                        <li>
-                                            <p class="truncate">
-                                                {{ slotProps.option.name }}
-                                            </p>
-                                        </li>
-                                        <li>
-                                            <p><span class="font-semibold">Casco:</span>
-                                                {{ slotProps.option.idHull }}
-                                            </p>
-                                        </li>
-                                        <li>
-                                            <p><span class="font-semibold">Clase:</span>
-                                                {{ slotProps.option.type_ship.name }}
-                                            </p>
-                                        </li>
+                    <tab-content title="Buques" icon="fa-solid fa-ship" :before-change="beforeChange"
+                        class="h-[45vh] flex gap-2">
+                        <span class="h-ful flex flex-col w-1/2">
+                            <p class="font-bold text-lg">Buques agregados</p>
+                            <Listbox :options="projectShips" optionValue="id" :filterFields="['ship.name', 'ship.idHull']"
+                                filterPlaceholder="Filtrar Buques agregados" multiple filter optionLabel="name" :pt="{
+                                    list: projectShips.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
+                                    header: '!p-1',
+                                    filterInput: '!h-8',
+                                    item: '!h-min !rounded-lg'
+                                }">
+                                <template #option="slotProps">
+                                    <div class="flex items-center justify-between">
+                                        <ol class="h-full flex flex-col">
+                                            <li>
+                                                <p class="">
+                                                    {{ slotProps.option.ship.name }}
+                                                </p>
+                                            </li>
+                                            <li>
+                                                <p><span class="font-semibold">Casco:</span>
+                                                    {{ slotProps.option.ship.idHull }}
+                                                </p>
+                                            </li>
+                                        </ol>
+                                        <Button v-tooltip="'Eliminar el buque del proyecto'" icon="fa-solid fa-trash-can"
+                                            text rounded severity="danger"
+                                            @click="confirmDelete(slotProps.option.id, 'Buque', 'projectships')" />
                                     </div>
-                                </div>
-                            </template>
-                        </Listbox>
+                                </template>
+                                <template #empty>
+                                    <Empty message="Aun no se agregan buques" />
+                                </template>
+                            </Listbox>
+                        </span>
+                        <span class="flex flex-col w-1/2">
+                            <p class="font-bold text-lg">Buques para agregar</p>
+                            <Listbox :options="ships" v-model="formData.ships" optionValue="id"
+                                :filterFields="['name', 'idHull']" filterPlaceholder="Filtrar Buques sin agregar" multiple
+                                filter optionLabel="name" :pt="{
+                                    list: ships.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
+                                    header: '!p-1',
+                                    filterInput: '!h-8',
+                                    item: '!h-min !rounded-lg'
+                                }">
+                                <template #option="slotProps">
+                                    <div class="flex">
+                                        <div class="h-full flex flex-col">
+                                            <li>
+                                                <p class="truncate">
+                                                    {{ slotProps.option.name }}
+                                                </p>
+                                            </li>
+                                            <li>
+                                                <p><span class="font-semibold">Casco:</span>
+                                                    {{ slotProps.option.idHull }}
+                                                </p>
+                                            </li>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template #empty>
+                                    <Empty message="No hay buques para mostrar" />
+                                </template>
+                            </Listbox>
+                        </span>
                     </tab-content>
                     <tab-content title="Hitos" icon="fa-solid fa-list-check"
                         class=" h-[45vh] w-full border rounded-lg p-1 overflow-y-auto">
@@ -486,6 +530,15 @@ const saveweekTask = () => {
                             @edit="showModal" :filter="false" :showHeader="false" :showAdd="true" @addClic="showModal"
                             @delete="delMilestone" />
                     </tab-content>
+                    <template #prev>
+                        <Button label="Regresar" raised icon="fa-solid fa-arrow-left" />
+                    </template>
+                    <template #next>
+                        <Button label="Siguiente" raised iconPos="right" icon="fa-solid fa-arrow-right" />
+                    </template>
+                    <template #finish>
+                        <Button label="Guardar y salir" raised icon="fa-solid fa-floppy-disk" />
+                    </template>
                 </form-wizard>
             </div>
         </div>
@@ -562,15 +615,4 @@ const saveweekTask = () => {
             </div>
         </template>
     </CustomModal>
-
-    <Toast position="bottom-center" :pt="{
-        root: '!h-10 !w-64',
-        container: {
-            class: '!bg-primary !h-10 !rounded-lg'
-        },
-        content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
-        buttonContainer: '!hidden',
-        icon: '!hidden',
-        detail: '!hidden'
-    }" />
 </template>

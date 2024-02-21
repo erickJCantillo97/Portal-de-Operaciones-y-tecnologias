@@ -32,7 +32,8 @@ class PermissionController extends Controller
                 'rolesObj' => collect($user['roles'])->map(function ($role) {
                     return [
                         'id' => $role['id'],
-                        'name'=> explode('%TOP%', $role['name'])[0]];
+                        'name' => explode('%TOP%', $role['name'])[0]
+                    ];
                 }),
             ];
         });
@@ -78,11 +79,8 @@ class PermissionController extends Controller
         try {
 
             $permiso = Permission::create($validateData);
-
-            foreach ($roles as $role) {
-                $r = Role::where('name', $role)->first();
-                $r->givePermissionTo($permiso);
-            }
+            $r = Role::first();
+            $r->givePermissionTo($permiso);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error: ' . $e);
         }

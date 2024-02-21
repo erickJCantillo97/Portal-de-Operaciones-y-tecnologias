@@ -43,6 +43,7 @@ const buttons = [
 const modalUserDetails = ref(false)
 const userSelect = ref({})
 
+
 function userDetalis(event, data) {
     modalUserDetails.value = true
     Object.assign(userSelect.value, data)
@@ -93,6 +94,9 @@ const rol = useForm({
     name: null,
     description: null,
     permissions: []
+})
+const permision = useForm({
+    name: null,
 })
 
 
@@ -145,6 +149,18 @@ const deleteRol = async (id) => {
     rol.processing = false
 }
 
+const savePermiso = () => {
+    permision.post(route('permissions.store'), {
+        onSuccess: (s) => {
+            toast.add({ severity: 'success', group: "customToast", text: 'Rol creado con exito', life: 2000 })
+            rol.reset()
+        },
+        onError: (e) => {
+            toast.add({ severity: 'error', group: "customToast", text: 'Ocurrio un error', life: 2000 })
+        }
+    })
+}
+
 
 const permissionsClic = async (permiso) => {
     const indice = await rol.permissions.findIndex((permission) => permission.name === permiso.name)
@@ -166,21 +182,32 @@ function filter() {
         return permisosFiltrados
     }
 }
+
+const permissionModal = ref(false)
 //#endregion
 
 </script>
 <template>
     <AppLayout>
         <div class="h-[89vh] overflow-y-auto">
-            <div class="px-4 space-y-2">
-                <h1 class="text-3xl font-bold text-primary">Roles</h1>
-                <p class="text-sm text-gray-700 italic w-1/2 text-justify">
-                    Un rol proporciona acceso a menús y funciones predefinidos para que, dependiendo del rol asignado, un
-                    administrador pueda tener acceso de lo que cada usuario necesita.
-                </p>
+            <div class="px-4 space-y-2 flex ">
+                <div>
+                    <h1 class="text-3xl font-bold text-primary">Roles</h1>
+                    <p class="text-sm text-gray-700 italic w-1/2 text-justify">
+                        Un rol proporciona acceso a menús y funciones predefinidos para que, dependiendo del rol asignado,
+                        un
+                        administrador pueda tener acceso de lo que cada usuario necesita.
+                    </p>
+                </div>
+                <div>
+
+                    <Button label="Nuevo Permiso" icon="fa fa-plus" @click="permissionModal = true"
+                        v-if="$page.props.auth.user.id == 2" />
+                </div>
             </div>
             <div class="grid grid-cols-4 gap-8 m-4">
-                <div v-tooltip.top="rol.description" class="cursor-default shadow-lg rounded-lg p-1 bg-gray-50" v-for="rol in roles">
+                <div v-tooltip.top="rol.description" class="cursor-default shadow-lg rounded-lg p-1 bg-gray-50"
+                    v-for="rol in roles">
                     <div class="flex px-2">
                         <div class="flex justify-between w-full">
                             <span class="text-sm text-gray-600">Total {{ rol.permissions.length }} Permisos</span>
@@ -239,12 +266,12 @@ function filter() {
                     </div>
                 </div>
                 <span class="flex flex-col w-10 justify-center gap-2">
-                    <Button :loading="processing" :disabled="rolAdd==null" v-tooltip.top="'Agregar rol'" @click="userRolUpdate('add')" icon="fa-solid fa-angle-left"
-                        severity="success" text outlined />
+                    <Button :loading="processing" :disabled="rolAdd == null" v-tooltip.top="'Agregar rol'"
+                        @click="userRolUpdate('add')" icon="fa-solid fa-angle-left" severity="success" text outlined />
                     <!-- <Button v-tooltip.top="'Agregar todos los roles'" icon="fa-solid fa-angles-left" severity="success" text
                         outlined /> -->
-                    <Button :loading="processing" :disabled="rolDel==null" v-tooltip.top="'Quitar rol'" @click="userRolUpdate('del')" icon="fa-solid fa-angle-right"
-                        severity="danger" text outlined />
+                    <Button :loading="processing" :disabled="rolDel == null" v-tooltip.top="'Quitar rol'"
+                        @click="userRolUpdate('del')" icon="fa-solid fa-angle-right" severity="danger" text outlined />
                     <!-- <Button v-tooltip.top="'Quitar todos los roles'" icon="fa-solid fa-angles-right" severity="danger" text
                         outlined /> -->
                 </span>
@@ -284,7 +311,7 @@ function filter() {
                 </div>
                 <li class="grid p-1 grid-cols-4 gap-1 h-[35vh] overflow-y-auto">
                     <ul v-if="filter().length > 0"
-                        class="border h-6 text-center capitalize border-success flex justify-center items-center rounded-md cursor-pointer"
+                        class="border h-6 text-center  border-success flex justify-center items-center rounded-md cursor-pointer"
                         :class="rol.permissions.find((permission) => permission.name === permiso.name) ? 'bg-success fa-regular fa-circle-check text-white' : 'bg-success-light'"
                         v-for="permiso in filter()" @click="permissionsClic(permiso)">
                         <p class="font-sans ml-1">{{ permiso.name }}</p>
@@ -302,5 +329,17 @@ function filter() {
         </template>
     </CustomModal>
     <!-- endregion -->
+    <!-- #region permiso rol -->
+    <CustomModal v-model:visible="permissionModal" width="70vw" :titulo="'Agregar Permiso'" icon="fa-solid fa-user-tag">
+        <template #body>
+            <CustomInput v-model:input="permision.name" class="w-full" label="Nombre del Permiso"
+                :invalid="permision.errors.name ? true : false" :errorMessage="permision.errors.name" />
 
+        </template>
+        <template #footer>
+            <Button severity="danger" label="Cancelar" :disabled="permision.processing" @click="permissionModal = false" />
+            <Button severity="success" :label="'Guardar'" @click="savePermiso()" :loading="permision.processing" />
+        </template>
+    </CustomModal>
+    <!-- endregion -->
 </template>

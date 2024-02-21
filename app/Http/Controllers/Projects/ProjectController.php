@@ -13,6 +13,7 @@ use App\Models\Projects\ProjectsShip;
 use App\Models\Projects\Ship;
 use App\Models\Quotes\Quote;
 use App\Models\VirtualTask;
+use App\Policies\ProjectPolicy;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -20,6 +21,10 @@ use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Project::class, 'project');
+    }
     /**
      * Display a listing of the resource.
      */
@@ -50,7 +55,7 @@ class ProjectController extends Controller
             ];
         })->toArray();
         // return $ships;
-        return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes', 'ships', 'gerente'));
+        return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes', 'ships', 'gerentes'));
     }
 
     /**
@@ -116,38 +121,6 @@ class ProjectController extends Controller
         return response()->json($taskProject);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function goToProjectOverview(Project $project)
-    {
-        try {
-            $ships_ids = ProjectsShip::where('project_id', $project->id)->pluck('ship_id')->toArray();
-            $ships = Ship::with('typeShip')->whereIn('id', $ships_ids)->get();
-            $semana = ProgressProjectWeek::where('project_id', $project->id)->where('real_progress', '<>', 0)->orderBy('week', 'DESC')->first();
-
-            return Inertia::render(
-                'Project/ProjectOverview',
-                [
-                    'project' => Project::with('projectShip', 'contract', 'milestone')->findOrFail($project->id),
-                    'ships' => $ships,
-                    'semana' => $semana
-                ]
-            );
-        } catch (Exception $e) {
-            return back()->withErrors(['message', 'Error al cargar la página' . $e]);
-        }
-    }
-
-    public function addShips(Request $request, Project $project)
-    {
-        foreach ($request->ships as $ship) {
-            ProjectsShip::create([
-                'project_id' => $project->id,
-                'ship_id' => $ship
-            ]);
-        }
-    }
 
     /**
      * Show the form for editing the specified resource.
@@ -235,6 +208,36 @@ class ProjectController extends Controller
             $project->delete();
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
+        }
+    }
+
+    public function goToProjectOverview(Project $project)
+    {
+        try {
+            $ships_ids = ProjectsShip::where('project_id', $project->id)->pluck('ship_id')->toArray();
+            $ships = Ship::with('typeShip')->whereIn('id', $ships_ids)->get();
+            $semana = ProgressProjectWeek::where('project_id', $project->id)->where('real_progress', '<>', 0)->orderBy('week', 'DESC')->first();
+
+            return Inertia::render(
+                'Project/ProjectOverview',
+                [
+                    'project' => Project::with('projectShip', 'contract', 'milestone')->findOrFail($project->id),
+                    'ships' => $ships,
+                    'semana' => $semana
+                ]
+            );
+        } catch (Exception $e) {
+            return back()->withErrors(['message', 'Error al cargar la página' . $e]);
+        }
+    }
+
+    public function addShips(Request $request, Project $project)
+    {
+        foreach ($request->ships as $ship) {
+            ProjectsShip::create([
+                'project_id' => $project->id,
+                'ship_id' => $ship
+            ]);
         }
     }
 }
