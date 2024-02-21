@@ -1,22 +1,21 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue'
+const { confirmDelete } = useSweetalert()
+const toast = useToast()
+import 'vue3-form-wizard/dist/style.css'
+import { FormWizard, TabContent } from 'vue3-form-wizard'
 import { ref, onMounted } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
-import axios from 'axios'
-import ToggleButton from 'primevue/togglebutton'
-import Listbox from 'primevue/listbox';
-import CustomUpload from "@/Components/CustomUpload.vue";
+import { useSweetalert } from '@/composable/sweetAlert'
+import { useToast } from "primevue/usetoast";
+import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
-import { FormWizard, TabContent } from 'vue3-form-wizard'
-import 'vue3-form-wizard/dist/style.css'
-import Toast from 'primevue/toast';
-import { useToast } from "primevue/usetoast";
+import CustomUpload from "@/Components/CustomUpload.vue"
 import Empty from '@/Components/Empty.vue'
-import { useSweetalert } from '@/composable/sweetAlert'
-const { confirmDelete } = useSweetalert();
-const toast = useToast();
+import Listbox from 'primevue/listbox'
+import Toast from 'primevue/toast'
+import ToggleButton from 'primevue/togglebutton'
 
 const props = defineProps({
     project: Object,
@@ -290,7 +289,7 @@ const saveweekTask = () => {
                     <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" icon-button="fa-solid fa-chart-bar"
                         tooltip="Subir Estructura" accept=".xlsx,.xls"
                         :url="route('upload.estructure', props.project.id)" />
-                    <!-- 
+                    <!--
                     <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Presupuesto del proyecto"
                         icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
                         url="prueba" severity="success" />
@@ -298,7 +297,7 @@ const saveweekTask = () => {
                     <CustomUpload mode="advanced" titleModal="Subir Presupuesto del proyecto"
                         icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
                         :url="route('upload.budget', props.project.id)" severity="success" />
-                    
+
                     <CustomUpload mode="advanced" :multiple="true" titleModal="Subir el avance planeado del proyecto"
                         tooltip="Subir Curva S" accept=".xlsx,.xls" url="prueba" severity="info" />
 

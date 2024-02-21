@@ -16,8 +16,11 @@ class ContractEvent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
+
     public $message;
 
+    public $title = 'Contratos';
+    
     public $type;
 
     public function __construct(Contract $contract, $type = 'created')
@@ -41,7 +44,7 @@ class ContractEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('contracts'),
+            new PrivateChannel($this->title),
             // new PrivateChannel('myPrivateChannel.user.id'),
         ];
     }

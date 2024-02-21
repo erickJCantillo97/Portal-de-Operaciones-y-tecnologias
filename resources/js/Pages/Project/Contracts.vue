@@ -1,15 +1,17 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue'
+const { confirmDelete } = useSweetalert()
+const { eventListener } = broadcastNotifications()
+const { toast } = useSweetalert()
+import { broadcastNotifications } from '@/composable/webNotifications'
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { useSweetalert } from '@/composable/sweetAlert'
+import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
-import CustomModal from '@/Components/CustomModal.vue'
 import CustomInput from '@/Components/CustomInput.vue'
-const { toast } = useSweetalert()
-const loading = ref(false)
-const { confirmDelete } = useSweetalert()
+import CustomModal from '@/Components/CustomModal.vue'
 
+const loading = ref(false)
 
 //Props
 const props = defineProps({
@@ -102,6 +104,10 @@ const formatCurrency = (valor, moneda) => {
             { style: 'currency', currency: moneda, maximumFractionDigits: 0 })
     }
 }
+
+//#region broadcast
+eventListener('contracts', '.ContractsEvent')
+//#endregion
 </script>
 
 <template>

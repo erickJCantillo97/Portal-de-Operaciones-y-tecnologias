@@ -17,6 +17,8 @@ window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
 import Echo from "laravel-echo";
 
+let isProduction = import.meta.env.VITE_WS_CONNECT_PRODUCTION === "true";
+
 // import Pusher from "pusher-js";
 // window.Pusher = Pusher;
 
@@ -25,7 +27,10 @@ import Echo from "laravel-echo";
 //     key: import.meta.env.VITE_PUSHER_APP_KEY,
 //     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER ?? "mt1",
 //     wsHost: window.location.hostname,
-//     wsPort: 6001,
+//     wsPort: isProduction ? 6002 : 6001,
 //     forceTLS: false,
-//     disableStatus: true,
+//     encrypted: isProduction,
+//     disableStats: false,
+//     enabledTransports: ['ws', 'wss'],
+//     disabledTransports: ["sockjs", "xhr_polling", "xhr_streaming"];
 // });
