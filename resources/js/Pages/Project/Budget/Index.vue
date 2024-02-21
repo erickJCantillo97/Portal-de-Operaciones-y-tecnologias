@@ -88,58 +88,58 @@ const option = ref('total')
                     </span>
                 </span>
                 <div v-if="peps" class="grid sm:grid-cols-4 gap-4 p-1">
-                    <Button :outlined="!(option == 'material')" :key="totales.materials_ejecutados"
+                    <Button :outlined="!(option == 'material')" raised :key="totales.materials_ejecutados"
                         @click="option = 'material'" class="min-h-16">
                         <span class="w-full -mt-1">
                             <p class="w-full text-center font-bold">Materiales</p>
                             <p class="w-full text-center  !text-sm">{{ formatCurrency(totales.materials_ejecutados) }}</p>
-                            <div class="w-full h-4 border rounded-sm bg-gray-400"
+                            <div class="w-full h-4 border rounded-sm bg-gray-400" :title="parseFloat((totales.materials_ejecutados / parseInt(totales.materials)) / 100)+'%'"
                                 :style="!(option == 'material') ? 'border: var(--primary-color)' : ''">
                                 <div style="backgroundColor: var(--primary-color);"
-                                    :style="'width:' + parseInt((totales.materials_ejecutados / totales.materials) / 100) + '%;'"
+                                    :style="'width:' + ((totales.materials_ejecutados / parseInt(totales.materials)) / 100) + '%;'"
                                     class="h-full text-center text-xs rounded-sm text-white max-w-full">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">
-                                    {{ parseFloat((totales.materials_ejecutados / totales.materials) / 100).toFixed(2) }}%
+                                    {{ parseFloat((totales.materials_ejecutados / parseInt(totales.materials)) / 100).toFixed(2) }}%
                                 </p>
                             </div>
                         </span>
                     </Button>
-                    <Button :outlined="!(option == 'obra')" :key="totales.labor_ejecutados" @click="option = 'obra'"
+                    <Button :outlined="!(option == 'obra')" raised :key="totales.labor_ejecutados" @click="option = 'obra'"
                         class="min-h-16">
                         <span class="w-full -mt-1">
                             <p class="w-full text-center font-bold">Mano de obra</p>
                             <p class="w-full text-center !text-sm">{{ formatCurrency(totales.labor_ejecutados) }}</p>
-                            <div class="w-full h-4 border rounded-sm bg-gray-400"
+                            <div class="w-full h-4 border rounded-sm bg-gray-400" :title=" parseFloat((totales.labor_ejecutados / parseInt(totales.labor)) / 100)+'%'"
                                 :style="!(option == 'obra') ? 'border: var(--primary-color)' : ''">
-                                <div style="backgroundColor: var(--primary-color);"
-                                    :style="'width:' + (parseInt((totales.labor_ejecutados / totales.labor) / 100)) + '%'"
+                                <div style="backgroundColor: var(--primary-color);" 
+                                    :style="'width:' + (parseInt((totales.labor_ejecutados / parseInt(totales.labor)) / 100)) + '%'"
                                     class="h-full text-center text-xs rounded-sm text-white">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">
-                                    {{ parseFloat((totales.labor_ejecutados / totales.labor) / 100).toFixed(2) }}%
+                                    {{ parseFloat((totales.labor_ejecutados / parseInt(totales.labor)) / 100).toFixed(2) }}%
                                 </p>
                             </div>
                         </span>
                     </Button>
-                    <Button :outlined="!(option == 'servicio')" :key="totales.services_ejecutados"
+                    <Button :outlined="!(option == 'servicio')" raised :key="totales.services_ejecutados"
                         @click="option = 'servicio'" class="min-h-16">
                         <span class="w-full -mt-1">
                             <p class="w-full text-center font-bold">Servicios</p>
                             <p class="w-full text-center !text-sm">{{ formatCurrency(totales.services_ejecutados) }}</p>
-                            <div class="w-full h-4 border rounded-sm bg-gray-400"
+                            <div class="w-full h-4 border rounded-sm bg-gray-400" :title="parseFloat((totales.services_ejecutados / parseInt(totales.services) )/ 100)+'%'"
                                 :style="!(option == 'servicio') ? 'border: var(--primary-color)' : ''">
                                 <div style="backgroundColor: var(--primary-color);"
-                                    :style="'width:' + (parseInt((totales.services_ejecutados / totales.services) / 100)) + '%'"
+                                    :style="'width:' + (parseInt((totales.services_ejecutados / parseInt(totales.services)) / 100)) + '%'"
                                     class="h-full text-center text-xs rounded-sm text-white  ">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">
-                                    {{ parseFloat((totales.services_ejecutados / totales.services) / 100).toFixed(2) }}%
+                                    {{ parseFloat((totales.services_ejecutados / parseInt(totales.services) )/ 100).toFixed(2) }}%
                                 </p>
                             </div>
                         </span>
                     </Button>
-                    <Button :outlined="!(option == 'total')" :key="(totales.services_ejecutados +
+                    <Button :outlined="!(option == 'total')" raised :key="(totales.services_ejecutados +
                         totales.materials_ejecutados + totales.labor_ejecutados)
                         " @click="option = 'total'" class="min-h-16">
                         <span class="w-full -mt-1">
@@ -147,15 +147,17 @@ const option = ref('total')
                             <p class="w-full text-center !text-sm">{{ formatCurrency(totales.services_ejecutados +
                                 totales.materials_ejecutados + totales.labor_ejecutados) }}
                             </p>
-                            <div class="w-full h-4 border  rounded-sm bg-gray-400" style="border;: var(--primary-color)">
+                            <div class="w-full h-4 border  rounded-sm bg-gray-400" :title="parseFloat(((totales.services_ejecutados + totales.materials_ejecutados +
+                                        totales.labor_ejecutados) / (parseInt(totales.services) + parseInt(totales.materials) +
+                                        parseInt(totales.labor))) / 100) +'%'" style="border;: var(--primary-color)">
                                 <div style="backgroundColor: var(--primary-color);"
                                     :style="'width:' + (parseInt((totales.services_ejecutados + totales.materials_ejecutados + totales.labor_ejecutados) / (totales.services + totales.materials + totales.labor)) * 0.01) + '%'"
                                     class="h-full text-center text-xs text-white rounded-sm ">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">{{
                                     parseFloat(((totales.services_ejecutados + totales.materials_ejecutados +
-                                        totales.labor_ejecutados) / (totales.services + totales.materials +
-                                            totales.labor)) / 100).toFixed(2)
+                                        totales.labor_ejecutados) / (parseInt(totales.services) + parseInt(totales.materials) +
+                                        parseInt(totales.labor))) / 100).toFixed(2)
                                 }}%</p>
                             </div>
                         </span>
