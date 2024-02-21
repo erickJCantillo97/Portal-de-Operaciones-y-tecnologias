@@ -17,6 +17,9 @@ import Image from 'primevue/image'
 import Divider from 'primevue/divider'
 import Tag from 'primevue/tag'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
+import { usePermissions } from '@/composable/permission';
+
+const { hasRole, hasPermission } = usePermissions();
 
 const props = defineProps({
     projects: Array,
@@ -215,9 +218,9 @@ const filterButtons = [
 
 const buttons = [
     { event: 'addDoc', severity: 'primary', class: '', icon: 'fa-solid fa-cloud-arrow-up', text: true, outlined: false, rounded: false },
-    { event: 'addAct', severity: 'primary', class: '', icon: 'fa-regular fa-calendar-plus', text: true, outlined: false, rounded: false },
-    { event: 'editClic', severity: 'primary', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
-    { event: 'deleteClic', severity: 'danger', icon: 'fa-regular fa-trash-can', class: '!h-8', text: true, outlined: false, rounded: false },
+    { event: 'addAct', severity: 'primary', class: '', icon: 'fa-regular fa-calendar-plus', text: true, outlined: false, rounded: false, show: hasPermission('schedule create') },
+    { event: 'editClic', severity: 'primary', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false, show: hasPermission('projects edit') },
+    { event: 'deleteClic', severity: 'danger', icon: 'fa-regular fa-trash-can', class: '!h-8', text: true, outlined: false, rounded: false, show: hasPermission('projects delete') },
 ]
 
 const goToProjectOverview = (event, data) => {
@@ -238,7 +241,8 @@ const goToProjectOverview = (event, data) => {
                 :columnas="columnas" :actions="buttons" @addDoc="addDoc" @addAct="addAct" @editClic="editClic"
                 @deleteClic="deleteClic" @goToProjectOverview="goToProjectOverview">
                 <template #buttonHeader>
-                    <Button @click="addItem" severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
+                    <Button @click="addItem" severity="success" v-if="hasPermission('projects create')"
+                        icon="fa-solid fa-plus" label="Agregar" outlined />
                 </template>
             </CustomDataTable>
         </div>

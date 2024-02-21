@@ -212,7 +212,7 @@ Route::get('estmaciones_anterior', function () {
             'coin' => $estimacion->moneda_original,
             'file' => $estimacion->file,
         ]);
-        $quoteVersion->created_at = $estimacion->fecha;
+        $quoteVersion->created_at = $estimacion->fecha_solicitud;
         $quote->current_version_id = $quoteVersion->id;
         $quote->save();
         if ($estimacion->clase_id) {
@@ -245,7 +245,7 @@ Route::get('estmaciones_anterior', function () {
             QuoteStatus::create([
                 'quote_version_id' => $quoteVersion->id,
                 'status' => $estado,
-                'fecha' => $estado,
+                'fecha' => $fecha,
                 'user_id' => auth()->user()->id
             ]);
         }

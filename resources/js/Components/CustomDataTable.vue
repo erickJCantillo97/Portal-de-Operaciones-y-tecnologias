@@ -329,9 +329,9 @@ const auxdata = ref()
                         </div>
                     </span>
                     <span v-else-if="col.type == 'button'" class="w-full">
-                        <Button :label="String(data[col.field])" class="w-full truncate" :class="col.rowClass" :icon="col.icon"
-                            :outlined="col.outlined" :text="col.text" :severity="col.severity" :rounded="col.rounded"
-                            @click="$emit(col.event, $event, data)">
+                        <Button :label="String(data[col.field])" class="w-full truncate" :class="col.rowClass"
+                            :icon="col.icon" :outlined="col.outlined" :text="col.text" :severity="col.severity"
+                            :rounded="col.rounded" @click="$emit(col.event, $event, data)">
                         </Button>
                     </span>
                     <span v-else-if="col.type == 'array'" class="w-full flex space-x-1">
@@ -351,9 +351,11 @@ const auxdata = ref()
         <Column frozen alignFrozen="right" class="w-[8%]" v-if="props.actions.length > 0">
             <template #body="{ data }">
                 <div class="flex items-center justify-center w-full bg-white rounded-md shadow-sm">
-                    <Button v-for="button in props.actions" @click="$emit(button.event, $event, data)" :text="button.text"
-                        :severity="button.severity" :outlined="button.outlined" :rounded="button.rounded"
-                        :icon="button.icon" :title="button.label" :class="button.class" />
+                    <span v-for="button in props.actions">
+                        <Button @click="$emit(button.event, $event, data)" :text="button.text" :severity="button.severity"
+                            :outlined="button.outlined" :rounded="button.rounded" :icon="button.icon" :title="button.label"
+                            :class="button.class" v-if="button.show == null? true: button.show" />
+                    </span>
                 </div>
             </template>
         </Column>

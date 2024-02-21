@@ -69,7 +69,7 @@ class Project extends Model implements Auditable
     {
         return Attribute::make(
             set: fn ($value) => is_array($value) ? $value[0] : $value,
-            get: fn ($value) => [$value == 0 ? ($this->contract->quote->total_cost ?? 0) : $value, $this->contract->quote->coin ?? 'COP'],
+            get: fn ($value) => [$value == 0 ? (intval($this->contract->quote->total_cost ?? 0)) : intval($value), $this->contract->quote->coin ?? 'COP'],
         );
     }
 

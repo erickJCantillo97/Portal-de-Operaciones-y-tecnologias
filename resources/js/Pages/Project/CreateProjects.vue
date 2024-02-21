@@ -33,7 +33,10 @@ const props = defineProps({
     },
     weekTasks: Array,
     gerentes: Object,
-    projectShips: Array
+    projectShips: {
+        type: Array,
+        default: []
+    }
 })
 
 //#region Referencias (v-model)
@@ -101,7 +104,7 @@ const formData = ref({
     status: props.project?.status ?? null, //ENUMS
     scope: props.project?.scope ?? null, //ENUMS
     supervisor: props.project?.supervisor ?? null,
-    cost_sale: props.project.cost_sale ? [parseInt(props.project.cost_sale[0]), props.project.cost_sale[1]] : [0, 'COP'],
+    cost_sale: props.project?.cost_sale ?? [0, 'COP'],
     observations: props.project?.observations ?? null,
     start_date: props.project?.start_date ?? null,
     end_date: props.project?.end_date ?? null,
@@ -134,7 +137,7 @@ const beforeChange = async () => {
         } else {
             await axios.put(route('projects.update', formData.value.id), formData.value)
                 .then((res) => {
-                    toast.add({ severity: 'success', group: 'customToast', text: 'Actualizado',life: 2000 });
+                    toast.add({ severity: 'success', group: 'customToast', text: 'Actualizado', life: 2000 });
                     switchTabsStates = true
                 })
         }
@@ -145,7 +148,7 @@ const beforeChange = async () => {
     }
 }
 
-const finish =  (msg) => {
+const finish = (msg) => {
     toast.add({ severity: 'success', group: 'customToast', text: msg, life: 2000 });
     router.get(route('projects.index'))
 }
@@ -280,11 +283,12 @@ const saveweekTask = () => {
         <div class="h-[89vh] overflow-y-auto flex flex-col ">
             <div class="flex justify-between items-center px-2 h-[8vh]">
                 <span class="w-full flex space-x-1">
-                    <Button v-tooltip="'Volver a proyectos'" text raised rounded icon="fa-solid fa-arrow-left" @click="finish('Saliendo')" />
+                    <Button v-tooltip="'Volver a proyectos'" text raised rounded icon="fa-solid fa-arrow-left"
+                        @click="finish('Saliendo')" />
                     <h2 class="text-lg font-semibold w-full text-primary lg:text-2xl">
                         {{ project ? project.name : 'Nuevo proyecto' }}
                     </h2>
-                    
+
                 </span>
                 <div v-if="project" class="space-x-4 justify-end flex w-full">
                     <Button icon="fa-solid fa-list-check" severity="help" v-tooltip.top="'Tareas de la semana'"
@@ -312,8 +316,9 @@ const saveweekTask = () => {
             </div>
             <div class="p-2">
                 <!-- AQUÍ VA EL CONTENIDO DEL FORMULARIO-->
-                <form-wizard @onComplete="finish('Guardado y saliendo')" stepSize="md" class="flex flex-col h-[75vh]" color="#2E3092"
-                    nextButtonText="Siguiente" backButtonText="Regresar" finishButtonText="Guardar y salir" ref="wizard">
+                <form-wizard @onComplete="finish('Guardado y saliendo')" stepSize="md" class="flex flex-col h-[75vh]"
+                    color="#2E3092" nextButtonText="Siguiente" backButtonText="Regresar" finishButtonText="Guardar y salir"
+                    ref="wizard">
                     <!--INFORMACIÓN CONTRACTUAL-->
                     <tab-content title="Información Contractual" class="h-[45vh] overflow-y-auto"
                         icon="fa-solid fa-file-signature" :beforeChange="beforeChange">
@@ -350,7 +355,7 @@ const saveweekTask = () => {
                         <!--CAMPO SUPERVISOR (supervisor)-->
                         <div class="sm:grid sm:grid-cols-2 border gap-4 rounded-lg p-4">
 
-                            <CustomInput label="Supervisor" placeholder="Nombre del supervisor" optionLabel="name"
+                            <CustomInput label="Gerente" placeholder="Nombre del Gerente" optionLabel="name"
                                 optionValue="name" :options="Object.values(gerentes)" type="dropdown"
                                 v-model:input="formData.supervisor" @change="console.log($event)" />
 
@@ -608,5 +613,4 @@ const saveweekTask = () => {
             </div>
         </template>
     </CustomModal>
-
 </template>
