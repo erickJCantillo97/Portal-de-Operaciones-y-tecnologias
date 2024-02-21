@@ -297,10 +297,12 @@ const saveweekTask = () => {
                         @click="modalProgress = true" />
                     <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" icon-button="fa-solid fa-chart-bar"
                         tooltip="Subir Estructura" accept=".xlsx,.xls" :url="route('upload.estructure', project.id)" />
-                    <!-- 
-                    <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Presupuesto del proyecto"
+
+                    <CustomUpload mode="advanced" titleModal="Subir Presupuesto del proyecto"
                         icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
-                        url="prueba" severity="success" />
+                        :url="route('upload.budget', project.id)" severity="success" />
+                    <!-- 
+                    
 
                     <CustomUpload mode="advanced" titleModal="Subir Presupuesto del proyecto"
                         icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project\ProgressProjectWeek;
-use App\Models\Project\WeekTask;
 use App\Models\Projects\Authorization;
 use App\Models\Projects\Contract;
 use App\Models\Projects\Milestone;
@@ -13,10 +12,8 @@ use App\Models\Projects\ProjectsShip;
 use App\Models\Projects\Ship;
 use App\Models\Quotes\Quote;
 use App\Models\VirtualTask;
-use App\Policies\ProjectPolicy;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
