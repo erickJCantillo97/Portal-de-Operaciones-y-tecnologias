@@ -18,6 +18,8 @@ class ContractEvent implements ShouldBroadcast
      */
     public $message;
 
+    public $title = 'Erick';
+
     public $type;
 
     public function __construct(Contract $contract, $type = 'created')
@@ -26,11 +28,11 @@ class ContractEvent implements ShouldBroadcast
         $this->type = $type;
 
         if ($type === 'created') {
-            $this->message = 'Se ha creado el contrato:' . "\n" . $contract->contract_id;
+            $this->message = 'Se ha creado el contrato:'."\n".$contract->contract_id;
         } elseif ($type === 'updated') {
-            $this->message = 'Se ha actualizado el contrato:' . "\n" . $contract->name;
+            $this->message = 'Se ha actualizado el contrato:'."\n".$contract->name;
         } elseif ($type === 'deleted') {
-            $this->message = 'Se ha eliminado el contrato:' . "\n" . $contract->name;
+            $this->message = 'Se ha eliminado el contrato:'."\n".$contract->name;
         }
     }
 

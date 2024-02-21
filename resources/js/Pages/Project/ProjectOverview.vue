@@ -1,19 +1,19 @@
 <script setup>
+// import html2canvas from 'html2canvas'
 import { ref, onMounted } from 'vue'
-import TabView from 'primevue/tabview'
-import TabPanel from 'primevue/tabpanel'
-import Moment from 'moment'
-import MiniCardInfo from '@/Components/MiniCardInfo.vue'
-import DescriptionItem from '@/Components/DescriptionItem.vue'
-import ApplicationLogo from '@/Components/ApplicationLogo.vue'
-import Loading from '@/Components/Loading.vue'
-import BasicBarChart from '@/Pages/Dashboards/Projects/BasicBarChart.vue'
-import S_Curve from '@/Pages/Dashboards/Projects/S_Curve.vue'
-import GaugeGradeChart from '@/Pages/Dashboards/Projects/GaugeGradeChart.vue'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
+import ApplicationLogo from '@/Components/ApplicationLogo.vue'
+import BasicBarChart from '@/Pages/Dashboards/Projects/BasicBarChart.vue'
+import DescriptionItem from '@/Components/DescriptionItem.vue'
+import GaugeGradeChart from '@/Pages/Dashboards/Projects/GaugeGradeChart.vue'
 import Image from 'primevue/image'
-// import html2canvas from 'html2canvas'
+import Loading from '@/Components/Loading.vue'
+import MiniCardInfo from '@/Components/MiniCardInfo.vue'
+import Moment from 'moment'
+import S_Curve from '@/Pages/Dashboards/Projects/S_Curve.vue'
+import TabPanel from 'primevue/tabpanel'
+import TabView from 'primevue/tabview'
 import Tag from 'primevue/tag'
 
 const props = defineProps({
@@ -228,7 +228,7 @@ td {
 }
 </style>
 <template>
-  <main class="flex flex-col max-w-full justify-center min-h-screen overflow-hidden">
+  <main class="flex min-h-screen max-w-full flex-col justify-center overflow-hidden">
     <section class="space-y-6  pt-0.5 md:space-x-6 h-screen">
       <!--Project Details-->
       <TabView @tab-click="toggleTabClicked($event)" :scrollable="true" :pt="{
@@ -238,7 +238,7 @@ td {
           root: 'w-full',
         }">
           <div class="grid grid-cols-2 gap-2 h-[90vh]">
-            <div class="col-span-1 rounded-lg p-2 mb-2 w-full border border-solid">
+            <div class="col-span-1 mb-2 w-full rounded-lg border border-solid p-2">
               <div class="flex text-sm font-medium justify-center items-center">
                 <i class="fa-solid fa-ship "></i>
                 <h1 class="text-lg font-semibold  px-4 uppercase">
@@ -247,7 +247,7 @@ td {
               </div>
               <div class="flex justify-center items-center">
               </div>
-              <dl class="divide-y flex space-x-4 divide-gray-200 border-b border-t border-gray-200 items-center">
+              <dl class="flex items-center space-x-4 divide-y divide-gray-200 border-b border-t border-gray-200">
                 <Tag :severity="severitys.find((severity) => severity.text == project.status).severity"
                   :value="'EN ' + project.status"></Tag>
                 <div class="flex py-3 text-xs font-medium">
