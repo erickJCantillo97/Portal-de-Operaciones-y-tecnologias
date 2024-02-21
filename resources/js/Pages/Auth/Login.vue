@@ -75,8 +75,8 @@ const submit = () => {
                                 class="ml-3 mt-2 block text-sm leading-6 text-primary md:text-white">Recuérdame</label>
                         </div>
                     </div>
-                    <div>
-                        <Button type="submit" class="!h-8 w-full" label="Iniciar sesion" :loading="form.processing" />
+                    <div class="flex justify-center">
+                        <Button type="submit" class="!h-8 !w-full" :label="!form.processing?'Iniciar sesion':'Iniciando sesion...'" :loading="form.processing" />
                     </div>
                 </form>
             </AuthenticationCard>

@@ -236,11 +236,12 @@
             <i v-if="slotProps.message.icon" class="text-3xl" :class="slotProps.message.icon" />
             <i v-else class="text-3xl"
                 :class="slotProps.message.severity == 'error' ? 'fa-solid fa-xmark' : slotProps.message.severity == 'success' ? 'fa-solid fa-check' : slotProps.message.severity == 'info' ? 'fa-solid fa-circle-info' : slotProps.message.severity == 'warn' ? 'fa-solid fa-triangle-exclamation' : null" />
-            <div class="flex items-center space-x-2">
-                <p class="font-bold text-lg">{{ slotProps.message.text }}</p>
+            <div class="flex items-center mx-1">
+                <p class="font-bold text-center text-lg">{{ slotProps.message.text }}</p>
             </div>
         </template>
     </Toast>
+    <ConfirmPopup></ConfirmPopup>
 </template>
 
 <script setup>
@@ -261,6 +262,7 @@ import Button from '@/Components/Button.vue'
 import html2canvas from 'html2canvas'
 import RadioButton from 'primevue/radiobutton'
 import Toast from 'primevue/toast'
+import ConfirmPopup from 'primevue/confirmpopup';
 import DolarTRM from "@/Components/DolarTRM.vue"
 import Footer from "@/Components/Footer.vue"
 import FlyoutNotificationsMenu from '@/Components/FlyoutNotificationsMenu.vue'
