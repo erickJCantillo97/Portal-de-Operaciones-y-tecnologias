@@ -38,7 +38,7 @@ return [
             'options' => [
                 'cluster' => env('PUSHER_APP_CLUSTER'),
                 'host' => '127.0.0.1',
-                'port' => env('VITE_WS_CONNECT_PRODUCTION') ? 6002 : 6001,
+                'port' => 6002,
                 'scheme' => 'http',
                 'encrypted' => true,
             ],

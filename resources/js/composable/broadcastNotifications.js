@@ -30,18 +30,20 @@
 
 export function broadcastNotifications() {
     const eventListener = (channel, events) => {
-        events.forEach((event) => {
-            window.Echo.private(channel).listen(event, (e) => {
-                handleDataEvents(e)
-            })
-        })
-    }
+        console.log("Canal: " + channel + "Events: " + events);
+        window.Echo.private(channel).listen(events, (e) => {
+            console.log("Estoy en eventListener: ", + e);
+            handleDataEvents(e);
+        });
+    };
 
     const handleDataEvents = (data) => {
-        showNotification(data.title, data.message)
-    }
+        console.log("Estoy en handleDataEvents: " + data);
+        showNotification(data.title, data.message);
+    };
 
     const showNotification = (title, message) => {
+        console.log("Estoy en showNotification");
         Push.create(title, {
             body: message,
             icon: "/images/cotecmar-logo-bg-white.png",
@@ -51,7 +53,7 @@ export function broadcastNotifications() {
                 window.open("https://www.cotecmar.com/", "_blank");
                 this.close();
             },
-        })
-    }
-    return { eventListener, handleDataEvents }
+        });
+    };
+    return { eventListener, handleDataEvents };
 }

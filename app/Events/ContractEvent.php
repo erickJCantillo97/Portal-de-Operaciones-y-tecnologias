@@ -16,11 +16,10 @@ class ContractEvent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-
     public $message;
 
-    public $title = 'Contratos';
-    
+    public $title = 'Erick';
+
     public $type;
 
     public function __construct(Contract $contract, $type = 'created')
@@ -29,11 +28,11 @@ class ContractEvent implements ShouldBroadcast
         $this->type = $type;
 
         if ($type === 'created') {
-            $this->message = 'Se ha creado el contrato:' . "\n" . $contract->contract_id;
+            $this->message = 'Se ha creado el contrato:'."\n".$contract->contract_id;
         } elseif ($type === 'updated') {
-            $this->message = 'Se ha actualizado el contrato:' . "\n" . $contract->name;
+            $this->message = 'Se ha actualizado el contrato:'."\n".$contract->name;
         } elseif ($type === 'deleted') {
-            $this->message = 'Se ha eliminado el contrato:' . "\n" . $contract->name;
+            $this->message = 'Se ha eliminado el contrato:'."\n".$contract->name;
         }
     }
 
@@ -45,7 +44,7 @@ class ContractEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel($this->title),
+            new PrivateChannel('contracts'),
             // new PrivateChannel('myPrivateChannel.user.id'),
         ];
     }

@@ -37,6 +37,7 @@ use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+    return event(new ContractEvent(Contract::first()));
     return Inertia::render('Auth/Login', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),

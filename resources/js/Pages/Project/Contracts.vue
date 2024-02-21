@@ -2,7 +2,7 @@
 const { confirmDelete } = useSweetalert()
 const { eventListener } = broadcastNotifications()
 const { toast } = useSweetalert()
-import { broadcastNotifications } from '@/composable/webNotifications'
+import { broadcastNotifications } from '@/composable/broadcastNotifications'
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { useSweetalert } from '@/composable/sweetAlert'
