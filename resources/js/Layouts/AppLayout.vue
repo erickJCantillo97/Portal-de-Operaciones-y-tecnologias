@@ -247,7 +247,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { Menu, MenuButton, MenuItems, MenuItem, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { router } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
 import {
     Bars3CenterLeftIcon
 } from '@heroicons/vue/24/outline'

@@ -14,6 +14,7 @@ import 'vue3-form-wizard/dist/style.css'
 import Empty from '@/Components/Empty.vue'
 import Listbox from 'primevue/listbox'
 import ToggleButton from 'primevue/togglebutton'
+import CustomUpload from '@/Components/CustomUpload.vue';
 
 const props = defineProps({
     project: Object,

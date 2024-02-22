@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Support\Facades\Broadcast;
+use Spatie\Permission\Models\Role;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +23,7 @@ use Illuminate\Support\Facades\Broadcast;
 //     return true;
 // });
 
-Broadcast::channel('contracts', function () {
-    return true;
+Broadcast::channel('contracts.{contractId}', function (User $user, int $contractId) {
+    $role = Role::first()->name;
+    return $user->hasRole($role);
 });

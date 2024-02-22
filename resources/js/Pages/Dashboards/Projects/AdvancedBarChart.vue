@@ -34,6 +34,10 @@ const option = ref({
   title: {
     text: props.title,
   },
+  legend: {
+    orient: 'horizontal',
+    height: '5%',
+  },
   tooltip: {
     axisPointer: {
       type: 'shadow'

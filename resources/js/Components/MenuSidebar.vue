@@ -210,7 +210,7 @@ const navigation = [
                 name: 'Contratos',
                 href: 'contracts.index',
                 // dev: true,
-                show: hasPermission(['conttract read']),
+                show: hasPermission(['contract read']),
             },
             {
                 name: 'Autorizaciones',

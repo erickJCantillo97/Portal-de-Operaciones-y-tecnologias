@@ -24,11 +24,13 @@ const getData = () => {
         type: 'bar',
         data: res.data.indicators.map(p => p.planned_progress),
         showBackground: true,
+        color: ['#4A4B51'],
 
       },
       {
         name: 'real',
         type: 'bar',
+        color: ['#2E3092'],
         data: res.data.indicators.map(p => p.real_progress),
         showBackground: true,
       },
