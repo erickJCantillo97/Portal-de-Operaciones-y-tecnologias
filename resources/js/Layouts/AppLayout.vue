@@ -281,7 +281,7 @@ const debug = import.meta.env.VITE_APP_DEBUG
 
 onMounted(() => {
     loadSuggestions()
-    testBroadcast()
+    // testBroadcast()
 })
 
 const testBroadcast = () => {

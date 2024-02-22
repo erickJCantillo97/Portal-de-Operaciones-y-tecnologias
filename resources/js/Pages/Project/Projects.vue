@@ -2,7 +2,6 @@
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { ref } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
-import '../../../sass/dataTableCustomized.scss'
 import { MagnifyingGlassPlusIcon, SparklesIcon, PhotoIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline'
 import { useSweetalert } from '@/composable/sweetAlert'
 import Loading from '@/Components/Loading.vue';
@@ -15,11 +14,10 @@ import DataView from 'primevue/dataview'
 import Button from 'primevue/button'
 import Image from 'primevue/image'
 import Divider from 'primevue/divider'
-import Tag from 'primevue/tag'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import { usePermissions } from '@/composable/permission';
 
-const { hasRole, hasPermission } = usePermissions();
+const { hasPermission } = usePermissions();
 
 const props = defineProps({
     projects: Array,
@@ -27,14 +25,11 @@ const props = defineProps({
 const modalDocument = ref(false)
 const { toast } = useSweetalert()
 const { confirmDelete } = useSweetalert()
-const projectSelect = ref()
-const op = ref()
 
 const addAct = (event, p) => {
-    console.log(p)
-    projectSelect.value = p
-    console.log(event)
-    op.value.toggle(event)
+    router.get(route('createSchedule.create', p.id))
+    // projectSelect.value = p
+    // op.value.toggle(event)
 }
 
 const editClic = (event, data) => {
@@ -73,37 +68,6 @@ const clearError = () => {
     router.page.props.errors = {}
 }
 
-// Formatear el número en moneda (USD)
-const items = [{
-    title: 'Crear cronograma nuevo',
-    description: 'Aqui podra crear un cronograma vacio',
-    icon: MagnifyingGlassPlusIcon,
-    background: 'bg-pink-500',
-    page: 'createSchedule.create'
-},
-{
-    title: 'Crear cronograma con asistente',
-    description: 'Podra crear el proyecto con un asistente inteligente',
-    icon: SparklesIcon,
-    background: 'bg-yellow-500',
-    page: 'wizard',
-    dev: true
-},
-{
-    title: 'Crear proyecto desde proyecto anterior',
-    description: 'Actualmente en desarollo',
-    icon: PhotoIcon,
-    background: 'bg-green-500',
-    dev: true
-},
-{
-    title: 'Crear proyecto desde plantilla prediseñada',
-    description: 'Actualmente en desarrollo',
-    icon: ViewColumnsIcon,
-    background: 'bg-blue-500',
-    dev: true
-},
-]
 //#region subida de documentos
 const files = ref([])
 const fileup = ref(Math.random() * (10))
@@ -214,8 +178,6 @@ const filterButtons = [
     { field: 'status', label: 'GARANTIA ', data: 'GARANTIA', severity: 'warning' },
 ]
 
-
-
 const buttons = [
     { event: 'addDoc', severity: 'primary', class: '', icon: 'fa-solid fa-cloud-arrow-up', text: true, outlined: false, rounded: false },
     { event: 'addAct', severity: 'primary', class: '', icon: 'fa-regular fa-calendar-plus', text: true, outlined: false, rounded: false, show: hasPermission('schedule create') },
@@ -247,44 +209,6 @@ const goToProjectOverview = (event, data) => {
             </CustomDataTable>
         </div>
     </AppLayout>
-
-    <OverlayPanel ref="op">
-        <div>
-            <h2 class="text-base font-semibold leading-6 text-gray-900">Creación o edición de cronograma</h2>
-            <p class="mt-1 text-sm text-gray-500">Aquí podrá escoger como desea crear el cronograma del proyecto.</p>
-
-            <ul role="list" class="grid grid-cols-1 gap-6 py-6 mt-6 border-t border-b border-gray-200 sm:grid-cols-2">
-                <li v-for="(item, itemIdx) in items" :key="itemIdx" class="flow-root">
-                    <div @click="router.get(route(item.page, projectSelect.id))"
-                        class="relative flex items-center p-2 -m-2 space-x-4 rounded-xl focus-within:ring-2 focus-within:ring-indigo-500 hover:bg-gray-50">
-                        <div
-                            :class="[item.background, 'flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg']">
-                            <component :is="item.icon" class="w-6 h-6 text-white" aria-hidden="true" />
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-medium text-gray-900">
-                                <a href="#" class="focus:outline-none">
-                                    <span class="absolute inset-0" aria-hidden="true" />
-                                    <span>{{ item.title }}</span>
-                                    <span aria-hidden="true"> &rarr</span>
-                                </a>
-                            </h3>
-                            <p class="mt-1 text-sm text-gray-500">{{ item.description }}</p>
-                            <Tag v-if="item.dev" value="En Desarrollo" severity="info" class="animate-pulse" rounded :pt="{
-                                value: '!text-xs'
-                            }" />
-                        </div>
-                    </div>
-                </li>
-            </ul>
-            <!-- <div class="flex mt-4">
-                    <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                        Or start from an empty project
-                        <span aria-hidden="true"> &rarr</span>
-                    </a>
-                </div> -->
-        </div>
-    </OverlayPanel>
 
     <CustomModal v-model:visible="modalDocument" :maximizable="true" width="95vw">
         <template #icon>

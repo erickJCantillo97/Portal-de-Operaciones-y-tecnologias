@@ -679,7 +679,7 @@ const onSettingsRowHeightChange = ({ value }) => {
     gantt.widgetMap.settingsButton.menu.widgetMap.barMargin.max =
         value / 2 - 5;
 }
-//ajuste de marjen
+//ajuste de margen
 const onSettingsMarginChange = ({ value }) => {
     gantt.barMargin = value;
 }
