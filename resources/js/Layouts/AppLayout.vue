@@ -281,12 +281,12 @@ const debug = import.meta.env.VITE_APP_DEBUG
 
 onMounted(() => {
     loadSuggestions()
-    testBroadcast()
+    // testBroadcast()
 })
 
-const testBroadcast = () => {
-    eventListener('contracts', '.contracts-event')
-}
+// const testBroadcast = () => {
+//     eventListener('contracts', '.contracts-event')
+// }
 
 const logout = () => {
     router.post(route('logout'))
