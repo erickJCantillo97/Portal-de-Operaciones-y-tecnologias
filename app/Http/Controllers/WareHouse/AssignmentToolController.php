@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Notification;
 use App\Notifications\AssignmentToolNotification;
 use Carbon\Carbon;
 use App\Mail\AssignmentToolsMail;
+use App\Models\Warehouse;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -25,7 +26,9 @@ class AssignmentToolController extends Controller
     {
         $assignmentsTool = AssignmentTool::where('status', 'ASIGNADO')->with('tool', 'project')->get();
         $projects = Project::orderBy('created_at', 'DESC')->get();
-        $tools = Tool::where('estado', '!=', 'ASIGNADO')->with('category')->get();
+        $warehouse = Warehouse::where('department', auth()->user()->oficina)->first()->id ?? 4;
+        $tools = Tool::where('warehouse_id', $warehouse)->with('category', 'warehouse')->orderBy('category_id')->where('estado', '!=', 'ASIGNADO')->get();
+
 
         return Inertia::render('WareHouse/Assignment', compact('assignmentsTool', 'projects', 'tools'));
     }

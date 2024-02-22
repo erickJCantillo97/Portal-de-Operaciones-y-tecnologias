@@ -214,10 +214,10 @@ const permissionModal = ref(false)
                             <span class="flex">
                                 <img :src="user.photo" v-for="(user, index) of  rol.users " alt="" :title="user.short_name"
                                     class="rounded-full size-6 object-cover -mr-2 hover:mr-0 hover:scale-150 border-2 border-white"
-                                    :class="index > 1 ? 'hidden' : ''">
-                                <span v-if="rol.users.length > 1"
+                                    :class="index > 4 ? 'hidden' : ''">
+                                <span v-if="rol.users.length > 4"
                                     class="rounded-full size-6 object-cover cursor-default text-center items-center hover:mr-0 hover:scale-150 border-2 border-white bg-gray-700 text-white">
-                                    +{{ rol.users.length - 2 }} </span>
+                                    +{{ rol.users.length - 4 }} </span>
                             </span>
                         </div>
                     </div>

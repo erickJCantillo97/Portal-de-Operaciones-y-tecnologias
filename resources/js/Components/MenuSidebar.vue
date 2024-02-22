@@ -39,8 +39,8 @@
                                 <vue-collapsible :isOpen="activeDropdown === item.name">
                                     <ul class="text-gray-500 sub-menu dark:text-white">
                                         <span v-for="children of item.children">
-                                            <li v-if="(!children.dev || debug) && children.show">
-                                                <Link :href="route(children.href)">
+                                            <li v-if="children.show">
+                                                <Link :href="!children.dev ? route(children.href) : route('dashboard')">
                                                 <span class="">
                                                     <p :class="children.dev ? '-mb-2' : ''">{{ children.name }}</p>
                                                     <small v-if="children.dev" class="text-xs text-red-300 animate-pulse">
@@ -96,7 +96,7 @@ const navigation = [
         name: 'Gestion de Personal',
         icon: UsersIcon,
         current: false,
-        show: hasPermission(['programming read', ]),
+        show: hasPermission(['programming read',]),
         children: [
             {
                 name: 'Mi Personal',
@@ -177,7 +177,6 @@ const navigation = [
             {
                 name: 'Presupuestos',
                 href: 'budget.index',
-                dev: true,
                 show: true,
             },
             {
