@@ -134,14 +134,16 @@ const getDataSeriesBar = () => {
     {
       name: 'Planeado',
       type: 'bar',
-      data: [props.semana.planned_progress],
+      color: ['#4A4B51'],
+      data: [props.semana?.planned_progress ?? 0],
       showBackground: true,
     },
     {
-      name: 'Ejecutado',
+      name: 'Real',
       type: 'bar',
+      color: ['#2E3092'],
       showBackground: true,
-      data: [props.semana.real_progress]
+      data: [props.semana?.real_progress ?? 0]
     })
 }
 
@@ -343,14 +345,16 @@ td {
                 <!-- Segunda fila -->
                 <div class="border text-center border-gray-800 bg-gray-100">FECHA REPORTE: </div>
                 <div class="border text-center border-gray-800"> {{
-                  Moment(project.contract.start_date).format('DD/MM/YYYY') }}</div>
+                  Moment().format('DD/MM/YYYY') }}</div>
                 <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE INICIO </div>
                 <div class="border text-center border-gray-800">{{
                   Moment(project.contract.start_date).format('DD/MM/YYYY') }}</div>
 
                 <!-- Tercera fila -->
                 <div class="border text-center border-gray-800 bg-gray-100">SEMANA: </div>
-                <div class="border text-center border-gray-800"> {{ semana.week }}</div>
+                <div class="border text-center border-gray-800"> {{ 'WK ' + semana.week.substr(2, 2) + ' - 20' +
+                  semana.week.substr(0, 2) }}
+                </div>
                 <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE FIN </div>
                 <div class="border text-center border-gray-800">{{
                   Moment(project.contract.end_date).format('DD/MM/YYYY')

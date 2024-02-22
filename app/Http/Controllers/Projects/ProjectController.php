@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project\ProgressProjectWeek;
+use App\Models\Project\WeekTask;
 use App\Models\Projects\Authorization;
 use App\Models\Projects\Contract;
 use App\Models\Projects\Milestone;
@@ -12,6 +13,7 @@ use App\Models\Projects\ProjectsShip;
 use App\Models\Projects\Ship;
 use App\Models\Quotes\Quote;
 use App\Models\VirtualTask;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -130,6 +132,9 @@ class ProjectController extends Controller
         $milestones = Milestone::where('project_id', $project->id)->get();
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
         $projectShips = ProjectsShip::with('ship')->where('project_id', $project->id)->get();
+        $week = Carbon::now()->weekOfYear;
+        $year = Carbon::now()->format('y');
+        $weekTasks  = WeekTask::where('project_id', $project->id)->where('week', $week . $year)->get();
         $gerentes = getPersonalGerenciaOficina('GECON', 'DEGPC')->map(function ($estimador) {
             return [
                 'user_id' => $estimador['Num_SAP'],
@@ -149,6 +154,7 @@ class ProjectController extends Controller
                 'ships' => $ships,
                 'milestones' => $milestones,
                 'gerentes' => $gerentes,
+                'weekTasks' => $weekTasks,
                 'projectShips' => $projectShips,
             ]
         );
@@ -213,7 +219,7 @@ class ProjectController extends Controller
         try {
             $ships_ids = ProjectsShip::where('project_id', $project->id)->pluck('ship_id')->toArray();
             $ships = Ship::with('typeShip')->whereIn('id', $ships_ids)->get();
-            $semana = ProgressProjectWeek::where('project_id', $project->id)->where('real_progress', '<>', 0)->orderBy('week', 'DESC')->first();
+            $semana = ProgressProjectWeek::where('project_id', $project->id)->orderBy('real_progress', 'DESC')->first();
 
             return Inertia::render(
                 'Project/ProjectOverview',

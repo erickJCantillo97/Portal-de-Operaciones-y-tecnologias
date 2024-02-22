@@ -2,20 +2,14 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
-import '../../../sass/dataTableCustomized.scss';
-import Dropdown from 'primevue/dropdown';
 import { useSweetalert } from '@/composable/sweetAlert';
-import { useConfirm } from "primevue/useconfirm";
-import TextInput from '../../Components/TextInput.vue';
 import Button from 'primevue/button';
 import CustomDataTable from '@/Components/CustomDataTable.vue';
 import CustomModal from '@/Components/CustomModal.vue';
-import CustomSelectCountries from '@/Components/CustomSelectCountries.vue';
 import CustomInput from '@/Components/CustomInput.vue';
 import { usePermissions } from '@/composable/permission';
 const { hasRole, hasPermission } = usePermissions()
 
-const confirm = useConfirm();
 const { toast } = useSweetalert();
 const loading = ref(false);
 const { confirmDelete } = useSweetalert();
@@ -93,12 +87,9 @@ const deleteItem = (event, data) => {
 }
 
 const columnas = [
-    // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
-    // { field: 'NIT', header: 'NIT', filter: true, sortable: true },
     { field: 'name', header: 'Nombre', filter: true, sortable: true },
     { field: 'country', header: 'Pais', filter: true, sortable: true },
     { field: 'type', header: 'Tipo', filter: true, sortable: true },
-    // { field: 'email', header: 'Correo', filter: true, sortable: true }
 ]
 const buttons = [
     { event: 'showShips', severity: 'success', icon: 'fa-solid fa-ship', text: true, outlined: false, rounded: false, show: hasPermission('ship read') },

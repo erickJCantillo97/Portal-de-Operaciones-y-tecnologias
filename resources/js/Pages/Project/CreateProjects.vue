@@ -14,6 +14,7 @@ import 'vue3-form-wizard/dist/style.css'
 import Empty from '@/Components/Empty.vue'
 import Listbox from 'primevue/listbox'
 import ToggleButton from 'primevue/togglebutton'
+import CustomUpload from '@/Components/CustomUpload.vue';
 
 const props = defineProps({
     project: Object,
@@ -245,13 +246,16 @@ const modalWeekTask = ref()
 const weekTask = useForm({
     id: null,
     task: null,
-    week: null
+    week: null,
+    project_id:null
+
 })
 const saveweekTask = () => {
+    weekTask.project_id=props.project.id
     if (weekTask.id) {
-        formMilestone.put(route('weektask.update', formMilestone.id), {
+        weekTask.put(route('weektask.update', weekTask.id), {
             onSuccess: () => {
-                formMilestone.reset()
+                weekTask.reset()
                 toast.add({ severity: 'success', group: 'customToast', text: 'Hito Guardado', life: 2000 });
                 openDialogHito.value = false;
             },
@@ -261,9 +265,9 @@ const saveweekTask = () => {
             }
         })
     } else {
-        formMilestone.post(route('weektask.store'), {
+        weekTask.post(route('weektask.store'), {
             onSuccess: () => {
-                formMilestone.reset()
+                weekTask.reset()
                 toast.add({ summary: 'Hito Guardado', life: 2000 });
                 openDialogHito.value = false;
             },
@@ -288,17 +292,29 @@ const saveweekTask = () => {
                     </h2>
 
                 </span>
-                <div v-if="project" class="space-x-4 justify-end flex w-full">
-                    <Button icon="fa-solid fa-list-check" severity="help" v-tooltip.top="'Tareas de la semana'"
+                <div v-if="project" class="space-x-6 justify-end flex w-full">
+                    <Button icon="fa-solid fa-list-check" severity="help" v-tooltip.left="'Tareas de la semana'"
                         @click="modalWeekTask = true" />
-                    <Button icon="fa-solid fa-gauge-high" severity="secondary" v-tooltip.top="'Avance del proyecto'"
+                    <Button icon="fa-solid fa-gauge-high" severity="secondary" v-tooltip.left="'Avance del proyecto'"
                         @click="modalProgress = true" />
+
                     <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" icon-button="fa-solid fa-chart-bar"
                         tooltip="Subir Estructura" accept=".xlsx,.xls" :url="route('upload.estructure', project.id)" />
+
+
+
+                    <CustomUpload mode="advanced" titleModal="Subir Curva S" icon-button="fa-solid fa-chart-line"
+                        tooltip="Subir Curva S" accept=".xlsx,.xls" :url="route('progressProjectWeek.upload', project.id)"
+                        severity="info" />
 
                     <CustomUpload mode="advanced" titleModal="Subir Presupuesto del proyecto"
                         icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
                         :url="route('upload.budget', project.id)" severity="success" />
+
+                    <CustomUpload mode="advanced" titleModal="Subir Costos Ejecutados"
+                        icon-button="fa-solid fa-money-bill-transfer" tooltip="Subir ejecutado" accept=".xlsx,.xls"
+                        :url="route('upload.execute', project.id)" severity="info" />
+
                     <!-- 
                     
 
@@ -525,7 +541,7 @@ const saveweekTask = () => {
                     <tab-content title="Hitos" icon="fa-solid fa-list-check"
                         class=" h-[45vh] w-full border rounded-lg p-1 overflow-y-auto">
                         <CustomDataTable :rowsDefault="5" :data="milestones" :columnas="columnas" :actions="actions"
-                            @edit="showModal" :filter="false" :showHeader="false" :showAdd="true" @addClic="showModal"
+                            @edit="showModal" :filter="false" :showHeader="false" :showAdd="true" @addClick="showModal"
                             @delete="delMilestone" />
                     </tab-content>
                     <template #prev>
@@ -584,8 +600,8 @@ const saveweekTask = () => {
             <CustomInput label="Porcentaje de avance" :maxFractionDigits="2" v-model:input="avance.real_progress"
                 type="number" :max="100" :min="0" suffix="%" />
             <CustomInput label="CPI" v-model:input="avance.CPI" :errorMessage="avance.errors.CPI"
-                :invalid="avance.errors.CPI ? true : false" />
-            <CustomInput label="SPI" v-model:input="avance.SPI" />
+                :invalid="avance.errors.CPI ? true : false" type="number" :maxFractionDigits="2" />
+            <CustomInput label="SPI" v-model:input="avance.SPI" type="number" :maxFractionDigits="2"  />
         </template>
         <template #footer>
             <Button label="Guardar" severity="success" :loading="avance.processing" @click="guardarAvance()" />

@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Support\Facades\Broadcast;
+use Spatie\Permission\Models\Role;
 
 /*
 |--------------------------------------------------------------------------

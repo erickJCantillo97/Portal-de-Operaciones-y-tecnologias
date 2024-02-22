@@ -43,6 +43,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::resource('projects', ProjectController::class);
 
     Route::resource('ProgressProjectWeek', ProgressProjectWeekController::class);
+    Route::post('ProgressProjectWeek/upload/{project}', [ProgressProjectWeekController::class, 'upload'])->name('progressProjectWeek.upload');
 
     Route::get('ProgressWeek/getDataProject', [ProgressProjectWeekController::class, 'getDataProject'])->name('progressProjectWeek.get.data');
     Route::get('ProgressWeek/getDataWeek', [ProgressProjectWeekController::class, 'getDataWeek'])->name('progressProjectWeek.get.data.week');
@@ -75,6 +76,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('uploadEstructure/{project}', [BudgetController::class, 'uploadEstructure'])->name('upload.estructure');
 
     Route::post('uploadBudget/{project}', [BudgetController::class, 'uploadGudget'])->name('upload.budget');
+    Route::post('uploadExecuted/{project}', [BudgetController::class, 'executedimport'])->name('upload.execute');
 
     //CRUD Customers
     Route::resource('customers', CustomerController::class);
