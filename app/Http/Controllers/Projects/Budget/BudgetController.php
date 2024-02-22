@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Projects\Budget;
 use App\Http\Controllers\Controller;
 use App\Imports\Budge\BudgetImport;
 use App\Imports\Budge\EstructureImport;
+use App\Imports\Budge\ExecutedImport;
 use App\Models\Project\Grafo;
 use App\Models\Project\Operation;
 use App\Models\Project\Pep;
@@ -88,6 +89,36 @@ class BudgetController extends Controller
     {
         try {
             Excel::import(new BudgetImport($project), $request->docs);
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            foreach ($failures as $failure) {
+                $failure->row(); // row that went wrong
+                $failure->attribute(); // either heading key (if using heading row concern) or column index
+                $failure->errors(); // Actual error messages from Laravel validator
+                $failure->values(); // The values of the row that has failed.
+            }
+        }
+    }
+
+    public function executedimport(Request $request, $project)
+    {
+        try {
+            Pep::where('project_id', $project)->update([
+                'materials_ejecutados' => 0,
+                'labor_ejecutados' => 0,
+                'services_ejecutados' => 0
+            ]);
+            Grafo::where('project_id', $project)->update([
+                'materials_ejecutados' => 0,
+                'labor_ejecutados' => 0,
+                'services_ejecutados' => 0
+            ]);
+            Operation::where('project_id', $project)->update([
+                'materials_ejecutados' => 0,
+                'labor_ejecutados' => 0,
+                'services_ejecutados' => 0
+            ]);
+            Excel::import(new ExecutedImport($project), $request->docs);
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
             foreach ($failures as $failure) {
