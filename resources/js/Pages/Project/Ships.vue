@@ -7,7 +7,8 @@ import Button from 'primevue/button';
 import CustomModal from '@/Components/CustomModal.vue';
 import CustomDataTable from '@/Components/CustomDataTable.vue';
 import CustomInput from '@/Components/CustomInput.vue';
-
+import { usePermissions } from '@/composable/permission';
+const { hasRole, hasPermission } = usePermissions()
 const modalType = ref('Nueva unidad')
 const customerSelect = ref();
 const typeSelect = ref();
@@ -109,9 +110,9 @@ const columnas = ref([
     { field: 'acronyms', header: 'SIGLAS' },
 ])
 const buttons = ref([
-    { event: 'editItem', severity: 'primary', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
-    { event: 'cloneItem', severity: 'warning', icon: 'fa-solid fa-copy', class: '!h-8', text: true, outlined: false, rounded: false },
-    { event: 'confirmDelete', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
+    { event: 'editItem', severity: 'primary', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false, show: hasPermission('ship edit') },
+    { event: 'cloneItem', severity: 'warning', icon: 'fa-solid fa-copy', class: '!h-8', text: true, outlined: false, rounded: false, show: hasPermission('ship create') },
+    { event: 'confirmDelete', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false, show: hasPermission('ship delete') },
 ])
 
 </script>
@@ -124,7 +125,7 @@ const buttons = ref([
                 @confirmDelete="deleteItem" @editItem="editItem" @cloneItem="cloneItem">
                 <template #buttonHeader>
                     <Button title="Agregar Estimación" @click="addItem()" severity="success" label="Agregar" outlined
-                        icon="fa-solid fa-plus" class="!h-8" />
+                        icon="fa-solid fa-plus" class="!h-8" v-if="hasPermission('ship create')" />
                 </template>
             </CustomDataTable>
         </div>

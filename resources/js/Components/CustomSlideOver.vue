@@ -15,6 +15,8 @@ import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 import Button from 'primevue/button'
 import { router } from '@inertiajs/vue3'
+import { usePermissions } from '@/composable/permission';
+const { hasRole, hasPermission } = usePermissions()
 
 const { toast } = useSweetalert()
 
@@ -327,7 +329,7 @@ const formatCurrency = (value) => {
                                                     root: '!w-full !bg-emerald-600 !hover:bg-emerald-500',
                                                     label: '!text-center',
                                                 }
-                                                    " />
+                                                    " v-if="hasPermission('quote create')" />
 
                                                 <!--Botón Editar-->
                                                 <Link :href="route('quotesversion.edit', props.quote.version_id)"
@@ -336,7 +338,7 @@ const formatCurrency = (value) => {
                                                     root: '!w-full !bg-warning !hover:bg-orange-500',
                                                     label: '!text-center',
                                                 }
-                                                    " />
+                                                    " v-if="hasPermission('quote edit')" />
                                                 </Link>
                                             </div>
 
@@ -348,7 +350,7 @@ const formatCurrency = (value) => {
                                                     root: '!w-full !bg-primary !hover:bg-blue-500',
                                                     label: '!text-center',
                                                 }
-                                                    " />
+                                                    " v-if="hasPermission('quote edit')" />
                                                 </Link>
 
                                                 <!--Botón Eliminar-->
@@ -356,7 +358,7 @@ const formatCurrency = (value) => {
                                                     root: '!w-full !bg-danger !hover:bg-red-500',
                                                     label: '!text-center',
                                                 }
-                                                    " />
+                                                    " v-if="hasPermission('quote delete')" />
                                             </div>
                                         </section>
                                     </section>
@@ -394,7 +396,8 @@ const formatCurrency = (value) => {
                     <Calendar v-model="dateSelected" showIcon :manualInput="true" placeholder="Fecha Inicio de Reunión" />
                 </div>
                 <div class="mt-8">
-                    <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" size="small" />
+                    <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" size="small"
+                        v-if="hasPermission('quote create')" />
                 </div>
             </div>
             <div>

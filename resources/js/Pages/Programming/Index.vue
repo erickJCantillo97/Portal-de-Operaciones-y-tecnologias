@@ -1,9 +1,9 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
 import { Container, Draggable } from "vue-dndrop";
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import { usePermissions } from '@/composable/permission';
 import { useSweetalert } from '@/composable/sweetAlert';
 import Knob from 'primevue/knob';
 import FullCalendar from '@/Components/FullCalendar.vue'
@@ -14,6 +14,7 @@ import CustomInput from '@/Components/CustomInput.vue';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 
+const { hasRole, hasPermission } = usePermissions()
 const { toast } = useSweetalert();
 
 const props = defineProps({
@@ -66,7 +67,6 @@ const getChildPayload = (index) => {
 onMounted(() => {
     getTask('tomorrow')
 })
-
 
 // El código anterior es una función de Vue.js que recupera tareas según la opción seleccionada.
 const getTask = async (option) => {

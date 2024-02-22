@@ -11,6 +11,8 @@ import Listbox from 'primevue/listbox'
 import Textarea from 'primevue/textarea'
 import Toast from 'primevue/toast';
 import { useToast } from "primevue/usetoast";
+import { usePermissions } from '@/composable/permission';
+const { hasRole, hasPermission } = usePermissions()
 const toast = useToast();
 const { confirmDelete } = useSweetalert()
 
@@ -60,8 +62,8 @@ const columnas = [
 ]
 
 const actions = [
-  { event: 'download', severity: 'warning', icon: 'fa-regular fa-circle-xmark', text: true, outlined: false, rounded: false },
-  { event: 'delete', severity: 'danger', icon: 'fa-regular fa-trash-can', text: true, outlined: false, rounded: false },
+  { event: 'download', severity: 'warning', icon: 'fa-regular fa-circle-xmark', text: true, outlined: false, rounded: false, show: hasPermission('assignmentTool delete') },
+  { event: 'delete', severity: 'danger', icon: 'fa-regular fa-trash-can', text: true, outlined: false, rounded: false, show: hasPermission('assignmentTool delete') },
   // { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
 ]
 
@@ -141,7 +143,8 @@ const clearModal2 = () => {
       <CustomDataTable :data="assignmentsTool" title="Asignaciones" :rows-default="15" :columnas="columnas"
         :actions="actions" @download="downloadAssignment" @delete="deleteAssignment">
         <template #buttonHeader>
-          <Button @click="createAssignmentsTool()" label="Nuevo" icon="fa-solid fa-plus" outlined />
+          <Button @click="createAssignmentsTool()" label="Nuevo" icon="fa-solid fa-plus" outlined
+            v-if="hasPermission('assignmentTool create')" />
         </template>
       </CustomDataTable>
     </div>

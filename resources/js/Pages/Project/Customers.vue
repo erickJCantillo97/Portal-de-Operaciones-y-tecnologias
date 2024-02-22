@@ -12,6 +12,8 @@ import CustomDataTable from '@/Components/CustomDataTable.vue';
 import CustomModal from '@/Components/CustomModal.vue';
 import CustomSelectCountries from '@/Components/CustomSelectCountries.vue';
 import CustomInput from '@/Components/CustomInput.vue';
+import { usePermissions } from '@/composable/permission';
+const { hasRole, hasPermission } = usePermissions()
 
 const confirm = useConfirm();
 const { toast } = useSweetalert();
@@ -99,9 +101,9 @@ const columnas = [
     // { field: 'email', header: 'Correo', filter: true, sortable: true }
 ]
 const buttons = [
-    { event: 'showShips', severity: 'success', icon: 'fa-solid fa-ship', text: true, outlined: false, rounded: false },
-    { event: 'editItem', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
-    { event: 'deleteItem', severity: 'danger', icon: 'fa-solid fa-trash', text: true, outlined: false, rounded: false },
+    { event: 'showShips', severity: 'success', icon: 'fa-solid fa-ship', text: true, outlined: false, rounded: false, show: hasPermission('ship read') },
+    { event: 'editItem', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false, show: hasPermission('customer edit') },
+    { event: 'deleteItem', severity: 'danger', icon: 'fa-solid fa-trash', text: true, outlined: false, rounded: false, show: hasPermission('customer delete') },
 ]
 </script>
 
@@ -113,7 +115,7 @@ const buttons = [
                 @editItem="editItem">
                 <template #buttonHeader>
                     <Button title="Agregar Estimación" @click="addItem()" severity="success" label="Agregar" outlined
-                        icon="fa-solid fa-plus" class="!h-8" />
+                        icon="fa-solid fa-plus" class="!h-8" v-if="hasPermission('customer create')" />
                 </template>
             </CustomDataTable>
         </div>

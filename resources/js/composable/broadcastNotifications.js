@@ -30,7 +30,7 @@
 
 export function broadcastNotifications() {
     const eventListener = (channel, events) => {
-        console.log("Canal: " + channel + "Events: " + events);
+        console.log("Canal: " + channel + " Events: " + events);
         window.Echo.private(channel).listen(events, (e) => {
             console.log("Estoy en eventListener: ", + e);
             handleDataEvents(e);

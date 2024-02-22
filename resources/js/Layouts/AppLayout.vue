@@ -41,7 +41,6 @@
                                     aria-hidden="true" />
                             </MenuButton>
                         </div>
-
                         <transition enter-active-class="transition duration-100 ease-out"
                             enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100"
                             leave-active-class="transition duration-75 ease-in"
@@ -83,7 +82,6 @@
                         leave-to="opacity-0">
                         <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" />
                     </TransitionChild>
-
                     <div class="fixed inset-0 overflow-hidden">
                         <div class="absolute inset-0 overflow-hidden">
                             <div class="fixed inset-y-0 right-0 flex max-w-full pl-10 pointer-events-none">
@@ -107,7 +105,6 @@
                                             </div>
                                         </TransitionChild>
                                         <div class="flex flex-col h-full bg-white shadow-xl">
-
                                             <!-- Your content -->
                                             <div class="flex flex-col h-full">
                                                 <div class="flex-1 shadow-md bg-primary shadow-primary">
@@ -166,7 +163,6 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-
                                                     </div>
                                                 </div>
                                                 <div
@@ -218,7 +214,6 @@
 
                                                 </div>
                                             </div>
-
                                         </div>
                                     </DialogPanel>
                                 </TransitionChild>
@@ -245,7 +240,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Menu, MenuButton, MenuItems, MenuItem, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { router } from '@inertiajs/vue3'
 import {
@@ -256,36 +251,37 @@ import {
     QuestionMarkCircleIcon,
     XCircleIcon
 } from '@heroicons/vue/20/solid'
-import MenuSidebar from '@/Components/MenuSidebar.vue'
-import DropdownSetting from '@/Components/DropdownSetting.vue'
-import Button from '@/Components/Button.vue'
-import html2canvas from 'html2canvas'
-import RadioButton from 'primevue/radiobutton'
-import Toast from 'primevue/toast'
-import ConfirmPopup from 'primevue/confirmpopup';
-import DolarTRM from "@/Components/DolarTRM.vue"
-import Footer from "@/Components/Footer.vue"
-import FlyoutNotificationsMenu from '@/Components/FlyoutNotificationsMenu.vue'
-import { useSweetalert } from '@/composable/sweetAlert'
-import { broadcastNotifications } from '@/composable/broadcastNotifications'
-import "@/composable/push.min.js"
 const { eventListener, handleDataEvents } = broadcastNotifications()
 const { toast } = useSweetalert()
+import "@/composable/push.min.js"
+import { broadcastNotifications } from '@/composable/broadcastNotifications'
+import { useSweetalert } from '@/composable/sweetAlert'
+import Button from '@/Components/Button.vue'
+import ConfirmPopup from 'primevue/confirmpopup';
+import DolarTRM from "@/Components/DolarTRM.vue"
+import DropdownSetting from '@/Components/DropdownSetting.vue'
+import FlyoutNotificationsMenu from '@/Components/FlyoutNotificationsMenu.vue'
+import Footer from "@/Components/Footer.vue"
+import html2canvas from 'html2canvas'
+import MenuSidebar from '@/Components/MenuSidebar.vue'
+import RadioButton from 'primevue/radiobutton'
+import Toast from 'primevue/toast'
+
+const debug = import.meta.env.VITE_APP_DEBUG
 const menu = ref(false)
 const sugerencia = ref('')
-const tipoReporte = ref('Sugerencia')
 const sugerenciaVisible = ref(false)
 const suggestions = ref([])
-const debug = import.meta.env.VITE_APP_DEBUG
-
+const tipoReporte = ref('Sugerencia')
 
 onMounted(() => {
     loadSuggestions()
     testBroadcast()
 })
 
+const processId = ref(1)
 const testBroadcast = () => {
-    eventListener('contracts', '.contracts-event')
+    eventListener(`bulk-data-loading.${processId.value}`, '.bulk.data.loaded')
 }
 
 const logout = () => {
@@ -294,7 +290,7 @@ const logout = () => {
 
 const createSuggestion = () => {
     if (sugerencia.value.length < 20) {
-        toast('¡Debe tener minimo 20 caracteres la sugerencia!', 'error')
+        toast('La sugerencia debe tener mínimo 20 caracteres', 'error')
     } else {
         html2canvas(document.body).then(canvas => {
             router.post(route('suggestion.store'),
@@ -305,14 +301,14 @@ const createSuggestion = () => {
                     urlAddress: document.location.href
                 }, {
                 onSuccess: res => {
-                    toast('¡Se ha enviado con exito! Gracias por su reporte', 'success')
+                    toast('¡Se ha enviado con éxito, muchas gracias por su reporte!', 'success')
                     sugerenciaVisible.value = false
                     sugerencia.value = null
                     loadSuggestions()
                 },
                 onError: (e) => {
                     console.log(e)
-                    toast('¡Ha ocurrido un error', 'error')
+                    toast('Ha ocurrido un error', 'error')
                 }
             }
             )
@@ -330,17 +326,6 @@ function formatDateTime24h(dateTime) {
     return new Date(dateTime).toLocaleString('es-CO',
         { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
 }
-
-// const broadcastChannel = () => {
-//     setTimeout(() => {
-//         window.Echo.private('contracts')
-//             .listen('.contracts-event', (e) => {
-//                 console.log(e.message);
-//                 Push.create(e.message)
-//             })
-//     }, 200);
-// }
-// broadcastChannel()
 </script>
 <style scoped>
 .custom-image {

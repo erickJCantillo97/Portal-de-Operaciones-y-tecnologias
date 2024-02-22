@@ -37,7 +37,8 @@ use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return event(new ContractEvent(Contract::first()));
+    // $processId = 1;// Asigna un identificador único para cada proceso de carga
+    // return event(new ContractEvent($processId));
     return Inertia::render('Auth/Login', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -55,7 +56,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     })->name('get.foto');
 
     Route::get('/dashboard', function () {
-
 
         $taskProject = [];
 
@@ -162,7 +162,6 @@ Route::get('costoPersonal', function () {
 
 Route::get('/timeline', [DashboardEstimacionesController::class, 'getQuotesStatus'])->name('timeline');
 
-
 Route::get('clientes_anterior', function () {
     // QuoteStatus::truncate();
     // QuoteVersion::truncate();
@@ -182,7 +181,6 @@ Route::get('clientes_anterior', function () {
     }
     return Customer::get();
 });
-
 
 Route::get('estmaciones_anterior', function () {
     $estimaciones =  DB::connection('sqlsrv_anterior')->table('estimacions')->get();
@@ -252,6 +250,7 @@ Route::get('estmaciones_anterior', function () {
         }
     }
 });
+
 Route::get('clases_anterior', function () {
 
     $data =  DB::connection('sqlsrv_anterior')->table('clases')->get();
@@ -279,6 +278,7 @@ Route::get('clases_anterior', function () {
         ]);
     }
 });
+
 Route::get('contratos_anterior', function () {
     // Contract::truncate();
     $data =  DB::connection('sqlsrv_anterior')->table('contratos')->get();
@@ -307,7 +307,6 @@ Route::get('proyectos_anterior', function () {
     Ship::truncate();
     $data =  DB::connection('sqlsrv_anterior')->table('proyectos')->get();
     foreach ($data as $proyecto) {
-
 
         $clase = DB::connection('sqlsrv_anterior')->table('clases')->where('id', $proyecto->clase_id)->first();
         $contrato = DB::connection('sqlsrv_anterior')->table('contratos')->where('id', $proyecto->contrato_id)->first();
@@ -350,13 +349,11 @@ Route::get('operaciones-anteriores', [DatabaseBackController::class, 'getOperati
 Route::get('hitos-anteriores', [DatabaseBackController::class, 'getHitos']);
 Route::get('avance_anteriores', [DatabaseBackController::class, 'getProgress']);
 
-
 Route::get('/mailable', function () {
     $data = 'Hello';
 
     return new App\Mail\AssignmentToolsMail($data);
 });
 Route::post('/prueba', function (Request $request) {
-
     return back()->withErrors(['errors' => ['messaje', 'default1', 'messaje1', 'default2', 'messaje4', 'default4', 'messaje', 'default',]]);
 })->name('prueba');

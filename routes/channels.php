@@ -21,6 +21,6 @@ use Illuminate\Support\Facades\Broadcast;
 //     return true;
 // });
 
-Broadcast::channel('contracts', function () {
+Broadcast::channel('bulk-data-loading.{processId}', function ($user, $processId) {
     return true;
 });
