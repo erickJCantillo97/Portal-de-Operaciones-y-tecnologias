@@ -6,13 +6,14 @@ use App\Models\Project\Grafo;
 use App\Models\Project\Operation;
 use App\Models\Project\Pep;
 use App\Models\TypeAccount;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow
+class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow, ShouldQueue
 {
     /**
      * @param Collection $collection

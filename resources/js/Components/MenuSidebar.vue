@@ -126,7 +126,7 @@ const navigation = [
                 name: 'Personal Activo',
                 href: 'personal.activos',
                 dev: false,
-                show: hasPermission('personal active view')
+                show: true
             },
             // { name: 'Programación', href: '#' },
             // { name: 'Parte Diario', href: '#' },

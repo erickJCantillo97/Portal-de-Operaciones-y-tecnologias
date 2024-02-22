@@ -137,6 +137,7 @@ class ProgressProjectWeekController extends Controller
     public function upload(Request $request, $project)
     {
         try {
+            $prgress = ProgressProjectWeek::where('project_id', $project)->delete();
             // dd($request->files->get('files'));
             Excel::import(new ProgressImport($project), $request->docs);
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
