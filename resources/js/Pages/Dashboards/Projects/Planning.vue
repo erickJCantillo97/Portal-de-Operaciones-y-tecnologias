@@ -70,7 +70,7 @@ const series = ref([])
           <h2 class="text-md font-semibold">PONDERADO</h2>
         </div>
         <div class="flex justify-center size-full">
-          <GaugeGradeChart :key="showLineChart" title="CPI" :value="1.008" />
+          <GaugeGradeChart :key="showLineChart" title="CPI" :value="1.023" />
           <GaugeGradeChart :key="showLineChart" title="SPI" :value="0.999" />
         </div>
       </div>
