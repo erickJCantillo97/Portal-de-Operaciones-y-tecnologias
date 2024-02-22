@@ -7,11 +7,16 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
+    protected $commands = [
+        Commands\TestTask::class
+    ];
+
     /**
      * Define the application's command schedule.
      */
     protected function schedule(Schedule $schedule): void
     {
+        $schedule->command('test:task')->everyMinute();
         // $schedule->command('inspire')->hourly();
     }
 

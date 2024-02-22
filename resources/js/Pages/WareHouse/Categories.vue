@@ -9,6 +9,8 @@ import Toast from 'primevue/toast';
 import { useToast } from "primevue/usetoast";
 import TabPanel from 'primevue/tabpanel';
 import TabView from 'primevue/tabview';
+import { usePermissions } from '@/composable/permission';
+const { hasRole, hasPermission } = usePermissions()
 const toast = useToast();
 
 const props = defineProps({
@@ -48,7 +50,7 @@ const columnasSubgrupos = [
 
 
 const actions = [
-    { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
+    { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false, show: hasPermission('category edit') },
 ]
 
 const modalType = ref('Nuevo')
@@ -137,7 +139,6 @@ const save = () => {
         toast.add({ summary: 'Error al guardar', life: 1500 });
     }
 }
-
 </script>
 
 <template>
@@ -153,7 +154,7 @@ const save = () => {
                         <span class="flex justify-between w-full">
                             <span class="text-lg font-bold">Descripción</span>
                             <Button v-tooltip.left="'Agregar descripción'" @click="showModal(null, null, 'Descripcion')"
-                                icon="fa-solid fa-plus" />
+                                icon="fa-solid fa-plus" v-if="hasPermission('category create')" />
                         </span>
                     </template>
                     <CustomDataTable :rowsDefault="20" :data="categories" :columnas="columnasDescripcion" :actions="actions"
@@ -167,7 +168,7 @@ const save = () => {
                         <span class="flex justify-between w-full">
                             <span class="text-lg font-bold"> Grupos</span>
                             <Button v-tooltip.left="'Agregar grupo'" @click="showModal(null, null, 'Grupo')"
-                                icon="fa-solid fa-plus" />
+                                icon="fa-solid fa-plus" v-if="hasPermission('category create')" />
                         </span>
                     </template>
                     <CustomDataTable :rowsDefault="20" :data="groups" :columnas="columnasGrupos" :actions="actions"
@@ -181,7 +182,7 @@ const save = () => {
                         <span class="flex justify-between w-full">
                             <span class="text-lg font-bold"> Subgrupos</span>
                             <Button v-tooltip.left="'Agregar subgrupo'" @click="showModal(null, null, 'Subgrupo')"
-                                icon="fa-solid fa-plus" />
+                                icon="fa-solid fa-plus" v-if="hasPermission('category create')" />
                         </span>
                     </template>
                     <CustomDataTable :rowsDefault="20" :data="subgroups" :columnas="columnasSubgrupos" :actions="actions"

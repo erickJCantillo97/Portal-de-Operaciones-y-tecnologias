@@ -66,7 +66,7 @@ import { ref } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 import { usePermissions } from '@/composable/permission';
-const { hasRole, hasPermission } = usePermissions();
+const { hasRole, hasPermission } = usePermissions()
 import VueCollapsible from 'vue-height-collapsible/vue3';
 import {
     CalendarIcon,
@@ -96,7 +96,7 @@ const navigation = [
         name: 'Gestion de Personal',
         icon: UsersIcon,
         current: false,
-        show: true,
+        show: hasPermission(['programming read', ]),
         children: [
             {
                 name: 'Mi Personal',
@@ -126,7 +126,7 @@ const navigation = [
                 name: 'Personal Activo',
                 href: 'personal.activos',
                 dev: false,
-                show: hasPermission('personal active view')
+                show: true
             },
             // { name: 'Programación', href: '#' },
             // { name: 'Parte Diario', href: '#' },

@@ -1,12 +1,14 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue'
-import CustomDataTable from '@/Components/CustomDataTable.vue'
-import CustomModal from '@/Components/CustomModal.vue'
+const { hasRole, hasPermission } = usePermissions()
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
-import CustomInput from '@/Components/CustomInput.vue'
-import Toast from 'primevue/toast'
+import { usePermissions } from '@/composable/permission';
 import { useToast } from "primevue/usetoast"
+import AppLayout from '@/Layouts/AppLayout.vue'
+import CustomDataTable from '@/Components/CustomDataTable.vue'
+import CustomInput from '@/Components/CustomInput.vue'
+import CustomModal from '@/Components/CustomModal.vue'
+import Toast from 'primevue/toast'
 
 const toast = useToast()
 const props = defineProps({
@@ -44,7 +46,8 @@ const filterButtons = [
 ]
 
 const actions = [
-    { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },]
+    { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false, show: hasPermission('tool edit') },
+]
 
 const showModal = (event, data) => {
     if (data == null) {
@@ -122,7 +125,6 @@ const save = () => {
         form.value.loading = false
     }
 }
-
 </script>
 
 <template>
@@ -131,7 +133,8 @@ const save = () => {
             <CustomDataTable :rowsDefault="100" title="Herramientas y equipos" :data="tools" :columnas="columnas"
                 :actions="actions" @edit="showModal" @goToToolOverview="goToToolOverview" :filterButtons="filterButtons">
                 <template #buttonHeader>
-                    <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal" />
+                    <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal"
+                        v-if="hasPermission('tool create')" />
                 </template>
             </CustomDataTable>
         </div>

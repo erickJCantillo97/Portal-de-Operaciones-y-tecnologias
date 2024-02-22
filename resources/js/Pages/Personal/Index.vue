@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
 import '../../../sass/dataTableCustomized.scss'
 import { FilterMatchMode, FilterOperator } from 'primevue/api'
+import { usePermissions } from '@/composable/permission';
 import { useSweetalert } from '@/composable/sweetAlert'
 import Textarea from 'primevue/textarea'
 import InputText from 'primevue/inputtext'
@@ -16,8 +17,10 @@ import Loading from '@/Components/Loading.vue'
 import NoContentToShow from '@/Components/NoContentToShow.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import Dropdown from 'primevue/dropdown'
-const { toast } = useSweetalert()
+
 const { confirmDelete } = useSweetalert()
+const { hasRole, hasPermission } = usePermissions()
+const { toast } = useSweetalert()
 
 const props = defineProps({
     miPersonal: Array,
@@ -222,7 +225,7 @@ const columnas = [
     { field: 'Costo_Mes', header: 'costo mes', filter: true, sortable: true, type: 'currency', class: "w-52" },
 ]
 const buttons = [
-    { event: 'delete', severity: 'danger', class: '', icon: 'fa-regular fa-trash-can', text: true, outlined: false, rounded: false },
+    { event: 'delete', severity: 'danger', class: '', icon: 'fa-regular fa-trash-can', text: true, outlined: false, rounded: false, show: hasPermission('programming delete') },
 ]
 </script>
 
@@ -242,9 +245,9 @@ const buttons = [
                                 item: '!p-1 w-full'
                             }" />
                         <Button severity=" success" type="button" outlined label="Agregar Personal" icon="pi pi-user-plus"
-                            @click="showNew()" />
+                            @click="showNew()" v-if="hasPermission('programming create')" />
                         <Button icon="pi pi-users" severity="primary" outlined label="Crear Grupo"
-                            @click="openGroupDialog()" />
+                            @click="openGroupDialog()" v-if="hasPermission('programming create')" />
                     </template>
                 </CustomDataTable>
             </div>

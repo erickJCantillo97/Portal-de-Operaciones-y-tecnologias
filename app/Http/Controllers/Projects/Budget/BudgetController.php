@@ -52,11 +52,12 @@ class BudgetController extends Controller
         $materials = Pep::where('pep_id', $pep->id)->sum('materials');
         $services = Pep::where('pep_id', $pep->id)->sum('services');
 
-        $materials_ejecutados = VirtualPep::where('project_id', $project->id)->get()->sum('materials_ejecutados') + Grafo::where('project_id', $project->id)->get()->sum('materials_ejecutados') + Operation::where('project_id', $project->id)->get()->sum('materials_ejecutados');
+        $materials_ejecutados = VirtualPep::where('project_id', $project->id)->get()->sum('materials_ejecutados')  + Operation::where('project_id', $project->id)->get()->sum('materials_ejecutados');
 
-        $labor_ejecutados = VirtualPep::where('project_id', $project->id)->get()->sum('labor_ejecutados') + Grafo::where('project_id', $project->id)->get()->sum('labor_ejecutados') + Operation::where('project_id', $project->id)->get()->sum('labor_ejecutados');
+        $labor_ejecutados = VirtualPep::where('project_id', $project->id)->get()->sum('labor_ejecutados') +  Operation::where('project_id', $project->id)->get()->sum('labor_ejecutados');
 
-        $services_ejecutados = VirtualPep::where('project_id', $project->id)->get()->sum('services_ejecutados') + Grafo::where('project_id', $project->id)->get()->sum('services_ejecutados') + Operation::where('project_id', $project->id)->get()->sum('services_ejecutados');
+        $services_ejecutados = VirtualPep::where('project_id', $project->id)->get()->sum('services_ejecutados') + Operation::where('project_id', $project->id)->get()->sum('services_ejecutados');
+
         return response()->json([
             'labor' => $labor,
             'materials' => $materials,
@@ -118,6 +119,7 @@ class BudgetController extends Controller
                 'labor_ejecutados' => 0,
                 'services_ejecutados' => 0
             ]);
+
             Excel::import(new ExecutedImport($project), $request->docs);
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();

@@ -1,7 +1,9 @@
 <script setup>
 const { confirmDelete } = useSweetalert()
 const { eventListener } = broadcastNotifications()
+const { hasRole, hasPermission } = usePermissions();
 const { toast } = useSweetalert()
+import { usePermissions } from '@/composable/permission';
 import { broadcastNotifications } from '@/composable/broadcastNotifications'
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
@@ -19,6 +21,7 @@ const props = defineProps({
     customers: Array,
     quotes: Object
 })
+
 const typeOfSaleOptions = ref(['VENTA DIRECTA', 'FINANCIADA', 'LEASING'])
 const stateOptions = ref(['LIQUIDADO', 'EN EJECUCIÓN'])
 
@@ -31,7 +34,6 @@ const formData = ref({
     contract: {}
 })
 //#endregion
-
 
 /*SUBMIT*/
 const submit = () => {
@@ -92,9 +94,10 @@ const columnas = [
     { field: 'end_date', header: 'Fecha Finalización', filter: true, sortable: true, type: 'date' },
     { field: 'total_cost', header: 'Costo', filter: true, sortable: true, type: 'currency' },
 ]
+
 const buttons = [
-    { event: 'edit', severity: 'primary', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
-    { event: 'delete', severity: 'danger', class: '', icon: 'fa-regular fa-trash-can', text: true, outlined: false, rounded: false },
+    { event: 'edit', severity: 'primary', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false, show: hasPermission('contract edit') },
+    { event: 'delete', severity: 'danger', class: '', icon: 'fa-regular fa-trash-can', text: true, outlined: false, rounded: false, show: hasPermission('contract delete') },
 ]
 const formatCurrency = (valor, moneda) => {
     if (valor == undefined || valor == null) {
@@ -116,8 +119,8 @@ eventListener('contracts', '.ContractsEvent')
             <CustomDataTable :data="contracts" :rowsDefault="20" title="Contratos" :columnas="columnas" :actions="buttons"
                 @edit="editItem" @delete="del">
                 <template #buttonHeader>
-                    <Button @click="addItem()" severity="success" icon="fa-solid fa-plus" outlined label="Nuevo">
-                    </Button>
+                    <Button @click="addItem()" severity="success" icon="fa-solid fa-plus" outlined label="Nuevo"
+                        v-if="hasPermission('contract create')" />
                 </template>
             </CustomDataTable>
         </div>

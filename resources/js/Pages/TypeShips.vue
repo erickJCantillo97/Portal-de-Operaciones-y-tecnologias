@@ -5,6 +5,7 @@ import { ref } from 'vue';
 import Button from 'primevue/button';
 import CustomModal from '@/Components/CustomModal.vue';
 import Image from 'primevue/image';
+import { usePermissions } from '@/composable/permission';
 import { useSweetalert } from '@/composable/sweetAlert';
 import CustomDataTable from '@/Components/CustomDataTable.vue';
 import CustomInput from '@/Components/CustomInput.vue';
@@ -14,6 +15,8 @@ import axios from 'axios';
 import Card from 'primevue/card'
 import Tag from 'primevue/tag';
 import { Link } from '@inertiajs/vue3';
+
+const { hasRole, hasPermission } = usePermissions()
 const { toast } = useSweetalert();
 const { confirmDelete } = useSweetalert();
 
@@ -119,6 +122,7 @@ const edit = () => {
 const deleteClic = (event, dato) => {
     confirmDelete(dato.id, 'Clase', 'typeShips')
 }
+
 const visibleSidebar = ref(false)
 const dataSidebar = ref()
 const rowClick = (event) => {
@@ -129,6 +133,7 @@ const rowClick = (event) => {
     })
     visibleSidebar.value = true
 }
+
 const columns = [
     { field: 'name', header: 'Nombre', sortable: true, filter: true },
     { field: 'count_ships', header: 'Cascos', class: 'w-24', rowclass: "underline", sortable: true, filter: true, type: 'button', event: 'showHull', severity: 'info', text: true },
@@ -137,9 +142,10 @@ const columns = [
     { field: 'length', header: 'Eslora' },
     { field: 'breadth', header: 'Manga' },
 ];
+
 const buttons = [
-    { event: 'showEdit', severity: 'success', class: '', icon: 'fa-solid fa-pen-to-square', text: true, outlined: false, rounded: false },
-    { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', text: true, outlined: false, rounded: false },
+    { event: 'showEdit', severity: 'success', class: '', icon: 'fa-solid fa-pen-to-square', text: true, outlined: false, rounded: false, show: hasPermission('typeShip edit') },
+    { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', text: true, outlined: false, rounded: false, show: hasPermission('typeShip create') },
 ]
 
 const op = ref();
@@ -150,8 +156,6 @@ const showHull = (event, data) => {
         op.value.toggle(event);
     }
 }
-
-
 </script>
 
 <template>
@@ -162,7 +166,7 @@ const showHull = (event, data) => {
                 @deleteClic="deleteClic" @addClick="showNew()" >
                 <template #buttonHeader>
                     <Button title="Nuevo" severity="success" label="Agregar" outlined class="!h-8" icon="fa-solid fa-plus"
-                        @click="showNew()" />
+                        @click="showNew()" v-if="hasPermission('typeShip create')" />
                 </template>
             </CustomDataTable>
         </div>

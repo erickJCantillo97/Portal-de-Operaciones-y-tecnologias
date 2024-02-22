@@ -36,7 +36,7 @@ class ProgressImport implements ToCollection, WithHeadingRow
                 'project_id' => $this->project
             ]);
             $avance->planned_progress = ($row['avance_planeado'] ?? 0) * 100;
-            $avance->real_progress = ($row['avance_real'] ?? ($avance->real_progress ?? 0)) * 100;
+            $avance->real_progress = ($row['avance_real'] * 100 ?? ($avance->real_progress ?? 0));
             $avance->save();
         }
     }

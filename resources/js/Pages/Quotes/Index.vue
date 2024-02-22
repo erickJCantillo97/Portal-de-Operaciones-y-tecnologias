@@ -1,9 +1,11 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue'
+const { hasRole, hasPermission } = usePermissions()
+import { Link } from '@inertiajs/vue3'
 import { ref } from 'vue'
+import { usePermissions } from '@/composable/permission';
+import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomSlideOver from '@/Components/CustomSlideOver.vue'
-import { Link } from '@inertiajs/vue3'
 
 const props = defineProps({
     quotes: Array,
@@ -12,6 +14,7 @@ const props = defineProps({
 
 const openSlideOver = ref(false)
 const quote = ref({})
+
 console.log(props.quote)
 if (props.quote) {
     quote.value = props.quote
@@ -71,7 +74,7 @@ const showClic = (event) => {
                 <template #buttonHeader>
                     <Link :href="route('quotes.create')">
                     <Button title="Agregar Estimación" severity="success" label="Agregar" outlined icon="fa-solid fa-plus"
-                        class="!h-8" />
+                        class="!h-8" v-if="hasPermission('quote create')" />
                     </Link>
                 </template>
             </CustomDataTable>
