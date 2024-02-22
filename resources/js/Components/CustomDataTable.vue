@@ -179,7 +179,7 @@ const auxdata = ref()
                     </p>
                     <span class="space-x-1">
                         <slot name="buttonHeader" />
-                        <Button v-if="showAdd" v-tooltip.left="'Añadir'" @click="$emit('addClic', $event)"
+                        <Button v-if="showAdd" v-tooltip.left="'Añadir'" @click="$emit('addClick', $event)"
                             severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
                     </span>
                 </span>

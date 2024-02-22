@@ -109,15 +109,15 @@ const deleteAlmacen = async (event, data) => {
 
 <template>
     <CustomDataTable :loading :rowsDefault="10" :data="warehouses" :columnas="columnsAlmacen" :actions="buttonsAlmacen"
-        :showAdd="true" title="Almacenes" :showColumns="false" :filter="false" @addClic="openModal" @edit="openModal"
+        :showAdd="true" title="Almacenes" :showColumns="false" :filter="false" @addClick="openModal" @edit="openModal"
         @delete="deleteAlmacen" />
 
-
-    <CustomModal v-model:visible="modalAlmacen" width="20rem"
+    <CustomModal v-model:visible="modalAlmacen" width="30rem"
         :titulo="formAlmacen.id ? 'Editar almacen' : 'Añadir almacen'">
         <template #body>
-            <CustomInput @input="formAlmacen.error = {}" :required="true" v-model:input="formAlmacen.name" label="Nombre"
+                <CustomInput @input="formAlmacen.error = {}" :required="true" v-model:input="formAlmacen.name" label="Nombre"
                 :invalid="formAlmacen.error.name ? true : false" :errorMessage="formAlmacen.error.name" />
+        
         </template>
         <template #footer>
             <Button severity="danger" label="Cancelar" :disabled="formAlmacen.processing" @click="modalAlmacen = false" />

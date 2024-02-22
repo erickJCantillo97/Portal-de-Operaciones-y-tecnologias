@@ -159,7 +159,7 @@ const showHull = (event, data) => {
         <div class="h-[89vh] overflow-y-auto">
             <CustomDataTable :rows-default="100" :data="typeShips" :columnas="columns" :actions="buttons"
                 @showHull="showHull" @rowClic="rowClick" @showEdit="showEdit" title="Clases de buque"
-                @deleteClic="deleteClic" @addClic="showNew()" >
+                @deleteClic="deleteClic" @addClick="showNew()" >
                 <template #buttonHeader>
                     <Button title="Nuevo" severity="success" label="Agregar" outlined class="!h-8" icon="fa-solid fa-plus"
                         @click="showNew()" />
