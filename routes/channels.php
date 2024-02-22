@@ -23,7 +23,6 @@ use Spatie\Permission\Models\Role;
 //     return true;
 // });
 
-Broadcast::channel('contracts.{contractId}', function (User $user, int $contractId) {
-    $role = Role::first()->name;
-    return $user->hasRole($role);
+Broadcast::channel('bulk-data-loading.{processId}', function ($user, $processId) {
+    return true;
 });
