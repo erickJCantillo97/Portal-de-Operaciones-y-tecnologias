@@ -30,19 +30,13 @@ const option = ref({
   title: {
     text: props.title,
   },
-  tooltip: {
-    axisPointer: {
-      type: 'shadow'
-    },
-    trigger: 'axis',
-    formatter: (params => {
-      let tooltip = ''
-      params.map(param => {
-        tooltip += param.name + '<br>' + param.marker + ' ' + param.seriesName + ': '
-          + Intl.NumberFormat().format(Number(param.value).toFixed(2)) + '%<br>'
-      })
-      return tooltip
-    })
+  legend: {
+    orient: 'horizontal',
+    height: '5%',
+  },
+  grid: {
+    left: '0%',
+    containLabel: true
   },
   label: {
     show: true,
@@ -63,29 +57,31 @@ const option = ref({
     },
   },
   yAxis: {
+    show: false,
     type: 'category',
+
     data: ['Avance']
   },
   series:
     props.series
-    // {
-    //   name: 'Planeado',
-    //   type: 'bar',
-    //   data: [props.planeado],
-    //   showBackground: true,
-    // },
-    // {
-    //   name: 'Ejecutado',
-    //   type: 'bar',
-    //   showBackground: true,
-    //   data: [props.real]
-    // }
+  // {
+  //   name: 'Planeado',
+  //   type: 'bar',
+  //   data: [props.planeado],
+  //   showBackground: true,
+  // },
+  // {
+  //   name: 'Ejecutado',
+  //   type: 'bar',
+  //   showBackground: true,
+  //   data: [props.real]
+  // }
 
 })
 </script>
 <style scoped>
 .chart {
-  height: 100px;
+  height: 180px;
   width: 100%;
 }
 </style>

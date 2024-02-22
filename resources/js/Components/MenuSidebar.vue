@@ -166,7 +166,7 @@ const navigation = [
         name: 'Gestión de Proyectos',
         icon: FolderIcon,
         current: false,
-        show: hasPermission('projects read'),
+        show: hasPermission(['projects read', 'ship read', 'typeShip read']),
         children: [
             {
                 name: 'Proyectos',
@@ -210,7 +210,7 @@ const navigation = [
                 name: 'Contratos',
                 href: 'contracts.index',
                 // dev: true,
-                show: hasPermission(['conttract read']),
+                show: hasPermission(['contract read']),
             },
             {
                 name: 'Autorizaciones',

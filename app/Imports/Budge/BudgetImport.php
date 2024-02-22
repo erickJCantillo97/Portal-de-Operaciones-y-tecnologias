@@ -5,6 +5,7 @@ namespace App\Imports\Budge;
 use App\Models\Project\Grafo;
 use App\Models\Project\Operation;
 use App\Models\Project\Pep;
+use App\Models\WareHouse\Tool;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -25,6 +26,20 @@ class BudgetImport implements ToCollection, WithChunkReading, WithHeadingRow
      */
     public function collection(Collection $rows)
     {
+        // foreach ($rows as $row) {
+        //     $tool = Tool::firstorNew([
+        //         'code' => $row['code'],
+        //     ]);
+        //     $tool->serial => $row['serial'];
+        //     $tool->responsible_id = $row['responsible_id'];
+        //     $tool->category_id = $row['category_id'];
+        //     $tool->gerencia = $row['gerencia'];
+        //     $tool->value = $row['value'];
+        //     $tool->brand = $row['brand'];
+        //     $tool->estado = $row['estado'];
+        //     $tool->estado_operativo = $row['estado_operativo'];
+        //     $tool->save();
+        // }
         Validator::make($rows->toArray(), [
             '*.estructura_sap' => 'required',
             '*.presupuesto_materiales' => 'nullable|numeric',

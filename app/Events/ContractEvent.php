@@ -18,20 +18,17 @@ class ContractEvent implements ShouldBroadcast
      */
     public $message;
 
+    public $title = 'Nuevo Contrato Añadido';
+
+    public $contract;
+
     public $type;
 
     public function __construct(Contract $contract, $type = 'created')
     {
-
         $this->type = $type;
-
-        if ($type === 'created') {
-            $this->message = 'Se ha creado el contrato:' . "\n" . $contract->contract_id;
-        } elseif ($type === 'updated') {
-            $this->message = 'Se ha actualizado el contrato:' . "\n" . $contract->name;
-        } elseif ($type === 'deleted') {
-            $this->message = 'Se ha eliminado el contrato:' . "\n" . $contract->name;
-        }
+        $this->contract = $contract;
+        $this->message = auth()->user()->short_name . ' ha creado el contrato:' . "\n" . $contract->contract_id;
     }
 
     /**
@@ -42,7 +39,7 @@ class ContractEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('contracts'),
+            new PrivateChannel('contracts.' . $this->contract->id),
             // new PrivateChannel('myPrivateChannel.user.id'),
         ];
     }

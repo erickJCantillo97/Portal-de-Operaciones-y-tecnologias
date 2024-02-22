@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\Projects\ProgressImport;
 use App\Models\Project\ProgressProjectWeek;
 use App\Models\Projects\Project;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Laravel\Prompts\Progress;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProgressProjectWeekController extends Controller
 {
@@ -129,6 +131,22 @@ class ProgressProjectWeekController extends Controller
             $progressProjectWeek->delete();
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
+        }
+    }
+
+    public function upload(Request $request, $project)
+    {
+        try {
+            // dd($request->files->get('files'));
+            Excel::import(new ProgressImport($project), $request->docs);
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            foreach ($failures as $failure) {
+                $failure->row(); // row that went wrong
+                $failure->attribute(); // either heading key (if using heading row concern) or column index
+                $failure->errors(); // Actual error messages from Laravel validator
+                $failure->values(); // The values of the row that has failed.
+            }
         }
     }
 }

@@ -1,21 +1,20 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue'
+const { confirmDelete } = useSweetalert()
+const toast = useToast()
+import { FormWizard, TabContent } from 'vue3-form-wizard'
 import { ref, onMounted } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
-import axios from 'axios'
-import ToggleButton from 'primevue/togglebutton'
-import Listbox from 'primevue/listbox';
-import CustomUpload from "@/Components/CustomUpload.vue";
+import { useSweetalert } from '@/composable/sweetAlert'
+import { useToast } from "primevue/usetoast";
+import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
-import { FormWizard, TabContent } from 'vue3-form-wizard'
 import 'vue3-form-wizard/dist/style.css'
-import { useToast } from "primevue/usetoast";
 import Empty from '@/Components/Empty.vue'
-import { useSweetalert } from '@/composable/sweetAlert'
-const { confirmDelete } = useSweetalert();
-const toast = useToast();
+import Listbox from 'primevue/listbox'
+import ToggleButton from 'primevue/togglebutton'
+import CustomUpload from '@/Components/CustomUpload.vue';
 
 const props = defineProps({
     project: Object,
@@ -293,22 +292,36 @@ const saveweekTask = () => {
                     </h2>
 
                 </span>
-                <div v-if="project" class="space-x-4 justify-end flex w-full">
-                    <Button icon="fa-solid fa-list-check" severity="help" v-tooltip.top="'Tareas de la semana'"
+                <div v-if="project" class="space-x-6 justify-end flex w-full">
+                    <Button icon="fa-solid fa-list-check" severity="help" v-tooltip.left="'Tareas de la semana'"
                         @click="modalWeekTask = true" />
-                    <Button icon="fa-solid fa-gauge-high" severity="secondary" v-tooltip.top="'Avance del proyecto'"
+                    <Button icon="fa-solid fa-gauge-high" severity="secondary" v-tooltip.left="'Avance del proyecto'"
                         @click="modalProgress = true" />
+
                     <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" icon-button="fa-solid fa-chart-bar"
                         tooltip="Subir Estructura" accept=".xlsx,.xls" :url="route('upload.estructure', project.id)" />
-                    <!-- 
-                    <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Presupuesto del proyecto"
+
+
+
+                    <CustomUpload mode="advanced" titleModal="Subir Curva S" icon-button="fa-solid fa-chart-line"
+                        tooltip="Subir Curva S" accept=".xlsx,.xls" :url="route('progressProjectWeek.upload', project.id)"
+                        severity="info" />
+
+                    <CustomUpload mode="advanced" titleModal="Subir Presupuesto del proyecto"
                         icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
-                        url="prueba" severity="success" />
+                        :url="route('upload.budget', project.id)" severity="success" />
+
+                    <CustomUpload mode="advanced" titleModal="Subir Costos Ejecutados"
+                        icon-button="fa-solid fa-money-bill-transfer" tooltip="Subir ejecutado" accept=".xlsx,.xls"
+                        :url="route('upload.execute', project.id)" severity="info" />
+
+                    <!-- 
+                    
 
                     <CustomUpload mode="advanced" titleModal="Subir Presupuesto del proyecto"
                         icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
                         :url="route('upload.budget', props.project.id)" severity="success" />
-                    
+
                     <CustomUpload mode="advanced" :multiple="true" titleModal="Subir el avance planeado del proyecto"
                         tooltip="Subir Curva S" accept=".xlsx,.xls" url="prueba" severity="info" />
 

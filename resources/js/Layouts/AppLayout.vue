@@ -247,7 +247,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { Menu, MenuButton, MenuItems, MenuItem, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { router } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
 import {
     Bars3CenterLeftIcon
 } from '@heroicons/vue/24/outline'
@@ -267,7 +267,9 @@ import DolarTRM from "@/Components/DolarTRM.vue"
 import Footer from "@/Components/Footer.vue"
 import FlyoutNotificationsMenu from '@/Components/FlyoutNotificationsMenu.vue'
 import { useSweetalert } from '@/composable/sweetAlert'
+import { broadcastNotifications } from '@/composable/broadcastNotifications'
 import "@/composable/push.min.js"
+const { eventListener, handleDataEvents } = broadcastNotifications()
 const { toast } = useSweetalert()
 const menu = ref(false)
 const sugerencia = ref('')
@@ -276,9 +278,15 @@ const sugerenciaVisible = ref(false)
 const suggestions = ref([])
 const debug = import.meta.env.VITE_APP_DEBUG
 
+
 onMounted(() => {
     loadSuggestions()
+    testBroadcast()
 })
+
+const testBroadcast = () => {
+    eventListener('contracts', '.contracts-event')
+}
 
 const logout = () => {
     router.post(route('logout'))
