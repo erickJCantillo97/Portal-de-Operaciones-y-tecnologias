@@ -1,124 +1,72 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { onMounted } from 'vue';
+import { ref } from 'vue';
 import "@bryntum/gantt/gantt.material.css";
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
-import { DateHelper, Gantt, List, LocaleManager, ProjectModel, StringHelper, Widget } from '@bryntum/gantt/gantt.module.js';
+import { BryntumGantt } from '@bryntum/gantt-vue-3';
+import { DateHelper, LocaleManager } from '@bryntum/gantt/gantt.module.js';
 
-import { useSweetalert } from '@/composable/sweetAlert';
-import Tag from 'primevue/tag';
-const { toast } = useSweetalert();
+import { useToast } from "primevue/usetoast";
+import Toolbar from 'primevue/toolbar';
+import CustomInput from '@/Components/CustomInput.vue';
+import InputText from 'primevue/inputtext';
+import Calendar from 'primevue/calendar';
+
+const toast = useToast();
+
 const props = defineProps({
     project: Object,
     groups: Array
 })
 LocaleManager.applyLocale('Es');
+const ganttref = ref()
+const loading = ref(false)
+const error = ref(false)
 
-//#region colocar tab personalizado en el editor de tareas
-
-if (!Widget.factoryable.registry.resourcelist) {
-    class ResourceList extends List {
-
-        // Factoryable type name
-        static get type() {
-            return 'resourcelist';
-        }
-
-        static get configurable() {
-            return {
-                title: 'Resources',
-                cls: 'b-inline-list',
-                items: [],
-                itemTpl: resource => {
-                    return StringHelper.xss`
-                    <div class="b-resource-detail">
-                        <div class="b-resource-name">${resource.name}</div>
-                        <div class="b-resource-city">
-                            ${resource.unit}
-                        </div>
-                        <div class="b-resource-city">
-                            Costo hora: ${resource.costo_hora}
-                            <i data-btip="Quitar recurso" class="b-icon b-icon-trash"></i>
-                        </div>
-                    </div>`;
-                }
-            };
-        }
-
-        // Called by the owning TaskEditor whenever a task is loaded
-        loadEvent(taskRecord) {
-            this.taskRecord = taskRecord;
-            this.store.data = taskRecord.resources;
-        }
-
-        // Called on item click
-        onItem({ event, record }) {
-            if (event.target.matches('.b-icon-trash')) {
-                // Unassign the clicked resource record from the currehtly loaded task
-                this.taskRecord.unassign(record);
-
-                // Update our store with the new assignment set
-                this.store.data = this.taskRecord.resources;
-            }
-        }
+const maximize = () => {
+    let elementGantt = document.getElementById("containergantt");
+    if (elementGantt.requestFullScreen) {
+        elementGantt.requestFullScreen();
+    } else if (elementGantt.mozRequestFullScreen) {
+        elementGantt.mozRequestFullScreen();
+    } else if (elementGantt.webkitRequestFullScreen) {
+        elementGantt.webkitRequestFullScreen();
     }
-    ResourceList.initClass();
 }
-
-//#endregion
-
-const project = new ProjectModel({
-    autoSync: true,
-    autoLoad: true,
-    transport: {
-        load: {
-            url: route('dataGantt', props.project)
-            // url: 'data/launch-saas.json'
-        },
-        sync: {
-            url: route('syncGantt', props.project),
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            credentials: 'include'
-        }
-    },
-    // This config enables response validation and dumping of found errors to the browser console.
-    // It's meant to be used as a development stage helper only so please set it to false for production systems.
-    validateResponse: true,
-    listeners: {
-        syncFail: (e) => {
-            gantt.unmaskBody();
-            // console.log(e);
-            toast('Ha ocurrido un error, reiniciando...', 'error');
-            // setTimeout(() => { location.reload() }, 3000);
-
-        }
-    }
-
-});
-
-const headerTpl = ({ currentPage, totalPages }) => `
-    <div class="flex space-x-3 items-center">
-        <img class="max-h-8" alt="Company logo" src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
-        <h3>${props.project.name}</h3>
-    </div>
-    <img class="opacity-50" alt="Company logo" src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
-    <dl>
-        <dt>Fecha y hora de impresion: ${DateHelper.format(new Date(), 'll LT')}</dt>
-        <dd>${totalPages ? `Pagina: ${currentPage + 1}/${totalPages}` : ''}</dd>
-    </dl>
-    `;
-
-const footerTpl = () => `<h3 class="">© ${new Date().getFullYear()} TOP - COTECMAR</h3>`;
-
-
-const gantt = new Gantt(({
-    project,
+const ganttConfig = ref({
     rowHeight: 28,
-    // resourceImageFolderPath: '../images/users/',
     dependencyIdField: 'sequenceNumber',
+    project: {
+        autoSync: true,
+        autoLoad: true,
+        transport: {
+            load: {
+                url: route('dataGantt', props.project)
+            },
+            sync: {
+                url: route('syncGantt', props.project),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                credentials: 'include'
+            }
+        },
+        validateResponse: true,
+        // listeners: {
+        //     syncFail: (e) => {
+        //         gantt.unmaskBody();
+        //         toast('Ha ocurrido un error, reiniciando...', 'error');
+        //         setTimeout(() => { location.reload() }, 3000);
+        //     },
+        //     beforeSync: () => {
+        //         loading.value = true
+        //     },
+        //     sync: (e) => {
+        //         loading.value = false
+        //     }
+        // }
+    },
     columns: [
         { id: 'wbs', type: 'wbs', text: 'EDT' },
         { id: 'name', type: 'name', },
@@ -181,52 +129,13 @@ const gantt = new Gantt(({
                         + '</div></div>')
                 }
                 return `
-                    <div class="flex justify-between space-x-2 text-xs"><div>${assignmentRecord.units / 100}</div><div class="italic">${assignmentRecord.name}</div><div class="font-bold">$${Math.round(task.durationUnit == 'day' ? (task.duration * (assignmentRecord.units / 100) * assignmentRecord.costo_hora) * 8.5 : (task.duration * (assignmentRecord.units / 100) * assignmentRecord.costo_hora)).toLocaleString('es')} </div></div>
-                     ${overflowCount > 0 ? `${overflowAssignments2}` : ''}
-                `;
+                        <div class="flex justify-between space-x-2 text-xs"><div>${assignmentRecord.units / 100}</div><div class="italic">${assignmentRecord.name}</div><div class="font-bold">$${Math.round(task.durationUnit == 'day' ? (task.duration * (assignmentRecord.units / 100) * assignmentRecord.costo_hora) * 8.5 : (task.duration * (assignmentRecord.units / 100) * assignmentRecord.costo_hora)).toLocaleString('es')} </div></div>
+                         ${overflowCount > 0 ? `${overflowAssignments2}` : ''}
+                    `;
             }
         },
         { type: 'addnew', text: 'Añadir Columna' },
-        // {
-        //     text: 'Linea Base 1',
-        //     collapsible: true,
-        //     children: [
-        //         { type: 'baselinestartdate', text: 'Start', field: 'baselines[0].startDate' },
-        //         { type: 'baselineenddate', text: 'Finish', field: 'baselines[0].endDate' },
-        //         { type: 'baselineduration', text: 'Duration', field: 'baselines[0].fullDuration' },
-        //         { type: 'baselinestartvariance', field: 'baselines[0].startVariance' },
-        //         { type: 'baselineendvariance', field: 'baselines[0].endVariance' },
-        //         { type: 'baselinedurationvariance', field: 'baselines[0].durationVariance' }
-        //     ]
-        // },
-        // {
-        //     text: 'Linea Base 2',
-        //     collapsible: true,
-        //     collapsed: true,
-        //     children: [
-        //         { type: 'baselinestartdate', text: 'Start', field: 'baselines[1].startDate' },
-        //         { type: 'baselineenddate', text: 'Finish', field: 'baselines[1].endDate' },
-        //         { type: 'baselineduration', text: 'Duration', field: 'baselines[1].fullDuration' },
-        //         { type: 'baselinestartvariance', field: 'baselines[1].startVariance' },
-        //         { type: 'baselineendvariance', field: 'baselines[1].endVariance' },
-        //         { type: 'baselinedurationvariance', field: 'baselines[1].durationVariance' }
-        //     ]
-        // },
-        // {
-        //     text: 'Linea Base 3',
-        //     collapsible: true,
-        //     collapsed: true,
-        //     children: [
-        //         { type: 'baselinestartdate', text: 'Start', field: 'baselines[2].startDate' },
-        //         { type: 'baselineenddate', text: 'Finish', field: 'baselines[2].endDate' },
-        //         { type: 'baselineduration', text: 'Duration', field: 'baselines[2].fullDuration' },
-        //         { type: 'baselinestartvariance', field: 'baselines[2].startVariance' },
-        //         { type: 'baselineendvariance', field: 'baselines[2].endVariance' },
-        //         { type: 'baselinedurationvariance', field: 'baselines[2].durationVariance' }
-        //     ]
-        // }
     ],
-    // Allow extra space for baseline(s)
     subGridConfigs: {
         locked: {
             flex: 1
@@ -235,363 +144,20 @@ const gantt = new Gantt(({
             flex: 1
         }
     },
-    features: {
-        filter: true,
-        mspExport: true,
-        pdfExport: {
-            exportServer: 'https://dev.bryntum.com:8082',
-            headerTpl,
-            footerTpl,
-            orientation: 'portrait',
-            paperFormat: 'Letter',
-            keepRegionSizes: { locked: true },
-            exportDialog: {
-                autoSelectVisibleColumns: false,
-                items: {
-                    columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
-                }
-            }
-        },
-        projectLines: false,
-        taskEdit: {
-            items: {
-                resourcesTab: {
-                    type: 'resourcelist',
-                    weight: 120,
-                    title: 'Recursos',
-                },
-            }
-        },
-        baselines: {
-            // Custom tooltip template for baselines
-            template(data) {
-                const
-                    me = this,
-                    { baseline } = data,
-                    { task } = baseline,
-                    delayed = task.startDate > baseline.startDate,
-                    overrun = task.durationMS > baseline.durationMS;
-
-                let { decimalPrecision } = me;
-
-                if (decimalPrecision == null) {
-                    decimalPrecision = me.client.durationDisplayPrecision;
-                }
-
-                const
-                    multiplier = Math.pow(10, decimalPrecision),
-                    displayDuration = Math.round(baseline.duration * multiplier) / multiplier;
-
-                return `
-                    <div class="b-gantt-task-title">${StringHelper.encodeHtml(task.name)} (${me.L('Linea Base ')} ${baseline.parentIndex + 1})</div>
-                    <table>
-                    <tr><td>${me.L('Inicio')}:</td><td>${data.startClockHtml}</td></tr>
-                    ${baseline.milestone ? '' : `
-                        <tr><td>${me.L('Fin')}:</td><td>${data.endClockHtml}</td></tr>
-                        <tr><td>${me.L('Duracion')}:</td><td class="b-right">${displayDuration + ' ' + DateHelper.getLocalizedNameOfUnit(baseline.durationUnit, baseline.duration !== 1)}</td></tr>
-                    `}
-                    </table>
-                    ${delayed ? `
-                        <h4 class="statusmessage b-baseline-delay"><i class="statusicon b-fa b-fa-exclamation-triangle"></i>${me.L('Inicio retrasado por')} ${DateHelper.formatDelta(task.startDate - baseline.startDate)}</h4>
-                    ` : ''}
-                    ${overrun ? `
-                        <h4 class="statusmessage b-baseline-overrun"><i class="statusicon b-fa b-fa-exclamation-triangle"></i>${me.L('Atrasado por')} ${DateHelper.formatDelta(task.durationMS - baseline.durationMS)}</h4>
-                    ` : ''}
-                    `;
-            },
-
-            renderer: baselineRenderer
-        },
-    },
     keyMap: {
         // This is a function from the existing Gantt API
         'Ctrl+Shift+Q': 'addSubTask',
         'Ctrl+i': 'indent',
         'Ctrl+o': 'outdent',
-
+        // 'Ctrl+z': 'outdent',
     },
-    tbar: {
-        height: '4em',
-        items: [
-            {
-                type: "buttonGroup",
-                items: [
-                    {
-                        color: "b-green",
-                        ref: "addTaskButton",
-                        icon: "b-fa b-fa-plus",
-                        text: "",
-                        tooltip: "Crear una nueva tarea",
-                        onAction() {
-                            onAddTaskClick()
-                        }
-                    }
-                ]
-            },
-            {
-                type: "buttonGroup",
-                items: [
-                    {
-                        ref: "editTaskButton",
-                        icon: "b-fa b-fa-pen",
-                        text: "",
-                        tooltip: "Editar celda seleccionada",
-                        onAction() {
-                            onEditTaskClick()
-                        }
-                    },
-                    {
-                        ref: "undoRedo",
-                        type: "undoredo",
-                        items: {
-                            transactionsCombo: null
-                        }
-                    }
-                ]
-            },
-            {
-                type: "buttonGroup",
-                items: [
-                    {
-                        ref: "expandAllButton",
-                        icon: "b-fa b-fa-angle-double-down",
-                        tooltip: "Expandir todo",
-                        onAction() {
-                            onExpandAllClick()
-                        }
-                    },
-                    {
-                        ref: "collapseAllButton",
-                        icon: "b-fa b-fa-angle-double-up",
-                        tooltip: "Colapsar todo",
-                        onAction() {
-                            onCollapseAllClick()
-                        }
-                    }
-                ]
-            },
-            {
-                type: "buttonGroup",
-                items: [
-                    {
-                        type: "button",
-                        ref: "settingsButton",
-                        tooltip: "Ajustes",
-                        toggleable: true,
-                        icon: 'b-fa-gear',
-                        menu: {
-                            type: "popup",
-                            anchor: true,
-                            cls: "settings-menu",
-                            layoutStyle: {
-                                flexDirection: "column"
-                            },
-                            onBeforeShow(e) {
-                                onSettingsShow(e)
-                            },
-
-                            items: [
-                                {
-                                    type: "slider",
-                                    ref: "rowHeight",
-                                    text: "Altura de celdas",
-                                    width: "12em",
-                                    showValue: true,
-                                    min: 10,
-                                    max: 70,
-                                    onInput(e) {
-                                        onSettingsRowHeightChange(e)
-                                    }
-                                },
-                                {
-                                    type: "slider",
-                                    ref: "barMargin",
-                                    text: "Altura barras",
-                                    width: "12em",
-                                    showValue: true,
-                                    min: 0,
-                                    max: 10,
-                                    onInput(e) {
-                                        onSettingsMarginChange(e)
-                                    }
-                                },
-                            ]
-                        }
-                    },
-                    // {
-                    //     type: "button",
-                    //     color: "b-red",
-                    //     ref: "criticalPathsButton",
-                    //     icon: "b-fa b-fa-fire",
-                    //     text: "Critical paths",
-                    //     tooltip: "Highlight critical paths",
-                    //     toggleable: true,
-                    //     onAction: "up.onCriticalPathsClick"
-                    // }
-                ]
-            },
-            {
-                type: "datefield",
-                ref: "startDateField",
-                placeholder: "Busqueda por fecha",
-                maxWidth: "12em",
-                required: 'done',
-                flex: "0 0 17em",
-                listeners: {
-                    change() {
-                        onStartDateChange()
-                    }
-                }
-            },
-            {
-                type: "textfield",
-                ref: "filterByName",
-                cls: "filter-by-name",
-                flex: "0 0 12.5em",
-                // Placeholder for others
-                placeholder: "Buscar Actividad",
-                clearable: true,
-                keyStrokeChangeDelay: 100,
-                triggers: {
-                    filter: {
-                        align: "end",
-                    }
-                },
-                onChange(e) {
-                    onFilterChange(e)
-                }
-            },
-            {
-                type: 'button',
-                ref: 'mspExportBtn',
-                hidden: true,
-                tooltip: "Exportar a XML",
-                icon: 'b-fa-file-export',
-                onAction() {
-                    onExport()
-                }
-            },
-            {
-                type: 'button',
-                text: 'LB',
-                cls: '',
-                // hidden:true,
-                tooltip: "Guardar en linea base",
-                menu: [{
-                    text: 'Linea base 1',
-                    onItem() {
-                        setBaseline(1);
-                    }
-                }, {
-                    text: 'Linea base 2',
-                    onItem() {
-                        setBaseline(2);
-                    }
-                }, {
-                    text: 'Linea base 3',
-                    onItem() {
-                        setBaseline(3);
-                    }
-                }]
-            },
-            {
-                type: 'button',
-                icon: "b-fa b-fa-eye",
-                tooltip: "Ver lineas base",
-                menu: [{
-                    checked: true,
-                    text: 'Linea Base 1',
-                    onToggle({ checked }) {
-                        toggleBaselineVisible(1, checked);
-                    }
-                }, {
-                    checked: true,
-                    text: 'Linea base 2',
-                    onToggle({ checked }) {
-                        toggleBaselineVisible(2, checked);
-                    }
-                }, {
-                    checked: true,
-                    text: 'Linea base 3',
-                    onToggle({ checked }) {
-                        toggleBaselineVisible(3, checked);
-                    }
-                }]
-            },
-            {
-                type: 'button',
-                ref: 'exportButton',
-                icon: 'b-fa-file-export',
-                text: 'Export to PDF',
-                onClick() {
-                    gantt.features.pdfExport.showExportDialog();
-                }
-            }
-            // {
-            //     type: 'checkbox',
-            //     text: 'Mostrar todas',
-            //     checked: true,
-            //     toggleable: true,
-            //     onAction({ checked }) {
-            //         gantt.features.baselines.disabled = !checked;
-            //     }
-            // },
-            // {
-            //     type: 'checkbox',
-            //     text: 'Habilitar lineas base',
-            //     cls: 'b-baseline-toggle',
-            //     checked: true,
-            //     toggleable: true,
-            //     onAction({ checked }) {
-            //         gantt.features.baselines.renderer = checked ? baselineRenderer : () => { };
-            //     }
-            // }
-        ]
-    },
-}))
-
-//#region baseline
-
-function baselineRenderer({ baselineRecord, taskRecord, renderData }) {
-    if (baselineRecord.endDate.getTime() + 24 * 3600 * 1000 < taskRecord.endDate.getTime()) {
-        renderData.className['b-baseline-behind'] = 1;
-    }
-    else if (taskRecord.endDate < baselineRecord.endDate) {
-        renderData.className['b-baseline-ahead'] = 1;
-    }
-    else {
-        renderData.className['b-baseline-on-time'] = 1;
-    }
-}
-const setBaseline = (index) => {
-    gantt.taskStore.setBaseline(index);
-}
-
-const toggleBaselineVisible = (index, visible) => {
-    gantt.element.classList[visible ? 'remove' : 'add'](`b-hide-baseline-${index}`);
-}
-//#endregion
-
-onMounted(() => {
-    gantt.appendTo = 'containergantt';
 })
+
 //#region toolbar
 
-//exportar
-const onExport = () => {
-    // give a filename based on task name
-    const filename = gantt.project.taskStore.first && `${gantt.project.taskStore.first.name}.xml`;
-
-    // call the export to download the XML file
-    gantt.features.mspExport.export({
-        filename
-    });
-}
-
-
-// añadir tarea
-
 const onAddTaskClick = async () => {
+    let gantt = ganttref.value.instance.value
+    // console.log(gantt.value.instance.value)
     const added = gantt.taskStore.rootNode.appendChild({
         name: "Nueva tarea",
         duration: 1
@@ -609,107 +175,115 @@ const onAddTaskClick = async () => {
     });
 }
 
-//editar tarea
-
 const onEditTaskClick = () => {
-
+    let gantt = ganttref.value.instance.value
     if (gantt.selectedRecord) {
         gantt.editTask(gantt.selectedRecord);
     } else {
-        Toast.show("Primero selecciona una tarea a editar");
+        toast.add({ severity: 'error', group: 'customToast', text: 'Debe seleccionar la tarea a editar', life: 2000 });
     }
 }
-
-//expandir todas las tareas
 const onExpandAllClick = () => {
+    let gantt = ganttref.value.instance.value
     gantt.expandAll();
 }
 
 //recojer todas las tareas
 const onCollapseAllClick = () => {
+    let gantt = ganttref.value.instance.value
     gantt.collapseAll();
 }
 
-//buscar por fecha
-function onStartDateChange({ value, oldValue }) {
-    if (!oldValue) {
-        // ignore initial set
-        return;
-    }
+// const onUndo = () => {
+//     let gantt = ganttref.value.instance.value
+//     console.log(gantt)
+// }
+// const onRedo = () => {
+//     console.log(gantt.value.project)
+// }
 
-    gantt.startDate = DateHelper.add(value, -1, "week");
+const fecha = ref()
+function onStartDateChange(event) {
+    let gantt = ganttref.value.instance.value
+    console.log(event)
+    // if (!oldValue) {
+    //     // ignore initial set
+    //     return;
+    // }
 
-    gantt.project.setStartDate(value);
+    gantt.startDate = DateHelper.add(event, -1, "week");
+
+    gantt.project.setStartDate(event);
 }
-
-//buscar por nombre
-const onFilterChange = ({ value }) => {
-    if (value === "") {
+const texto=ref()
+function onFilterChange() {
+    let gantt = ganttref.value.instance.value
+    if (texto.value === "") {
         gantt.taskStore.clearFilters();
     } else {
-        value = value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        texto.value = texto.value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
         gantt.taskStore.filter({
             filters: task =>
-                task.name && task.name.match(new RegExp(value, "i")),
+                task.name && task.name.match(new RegExp(texto.value, "i")),
             replace: true
         });
     }
 }
 
-//ver ajustes
-const onSettingsShow = ({ source: menu }) => {
-    const { rowHeight, barMargin } = menu.widgetMap;
-    rowHeight.value = gantt.rowHeight;
-    barMargin.value = gantt.barMargin;
-    barMargin.max = gantt.rowHeight / 2 - 5;
-}
-//ajuste de altura de filas
-const onSettingsRowHeightChange = ({ value }) => {
-    gantt.rowHeight = value;
-    gantt.widgetMap.settingsButton.menu.widgetMap.barMargin.max =
-        value / 2 - 5;
-}
-//ajuste de marjen
-const onSettingsMarginChange = ({ value }) => {
-    gantt.barMargin = value;
-}
+
 //#endregion
 
 </script>
 <template>
     <AppLayout>
-        <main class="h-[89vh] overflow-y-auto">
-            <section class="place-content-center w-full shadow-md">
-                <div>
-                    <div class="bg-blue-800 rounded-t-lg">
-                        <p class="text-md flex items-center justify-center font-semibold capitalize text-white">
-                            {{ props.project.name }}
-                        </p>
-                    </div>
-                    <div class="col-span-2 justify-between px-2 mt-2 flex">
-                        <p class="text-sm shadow-lg p-2 rounded-md font-semibold">Codigo SAP: {{ props.project.SAP_code }}
-                        </p>
-                        <p class="text-sm shadow-lg p-2 rounded-md font-semibold">Horas por dia: {{
-                            props.project.hoursPerDay }} horas
-                        </p>
-                        <p class="text-sm shadow-lg p-2 rounded-md font-semibold">Dias por semana: {{
-                            props.project.daysPerWeek }} dias
-                        </p>
-                        <p class="text-sm shadow-lg p-2 rounded-md font-semibold">Dias por mes: {{
-                            props.project.daysPerMonth }} dias
-                        </p>
-                        <p class="text-sm shadow-lg p-2 rounded-md font-semibold">Horario: {{ props.project.shift }}</p>
-                        <Tag severity="info">{{ props.project.status }}</Tag>
-                    </div>
-                </div>
-                <!-- <div class="divide-x"></div> -->
-
-                <!-- <p>{{ props.project }}</p> -->
-            </section>
-            <div id="containergantt" class="h-[80vh] text-xs mt-2">
+        <div class="h-[89vh] flex flex-col overflow-y-auto gap-y-1">
+            <div class="rounded-t-lg h-8 flex space-x-0.5">
+                <p
+                    class="text-md w-full pl-3 bg-blue-800 flex items-center rounded-tl-lg font-semibold capitalize text-white">
+                    {{ props.project.name }}
+                </p>
+                <span v-if="!error"
+                    v-tooltip.bottom="loading ? 'Sincronizando cambios...' : 'Todos los cambios estan guardados'"
+                    class="w-48 justify-end cursor-default px-2 flex items-center space-x-2 text-white bg-success rounded-tr-lg">
+                    <p class="w-full text-center font-bold">{{ loading ? 'Sincronizando...' : 'Sincronizado' }}</p>
+                    <i :class="loading ? 'fa-solid fa-spinner animate-spin' : 'fa-regular fa-circle-check'"
+                        class="text-xl" />
+                </span>
+                <span v-else v-tooltip.bottom="'Hubo un error, se debe recargar la pagina'"
+                    class="w-48 justify-end cursor-default px-2 flex items-center space-x-2 text-white bg-danger rounded-tr-lg">
+                    <p class="w-full text-center">No sincronizado</p>
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </span>
             </div>
-        </main>
+            <span class="flex justify-between">
+                <span class="flex space-x-1">
+                    <Button raised icon="fa-solid fa-plus" v-tooltip="'Nueva actividad'" severity="success"
+                        @click=onAddTaskClick() />
+                    <Button raised icon="fa-solid fa-pen" v-tooltip="'Editar Actividad'" severity="warning"
+                        @click="onEditTaskClick()" />
+                    <!-- <Button icon="fa-solid fa-rotate-left" severity="secondary" @click="onUndo()" />
+                            <Button icon="fa-solid fa-rotate-right" severity="secondary" @click="onRedo()" /> -->
+                    <Button raised icon="fa-solid fa-chevron-down" v-tooltip="'Expandir todo'" severity="secondary"
+                        @click="onExpandAllClick()" />
+                    <Button raised icon="fa-solid fa-chevron-up" v-tooltip="'Contraer todo'" severity="secondary"
+                        @click="onCollapseAllClick()" />
+                    <Button raised icon="fa-solid fa-gear" v-tooltip="'Ajustes'" severity="secondary"
+                        @click="onCollapseAllClick()" />
+                    <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange"
+                        placeholder="Buscar por fecha" class="shadow-md" showIcon :pt="{ input: '!h-8' }" />
+                    <InputText v-model="texto" @input="onFilterChange" placeholder="Buscar por actividad" class="shadow-md" />
+                    <Button raised v-tooltip="'Guardar en linea base'" icon="fa-solid fa-grip-lines" />
+                    <Button raised v-tooltip="'Ver lineas base'" icon="fa-solid fa-eye" />
+                    <Button raised v-tooltip="'Exportar a PDF'" icon="fa-solid fa-file-pdf" />
+                </span>
+                <span>
+                    <Button v-tooltip.left="'Pantalla completa'" icon="fa-solid fa-maximize" severity="help" raised
+                        @click="maximize" />
+                </span>
+            </span>
+            <BryntumGantt id="containergantt" ref="ganttref" class="h-full" v-bind="ganttConfig" />
+        </div>
     </AppLayout>
 </template>
 <style>
@@ -760,5 +334,4 @@ const onSettingsMarginChange = ({ value }) => {
 
 #id {
     font-size: 12px !important;
-}
-</style>
+}</style>

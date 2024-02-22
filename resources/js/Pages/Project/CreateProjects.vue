@@ -247,13 +247,16 @@ const modalWeekTask = ref()
 const weekTask = useForm({
     id: null,
     task: null,
-    week: null
+    week: null,
+    project_id:null
+
 })
 const saveweekTask = () => {
+    weekTask.project_id=props.project.id
     if (weekTask.id) {
-        formMilestone.put(route('weektask.update', formMilestone.id), {
+        weekTask.put(route('weektask.update', weekTask.id), {
             onSuccess: () => {
-                formMilestone.reset()
+                weekTask.reset()
                 toast.add({ severity: 'success', group: 'customToast', text: 'Hito Guardado', life: 2000 });
                 openDialogHito.value = false;
             },
@@ -263,9 +266,9 @@ const saveweekTask = () => {
             }
         })
     } else {
-        formMilestone.post(route('weektask.store'), {
+        weekTask.post(route('weektask.store'), {
             onSuccess: () => {
-                formMilestone.reset()
+                weekTask.reset()
                 toast.add({ summary: 'Hito Guardado', life: 2000 });
                 openDialogHito.value = false;
             },
@@ -525,7 +528,7 @@ const saveweekTask = () => {
                     <tab-content title="Hitos" icon="fa-solid fa-list-check"
                         class=" h-[45vh] w-full border rounded-lg p-1 overflow-y-auto">
                         <CustomDataTable :rowsDefault="5" :data="milestones" :columnas="columnas" :actions="actions"
-                            @edit="showModal" :filter="false" :showHeader="false" :showAdd="true" @addClic="showModal"
+                            @edit="showModal" :filter="false" :showHeader="false" :showAdd="true" @addClick="showModal"
                             @delete="delMilestone" />
                     </tab-content>
                     <template #prev>
@@ -584,8 +587,8 @@ const saveweekTask = () => {
             <CustomInput label="Porcentaje de avance" :maxFractionDigits="2" v-model:input="avance.real_progress"
                 type="number" :max="100" :min="0" suffix="%" />
             <CustomInput label="CPI" v-model:input="avance.CPI" :errorMessage="avance.errors.CPI"
-                :invalid="avance.errors.CPI ? true : false" />
-            <CustomInput label="SPI" v-model:input="avance.SPI" />
+                :invalid="avance.errors.CPI ? true : false" type="number" :maxFractionDigits="2" />
+            <CustomInput label="SPI" v-model:input="avance.SPI" type="number" :maxFractionDigits="2"  />
         </template>
         <template #footer>
             <Button label="Guardar" severity="success" :loading="avance.processing" @click="guardarAvance()" />
