@@ -57,7 +57,7 @@ class BudgetController extends Controller
         $labor_ejecutados = VirtualPep::where('project_id', $project->id)->get()->sum('labor_ejecutados') +  Operation::where('project_id', $project->id)->get()->sum('labor_ejecutados');
 
         $services_ejecutados = VirtualPep::where('project_id', $project->id)->get()->sum('services_ejecutados') + Operation::where('project_id', $project->id)->get()->sum('services_ejecutados');
-        dd($services);
+
         return response()->json([
             'labor' => $labor,
             'materials' => $materials,
@@ -119,7 +119,7 @@ class BudgetController extends Controller
                 'labor_ejecutados' => 0,
                 'services_ejecutados' => 0
             ]);
-            
+
             Excel::import(new ExecutedImport($project), $request->docs);
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
