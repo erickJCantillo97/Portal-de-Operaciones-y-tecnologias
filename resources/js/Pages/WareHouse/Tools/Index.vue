@@ -32,7 +32,6 @@ const form = ref({
 const columnas = [
     { field: 'name', header: 'Nombre', rowClass: "underline !text-left", sortable: true, filter: true, type: 'button', event: 'goToToolOverview', severity: 'info', text: true },
     { field: 'code', header: 'Codigo', filter: true, sortable: true },
-    { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true },
     { field: 'serial', header: 'Serial', filter: true, sortable: true },
     { field: 'estado_operativo', header: 'Operatividad', filter: true, sortable: true },
     { field: 'estado', header: 'Disponibilidad', filter: true, sortable: true },
@@ -47,6 +46,7 @@ const filterButtons = [
 
 const actions = [
     { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false, show: hasPermission('tool edit') },
+    { event: 'cloneItem', severity: 'success', icon: 'fa-solid fa-copy', class: '!h-8', text: true, outlined: false, rounded: false, show: hasPermission('tool create') },
 ]
 
 const showModal = (event, data) => {
@@ -61,7 +61,7 @@ const showModal = (event, data) => {
         form.value = { error: false, errors: {} }
         modalType.value = 'Editar'
         form.value.id = data.id
-        form.value.category = data.category
+        form.value.category_id = parseInt(data.category_id)
         form.value.is_small = data.is_small == 0 ? false : true
         form.value.serial = data.serial
         form.value.SAP_code = data.SAP_code
@@ -73,6 +73,20 @@ const showModal = (event, data) => {
         form.value.imagen = data.imagen
         modalVisible.value = true
     }
+}
+const showModalClone = (event, data) => {
+    form.value = { error: false, errors: {} }
+    modalType.value = 'Nuevo'
+    form.value.category_id = parseInt(data.category_id)
+    form.value.is_small = data.is_small == 0 ? false : true
+    form.value.SAP_code = data.SAP_code
+    form.value.value = parseInt(data.value)
+    form.value.brand = data.brand
+    form.value.entry_date = data.entry_date
+    form.value.estado_operativo = data.estado_operativo
+    form.value.description = data.description
+    form.value.imagen = data.imagen
+    modalVisible.value = true
 }
 
 const goToToolOverview = (event, data) => {
@@ -87,8 +101,8 @@ const save = () => {
     form.value.error = false
     form.value.errors = {}
     form.value.loading = true
-    if (form.value.category) {
-        form.value.category_id = form.value.category.id
+    if (form.value.category_id) {
+        // form.value.category_id = form.value.category.id
         if (modalType.value == 'Nuevo') {
             router.post(route('tools.store'), form.value, {
                 onSuccess: () => {
@@ -131,7 +145,8 @@ const save = () => {
     <AppLayout>
         <div class="w-full h-[89vh] overflow-y-auto">
             <CustomDataTable :rowsDefault="100" title="Herramientas y equipos" :data="tools" :columnas="columnas"
-                :actions="actions" @edit="showModal" @goToToolOverview="goToToolOverview" :filterButtons="filterButtons">
+                :actions="actions" @edit="showModal" @goToToolOverview="goToToolOverview" @cloneItem="showModalClone"
+                :filterButtons="filterButtons">
                 <template #buttonHeader>
                     <Button label="Nuevo" severity="success" icon="fa-solid fa-plus" @click="showModal"
                         v-if="hasPermission('tool create')" />
@@ -150,9 +165,10 @@ const save = () => {
         </template>
         <template #body>
             <section class="grid grid-cols-3 gap-2">
-                <CustomInput label="Descripción" id="category" v-model:input="form.category" type="dropdown"
-                    placeholder="Selecciona una Descripción" :options="categories" optionLabel="name"
-                    :invalid="form.errors.category ? true : false" :errorMessage="form.errors.category" />
+                <CustomInput label="Descripción" id="category" v-model:input="form.category_id" type="dropdown"
+                    placeholder="Selecciona una Descripción" :options="categories" optionLabel="name" optionValue="id"
+                    :invalid="form.errors.category_id ? true : false" :errorMessage="form.errors.category_id" />
+
                 <CustomInput label="Serial" id="serial" v-model:input="form.serial" placeholder="Serial del equipo"
                     :invalid="form.errors.serial ? true : false" :errorMessage="form.errors.serial" />
                 <CustomInput label="Codigo SAP" id="SAP_code" v-model:input="form.SAP_code" placeholder="Codigo SAP"

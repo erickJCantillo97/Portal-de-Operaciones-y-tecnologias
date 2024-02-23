@@ -39,6 +39,7 @@ const projectSelect = async () => {
         await axios.get(route('get.details.budget', project.value.id)).then((res) => {
             peps.value = Object.values(res.data.peps)
             peps.value.forEach(element => {
+                // console.log(peps.value)
                 totales.value.materials_ejecutados = totales.value.materials_ejecutados + parseInt(element.materials_ejecutados)
                 totales.value.labor_ejecutados = totales.value.labor_ejecutados + parseInt(element.labor_ejecutados)
                 totales.value.services_ejecutados = totales.value.services_ejecutados + parseInt(element.services_ejecutados)

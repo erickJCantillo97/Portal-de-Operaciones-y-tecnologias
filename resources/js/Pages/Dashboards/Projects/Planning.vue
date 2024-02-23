@@ -61,8 +61,8 @@ const series = ref([])
           <h2 class="text-md font-semibold">PROMEDIO</h2>
         </div>
         <div class="flex justify-center size-full">
-          <GaugeGradeChart :key="showLineChart" title="CPI" :value="0.2" />
-          <GaugeGradeChart :key="showLineChart" title="SPI" :value="0.5" />
+          <GaugeGradeChart :key="showLineChart" title="CPI" :value="1.008" />
+          <GaugeGradeChart :key="showLineChart" title="SPI" :value="1.001" />
         </div>
       </div>
       <div class="col-span-2 border border-gray-200 rounded-lg shadow-sm">
@@ -70,8 +70,8 @@ const series = ref([])
           <h2 class="text-md font-semibold">PONDERADO</h2>
         </div>
         <div class="flex justify-center size-full">
-          <GaugeGradeChart :key="showLineChart" title="CPI" :value="0.7" />
-          <GaugeGradeChart :key="showLineChart" title="SPI" :value="1" />
+          <GaugeGradeChart :key="showLineChart" title="CPI" :value="1.023" />
+          <GaugeGradeChart :key="showLineChart" title="SPI" :value="0.999" />
         </div>
       </div>
     </div>

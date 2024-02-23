@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\WareHouse;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\Warehouse;
 use App\Models\WareHouse\Category;
 use App\Models\WareHouse\Tool;
 use DateTime;
@@ -20,7 +22,19 @@ class ToolController extends Controller
     public function index()
     {
 
-        $tools = Tool::with('category', 'category.padre', 'category.padre.padre')->orderBy('category_id')->get();
+        $warehouse = Warehouse::where('department', auth()->user()->oficina)->first()->id ?? 4;
+        $tools = Tool::where('warehouse_id', $warehouse)->with('category', 'warehouse')->orderBy('category_id')->get();
+        // foreach ($tools as $tool) {
+        //     $user =  User::where('id', $tool->responsible_id)->first();
+        //     $oficina = $user->oficina == 'DEPPC' ? 'DVMAP' : $user->oficina;
+        //     $wareHousee = Warehouse::firstOrCreate([
+        //         'name' => 'Almacen ' .  $oficina,
+        //         'gerencia' => $user->gerencia,
+        //         'department' =>  $oficina
+        //     ]);
+        //     $tool->warehouse_id = $wareHousee->id;
+        //     $tool->save();
+        // }
         $categories = Category::has('padre')->with('padre', 'padre.padre')->where('level', 'Descripcion')->get();
         return Inertia::render('WareHouse/Tools/Index', [
             'tools' => $tools,
@@ -64,7 +78,7 @@ class ToolController extends Controller
     {
         $validateData = $request->validate([
             'category_id' => 'required',
-            'serial' => 'required|unique:tools,serial',
+            'serial' => 'required',
             'SAP_code' => 'nullable|string',
             'value' => 'required',
             'brand' => 'nullable',
@@ -81,6 +95,8 @@ class ToolController extends Controller
             $validateData['code'] = $this->createCode($validateData);
             $validateData['is_small'] = 0;
             // $validateData['criticidad'] = 0;
+            $warehouse = Warehouse::where('department', auth()->user()->oficina)->first()->id ?? 4;
+            $validateData['warehouse_id'] = $warehouse;
             Tool::create($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
@@ -134,7 +150,7 @@ class ToolController extends Controller
     {
         $validateData = $request->validate([
             'category_id' => 'required',
-            'serial' => 'required|unique:tools,serial,' . $tool->id,
+            'serial' => 'required',
             'SAP_code' => 'nullable|string',
             'value' => 'required',
             'brand' => 'nullable',
