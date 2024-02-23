@@ -28,7 +28,7 @@
 //     return { contractNotification };
 // }
 
-export function broadcastNotifications() {
+export function useBroadcastNotifications() {
     const eventListener = (channel, events) => {
         console.log("Canal: " + channel + " Events: " + events);
         window.Echo.private(channel).listen(events, (e) => {

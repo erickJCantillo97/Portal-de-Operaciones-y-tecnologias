@@ -247,11 +247,11 @@ const weekTask = useForm({
     id: null,
     task: null,
     week: null,
-    project_id:null
+    project_id: null
 
 })
 const saveweekTask = () => {
-    weekTask.project_id=props.project.id
+    weekTask.project_id = props.project.id
     if (weekTask.id) {
         weekTask.put(route('weektask.update', weekTask.id), {
             onSuccess: () => {
@@ -371,7 +371,7 @@ const saveweekTask = () => {
                         <!--CAMPO SUPERVISOR (supervisor)-->
                         <div class="sm:grid sm:grid-cols-2 border gap-4 rounded-lg p-4">
 
-                            <CustomInput label="Gerente" placeholder="Nombre del Gerente" optionLabel="name"
+                            <CustomInput label="Gerente de Proyecto" placeholder="Nombre del Gerente de Proyecto" optionLabel="name"
                                 optionValue="name" :options="Object.values(gerentes)" type="dropdown"
                                 v-model:input="formData.supervisor" @change="console.log($event)" />
 
@@ -601,7 +601,7 @@ const saveweekTask = () => {
                 type="number" :max="100" :min="0" suffix="%" />
             <CustomInput label="CPI" v-model:input="avance.CPI" :errorMessage="avance.errors.CPI"
                 :invalid="avance.errors.CPI ? true : false" type="number" :maxFractionDigits="2" />
-            <CustomInput label="SPI" v-model:input="avance.SPI" type="number" :maxFractionDigits="2"  />
+            <CustomInput label="SPI" v-model:input="avance.SPI" type="number" :maxFractionDigits="2" />
         </template>
         <template #footer>
             <Button label="Guardar" severity="success" :loading="avance.processing" @click="guardarAvance()" />

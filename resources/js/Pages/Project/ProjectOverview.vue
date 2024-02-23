@@ -266,7 +266,7 @@ td {
                   {{ project.description }}
                 </h2>
               </div>
-              <div class="flex7 size-full justify-center">
+              <div class="flex size-full justify-center">
                 <Image :src="selectedImage" v-if="selectedImage != '/'" alt="image" preview />
                 <div v-else class="flex justify-center mt-10">
                   <ApplicationLogo height="350" width="350" />

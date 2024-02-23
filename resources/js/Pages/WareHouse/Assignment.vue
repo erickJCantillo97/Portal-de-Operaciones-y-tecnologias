@@ -12,6 +12,7 @@ import Textarea from 'primevue/textarea'
 import Toast from 'primevue/toast';
 import { useToast } from "primevue/usetoast";
 import { usePermissions } from '@/composable/permission';
+import Empty from '@/Components/Empty.vue'
 const { hasRole, hasPermission } = usePermissions()
 const toast = useToast();
 const { confirmDelete } = useSweetalert()
@@ -183,12 +184,21 @@ const clearModal2 = () => {
         <!--CAMPO SELECCIÓN DE EQUIPOS (tools)-->
         <div class="col-span-2">
           <label class="text-md font-semibold">Seleccionar Equipos</label>
-          <Listbox v-model="form.tools" :options="tools" multiple filter optionLabel="name" optionValue="id"
-            :emptyMessage="loading ? 'Cargando equipos, espere un momento por favor...' : 'No se encuentran resultados.'"
-            filterPlaceholder="Seleccione el/los equipo(s) para asignar." class="w-full md:w-14rem"
-            :virtualScrollerOptions="{ itemSize: 38 }" listStyle="height:15rem" :pt="{
+          <Listbox v-model="form.tools" :options="tools" multiple filter :filterFields="['name', 'serial']"
+            optionLabel="name" optionValue="id" filterPlaceholder="Seleccione el/los equipo(s) para asignar."
+            class="w-full md:w-14rem" :virtualScrollerOptions="{ itemSize: 38 }" listStyle="height:15rem" :pt="{
               filterInput: '!text-sm'
-            }" />
+            }">
+            <template #option="slotProps">
+              <div class="items-center flex justify-between">
+                <div> {{ slotProps.option.name }}</div>
+                <div>{{ slotProps.option.serial }}</div>
+              </div>
+            </template>
+            <template #empty>
+              <Empty message="Aun no se agregan buques" />
+            </template>
+          </Listbox>
         </div>
       </section>
     </template>
