@@ -8,7 +8,7 @@ $tmp_dir  = $dir . '/tmp/';
 
 // Force UTF-8 encoding to make sure multi-byte characters returned by bryntum-project-reader-xxx.jar
 // are not corrupted
-// putenv('LANG=en_US.UTF-8');
+putenv('LANG=en_US.UTF-8');
 
 $result = ['success' => true];
 
@@ -35,6 +35,7 @@ try {
     $move_path = $tmp_dir . uniqid();
 
     if (!move_uploaded_file($tmp_file, $move_path)) {
+        unlink($move_path);
         throw new Exception('No se pudo subir el archivo!<br>No tienes permiso de escritura en el servidor');
     }
 
@@ -42,6 +43,7 @@ try {
     exec('java -version', $json, $exec_result);
 
     if ($exec_result > 0) {
+        unlink($move_path);
         throw new Exception('<br>No se pudo procesar el archivo subido!<br>Servidor no tiene java instalado');
     }
 
@@ -50,19 +52,20 @@ try {
 
     $json = shell_exec($shell_command);
     // echo 'llega a json'.$json.' fin json';
-    $jsonencode = mb_convert_encoding($json, 'utf-8');
+    // $jsonencode = mb_convert_encoding($json, 'utf-8');
 
     // echo 'llega a jsonencode'.$jsonencode.' fin jsonencode';
 
+    // ensure the output is actually a JSON string
+    $decoded = json_decode($json,false);
+    // echo 'llega a decoded ' . $decoded . ' fin decoded';
+    if (!$json || !$decoded) {
+        unlink($move_path);
+        throw new Exception('Could not process uploaded file!<br>Command: ' . $shell_command);
+    }
     // cleanup copied file
     unlink($move_path);
-    // ensure the output is actually a JSON string
-    $decoded = json_decode($jsonencode);
-    // echo 'llega a decoded ' . $decoded . ' fin decoded';
-    if (!$jsonencode || !$decoded) {
-        throw new Exception('<br>No se pudo procesar el archivo subido!<br>Intente con otro');
-    }
-
+    
     $result['data'] = $decoded;
 } catch (Exception $e) {
 
