@@ -1,9 +1,10 @@
 <script setup>
 const { confirmDelete } = useSweetalert()
-const { eventListener } = broadcastNotifications()
+const { eventListener } = useBroadcastNotifications()
+const { hasRole, hasPermission } = usePermissions();
 const { toast } = useSweetalert()
 import { usePermissions } from '@/composable/permission';
-import { broadcastNotifications } from '@/composable/broadcastNotifications'
+import { useBroadcastNotifications } from '@/composable/broadcastNotifications'
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { useSweetalert } from '@/composable/sweetAlert'
@@ -11,9 +12,7 @@ import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
-
-
-const { hasRole, hasPermission } = usePermissions()
+import ContractsSlideOver from '@/Components/ContractsSlideOver.vue'
 
 const loading = ref(false)
 
@@ -110,7 +109,15 @@ const formatCurrency = (valor, moneda) => {
     }
 }
 
+const contractData = ref({})
+const openSlideOver = ref(false)
+
+const showClic = (event) => {
+    contractData.value = event.data;
+    openSlideOver.value = true
+}
 //#region broadcast
+// eventListener('contracts', '.ContractsEvent')
 //#endregion
 </script>
 
@@ -118,7 +125,7 @@ const formatCurrency = (valor, moneda) => {
     <AppLayout>
         <div class="h-[89vh] overflow-y-auto">
             <CustomDataTable :data="contracts" :rowsDefault="20" title="Contratos" :columnas="columnas" :actions="buttons"
-                @edit="editItem" @delete="del">
+                @edit="editItem" @delete="del" @rowClic="showClic">
                 <template #buttonHeader>
                     <Button @click="addItem()" severity="success" icon="fa-solid fa-plus" outlined label="Nuevo"
                         v-if="hasPermission('contract create')" />
@@ -198,5 +205,6 @@ const formatCurrency = (valor, moneda) => {
                 </Button>
             </template>
         </CustomModal>
+        <ContractsSlideOver :data="contractData" :show="openSlideOver" @closeSlideOver="openSlideOver = false" />
     </AppLayout>
 </template>

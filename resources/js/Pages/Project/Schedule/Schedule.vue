@@ -1,16 +1,18 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import "@bryntum/gantt/gantt.material.css";
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
 import { BryntumGantt } from '@bryntum/gantt-vue-3';
-import { DateHelper, LocaleManager, StringHelper } from '@bryntum/gantt/gantt.module.js';
+import { AjaxHelper, DateHelper, List, LocaleManager, StringHelper, Widget } from '@bryntum/gantt/gantt.module.js';
 import Slider from 'primevue/slider'
 import { useToast } from "primevue/usetoast";
 import InputText from 'primevue/inputtext';
 import Calendar from 'primevue/calendar';
 import OverlayPanel from 'primevue/overlaypanel';
 import Checkbox from 'primevue/checkbox';
+import CustomModal from '@/Components/CustomModal.vue';
+import FileUpload from 'primevue/fileupload';
 
 const toast = useToast();
 
@@ -36,17 +38,283 @@ const headerTpl = ({ currentPage, totalPages }) => `
 
 const footerTpl = () => `<h3 class="">© ${new Date().getFullYear()} TOP - COTECMAR</h3>`;
 
+//#region funciones
 
-const maximize = () => {
-    let elementGantt = document.getElementById("containergantt");
-    if (elementGantt.requestFullScreen) {
-        elementGantt.requestFullScreen();
-    } else if (elementGantt.mozRequestFullScreen) {
-        elementGantt.mozRequestFullScreen();
-    } else if (elementGantt.webkitRequestFullScreen) {
-        elementGantt.webkitRequestFullScreen();
+if (!Widget.factoryable.registry.resourcelist) {
+    class ResourceList extends List {
+
+        // Factoryable type name
+        static get type() {
+            return 'resourcelist';
+        }
+
+        static get configurable() {
+            return {
+                title: 'Resources',
+                cls: 'b-inline-list',
+                items: [],
+                itemTpl: resource => {
+                    return StringHelper.xss`
+                    <div class="b-resource-detail">
+                        <div class="b-resource-name">${resource.name}</div>
+                        <div class="b-resource-city">
+                            ${resource.unit}
+                        </div>
+                        <div class="b-resource-city">
+                            Costo hora: ${resource.costo_hora}
+                            <i data-btip="Quitar recurso" class="b-icon b-icon-trash"></i>
+                        </div>
+                    </div>`;
+                }
+            };
+        }
+
+        // Called by the owning TaskEditor whenever a task is loaded
+        loadEvent(taskRecord) {
+            this.taskRecord = taskRecord;
+            this.store.data = taskRecord.resources;
+        }
+
+        // Called on item click
+        onItem({ event, record }) {
+            if (event.target.matches('.b-icon-trash')) {
+                // Unassign the clicked resource record from the currehtly loaded task
+                this.taskRecord.unassign(record);
+
+                // Update our store with the new assignment set
+                this.store.data = this.taskRecord.resources;
+            }
+        }
+    }
+    ResourceList.initClass();
+}
+class Importer {
+
+    constructor(config) {
+        this.gantt = config.ganttImport;
+        this.defaultColumns = config.defaultColumns;
+    }
+
+    async importData(data) {
+        const
+            me = this,
+
+            project = new me.gantt.projectModelClass({
+                silenceInitialCommit: false,
+                // To save imported data provide `sync` url and set `autoSync` true, or call `gantt.project.sync()` manually after data is imported.
+                autoSync: false,
+            });
+
+        me.project = project;
+        me.calendarManager = project.calendarManagerStore;
+        me.taskStore = project.taskStore;
+        me.assignmentStore = project.assignmentStore;
+        me.resourceStore = project.resourceStore;
+        me.dependencyStore = project.dependencyStore;
+
+        Object.assign(me, {
+            calendarMap: {},
+            resourceMap: {},
+            taskMap: {}
+        });
+
+        me.importCalendars(data);
+
+        const tasks = me.getTaskTree(Array.isArray(data.tasks) ? data.tasks : [data.tasks]);
+
+        me.importResources(data);
+        me.importAssignments(data);
+
+        me.taskStore.rootNode.appendChild(tasks[0].children);
+
+        me.importDependencies(data);
+
+        me.importProject(data);
+
+        // Assign the new project to the gantt before launching commitAsync()
+        // to let Gantt resolve possible scheduling conflicts
+        me.gantt.project = project;
+
+        await me.project.commitAsync();
+
+        me.importColumns(data);
+
+        return project;
+    }
+
+    // region RESOURCES
+    importResources(data) {
+        this.resourceStore.add(data.resources.map(this.processResource, this));
+    }
+
+    processResource(data) {
+        const { id } = data;
+
+        delete data.id;
+
+        data.calendar = this.calendarMap[data.calendar];
+
+        const resource = new this.resourceStore.modelClass(data);
+
+        this.resourceMap[id] = resource;
+
+        return resource;
+    }
+    // endregion
+
+    // region DEPENDENCIES
+    importDependencies(data) {
+        this.dependencyStore.add(data.dependencies.map(this.processDependency, this));
+    }
+
+    processDependency(data) {
+        const
+            me = this,
+            { fromEvent, toEvent } = data;
+
+        delete data.id;
+
+        const dep = new me.dependencyStore.modelClass(data);
+
+        dep.fromEvent = me.taskMap[fromEvent].id;
+        dep.toEvent = me.taskMap[toEvent].id;
+
+        return dep;
+    }
+    // endregion
+
+    // region ASSIGNMENTS
+    importAssignments(data) {
+        this.assignmentStore.add(data.assignments.map(this.processAssignment, this));
+    }
+
+    processAssignment(data) {
+        const me = this;
+
+        delete data.id;
+
+        return new me.assignmentStore.modelClass({
+            units: data.units,
+            event: me.taskMap[data.event],
+            resource: me.resourceMap[data.resource]
+        });
+    }
+    // endregion
+
+    // region TASKS
+    getTaskTree(tasks) {
+        return tasks.map(this.processTask, this);
+    }
+
+    processTask(data) {
+        const
+            me = this,
+            { id, children } = data;
+
+        delete data.children;
+        delete data.id;
+        delete data.milestone;
+
+        data.calendar = me.calendarMap[data.calendar];
+
+        const t = new me.taskStore.modelClass(data);
+
+        if (children) {
+            t.appendChild(me.getTaskTree(children));
+        }
+
+        t._id = id;
+        me.taskMap[t._id] = t;
+
+        return t;
+    }
+    // endregion
+
+    // region CALENDARS
+    processCalendarChildren(children) {
+        return children.map(this.processCalendar, this);
+    }
+
+    processCalendar(data) {
+        const
+            me = this,
+            { id, children } = data,
+            intervals = data.intervals;
+
+        delete data.children;
+        delete data.id;
+
+        const t = new me.calendarManager.modelClass(Object.assign(data, { intervals }));
+
+        if (children) {
+            t.appendChild(me.processCalendarChildren(children));
+        }
+
+        t._id = id;
+        me.calendarMap[t._id] = t;
+
+        return t;
+    }
+
+    // Entry point of calendars loading
+    importCalendars(data) {
+        this.calendarManager.add(this.processCalendarChildren(data.calendars.children));
+    }
+    // endregion
+
+    // region Columns
+
+    importColumns(data) {
+        let columns = data.columns.map(this.processColumn, this).filter(column => column);
+
+        const columnStore = this.gantt.subGrids.locked.columns;
+
+        // if no columns extracted apply default set (if configured)
+        if (!columns.length && this.defaultColumns) {
+            columns = this.defaultColumns;
+        }
+
+        if (columns.length) {
+            columnStore.removeAll(true);
+            columnStore.add(columns);
+        }
+    }
+
+    processColumn(data) {
+        const columnClass = this.gantt.columns.constructor.getColumnClass(data.type);
+
+        // ignore unknown columns (or columns that classes are not loaded)
+        if (columnClass) {
+            return Object.assign({ region: 'locked' }, data);
+        }
+    }
+
+    // endregion
+
+    importProject(data) {
+        if ('calendar' in data.project) {
+            data.project.calendar = this.calendarMap[data.project.calendar];
+        }
+        Object.assign(this.project, data.project);
     }
 }
+//#endregion
+onMounted(() => {
+    onExpandAllClick()
+    editMode()
+})
+
+
+
+const full = ref(false)
+const readOnly = ref()
+
+const editMode = () => {
+    let gantt = ganttref.value.instance.value
+    gantt.readOnly = !gantt.readOnly
+    readOnly.value = gantt.readOnly
+}
+
 const features = ref(
     {
         filter: true,
@@ -116,6 +384,7 @@ const features = ref(
             renderer: baselineRenderer
         },
     })
+
 const ganttConfig = ref({
     rowHeight: 28,
     dependencyIdField: 'sequenceNumber',
@@ -136,19 +405,22 @@ const ganttConfig = ref({
             }
         },
         validateResponse: true,
-        // listeners: {
-        //     syncFail: (e) => {
-        //         gantt.unmaskBody();
-        //         toast('Ha ocurrido un error, reiniciando...', 'error');
-        //         setTimeout(() => { location.reload() }, 3000);
-        //     },
-        //     beforeSync: () => {
-        //         loading.value = true
-        //     },
-        //     sync: (e) => {
-        //         loading.value = false
-        //     }
-        // }
+        listeners: {
+            syncFail: (e) => {
+                console.log(e)
+                toast('Ha ocurrido un error, reiniciando...', 'error');
+                setTimeout(() => { location.reload() }, 3000);
+            },
+            beforeSync: () => {
+                loading.value = true
+            },
+            sync: (e) => {
+                loading.value = false
+            },
+            load: () => {
+                onExpandAllClick()
+            }
+        }
     },
     columns: [
         { id: 'wbs', type: 'wbs', text: 'EDT' },
@@ -237,9 +509,6 @@ const ganttConfig = ref({
     features: features
 })
 
-
-
-
 //#region toolbar
 
 
@@ -289,6 +558,24 @@ const onCollapseAllClick = () => {
 // const onRedo = () => {
 //     console.log(gantt.value.project)
 // }
+const zoom = ref()
+function onZoomInClick() {
+    let gantt = ganttref.value.instance.value
+    gantt.zoomIn();
+}
+
+function onZoomOutClick() {
+    let gantt = ganttref.value.instance.value
+    gantt.zoomOut();
+}
+
+function onZoomToFitClick() {
+    let gantt = ganttref.value.instance.value
+    gantt.zoomToFit({
+        leftMargin: 50,
+        rightMargin: 50
+    });
+}
 
 const fecha = ref()
 function onStartDateChange(event) {
@@ -360,10 +647,10 @@ const onExportPDF = () => {
     gantt.features.pdfExport.showExportDialog();
 }
 
-const setConf=ref()
-const rowHeight=ref()
-const barMargin=ref()
-const barMarginMax=ref()
+const setConf = ref()
+const rowHeight = ref()
+const barMargin = ref()
+const barMarginMax = ref()
 
 const onSettingsShow = (event) => {
     let gantt = ganttref.value.instance.value
@@ -383,18 +670,131 @@ const onSettingsMarginChange = () => {
     let gantt = ganttref.value.instance.value
     gantt.barMargin = barMargin.value;
 }
+const modalImport = ref(false)
+const fileMSP = ref()
+const ganttrefimport = ref()
+const ganttConfigImporter = ref({
+    emptyText: 'Seleccione un archivo',
+    startDate: '2023-01-08',
+    endDate: '2023-04-01',
+    rowHeight: 28,
+    dependencyIdField: 'sequenceNumber',
+    columns: [
+        { id: 'wbs', type: 'wbs', text: 'EDT' },
+        { id: 'name', type: 'name', },
+        { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true },
+        { id: 'duration', type: 'duration', text: 'Duración' },
+        { id: 'startdate', type: 'startdate', text: 'Fecha Inicio' },
+        { id: 'enddate', type: 'enddate', text: 'Fecha fin' },
+        { type: 'addnew', text: 'Añadir Columna' },
+    ],
+    subGridConfigs: {
+        locked: {
+            flex: 1
+        },
+        normal: {
+            flex: 1
+        }
+    },
+}
+)
+const uploadMSP = async (file) => {
+    let ganttImport = ganttrefimport.value.instance.value
+    let projectLoaderScript = '/modImport/php/load.php'
+    const importer = new Importer({
+        // gantt panel reference
+        ganttImport,
+        // Columns that should be shown by the Gantt
+        // if the imported file does not provide columns list
+        defaultColumns: [
+            { id: 'wbs', type: 'wbs', text: 'EDT' },
+            { id: 'name', type: 'name', },
+            { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true },
+            { id: 'duration', type: 'duration', text: 'Duración' },
+            { id: 'startdate', type: 'startdate', text: 'Fecha Inicio' },
+            { id: 'enddate', type: 'enddate', text: 'Fecha fin' },
+            { type: 'addnew', text: 'Añadir Columna' },
+        ]
+    });
+    const formData = new FormData();
+
+    formData.append('mpp-file', file);
+
+    ganttImport.maskBody('Importando, espere por favor ...');
+
+    try {
+        const { parsedJson } = await AjaxHelper.post(projectLoaderScript, formData, { parseJson: true });
+        if (parsedJson.success && parsedJson.data) {
+            const { project } = ganttImport;
+            // Import the uploaded mpp-file data (will make a new project and assign it to the gantt)
+            await importer.importData(parsedJson.data);
+            // destroy old project
+            project.destroy();
+            // set the view start date to the loaded project start
+            ganttImport.setStartDate(ganttImport.project.startDate);
+            await ganttImport.scrollToDate(ganttImport.project.startDate, { block: 'start' });
+            // input.clear();
+            // remove "Importing project ..." mask
+            ganttImport.unmaskBody();
+            // Toast.show('Importado con exito!');
+        }
+        else {
+            console.log('Error al importar:' + parsedJson.msg);
+            // onError(`Error al importar: ${parsedJson.msg}`);
+        }
+    }
+    catch (error) {
+        console.log('Error al importar:' + error);
+    }
+}
+
+const importMSP = async () => {
+    let ganttImport = ganttrefimport.value.instance.value
+    let gantt = ganttref.value.instance.value
+    const project = ref({
+        autoSync: false,
+        autoLoad: false,
+        transport: {
+            sync: {
+                url: route('syncGantt', props.project),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                credentials: 'include'
+            }
+        },
+        validateResponse: true,
+        listeners: {
+            syncFail: (e) => {
+                console.log(e)
+                toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
+                // setTimeout(() => { location.reload() }, 3000);
+            },
+        }
+    })
+    Object.assign(ganttImport.project, project.value)
+    await ganttImport.project.sync()
+    await gantt.project.load()
+    modalImport.value = false
+}
+
 
 //#endregion
 
 </script>
 <template>
     <AppLayout>
-        <div class="h-[89vh] flex flex-col overflow-y-auto gap-y-1">
-            <div class="rounded-t-lg h-8 flex space-x-0.5">
-                <p
-                    class="text-md w-full pl-3 bg-blue-800 flex items-center rounded-tl-lg font-semibold capitalize text-white">
-                    {{ props.project.name }}
-                </p>
+        <div id="ganttContainer" :class="full ? 'fixed bg-white z-50 top-0 left-0 h-screen w-screen' : 'h-[89vh]'"
+            class="flex flex-col overflow-y-auto gap-y-1">
+            <div class="rounded-t-lg h-8 flex justify-between">
+                <span class="bg-blue-800 flex justify-between rounded-tl-lg w-full">
+                    <p class="text-md pl-3 flex items-center font-semibold capitalize text-white">
+                        {{ props.project.name }}
+                    </p>
+                    <p :class="readOnly ? 'bg-success text-white font-bold ' : 'text-white bg-danger animate-pulse'"
+                        class="px-3 flex items-center">{{ readOnly ? 'Modo lectura' : 'Modo edicion' }}</p>
+                </span>
                 <span v-if="!error"
                     v-tooltip.bottom="loading ? 'Sincronizando cambios...' : 'Todos los cambios estan guardados'"
                     class="w-48 justify-end cursor-default px-2 flex items-center space-x-2 text-white bg-success rounded-tr-lg">
@@ -408,40 +808,49 @@ const onSettingsMarginChange = () => {
                     <i class="fa-solid fa-triangle-exclamation"></i>
                 </span>
             </div>
-            <span class="flex justify-between">
+            <span class="flex justify-between px-1">
                 <span class="flex space-x-1">
-                    <Button raised icon="fa-solid fa-plus" v-tooltip="'Nueva actividad'" severity="success"
-                        @click=onAddTaskClick() />
-                    <Button raised icon="fa-solid fa-pen" v-tooltip="'Editar Actividad'" severity="warning"
-                        @click="onEditTaskClick()" />
+                    <Button raised icon="fa-solid fa-plus" v-tooltip.bottom="'Nueva actividad'" severity="success"
+                        @click=onAddTaskClick() v-if="!readOnly" />
+                    <Button raised icon="fa-solid fa-pen" v-tooltip.bottom="'Editar Actividad'" severity="warning"
+                        @click="onEditTaskClick()" v-if="!readOnly" />
                     <!-- <Button icon="fa-solid fa-rotate-left" severity="secondary" @click="onUndo()" />
                             <Button icon="fa-solid fa-rotate-right" severity="secondary" @click="onRedo()" /> -->
-                    <Button raised icon="fa-solid fa-chevron-down" v-tooltip="'Expandir todo'" severity="secondary"
+                    <Button raised icon="fa-solid fa-chevron-down" v-tooltip.bottom="'Expandir todo'" severity="secondary"
                         @click="onExpandAllClick()" />
-                    <Button raised icon="fa-solid fa-chevron-up" v-tooltip="'Contraer todo'" severity="secondary"
+                    <Button raised icon="fa-solid fa-chevron-up" v-tooltip.bottom="'Contraer todo'" severity="secondary"
                         @click="onCollapseAllClick()" />
-                    <Button raised icon="fa-solid fa-gear" v-tooltip="'Ajustes'" severity="secondary"
+                    <Button raised icon="fa-solid fa-gear" v-tooltip.bottom="'Ajustes'" severity="secondary"
                         @click="onSettingsShow" />
-                    <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange"
+                    <Button raised icon="fa-solid fa-magnifying-glass" v-tooltip.bottom="'Zoom'" severity="secondary"
+                        @click="zoom.toggle($event)" />
+                    <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange()"
                         placeholder="Buscar por fecha" class=" !h-8 shadow-md" showIcon :pt="{ input: '!h-8' }" />
                     <InputText v-model="texto" @input="onFilterChange" placeholder="Buscar por actividad"
                         class="shadow-md" />
-                    <Button raised v-tooltip="'Guardar en linea base'" icon="fa-solid fa-grip-lines"
-                        @click="setLB.toggle($event);" />
-                    <Button raised v-tooltip="'Ver lineas base'" icon="fa-solid fa-eye" @click="seeLB.toggle($event)" />
-                    <Button raised v-tooltip="'Exportar a PDF'" icon="fa-solid fa-file-pdf" @click="onExportPDF" />
-                    <Button raised v-tooltip="'Exportar a XML'" icon="fa-solid fa-file-arrow-down" @click="onExport" />
+                    <Button raised v-tooltip.bottom="'Guardar en linea base'" icon="fa-solid fa-grip-lines"
+                        @click="setLB.toggle($event);" v-if="!readOnly" />
+                    <Button raised v-tooltip.bottom="'Ver lineas base'" icon="fa-solid fa-eye"
+                        @click="seeLB.toggle($event)" />
+                    <Button raised v-tooltip.bottom="'Exportar a PDF'" icon="fa-solid fa-file-pdf" @click="onExportPDF()" />
+                    <Button raised v-tooltip.bottom="'Exportar a XML'" icon="fa-solid fa-file-arrow-down"
+                        @click="onExport()" />
+                    <Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input"
+                        icon="fa-solid fa-upload" @click="modalImport = true" />
                 </span>
-                <span>
-                    <Button v-tooltip.left="'Pantalla completa'" icon="fa-solid fa-maximize" severity="help" raised
-                        @click="maximize" />
+                <span class="flex space-x-1">
+                    <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"
+                        :icon="readOnly ? 'fa-solid fa-pen-to-square' : 'fa-solid fa-eye'" severity="help" raised
+                        @click="editMode" />
+                    <Button v-tooltip.left="full ? 'Pantalla normal' : 'Pantalla completa'"
+                        :icon="full ? 'fa-solid fa-minimize' : 'fa-solid fa-maximize'" severity="help" raised
+                        @click="full = !full" />
                 </span>
             </span>
-            <BryntumGantt id="containergantt" :features="features.features" ref="ganttref" class="h-full"
-                v-bind="ganttConfig" />
+            <BryntumGantt ref="ganttref" class="h-full" v-bind="ganttConfig" />
         </div>
     </AppLayout>
-    <OverlayPanel ref="setLB" :pt="{ content: '!p-1' }">
+    <OverlayPanel id="setLB" ref="setLB" :pt="{ content: '!p-1' }">
         <div class="flex flex-col space-y-1">
             <p>Lineas base</p>
             <span v-for="index in 4">
@@ -449,7 +858,7 @@ const onSettingsMarginChange = () => {
             </span>
         </div>
     </OverlayPanel>
-    <OverlayPanel ref="seeLB" :pt="{ content: '!p-1' }">
+    <OverlayPanel id="seeLB" ref="seeLB" :pt="{ content: '!p-1' }">
         <div class="flex flex-col space-y-1">
             <p>Lineas base</p>
             <span v-for="index in 4">
@@ -461,18 +870,45 @@ const onSettingsMarginChange = () => {
             </span>
         </div>
     </OverlayPanel>
-    <OverlayPanel ref="setConf" :pt="{ content: '!p-4' }">
+    <OverlayPanel id="setConf" ref="setConf" :pt="{ content: '!p-4' }">
         <div class="flex flex-col h space-y-3">
             <span>
                 <Slider v-model="rowHeight" @change="onSettingsRowHeightChange" />
-                <p>Altura de celdas ({{rowHeight}})</p>
+                <p>Altura de celdas ({{ rowHeight }})</p>
             </span>
             <span>
-                <Slider v-model="barMargin" :max="barMarginMax" @change="onSettingsMarginChange"/>
+                <Slider v-model="barMargin" :max="barMarginMax" @change="onSettingsMarginChange" />
                 <p>Altura de barras ({{ barMargin }})</p>
             </span>
         </div>
     </OverlayPanel>
+    <OverlayPanel id="zoom" ref="zoom" :pt="{ content: '!p-2' }">
+        <div class="flex space-x-1">
+            <Button raised icon="fa-solid fa-magnifying-glass-plus" v-tooltip.bottom="'Aumentar'" severity="primary"
+                @click="onZoomInClick()" />
+            <Button raised icon="fa-solid fa-magnifying-glass-minus" v-tooltip.bottom="'Reducir'" severity="warning"
+                @click="onZoomOutClick()" />
+            <Button raised icon="fa-solid fa-xmark" v-tooltip.bottom="'Reestablecer'" severity="danger"
+                @click="onZoomToFitClick()" />
+        </div>
+    </OverlayPanel>
+    <CustomModal v-model:visible="modalImport" icon="fa-solid fa-upload" titulo="Importar desde project">
+        <template #body>
+            <div class="w-full flex h-[70vh] flex-col">
+                <div class="flex space-x-4 items-center">
+                    <p>Seleccione el archivo a importar</p>
+                    <FileUpload mode="basic" class="h-8" v-model:input="fileMSP" accept=".mpp"
+                        @select="uploadMSP($event.files[0])" />
+                </div>
+                <BryntumGantt ref="ganttrefimport" class="h-full" v-bind="ganttConfigImporter" />
+            </div>
+        </template>
+        <template #footer>
+            <Button severity="danger" label="Cancelar" />
+            <Button severity="success" label="Importar" @click="importMSP" />
+        </template>
+
+    </CustomModal>
 </template>
 <style>
 /* .b-export .b-panel {
