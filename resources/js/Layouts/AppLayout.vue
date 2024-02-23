@@ -251,10 +251,10 @@ import {
     QuestionMarkCircleIcon,
     XCircleIcon
 } from '@heroicons/vue/20/solid'
-const { eventListener, handleDataEvents } = broadcastNotifications()
+const { eventListener, handleDataEvents } = useBroadcastNotifications()
 const { toast } = useSweetalert()
 import "@/composable/push.min.js"
-import { broadcastNotifications } from '@/composable/broadcastNotifications'
+import { useBroadcastNotifications } from '@/composable/broadcastNotifications'
 import { useSweetalert } from '@/composable/sweetAlert'
 import Button from '@/Components/Button.vue'
 import ConfirmPopup from 'primevue/confirmpopup';

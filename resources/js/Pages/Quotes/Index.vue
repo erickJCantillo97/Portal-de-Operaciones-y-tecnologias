@@ -63,7 +63,6 @@ const showClic = (event) => {
     quote.value = event.data;
     openSlideOver.value = true
 }
-
 </script>
 
 <template>
