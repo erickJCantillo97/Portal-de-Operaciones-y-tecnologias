@@ -1,7 +1,6 @@
 <script setup>
 const { confirmDelete } = useSweetalert()
 const { eventListener } = broadcastNotifications()
-const { hasRole, hasPermission } = usePermissions();
 const { toast } = useSweetalert()
 import { usePermissions } from '@/composable/permission';
 import { broadcastNotifications } from '@/composable/broadcastNotifications'
@@ -12,6 +11,9 @@ import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
+
+
+const { hasRole, hasPermission } = usePermissions()
 
 const loading = ref(false)
 
@@ -109,7 +111,6 @@ const formatCurrency = (valor, moneda) => {
 }
 
 //#region broadcast
-eventListener('contracts', '.ContractsEvent')
 //#endregion
 </script>
 
