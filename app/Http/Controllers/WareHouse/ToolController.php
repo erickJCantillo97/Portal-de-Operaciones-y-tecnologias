@@ -30,7 +30,7 @@ class ToolController extends Controller
         //     $wareHousee = Warehouse::firstOrCreate([
         //         'name' => 'Almacen ' .  $oficina,
         //         'gerencia' => $user->gerencia,
-        //         '' =>  $oficina
+        //         'department' =>  $oficina
         //     ]);
         //     $tool->warehouse_id = $wareHousee->id;
         //     $tool->save();
@@ -95,6 +95,8 @@ class ToolController extends Controller
             $validateData['code'] = $this->createCode($validateData);
             $validateData['is_small'] = 0;
             // $validateData['criticidad'] = 0;
+            $warehouse = Warehouse::where('department', auth()->user()->oficina)->first()->id ?? 4;
+            $validateData['warehouse_id'] = $warehouse;
             Tool::create($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
@@ -148,7 +150,7 @@ class ToolController extends Controller
     {
         $validateData = $request->validate([
             'category_id' => 'required',
-            'serial' => 'required|unique:tools,serial,' . $tool->id,
+            'serial' => 'required',
             'SAP_code' => 'nullable|string',
             'value' => 'required',
             'brand' => 'nullable',
