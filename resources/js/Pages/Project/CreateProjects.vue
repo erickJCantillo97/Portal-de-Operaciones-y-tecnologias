@@ -359,9 +359,10 @@ const saveweekTask = () => {
                                 optionLabel="name" v-model:input="authorizationSelect" showClear :options="authorizations"
                                 :errorMessage="$page.props.errors.authorization_id"
                                 :invalid="$page.props.errors.authorization_id ? true : false" />
+
                             <CustomInput label="Estimaciones" type="dropdown" placeholder="Seleccione Estimación"
-                                optionLabel="name" v-model:input="formData.quote_id" optionValue="id" showClear
-                                :options="quotes" :errorMessage="$page.props.errors.quote_id"
+                                optionLabel="consecutive" v-model:input="formData.quote_id" optionValue="id" showClear
+                                :options="Object.values(quotes)" :errorMessage="$page.props.errors.quote_id"
                                 :invalid="$page.props.errors.quote_id ? true : false" />
                         </div>
                     </tab-content>
@@ -371,8 +372,8 @@ const saveweekTask = () => {
                         <!--CAMPO SUPERVISOR (supervisor)-->
                         <div class="sm:grid sm:grid-cols-2 border gap-4 rounded-lg p-4">
 
-                            <CustomInput label="Gerente de Proyecto" placeholder="Nombre del Gerente de Proyecto" optionLabel="name"
-                                optionValue="name" :options="Object.values(gerentes)" type="dropdown"
+                            <CustomInput label="Gerente de Proyecto" placeholder="Nombre del Gerente de Proyecto"
+                                optionLabel="name" optionValue="name" :options="Object.values(gerentes)" type="dropdown"
                                 v-model:input="formData.supervisor" @change="console.log($event)" />
 
                             <!--CAMPO TIPO DE PROYECTO (type)-->

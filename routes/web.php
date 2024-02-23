@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Mail\AssignmentToolsMail;
+use App\Models\Project\ProgressProjectWeek;
 use App\Models\Projects\Contract;
 use App\Models\Projects\ProjectsShip;
 use App\Models\Projects\Ship;
@@ -357,3 +358,12 @@ Route::get('/mailable', function () {
 Route::post('/prueba', function (Request $request) {
     return back()->withErrors(['errors' => ['messaje', 'default1', 'messaje1', 'default2', 'messaje4', 'default4', 'messaje', 'default',]]);
 })->name('prueba');
+
+
+Route::get('quitar-curvaS', function () {
+    $projects = Project::find(144);
+    ProgressProjectWeek::where('project_id', 144)->update([
+        'planned_progress' => 0,
+        'real_progress' => 0
+    ]);
+});

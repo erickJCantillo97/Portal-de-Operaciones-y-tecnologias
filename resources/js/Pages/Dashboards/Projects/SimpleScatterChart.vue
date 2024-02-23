@@ -70,7 +70,6 @@ const option = ref({
     }
   },
   xAxis: {
-    max: 4,
     name: 'CPI'
     // splitLine: {
     //   lineStyle: {
@@ -113,7 +112,6 @@ const option = ref({
   yAxis: {
     // min: 0.970,
     name: 'SPI',
-    max: 4
   },
   series: props.series,
 })

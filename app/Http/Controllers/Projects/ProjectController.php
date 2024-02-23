@@ -12,6 +12,7 @@ use App\Models\Projects\Project;
 use App\Models\Projects\ProjectsShip;
 use App\Models\Projects\Ship;
 use App\Models\Quotes\Quote;
+use App\Models\Quotes\QuoteVersion;
 use App\Models\VirtualTask;
 use Carbon\Carbon;
 use Exception;
@@ -44,7 +45,9 @@ class ProjectController extends Controller
     {
         $contracts = Contract::orderBy('contract_id')->get();
         $authorizations = Authorization::orderBy('contract_id')->get();
-        $quotes = Quote::get();
+        $quotes = QuoteVersion::with('customer')->get()->filter(function ($quote) {
+            return $quote['get_status'] === 'Contratada';
+        });
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
         $gerentes = getPersonalGerenciaOficina('GECON', 'DEGPC')->map(function ($estimador) {
             return [
@@ -128,7 +131,9 @@ class ProjectController extends Controller
     {
         $contracts = Contract::get();
         $authorizations = Authorization::orderBy('contract_id')->get();
-        $quotes = Quote::get();
+        $quotes = QuoteVersion::with('customer')->get()->filter(function ($quote) {
+            return $quote['get_status'] === 'Contratada';
+        })->toArray();
         $milestones = Milestone::where('project_id', $project->id)->get();
         $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
         $projectShips = ProjectsShip::with('ship')->where('project_id', $project->id)->get();
