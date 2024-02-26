@@ -286,7 +286,7 @@ const buttons = [
                         </div>
                         <div class="block space-y-4 h-[320px] custom-scroll overflow-y-auto shadow-lg rounded-lg p-2">
                             <div v-for="persona of form.users" class="flex justify-between">
-                                <UserTable :user="persona" :photo="true">
+                                <UserTable :user="persona" :photo="false">
                                 </UserTable>
                                 <div>
                                     <Button severity="danger" @click="quitar(persona)" icon="fa-regular fa-trash-can" text>

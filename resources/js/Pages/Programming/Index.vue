@@ -205,10 +205,12 @@ const toggle = (event, horario) => {
                 </span>
                 <div class="flex items-center space-x-2">
                     <span class="p-buttonset">
-                        <Button label="Hoy" :outlined="optionValue != 'today'" @click="getTask('today')" />
-                        <Button label="Mañana" :outlined="optionValue != 'tomorrow'" @click="getTask('tomorrow')" />
+                        <Button label="Semana Actual" :outlined="optionValue != 'today'" @click="getTask('today')" />
+                        <Button label="Proxima Semana" :outlined="optionValue != 'today'" @click="getTask('today')" />
+                        <!-- <Button label="Mañana" :outlined="optionValue != 'tomorrow'" @click="getTask('tomorrow')" /> -->
                     </span>
-                    <CustomInput type="date" id="date" v-model:input="date" @change="getTask('date')" />
+                    <CustomInput type="week" v-model:input="date" @change="getTask('date')" />
+                    <!-- <CustomInput type="date" id="date" v-model:input="date" @change="getTask('date')" /> -->
                 </div>
             </span>
             <!--#region LISTA PERSONAL-->

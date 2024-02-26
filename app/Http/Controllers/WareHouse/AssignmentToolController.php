@@ -24,7 +24,7 @@ class AssignmentToolController extends Controller
      */
     public function index()
     {
-        $assignmentsTool = AssignmentTool::where('status', 'ASIGNADO')->with('tool', 'project')->get();
+        $assignmentsTool = AssignmentTool::has('tool')->where('status', 'ASIGNADO')->with('tool', 'project')->get();
         $projects = Project::orderBy('created_at', 'DESC')->get();
         $warehouse = Warehouse::where('department', auth()->user()->oficina)->first()->id ?? 4;
         $tools = Tool::where('warehouse_id', $warehouse)->with('category', 'warehouse')->orderBy('category_id')->where('estado', '!=', 'ASIGNADO')->get();
