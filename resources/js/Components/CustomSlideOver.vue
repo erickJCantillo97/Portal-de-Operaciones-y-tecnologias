@@ -393,7 +393,7 @@ const formatCurrency = (value) => {
                 </div>
                 <div>
                     <label for="dd-city">Seleccione Fecha</label>
-                    <Calendar v-model="dateSelected" showIcon :manualInput="true" placeholder="Fecha Inicio de Reunión" />
+                    <Calendar v-model="dateSelected" showIcon :manualInput="true" placeholder="Fecha de Estado" />
                 </div>
                 <div class="mt-8">
                     <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" size="small"
