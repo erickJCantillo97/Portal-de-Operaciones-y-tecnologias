@@ -81,10 +81,10 @@ class ScheduleController extends Controller
         $assgimentRows = [];
         if (isset($request->tasks['added'])) {
             foreach ($request->tasks['added'] as $task) {
-                if (!isset($task['parentID'])) {
+                if (!isset($task['parentId'])) {
                     $parentID = null;
                 } else {
-                    $parentID = Task::Where('id', $task['parentId'])->first()->id;
+                    $parentID = Task::Where('id', $task['parentId'])->first()->id ?? null;
                     foreach ($rows as $row) {
                         if ($row['$PhantomId'] == $task['parentId']) {
                             $parentID = $row['id'];

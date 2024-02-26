@@ -504,7 +504,6 @@ const ganttConfig = ref({
         'Ctrl+Shift+Q': 'addSubTask',
         'Ctrl+i': 'indent',
         'Ctrl+o': 'outdent',
-        // 'Ctrl+z': 'outdent',
     },
     features: features
 })
@@ -551,13 +550,13 @@ const onCollapseAllClick = () => {
     gantt.collapseAll();
 }
 
-// const onUndo = () => {
-//     let gantt = ganttref.value.instance.value
-//     console.log(gantt)
-// }
-// const onRedo = () => {
-//     console.log(gantt.value.project)
-// }
+const onUndo = () => {
+    let gantt = ganttref.value.instance.value
+    console.log(gantt)
+}
+const onRedo = () => {
+    console.log(gantt.value.project)
+}
 const zoom = ref()
 function onZoomInClick() {
     let gantt = ganttref.value.instance.value
@@ -580,11 +579,6 @@ function onZoomToFitClick() {
 const fecha = ref()
 function onStartDateChange(event) {
     let gantt = ganttref.value.instance.value
-    console.log(event)
-    // if (!oldValue) {
-    //     // ignore initial set
-    //     return;
-    // }
 
     gantt.startDate = DateHelper.add(event, -1, "week");
 
@@ -698,6 +692,7 @@ const ganttConfigImporter = ref({
     },
 }
 )
+const btnImport=ref(true)
 const uploadMSP = async (file) => {
     let ganttImport = ganttrefimport.value.instance.value
     let projectLoaderScript = '/modImport/php/load.php'
@@ -737,20 +732,23 @@ const uploadMSP = async (file) => {
             // remove "Importing project ..." mask
             ganttImport.unmaskBody();
             // Toast.show('Importado con exito!');
+            btnImport.value=false
         }
         else {
         console.log('Error al importar')
             console.log(parsedJson.msg);
+            toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
             // onError(`Error al importar: ${parsedJson.msg}`);
         }
     }
     catch (error) {
-        console.log('Error al importar')
+        toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
         console.log( error);
     }
 }
-
+const loadImport=ref(false)
 const importMSP = async () => {
+    loadImport.value=true
     let ganttImport = ganttrefimport.value.instance.value
     let gantt = ganttref.value.instance.value
     const project = ref({
@@ -779,6 +777,7 @@ const importMSP = async () => {
     await ganttImport.project.sync()
     await gantt.project.load()
     modalImport.value = false
+    loadImport.value=false
 }
 
 
@@ -789,7 +788,7 @@ const importMSP = async () => {
     <AppLayout>
         <div id="ganttContainer" :class="full ? 'fixed bg-white z-50 top-0 left-0 h-screen w-screen' : 'h-[89vh]'"
             class="flex flex-col overflow-y-auto gap-y-1">
-            <div class="rounded-t-lg h-8 flex justify-between">
+            <div class="rounded-t-lg h-8 flex justify-between cursor-default">
                 <span class="bg-blue-800 flex justify-between rounded-tl-lg w-full">
                     <p class="text-md pl-3 flex items-center font-semibold capitalize text-white">
                         {{ props.project.name }}
@@ -799,7 +798,7 @@ const importMSP = async () => {
                 </span>
                 <span v-if="!error"
                     v-tooltip.bottom="loading ? 'Sincronizando cambios...' : 'Todos los cambios estan guardados'"
-                    class="w-48 justify-end cursor-default px-2 flex items-center space-x-2 text-white bg-success rounded-tr-lg">
+                    class="w-48 justify-end px-2 flex items-center space-x-2 text-white bg-success rounded-tr-lg">
                     <p class="w-full text-center font-bold">{{ loading ? 'Sincronizando...' : 'Sincronizado' }}</p>
                     <i :class="loading ? 'fa-solid fa-spinner animate-spin' : 'fa-regular fa-circle-check'"
                         class="text-xl" />
@@ -839,6 +838,8 @@ const importMSP = async () => {
                         @click="onExport()" />
                     <Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input"
                         icon="fa-solid fa-upload" @click="modalImport = true" />
+                        <Button raised v-tooltip.bottom="'undo'" icon="fa-solid fa-file-arrow-down"
+                        @click="onUndo" />
                 </span>
                 <span class="flex space-x-1">
                     <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"
@@ -906,8 +907,8 @@ const importMSP = async () => {
             </div>
         </template>
         <template #footer>
-            <Button severity="danger" label="Cancelar" />
-            <Button severity="success" label="Importar" @click="importMSP" />
+            <Button severity="danger" label="Cancelar" :disabled="loadImport" @click="modalImport=false" />
+            <Button severity="success" :loading="loadImport" label="Importar" :disabled="btnImport" @click="importMSP" />
         </template>
 
     </CustomModal>
