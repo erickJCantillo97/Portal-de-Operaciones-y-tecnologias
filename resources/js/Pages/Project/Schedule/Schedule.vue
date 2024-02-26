@@ -383,11 +383,15 @@ const features = ref(
 
             renderer: baselineRenderer
         },
+        cellEdit:{
+            addNewAtEnd:false,
+        }
     })
 
 const ganttConfig = ref({
     rowHeight: 28,
     dependencyIdField: 'sequenceNumber',
+    // continueEditingOnCellClick:false,
     project: {
         autoSync: true,
         autoLoad: true,
@@ -420,7 +424,7 @@ const ganttConfig = ref({
             load: () => {
                 onExpandAllClick()
             }
-        }
+        },
     },
     columns: [
         { id: 'wbs', type: 'wbs', text: 'EDT' },
@@ -501,11 +505,11 @@ const ganttConfig = ref({
     },
     keyMap: {
         // This is a function from the existing Gantt API
-        'Ctrl+Shift+Q': 'addSubTask',
+        'Ctrl+Shift+Q': () =>onAddTaskClick(),
         'Ctrl+i': 'indent',
         'Ctrl+o': 'outdent',
     },
-    features: features
+    features: features,
 })
 
 //#region toolbar
@@ -518,7 +522,7 @@ const onAddTaskClick = async () => {
         name: "Nueva tarea",
         duration: 1
     });
-
+    gantt.indent(added)
     // wait for immediate commit to calculate new task fields
     await gantt.project.commitAsync();
 
@@ -551,11 +555,11 @@ const onCollapseAllClick = () => {
 }
 
 const onUndo = () => {
-    let gantt = ganttref.value.instance.value
-    console.log(gantt)
-}
-const onRedo = () => {
-    console.log(gantt.value.project)
+//     let gantt = ganttref.value.instance.value
+//     console.log(gantt)
+// }
+// const onRedo = () => {
+//     console.log(gantt.value.project)
 }
 const zoom = ref()
 function onZoomInClick() {
@@ -769,7 +773,7 @@ const importMSP = async () => {
             syncFail: (e) => {
                 console.log(e)
                 toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
-                // setTimeout(() => { location.reload() }, 3000);
+                loadImport.value=false
             },
         }
     })
@@ -793,7 +797,7 @@ const importMSP = async () => {
                     <p class="text-md pl-3 flex items-center font-semibold capitalize text-white">
                         {{ props.project.name }}
                     </p>
-                    <p :class="readOnly ? 'bg-success text-white font-bold ' : 'text-white bg-danger animate-pulse'"
+                    <p :class="readOnly ? 'bg-success text-white font-bold ' : 'text-white bg-warning '"
                         class="px-3 flex items-center">{{ readOnly ? 'Modo lectura' : 'Modo edicion' }}</p>
                 </span>
                 <span v-if="!error"
@@ -838,8 +842,8 @@ const importMSP = async () => {
                         @click="onExport()" />
                     <Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input"
                         icon="fa-solid fa-upload" @click="modalImport = true" />
-                        <Button raised v-tooltip.bottom="'undo'" icon="fa-solid fa-file-arrow-down"
-                        @click="onUndo" />
+                        <!-- <Button raised v-tooltip.bottom="'undo'" icon="fa-solid fa-file-arrow-down"
+                        @click="onUndo" /> -->
                 </span>
                 <span class="flex space-x-1">
                     <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"
