@@ -388,12 +388,11 @@ const formatCurrency = (value) => {
                     <Dropdown v-model="statusSelected" option-label="name" option-value="id" :options="statusOptions"
                         showClear placeholder="Seleccione Estado de la Estimación" class="w-full md:w-14rem" :pt="{
                             filterContainer: '!h-12',
-                        }
-                            " />
+                        }" />
                 </div>
                 <div>
                     <label for="dd-city">Seleccione Fecha</label>
-                    <Calendar v-model="dateSelected" showIcon :manualInput="true" placeholder="Fecha de Estado" />
+                    <Calendar v-model="dateSelected" showIcon :manualInput="true" placeholder="Fecha de rogEstado" />
                 </div>
                 <div class="mt-8">
                     <Button @click="saveStatus()" label="Guardar" icon="pi pi-save" severity="success" size="small"
