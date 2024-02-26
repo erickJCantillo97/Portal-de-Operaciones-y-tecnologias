@@ -739,12 +739,14 @@ const uploadMSP = async (file) => {
             // Toast.show('Importado con exito!');
         }
         else {
-            console.log('Error al importar:' + parsedJson.msg);
+        console.log('Error al importar')
+            console.log(parsedJson.msg);
             // onError(`Error al importar: ${parsedJson.msg}`);
         }
     }
     catch (error) {
-        console.log('Error al importar:' + error);
+        console.log('Error al importar')
+        console.log( error);
     }
 }
 
