@@ -78,11 +78,9 @@ class AssignmentToolController extends Controller
         $validateData = $request->validate([
             'employee_id' => 'required',
             'supervisor_id' => 'required',
-            'project_id' => 'required',
+            'project_id' => 'nullable',
             'tools' => 'nullable|array',
             'email' => 'required|email'
-        ], [
-            'project_id' => 'Es requerido',
         ]);
         //correo user, username, correo persona, nombre persona
         try {
@@ -93,7 +91,7 @@ class AssignmentToolController extends Controller
                     'tool_id' =>  $tool,
                     'employee_name' => $request->employee_name,
                     'employee_id' => $validateData['employee_id'],
-                    'project_id' => $validateData['project_id'],
+                    'project_id' => $validateData['project_id'] ?? 0,
                     'supervisor_id' => $validateData['supervisor_id'],
                     'user_deliver' => $validateData['user_id'],
                     'location' => '1',

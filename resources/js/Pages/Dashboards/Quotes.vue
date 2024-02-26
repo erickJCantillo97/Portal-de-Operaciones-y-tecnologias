@@ -1,11 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import GraphicMadurity from '@/Pages/Dashboards/Quotes/GraphicMadurity.vue'
-import CustomInput from '@/Components/CustomInput.vue';
 import TableQuotes from '@/Pages/Dashboards/Quotes/TableQuotes.vue';
 import GraphicStatus from '@/Pages/Dashboards/Quotes/GraphicStatus.vue';
 import DataEstimatorCard from '@/Pages/Dashboards/Quotes/DataEstimatorCard.vue';
-import BeijingAQIChart from '@/Pages/Dashboards/Quotes/BeijingAQIChart.vue';
 import GraphicMadurityTime from './Quotes/GraphicMadurityTime.vue';
 import GraphicQuoteCountry from './Quotes/GraphicQuoteCountry.vue';
 

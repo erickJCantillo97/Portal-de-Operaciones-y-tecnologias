@@ -84,7 +84,14 @@ class ScheduleController extends Controller
                 if (!isset($task['parentID'])) {
                     $parentID = null;
                 } else {
-                    $parentID = is_numeric($task['parentId']) ? Task::Where('id', $task['parentId'])->first()->id : Task::where('PhantomId', $task['parentId'])->first()->id;
+                    $parentID = Task::Where('id', $task['parentId'])->first()->id;
+                    foreach ($rows as $row) {
+                        if ($row['$PhantomId'] == $task['parentId']) {
+                            $parentID = $row['id'];
+                            break;
+                        }
+                    }
+                    // $parentID = is_numeric($task['parentId']) ? Task::Where('id', $task['parentId'])->first()->id : Task::where('PhantomId', $task['parentId'])->first()->id;
                 }
                 $taskCreate = Task::create([
                     'project_id' => $project->id,
