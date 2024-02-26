@@ -8,7 +8,7 @@ $tmp_dir  = $dir . '/tmp/';
 
 // Force UTF-8 encoding to make sure multi-byte characters returned by bryntum-project-reader-xxx.jar
 // are not corrupted
-putenv('LANG=en_US.UTF-8');
+// putenv('LANG=es_ES.UTF-8');
 
 $result = ['success' => true];
 
@@ -52,12 +52,12 @@ try {
 
     $json = shell_exec($shell_command);
     // echo 'llega a json'.$json.' fin json';
-    // $jsonencode = mb_convert_encoding($json, 'utf-8');
+    $jsonencode = mb_convert_encoding($json, 'UTF-8','windows-1252');
 
-    // echo 'llega a jsonencode'.$jsonencode.' fin jsonencode';
+    // dd();
 
     // ensure the output is actually a JSON string
-    $decoded = json_decode($json,false);
+    $decoded = json_decode($jsonencode,false);
     // echo 'llega a decoded ' . $decoded . ' fin decoded';
     if (!$json || !$decoded) {
         unlink($move_path);
