@@ -958,13 +958,13 @@ const pruebas = () => {
 
 .b-grid-body-container {
   position: relative;
-  background-image: url('/public/images/cotecmar-logo-opacity-20.png') !important;
+  background-image: url('https://top.cotecmar.com/images/cotecmar-logo-opacity-20.png') !important;
   background-repeat: no-repeat !important;
   background-position: 50% 50% !important;
 }
 .b-export .b-grid-body-container {
   position: relative;
-  background-image: url('/public/images/cotecmar-logo-opacity-20.png') !important;
+  background-image: url('https://top.cotecmar.com/images/cotecmar-logo-opacity-20.png') !important;
   background-repeat: no-repeat !important;
   background-position: 50% 50% !important;
 }
