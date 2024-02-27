@@ -88,27 +88,34 @@ const deleteAssignment = (event, data) => {
 }
 
 const submit = () => {
+
   try {
-    router.post(route('assignmentTool.store'),
-      {
-        employee_id: selectedEmployee.value.Num_SAP,
-        employee_name: selectedEmployee.value.Nombres_Apellidos,
-        supervisor_id: selectedSupervisor.value.Num_SAP,
-        project_id: selectedProject.value.id,
-        email: selectedEmployee.value.Correo,
-        tools: form.tools
-      },
-      {
-        onSuccess: () => {
-          // toast(`¡Asignación creada exitosamente!`, 'success')
-          clearModal()
+    if (form.tools == null) {
+      toast.add({ severity: 'error', group: 'customToast', text: 'Seleccione los Equipos a Asignar', life: 2000 });
+    } else {
+      router.post(route('assignmentTool.store'),
+        {
+          employee_id: selectedEmployee.value.Num_SAP,
+          employee_name: selectedEmployee.value.Nombres_Apellidos,
+          supervisor_id: selectedSupervisor.value.Num_SAP,
+          project_id: selectedProject.value?.id ?? 0,
+          email: selectedEmployee.value.Correo,
+          tools: form.tools
         },
-        onError: (error) => {
-          // toast(`Ha ocurrido un error al guardar las asignaciones; ERROR: ${error.message}`, 'error')
-        }
-      })
+        {
+          onSuccess: () => {
+            toast.add({ severity: 'success', group: 'customToast', text: 'Asignación Exitosa, Enviaremos un Mensaje a: ' + selectedEmployee.value.Correo, life: 10000 });
+            // toast(`¡Asignación creada exitosamente!`, 'success')
+            clearModal()
+          },
+          onError: (error) => {
+            // toast(`Ha ocurrido un error al guardar las asignaciones; ERROR: ${error.message}`, 'error')
+          }
+        })
+    }
   } catch (e) {
-    // toast(e.message, 'error')
+    toast.add({ severity: 'error', group: 'customToast', text: 'Hubo un error, reintente', life: 2000 });
+    console.log(e)
   }
 }
 

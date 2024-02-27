@@ -109,7 +109,7 @@ class ProgrammingController extends Controller
      */
     public function endNivelActivities(Request $request)
     {
-        if (isset($request->dates[0]) && 1 != 0) {
+        if (isset($request->dates[0])) {
             $date_start = Carbon::parse($request->dates[0])->format('Y-m-d');
             $date_end = Carbon::parse($request->dates[1])->format('Y-m-d');
         } elseif (isset($request->date)) {
