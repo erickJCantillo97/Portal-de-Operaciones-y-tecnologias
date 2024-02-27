@@ -267,7 +267,7 @@ const toggle = (event, horario) => {
                 <div v-else class="h-full">
                     <div v-for="task in tasks"
                         class="flex flex-col justify-between h-full p-2 border rounded-md shadow-md snap-start">
-                        <p>{{ task.name }}</p>
+                        <p><b>{{ task.task }}</b> <i class="fa-solid fa-angle-right"></i> {{ task.name }} </p>
                         <p class="text-xs italic uppercase text-primary">{{ task.project }}</p>
                         <span class="grid items-center text-xs grid-cols-6">
                             <span class="grid grid-cols-3">
