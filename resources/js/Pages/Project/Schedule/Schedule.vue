@@ -840,8 +840,7 @@ const pruebas = () => {
                         @click="onExport()" />
                     <Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input"
                         icon="fa-solid fa-upload" @click="modalImport = true" />
-                    <Button raised v-tooltip.bottom="'undo'" icon="fa-solid fa-print"
-                        @click="pruebas" />
+                    <Button raised v-tooltip.bottom="'undo'" icon="fa-solid fa-print" @click="pruebas" />
                 </span>
                 <span class="flex space-x-1">
                     <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"
@@ -955,13 +954,12 @@ const pruebas = () => {
     justify-content: center;
 }
 
-/* .b-export .b-sch-canvas {
-    width: 100% !important;
-    background-color: #62ff65 !important;
-    overflow: visible !important;
-    contain: none !important;
-    height: 100% !important;
-} */
+.b-export .b-sch-canvas {
+    background-image: url('https://top.cotecmar.com/images/cotecmar-logo-bg-white.png') !important;
+    position: absolute !important;
+    background-repeat: no-repeat !important;
+    background-position: 50% 50% !important;
+}
 
 #id {
     font-size: 12px !important;
