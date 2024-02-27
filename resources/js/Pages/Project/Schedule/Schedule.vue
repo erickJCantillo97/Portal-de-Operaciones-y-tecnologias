@@ -421,6 +421,7 @@ const ganttConfig = ref({
             },
             load: () => {
                 onExpandAllClick()
+                onZoomToFitClick()
             }
         },
     },
@@ -504,6 +505,7 @@ const ganttConfig = ref({
     keyMap: {
         // This is a function from the existing Gantt API
         'Ctrl+Shift+Q': () => onAddTaskClick(),
+        'Ctrl+Shift+e': () => onExportPDF(),
         'Ctrl+i': 'indent',
         'Ctrl+o': 'outdent',
     },
@@ -840,7 +842,7 @@ const pruebas = () => {
                         @click="onExport()" />
                     <Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input"
                         icon="fa-solid fa-upload" @click="modalImport = true" />
-                    <Button raised v-tooltip.bottom="'undo'" icon="fa-solid fa-print" @click="pruebas" />
+                    <!-- <Button raised v-tooltip.bottom="'undo'" icon="fa-solid fa-print" @click="pruebas" /> -->
                 </span>
                 <span class="flex space-x-1">
                     <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"
@@ -954,11 +956,17 @@ const pruebas = () => {
     justify-content: center;
 }
 
-.b-export .b-sch-canvas {
-    background-image: url('https://top.cotecmar.com/images/cotecmar-logo-bg-white.png') !important;
-    position: absolute !important;
-    background-repeat: no-repeat !important;
-    background-position: 50% 50% !important;
+.b-grid-body-container {
+  position: relative;
+  background-image: url('/public/images/cotecmar-logo-opacity-20.png') !important;
+  background-repeat: no-repeat !important;
+  background-position: 50% 50% !important;
+}
+.b-export .b-grid-body-container {
+  position: relative;
+  background-image: url('/public/images/cotecmar-logo-opacity-20.png') !important;
+  background-repeat: no-repeat !important;
+  background-position: 50% 50% !important;
 }
 
 #id {
