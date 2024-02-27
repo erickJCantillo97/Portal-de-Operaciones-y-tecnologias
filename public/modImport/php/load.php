@@ -52,7 +52,7 @@ try {
 
     $json = shell_exec($shell_command);
     // echo 'llega a json'.$json.' fin json';
-    $jsonencode = mb_convert_encoding($json, 'UTF-8');
+    $jsonencode = mb_convert_encoding($json, 'UTF-8','windows-1252');
 
     // dd();
 
