@@ -4,7 +4,7 @@ import { onMounted, ref } from 'vue';
 import "@bryntum/gantt/gantt.material.css";
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
 import { BryntumGantt } from '@bryntum/gantt-vue-3';
-import { AjaxHelper, DateHelper, List, LocaleManager, StringHelper, Widget } from '@bryntum/gantt/gantt.module.js';
+import { AjaxHelper, DateHelper, List, LocaleManager, StringHelper, Widget } from '@bryntum/gantt';
 import Slider from 'primevue/slider'
 import { useToast } from "primevue/usetoast";
 import InputText from 'primevue/inputtext';
@@ -24,6 +24,8 @@ LocaleManager.applyLocale('Es');
 const ganttref = ref()
 const loading = ref(false)
 const error = ref(false)
+
+//#region funciones
 const headerTpl = ({ currentPage, totalPages }) => `
     <div class="flex space-x-3 items-center">
         <img class="max-h-8" alt="Company logo" src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
@@ -37,8 +39,6 @@ const headerTpl = ({ currentPage, totalPages }) => `
     `;
 
 const footerTpl = () => `<h3 class="">© ${new Date().getFullYear()} TOP - COTECMAR</h3>`;
-
-//#region funciones
 
 if (!Widget.factoryable.registry.resourcelist) {
     class ResourceList extends List {
@@ -312,58 +312,56 @@ const readOnly = ref()
 const editMode = () => {
     let gantt = ganttref.value.instance.value
     gantt.readOnly = !gantt.readOnly
+    gantt.project.autoSync = !gantt.readOnly
     readOnly.value = gantt.readOnly
 }
 
-const features = ref(
-    {
-        filter: true,
-        mspExport: true,
-        pdfExport: {
-            exportServer: 'https://dev.bryntum.com:8082',
-            headerTpl,
-            footerTpl,
-            orientation: 'portrait',
-            paperFormat: 'Letter',
-            keepRegionSizes: { locked: true },
-            exportDialog: {
-                autoSelectVisibleColumns: false,
-                items: {
-                    columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
-                }
-            }
+//#region Features Gantt
+
+const pdfExport = ref({
+    exportServer: 'https://dev.bryntum.com:8082',
+    headerTpl,
+    footerTpl,
+    orientation: 'portrait',
+    paperFormat: 'Letter',
+    keepRegionSizes: { locked: true },
+    exportDialog: {
+        autoSelectVisibleColumns: false,
+        items: {
+            columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
+        }
+    }
+})
+const taskEdit = ref({
+    items: {
+        resourcesTab: {
+            type: 'resourcelist',
+            weight: 120,
+            title: 'Recursos',
         },
-        projectLines: false,
-        taskEdit: {
-            items: {
-                resourcesTab: {
-                    type: 'resourcelist',
-                    weight: 120,
-                    title: 'Recursos',
-                },
-            }
-        },
-        baselines: {
-            // Custom tooltip template for baselines
-            template(data) {
-                const
-                    me = this,
-                    { baseline } = data,
-                    { task } = baseline,
-                    delayed = task.startDate > baseline.startDate,
-                    overrun = task.durationMS > baseline.durationMS;
+    }
+})
+const baselines = ref({
+    // Custom tooltip template for baselines
+    template(data) {
+        const
+            me = this,
+            { baseline } = data,
+            { task } = baseline,
+            delayed = task.startDate > baseline.startDate,
+            overrun = task.durationMS > baseline.durationMS;
 
-                let { decimalPrecision } = me;
+        let { decimalPrecision } = me;
 
-                if (decimalPrecision == null) {
-                    decimalPrecision = me.client.durationDisplayPrecision;
-                }
+        if (decimalPrecision == null) {
+            decimalPrecision = me.client.durationDisplayPrecision;
+        }
 
-                const
-                    multiplier = Math.pow(10, decimalPrecision),
-                    displayDuration = Math.round(baseline.duration * multiplier) / multiplier;
+        const
+            multiplier = Math.pow(10, decimalPrecision),
+            displayDuration = Math.round(baseline.duration * multiplier) / multiplier;
 
-                return `
+        return `
                     <div class="b-gantt-task-title">${StringHelper.encodeHtml(task.name)} (${me.L('Linea Base ')} ${baseline.parentIndex + 1})</div>
                     <table>
                     <tr><td>${me.L('Inicio')}:</td><td>${data.startClockHtml}</td></tr>
@@ -379,19 +377,19 @@ const features = ref(
                         <h4 class="statusmessage b-baseline-overrun"><i class="statusicon b-fa b-fa-exclamation-triangle"></i>${me.L('Atrasado por')} ${DateHelper.formatDelta(task.durationMS - baseline.durationMS)}</h4>
                     ` : ''}
                     `;
-            },
+    },
 
-            renderer: baselineRenderer
-        },
-        cellEdit:{
-            addNewAtEnd:false,
-        }
-    })
+    renderer: baselineRenderer
+})
+const cellEdit = ref({
+    addNewAtEnd: false,
+})
+//#endRegion
 
+//#region Config Gantt
 const ganttConfig = ref({
     rowHeight: 28,
     dependencyIdField: 'sequenceNumber',
-    // continueEditingOnCellClick:false,
     project: {
         autoSync: true,
         autoLoad: true,
@@ -412,7 +410,7 @@ const ganttConfig = ref({
         listeners: {
             syncFail: (e) => {
                 console.log(e)
-                toast('Ha ocurrido un error, reiniciando...', 'error');
+                toast.add({ severity: 'error', group: 'customToast', text: 'Ha ocurrido un error, reiniciando...', life: 3000 });
                 setTimeout(() => { location.reload() }, 3000);
             },
             beforeSync: () => {
@@ -505,12 +503,14 @@ const ganttConfig = ref({
     },
     keyMap: {
         // This is a function from the existing Gantt API
-        'Ctrl+Shift+Q': () =>onAddTaskClick(),
+        'Ctrl+Shift+Q': () => onAddTaskClick(),
         'Ctrl+i': 'indent',
         'Ctrl+o': 'outdent',
     },
-    features: features,
+    // features: features,
 })
+
+//#endRegion
 
 //#region toolbar
 
@@ -554,13 +554,6 @@ const onCollapseAllClick = () => {
     gantt.collapseAll();
 }
 
-const onUndo = () => {
-//     let gantt = ganttref.value.instance.value
-//     console.log(gantt)
-// }
-// const onRedo = () => {
-//     console.log(gantt.value.project)
-}
 const zoom = ref()
 function onZoomInClick() {
     let gantt = ganttref.value.instance.value
@@ -696,7 +689,7 @@ const ganttConfigImporter = ref({
     },
 }
 )
-const btnImport=ref(true)
+const btnImport = ref(true)
 const uploadMSP = async (file) => {
     let ganttImport = ganttrefimport.value.instance.value
     let projectLoaderScript = '/modImport/php/load.php'
@@ -736,10 +729,10 @@ const uploadMSP = async (file) => {
             // remove "Importing project ..." mask
             ganttImport.unmaskBody();
             // Toast.show('Importado con exito!');
-            btnImport.value=false
+            btnImport.value = false
         }
         else {
-        console.log('Error al importar')
+            console.log('Error al importar')
             console.log(parsedJson.msg);
             toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
             // onError(`Error al importar: ${parsedJson.msg}`);
@@ -747,12 +740,12 @@ const uploadMSP = async (file) => {
     }
     catch (error) {
         toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
-        console.log( error);
+        console.log(error);
     }
 }
-const loadImport=ref(false)
+const loadImport = ref(false)
 const importMSP = async () => {
-    loadImport.value=true
+    loadImport.value = true
     let ganttImport = ganttrefimport.value.instance.value
     let gantt = ganttref.value.instance.value
     const project = ref({
@@ -773,7 +766,7 @@ const importMSP = async () => {
             syncFail: (e) => {
                 console.log(e)
                 toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
-                loadImport.value=false
+                loadImport.value = false
             },
         }
     })
@@ -781,11 +774,16 @@ const importMSP = async () => {
     await ganttImport.project.sync()
     await gantt.project.load()
     modalImport.value = false
-    loadImport.value=false
+    loadImport.value = false
 }
 
 
 //#endregion
+
+const pruebas = () => {
+    let gantt = ganttref.value.instance.value
+    gantt.features.print.showPrintDialog();
+}
 
 </script>
 <template>
@@ -842,8 +840,8 @@ const importMSP = async () => {
                         @click="onExport()" />
                     <Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input"
                         icon="fa-solid fa-upload" @click="modalImport = true" />
-                        <!-- <Button raised v-tooltip.bottom="'undo'" icon="fa-solid fa-file-arrow-down"
-                        @click="onUndo" /> -->
+                    <Button raised v-tooltip.bottom="'undo'" icon="fa-solid fa-print"
+                        @click="pruebas" />
                 </span>
                 <span class="flex space-x-1">
                     <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"
@@ -854,7 +852,9 @@ const importMSP = async () => {
                         @click="full = !full" />
                 </span>
             </span>
-            <BryntumGantt ref="ganttref" class="h-full" v-bind="ganttConfig" />
+            <BryntumGantt :filterFeature="true" :taskEditFeature="taskEdit" :projectLinesFeature="false"
+                :cellEditFeature="cellEdit" :pdfExportFeature="pdfExport" :mspExportFeature="true"
+                :baselinesFeature="baselines" ref="ganttref" class="h-full" :printFeature="true" v-bind="ganttConfig" />
         </div>
     </AppLayout>
     <OverlayPanel id="setLB" ref="setLB" :pt="{ content: '!p-1' }">
@@ -911,7 +911,7 @@ const importMSP = async () => {
             </div>
         </template>
         <template #footer>
-            <Button severity="danger" label="Cancelar" :disabled="loadImport" @click="modalImport=false" />
+            <Button severity="danger" label="Cancelar" :disabled="loadImport" @click="modalImport = false" />
             <Button severity="success" :loading="loadImport" label="Importar" :disabled="btnImport" @click="importMSP" />
         </template>
 
