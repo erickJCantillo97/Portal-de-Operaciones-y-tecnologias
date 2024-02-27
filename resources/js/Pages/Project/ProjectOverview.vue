@@ -26,9 +26,11 @@ const props = defineProps({
 const budge = ref({
 })
 
+
 onMounted(() => {
   getBudges()
   getDataSeriesBar()
+  // getImagesFiles()
 })
 
 const loadingDashboard = ref(true)
@@ -175,7 +177,22 @@ const responsiveOptions = ref([
   }
 ])
 //#endregion
-const selectedImage = ref(props.ships[0]?.file ?? props.ships[0].type_ship.render)
+
+const applicationLogo = ref(false)
+const selectedImage = ref([])
+const showGalleria = ref(true)
+
+const getImagesFiles = () => {
+  props.ships.map(ship => {
+    if (ship.file === '/') {
+      applicationLogo.value = true;
+      showGalleria.value = false
+    } else {
+      selectedImage.value.push(ship.file)
+    }
+  })
+  console.log(selectedImage.value)
+}
 
 const severitys = [
   { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'primary', class: '' },
@@ -285,6 +302,9 @@ const toggleTabClicked = (event) => {
 }
 
 const handleTabClick = (event) => {
+  // const selectedShip = props.ships[event.index]
+  // selectedShip.file == '/' ? true : selectedImage.value = selectedShip.file
+  // console.log(selectedImage.value)
   selectedImage.value = props.ships[event.index]?.file ?? props.ships[event.index].type_ship.render
 }
 //#endregion
@@ -341,30 +361,39 @@ td {
                   {{ project.description }}
                 </h2>
               </div>
-              <!-- <div class="flex size-full justify-center"> -->
-              <!-- <Image v-if="selectedImage != '/'" :src="selectedImage"  alt="image" preview />
+              <div class="flex size-full justify-center">
+              <Image v-if="selectedImage != '/'" :src="selectedImage"  alt="image" preview />
                 <div v-else class="flex justify-center mt-10">
                   <ApplicationLogo height="350" width="350" />
-                </div> -->
-              <article class="flex col-span-1 md:flex md:col-span-2 md:justify-center md:items-center">
-                <Galleria v-if="selectedImage != '/'" :value="selectedImage" :responsiveOptions="responsiveOptions"
-                  numVisible="5" indicatorsPosition="left" :transitionInterval="2000" :showThumbnails="true"
-                  :changeItemOnIndicatorHover="true" :showIndicatorsOnItem="true" containerStyle="max-width: 600px" :pt="{
+                </div>
+              <!-- <article class="flex col-span-1 md:flex md:col-span-2 md:justify-center md:items-center">
+                <Galleria :value="selectedImage" :responsiveOptions="responsiveOptions" indicatorsPosition="left"
+                  :transitionInterval="2000" :showThumbnails="true" :changeItemOnIndicatorHover="true"
+                  :showIndicatorsOnItem="true" containerStyle="max-width: 600px" :pt="{
                     itemContainer: '!border !border-gray-200 !rounded-lg',
                     indicatorButton: '!bg-blue-800'
                   }">
                   <template #item="slotProps">
-                    <img :src="slotProps.item.src" :alt="slotProps.item.alt" />
+                    {{ selectedImage }}
+                    <img :src="selectedImage" />
                   </template>
                   <template #thumbnail="slotProps">
-                    <img :src="slotProps.item.thumb" :alt="slotProps.item.alt" style="width: 100%;" />
+                    <img :src="selectedImage" style="width: 100%;" />
+                  </template>
+                  <template #caption="slotProps">
+                    <div class="text-xl mb-2 font-bold">
+                      {{ props.ships[0].name }}
+                    </div>
+                    <p class="text-white">
+                      No. Casco: {{ props.ships[0].idHull }}
+                    </p>
                   </template>
                 </Galleria>
-                <div v-else class="flex justify-center mt-10">
+                <div v-if="selectedImage == null" class="flex justify-center mt-10">
                   <ApplicationLogo height="350" width="350" />
                 </div>
-              </article>
-              <!-- </div> -->
+              </article> -->
+              </div>
             </div>
             <TabView :scrollable="true" :pt="{
               nav: '!flex !justify-between'
