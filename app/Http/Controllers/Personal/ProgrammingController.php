@@ -109,7 +109,7 @@ class ProgrammingController extends Controller
      */
     public function endNivelActivities(Request $request)
     {
-        if (isset($request->dates[0]) && 1 != 0) {
+        if (isset($request->dates[0])) {
             $date_start = Carbon::parse($request->dates[0])->format('Y-m-d');
             $date_end = Carbon::parse($request->dates[1])->format('Y-m-d');
         } elseif (isset($request->date)) {
@@ -120,11 +120,11 @@ class ProgrammingController extends Controller
             $date_end = Carbon::now()->format('Y-m-d');
         }
 
-        $tareas = VirtualTask::has('project')->whereNotNull('task_id')->select('task_id')->get()->toArray();
+        $taskWithSubTasks = VirtualTask::has('project')->whereNotNull('task_id')->select('task_id')->get()->map(function ($task) {
+            return $task['task_id'];
+        })->toArray();
 
-        $ids = array_map(function ($objeto) {
-            return $objeto['task_id'];
-        }, $tareas);
+
 
         return response()->json(
             VirtualTask::has('project')->where(function ($query) use ($date_start, $date_end) {
@@ -134,10 +134,11 @@ class ProgrammingController extends Controller
                         $query->where('enddate', '>', $date_end)
                             ->where('startdate', '<', $date_start);
                     });
-            })->whereNotIn('id', array_unique($ids))->get()->map(function ($task) {
+            })->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) {
                 return [
                     'name' => $task['name'],
                     'id' => $task['id'],
+                    'task' => $task->task->name,
                     'endDate' => $task['endDate'],
                     'percentDone' => $task['percentDone'],
                     'project' => $task->project->name,

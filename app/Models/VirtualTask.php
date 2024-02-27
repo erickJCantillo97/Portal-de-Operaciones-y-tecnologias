@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Gantt\Assignment;
+use App\Models\Gantt\Task;
 use App\Models\Projects\Project;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,5 +28,10 @@ class VirtualTask extends Model implements Auditable
     public function assignments()
     {
         return $this->hasMany(Assignment::class, 'event');
+    }
+
+    public function task()
+    {
+        return $this->belongsTo(Task::class);
     }
 }

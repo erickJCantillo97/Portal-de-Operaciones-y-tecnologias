@@ -95,7 +95,7 @@ class ToolController extends Controller
             $validateData['code'] = $this->createCode($validateData);
             $validateData['is_small'] = 0;
             // $validateData['criticidad'] = 0;
-            $warehouse = Warehouse::fisrtOrCreate([
+            $warehouse = Warehouse::firstOrCreate([
                 'name' => 'Almacen ' .  auth()->user()->oficina,
                 'gerencia' => auth()->user()->gerencia,
                 'department' =>  auth()->user()->oficina

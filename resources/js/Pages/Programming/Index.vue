@@ -205,10 +205,12 @@ const toggle = (event, horario) => {
                 </span>
                 <div class="flex items-center space-x-2">
                     <span class="p-buttonset">
-                        <Button label="Hoy" :outlined="optionValue != 'today'" @click="getTask('today')" />
-                        <Button label="Mañana" :outlined="optionValue != 'tomorrow'" @click="getTask('tomorrow')" />
+                        <Button label="Semana Actual" :outlined="optionValue != 'today'" @click="getTask('today')" />
+                        <Button label="Proxima Semana" :outlined="optionValue != 'today'" @click="getTask('today')" />
+                        <!-- <Button label="Mañana" :outlined="optionValue != 'tomorrow'" @click="getTask('tomorrow')" /> -->
                     </span>
-                    <CustomInput type="date" id="date" v-model:input="date" @change="getTask('date')" />
+                    <CustomInput type="week" v-model:input="date" @change="getTask('date')" />
+                    <!-- <CustomInput type="date" id="date" v-model:input="date" @change="getTask('date')" /> -->
                 </div>
             </span>
             <!--#region LISTA PERSONAL-->
@@ -265,7 +267,7 @@ const toggle = (event, horario) => {
                 <div v-else class="h-full">
                     <div v-for="task in tasks"
                         class="flex flex-col justify-between h-full p-2 border rounded-md shadow-md snap-start">
-                        <p>{{ task.name }}</p>
+                        <p><b>{{ task.task }}</b> <i class="fa-solid fa-angle-right"></i> {{ task.name }} </p>
                         <p class="text-xs italic uppercase text-primary">{{ task.project }}</p>
                         <span class="grid items-center text-xs grid-cols-6">
                             <span class="grid grid-cols-3">
