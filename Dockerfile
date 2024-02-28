@@ -10,7 +10,7 @@ WORKDIR /var/www/html
 RUN yes | pecl install ${XDEBUG_VERSION} \
     && docker-php-ext-enable xdebug
 
-RUN apt update && apt install -y openjdk-11-jdk
+RUN apt update && apt install -y default-jre
 
 RUN apt update; \
     apt install -y libmagickwand-dev; \
