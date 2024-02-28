@@ -8,7 +8,7 @@ $tmp_dir  = $dir . '/tmp/';
 
 // Force UTF-8 encoding to make sure multi-byte characters returned by bryntum-project-reader-xxx.jar
 // are not corrupted
-putenv('LANG=es_ES.UTF-8');
+putenv('LANG=en_US.UTF-8');
 
 $result = ['success' => true];
 
