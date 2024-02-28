@@ -85,7 +85,7 @@ const getTask = async (option) => {
             break;
     }
     tasks.value = [];
-    await axios.get(route('actividadesDeultimonivel', { date: date.value })).then((res) => {
+    await axios.get(route('actividadesDeultimonivel', { week: date.value })).then((res) => {
         tasks.value = res.data
         loadingProgram.value = false;
     })
