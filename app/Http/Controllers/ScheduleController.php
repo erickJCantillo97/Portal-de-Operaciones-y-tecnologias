@@ -16,18 +16,18 @@ class ScheduleController extends Controller
 {
     public function create(Project $project)
     {
-        $taskProject = Task::where('project_id', $project->id)->first();
-        if (!$taskProject) {
-            Task::firstOrcreate([
-                'project_id' => $project->id,
-                'name' => $project->name,
-                'percentDone' => 0,
-                'duration' => Carbon::parse($project->start_date)->diffInDays($project->end_date),
-                'durationUnit' => 'Days',
-                'startDate' => $project->start_date,
-                'endDate' => $project->end_date,
-            ]);
-        }
+        // $taskProject = Task::where('project_id', $project->id)->first();
+        // if (!$taskProject) {
+        //     Task::firstOrcreate([
+        //         'project_id' => $project->id,
+        //         'name' => $project->name,
+        //         'percentDone' => 0,
+        //         'duration' => Carbon::parse($project->start_date)->diffInDays($project->end_date),
+        //         'durationUnit' => 'Days',
+        //         'startDate' => $project->start_date,
+        //         'endDate' => $project->end_date,
+        //     ]);
+        // }
         return Inertia::render('Project/Schedule/Schedule', [
             'project' => Project::where('id', $project->id)->first(),
 
@@ -50,6 +50,23 @@ class ScheduleController extends Controller
 
     public function get(Project $project)
     {
+        $project->programming_resources = 'CARGO';
+        $personal = getPersonalUser()->map(function ($p) {
+            return [
+                'id' => $p['Num_SAP'],
+                'name' => $p['Nombres_Apellidos'],
+                'costo_hora' => '$ ' . number_format($p['Costo_Hora'], 0)
+            ];
+        })->toArray();
+        if ($project->programming_resources == 'CARGO')
+            $cargos =  Labor::where('gerencia', auth()->user()->gerencia)->get()->map(function ($cargo) {
+                return [
+                    'id' => 'CA' . $cargo->id,
+                    'name' => $cargo->name,
+                    'costo_hora' => '$ ' . number_format($cargo->costo_hora, 0),
+                ];
+            })->toArray();
+        $recursos = array_merge_recursive($cargos, $personal);
 
         return response()->json([
             'success' => true,
@@ -62,13 +79,7 @@ class ScheduleController extends Controller
             ]],
             'tasks' => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
             'dependencies' => ['rows' => Dependecy::get()],
-            'resources' => ['rows' => Labor::where('gerencia', auth()->user()->gerencia)->get()->map(function ($cargo) {
-                return [
-                    'id' => $cargo->id,
-                    'name' => $cargo->name,
-                    'costo_hora' => '$ ' . number_format($cargo->costo_hora, 0),
-                ];
-            })],
+            'resources' => ['rows' => $recursos],
             'assignments' => ['rows' => Assignment::get()],
             'timeRanges' => ['rows' => []],
         ]);
@@ -145,7 +156,13 @@ class ScheduleController extends Controller
         }
         if (isset($request->assignments['added'])) {
             foreach ($request->assignments['added'] as $assignment) {
-                $labor = Labor::find($assignment['resource']);
+                if (!is_numeric($assignment['resource'])) {
+                    $idResource = str_replace('CA', '', $assignment['resource']);
+                    $labor = Labor::find($idResource);
+                } else {
+                    $labor = searchEmpleados('Num_SAP', $assignment['resource']);
+                    $labor->name = $labor['Nombres_Apellidos'];
+                }
                 $assigmmentCreate = Assignment::create([
                     'event' => $assignment['event'],
                     'resource' => $assignment['resource'],

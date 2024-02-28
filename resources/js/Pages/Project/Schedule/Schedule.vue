@@ -411,7 +411,7 @@ const ganttConfig = ref({
             syncFail: (e) => {
                 console.log(e)
                 toast.add({ severity: 'error', group: 'customToast', text: 'Ha ocurrido un error, reiniciando...', life: 3000 });
-                setTimeout(() => { location.reload() }, 3000);
+                // setTimeout(() => { location.reload() }, 3000);
             },
             beforeSync: () => {
                 loading.value = true
@@ -957,16 +957,17 @@ const pruebas = () => {
 }
 
 .b-grid-body-container {
-  position: relative;
-  background-image: url('https://top.cotecmar.com/images/cotecmar-logo-opacity-20.png') !important;
-  background-repeat: no-repeat !important;
-  background-position: 50% 50% !important;
+    position: relative;
+    background-image: url('https://top.cotecmar.com/images/cotecmar-logo-opacity-20.png') !important;
+    background-repeat: no-repeat !important;
+    background-position: 50% 50% !important;
 }
+
 .b-export .b-grid-body-container {
-  position: relative;
-  background-image: url('https://top.cotecmar.com/images/cotecmar-logo-opacity-20.png') !important;
-  background-repeat: no-repeat !important;
-  background-position: 50% 50% !important;
+    position: relative;
+    background-image: url('https://top.cotecmar.com/images/cotecmar-logo-opacity-20.png') !important;
+    background-repeat: no-repeat !important;
+    background-position: 50% 50% !important;
 }
 
 #id {

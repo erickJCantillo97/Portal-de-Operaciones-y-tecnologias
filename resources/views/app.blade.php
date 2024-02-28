@@ -8,6 +8,7 @@
     <title>TOP - COTECMAR</title>
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
     <!-- Fonts -->
+    <link rel="icon" type="image" href="{{ asset('favicon.ico') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
