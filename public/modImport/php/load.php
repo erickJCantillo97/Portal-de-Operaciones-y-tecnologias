@@ -52,12 +52,12 @@ try {
 
     $json = shell_exec($shell_command);
     // echo 'llega a json'.$json.' fin json';
-    $jsonencode = mb_convert_encoding($json, 'UTF-8', 'ISO-8859-15');
+    // $jsonencode = mb_convert_encoding($json, 'UTF-8', 'ISO-8859-15');
 
     // dd();
 
     // ensure the output is actually a JSON string
-    $decoded = json_decode($jsonencode, false);
+    $decoded = json_decode($json, false);
     // echo 'llega a decoded ' . $decoded . ' fin decoded';
     if (!$json || !$decoded) {
         unlink($move_path);
