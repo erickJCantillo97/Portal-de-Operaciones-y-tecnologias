@@ -90,6 +90,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     /// CRUD HITOS
     Route::resource('milestones', MilestoneController::class);
-    Route::resource('weektask', WeekTaskController::class);
+    Route::resource('weektasks', WeekTaskController::class);
     Route::resource('projectships', ProjectsShipController::class);
 });

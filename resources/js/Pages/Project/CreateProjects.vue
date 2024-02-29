@@ -253,10 +253,10 @@ const weekTask = useForm({
 const saveweekTask = () => {
     weekTask.project_id = props.project.id
     if (weekTask.id) {
-        weekTask.put(route('weektask.update', weekTask.id), {
+        weekTask.put(route('weektasks.update', weekTask.id), {
             onSuccess: () => {
                 weekTask.reset()
-                toast.add({ severity: 'success', group: 'customToast', text: 'Hito Guardado', life: 2000 });
+                toast.add({ severity: 'success', group: 'customToast', text: 'Actividad Guardada', life: 2000 });
                 openDialogHito.value = false;
             },
             onError: (e) => {
@@ -265,7 +265,7 @@ const saveweekTask = () => {
             }
         })
     } else {
-        weekTask.post(route('weektask.store'), {
+        weekTask.post(route('weektasks.store'), {
             onSuccess: () => {
                 weekTask.reset()
                 toast.add({ summary: 'Hito Guardado', life: 2000 });
@@ -277,6 +277,20 @@ const saveweekTask = () => {
             }
         })
     }
+}
+const deleteweekTask = (id) => {
+
+    router.delete(route('weektasks.destroy', id), {
+        onSuccess: () => {
+            weekTask.reset()
+            toast.add({ severity: 'success', group: 'customToast', text: 'Atividad Eliminada', life: 2000 });
+            openDialogHito.value = false;
+        },
+        onError: (e) => {
+            toast.add({ severity: 'error', group: 'customToast', text: 'Hubo un error, reintente', life: 2000 });
+            console.log(e)
+        }
+    })
 }
 
 </script>
@@ -617,10 +631,11 @@ const saveweekTask = () => {
                 <span class="col-span-3 grid gap-2 grid-cols-2 h-min max-h-64 overflow-y-auto justify-center ">
                     <div class="flex items-center p-1 justify-between border rounded-md" v-for="weekTask in weekTasks">
                         <p>{{ weekTask.task }}</p>
-                        <!-- <div class="min-w-20 flex items-center">
-                            <Button rounded text severity="danger" icon="fa-solid fa-trash-can" />
-                            <Button rounded text severity="warning" icon="fa-solid fa-pen" />
-                        </div> -->
+                        <div class="flex items-center">
+                            <Button rounded text severity="danger" icon="fa-solid fa-trash-can"
+                                @click="deleteweekTask(weekTask.id)" />
+                            <!-- <Button rounded text severity="warning" icon="fa-solid fa-pen" /> -->
+                        </div>
                     </div>
                 </span>
                 <span class="flex flex-col justify-end">
