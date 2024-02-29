@@ -34,14 +34,14 @@ class WeekTaskController extends Controller
             'project_id' => 'required',
             'week' => 'required|string',
         ]);
-        
-        try{
+
+        try {
             $year = explode('-', $validateData['week'])[0];
             $week_number = str_replace('W', '', explode('-', $validateData['week'])[1]);
             $validateData['week'] = substr($year, -2) . $week_number;
             WeekTask::create($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
     }
 
@@ -64,28 +64,28 @@ class WeekTaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, WeekTask $weekTask)
+    public function update(Request $request, WeekTask $weektask)
     {
         $validateData = $request->validate([
             //
         ]);
 
-        try{
+        try {
             $weekTask->update($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(WeekTask $weekTask)
+    public function destroy(WeekTask $weektask)
     {
-        try{
-            $weekTask->delete();
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+        try {
+            $weektask->delete();
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }

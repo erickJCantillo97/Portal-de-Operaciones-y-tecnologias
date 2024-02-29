@@ -20,6 +20,7 @@ import Tag from 'primevue/tag'
 const props = defineProps({
   project: Object,
   ships: Array,
+  weekTasks: Array,
   semana: Object
 })
 
@@ -362,11 +363,11 @@ td {
                 </h2>
               </div>
               <div class="flex size-full justify-center">
-              <Image v-if="selectedImage != '/'" :src="selectedImage"  alt="image" preview />
+                <Image v-if="selectedImage != '/'" :src="selectedImage" alt="image" preview />
                 <div v-else class="flex justify-center mt-10">
                   <ApplicationLogo height="350" width="350" />
                 </div>
-              <!-- <article class="flex col-span-1 md:flex md:col-span-2 md:justify-center md:items-center">
+                <!-- <article class="flex col-span-1 md:flex md:col-span-2 md:justify-center md:items-center">
                 <Galleria :value="selectedImage" :responsiveOptions="responsiveOptions" indicatorsPosition="left"
                   :transitionInterval="2000" :showThumbnails="true" :changeItemOnIndicatorHover="true"
                   :showIndicatorsOnItem="true" containerStyle="max-width: 600px" :pt="{
@@ -607,6 +608,13 @@ td {
                 <div class="flex justify-center items-center p-0.5 mb-1 bg-blue-800 text-white">
                   <h2 class="font-semibold">ACTIVIDADES/NOVEDADES DE LA SEMANA</h2>
                 </div>
+                <ul>
+                  <li v-for="(task, index) in weekTasks" class="px-4">
+                    <span class="text-sm font-bold">{{ index + 1 }}</span>. <span
+                      class="text-sm italic font-semibold capitalize">{{
+                        task.task }}</span>
+                  </li>
+                </ul>
               </article>
 
               <!-- TABLA: HITOS CONTRACTUALES -->
