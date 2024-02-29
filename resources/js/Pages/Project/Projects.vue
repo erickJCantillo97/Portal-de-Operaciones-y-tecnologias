@@ -22,6 +22,7 @@ const { hasPermission } = usePermissions();
 const props = defineProps({
     projects: Array,
 })
+
 const modalDocument = ref(false)
 const { toast } = useSweetalert()
 const { confirmDelete } = useSweetalert()
@@ -48,6 +49,7 @@ const tipologias = ref(null)
 const project = ref()
 const tipologia = ref()
 const listTipologia = ref(0)
+
 const getTipologias = (p) => {
     axios.get(route('get.tipologias', p.id)).then((res) => {
         tipologias.value = Object.values(res.data.tipologias)
@@ -75,6 +77,7 @@ const fileup = ref(Math.random() * (10))
 const onSelectedFiles = (event) => {
     files.value = event.files;
 }
+
 const onRemoveTemplatingFile = (file, removeFileCallback, index) => {
     removeFileCallback(index);
 };
@@ -99,6 +102,7 @@ const uploadForm = useForm({
     tipologia_id: null,
     tipologia_name: null
 })
+
 const uploadEvent = () => {
     uploadForm.files = files.value
     uploadForm.project_id = project.value.id
