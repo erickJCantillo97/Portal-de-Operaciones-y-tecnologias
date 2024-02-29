@@ -35,10 +35,14 @@ class AssignmentToolController extends Controller
 
     public function getDataAnterior()
     {
-        AssignmentTool::truncate();
-        $equipos = DB::connection('sqlsrv_anterior')->table('asignacions')->get();
+        // AssignmentTool::truncate();
+        // $asignaciones = AssignmentTool::where('assigment_date', '<', '09/02/2023')->forceDelete();
+        // return $asignaciones;
+        $equipos = DB::connection('sqlsrv_anterior')->table('asignacions')->join('CORPORATIVA_INTERFACE.dbo.LISTADO_PERSONAL_SAP_TODOS_View as l', 'l.ID', DB::raw('asignacions.persona_id'))->orderBy('asignacions.id')->get();
+       
         foreach ($equipos as $e) {
-            $empleado = collect(searchEmpleados('Num_SAP', $e->persona_id))->first();
+
+            // $empleado = collect(searchEmpleados('Num_SAP', $e->persona_id))->first();
             $equipo =  DB::connection('sqlsrv_anterior')->table('equipos')->where('id', $e->equipo_id)->first();
             if ($equipo && $e->estado == 'ASIGNADO') {
                 $tool = Tool::where('code', $equipo->codigo_interno)->first();
@@ -52,7 +56,7 @@ class AssignmentToolController extends Controller
                         'location' => 0,
                         'assigment_date' => $e->fecha_prestamo,
                         'status' => $e->estado,
-                        'employee_name' => $empleado['Nombres_Apellidos'],
+                        'employee_name' => $e->NOMBRES_APELLIDOS,
                         'gerencia' => 'GECON'
                     ]);
                 }

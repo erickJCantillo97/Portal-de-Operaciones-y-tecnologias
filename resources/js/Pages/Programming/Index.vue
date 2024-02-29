@@ -13,6 +13,7 @@ import Loading from '@/Components/Loading.vue';
 import CustomInput from '@/Components/CustomInput.vue';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
+import Listbox from 'primevue/listbox';
 
 const { hasRole, hasPermission } = usePermissions()
 const { toast } = useSweetalert();
@@ -85,7 +86,7 @@ const getTask = async (option) => {
             break;
     }
     tasks.value = [];
-    await axios.get(route('actividadesDeultimonivel', { date: date.value })).then((res) => {
+    await axios.get(route('actividadesDeultimonivel', { week: date.value })).then((res) => {
         tasks.value = res.data
         loadingProgram.value = false;
     })
@@ -178,6 +179,9 @@ const toggle = (event, horario) => {
     op.value.toggle(event);
 }
 //#endregion
+
+const filter = ref('')
+
 </script>
 <style scoped>
 .custom-image {
@@ -198,59 +202,180 @@ const toggle = (event, horario) => {
 
 <template>
     <AppLayout>
-        <div class="h-[89vh] overflow-y-auto grid grid-cols-3">
-            <span class="col-span-2 flex justify-between m-1 h-9">
-                <span class="text-xl font-bold text-primary h-full items-center flex">
-                    Programación de actividades
-                </span>
-                <div class="flex items-center space-x-2">
-                    <span class="p-buttonset">
-                        <Button label="Semana Actual" :outlined="optionValue != 'today'" @click="getTask('today')" />
-                        <Button label="Proxima Semana" :outlined="optionValue != 'today'" @click="getTask('today')" />
-                        <!-- <Button label="Mañana" :outlined="optionValue != 'tomorrow'" @click="getTask('tomorrow')" /> -->
+        <div class="h-[89vh] grid grid-cols-3">
+            <span class="col-span-2 space-y-1 pt-1 px-1">
+                <span class="flex justify-between items-center">
+                    <span class="text-xl font-bold text-primary h-full items-center flex">
+                        Programación de actividades
                     </span>
-                    <CustomInput type="week" v-model:input="date" @change="getTask('date')" />
-                    <!-- <CustomInput type="date" id="date" v-model:input="date" @change="getTask('date')" /> -->
-                </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="p-buttonset">
+                            <Button label="Semana Actual" :outlined="optionValue != 'today'" @click="getTask('today')" />
+                            <Button label="Proxima Semana" :outlined="optionValue != 'today'" @click="getTask('today')" />
+                            <!-- <Button label="Mañana" :outlined="optionValue != 'tomorrow'" @click="getTask('tomorrow')" /> -->
+                        </span>
+                        <CustomInput type="week" v-model:input="date" @change="getTask('date')" />
+                        <!-- <CustomInput type="date" id="date" v-model:input="date" @change="getTask('date')" /> -->
+                    </div>
+                </span>
+                <Listbox :options="tasks" :filterFields="['task', 'name', 'project']" class="col-span-2" filter :pt="{
+                    list: '!h-[69vh] !px-1 !snap-y !snap-mandatory',
+                    item: '!h-full !p-0 !rounded-md !snap-start !my-0.5',
+                    filterInput: '!h-8',
+                    header: '!p-1'
+                }">
+                    <template #option="slotProps">
+                        <div class="flex flex-col justify-between h-full p-2 border rounded-md shadow-md snap-start">
+                            <p><b>{{ slotProps.option.task }}</b> <i class="fa-solid fa-angle-right"></i> {{
+                                slotProps.option.name }} </p>
+                            <p class="text-xs italic uppercase text-primary">{{ slotProps.option.project }}</p>
+                            <span class="grid items-center text-xs grid-cols-6">
+                                <span class="grid grid-cols-3">
+                                    <p class="font-bold ">I:</p>
+                                    <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha inicio'">{{
+                                        slotProps.option.startDate
+                                    }} </p>
+                                    <p class="font-bold">F:</p>
+                                    <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha fin'">{{
+                                        slotProps.option.endDate }}
+                                    </p>
+                                </span>
+                                <span class="flex justify-center">
+                                    <Knob v-tooltip.top="'Avance: ' + parseInt(slotProps.option.percentDone) + '%'"
+                                        :model-value=parseInt(slotProps.option.percentDone) :size=50
+                                        valueTemplate="{value}%" readonly />
+                                </span>
+                                <div class="text-center justify-center">
+                                    <p class="font-bold">Valor estimado</p>
+                                    <p class="">$1.000.000
+                                    </p>
+                                </div>
+                                <div class="text-center justify-center">
+                                    <p class="font-bold">Valor programado</p>
+                                    <p class="">$1.000.000
+                                    </p>
+                                </div>
+                                <div class="text-center justify-center">
+                                    <p class="font-bold">Diferencia</p>
+                                    <p class="">$1.000.000
+                                    </p>
+                                </div>
+                            </span>
+                            <div v-if="loadingTasks ? true : loadingTask[slotProps.option.id] ? true : false"
+                                class="flex flex-col items-center justify-center h-full p-2">
+                                <Loading message="Cargando" />
+                            </div>
+                            <Container v-if="!loadingTask[slotProps.option.id]"
+                                class="h-full p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
+                                @drop="onDrop(slotProps.option.id, $event)" group-name="1">
+                                <div class="grid grid-cols-2 gap-1"
+                                    v-if="listaDatos[slotProps.option.id] !== undefined && listaDatos[slotProps.option.id].length != 0">
+                                    <div v-for="(item, index) in listaDatos[slotProps.option.id]"
+                                        class="p-1 mt-1 border-2 rounded-md">
+                                        <div class="flex items-center justify-between w-full ">
+                                            <p class="text-sm font-semibold ">{{ item.name }}</p>
+                                            <button v-tooltip.top="'Eliminar de la Actividad'"
+                                                @click="deleteSchedule(slotProps.option, index, item)">
+                                                <i
+                                                    class="fa-solid fa-circle-xmark text-danger hover:animate-pulse hover:scale-125" />
+                                            </button>
+                                        </div>
+                                        <div class="flex items-center justify-between w-full font-mono align-middle ">
+                                            <div class="grid w-full grid-cols-3 gap-2">
+                                                <div v-for="horario in item.schedule_times"
+                                                    class="flex items-center justify-between px-1 py-1 text-green-900 bg-green-200 rounded-md cursor-default group">
+                                                    <button v-tooltip.bottom="'En desarrollo'"
+                                                        class="hidden group-hover:flex"
+                                                        @click="console.log('En desarrollo')"
+                                                        v-if="item.schedule_times.length > 1">
+                                                        <i
+                                                            class="fa-solid fa-trash-can text-danger text-xs hover:animate-pulse hover:scale-125"></i>
+                                                    </button>
+                                                    <button v-tooltip.bottom="'Eliminar'" class="hidden group-hover:flex"
+                                                        @click="deleteSchedule(slotProps.option, index, item)" v-else>
+                                                        <i
+                                                            class="fa-solid fa-trash-can text-danger text-xs hover:animate-pulse hover:scale-125"></i>
+                                                    </button>
+                                                    <span class="w-full text-xs tracking-tighter text-center">
+                                                        {{ format24h(horario.hora_inicio) }} {{ format24h(horario.hora_fin)
+                                                        }}
+                                                    </span>
+                                                    <button v-tooltip.bottom="'Cambiar horario'"
+                                                        class="hidden group-hover:flex"
+                                                        @click="optionSelectHours = 'select'; toggle($event, horario)">
+                                                        <i
+                                                            class="fa-solid fa-pencil text-primary text-xs hover:animate-pulse hover:scale-125"></i>
+                                                    </button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-else class="items-center justify-center text-center align-middle opacity-50">
+                                    <h2 class="mt-4 text-xl font-medium tracking-wide text-gray-700">No hay personas
+                                        asignadas
+                                    </h2>
+
+                                    <p class="mt-2 tracking-wide text-gray-500">Arrastre una persona de la lista de la
+                                        izquierda
+                                        para agregarla a la actividad </p>
+                                </div>
+                            </Container>
+                        </div>
+                    </template>
+                    <template #empty>
+                        <Loading v-if="loadingProgram" message="Cargando actividades" />
+                    </template>
+
+                </Listbox>
             </span>
             <!--#region LISTA PERSONAL-->
-            <span class="h-full row-span-2 overflow-y-auto snap-y snap-mandatory rounded-lg">
-                <Loading v-if="loadingPerson" message="Cargando personas" />
-                <TabView v-else class="tabview-custom" :scrollable="true" :pt="{
-                    nav: '!flex !justify-between'
+
+            <div class="row-span-2 rounded-lg">
+                <TabView class="tabview-custom" :scrollable="true" :pt="{
+                    nav: '!flex !justify-between',
+                    panelContainer: '!p-1'
                 }">
                     <TabPanel header="Personas" :pt="{
                         root: 'w-full',
-                        headerTitle: '!w-full !flex !justify-center'
+                        headerTitle: '!w-full !flex !justify-center',
                     }">
-                        <Container oncontextmenu="return false" onkeydown="return false" behaviour="copy" group-name="1"
-                            :get-child-payload="getChildPayload" class="h-full space-y-1">
-                            <Draggable v-for="item in personal"
-                                :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
-                                class="rounded-xl shadow-md cursor-pointer hover:bg-blue-200 hover:ring-1 hover:ring-primary ">
-                                <div class="grid grid-cols-5 gap-x-1 p-1">
-                                    <img class="custom-image " :src="item.photo" onerror="this.src='/svg/cotecmar-logo.svg'"
-                                        draggable="false" alt="profile-photo" />
-                                    <span class="col-span-3">
-                                        <p class="text-sm font-semibold truncate leading-6 text-gray-900">
-                                            {{ item.Nombres_Apellidos }}
-                                        </p>
-                                        <p class="flex mt-1 text-xs truncate leading-5 text-gray-500">
-                                            {{ item.Cargo }}
-                                        </p>
-                                    </span>
-                                    <span class="flex items-center">
-                                        <Button v-tooltip.left="'Horas programadas'"
-                                            :label="personalHours[(item.Num_SAP)] + ' horas'"
-                                            :severity="personalHours[(item.Num_SAP)] < 9.5 ? 'primary' : 'success'"
-                                            @click="employeeDialog(item)" :pt="{
-                                                label: '!text-xs'
-                                            }" />
-                                    </span>
-                                </div>
-                            </Draggable>
+                        <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
+                        <Loading v-if="loadingPerson" message="Cargando personas" />
+                        <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy"
+                            group-name="1" :get-child-payload="getChildPayload"
+                            class="!h-[75vh] space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
+                            <span v-for="item in personal">
+                                <Draggable v-if="item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase())||item.Cargo.toUpperCase().includes(filter.toUpperCase())"
+                                    :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
+                                    class="snap-start rounded-xl shadow-md cursor-pointer hover:bg-blue-200 hover:ring-1 hover:ring-primary ">
+                                    <div class="grid grid-cols-5 gap-x-1 p-1">
+                                        <img class="custom-image " :src="item.photo"
+                                            onerror="this.src='/svg/cotecmar-logo.svg'" draggable="false"
+                                            alt="profile-photo" />
+                                        <span class="col-span-3">
+                                            <p class="text-sm font-semibold truncate leading-6 text-gray-900">
+                                                {{ item.Nombres_Apellidos }}
+                                            </p>
+                                            <p class="flex mt-1 text-xs truncate leading-5 text-gray-500">
+                                                {{ item.Cargo }}
+                                            </p>
+                                        </span>
+                                        <span class="flex items-center">
+                                            <Button v-tooltip.left="'Horas programadas'"
+                                                :label="personalHours[(item.Num_SAP)] + ' horas'"
+                                                :severity="personalHours[(item.Num_SAP)] < 9.5 ? 'primary' : 'success'"
+                                                @click="employeeDialog(item)" :pt="{
+                                                    label: '!text-xs'
+                                                }" />
+                                        </span>
+                                    </div>
+                                </Draggable>
+                            </span>
                         </Container>
                     </TabPanel>
+
                     <TabPanel header="Grupos" :pt="{
                         root: 'w-full',
                         headerTitle: '!w-full !flex !justify-center'
@@ -259,106 +384,7 @@ const toggle = (event, horario) => {
                     </TabPanel>
 
                 </TabView>
-            </span>
-            <!--#endregion -->
-            <!--LISTA PROGRAMACIÓN DE ACTIVIDADES-->
-            <span class="col-span-2 p-1 space-y-1 h-full overflow-y-auto snap-y snap-mandatory rounded-xl">
-                <Loading v-if="loadingProgram" message="Cargando actividades" />
-                <div v-else class="h-full">
-                    <div v-for="task in tasks"
-                        class="flex flex-col justify-between h-full p-2 border rounded-md shadow-md snap-start">
-                        <p><b>{{ task.task }}</b> <i class="fa-solid fa-angle-right"></i> {{ task.name }} </p>
-                        <p class="text-xs italic uppercase text-primary">{{ task.project }}</p>
-                        <span class="grid items-center text-xs grid-cols-6">
-                            <span class="grid grid-cols-3">
-                                <p class="font-bold ">I:</p>
-                                <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha inicio'">{{ task.startDate
-                                }} </p>
-                                <p class="font-bold">F:</p>
-                                <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha fin'">{{ task.endDate }}
-                                </p>
-                            </span>
-                            <span class="flex justify-center">
-                                <Knob v-tooltip.top="'Avance: ' + parseInt(task.percentDone) + '%'"
-                                    :model-value=parseInt(task.percentDone) :size=50 valueTemplate="{value}%" readonly />
-                            </span>
-                            <div class="text-center justify-center">
-                                <p class="font-bold">Valor estimado</p>
-                                <p class="">$1.000.000
-                                </p>
-                            </div>
-                            <div class="text-center justify-center">
-                                <p class="font-bold">Valor programado</p>
-                                <p class="">$1.000.000
-                                </p>
-                            </div>
-                            <div class="text-center justify-center">
-                                <p class="font-bold">Diferencia</p>
-                                <p class="">$1.000.000
-                                </p>
-                            </div>
-                        </span>
-                        <div v-if="loadingTasks ? true : loadingTask[task.id] ? true : false"
-                            class="flex flex-col items-center justify-center h-full p-2">
-                            <Loading message="Cargando" />
-                        </div>
-                        <Container v-if="!loadingTask[task.id]"
-                            class="h-full p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
-                            @drop="onDrop(task.id, $event)" group-name="1">
-                            <div class="grid grid-cols-2 gap-1"
-                                v-if="listaDatos[task.id] !== undefined && listaDatos[task.id].length != 0">
-                                <div v-for="(item, index) in listaDatos[task.id]" class="p-1 mt-1 border-2 rounded-md">
-                                    <div class="flex items-center justify-between w-full ">
-                                        <p class="text-sm font-semibold ">{{ item.name }}</p>
-                                        <button v-tooltip.top="'Eliminar de la Actividad'"
-                                            @click="deleteSchedule(task, index, item)">
-                                            <i
-                                                class="fa-solid fa-circle-xmark text-danger hover:animate-pulse hover:scale-125" />
-                                        </button>
-                                    </div>
-                                    <div class="flex items-center justify-between w-full font-mono align-middle ">
-                                        <div class="grid w-full grid-cols-3 gap-2">
-                                            <div v-for="horario in item.schedule_times"
-                                                class="flex items-center justify-between px-1 py-1 text-green-900 bg-green-200 rounded-md cursor-default group">
-                                                <button v-tooltip.bottom="'En desarrollo'" class="hidden group-hover:flex"
-                                                    @click="console.log('En desarrollo')"
-                                                    v-if="item.schedule_times.length > 1">
-                                                    <i
-                                                        class="fa-solid fa-trash-can text-danger text-xs hover:animate-pulse hover:scale-125"></i>
-                                                </button>
-                                                <button v-tooltip.bottom="'Eliminar'" class="hidden group-hover:flex"
-                                                    @click="deleteSchedule(task, index, item)" v-else>
-                                                    <i
-                                                        class="fa-solid fa-trash-can text-danger text-xs hover:animate-pulse hover:scale-125"></i>
-                                                </button>
-                                                <span class="w-full text-xs tracking-tighter text-center">
-                                                    {{ format24h(horario.hora_inicio) }} {{ format24h(horario.hora_fin) }}
-                                                </span>
-                                                <button v-tooltip.bottom="'Cambiar horario'" class="hidden group-hover:flex"
-                                                    @click="optionSelectHours = 'select'; toggle($event, horario)">
-                                                    <i
-                                                        class="fa-solid fa-pencil text-primary text-xs hover:animate-pulse hover:scale-125"></i>
-                                                </button>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div v-else class="items-center justify-center text-center align-middle opacity-50">
-                                <h2 class="mt-4 text-xl font-medium tracking-wide text-gray-700">No hay personas
-                                    asignadas
-                                </h2>
-
-                                <p class="mt-2 tracking-wide text-gray-500">Arrastre una persona de la lista de la
-                                    izquierda
-                                    para agregarla a la actividad </p>
-                            </div>
-                        </Container>
-                    </div>
-                </div>
-            </span>
-            <!--#endregion -->
+            </div>
 
         </div>
     </AppLayout>

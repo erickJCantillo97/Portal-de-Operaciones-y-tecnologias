@@ -48,7 +48,7 @@ class ProgrammingController extends Controller
                 $schedule->save();
                 ScheduleTime::create([
                     'schedule_id' => $schedule->id,
-                    'hora_inicio' => '7:00',
+                    'hora_inicio' => '1:00',
                     'hora_fin' => '16:30',
                 ]);
                 $status = true;
@@ -116,18 +116,16 @@ class ProgrammingController extends Controller
             $date_start = Carbon::parse($request->date)->format('Y-m-d');
             $date_end = Carbon::parse($request->date)->format('Y-m-d');
         } else {
-            $date_start = Carbon::now()->format('Y-m-d');
-            $date_end = Carbon::now()->format('Y-m-d');
+            $date_start = Carbon::tomorrow()->format('Y-m-d');
+            $date_end = Carbon::tomorrow()->format('Y-m-d');
         }
 
         $taskWithSubTasks = VirtualTask::has('project')->whereNotNull('task_id')->select('task_id')->get()->map(function ($task) {
             return $task['task_id'];
         })->toArray();
 
-
-
         return response()->json(
-            VirtualTask::has('project')->where(function ($query) use ($date_start, $date_end) {
+            VirtualTask::whereHas('task')->has('project')->where(function ($query) use ($date_start, $date_end) {
                 $query->whereBetween('startdate', [$date_start, $date_end])
                     ->orWhereBetween('enddate', [$date_start, $date_end])
                     ->orWhere(function ($query) use ($date_start, $date_end) {
@@ -186,7 +184,7 @@ class ProgrammingController extends Controller
         ])->pluck('id')->toArray();
 
         $horas_acumulados = ScheduleTime::whereIn('schedule_id', $schedule)->selectRaw('SUM(datediff(mi,hora_inicio, hora_fin)) as diferencia_acumulada')->get();
-
+        dd($horas_acumulados);
         return $horas_acumulados[0]->diferencia_acumulada / 60;
     }
 
