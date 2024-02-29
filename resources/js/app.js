@@ -1,21 +1,21 @@
-import "./bootstrap";
+import 'material-icons/iconfont/material-icons.css';
 import "../css/app.css";
 import "../css/tailwind.css";
+import "./bootstrap";
+import "primeicons/primeicons.css";
+import "primevue/resources/themes/mdc-light-indigo/theme.css";
 import { createApp, h } from "vue";
 import { createInertiaApp } from "@inertiajs/vue3";
+import { Head } from '@inertiajs/vue3';
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy/dist/vue.m";
-import PrimeVue from "primevue/config";
+import Button from "primevue/button"
 import ConfirmationService from "primevue/confirmationservice";
+import CustomModal from '@/Components/CustomModal.vue'
+import PrimeVue from "primevue/config";
 import ToastService from "primevue/toastservice";
-import "primevue/resources/themes/mdc-light-indigo/theme.css";
-import "primeicons/primeicons.css";
-import 'material-icons/iconfont/material-icons.css';
 import Tooltip from "primevue/tooltip";
 import VueApexCharts from "vue3-apexcharts";
-import { Head } from '@inertiajs/vue3';
-import CustomModal from '@/Components/CustomModal.vue'
-import Button from "primevue/button"
 import VueChatScroll from 'vue3-chat-scroll'
 
 const appName =

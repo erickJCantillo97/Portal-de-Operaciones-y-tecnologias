@@ -243,7 +243,7 @@ const navigation = [
         href: 'get.projectsGD',
         icon: DocumentDuplicateIcon,
         current: true,
-        show: false
+        show: true
     },
     {
         name: 'Almacén',
