@@ -48,7 +48,7 @@ class ProgrammingController extends Controller
                 $schedule->save();
                 ScheduleTime::create([
                     'schedule_id' => $schedule->id,
-                    'hora_inicio' => '7:00',
+                    'hora_inicio' => '1:00',
                     'hora_fin' => '16:30',
                 ]);
                 $status = true;
@@ -184,7 +184,7 @@ class ProgrammingController extends Controller
         ])->pluck('id')->toArray();
 
         $horas_acumulados = ScheduleTime::whereIn('schedule_id', $schedule)->selectRaw('SUM(datediff(mi,hora_inicio, hora_fin)) as diferencia_acumulada')->get();
-
+        dd($horas_acumulados);
         return $horas_acumulados[0]->diferencia_acumulada / 60;
     }
 

@@ -104,68 +104,7 @@ const shipField = [
 
 //#Galería
 const images = ref()
-const imageSrc = [
-  {
-    id: 1,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria1.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria1s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 2,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria2.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria2s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 3,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria3.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria3s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 4,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria4.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria4s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 5,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria5.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria5s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 6,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria6.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria6s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 7,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria7.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria7s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 8,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria8.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria8s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 9,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria9.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria9s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 10,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria10.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria10s.jpg',
-    alt: 'image-1'
-  }
-]
+
 
 const responsiveOptions = ref([
   {
@@ -180,7 +119,7 @@ const responsiveOptions = ref([
 //#endregion
 
 const applicationLogo = ref(false)
-const selectedImage = ref([])
+const selectedImage = ref(props.ships[0]?.file ?? props.ships[0].type_ship.render)
 const showGalleria = ref(true)
 
 const getImagesFiles = () => {
@@ -363,6 +302,7 @@ td {
                 </h2>
               </div>
               <div class="flex size-full justify-center">
+                
                 <Image v-if="selectedImage != '/'" :src="selectedImage" alt="image" preview />
                 <div v-else class="flex justify-center mt-10">
                   <ApplicationLogo height="350" width="350" />
