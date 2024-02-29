@@ -58,14 +58,13 @@ class ScheduleController extends Controller
                 'costo_hora' => '$ ' . number_format($p['Costo_Hora'], 0)
             ];
         })->toArray();
-        if ($project->programming_resources == 'CARGO')
-            $cargos =  Labor::where('gerencia', auth()->user()->gerencia)->get()->map(function ($cargo) {
-                return [
-                    'id' => 'CA' . $cargo->id,
-                    'name' => $cargo->name,
-                    'costo_hora' => '$ ' . number_format($cargo->costo_hora, 0),
-                ];
-            })->toArray();
+        $cargos =  Labor::where('gerencia', auth()->user()->gerencia)->get()->map(function ($cargo) {
+            return [
+                'id' => 'CA' . $cargo->id,
+                'name' => $cargo->name,
+                'costo_hora' => '$ ' . number_format($cargo->costo_hora, 0),
+            ];
+        })->toArray();
         $recursos = array_merge_recursive($cargos, $personal);
 
         return response()->json([

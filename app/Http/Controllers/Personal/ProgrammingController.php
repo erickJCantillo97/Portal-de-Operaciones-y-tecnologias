@@ -109,44 +109,28 @@ class ProgrammingController extends Controller
      */
     public function endNivelActivities(Request $request)
     {
-        $year = explode('-', $request->week)[0];
-        $week_number = str_replace('W', '', explode('-', $request->week)[1]);
-        $fecha = Carbon::createFromDate($year, 1, 1);
-
-        // Agregar el número de semanas menos uno (ya que queremos la semana anterior)
-        $fecha->addWeeks($week_number - 1);
-
-        // Obtener el lunes de esa semana
-        $lunes = $fecha->startOfWeek();
-
-        // Obtener el viernes de esa semana
-        $viernes = $fecha->copy()->endOfWeek()->subDays(2);
-
-
-        // if (isset($request->dates[0])) {
-        //     $lunes = Carbon::parse($request->dates[0])->format('Y-m-d');
-        //     $date_end = Carbon::parse($request->dates[1])->format('Y-m-d');
-        // } elseif (isset($request->date)) {
-        //     $date_start = Carbon::parse($request->date)->format('Y-m-d');
-        //     $date_end = Carbon::parse($request->date)->format('Y-m-d');
-        // } else {
-        //     $date_start = Carbon::now()->format('Y-m-d');
-        //     $date_end = Carbon::now()->format('Y-m-d');
-        // }
-
+        if (isset($request->dates[0])) {
+            $date_start = Carbon::parse($request->dates[0])->format('Y-m-d');
+            $date_end = Carbon::parse($request->dates[1])->format('Y-m-d');
+        } elseif (isset($request->date)) {
+            $date_start = Carbon::parse($request->date)->format('Y-m-d');
+            $date_end = Carbon::parse($request->date)->format('Y-m-d');
+        } else {
+            $date_start = Carbon::tomorrow()->format('Y-m-d');
+            $date_end = Carbon::tomorrow()->format('Y-m-d');
+        }
+  
         $taskWithSubTasks = VirtualTask::has('project')->whereNotNull('task_id')->select('task_id')->get()->map(function ($task) {
             return $task['task_id'];
         })->toArray();
 
-
-
         return response()->json(
-            VirtualTask::has('project')->where(function ($query) use ($lunes, $viernes) {
-                $query->whereBetween('startdate', [$lunes, $viernes])
-                    ->orWhereBetween('enddate', [$lunes, $viernes])
-                    ->orWhere(function ($query) use ($lunes, $viernes) {
-                        $query->where('enddate', '>', $viernes)
-                            ->where('startdate', '<', $lunes);
+            VirtualTask::has('project')->where(function ($query) use ($date_start, $date_end) {
+                $query->whereBetween('startdate', [$date_start, $date_end])
+                    ->orWhereBetween('enddate', [$date_start, $date_end])
+                    ->orWhere(function ($query) use ($date_start, $date_end) {
+                        $query->where('enddate', '>', $date_end)
+                            ->where('startdate', '<', $date_start);
                     });
             })->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) {
                 return [
