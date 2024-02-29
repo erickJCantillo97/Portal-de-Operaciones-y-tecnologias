@@ -618,10 +618,10 @@ const saveweekTask = () => {
                 <span class="col-span-3 grid gap-2 grid-cols-2 h-min max-h-64 overflow-y-auto justify-center ">
                     <div class="flex items-center p-1 justify-between border rounded-md" v-for="weekTask in weekTasks">
                         <p>{{ weekTask.task }}</p>
-                        <div class="min-w-20 flex items-center">
+                        <!-- <div class="min-w-20 flex items-center">
                             <Button rounded text severity="danger" icon="fa-solid fa-trash-can" />
                             <Button rounded text severity="warning" icon="fa-solid fa-pen" />
-                        </div>
+                        </div> -->
                     </div>
                 </span>
                 <span class="flex flex-col justify-end">
