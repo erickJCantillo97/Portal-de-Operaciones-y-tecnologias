@@ -557,7 +557,6 @@ const saveweekTask = () => {
                     </template>
                 </form-wizard>
             </div>
-            {{ weekTasks }}
         </div>
     </AppLayout>
 
