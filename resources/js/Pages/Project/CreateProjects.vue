@@ -292,6 +292,7 @@ const saveweekTask = () => {
                     </h2>
 
                 </span>
+
                 <div v-if="project" class="space-x-6 justify-end flex w-full">
                     <Button icon="fa-solid fa-list-check" severity="help" v-tooltip.left="'Tareas de la semana'"
                         @click="modalWeekTask = true" />
@@ -556,6 +557,7 @@ const saveweekTask = () => {
                     </template>
                 </form-wizard>
             </div>
+            {{ weekTasks }}
         </div>
     </AppLayout>
 

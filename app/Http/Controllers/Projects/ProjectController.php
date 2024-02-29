@@ -139,7 +139,8 @@ class ProjectController extends Controller
         $projectShips = ProjectsShip::with('ship')->where('project_id', $project->id)->get();
         $week = Carbon::now()->weekOfYear;
         $year = Carbon::now()->format('y');
-        $weekTasks  = WeekTask::where('project_id', $project->id)->where('week', $week . $year)->get();
+
+        $weekTasks  = WeekTask::where('project_id', $project->id)->where('week', $year . str_pad($week, 2, "0", STR_PAD_LEFT))->get();
         $gerentes = getPersonalGerenciaOficina('GECON', 'DEGPC')->map(function ($estimador) {
             return [
                 'user_id' => $estimador['Num_SAP'],
@@ -225,13 +226,16 @@ class ProjectController extends Controller
             $ships_ids = ProjectsShip::where('project_id', $project->id)->pluck('ship_id')->toArray();
             $ships = Ship::with('typeShip')->whereIn('id', $ships_ids)->get();
             $semana = ProgressProjectWeek::where('project_id', $project->id)->orderBy('real_progress', 'DESC')->first();
-
+            $week = Carbon::now()->weekOfYear;
+            $year = Carbon::now()->format('y');
+            $weekTasks  = WeekTask::where('project_id', $project->id)->where('week', $year . str_pad($week, 2, "0", STR_PAD_LEFT))->get();
             return Inertia::render(
                 'Project/ProjectOverview',
                 [
                     'project' => Project::with('projectShip', 'contract', 'milestone')->findOrFail($project->id),
                     'ships' => $ships,
-                    'semana' => $semana
+                    'semana' => $semana,
+                    'weekTasks' => $weekTasks
                 ]
             );
         } catch (Exception $e) {
