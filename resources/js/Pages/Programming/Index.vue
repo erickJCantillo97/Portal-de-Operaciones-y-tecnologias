@@ -357,7 +357,7 @@ const filter = ref('')
                                 :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"
                                 :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
                                 class="snap-start rounded-xl shadow-md cursor-pointer hover:bg-blue-200 hover:ring-1 hover:ring-primary">
-                                <div class="grid grid-cols-5 gap-x-1 p-1">
+                            <div class="grid grid-cols-5 gap-x-1 p-1">
                                     <img class="custom-image " :src="item.photo" onerror="this.src='/svg/cotecmar-logo.svg'"
                                         draggable="false" alt="profile-photo" />
                                     <span class="col-span-3">
