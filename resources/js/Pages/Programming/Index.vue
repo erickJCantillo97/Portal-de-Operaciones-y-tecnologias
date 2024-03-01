@@ -180,7 +180,7 @@ const optionSelectHours = ref('select')
 const modhours = ref(false)
 const toggle = (horario, data) => {
     editHorario.value = horario
-    editHorario.value.data=data
+    editHorario.value.data = data
     nuevoHorario.value = {}
     modhours.value = true
 }
@@ -308,7 +308,7 @@ const filter = ref('')
                                                     </span>
                                                     <button v-tooltip.bottom="'Cambiar horario'"
                                                         class="hidden group-hover:flex"
-                                                        @click="optionSelectHours = 'select'; toggle(horario, item.name )">
+                                                        @click="optionSelectHours = 'select'; toggle(horario, item.name)">
                                                         <i
                                                             class="fa-solid fa-pencil text-primary text-xs hover:animate-pulse hover:scale-125"></i>
                                                     </button>
@@ -394,7 +394,8 @@ const filter = ref('')
 
         </div>
     </AppLayout>
-    <CustomModal v-model:visible="modhours" icon="fa-regular fa-clock" width="60vw" :titulo="'Modificar horario de '+editHorario.data">
+    <CustomModal v-model:visible="modhours" icon="fa-regular fa-clock" width="60vw"
+        :titulo="'Modificar horario de ' + editHorario?.data ?? null">
         <template #body>
             <!-- {{ editHorario }} -->
             <div class="flex flex-col gap-1">
@@ -464,7 +465,7 @@ const filter = ref('')
             </div>
             <p>Aplicar por:</p>
             <span class="flex items-center p-2 gap-4">
-                <div v-for="category in [{ name: 'el '+date, key: 'dia' }, { name: 'Resto de la actividad', key: 'resto' }, { name: 'Rango de fechas', key: 'range' }, { name: 'Fechas específicos', key: 'multiple' }]"
+                <div v-for="category in [{ name: 'el ' + date, key: 'dia' }, { name: 'Resto de la actividad', key: 'resto' }, { name: 'Rango de fechas', key: 'range' }, { name: 'Fechas específicos', key: 'multiple' }]"
                     :key="category.key" class="flex items-center">
                     <RadioButton v-model="nuevoHorario.type" :inputId="category.key" name="dynamic" :value="category.key"
                         @click="nuevoHorario.days = null" />
