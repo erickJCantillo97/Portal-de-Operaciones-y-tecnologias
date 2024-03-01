@@ -2,13 +2,10 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, onMounted } from 'vue';
 import { Container, Draggable } from "vue-dndrop";
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import { usePermissions } from '@/composable/permission';
 import { useSweetalert } from '@/composable/sweetAlert';
 import Knob from 'primevue/knob';
 import FullCalendar from '@/Components/FullCalendar.vue'
-import OverlayPanel from 'primevue/overlaypanel';
-import Dropdown from 'primevue/dropdown';
 import Loading from '@/Components/Loading.vue';
 import CustomInput from '@/Components/CustomInput.vue';
 import TabView from 'primevue/tabview';
@@ -150,9 +147,7 @@ const deleteSchedule = async (task, index, schedule) => {
 const employee = ref([])
 const open = ref(false)
 const events = ref([])
-const turnSelect = ref()
 const rendersCalendars = ref(0)
-const showHours = ref('Horas')
 
 // El código anterior define una función llamada `employeeDialog` que toma un parámetro `item`. Dentro
 // de la función, establece el valor de "open" en "verdadero" y el valor de "employee" en el
@@ -170,9 +165,6 @@ const employeeDialog = (item) => {
         })
 }
 
-const submit = () => {
-    console.log('Hello!');
-}
 
 const editHorario = ref()
 const nuevoHorario = ref({})
@@ -357,7 +349,7 @@ const filter = ref('')
                                 :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"
                                 :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
                                 class="snap-start rounded-xl shadow-md cursor-pointer hover:bg-blue-200 hover:ring-1 hover:ring-primary">
-                            <div class="grid grid-cols-5 gap-x-1 p-1">
+                                <div class="grid grid-cols-5 gap-x-1 p-1">
                                     <img class="custom-image " :src="item.photo" onerror="this.src='/svg/cotecmar-logo.svg'"
                                         draggable="false" alt="profile-photo" />
                                     <span class="col-span-3">
@@ -484,132 +476,12 @@ const filter = ref('')
         </template>
     </CustomModal>
     <!--#region MODAL DE PERSONAS -->
-    <CustomModal v-model:visible="open" titulo="Ver detalle de horario">
+    <CustomModal :auto-z-index="false" :base-z-index="10" v-model:visible="open" width="70vw" :titulo="'Ver detalle de horario de ' + employee.Nombres_Apellidos">
         <template #body>
-            <div class="py-2 bg-white">
-                <div class="grid grid-cols-4 mx-auto max-w-[100%] gap-x-2 gap-y-20">
-                    <!--COLUMNA 1 (SECCIÓN INFORMACIÓN DEL EMPLEADO)-->
-                    <div class="col-span-1">
-                        <div
-                            class="flex flex-col items-center justify-center gap-10 pt-12 font-bold border border-solid rounded-md shadow-md sm:flex-col">
-                            <img class="aspect-[4/5] w-32 flex-none rounded-3xl object-cover shadow-md"
-                                :src="employee.photo" alt="Foto" />
-                            <div class="max-w-xl text-center">
-                                <h3 class="text-lg font-semibold leading-8 tracking-tight text-gray-900 whitespace-nowrap">
-                                    {{ employee.Nombres_Apellidos }}
-                                </h3>
-                                <p class="text-base leading-7 text-gray-600">{{ employee.Cargo }}
-                                </p>
-                                <p class="text-base leading-7 text-gray-600">{{ employee.Correo }}
-                                </p>
-                                <ul role="list" class="flex justify-center mt-6 gap-x-6">
-                                    <li>
-                                        <a :href="employee.twitterUrl" class="text-gray-400 hover:text-gray-500">
-                                            <span class="sr-only">Twitter</span>
-                                            <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
-                                                <!-- Icono de Twitter -->
-                                            </svg>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a :href="employee.linkedinUrl" class="text-gray-400 hover:text-gray-500">
-                                            <span class="sr-only">LinkedIn</span>
-                                            <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
-                                                <!-- Icono de LinkedIn -->
-                                            </svg>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <!--COLUMNA 2 - (FullCalendar)-->
-                    <div class="flex col-span-3 flex-nowrap custom-scroll">
-                        <FullCalendar :initialEvents="events" :tasks="tasks" :date="date" :employee="employee"
-                            :project="project" :key="rendersCalendars" />
-
-                    </div>
-                </div>
+            <div class="py-2 max-h-[90vh]">
+                <FullCalendar :initialEvents="events" :tasks="tasks" :date="date" :employee="employee"
+                    :key="rendersCalendars" />
             </div>
         </template>
     </CustomModal>
-
-    <!-- <TransitionRoot as="template" :show="open">
-        <Dialog as="div" class="relative z-30" @close="open = false">
-            <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
-                leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-                <div class="fixed inset-0 z-30 w-screen h-screen transition-opacity bg-gray-500 bg-opacity-75" />
-            </TransitionChild>
-            <div class="fixed inset-0 z-50 h-screen overflow-y-auto">
-                <div class="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
-                    <TransitionChild as="template" enter="ease-out duration-300"
-                        enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                        enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
-                        leave-from="opacity-100 translate-y-0 sm:scale-100"
-                        leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                        <DialogPanel
-                            class="p-6 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl max-w-screen-2xl sm:my-8">
-
-                            <div class="px-2 mt-2 text-center">
-                                <DialogTitle as="h3" class="text-3xl font-semibold text-center text-primary">
-                                    Ver detalle de horario
-                                </DialogTitle>
-                            </div>
-                            <div class="py-2 bg-white">
-                                <div class="grid grid-cols-4 mx-auto max-w-[100%] gap-x-2 gap-y-20">
-                                    
-                                    <div class="col-span-1">
-                                        <div
-                                            class="flex flex-col items-center justify-center gap-10 pt-12 font-bold border border-solid rounded-md shadow-md sm:flex-col">
-                                            <img class="aspect-[4/5] w-32 flex-none rounded-3xl object-cover shadow-md"
-                                                :src="employee.photo" alt="Foto" />
-                                            <div class="max-w-xl text-center">
-                                                <h3
-                                                    class="text-lg font-semibold leading-8 tracking-tight text-gray-900 whitespace-nowrap">
-                                                    {{ employee.Nombres_Apellidos }}
-                                                </h3>
-                                                <p class="text-base leading-7 text-gray-600">{{ employee.Cargo }}
-                                                </p>
-                                                <p class="text-base leading-7 text-gray-600">{{ employee.Correo }}
-                                                </p>
-                                                <ul role="list" class="flex justify-center mt-6 gap-x-6">
-                                                    <li>
-                                                        <a :href="employee.twitterUrl"
-                                                            class="text-gray-400 hover:text-gray-500">
-                                                            <span class="sr-only">Twitter</span>
-                                                            <svg class="w-5 h-5" aria-hidden="true" fill="currentColor"
-                                                                viewBox="0 0 20 20">
-                                                               
-                                                            </svg>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a :href="employee.linkedinUrl"
-                                                            class="text-gray-400 hover:text-gray-500">
-                                                            <span class="sr-only">LinkedIn</span>
-                                                            <svg class="w-5 h-5" aria-hidden="true" fill="currentColor"
-                                                                viewBox="0 0 20 20">
-                                                                
-                                                            </svg>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                   
-                                    <div class="flex col-span-3 flex-nowrap custom-scroll">
-                                        <FullCalendar :initialEvents="events" :tasks="tasks" :date="date"
-                                            :employee="employee" :project="project" :key="rendersCalendars" />
-
-                                    </div>
-                                </div>
-                            </div>
-                        </DialogPanel>
-                    </TransitionChild>
-                </div>
-            </div>
-        </Dialog>
-    </TransitionRoot> -->
-    <!--#endregion-->
 </template>
