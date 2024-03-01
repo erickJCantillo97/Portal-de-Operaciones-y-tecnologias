@@ -95,7 +95,7 @@ const option = ref({
         fontSize: 14,
         offsetCenter: [0, 0],
         formatter: function (value) {
-          return new Intl.NumberFormat().format(Number(value).toFixed(2))
+          return new Intl.NumberFormat().format(Number(value).toFixed(3))
         },
         valueAnimation: true,
         color: 'inherit'
