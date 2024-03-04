@@ -832,7 +832,30 @@ h4.statusmessage {
     z-index: -1;
 }
 
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
 ::-webkit-scrollbar-track {
+    background-color: #e9edf000;
+    border-left: 2px solid #ededed00;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #2e3092;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    /* <== make the border work */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    border: 0;
+}
+
+/* ::-webkit-scrollbar-track {
     background-color: #e9edf000;
     border-left: 2px solid #ededed00;
     border-radius: 4px;
@@ -847,7 +870,7 @@ h4.statusmessage {
 ::-webkit-scrollbar-thumb {
     background: rgb(46 48 146);
     border-radius: 1px;
-}
+} */
 
 .calendar {
     display: flex;
@@ -894,7 +917,7 @@ h4.statusmessage {
 [data-height-collapsible] {
     transition: height 280ms cubic-bezier(0.4, 0, 0.2, 1);
 }
-.no-animtion [data-height-collapsible] {
+.no-animation [data-height-collapsible] {
     transition: none !important;
 }
 
