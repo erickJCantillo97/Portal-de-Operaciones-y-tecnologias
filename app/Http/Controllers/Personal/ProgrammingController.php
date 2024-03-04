@@ -125,7 +125,7 @@ class ProgrammingController extends Controller
         })->toArray();
 
         return response()->json(
-            VirtualTask::whereHas('task')->has('project')->where(function ($query) use ($date_start, $date_end) {
+            VirtualTask::has('project')->has('task')->where(function ($query) use ($date_start, $date_end) {
                 $query->whereBetween('startdate', [$date_start, $date_end])
                     ->orWhereBetween('enddate', [$date_start, $date_end])
                     ->orWhere(function ($query) use ($date_start, $date_end) {
@@ -161,7 +161,9 @@ class ProgrammingController extends Controller
     {
         $date = Carbon::parse($request->date)->format('Y-m-d');
 
-        $schedule = Schedule::where('fecha', $date)->with('scheduleTimes')->where('task_id', $request->task_id)->get();
+        $schedule = Schedule::where('fecha', $date)->with('scheduleTimes')->where('task_id', $request->task_id)->get()->sortByDesc([
+            ['is_my_personal', 'desc'],
+        ]);
 
         return response()->json([
             'schedule' => $schedule,
@@ -170,7 +172,9 @@ class ProgrammingController extends Controller
 
     private function getSchedule($fecha, $taskId)
     {
-        return Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get();
+        return Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get()->sortByDesc([
+            ['is_my_personal', 'desc'],
+        ]);;
     }
 
     /*

@@ -155,6 +155,26 @@ class QuoteController extends Controller
      */
     public function show(Quote $quote)
     {
+        $quotes = Quote::with('version', 'version.quoteTypeShips')->orderBy('consecutive', 'DESC')->get()->map(function ($quote) {
+            return [
+                'id' => $quote['id'],
+                'name' => $quote['name'],
+                'gerencia' => $quote['gerencia'],
+                'status' => $quote['version']['status'],
+                'offer_type' => $quote['version']['offer_type'],
+                'get_status' => $quote['version']['get_status'],
+                'estimador' => $quote['version']['estimador_name'],
+                'customer' => $quote['version']['customer']['name'] ?? '',
+                'version_id' => $quote['version']['id'],
+                'version' => $quote['version']['version'],
+                'created_at' => $quote['version']['created_at'],
+                'expeted_answer_date' => $quote['version']['expeted_answer_date'],
+                'consecutive' => $quote['version']['consecutive'],
+                'products' => $quote['version']['quoteTypeShips'],
+                'total_cost' => collect($quote['version']['total_cost']),
+                'clases' => implode(', ', collect($quote['version']['quoteTypeShips'])->pluck('name')->toArray())
+            ];
+        });
     }
 
     public function updating(QuoteVersion $quoteVersion)
