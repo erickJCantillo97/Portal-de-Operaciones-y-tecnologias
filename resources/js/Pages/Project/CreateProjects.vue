@@ -15,6 +15,7 @@ import Empty from '@/Components/Empty.vue'
 import Listbox from 'primevue/listbox'
 import ToggleButton from 'primevue/togglebutton'
 import CustomUpload from '@/Components/CustomUpload.vue';
+import CustomShiftSelector from '@/Components/CustomShiftSelector.vue';
 
 const props = defineProps({
     project: Object,
@@ -41,6 +42,7 @@ const props = defineProps({
 //#region Referencias (v-model)
 const authorizationSelect = ref()
 const shiftOptions = ref([])
+const loading=ref(false)
 //#endregion
 
 
@@ -125,6 +127,7 @@ onMounted(() => {
 
 const beforeChange = async () => {
     let switchTabsStates = false
+    loading.value=true
     try {
         if (!formData.value.id) {
             await axios.post(route('projects.store'), formData.value)
@@ -140,6 +143,7 @@ const beforeChange = async () => {
                     switchTabsStates = true
                 })
         }
+        loading.value=false
         return switchTabsStates
     } catch (error) {
         console.log(error)
@@ -212,10 +216,6 @@ const getShift = () => {
         })
 }
 
-function formatDateTime24h(date) {
-    return new Date(date).toLocaleString('es-CO',
-        { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-}
 
 //#region Avance proyectos
 const modalProgress = ref(false)
@@ -252,6 +252,7 @@ const weekTask = useForm({
 })
 const saveweekTask = () => {
     weekTask.project_id = props.project.id
+    loading.value=true
     if (weekTask.id) {
         weekTask.put(route('weektasks.update', weekTask.id), {
             onSuccess: () => {
@@ -439,7 +440,7 @@ const deleteweekTask = (id) => {
                             </div>
                             <!--CAMPO TURNO (shift)-->
                             <div class="">
-                                <label class="text-sm mb-0.5 font-bold text-gray-900">Seleccione el Turno</label>
+                                <!-- <label class="text-sm mb-0.5 font-bold text-gray-900">Seleccione el Turno</label>
                                 <Listbox :options="shiftOptions" optionValue="id" v-model="formData.shift"
                                     optionLabel="name" filter :pt="{
                                         list: '!h-40 !p-1',
@@ -482,7 +483,8 @@ const deleteweekTask = (id) => {
                                     <template #emptyfilter>
                                         <Empty message="No se encuentran turnos"></Empty>
                                     </template>
-                                </Listbox>
+                                </Listbox> -->
+                                <CustomShiftSelector v-model:shift="formData.shift" optionValue="id"/>
                             </div>
                         </div>
                     </tab-content>
@@ -561,13 +563,13 @@ const deleteweekTask = (id) => {
                             @delete="delMilestone" />
                     </tab-content>
                     <template #prev>
-                        <Button label="Regresar" raised icon="fa-solid fa-arrow-left" />
+                        <Button label="Regresar" :loading="loading" raised icon="fa-solid fa-arrow-left" />
                     </template>
                     <template #next>
-                        <Button label="Siguiente" raised iconPos="right" icon="fa-solid fa-arrow-right" />
+                        <Button label="Siguiente" :loading="loading" raised iconPos="right" icon="fa-solid fa-arrow-right" />
                     </template>
                     <template #finish>
-                        <Button label="Guardar y salir" raised icon="fa-solid fa-floppy-disk" />
+                        <Button label="Guardar y salir" :loading="loading" raised icon="fa-solid fa-floppy-disk" />
                     </template>
                 </form-wizard>
             </div>

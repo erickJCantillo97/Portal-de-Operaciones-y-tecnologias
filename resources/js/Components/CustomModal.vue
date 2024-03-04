@@ -29,13 +29,21 @@ const props = defineProps({
     titulo: {
         type: String,
         default: null
+    },
+    baseZIndex: {
+        type: Number,
+        default: null
+    },
+    autoZIndex: {
+        type: Boolean,
+        default: false
     }
 })
 const visible = defineModel('visible')
 </script>
 
 <template>
-    <Dialog v-model:visible="visible" :maximizable="maximizable" modal :closable :closeOnEscape
+    <Dialog v-model:visible="visible" :maximizable="maximizable" modal :closable :closeOnEscape :autoZIndex :baseZIndex
         :style="{ width: props.width }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :pt="{
             header: { class: '!bg-primary !h-10' },
             closeButtonIcon: { class: 'text-white' },
