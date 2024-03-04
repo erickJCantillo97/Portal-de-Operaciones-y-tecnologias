@@ -233,7 +233,7 @@ function closeDialog() {
         <!--SELECCIÓN DE TURNOS-->
         <div v-if="showHours === 'Turno'" class="w-full h-64">
           <!--campo selección de turnos-->
-          <CustomShiftSelector optionValue="id" v-model:shift="turnSelect"/>
+          <CustomShiftSelector optionValue="id" v-model:shift="turnSelect" />
           <!-- {{ turnSelect }} -->
           <!-- <CustomInput type="dropdown" class="mt-2 text-left" label="Turnos" placeholder="Seleccione Turno"
             :options="tasks" v-model="turnSelect">
@@ -260,7 +260,7 @@ function closeDialog() {
     </template>
 
   </CustomModal>
-  <TransitionRoot as="template" :show="false">
+  <!-- <TransitionRoot as="template" :show="false">
     <Dialog as="div" class="relative z-30" @close="closeDialog()">
       <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
         leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
@@ -283,7 +283,7 @@ function closeDialog() {
                       Nuevo Horario
                     </DialogTitle>
 
-                    <!-- BOTÓN 'X'->(cerrar) DEL MODAL -->
+                    
                     <div class="w-8 h-8">
                       <button v-tooltip.top="'Cerrar'" @click="closeDialog()">
                         <XMarkIcon
@@ -292,12 +292,11 @@ function closeDialog() {
                     </div>
                   </div>
 
-                  <!--COLUMNA 3 - SELECCIÓN DE ACTIVIDADES-->
+                 
                   <Combobox class="mt-2 text-left" label="Actividad" placeholder="Seleccione Actividad" :options="tasks"
                     v-model="idTaskSelected">
                   </Combobox>
 
-                  <!--RADIO BUTTONS DE HORAS-->
                   <div class="flex flex-wrap w-full justify-around text-left align-items-center h-10 mt-4 space-x-2">
                     <div>
                       <input type="radio" name="action" value="Hours" v-model="showHours">
@@ -313,34 +312,32 @@ function closeDialog() {
                     </div>
                   </div>
 
-                  <!--SELECCIÓN DE HORAS-->
+           
                   <div v-if="showHours === 'Hours'" class="w-full h-auto">
 
-                    <!--campo hora inicio-->
+                 
                     <TextInput class="mt-2 text-left" type="time" label="Hora de inicio" v-model="getStartDateEvent">
                     </TextInput>
 
-                    <!--campo hora finalización-->
+             
                     <TextInput class="mt-2 text-left" type="time" label="Hora de Finalización" v-model="getEndDateEvent">
                     </TextInput>
                   </div>
 
-                  <!--SELECCIÓN DE TURNOS-->
                   <div v-if="showHours === 'Turno'" class="w-full h-64">
-                    <!--campo selección de turnos-->
+            
                     <Combobox class="mt-2 text-left" label="Turnos" placeholder="Seleccione Turno" :options="tasks"
                       v-model="turnSelect">
                     </Combobox>
                   </div>
 
-                  <!--SELECCIÓN RESTO-->
                   <div v-if="showHours === 'Resto'" class="flex justify-center w-full h-auto flex-nowrap">
                     <span class="info-resto">
                       <i>Se asignarán por defecto las horas que no se programaron</i>
                     </span>
                   </div>
 
-                  <!--BOTONES GUARDAR Y CANCELAR DEL MODAL-->
+                  
                   <div class="flex px-2 mt-2 space-x-4">
                     <Button v-if="canDeleteEvent" class="hover:bg-danger text-danger border-danger" severity="danger"
                       @click="handleEditEventClick(selectedEvent)">
@@ -363,6 +360,5 @@ function closeDialog() {
         </div>
       </div>
     </Dialog>
-  </TransitionRoot>
+  </TransitionRoot> -->
 </template>
-<style scoped></style>
