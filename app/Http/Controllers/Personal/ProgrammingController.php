@@ -48,7 +48,7 @@ class ProgrammingController extends Controller
                 $schedule->save();
                 ScheduleTime::create([
                     'schedule_id' => $schedule->id,
-                    'hora_inicio' => '1:00',
+                    'hora_inicio' => '13:00',
                     'hora_fin' => '16:30',
                 ]);
                 $status = true;
@@ -125,7 +125,7 @@ class ProgrammingController extends Controller
         })->toArray();
 
         return response()->json(
-            VirtualTask::whereHas('task')->has('project')->where(function ($query) use ($date_start, $date_end) {
+            VirtualTask::has('project')->has('task')->where(function ($query) use ($date_start, $date_end) {
                 $query->whereBetween('startdate', [$date_start, $date_end])
                     ->orWhereBetween('enddate', [$date_start, $date_end])
                     ->orWhere(function ($query) use ($date_start, $date_end) {
@@ -161,7 +161,9 @@ class ProgrammingController extends Controller
     {
         $date = Carbon::parse($request->date)->format('Y-m-d');
 
-        $schedule = Schedule::where('fecha', $date)->with('scheduleTimes')->where('task_id', $request->task_id)->get();
+        $schedule = Schedule::where('fecha', $date)->with('scheduleTimes')->where('task_id', $request->task_id)->get()->sortByDesc([
+            ['is_my_personal', 'desc'],
+        ]);
 
         return response()->json([
             'schedule' => $schedule,
@@ -170,7 +172,9 @@ class ProgrammingController extends Controller
 
     private function getSchedule($fecha, $taskId)
     {
-        return Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get();
+        return Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get()->sortByDesc([
+            ['is_my_personal', 'desc'],
+        ]);;
     }
 
     /*
@@ -184,7 +188,7 @@ class ProgrammingController extends Controller
         ])->pluck('id')->toArray();
 
         $horas_acumulados = ScheduleTime::whereIn('schedule_id', $schedule)->selectRaw('SUM(datediff(mi,hora_inicio, hora_fin)) as diferencia_acumulada')->get();
-        dd($horas_acumulados);
+        // dd($horas_acumulados);
         return $horas_acumulados[0]->diferencia_acumulada / 60;
     }
 
