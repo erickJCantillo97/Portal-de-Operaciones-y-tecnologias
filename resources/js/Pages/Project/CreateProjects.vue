@@ -16,6 +16,8 @@ import Listbox from 'primevue/listbox'
 import ToggleButton from 'primevue/togglebutton'
 import CustomUpload from '@/Components/CustomUpload.vue';
 import CustomShiftSelector from '@/Components/CustomShiftSelector.vue';
+import Stepper from 'primevue/stepper';
+import StepperPanel from 'primevue/stepperpanel';
 
 const props = defineProps({
     project: Object,
@@ -42,7 +44,7 @@ const props = defineProps({
 //#region Referencias (v-model)
 const authorizationSelect = ref()
 const shiftOptions = ref([])
-const loading=ref(false)
+const loading = ref(false)
 //#endregion
 
 
@@ -127,7 +129,7 @@ onMounted(() => {
 
 const beforeChange = async () => {
     let switchTabsStates = false
-    loading.value=true
+    loading.value = true
     try {
         if (!formData.value.id) {
             await axios.post(route('projects.store'), formData.value)
@@ -143,7 +145,7 @@ const beforeChange = async () => {
                     switchTabsStates = true
                 })
         }
-        loading.value=false
+        loading.value = false
         return switchTabsStates
     } catch (error) {
         console.log(error)
@@ -252,7 +254,7 @@ const weekTask = useForm({
 })
 const saveweekTask = () => {
     weekTask.project_id = props.project.id
-    loading.value=true
+    loading.value = true
     if (weekTask.id) {
         weekTask.put(route('weektasks.update', weekTask.id), {
             onSuccess: () => {
@@ -294,6 +296,7 @@ const deleteweekTask = (id) => {
     })
 }
 
+const active = ref(0);
 </script>
 <template>
     <AppLayout>
@@ -305,9 +308,7 @@ const deleteweekTask = (id) => {
                     <h2 class="text-lg font-semibold w-full text-primary lg:text-2xl">
                         {{ project ? project.name : 'Nuevo proyecto' }}
                     </h2>
-
                 </span>
-
                 <div v-if="project" class="space-x-6 justify-end flex w-full">
                     <Button icon="fa-solid fa-list-check" severity="help" v-tooltip.left="'Tareas de la semana'"
                         @click="modalWeekTask = true" />
@@ -484,7 +485,7 @@ const deleteweekTask = (id) => {
                                         <Empty message="No se encuentran turnos"></Empty>
                                     </template>
                                 </Listbox> -->
-                                <CustomShiftSelector v-model:shift="formData.shift" optionValue="id"/>
+                                <CustomShiftSelector v-model:shift="formData.shift" optionValue="id" />
                             </div>
                         </div>
                     </tab-content>
@@ -566,7 +567,8 @@ const deleteweekTask = (id) => {
                         <Button label="Regresar" :loading="loading" raised icon="fa-solid fa-arrow-left" />
                     </template>
                     <template #next>
-                        <Button label="Siguiente" :loading="loading" raised iconPos="right" icon="fa-solid fa-arrow-right" />
+                        <Button label="Siguiente" :loading="loading" raised iconPos="right"
+                            icon="fa-solid fa-arrow-right" />
                     </template>
                     <template #finish>
                         <Button label="Guardar y salir" :loading="loading" raised icon="fa-solid fa-floppy-disk" />
