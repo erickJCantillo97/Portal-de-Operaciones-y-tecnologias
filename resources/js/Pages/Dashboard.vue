@@ -21,7 +21,7 @@ const props = defineProps({
 //     setTimeout(() => {
 //         window.Echo.private('testing')
 //             .listen('.MyWebSocket', (e) => {
-//                 alert(e.data);
+//                 alert(e.data);aa
 //             })
 //     }, 200);
 // }
@@ -34,7 +34,7 @@ const props = defineProps({
                 <UserHeader class="col-span-1" />
                 <QuotesCard class="col-span-1" :showIndicators="false" v-if="$page.props.auth.user.oficina == 'DEPPC'" />
             </div>
-            <Quotes v-if="$page.props.auth.user.oficina == 'DEEST'" />
+            <Quotes v-if="$page.props.auth.user.oficina == 'DEPPC'" />
             <Planning v-if="$page.props.auth.user.oficina == 'DEPPC'" :projects="props.projects" />
             <!-- <Tools v-if="hasPermission('tool edit')" :projects="props.projects" /> -->
             <!-- <Projects v-else /> -->

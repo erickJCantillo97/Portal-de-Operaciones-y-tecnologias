@@ -131,4 +131,10 @@ class DashboardEstimacionesController extends Controller
             'status' => true
         ];
     }
+
+    public function getValueTotalCostoContratadas()
+    {
+        $year = Carbon::now()->format('Y');
+        // TO DO
+    }
 }
