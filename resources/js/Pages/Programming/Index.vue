@@ -15,6 +15,7 @@ import CustomModal from '@/Components/CustomModal.vue';
 import RadioButton from 'primevue/radiobutton';
 import Empty from '@/Components/Empty.vue';
 import Calendar from 'primevue/calendar';
+import CustomShiftSelector from '@/Components/CustomShiftSelector.vue';
 
 const { hasRole, hasPermission } = usePermissions()
 const { toast } = useSweetalert();
@@ -399,7 +400,7 @@ const filter = ref('')
                 </div>
                 <TabView class="border rounded-md p-1">
                     <TabPanel header="Seleccionar">
-                        <Listbox :options="props.hours" v-model="nuevoHorario" optionLabel="name" filter :pt="{
+                        <!-- <Listbox :options="props.hours" v-model="nuevoHorario" optionLabel="name" filter :pt="{
                             list: '!h-40 !p-1',
                             item: '!h-10 !p-0 !rounded-md hover:!bg-primary-light',
                             filterInput: '!h-8',
@@ -439,7 +440,8 @@ const filter = ref('')
                             <template #emptyfilter>
                                 <Empty message="No se encuentran turnos"></Empty>
                             </template>
-                        </Listbox>
+                        </Listbox> -->
+                        <CustomShiftSelector v-model:shift="nuevoHorario" />
                     </TabPanel>
                     <TabPanel header="Nuevo">
                         <div class="h-48 m-1">

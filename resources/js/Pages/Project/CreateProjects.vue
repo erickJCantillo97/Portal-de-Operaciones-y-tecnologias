@@ -15,6 +15,7 @@ import Empty from '@/Components/Empty.vue'
 import Listbox from 'primevue/listbox'
 import ToggleButton from 'primevue/togglebutton'
 import CustomUpload from '@/Components/CustomUpload.vue';
+import CustomShiftSelector from '@/Components/CustomShiftSelector.vue';
 
 const props = defineProps({
     project: Object,
@@ -439,7 +440,7 @@ const deleteweekTask = (id) => {
                             </div>
                             <!--CAMPO TURNO (shift)-->
                             <div class="">
-                                <label class="text-sm mb-0.5 font-bold text-gray-900">Seleccione el Turno</label>
+                                <!-- <label class="text-sm mb-0.5 font-bold text-gray-900">Seleccione el Turno</label>
                                 <Listbox :options="shiftOptions" optionValue="id" v-model="formData.shift"
                                     optionLabel="name" filter :pt="{
                                         list: '!h-40 !p-1',
@@ -482,7 +483,8 @@ const deleteweekTask = (id) => {
                                     <template #emptyfilter>
                                         <Empty message="No se encuentran turnos"></Empty>
                                     </template>
-                                </Listbox>
+                                </Listbox> -->
+                                <CustomShiftSelector v-model:shift="formData.shift" optionValue="id"/>
                             </div>
                         </div>
                     </tab-content>

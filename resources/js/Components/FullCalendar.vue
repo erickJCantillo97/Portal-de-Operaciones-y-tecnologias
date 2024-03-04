@@ -12,6 +12,9 @@ import Button from 'primevue/button'
 import Combobox from '@/Components/Combobox.vue'
 import Moment from "moment"
 import CustomModal from './CustomModal.vue';
+import CustomInput from './CustomInput.vue';
+import Listbox from 'primevue/listbox';
+import CustomShiftSelector from './CustomShiftSelector.vue';
 
 const props = defineProps({
   initialEvents: Array,
@@ -22,13 +25,11 @@ const props = defineProps({
 })
 
 const isOpen = ref(false)
-const scheduleSelected = ref(null)
 const idTaskSelected = ref(null)
 const selectedEvent = ref(null)
 const canDeleteEvent = ref(false)
 const getStartDateEvent = ref(null)
 const getEndDateEvent = ref(null)
-const taskSelected = ref([])
 const turnSelect = ref([])
 const showHours = ref('Hours')
 const currentEvents = ref([])
@@ -106,7 +107,7 @@ function handleWeekendsToggle() {
 }
 
 function handleDateSelect(selectInfo) {
-  console.log(selectInfo)
+  // console.log(selectInfo)
   isOpen.value = true
   selectedEvent.value = selectInfo
   canDeleteEvent.value = false
@@ -121,12 +122,12 @@ function handleDateSelect(selectInfo) {
 function handleEditEventClick(clickInfo) {
   //TODO Permitir editar el modal
   isOpen.value = true
-  console.log(clickInfo)
+  // console.log(clickInfo)
   selectedEvent.value = clickInfo
   canDeleteEvent.value = true
 }
 function handleDeleteEventClick(selectedEvent) {
-  console.log(selectedEvent)
+  // console.log(selectedEvent)
   if (selectedEvent) {
     selectedEvent.event.remove(); // Elimina el evento
     isOpen.value = false; // Cierra el modal
@@ -183,7 +184,7 @@ function closeDialog() {
 <template>
   <FullCalendar :key="eventguid" :options="calendarOptions">
     <template #eventContent="arg">
-      <div class="flex flex-col h-fu border p-2 justify-center">
+      <div v-tooltip="arg.event.title" class="w-full truncate">
         <p> {{ arg.timeText }} </p>
         <p> {{ arg.event.title }} </p>
       </div>
@@ -193,51 +194,59 @@ function closeDialog() {
   <CustomModal v-model:visible="isOpen" :titulo="(currentEvents != 0 ? 'Editar ' : 'Crear') + ' nuevo horario'">
 
     <template #body>
-      <!--COLUMNA 3 - SELECCIÓN DE ACTIVIDADES-->
-      <Combobox class="mt-2 text-left" label="Actividad" placeholder="Seleccione Actividad" :options="tasks"
-        v-model="idTaskSelected">
-      </Combobox>
+      <div class="h-full w-full space-y-3">
+        <!--COLUMNA 3 - SELECCIÓN DE ACTIVIDADES-->
+        <CustomInput type="dropdown" class="mt-2 text-left" optionLabel="name" optionValue="id" label="Actividad"
+          placeholder="Seleccione Actividad" :options="tasks" v-model:input="idTaskSelected">
+        </CustomInput>
 
-      <!--RADIO BUTTONS DE HORAS-->
-      <div class="flex flex-wrap w-full justify-around text-left align-items-center h-10 mt-4 space-x-2">
-        <div>
-          <input type="radio" name="action" value="Hours" v-model="showHours">
-          <label for="Hours">Intervalo</label>
+        <!--RADIO BUTTONS DE HORAS-->
+        <CustomInput type="radiobutton" v-model:input="showHours"
+          :options="[{ name: 'Intervalo', key: 'intervalo' }, { name: 'Resto', key: 'resto' }, { name: 'Turno', key: 'turno' }]">
+        </CustomInput>
+        <!-- <div class="flex flex-wrap w-full justify-around text-left align-items-center h-10 mt-4 space-x-2">
+          <div>
+            <input type="radio" name="action" value="Hours" v-model="showHours">
+            <label for="Hours">Intervalo</label>
+          </div>
+          <div>
+            <input type="radio" name="action" value="Resto" v-model="showHours">
+            <label for="Resto">Resto</label>
+          </div>
+          <div>
+            <input type="radio" name="action" value="Turno" v-model="showHours">
+            <label for="Turno">Turno</label>
+          </div>
+        </div> -->
+
+        <!--SELECCIÓN DE HORAS-->
+        <div v-if="showHours === 'Intervalo'" class="w-full grid grid-cols-2 gap-4 mt-">
+          <!--campo hora inicio-->
+          <CustomInput type="time" label="Hora de inicio" v-model="getStartDateEvent">
+          </CustomInput>
+
+          <!--campo hora finalización-->
+          <CustomInput type="time" label="Hora de Finalización" v-model="getEndDateEvent">
+          </CustomInput>
         </div>
-        <div>
-          <input type="radio" name="action" value="Resto" v-model="showHours">
-          <label for="Resto">Resto</label>
+
+        <!--SELECCIÓN DE TURNOS-->
+        <div v-if="showHours === 'Turno'" class="w-full h-64">
+          <!--campo selección de turnos-->
+          <CustomShiftSelector optionValue="id" v-model:shift="turnSelect"/>
+          <!-- {{ turnSelect }} -->
+          <!-- <CustomInput type="dropdown" class="mt-2 text-left" label="Turnos" placeholder="Seleccione Turno"
+            :options="tasks" v-model="turnSelect">
+          </CustomInput> -->
         </div>
-        <div>
-          <input type="radio" name="action" value="Turno" v-model="showHours">
-          <label for="Turno">Turno</label>
+
+
+        <!--SELECCIÓN RESTO-->
+        <div v-if="showHours === 'Resto'" class="flex justify-center w-full h-auto flex-nowrap">
+          <span class="info-resto">
+            <i>Se asignarán por defecto las horas que no se programaron</i>
+          </span>
         </div>
-      </div>
-
-      <!--SELECCIÓN DE HORAS-->
-      <div v-if="showHours === 'Hours'" class="w-full h-auto">
-        <!--campo hora inicio-->
-        <TextInput class="mt-2 text-left" type="time" label="Hora de inicio" v-model="getStartDateEvent">
-        </TextInput>
-
-        <!--campo hora finalización-->
-        <TextInput class="mt-2 text-left" type="time" label="Hora de Finalización" v-model="getEndDateEvent">
-        </TextInput>
-      </div>
-
-      <!--SELECCIÓN DE TURNOS-->
-      <div v-if="showHours === 'Turno'" class="w-full h-64">
-        <!--campo selección de turnos-->
-        <Combobox class="mt-2 text-left" label="Turnos" placeholder="Seleccione Turno" :options="tasks"
-          v-model="turnSelect">
-        </Combobox>
-      </div>
-
-      <!--SELECCIÓN RESTO-->
-      <div v-if="showHours === 'Resto'" class="flex justify-center w-full h-auto flex-nowrap">
-        <span class="info-resto">
-          <i>Se asignarán por defecto las horas que no se programaron</i>
-        </span>
       </div>
     </template>
     <!--BOTONES GUARDAR Y CANCELAR DEL MODAL-->
