@@ -13,9 +13,9 @@ import TabPanel from 'primevue/tabpanel';
 import Listbox from 'primevue/listbox';
 import CustomModal from '@/Components/CustomModal.vue';
 import RadioButton from 'primevue/radiobutton';
-import Empty from '@/Components/Empty.vue';
 import Calendar from 'primevue/calendar';
 import CustomShiftSelector from '@/Components/CustomShiftSelector.vue';
+import ButtonGroup from 'primevue/buttongroup';
 
 const { hasRole, hasPermission } = usePermissions()
 const { toast } = useSweetalert();
@@ -120,10 +120,6 @@ function format24h(hora) {
     return new Date("1970-01-01T" + hora).toLocaleString('es-CO',
         { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 }
-function formatdatetime24h(date) {
-    return new Date(date).toLocaleString('es-CO',
-        { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-}
 //#region
 
 // El código anterior define una función llamada "quitar" que toma tres parámetros: "tarea", "índice" y
@@ -208,11 +204,11 @@ const filter = ref('')
                         Programación de actividades
                     </span>
                     <div class="flex items-center space-x-2">
-                        <span class="p-buttonset">
+                        <ButtonGroup>
                             <Button label="Hoy" :outlined="optionValue != 'today'" @click="getTask('today')" />
                             <!-- <Button label="Proxima Semana" :outlined="optionValue != 'today'" @click="getTask('today')" /> -->
                             <Button label="Mañana" :outlined="optionValue != 'tomorrow'" @click="getTask('tomorrow')" />
-                        </span>
+                        </ButtonGroup>
                         <CustomInput type="date" v-model:input="date" @change="getTask('date')" />
                         <!-- <CustomInput type="date" id="date" v-model:input="date" @change="getTask('date')" /> -->
                     </div>
