@@ -11,6 +11,8 @@ import { ref } from 'vue';
 import ToggleButton from 'primevue/togglebutton';
 import RadioButton from 'primevue/radiobutton';
 import Calendar from 'primevue/calendar';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
 
 
 const props = defineProps({
@@ -177,6 +179,7 @@ const input = defineModel('input', {
 })
 
 </script>
+
 <template>
     <div class="flex flex-col">
         <div v-if="type == 'radiobutton'" class="w-full flex h-8"
@@ -197,22 +200,22 @@ const input = defineModel('input', {
                     :currency="currency" :mode="mode" :suffix :prefix :pt="{ input: '!w-full' }" />
                 <Textarea v-else-if="type == 'textarea'" :id :disabled :rows="rowsTextarea" class="w-full" :required
                     :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
-                <Dropdown v-else-if="type == 'dropdown'" :optionValue :id :disabled :placeholder :options :optionLabel :loading
-                    showClear :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''" v-model="input"
-                    :aria-describedby="id + '-help'" class="w-full" :pt="{
-                        root: '!h-8',
-                        input: '!py-0 !flex !items-center !text-sm !font-normal',
-                        item: '!py-1 !px-3 !text-sm !font-normal',
-                        filterInput: '!h-8'
-                    }" />
+                <Dropdown v-else-if="type == 'dropdown'" :optionValue :id :disabled :placeholder :options :optionLabel
+                    :loading showClear :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''"
+                    v-model="input" :aria-describedby="id + '-help'" class="w-full" :pt="{
+            root: '!h-8',
+            input: '!py-0 !flex !items-center !text-sm !font-normal',
+            item: '!py-1 !px-3 !text-sm !font-normal',
+            filterInput: '!h-8'
+        }" />
                 <Dropdown v-else-if="type == 'country'" :optionValue :id :disabled :placeholder filter resetFilterOnHide
                     :options="countries" :loading :class="invalid ? 'p-invalid' : ''" v-model="input"
                     optionLabel="translations.spa.common" :aria-describedby="id + '-help'" class="w-full" :pt="{
-                        root: '!h-8 ',
-                        input: '!py-0 !flex !items-center !text-sm !font-normal',
-                        item: '!py-1 !px-3 !text-sm !font-normal',
-                        filterInput: '!h-8'
-                    }">
+            root: '!h-8 ',
+            input: '!py-0 !flex !items-center !text-sm !font-normal',
+            item: '!py-1 !px-3 !text-sm !font-normal',
+            filterInput: '!h-8'
+        }">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class="flex space-x-1">
                             <img :src="slotProps.value.flags.svg" width="30" :alt="slotProps.value">
@@ -222,9 +225,11 @@ const input = defineModel('input', {
                             {{ slotProps.placeholder }}
                         </span>
                     </template>
+
                     <template #option="slotProps">
                         <div class="flex space-x-1">
-                            <img :src="slotProps.option.flags.svg" width="30" :alt="slotProps.option.translations.spa.common">
+                            <img :src="slotProps.option.flags.svg" width="30"
+                                :alt="slotProps.option.translations.spa.common">
                             <p>{{ slotProps.option.translations.spa.common }}</p>
                         </div>
                     </template>
@@ -232,14 +237,14 @@ const input = defineModel('input', {
                 <MultiSelect v-else-if="type == 'multiselect'" :optionValue :id display="chip" v-model="input" :options
                     :optionLabel :loading :maxSelectedLabels :placeholder :filter="optionLabel ? true : false"
                     :class="invalid ? 'p-invalid' : ''" class="w-full" :aria-describedby="id + '-help'" :pt="{
-                        root: '!h-8',
-                        label: '!py-0.5 !flex !h-full !items-center !text-sm !font-normal',
-                        token: '!py-0 !px-1',
-                        tokenLabel: '!text-sm',
-                        item: '!py-1 !px-3 !text-sm !font-normal',
-                        filterInput: '!h-8',
-                        header: '!h-min !py-0.5'
-                    }" />
+            root: '!h-8',
+            label: '!py-0.5 !flex !h-full !items-center !text-sm !font-normal',
+            token: '!py-0 !px-1',
+            tokenLabel: '!text-sm',
+            item: '!py-1 !px-3 !text-sm !font-normal',
+            filterInput: '!h-8',
+            header: '!h-min !py-0.5'
+        }" />
                 <span v-else-if="type == 'groupcheckbox'">
                     <div class="card flex flex-wrap justify-content-center gap-3">
                         <div class="flex h-8 space-x-1 items-center" v-for="option in options" :key="option.key">
@@ -248,20 +253,24 @@ const input = defineModel('input', {
                         </div>
                     </div>
                 </span>
-                <ToggleButton v-else-if="type == 'tooglebutton'" v-model="input" :onLabel :offLabel :pt="{
-                    root: '!h-8'
-                }" />
-    
+                <ToggleButton v-else-if="type == 'tooglebutton'" v-model="input" :onLabel :offLabel
+                    :pt="{ root: '!h-8' }" />
+
                 <span v-else-if="type == 'datetime'">
-                    <Calendar :id v-model="input" :minDate :maxDate showTime hourFormat="24" showIcon dateFormat="dd/mm/yy" :pt="{
-                        root: '!w-full',
-                        input: '!h-8'
-                    }" />
+                    <Calendar :id v-model="input" :minDate :maxDate showTime hourFormat="24" showIcon
+                        dateFormat="dd/mm/yy" :pt="{
+            root: '!w-full',
+            input: '!h-8'
+        }" />
                 </span>
-                <span v-else :class="(loading || icon) ? 'p-input-icon-left' : ''" class="w-full">
-                    <i v-if="(loading || icon)" :class="loading ? 'pi pi-spin pi-spinner' : icon" />
-                    <InputText size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''" v-model="input" :type
-                        :required :aria-describedby="id + '-help'" class="w-full" />
+                <IconField v-else-if="loading || icon" iconPosition="left" class="w-full">
+                    <InputIcon :class="loading ? 'fa-solid fa-spinner animate-spin' : icon" />
+                    <InputText size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''"
+                        v-model="input" :type :required :aria-describedby="id + '-help'" class="w-full" />
+                </IconField>
+                <span v-else class="w-full">
+                    <InputText size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''"
+                        v-model="input" :type :required :aria-describedby="id + '-help'" class="w-full" />
                 </span>
                 <label v-if="floatLabel && label" :for="id" class="">{{ label }}</label>
             </span>
