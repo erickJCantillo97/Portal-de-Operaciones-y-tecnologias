@@ -60,8 +60,8 @@ const submit = () => {
                     <div>
                         <div class="flex flex-col gap-1">
                             <label for="password">Contraseña</label>
-                            <Password id="password" v-model="form.password" toggleMask :feedback="false" class="!h-8 !w-full" :pt="{
-                                input:'!w-full',
+                            <Password id="password" v-model="form.password" toggleMask :feedback="false" class="!h-8" :pt="{
+                                root:'!grid'
                             }" />
                         </div>
                         <p class="text-xs font-bold text-red-800" id="email-error">{{ $page.props.errors.password }}
