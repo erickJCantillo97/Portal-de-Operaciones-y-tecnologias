@@ -41,7 +41,7 @@ const madurez = ['CONCEPTUAL', 'PRELIMINAR', 'CONTRACTUAL', 'PORTAFOLIO']
 const docTecnico = ['PENDIENTE', 'HT', 'ET', 'PTB', 'DG', 'AT']
 const modEdit = ref(false)
 const loadingButton = ref(false)
-const quoteShips = ref({})
+const quoteShips = ref([])
 
 const editActive = () => {
     modEdit.value = true
@@ -163,6 +163,7 @@ const quoteUpdate = () => {
         confirmButtonText: 'Guardar',
         denyButtonText: 'Cancelar'
     }).then(async (result) => {
+        if (result.isConfirmed) {
         await axios.put(route('quotesversion.update', props.quote.id), dataQuoteNew.value).then((res) => {
             quoteShips.value = res.data.quote.quote_type_ships
             toast('Estimacion actualizada correctamente', 'success')
@@ -173,28 +174,37 @@ const quoteUpdate = () => {
             toast('Hay errores en los datos a guardar', 'error')
         })
         loadingButton.value = false
+    }else{
+        loadingButton.value = false
+    }
     })
 }
 
-const quoteShipsSave = (revision) => {
+const quoteShipsSave = async (revision) => {
     loadingButton.value = true
-    Swal.fire({
+    await Swal.fire({
         title: '¿Desea actualizar los datos de las clases en la estimacion?',
         icon: 'warning',
         showDenyButton: true,
         confirmButtonText: 'Guardar',
         denyButtonText: 'Cancelar'
     }).then(async (result) => {
-        await axios.post(route('quote.version.type_ship.update', props.quote.id), { type_ships: quoteShips.value, revision }).then((res) => {
-            quoteShips.value = res.data.quote.quote_type_ships
-            toast('Datos de las clases actualizados correctamente', 'success')
-            modEdit.value = false
-        }).catch((e) => {
-            console.log(e)
-            errors.value = e.response.data.errors
-            toast('Hay errores en los datos a guardar', 'error')
-        })
-        loadingButton.value = false
+        if (result.isConfirmed) {
+            await axios.post(route('quote.version.type_ship.update', props.quote.id), { type_ships: quoteShips.value, revision }).then((res) => {
+                console.log(res.data)
+                quoteShips.value = res.data.quote.quote_type_ships
+                toast('Datos de las clases actualizados correctamente', 'success')
+                modEdit.value = false
+            }).catch((e) => {
+                console.log(e)
+                loadingButton.value = false
+                errors.value = e.response.data.errors
+                toast('Hay errores en los datos a guardar', 'error')
+            })
+            loadingButton.value = false
+        } else {
+            loadingButton.value = false
+        }
     })
 }
 
@@ -421,11 +431,11 @@ const toggle = (event) => {
                     <span class="flex items-end gap-2" v-if="!modEdit">
                         <Button severity="success" @click="quoteShipsSave(false)" icon="fa-solid fa-floppy-disk"
                             :loading="loadingButton" label="Guardar" class="!h-8"></Button>
-                        <Button severity="primary" @click="quoteShipsSave(true)" icon="fa-solid fa-paper-plane"
+                        <Button severity="primary" @click="quoteShipsSave(true)" :disabled="quoteShips.length==0" icon="fa-solid fa-paper-plane"
                             :loading="loadingButton" label="Enviar a revision" class="!h-8"></Button>
                     </span>
-
                 </span>
+                <!-- {{ quoteShips.length }} -->
             </div>
         </div>
     </AppLayout>

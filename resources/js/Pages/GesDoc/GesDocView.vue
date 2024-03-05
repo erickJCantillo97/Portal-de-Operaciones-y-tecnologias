@@ -14,13 +14,11 @@ import ProjectsCard from '@/Components/ProjectsCard.vue'
 
 onMounted(() => {
   getProjects()
-  // getTipologias()
-  // getGerencias()
 })
 
 const selectedProjects = ref([])
 const projectsOptions = ref([])
-const loadingProjects = ref(true)
+const loadingProjects = ref(false)
 const showNoProjects = ref(true)
 
 const project = ref()
@@ -29,13 +27,21 @@ const tipologias = ref(null) //options
 const listTipologia = ref(0) // Truco Ninja
 
 const getTipologias = async () => {
+  showNoProjects.value = false
+  loadingProjects.value = true
+  tipologias.value = []
+  tipologia.value = null
   try {
     if (selectedProjects.value != null) {
-      await axios.get(route('get.tipologias', selectedProjects.value))
+      await axios.get(route('get.tipologias', selectedProjects.value.id))
         .then((res) => {
           tipologias.value = Object.values(res.data.tipologias)
+          loadingProjects.value = false
           // listTipologia.value++
         })
+    } else {
+      showNoProjects.value = true
+      loadingProjects.value = false
     }
   } catch (error) {
     console.log(error)
@@ -52,8 +58,8 @@ const selectedTipologia = async () => {
   if (tipologia.value) {
     await axios.get(route('get.files.project.tipologia',
       {
-        porjectID: selectedProjects.value,
-        tipologiaID: tipologia.value
+        porjectID: selectedProjects.value.id,
+        tipologiaID: tipologia.value.id
       }))
       .then((response) => {
         tipologiaFiles.value = response.data.files
@@ -83,12 +89,13 @@ const getProjects = async () => {
 }
 
 const getProjectDetails = (option) => {
+  const name = option.name ? option.name : 'N/A';
   const startDate = option.start_date ? option.start_date : 'N/A';
   const endDate = option.end_date ? option.end_date : 'N/A';
   const gerencia = option.Gerencia ? option.Gerencia : 'N/A';
   const status = option.status ? option.status : 'N/A';
 
-  return `Fecha Inicio: ${startDate}\nFecha Fin: ${endDate}\nGerencia: ${gerencia}\nEstado: ${status}`;
+  return `Nombre: ${name}\nFecha Inicio: ${startDate}\nFecha Fin: ${endDate}\nGerencia: ${gerencia}\nEstado: ${status}`;
 }
 
 function formatDateTime24h(dateTime) {
@@ -111,37 +118,62 @@ const formatSize = (bytes) => {
   return `${formattedSize} ${sizeType[i]}`;
 }
 
-const truncateString = (string) => {
-  let maxLength = 20;
+const truncateString = (string, maxLength) => {
   let truncatedString = string.length > maxLength ? string.substring(0, maxLength) + "..." : string
   return truncatedString
 }
 </script>
+
+<style scoped>
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(-20px);
+  opacity: 0;
+}
+</style>
+
 <template>
   <AppLayout>
     <!-- <ProjectsCard /> -->
-    <main class="h-[89vh] overflow-y-auto">
-      <section class="grid size-full max-w-full grid-cols-3 gap-4 p-4">
+    <main class="h-[89vh] overflow-y-auto hover:scrollbar-width-lg">
+      <section class="grid grid-cols-3 size-full max-w-full gap-4 p-2">
+        <!--Lista de Proyectos-->
         <article class="col-span-1">
           <Listbox v-model="selectedProjects" @change="getTipologias()" :options="projectsOptions" filter
-            :filterFields="['name', 'SAP_code', 'contract.name', 'gerencia', 'start_date', 'end_date']" optionLabel="name"
-            optionValue="id" filterPlaceholder="Seleccione proyecto" :virtualScrollerOptions="{ itemSize: 38 }"
+            :filterFields="['name', 'SAP_code', 'contract.name', 'gerencia', 'start_date', 'end_date']"
+            optionLabel="name" filterPlaceholder="Seleccione proyecto" :virtualScrollerOptions="{ itemSize: 38 }"
             listStyle="height:70vh" class="w-full md:w-14rem" :pt="{
-              filterInput: '!h-8',
-              item: '!h-20',
-            }">
+            filterInput: '!h-8',
+            item: '!h-20',
+          }">
+            <template #header>
+              <div class="bg-blue-800 rounded-t-sm">
+                <h2 class="flex justify-center items-center font-semibold first-letter:uppercase text-white italic">
+                  Proyectos
+                </h2>
+              </div>
+            </template>
+
             <template #option="slotProps">
               <ul class="text-sm italic [&>li>p]:font-semibold snap-start">
                 <div v-tooltip.top="{
-                  value: getProjectDetails(slotProps.option),
-                  class: '!w-full',
-                  autoHide: false
-                }" class="flex flex-nowrap w-full space-x-4 size-12">
+            value: getProjectDetails(slotProps.option),
+            class: '!w-full',
+            autoHide: false
+          }" class="flex flex-nowrap w-full space-x-4 size-12">
                   <img class="object-cover rounded-lg" :src="'/images/generic-boat.png'" :alt="slotProps.option.name" />
                   <li class="w-full space-y-2">
                     <p class="w-full text-blue-800 text-md font-semibold truncate">
                       <i class="fa-solid fa-folder-closed"></i>
-                      {{ slotProps.option.name }}
+                      {{ truncateString(slotProps.option.name, 50) }}
                     </p>
                     <p class="font-semibold">
                       Código SAP: {{ slotProps.option.SAP_code }}
@@ -152,98 +184,128 @@ const truncateString = (string) => {
             </template>
           </Listbox>
         </article>
-        <article class="col-span-1">
-          <!-- <NoContentToShow subject="Tipologías" /> -->
-          <Listbox :key="listTipologia" v-model="tipologia" :options="tipologias" filter optionValue="id"
-            optionLabel="name" @click="selectedTipologia()" listStyle="max-height:60vh" class="w-full md:w-14rem" :pt="{
-              filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
-              item: { class: 'hover:bg-blue-100 text-md !px-1 !py-0.5' },
-            }">
-            <template #option="slotProps">
-              <div class="grid grid-cols-7 h-min">
-                <p class="col-span-6 flex items-center">{{ slotProps.option.name }}</p>
-                <!-- <div class="flex space-x-1 rounded-md p-1 justify-end text-right items-center"
-                  v-if="slotProps.option.count != 0">
-                  <p class="text-sm">{{ slotProps.option.count }}</p>
-                  <i class="fa-regular fa-file text-danger border p-1 rounded-md border-danger">
-                  </i>
-                </div> -->
-              </div>
-            </template>
-          </Listbox>
-        </article>
-        <article class="col-span-1">
-          <div v-if="tipologia">
-            <div class="border rounded-md">
-              <div class="flex w-full  space-x-2 p-2">
-                <p class="font-bold">Tipologia:</p>
-                <p>{{ tipologia.name }}</p>
-              </div>
-              <Divider />
-              <div v-if="tipologiaFiles.length > 0" class="overflow-y-auto h-[40vh]">
-                <DataView :value="tipologiaFiles" class="w-full overflow-y-auto">
-                  <template #list="slotProps">
-                    <div class="p-1 flex justify-between items-center w-full">
-                      <div class="flex">
-                        <i v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'"
-                          class=" text-danger fa-regular border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center fa-file-pdf"></i>
-                        <Image v-else :src="slotProps.data.filePath" preview class="w-6">
-                          <template #image>
-                            <div class="flex items-center h-full">
-                              <img :src="slotProps.data.filePath" alt="image" />
-                            </div>
-                          </template>
-                          <template #preview="slotProps1">
-                            <img :src="slotProps.data.filePath" class="!max-w-[80vw] !max-h-[80vh]" alt="preview"
-                              :style="slotProps1.style" @click="slotProps1.previewCallback" />
-                          </template>
-                        </Image>
-                        <div class="px-3">
-                          <p class="text-sm">
-                            {{ (slotProps.index + 1) + '. ' + slotProps.data.tipologia_name }}
-                          </p>
-                          <p class="text-xs font-semibold">{{ slotProps.data.name }}</p>
-                          <span class="flex space-x-2">
-                            <p class="text-xs">{{ slotProps.data.name_user }} </p>
-                            <p class="text-xs">{{ formatDateTime24h(slotProps.data.created_at) }}
+
+        <!--Tipologías-->
+        <Transition name="slide-fade">
+          <article v-if="tipologias && selectedProjects != null" class="col-span-1">
+            <Listbox :key="listTipologia" v-model="tipologia" :options="tipologias" filter optionLabel="name"
+              @click="selectedTipologia()" listStyle="max-height:70vh" class="w-full md:w-14rem" :pt="{
+            item: '!p-2',
+            filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
+          }">
+
+              <template #header>
+                <div class="bg-blue-800 rounded-t-sm">
+                  <h2 class="flex justify-center items-center font-semibold first-letter:uppercase text-white italic">
+                    Tipologías
+                  </h2>
+                </div>
+              </template>
+
+              <template #option="slotProps">
+                <div v-tooltip.top="slotProps.option.name" class="flex items-center justify-between h-min">
+                  <div class="flex space-x-2 items-center px-1">
+                    <i class="fa-solid fa-minus fa-xs"></i>
+                    <p class="col-span-6 flex items-center font-semibold italic">
+                      {{ truncateString(slotProps.option.name, 50) }}
+                    </p>
+                  </div>
+                  <div class="flex space-x-1 rounded-md p-1 justify-end text-right items-center"
+                    v-if="slotProps.option.count != 0">
+                    <p class="text-sm">{{ slotProps.option.count }}</p>
+                    <i class="fa-regular fa-file text-danger border p-1 rounded-md border-danger">
+                    </i>
+                  </div>
+                </div>
+              </template>
+
+              <template #empty>
+                <div class="flex h-[67vh] items-center">
+                  <Loading :message="`Cargando tipologias del proyecto \n${selectedProjects.name}`" />
+                </div>
+              </template>
+            </Listbox>
+          </article>
+        </Transition>
+
+        <!--Archivos-->
+        <Transition name="slide-fade">
+          <article :class="showNoProjects == false ? 'col-span-1' : 'col-span-2'">
+            <div v-if="tipologia != null && selectedProjects != null" class="w-full h-[78vh] border rounded-lg">
+              <div>
+                <div class="flex w-full space-x-2 p-2">
+                  <p class="font-bold">Tipologia:</p>
+                  <p>{{ tipologia.name }}</p>
+                </div>
+                <Divider />
+                <div v-if="tipologiaFiles.length > 0" class="overflow-y-auto h-[40vh]">
+                  <DataView :value="tipologiaFiles" class="w-full overflow-y-auto">
+
+                    <template #list="slotProps">
+                      <div class="p-1 flex justify-between items-center w-full">
+                        <div class="flex">
+                          <i v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'"
+                            class=" text-danger fa-regular border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center fa-file-pdf"></i>
+                          <Image v-else :src="slotProps.data.filePath" preview class="w-6">
+                            <template #image>
+                              <div class="flex items-center h-full">
+                                <img :src="slotProps.data.filePath" alt="image" />
+                              </div>
+                            </template>
+
+                            <template #preview="slotProps1">
+                              <img :src="slotProps.data.filePath" class="!max-w-[80vw] !max-h-[80vh]" alt="preview"
+                                :style="slotProps1.style" @click="slotProps1.previewCallback" />
+                            </template>
+                          </Image>
+                          <div class="px-3">
+                            <p class="text-sm">
+                              {{ (slotProps.index + 1) + '. ' + slotProps.data.tipologia_name }}
                             </p>
-                            <p class="text-xs">{{ formatSize(slotProps.data.file_size) }} </p>
-                            <p class="text-xs"
-                              v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'">
-                              {{ slotProps.data.num_folios }} folio(s) </p>
-                          </span>
+                            <p class="text-xs font-semibold">{{ slotProps.data.name }}</p>
+                            <span class="flex space-x-2">
+                              <p class="text-xs">{{ slotProps.data.name_user }} </p>
+                              <p class="text-xs">{{ formatDateTime24h(slotProps.data.created_at) }}
+                              </p>
+                              <p class="text-xs">{{ formatSize(slotProps.data.file_size) }} </p>
+                              <p class="text-xs"
+                                v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'">
+                                {{ slotProps.data.num_folios }} folio(s) </p>
+                            </span>
+                          </div>
                         </div>
+                        <span class="space-x-1">
+                          <Button class="!h-6 !w-6" icon="fa-regular fa-eye" outlined rounded
+                            @click="showPdf($event, slotProps.data)"
+                            v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'"
+                            severity="success">
+                          </Button>
+                          <Button class="!h-6 !w-6" icon="fa-regular fa-trash-can" outlined disabled @click="" rounded
+                            severity="danger">
+                          </Button>
+                        </span>
                       </div>
-                      <span class="space-x-1">
-                        <Button class="!h-6 !w-6" icon="fa-regular fa-eye" outlined rounded
-                          @click="showPdf($event, slotProps.data)"
-                          v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'"
-                          severity="success">
-                        </Button>
-                        <Button class="!h-6 !w-6" icon="fa-regular fa-trash-can" outlined disabled @click="" rounded
-                          severity="danger">
-                        </Button>
-                      </span>
-                    </div>
-                  </template>
-                </DataView>
-              </div>
-              <div class="flex items-center justify-center h-[30vh]" v-if="tipologiaFiles.length == 0">
-                <span>
-                  <i class="w-full text-center text-2xl text-danger fa-solid fa-file-circle-exclamation"></i>
-                  <p class="w-full text-center font-bold text-danger">
-                    Aun no hay archivos
-                  </p>
-                </span>
-              </div>
-              <div class="h-full flex items-center" v-if="tipologia.count > 0 && tipologiaFiles.length == 0">
-                <Loading message="Cargando archivos" />
+                    </template>
+                  </DataView>
+                </div>
+                <div class="flex items-center justify-center h-[30vh]" v-if="tipologiaFiles.length == 0">
+                  <span>
+                    <i class="w-full text-center text-2xl text-danger fa-solid fa-file-circle-exclamation"></i>
+                    <p class="w-full text-center font-bold text-danger">
+                      Aun no hay archivos
+                    </p>
+                  </span>
+                </div>
+                <div class="h-full flex items-center" v-if="tipologia.count > 0 && tipologiaFiles.length == 0">
+                  <Loading message="Cargando archivos" />
+                </div>
               </div>
             </div>
-          </div>
-          <Loading v-else class="col-span-3 h-full pt-10" message="Seleccione una tipologia" />
-          <NoContentToShow class="mt-5" v-else subject="Tipologias" />
-        </article>
+            <div v-else class="flex size-full justify-center items-center">
+              <NoContentToShow class="mt-5" subject="Seleccione un proyecto para ver sus tipologías" />
+            </div>
+          </article>
+        </Transition>
       </section>
     </main>
   </AppLayout>
