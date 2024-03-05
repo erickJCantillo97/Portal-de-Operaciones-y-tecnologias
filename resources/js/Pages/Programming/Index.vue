@@ -399,51 +399,13 @@ const filter = ref('')
                     </p>
                 </div>
                 <TabView class="border rounded-md p-1">
-                    <TabPanel header="Seleccionar">
-                        <!-- <Listbox :options="props.hours" v-model="nuevoHorario" optionLabel="name" filter :pt="{
-                            list: '!h-40 !p-1',
-                            item: '!h-10 !p-0 !rounded-md hover:!bg-primary-light',
-                            filterInput: '!h-8',
-                            header: '!p-1'
-                        }">
-                            <template #option="slotProps">
-                                <div class=" h-full grid grid-cols-4 border px-1 rounded-md ">
-                                    <span class="flex justify-between items-center overflow-hidden">
-                                        <p class="text-overflow h-full overflow-y-auto flex text-sm font-bold items-center">
-                                            {{ slotProps.option.name }}</p>
-                                        <i class="fa-regular fa-clock"></i>
-                                    </span>
-                                    <div class="text-xs items-center text-center col-span-3 grid grid-cols-4">
-                                        <span>
-                                            <p class="font-bold">Hora Inicio</p>
-                                            <p>{{ formatdatetime24h(slotProps.option.startShift) }}
-                                            </p>
-                                        </span>
-                                        <span>
-                                            <p class="font-bold">Hora Fin</p>
-                                            <p>{{ formatdatetime24h(slotProps.option.endShift) }}</p>
-                                        </span>
-                                        <span>
-                                            <p class="font-bold">Descanso</p>
-                                            <p>{{ slotProps.option.timeBreak }}h</p>
-                                        </span>
-                                        <span>
-                                            <p class="font-bold">H. Laborales</p>
-                                            <p> {{ parseFloat(slotProps.option.hours).toFixed(1) }}h</p>
-                                        </span>
-                                    </div>
-                                </div>
-                            </template>
-                            <template #empty>
-                                <Empty message="No hay turnos para mostrar"></Empty>
-                            </template>
-                            <template #emptyfilter>
-                                <Empty message="No se encuentran turnos"></Empty>
-                            </template>
-                        </Listbox> -->
+                    <TabPanel header="Seleccionar Turno">
                         <CustomShiftSelector v-model:shift="nuevoHorario" />
                     </TabPanel>
-                    <TabPanel header="Nuevo">
+                    <TabPanel header="Selccionar Horario Personalizado">
+                        <CustomShiftSelector v-model:shift="nuevoHorario" />
+                    </TabPanel>
+                    <TabPanel header="Nuevo Horario Personalizado">
                         <div class="h-48 m-1">
                             <CustomInput v-model:input="nuevoHorario.name" label="Nombre" type="text" id="name"
                                 placeholder="Nombre del horario" />
@@ -459,7 +421,7 @@ const filter = ref('')
             </div>
             <p>Aplicar por:</p>
             <span class="flex items-center p-2 gap-4">
-                <div v-for="category in [{ name: 'el ' + date, key: 'dia' }, { name: 'Resto de la actividad', key: 'resto' }, { name: 'Rango de fechas', key: 'range' }, { name: 'Fechas específicos', key: 'multiple' }]"
+                <div v-for="category in [{ name: 'Solo el ' + date, key: 'dia' }, { name: 'Resto de la actividad', key: 'resto' }, { name: 'Rango de fechas', key: 'range' }, { name: 'Fechas específicos', key: 'multiple' }]"
                     :key="category.key" class="flex items-center">
                     <RadioButton v-model="nuevoHorario.type" :inputId="category.key" name="dynamic" :value="category.key"
                         @click="nuevoHorario.days = null" />
@@ -478,7 +440,8 @@ const filter = ref('')
         </template>
     </CustomModal>
     <!--#region MODAL DE PERSONAS -->
-    <CustomModal :auto-z-index="false" :base-z-index="10" v-model:visible="open" width="70vw" :titulo="'Ver detalle de horario de ' + employee.Nombres_Apellidos">
+    <CustomModal :auto-z-index="false" :base-z-index="10" v-model:visible="open" width="70vw"
+        :titulo="'Ver detalle de horario de ' + employee.Nombres_Apellidos">
         <template #body>
             <div class="py-2 max-h-[90vh]">
                 <FullCalendar :initialEvents="events" :tasks="tasks" :date="date" :employee="employee"
