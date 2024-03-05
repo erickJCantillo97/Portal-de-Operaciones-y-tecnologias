@@ -75,12 +75,12 @@ const formatCurrency = (valor, moneda) => {
                             {{ formatCurrency(parseInt(pep.materials) + parseInt(pep.labor) + parseInt(pep.services)) }}
                         </p>
                         <p class="h-full flex items-center justify-end">
-                            {{ formatCurrency(pep.materials_ejecutados + pep.labor_ejecutados + pep.services_ejecutados) }}
+                            {{ formatCurrency(parseInt(pep.materials_ejecutados) + parseInt(pep.labor_ejecutados) + parseInt(pep.services_ejecutados)) }}
                         </p>
                         <p class="h-full flex items-center justify-end">
                             {{
                                 formatCurrency(((parseInt(pep.materials) + parseInt(pep.labor) + parseInt(pep.services)) -
-                                    parseInt(pep.materials_ejecutados + pep.labor_ejecutados + pep.services_ejecutados)))
+                                    (parseInt(pep.materials_ejecutados) + parseInt(pep.labor_ejecutados) + parseInt(pep.services_ejecutados))))
                             }}
                         </p>
                     </span>
@@ -88,9 +88,9 @@ const formatCurrency = (valor, moneda) => {
             </template>
             <div class="max-h-[50vh] overflow-y-auto overflow-x-hidden">
                 <AccordionBudget v-if="pep.peps" :data="pep.peps" :option="option" />
-                <AccordionBudget v-if="pep.grafos" :data="pep.grafos" :option="option" level="grafo" />
+                <AccordionBudget v-if="pep.grafos" :data="pep.grafos" :option="option" level="grafo"  />
                 <span v-if="level == 'grafo'">
-                    <div v-for="operacion in pep.operaciones" class=" border m-1 grid sm:grid-cols-4 w-full px-1">
+                    <div v-for="operacion in pep.operaciones" class=" border grid sm:grid-cols-4 w-full p-1">
                         <span class="">
                             <p>
                                 {{ operacion.identification }}
