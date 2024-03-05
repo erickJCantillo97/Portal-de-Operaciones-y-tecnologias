@@ -230,6 +230,16 @@ const truncateString = (string, maxLength) => {
 
         <!--Archivos-->
         <Transition name="slide-fade">
+          <Listbox :key="listTipologia" v-model="tipologia" :options="tipologias" filter optionLabel="name"
+            @click="selectedTipologia()" listStyle="max-height:70vh" class="w-full md:w-14rem" :pt="{
+            item: '!p-2',
+            filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
+          }">
+
+            <template #option="slotProps">
+              
+            </template>
+          </Listbox>
           <article :class="showNoProjects == false ? 'col-span-1' : 'col-span-2'">
             <div v-if="tipologia != null && selectedProjects != null" class="w-full h-[78vh] border rounded-lg">
               <div>
