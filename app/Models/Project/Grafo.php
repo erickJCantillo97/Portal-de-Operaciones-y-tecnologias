@@ -22,23 +22,4 @@ class Grafo extends Model implements Auditable
     {
         return Operation::where('grafo', '=', $this->id)->get();
     }
-
-    public function materialsEjecutados(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $this->getOperacionesAttribute()->sum('materials_ejecutados') +  $value,
-        );
-    }
-    public function laborEjecutados(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $this->getOperacionesAttribute()->sum('labor_ejecutados') +  $value,
-        );
-    }
-    public function servicesEjecutados(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $this->getOperacionesAttribute()->sum('services_ejecutados') +  $value,
-        );
-    }
 }

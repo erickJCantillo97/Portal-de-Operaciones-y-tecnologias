@@ -40,6 +40,8 @@ use Inertia\Inertia;
 Route::get('/', function () {
     // $processId = 1;// Asigna un identificador único para cada proceso de carga
     // return event(new ContractEvent($processId));
+    if (auth()->user() != null)
+        return Inertia::render('Dashboard');
     return Inertia::render('Auth/Login', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -57,57 +59,17 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     })->name('get.foto');
 
     Route::get('/dashboard', function () {
-
-        $taskProject = [];
-
-        // VirtualTask::whereNull('task_id')->get()->map(function ($item) {
-        //     return [
-        //         'id' => $item->id,
-        //         'project_id' => $item->project->id,
-        //         'avance' => number_format($item['percentDone'], 2),
-        //         'name' => $item['name'],
-        //         // 'file' => $item->project->contract->ship->file,
-        //         'contrato' => $item->project->contract->name,
-        //         'duracion' => $item->duration,
-        //         'fechaI' => $item->startDate,
-        //         'fechaF' => $item->endDate,
-        //         'unidadDuracion' => $item->durationUnit,
-        //         'costo' => $item->project->cost_sale
-        //     ];
-        // });
-
-        return Inertia::render('Dashboard', [
-            'projects' => $taskProject,
-        ]);
+        return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    Route::get('getEmpleadosGerencias', function () {
-        if (auth()->user()->hasRole('Super Admin')) {
-            return getEmpleadosAPI()->groupBy('GERENCIA');
-        }
-        return searchEmpleados('Gerencia', auth()->user()->gerencia)->groupBy('Oficina');
-    })->name('get.empleados.gerencia');
+
 
     Route::get('get/gerencias', function () {
         return response()->json(['gerencias' => gerencias()]);
     })->name('get.gerencias');
 
-    Route::get('dashboard/{gerencia}', function ($gerencia) {
-        $personal = searchEmpleados('GERENCIA', $gerencia)->groupBy('OFICINA');
 
-        return Inertia::render('Dashboards/Gerencias', ['personal' => $personal, 'GERENCIA' => $gerencia]);
-    })->name('dashboard.gerencias');
 
-    Route::get('crearTarea', function () {
-        Task::truncate();
-        Task::create([
-            'name' => 'ARC PUNTA ESPADA',
-            'percentDone' => 50,
-            'duration' => 260,
-            'startDate' => Carbon::now(),
-            'endDate' => Carbon::now()->addDays(260),
-        ]);
-    });
 
     //SUGERENCIAS
     Route::resource('suggestion', SuggestionController::class);
@@ -138,52 +100,19 @@ Route::get('recuperarDatos', function () {
     return System::get();
 });
 
-Route::get('projectAvance', function () {
-    $proyecto = Project::first();
 
-    $taskProject = Task::where('project_id', $proyecto->id)->whereNull('task_id')->get()->map(function (Task $item) {
-        return [
-            number_format($item['percentDone'], 2),
-            $item['name'],
-        ];
-    });
 
-    return $taskProject;
-});
 
-Route::get('costoPersonal', function () {
-
-    $personal = getPersonalGerenciaOficina(auth()->user()->gerencia);
-    $sum = $personal->sum(function ($objeto) {
-        return $objeto['Ingresos_Mes'];
-    });
-
-    return $sum;
-});
 
 Route::get('/timeline', [DashboardEstimacionesController::class, 'getQuotesStatus'])->name('timeline');
 
-Route::get('clientes_anterior', function () {
-    // QuoteStatus::truncate();
-    // QuoteVersion::truncate();
-    // QuoteTypeShip::truncate();
-    // Comment::truncate();
-    // Quote::truncate();
-    // Customer::truncate();
-    $clientes =  DB::connection('sqlsrv_anterior')->table('clientes')->get();
-    foreach ($clientes as $cliente) {
-        Customer::create([
-            // 'nit' => $cliente->id,
-            'name' => $cliente->nombre_cliente,
-            'type' => $cliente->tipo_cliente,
-            'country' => $cliente->pais,
-            'country_en' => strtoupper($cliente->pais),
-        ]);
-    }
-    return Customer::get();
-});
+
 
 Route::get('estmaciones_anterior', function () {
+    QuoteStatus::truncate();
+    // QuoteTypeShip::forceDeleted();
+    QuoteVersion::truncate();
+    Quote::truncate();
     $estimaciones =  DB::connection('sqlsrv_anterior')->table('estimacions')->get();
     foreach ($estimaciones as $estimacion) {
         $quote = Quote::where('consecutive', $estimacion->consecutivo)->first();
@@ -198,7 +127,7 @@ Route::get('estmaciones_anterior', function () {
         $cliente = DB::connection('sqlsrv_anterior')->table('clientes')->where('id', $estimacion->cliente_id)->first();
         $cliente_id = null;
         if ($cliente) {
-            $cliente_id = Customer::where('name', $cliente->nombre_cliente)->first()->id;
+            $cliente_id = Customer::where('name', $cliente->nombre_cliente)->first()->id ?? null;
         }
         $quoteVersion = QuoteVersion::FirstOrCreate([
             'quote_id' => $quote->id,
@@ -216,10 +145,12 @@ Route::get('estmaciones_anterior', function () {
         $quote->current_version_id = $quoteVersion->id;
         $quote->save();
         if ($estimacion->clase_id) {
-            QuoteTypeShip::FirstOrCreate([
+            $class =  DB::connection('sqlsrv_anterior')->table('clases')->where('id', $estimacion->clase_id)->first();
+            $clase = TypeShip::where('name', $class->name)->first();
+            $quoteShip = QuoteTypeShip::FirstOrCreate([
                 'quote_version_id' => $quoteVersion->id,
-                'type_ship_id' => $estimacion->clase_id,
-                'name' => TypeShip::find($estimacion->clase_id)->name ?? 'Sin Clase',
+                'type_ship_id' => $clase->id ?? 0,
+                'name' => $clase->name ?? 'Sin Clase',
                 'scope' => $estimacion->alcance,
                 'maturity' => $estimacion->madurez,
                 'margin' => $estimacion->margen_estimado,
@@ -228,6 +159,11 @@ Route::get('estmaciones_anterior', function () {
                 'white_paper' => $estimacion->documento_tecnico,
                 'price_before_iva_original' => $estimacion->precio_antes_de_iva_original ?? 0,
             ]);
+            if ($clase) {
+                $quoteShip->type_ship_id = $clase->id;
+                $quoteShip->name = $clase->name ?? $quoteShip->name;
+                $quoteShip->save();
+            }
         }
         $estado = 0;
         $fecha = $estimacion->fecha_solicitud;
@@ -236,12 +172,12 @@ Route::get('estmaciones_anterior', function () {
             $fecha = $estimacion->fecha_firma;
         } else if ($estimacion->fecha_pendiente_firma != null) {
             $estado = 2;
-            $fecha = $estimacion->fecha_pendiente_firma;
+            $fecha = $estimacion->fecha_pendiente_firma ?? '2023-07-18';
         } else if ($estimacion->fecha_respuesta_estimador != null) {
             $estado = 1;
             $fecha = $estimacion->fecha_respuesta_estimador;
         }
-        if (isset($quote)) {
+        if (isset($quote) && isset($fecha)) {
             QuoteStatus::create([
                 'quote_version_id' => $quoteVersion->id,
                 'status' => $estado,
@@ -252,97 +188,11 @@ Route::get('estmaciones_anterior', function () {
     }
 });
 
-Route::get('clases_anterior', function () {
 
-    $data =  DB::connection('sqlsrv_anterior')->table('clases')->get();
-    foreach ($data as $clase) {
-        TypeShip::firstOrCreate([
-            'name' => $clase->name,
-            'type' => $clase->type,
-            'disinger' => $clase->empresa_diseñadora,
-            'hull_material' => $clase->material_casco,
-            'length' => $clase->eslora,
-            'breadth' => $clase->manga,
-            'draught' => $clase->calado_diseño,
-            'depth' => $clase->puntal,
-            'full_load' => $clase->full_load,
-            'light_ship' => $clase->light_ship,
-            'power_total' => $clase->potencia_total_kw,
-            'propulsion_type' => $clase->tipo_propulsion,
-            'velocity' => $clase->velocidad,
-            'autonomy' => $clase->autonomias,
-            'crew' => $clase->tripulacion_maxima,
-            'GT' => $clase->GT,
-            'CGT' => $clase->CGT,
-            'bollard_pull' => $clase->bollard_pull,
-            'clasification' => $clase->clasificacion,
-        ]);
-    }
-});
 
-Route::get('contratos_anterior', function () {
-    // Contract::truncate();
-    $data =  DB::connection('sqlsrv_anterior')->table('contratos')->get();
-    foreach ($data as $clase) {
-        $cliente = DB::connection('sqlsrv_anterior')->table('clientes')->where('id', $clase->cliente_id)->first();
-        $id = null;
-        if ($cliente) {
-            $id = Customer::where('name', $cliente->nombre_cliente)->first()->id ?? null;
-        }
-        Contract::firstOrCreate([
-            'customer_id' => $id,
-            'contract_id' => $clase->contrato_id,
-            'subject' => $clase->objeto,
-            'gerencia' => 'GECON',
-            'type_of_sale' => $clase->tipo_venta == 'VENTA FINANCIADA' ? 'FINANCIADA' : $clase->tipo_venta,
-            'supervisor' => $clase->supervisor,
-            'start_date' => $clase->fecha_inicio,
-            'end_date' => $clase->fecha_fin,
-            'state' => $clase->estado,
-        ]);
-    }
-});
 
-Route::get('proyectos_anterior', function () {
-    // Contract::truncate();
-    Ship::truncate();
-    $data =  DB::connection('sqlsrv_anterior')->table('proyectos')->get();
-    foreach ($data as $proyecto) {
 
-        $clase = DB::connection('sqlsrv_anterior')->table('clases')->where('id', $proyecto->clase_id)->first();
-        $contrato = DB::connection('sqlsrv_anterior')->table('contratos')->where('id', $proyecto->contrato_id)->first();
-        $contrato_id = null;
-        if ($contrato) {
-            $contrato_id = Contract::where('contract_id', $contrato->contrato_id)->first()->id ?? null;
-        }
-        $p = Project::firstOrNew([
-            'SAP_code' => $proyecto->codigo_SAP
-        ]);
-        $p->name = $proyecto->name;
-        $p->contract_id = $contrato_id;
-        $p->type = $proyecto->tipo_proyecto == 'PROYECTO DE VENTA' ? 'PROYECTO DE VENTA (ARTEFACTO NAVAL)' : ($proyecto->tipo_proyecto == 'PROYECTO DE INVERSIÓN DE BUQUE' ? 'PROYECTO DE INVERSIÓN (ARTEFACTO NAVAL)' : $proyecto->tipo_proyecto);
-        $p->status = $proyecto->estado_proyecto == [] ?  null : $proyecto->estado_proyecto;
-        $p->scope = $proyecto->alcance == 'CO DESARROLL DISEÑO Y CONSTRUCCIÓN' ?  'CO DESARROLLO DISEÑO Y CONSTRUCCIÓN' : $proyecto->alcance;
-        $p->observations = $proyecto->observacions;
-        $p->gerencia = 'GECON';
-        $p->save();
-        $clase_id = null;
-        if ($clase) {
-            $clase_id = TypeShip::where('name', $clase->name)->first()->id ?? null;
-        }
 
-        $s = Ship::firstOrCreate([
-            'idHull' => $proyecto->casco,
-            'name' => $proyecto->name,
-            'acronyms' => $proyecto->siglas_proyecto,
-            'type_ship_id' => $clase_id
-        ]);
-        ProjectsShip::firstOrCreate([
-            'project_id' => $p->id,
-            'ship_id' => $s->id
-        ]);
-    }
-});
 
 Route::get('peps_anteriores', [DatabaseBackController::class, 'getPep']);
 Route::get('grafos-anteriores', [DatabaseBackController::class, 'getGrafos']);

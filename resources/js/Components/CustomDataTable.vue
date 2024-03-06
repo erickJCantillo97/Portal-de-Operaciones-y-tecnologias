@@ -8,9 +8,12 @@ import Dropdown from 'primevue/dropdown';
 import MultiSelect from 'primevue/multiselect';
 import Swal from 'sweetalert2';
 import ProgressBar from 'primevue/progressbar';
+import ButtonGroup from 'primevue/buttongroup';
 import Tag from 'primevue/tag';
 import InputNumber from 'primevue/inputnumber';
 import ApplicationLogo from './ApplicationLogo.vue';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
 import Loading from './Loading.vue';
 
 const props = defineProps({
@@ -142,10 +145,6 @@ const formatCurrency = (valor, moneda) => {
     }
 }
 
-
-
-
-const auxdata = ref()
 //#endregion
 </script>
 
@@ -184,20 +183,22 @@ const auxdata = ref()
                     </span>
                 </span>
                 <div class="flex items-center " :class="filter ? 'justify-between' : 'justify-end'" v-if="showHeader">
-                    <div class="space-x-2" v-if="filter">
+                    <div class="space-x-2 flex" v-if="filter">
                         <Button v-tooltip.top="'Quitar filtros'" @click="clearFilter()" outlined
                             icon="fa-solid fa-filter-circle-xmark" />
-                        <span class="p-input-icon-left">
-                            <i class="fa-solid fa-magnifying-glass"></i>
+                        <IconField iconPosition="left">
+                            <InputIcon>
+                                <i class="fa-solid fa-magnifying-glass" />
+                            </InputIcon>
                             <InputText v-model="filters.global.value" type="search" size="small" placeholder="Buscar" />
-                        </span>
-                        <span v-if="props.filterButtons && filterOK" class="p-buttonset">
+                        </IconField>
+                        <ButtonGroup v-if="props.filterButtons && filterOK">
                             <Button v-for="button in props.filterButtons"
                                 :label="button.label + ': ' + getTotalStatus(button.field, button.data)"
                                 :severity=button.severity
                                 @click="filters[button.field].value == button.data ? filters[button.field].value = null : filters[button.field].value = button.data"
                                 :outlined="filters[button.field].value != button.data" icon="" />
-                        </span>
+                        </ButtonGroup>
                     </div>
                     <div class="space-x-2">
                         <Button v-if="exportRute != ''" @click="exportar" icon="fa-solid fa-file-excel" class="!w-8" />
@@ -354,7 +355,7 @@ const auxdata = ref()
                     <span v-for="button in props.actions">
                         <Button @click="$emit(button.event, $event, data)" :text="button.text" :severity="button.severity"
                             :outlined="button.outlined" :rounded="button.rounded" :icon="button.icon" :title="button.label"
-                            :class="button.class" v-if="button.show == null? true: button.show" />
+                            :class="button.class" v-if="button.show == null ? true : button.show" />
                     </span>
                 </div>
             </template>

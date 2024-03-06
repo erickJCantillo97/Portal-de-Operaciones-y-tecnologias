@@ -31,26 +31,4 @@ class Pep extends Model implements Auditable
     {
         return Grafo::where('pep_id', '=', $this->id)->get();
     }
-
-    public function materialsEjecutados(): Attribute
-    {
-        return  Attribute::make(
-            get: fn ($value) => $this->getGrafosAttribute()->sum('materials_ejecutados') + $this->getPepsAttribute()->sum('materials_ejecutados') +  $value,
-            set: fn ($value) => $value,
-        );
-    }
-    public function laborEjecutados(): Attribute
-    {
-        return  Attribute::make(
-            get: fn ($value) => $this->getGrafosAttribute()->sum('labor_ejecutados') + $this->getPepsAttribute()->sum('labor_ejecutados') +  $value,
-            set: fn ($value) => $value,
-        );
-    }
-    public function servicesEjecutados(): Attribute
-    {
-        return  Attribute::make(
-            get: fn ($value) => $this->getGrafosAttribute()->sum('services_ejecutados') + $this->getPepsAttribute()->sum('services_ejecutados') +  $value,
-            set: fn ($value) => $value,
-        );
-    }
 }

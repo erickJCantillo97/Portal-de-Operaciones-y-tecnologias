@@ -53,6 +53,7 @@ const columnas = [
 //#region Botones de filtro de CustomDatatable
 const filterButtons = [
     { field: 'get_status', label: 'En proceso', data: 'Proceso', severity: 'primary' },
+    { field: 'get_status', label: 'Contratadas', data: 'Contratada', severity: 'warning' },
     { field: 'get_status', label: 'Entregadas', data: 'Entregada', severity: 'warning' },
     { field: 'get_status', label: 'Firmadas', data: 'Firmada', severity: 'success' },
     { field: 'get_status', label: 'Pendiente', data: 'Pendiente por Firma', severity: 'warning' },

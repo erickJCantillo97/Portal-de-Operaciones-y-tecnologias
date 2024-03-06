@@ -1,5 +1,5 @@
-<script>
-import { defineComponent } from 'vue'
+<script setup>
+import { ref, onMounted } from 'vue';
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
@@ -8,211 +8,259 @@ import esLocale from '@fullcalendar/core/locales/es'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { XMarkIcon } from '@heroicons/vue/20/solid'
 import TextInput from '@/Components/TextInput.vue'
-import Button from '@/Components/Button.vue'
+import Button from 'primevue/button'
 import Combobox from '@/Components/Combobox.vue'
 import Moment from "moment"
-import { Calendar } from '@fullcalendar/core';
-import { INITIAL_EVENTS, createEventId } from '../event-utils'
+import CustomModal from './CustomModal.vue';
+import CustomInput from './CustomInput.vue';
+import Listbox from 'primevue/listbox';
+import CustomShiftSelector from './CustomShiftSelector.vue';
 
-export default defineComponent({
-  components: {
-    FullCalendar,
-    TransitionRoot,
-    TransitionChild,
-    Dialog,
-    DialogTitle,
-    TextInput,
-    Button,
-    Combobox,
-    XMarkIcon,
-  },
-  props: {
-    initialEvents: Array,
-    date: Date,
-    tasks: Array,
-    employee: Array,
-    project: String,
-  },
-  // mounted() {
-
-  // },
-  // setup() {
-  //   const isOpen = ref(false);
-  //   const tasks = ref();
-  //   const taskSelect = ref();
-  //   const showHours = ref('Hours');
-  // },
-
-  data() {
-    return {
-      calendarOptions: {
-        plugins: [
-          dayGridPlugin,
-          timeGridPlugin,
-          interactionPlugin // needed for dateClick
-        ],
-        headerToolbar: {
-          left: 'today',
-          center: 'title',
-          right: ''
-          // right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
-        initialView: 'timeGridDay', //onMounted type calendar view
-        initialDate: this.date,
-        initialEvents: this.initialEvents, // alternatively, use the `events` setting to fetch from a feed
-        allDaySlot: false,
-        editable: true,
-        selectable: true,
-        selectMirror: true,
-        dayMaxEvents: true,
-        weekends: true,
-        select: this.handleDateSelect,
-        eventClick: this.handleEditEventClick,
-        eventsSet: this.handleEvents,
-        locale: esLocale,
-        eventOverlap: false,
-        nowIndicator: true,
-        selectable: true,
-        eventConstraint: {
-          startTime: '07:00',
-          endTime: '16:30',
-        },
-        selectConstraint: {
-          startTime: "07:00",
-          endTime: "16:30",
-        },
-        businessHours: {
-          // days of week. an array of zero-based day of week integers (0=Sunday)
-          daysOfWeek: [1, 2, 3, 4, 5], // Monday - Friday
-          startTime: '07:00', // a start time (07am in this example)
-          endTime: '16:30', // an end time (4:30pm in this example)
-        },
-        // eventColor: '#378006',
-        // eventClassNames: 'custom-event-class',
-        eventTimeFormat: { // like '14:30:00'
-          hour: '2-digit',
-          minute: '2-digit',
-          meridiem: 'short',
-          hour12: true
-        },
-        slotLabelFormat: {
-          hour: 'numeric',
-          minute: '2-digit',
-          meridiem: 'short',
-          hour12: false
-        },
-        // you can update a remote database when these fire:
-        // eventAdd: this.submit,
-        // eventChange: this.submit,
-        // eventRemove: this.handleDeleteEventClick,
-
-        tasks: [],
-      },
-      isOpen: false,
-      scheduleSelected: null,
-      idTaskSelected: null,
-      selectedEvent: null,
-      canDeleteEvent: false,
-      getStartDateEvent: null,
-      getEndDateEvent: null,
-      taskSelected: [],
-      turnSelect: [],
-      showHours: 'Hours',
-      currentEvents: [],
-    }
-  },
-  methods: {
-    handleWeekendsToggle() {
-      this.calendarOptions.weekends = !this.calendarOptions.weekends // update a property
-    },
-    handleDateSelect(selectInfo) {
-      this.isOpen = true
-      this.selectedEvent = selectInfo
-      this.canDeleteEvent = false
-
-      let formatStartDate = Moment(selectInfo.startStr).format('HH:mm')
-      this.getStartDateEvent = formatStartDate
-
-      let formatEndDate = Moment(selectInfo.endStr).format('HH:mm')
-      this.getEndDateEvent = formatEndDate
-    },
-    handleEditEventClick(clickInfo) {
-      //TODO Permitir editar el modal
-      this.isOpen = true
-      console.log(clickInfo)
-      this.selectedEvent = clickInfo
-      this.canDeleteEvent = true
-    },
-    handleDeleteEventClick(selectedEvent) {
-      console.log(selectedEvent)
-      if (this.selectedEvent) {
-        this.selectedEvent.event.remove(); // Elimina el evento
-        this.isOpen = false; // Cierra el modal
-      }
-    },
-    handleEvents(events) {
-      // console.log(events)
-      this.currentEvents = events
-    },
-    handleItem() {
-      console.log('Hello World')
-    },
-    submit(idTask, schedule) {
-      console.log(schedule)
-      console.log(idTask)
-
-      let title = this.idTaskSelected.name
-      let calendarApi = schedule.view.calendar
-
-      calendarApi.unselect() // clear date selection
-
-      if (title != null) {
-        calendarApi.addEvent({
-          id: createEventId(),
-          title,
-          start: schedule.startStr,
-          end: schedule.endStr,
-          color: 'purple'
-          // allDay: selectInfo.allDay
-        })
-      }
-
-      this.isOpen = false
-      // if (clickInfo == null) {
-      //   clickInfo.event.remove()
-      //   this.isOpen = false
-      // } else {
-      //   axios.put('/api/eventos', newEvent)
-      //     .then((response) => {
-      //       console.log('Evento creado exitosamente');
-      //     })
-      //     .catch((error) => {
-      //       console.error('Error al crear el evento', error);
-      //     });
-      // }
-    },
-    closeDialog() {
-      this.isOpen = false
-    }
-  }
+const props = defineProps({
+  initialEvents: Array,
+  date: String,
+  tasks: Array,
+  employee: Object,
+  project: String,
 })
+
+const isOpen = ref(false)
+const idTaskSelected = ref(null)
+const selectedEvent = ref(null)
+const canDeleteEvent = ref(false)
+const getStartDateEvent = ref(null)
+const getEndDateEvent = ref(null)
+const turnSelect = ref([])
+const showHours = ref('Hours')
+const currentEvents = ref([])
+const eventguid = ref(1)
+const calendarOptions = ref({
+  plugins: [
+    dayGridPlugin,
+    timeGridPlugin,
+    interactionPlugin // needed for dateClick
+  ],
+  headerToolbar: {
+    left: 'dayGridMonth,timeGridWeek,timeGridDay',
+    center: 'title',
+    right: ''
+    // right: 'dayGridMonth,timeGridWeek,timeGridDay'
+  },
+  initialView: 'dayGridMonth', //onMounted type calendar view
+  initialDate: props.date,
+  initialEvents: props.initialEvents, // alternatively, use the `events` setting to fetch from a feed
+  allDaySlot: true,
+  editable: true,
+  selectable: true,
+  selectMirror: true,
+  dayMaxEvents: true,
+  weekends: true,
+  select: handleDateSelect,
+  eventClick: handleEditEventClick,
+  eventsSet: handleEvents,
+  locale: esLocale,
+  eventOverlap: false,
+  nowIndicator: true,
+  selectable: true,
+  eventConstraint: {
+    startTime: '07:00',
+    endTime: '16:30',
+  },
+  // selectConstraint: {
+  //   startTime: "07:00",
+  //   endTime: "16:30",
+  // },
+  businessHours: {
+    // days of week. an array of zero-based day of week integers (0=Sunday)
+    daysOfWeek: [1, 2, 3, 4, 5], // Monday - Friday
+    // startTime: '07:00', // a start time (07am in this example)
+    // endTime: '16:30', // an end time (4:30pm in this example)
+  },
+  // eventColor: '#378006',
+  // eventClassNames: 'custom-event-class',
+  eventTimeFormat: { // like '14:30:00'
+    hour: '2-digit',
+    minute: '2-digit',
+    meridiem: 'short',
+    hour12: true
+  },
+  slotLabelFormat: {
+    hour: 'numeric',
+    minute: '2-digit',
+    meridiem: 'short',
+    hour12: false
+  },
+  // you can update a remote database when these fire:
+  // eventAdd: this.submit,
+  // eventChange: this.submit,
+  // eventRemove: this.handleDeleteEventClick,
+
+  // tasks: [],
+})
+
+onMounted(() => {
+  eventguid.value++
+})
+
+function handleWeekendsToggle() {
+  calendarOptions.value.weekends = !calendarOptions.value.weekends // update a property
+}
+
+function handleDateSelect(selectInfo) {
+  // console.log(selectInfo)
+  isOpen.value = true
+  selectedEvent.value = selectInfo
+  canDeleteEvent.value = false
+
+  let formatStartDate = Moment(selectInfo.startStr).format('HH:mm')
+  getStartDateEvent.value = formatStartDate
+
+  let formatEndDate = Moment(selectInfo.endStr).format('HH:mm')
+  getEndDateEvent.value = formatEndDate
+}
+
+function handleEditEventClick(clickInfo) {
+  //TODO Permitir editar el modal
+  isOpen.value = true
+  // console.log(clickInfo)
+  selectedEvent.value = clickInfo
+  canDeleteEvent.value = true
+}
+function handleDeleteEventClick(selectedEvent) {
+  // console.log(selectedEvent)
+  if (selectedEvent) {
+    selectedEvent.event.remove(); // Elimina el evento
+    isOpen.value = false; // Cierra el modal
+  }
+}
+function handleEvents(events) {
+  // console.log(events)
+  currentEvents.value = events
+}
+function handleItem() {
+  console.log('Hello World')
+}
+
+function submit(idTask, schedule) {
+  console.log(schedule)
+  console.log(idTask)
+
+  let title = idTaskSelected.value.name
+  let calendarApi = schedule.value.view.calendar
+
+  calendarApi.unselect() // clear date selection
+
+  if (title != null) {
+    calendarApi.addEvent({
+      id: String(eventguid++),
+      title,
+      start: schedule.startStr,
+      end: schedule.endStr,
+      color: 'purple'
+      // allDay: selectInfo.allDay
+    })
+  }
+
+  isOpen.value = false
+  // if (clickInfo == null) {
+  //   clickInfo.event.remove()
+  //   this.isOpen = false
+  // } else {
+  //   axios.put('/api/eventos', newEvent)
+  //     .then((response) => {
+  //       console.log('Evento creado exitosamente');
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error al crear el evento', error);
+  //     });
+  // }
+}
+function closeDialog() {
+  isOpen.value = false
+}
+
 </script>
 
 <template>
-  <section class='flex w-full min-h-[100%] font-sans text-sm rounded-md font-bold shadow-md border border-solid p-2'>
-    <article class='max-w-full w-full h-[60%]'>
-      <FullCalendar class='w-full h-96' :options='calendarOptions'>
-        <template v - slot: eventContent=' arg'>
-          <!--Los estilos de estos elementos se encuentran en 'resources/css/custom/fullcalendar.css'-->
-          <b> {{ arg.timeText }} </b>
-          <i> {{ arg.event.title }} </i>
-        </template>
-      </FullCalendar>
-    </article>
-  </section>
-
+  <FullCalendar :key="eventguid" :options="calendarOptions">
+    <template #eventContent="arg">
+      <div v-tooltip="arg.event.title" class="w-full truncate">
+        <p> {{ arg.timeText }} </p>
+        <p> {{ arg.event.title }} </p>
+      </div>
+    </template>
+  </FullCalendar>
   <!--MODAL DE FORMULARIO-->
-  <TransitionRoot as="template" :show="isOpen">
+  <CustomModal v-model:visible="isOpen" :titulo="(currentEvents != 0 ? 'Editar ' : 'Crear') + ' nuevo horario'">
+
+    <template #body>
+      <div class="h-full w-full space-y-3">
+        <!--COLUMNA 3 - SELECCIÓN DE ACTIVIDADES-->
+        <CustomInput type="dropdown" class="mt-2 text-left" optionLabel="name" optionValue="id" label="Actividad"
+          placeholder="Seleccione Actividad" :options="tasks" v-model:input="idTaskSelected">
+        </CustomInput>
+
+        <!--RADIO BUTTONS DE HORAS-->
+        <CustomInput type="radiobutton" v-model:input="showHours"
+          :options="[{ name: 'Intervalo', key: 'intervalo' }, { name: 'Resto', key: 'resto' }, { name: 'Turno', key: 'turno' }]">
+        </CustomInput>
+        <!-- <div class="flex flex-wrap w-full justify-around text-left align-items-center h-10 mt-4 space-x-2">
+          <div>
+            <input type="radio" name="action" value="Hours" v-model="showHours">
+            <label for="Hours">Intervalo</label>
+          </div>
+          <div>
+            <input type="radio" name="action" value="Resto" v-model="showHours">
+            <label for="Resto">Resto</label>
+          </div>
+          <div>
+            <input type="radio" name="action" value="Turno" v-model="showHours">
+            <label for="Turno">Turno</label>
+          </div>
+        </div> -->
+
+        <!--SELECCIÓN DE HORAS-->
+        <div v-if="showHours === 'Intervalo'" class="w-full grid grid-cols-2 gap-4 mt-">
+          <!--campo hora inicio-->
+          <CustomInput type="time" label="Hora de inicio" v-model="getStartDateEvent">
+          </CustomInput>
+
+          <!--campo hora finalización-->
+          <CustomInput type="time" label="Hora de Finalización" v-model="getEndDateEvent">
+          </CustomInput>
+        </div>
+
+        <!--SELECCIÓN DE TURNOS-->
+        <div v-if="showHours === 'Turno'" class="w-full h-64">
+          <!--campo selección de turnos-->
+          <CustomShiftSelector optionValue="id" v-model:shift="turnSelect" />
+          <!-- {{ turnSelect }} -->
+          <!-- <CustomInput type="dropdown" class="mt-2 text-left" label="Turnos" placeholder="Seleccione Turno"
+            :options="tasks" v-model="turnSelect">
+          </CustomInput> -->
+        </div>
+
+
+        <!--SELECCIÓN RESTO-->
+        <div v-if="showHours === 'Resto'" class="flex justify-center w-full h-auto flex-nowrap">
+          <span class="info-resto">
+            <i>Se asignarán por defecto las horas que no se programaron</i>
+          </span>
+        </div>
+      </div>
+    </template>
+    <!--BOTONES GUARDAR Y CANCELAR DEL MODAL-->
+    <template #footer>
+      <Button v-if="canDeleteEvent" severity="danger" label="Eliminar" @click="handleEditEventClick(selectedEvent)" />
+
+      <Button severity="danger" @click="closeDialog()" label="Cancelar" />
+
+      <Button severity="success" :loading="false" @click="submit(idTaskSelected, selectedEvent)"
+        :label="currentEvents != 0 ? 'Actualizar ' : 'Guardar'" />
+    </template>
+
+  </CustomModal>
+  <!-- <TransitionRoot as="template" :show="false">
     <Dialog as="div" class="relative z-30" @close="closeDialog()">
       <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
         leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
@@ -235,7 +283,7 @@ export default defineComponent({
                       Nuevo Horario
                     </DialogTitle>
 
-                    <!-- BOTÓN 'X'->(cerrar) DEL MODAL -->
+                    
                     <div class="w-8 h-8">
                       <button v-tooltip.top="'Cerrar'" @click="closeDialog()">
                         <XMarkIcon
@@ -244,12 +292,11 @@ export default defineComponent({
                     </div>
                   </div>
 
-                  <!--COLUMNA 3 - SELECCIÓN DE ACTIVIDADES-->
+                 
                   <Combobox class="mt-2 text-left" label="Actividad" placeholder="Seleccione Actividad" :options="tasks"
                     v-model="idTaskSelected">
                   </Combobox>
 
-                  <!--RADIO BUTTONS DE HORAS-->
                   <div class="flex flex-wrap w-full justify-around text-left align-items-center h-10 mt-4 space-x-2">
                     <div>
                       <input type="radio" name="action" value="Hours" v-model="showHours">
@@ -265,34 +312,32 @@ export default defineComponent({
                     </div>
                   </div>
 
-                  <!--SELECCIÓN DE HORAS-->
+           
                   <div v-if="showHours === 'Hours'" class="w-full h-auto">
 
-                    <!--campo hora inicio-->
+                 
                     <TextInput class="mt-2 text-left" type="time" label="Hora de inicio" v-model="getStartDateEvent">
                     </TextInput>
 
-                    <!--campo hora finalización-->
+             
                     <TextInput class="mt-2 text-left" type="time" label="Hora de Finalización" v-model="getEndDateEvent">
                     </TextInput>
                   </div>
 
-                  <!--SELECCIÓN DE TURNOS-->
                   <div v-if="showHours === 'Turno'" class="w-full h-64">
-                    <!--campo selección de turnos-->
+            
                     <Combobox class="mt-2 text-left" label="Turnos" placeholder="Seleccione Turno" :options="tasks"
                       v-model="turnSelect">
                     </Combobox>
                   </div>
 
-                  <!--SELECCIÓN RESTO-->
                   <div v-if="showHours === 'Resto'" class="flex justify-center w-full h-auto flex-nowrap">
                     <span class="info-resto">
                       <i>Se asignarán por defecto las horas que no se programaron</i>
                     </span>
                   </div>
 
-                  <!--BOTONES GUARDAR Y CANCELAR DEL MODAL-->
+                  
                   <div class="flex px-2 mt-2 space-x-4">
                     <Button v-if="canDeleteEvent" class="hover:bg-danger text-danger border-danger" severity="danger"
                       @click="handleEditEventClick(selectedEvent)">
@@ -315,5 +360,5 @@ export default defineComponent({
         </div>
       </div>
     </Dialog>
-  </TransitionRoot>
+  </TransitionRoot> -->
 </template>
