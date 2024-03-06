@@ -24,6 +24,8 @@ const props = defineProps({
     hours: Object
 })
 
+const openConflict = ref(false)
+
 //#region Draggable
 const listaDatos = ref({})
 const date = ref(new Date().toISOString().split("T")[0])
@@ -47,6 +49,9 @@ const onDrop = async (collection, dropResult) => {
             listaDatos.value[collection] = res.data.task
             personalHours.value[(payload.Num_SAP)] = res.data.hours
             loadingTask.value[collection] = false
+            if (Object.values(res.data.conflict).length > 0) {
+                openConflict.value = true;
+            }
         })
     }
 }
@@ -178,6 +183,7 @@ const toggle = (horario, data) => {
 const filter = ref('')
 
 </script>
+
 <style scoped>
 .custom-image {
     width: 200px;
@@ -214,11 +220,11 @@ const filter = ref('')
                     </div>
                 </span>
                 <Listbox :options="tasks" :filterFields="['task', 'name', 'project']" class="col-span-2" filter :pt="{
-                    list: '!h-[69vh] !px-1 !snap-y !snap-mandatory',
-                    item: '!h-full !p-0 !rounded-md !snap-start !my-0.5',
-                    filterInput: '!h-8',
-                    header: '!p-1'
-                }">
+                                list: '!h-[69vh] !px-1 !snap-y !snap-mandatory',
+                                item: '!h-full !p-0 !rounded-md !snap-start !my-0.5',
+                                filterInput: '!h-8',
+                                header: '!p-1'
+                            }">
                     <template #option="slotProps">
                         <div class="flex flex-col justify-between h-full p-2 border rounded-md shadow-md snap-start">
                             <p><b>{{ slotProps.option.task }}</b> <i class="fa-solid fa-angle-right"></i> {{
@@ -228,11 +234,11 @@ const filter = ref('')
                                 <span class="grid grid-cols-3">
                                     <p class="font-bold ">I:</p>
                                     <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha inicio'">{{
-                                        slotProps.option.startDate
-                                    }} </p>
+                                slotProps.option.startDate
+                            }} </p>
                                     <p class="font-bold">F:</p>
                                     <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha fin'">{{
-                                        slotProps.option.endDate }}
+                                slotProps.option.endDate }}
                                     </p>
                                 </span>
                                 <span class="flex justify-center">
@@ -286,14 +292,16 @@ const filter = ref('')
                                                         <i
                                                             class="fa-solid fa-trash-can text-danger text-xs hover:animate-pulse hover:scale-125"></i>
                                                     </button>
-                                                    <button v-tooltip.bottom="'Eliminar'" class="hidden group-hover:flex"
+                                                    <button v-tooltip.bottom="'Eliminar'"
+                                                        class="hidden group-hover:flex"
                                                         @click="deleteSchedule(slotProps.option, index, item)" v-else>
                                                         <i
                                                             class="fa-solid fa-trash-can text-danger text-xs hover:animate-pulse hover:scale-125"></i>
                                                     </button>
                                                     <span class="w-full text-xs tracking-tighter text-center">
-                                                        {{ format24h(horario.hora_inicio) }} {{ format24h(horario.hora_fin)
-                                                        }}
+                                                        {{ format24h(horario.hora_inicio) }} {{
+                                format24h(horario.hora_fin)
+                            }}
                                                     </span>
                                                     <button v-tooltip.bottom="'Cambiar horario'"
                                                         class="hidden group-hover:flex"
@@ -319,6 +327,7 @@ const filter = ref('')
                             </Container>
                         </div>
                     </template>
+
                     <template #empty>
                         <Loading v-if="loadingProgram" message="Cargando actividades" />
                     </template>
@@ -329,13 +338,13 @@ const filter = ref('')
 
             <div class="row-span-2 rounded-lg">
                 <TabView class="tabview-custom" :scrollable="true" :pt="{
-                    nav: '!flex !justify-between',
-                    panelContainer: '!p-1'
-                }">
+                                nav: '!flex !justify-between',
+                                panelContainer: '!p-1'
+                            }">
                     <TabPanel header="Personas" :pt="{
-                        root: 'w-full',
-                        headerTitle: '!w-full !flex !justify-center',
-                    }">
+                                root: 'w-full',
+                                headerTitle: '!w-full !flex !justify-center',
+                            }">
                         <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
                         <Loading v-if="loadingPerson" message="Cargando personas" />
                         <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy"
@@ -347,8 +356,9 @@ const filter = ref('')
                                 :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
                                 class="snap-start rounded-xl shadow-md cursor-pointer hover:bg-blue-200 hover:ring-1 hover:ring-primary">
                                 <div class="grid grid-cols-5 gap-x-1 p-1">
-                                    <img class="custom-image " :src="item.photo" onerror="this.src='/svg/cotecmar-logo.svg'"
-                                        draggable="false" alt="profile-photo" />
+                                    <img class="custom-image " :src="item.photo"
+                                        onerror="this.src='/svg/cotecmar-logo.svg'" draggable="false"
+                                        alt="profile-photo" />
                                     <span class="col-span-3">
                                         <p class="text-sm font-semibold truncate leading-6 text-gray-900">
                                             {{ item.Nombres_Apellidos }}
@@ -362,8 +372,8 @@ const filter = ref('')
                                             :label="personalHours[(item.Num_SAP)] + ' horas'"
                                             :severity="personalHours[(item.Num_SAP)] < 9.5 ? 'primary' : 'success'"
                                             @click="employeeDialog(item)" :pt="{
-                                                label: '!text-xs'
-                                            }" />
+                                label: '!text-xs'
+                            }" />
                                     </span>
                                 </div>
                             </Draggable>
@@ -372,9 +382,9 @@ const filter = ref('')
                     </TabPanel>
 
                     <TabPanel header="Grupos" :pt="{
-                        root: 'w-full',
-                        headerTitle: '!w-full !flex !justify-center'
-                    }">
+                                root: 'w-full',
+                                headerTitle: '!w-full !flex !justify-center'
+                            }">
 
                     </TabPanel>
 
@@ -385,6 +395,7 @@ const filter = ref('')
     </AppLayout>
     <CustomModal v-model:visible="modhours" icon="fa-regular fa-clock" width="60vw"
         :titulo="'Modificar horario de ' + editHorario?.data ?? null">
+
         <template #body>
             <!-- {{ editHorario }} -->
             <div class="flex flex-col gap-1">
@@ -419,17 +430,18 @@ const filter = ref('')
             <span class="flex items-center p-2 gap-4">
                 <div v-for="category in [{ name: 'Solo el ' + date, key: 'dia' }, { name: 'Resto de la actividad', key: 'resto' }, { name: 'Rango de fechas', key: 'range' }, { name: 'Fechas específicos', key: 'multiple' }]"
                     :key="category.key" class="flex items-center">
-                    <RadioButton v-model="nuevoHorario.type" :inputId="category.key" name="dynamic" :value="category.key"
-                        @click="nuevoHorario.days = null" />
+                    <RadioButton v-model="nuevoHorario.type" :inputId="category.key" name="dynamic"
+                        :value="category.key" @click="nuevoHorario.days = null" />
                     <label :for="category.key" class="ml-1 mb-0">{{ category.name }}</label>
                 </div>
             </span>
             <Calendar v-if="nuevoHorario.type == 'multiple' || nuevoHorario.type == 'range'" show-icon
                 v-model="nuevoHorario.days" :selectionMode="nuevoHorario.type" :manualInput="false" :pt="{
-                    root: '!w-full',
-                    input: '!h-8'
-                }" />
+                                root: '!w-full',
+                                input: '!h-8'
+                            }" />
         </template>
+
         <template #footer>
             <Button @click="console.log('hace algo'); nuevoHorario = null; op.hide()" icon="fa-solid fa-floppy-disk"
                 label="Guardar" />
@@ -438,10 +450,20 @@ const filter = ref('')
     <!--#region MODAL DE PERSONAS -->
     <CustomModal :auto-z-index="false" :base-z-index="10" v-model:visible="open" width="70vw"
         :titulo="'Ver detalle de horario de ' + employee.Nombres_Apellidos">
+
         <template #body>
             <div class="py-2 max-h-[90vh]">
                 <FullCalendar :initialEvents="events" :tasks="tasks" :date="date" :employee="employee"
                     :key="rendersCalendars" />
+            </div>
+        </template>
+    </CustomModal>
+    <CustomModal :auto-z-index="false" :base-z-index="10" v-model:visible="openConflict" width="70vw"
+        titulo="Colisiones de Programación">
+
+        <template #body>
+            <div class="py-2 max-h-[90vh]">
+                hay colicones
             </div>
         </template>
     </CustomModal>
