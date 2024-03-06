@@ -24,34 +24,40 @@ const totales = ref({
     labor_ejecutados: 0,
     services_ejecutados: 0,
 })
-
+//Esto solo lo entendi cuando lo hice... si lo tocas es tu responsabilidad :D rezare por ti, aunque soy ateo...
 function sumaEjecutados(pep) {
     if (pep.peps?.length > 0) {
-        let suma = 0
-        pep.peps.forEach((subPep, index) => {
-            var data = sumaEjecutados(subPep)
-            suma = suma + (data?.suma ?? 0)
-            pep.peps[index].materials_ejecutados = (data?.suma ?? 0) + parseInt(pep.peps[index].materials_ejecutados)
-            pep.peps[index].grafos = data?.grafos ?? []
+        pep.peps.forEach((subPep) => {
+            sumaEjecutados(subPep)
+            pep.materials_ejecutados = parseInt(pep.materials_ejecutados) + parseInt(subPep.materials_ejecutados)
+            pep.labor_ejecutados = parseInt(pep.labor_ejecutados) + parseInt(subPep.labor_ejecutados)
+            pep.services_ejecutados = parseInt(pep.services_ejecutados) + parseInt(subPep.services_ejecutados)
         })
-        pep.materials_ejecutados = suma + parseInt(pep.materials_ejecutados)
     } else if (pep.grafos?.length > 0) {
-        let suma = 0
-        pep.grafos.forEach((grafo, index) => {
-            // pep.grafos[index].materials_ejecutados = parseFloat(pep.grafos[index].materials_ejecutados)
-            const aux = sumaEjecutados(grafo);
-            suma = aux + suma
-            pep.grafos[index].materials_ejecutados = aux + parseInt(pep.grafos[index].materials_ejecutados);
+        let materials_ejecutados = 0, labor_ejecutados = 0, services_ejecutados = 0
+        pep.grafos.forEach((grafo) => {
+            const ejecutado = sumaEjecutados(grafo);
+            materials_ejecutados += ejecutado?.materials_ejecutados ?? 0
+            labor_ejecutados += ejecutado?.labor_ejecutados ?? 0
+            services_ejecutados += ejecutado?.services_ejecutados ?? 0
+            grafo.materials_ejecutados = ejecutado?.materials_ejecutados ?? 0;
+            grafo.labor_ejecutados = ejecutado?.labor_ejecutados ?? 0;
+            grafo.services_ejecutados = ejecutado?.services_ejecutados ?? 0;
         });
-        // console.log(pep.grafos[0].materials_ejecutados)
-        return { grafos: pep.grafos, suma: suma } //retorna los grafos con el materials_ejecutados
-        
+        pep.materials_ejecutados = parseInt(materials_ejecutados)
+        pep.labor_ejecutados = parseInt(labor_ejecutados)
+        pep.services_ejecutados = parseInt(services_ejecutados)
+
     } else if (pep.operaciones?.length > 0) {
-        let suma = 0
+        let materials_ejecutados = 0
+        let labor_ejecutados = 0
+        let services_ejecutados = 0
         pep.operaciones.forEach(operacion => {
-            suma = suma + parseInt(operacion.materials_ejecutados);
+            materials_ejecutados = materials_ejecutados + parseInt(operacion.materials_ejecutados);
+            labor_ejecutados = labor_ejecutados + parseInt(operacion.labor_ejecutados);
+            services_ejecutados = services_ejecutados + parseInt(operacion.services_ejecutados);
         });
-        return suma //retorna la suma del materials_ejecutados de las operaciones
+        return { materials_ejecutados, labor_ejecutados, services_ejecutados }
     }
 }
 
@@ -61,9 +67,15 @@ const projectSelect = async () => {
         materials: 0,
         services: 0,
         labor: 0,
+        total:0,
         materials_ejecutados: 0,
         labor_ejecutados: 0,
         services_ejecutados: 0,
+        total_ejecutado:0,
+        materials_100: 0,
+        services_100: 0,
+        labor_100: 0,
+        total_100: 0
     }
     loading.value = true
     try {
@@ -71,7 +83,19 @@ const projectSelect = async () => {
             peps.value = Object.values(res.data.peps)
             peps.value.forEach((pep) => {
                 sumaEjecutados(pep)
+                totales.value.materials_ejecutados += parseInt(pep.materials_ejecutados)
+                totales.value.labor_ejecutados += parseInt(pep.labor_ejecutados)
+                totales.value.services_ejecutados += parseInt(pep.services_ejecutados)
+                totales.value.materials += parseInt(pep.materials)
+                totales.value.labor += parseInt(pep.labor)
+                totales.value.services += parseInt(pep.services)
             });
+            totales.value.total_ejecutado = totales.value.materials_ejecutados + totales.value.services_ejecutados + totales.value.labor_ejecutados
+            totales.value.total = totales.value.materials + totales.value.services+ totales.value.labor
+            totales.value.materials_100 = (totales.value.materials_ejecutados / totales.value.materials) * 100
+            totales.value.services_100 = (totales.value.services_ejecutados / totales.value.services) * 100
+            totales.value.labor_100 = (totales.value.labor_ejecutados / totales.value.labor) * 100
+            totales.value.total_100 = ((totales.value.materials_ejecutados + totales.value.services_ejecutados + totales.value.labor_ejecutados) / (totales.value.materials + totales.value.services + totales.value.labor)) * 100
             loading.value = false
         })
     } catch (e) {
@@ -118,18 +142,19 @@ const option = ref('total')
                         @click="option = 'material'" class="min-h-16">
                         <span class="w-full -mt-1">
                             <p class="w-full text-center font-bold">Materiales</p>
-                            <p class="w-full text-center  !text-sm">{{ formatCurrency(totales.materials_ejecutados) }}
-                            </p>
-                            <div class="w-full h-4 border rounded-sm bg-gray-400"
-                                :title="parseFloat((totales.materials_ejecutados / parseInt(totales.materials)) / 100) + '%'"
-                                :style="!(option == 'material') ? 'border: var(--primary-color)' : ''">
+                            <div class="grid-cols-2 grid py-0.5 -mt-0.5">
+                                <p title="Presupuesto" class="w-full text-center border-r !text-sm">{{ formatCurrency(totales.materials) }}
+                                </p>
+                                <p  title="Ejecutado"  class="w-full text-center !text-sm border-l"> {{ formatCurrency(totales.materials_ejecutados) }}
+                                </p>
+                            </div>
+                            <div class="w-full h-4 border rounded-sm bg-gray-400" :title="totales.materials_100 + '%'">
                                 <div style="background-color: var(--primary-color);"
-                                    :style="'width:' + ((totales.materials_ejecutados / parseInt(totales.materials)) / 100) + '%;'"
+                                    :style="'width:' + totales.materials_100 + '%;'"
                                     class="h-full text-center text-xs rounded-sm text-white max-w-full">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">
-                                    {{ parseFloat((totales.materials_ejecutados / parseInt(totales.materials)) /
-                            100).toFixed(2) }}%
+                                    {{ totales.materials_100.toFixed(2) }}%
                                 </p>
                             </div>
                         </span>
@@ -138,17 +163,19 @@ const option = ref('total')
                         @click="option = 'obra'" class="min-h-16">
                         <span class="w-full -mt-1">
                             <p class="w-full text-center font-bold">Mano de obra</p>
-                            <p class="w-full text-center !text-sm">{{ formatCurrency(totales.labor_ejecutados) }}</p>
-                            <div class="w-full h-4 border rounded-sm bg-gray-400"
-                                :title="parseFloat((totales.labor_ejecutados / parseInt(totales.labor)) / 100) + '%'"
-                                :style="!(option == 'obra') ? 'border: var(--primary-color)' : ''">
+                            <div class="grid-cols-2 grid py-0.5 -mt-0.5">
+                                <p title="Presupuesto" class="w-full text-center border-r !text-sm"> {{ formatCurrency(totales.labor) }}
+                                </p>
+                                <p title="Ejecutado" class="w-full text-center !text-sm border-l"> {{ formatCurrency(totales.labor_ejecutados) }}
+                                </p>
+                            </div>
+                            <div class="w-full h-4 border rounded-sm bg-gray-400" :title="totales.labor_100 + '%'">
                                 <div style="background-color: var(--primary-color);"
-                                    :style="'width:' + (parseInt((totales.labor_ejecutados / parseInt(totales.labor)) / 100)) + '%'"
+                                    :style="'width:' + totales.labor_100 + '%'"
                                     class="h-full text-center text-xs rounded-sm text-white">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">
-                                    {{ parseFloat((totales.labor_ejecutados / parseInt(totales.labor)) / 100).toFixed(2)
-                                    }}%
+                                    {{ totales.labor_100.toFixed(2) }}%
                                 </p>
                             </div>
                         </span>
@@ -157,42 +184,40 @@ const option = ref('total')
                         @click="option = 'servicio'" class="min-h-16">
                         <span class="w-full -mt-1">
                             <p class="w-full text-center font-bold">Servicios</p>
-                            <p class="w-full text-center !text-sm">{{ formatCurrency(totales.services_ejecutados) }}</p>
-                            <div class="w-full h-4 border rounded-sm bg-gray-400"
-                                :title="parseFloat((totales.services_ejecutados / parseInt(totales.services)) / 100) + '%'"
-                                :style="!(option == 'servicio') ? 'border: var(--primary-color)' : ''">
+                            <div class="grid-cols-2 grid py-0.5 -mt-0.5">
+                                <p title="Presupuesto" class="w-full text-center border-r !text-sm"> {{ formatCurrency(totales.services) }}
+                                </p>
+                                <p  title="Ejecutado"  class="w-full text-center !text-sm border-l"> {{ formatCurrency(totales.services_ejecutados)}}
+                                </p>
+                            </div>
+                            <div class="w-full h-4 border rounded-sm bg-gray-400" :title="totales.services_100 + '%'">
                                 <div style="background-color: var(--primary-color);"
-                                    :style="'width:' + (parseInt((totales.services_ejecutados / parseInt(totales.services)) / 100)) + '%'"
+                                    :style="'width:' + totales.services_100 + '%'"
                                     class="h-full text-center text-xs rounded-sm text-white  ">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">
-                                    {{ parseFloat((totales.services_ejecutados / parseInt(totales.services)) /
-                            100).toFixed(2) }}%
+                                    {{ totales.services_100.toFixed(2) }}%
                                 </p>
                             </div>
                         </span>
                     </Button>
-                    <Button :outlined="!(option == 'total')" raised :key="(totales.services_ejecutados +
-                            totales.materials_ejecutados + totales.labor_ejecutados)
-                            " @click="option = 'total'" class="min-h-16">
+                    <Button :outlined="!(option == 'total')" raised :key="totales.total" @click="option = 'total'"
+                        class="min-h-16">
                         <span class="w-full -mt-1">
                             <p class="w-full text-center font-bold">Total</p>
-                            <p class="w-full text-center !text-sm">{{ formatCurrency(totales.services_ejecutados +
-                            totales.materials_ejecutados + totales.labor_ejecutados) }}
-                            </p>
-                            <div class="w-full h-4 border  rounded-sm bg-gray-400" :title="parseFloat(((totales.services_ejecutados + totales.materials_ejecutados +
-                            totales.labor_ejecutados) / (parseInt(totales.services) + parseInt(totales.materials) +
-                                parseInt(totales.labor))) / 100) + '%'" style="border;: var(--primary-color)">
+                            <div class="grid-cols-2 grid py-0.5 -mt-0.5">
+                                <p title="Presupuesto" class="w-full text-center border-r !text-sm"> {{ formatCurrency(totales.total) }}
+                                </p>
+                                <p  title="Ejecutado"  class="w-full text-center !text-sm border-l"> {{ formatCurrency(totales.total_ejecutado)}}
+                                </p>
+                            </div>
+                            <!-- <p class="w-full text-center !text-sm">{{ formatCurrency(totales.total) }} </p> -->
+                            <div class="w-full h-4 border  rounded-sm bg-gray-400" :title="totales.total_100 + '%'">
                                 <div style="background-color: var(--primary-color);"
-                                    :style="'width:' + (parseInt((totales.services_ejecutados + totales.materials_ejecutados + totales.labor_ejecutados) / (totales.services + totales.materials + totales.labor)) * 0.01) + '%'"
+                                    :style="'width:' + totales.total_100 + '%'"
                                     class="h-full text-center text-xs text-white rounded-sm ">
                                 </div>
-                                <p class="-mt-4 text-xs text-white">{{
-                            parseFloat(((totales.services_ejecutados + totales.materials_ejecutados +
-                                totales.labor_ejecutados) / (parseInt(totales.services) +
-                                    parseInt(totales.materials) +
-                                    parseInt(totales.labor))) / 100).toFixed(2)
-                        }}%</p>
+                                <p class="-mt-4 text-xs text-white">{{ totales.total_100.toFixed(2) }}%</p>
                             </div>
                         </span>
                     </Button>
