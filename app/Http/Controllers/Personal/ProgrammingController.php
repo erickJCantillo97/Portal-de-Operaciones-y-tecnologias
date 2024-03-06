@@ -55,8 +55,6 @@ class ProgrammingController extends Controller
                     $exist = DetailScheduleTime::
                     where('idUsuario',$validateData['employee_id'])
                     ->where('fecha',$date)
-                    ->whereBetween('horaInicio',[$task->project->shiftObject->startShift,$task->project->shiftObject->endShift])
-                    ->whereBetween('horaFin',[$task->project->shiftObject->startShift,$task->project->shiftObject->endShift])
                     ->get();
                    if($exist->count() > 0){
                         $conflict[$date->format('Y-m-d')]=$exist;
