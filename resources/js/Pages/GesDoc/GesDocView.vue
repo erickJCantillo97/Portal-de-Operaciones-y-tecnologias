@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import Button from 'primevue/button'
 import Combobox from '@/Components/Combobox.vue'
+import CustomModal from '@/Components/CustomModal.vue'
 import DataView from 'primevue/dataview'
 import Divider from 'primevue/divider'
 import Image from 'primevue/image'
@@ -20,6 +21,7 @@ const selectedProjects = ref([])
 const projectsOptions = ref([])
 const loadingProjects = ref(false)
 const showNoProjects = ref(true)
+const openDialog = ref(false)
 
 const project = ref()
 const tipologia = ref() // v-model
@@ -54,6 +56,7 @@ const fileup = ref(Math.random() * (10))
 const tipologiaFiles = ref([])
 
 const selectedTipologia = async () => {
+  openDialog.value = true
   fileup.value = Math.random() * (10)
   if (tipologia.value) {
     await axios.get(route('get.files.project.tipologia',
@@ -143,13 +146,13 @@ const truncateString = (string, maxLength) => {
 <template>
   <AppLayout>
     <!-- <ProjectsCard /> -->
-    <main class="h-[89vh] overflow-y-auto hover:scrollbar-width-lg">
-      <section class="grid grid-cols-3 size-full max-w-full gap-4 p-2">
+    <main class="h-[89vh] overflow-y-auto">
+      <section class="grid grid-cols-2 size-full max-w-full gap-4 p-2">
         <!--Lista de Proyectos-->
         <article class="col-span-1">
           <Listbox v-model="selectedProjects" @change="getTipologias()" :options="projectsOptions" filter
-            :filterFields="['name', 'SAP_code', 'contract.name', 'gerencia', 'start_date', 'end_date']"
-            optionLabel="name" filterPlaceholder="Seleccione proyecto" :virtualScrollerOptions="{ itemSize: 38 }"
+            :filterFields="['name', 'SAP_code', 'status,', 'contract.name', 'gerencia', 'start_date', 'end_date']"
+            optionLabel="name" filterPlaceholder="Buscar proyecto" :virtualScrollerOptions="{ itemSize: 38 }"
             listStyle="height:70vh" class="w-full md:w-14rem" :pt="{
             filterInput: '!h-8',
             item: '!h-20',
@@ -188,8 +191,9 @@ const truncateString = (string, maxLength) => {
         <!--Tipologías-->
         <Transition name="slide-fade">
           <article v-if="tipologias && selectedProjects != null" class="col-span-1">
-            <Listbox :key="listTipologia" v-model="tipologia" :options="tipologias" filter optionLabel="name"
-              @click="selectedTipologia()" listStyle="max-height:70vh" class="w-full md:w-14rem" :pt="{
+            <Listbox :key="listTipologia" v-model="tipologia" :options="tipologias" filter
+              filterPlaceholder="Buscar tipología" optionLabel="name" @click="selectedTipologia()"
+              listStyle="max-height:70vh" class="w-full md:w-14rem" :pt="{
             item: '!p-2',
             filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
           }">
@@ -227,20 +231,23 @@ const truncateString = (string, maxLength) => {
             </Listbox>
           </article>
         </Transition>
+      </section>
 
-        <!--Archivos-->
-        <Transition name="slide-fade">
-          <Listbox :key="listTipologia" v-model="tipologia" :options="tipologias" filter optionLabel="name"
-            @click="selectedTipologia()" listStyle="max-height:70vh" class="w-full md:w-14rem" :pt="{
-            item: '!p-2',
-            filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
-          }">
+      <!--MODAL DE FORMULARIO-->
+      <CustomModal v-model:visible="openDialog">
 
-            <template #option="slotProps">
-              
-            </template>
-          </Listbox>
-          <article :class="showNoProjects == false ? 'col-span-1' : 'col-span-2'">
+        <template #icon>
+          <i class="fa-solid fa-file-contract"></i>
+        </template>
+
+        <template #titulo>
+          <p>Archivos</p>
+        </template>
+
+        <template #body>
+          <span class="grid grid-cols-1 md:grid-cols-2 gap-4"></span>
+          <!--Archivos-->
+          <article class="col-span-1">
             <div v-if="tipologia != null && selectedProjects != null" class="w-full h-[78vh] border rounded-lg">
               <div>
                 <div class="flex w-full space-x-2 p-2">
@@ -252,47 +259,47 @@ const truncateString = (string, maxLength) => {
                   <DataView :value="tipologiaFiles" class="w-full overflow-y-auto">
 
                     <template #list="slotProps">
-                      <div class="p-1 flex justify-between items-center w-full">
+                      <!-- {{ slotProps.items }} -->
+                      <div v-for="item in slotProps.items" class="p-1 flex justify-between items-center w-full">
                         <div class="flex">
-                          <i v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'"
+                          <i v-if="item.filePath.slice(item.filePath.lastIndexOf('.') + 1) == 'pdf'"
                             class=" text-danger fa-regular border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center fa-file-pdf"></i>
-                          <Image v-else :src="slotProps.data.filePath" preview class="w-6">
+                          <Image v-else :src="item.filePath" preview class="w-6">
                             <template #image>
                               <div class="flex items-center h-full">
-                                <img :src="slotProps.data.filePath" alt="image" />
+                                <img :src="item.filePath" alt="image" />
                               </div>
                             </template>
 
                             <template #preview="slotProps1">
-                              <img :src="slotProps.data.filePath" class="!max-w-[80vw] !max-h-[80vh]" alt="preview"
+                              <img :src="item.filePath" class="!max-w-[80vw] !max-h-[80vh]" alt="preview"
                                 :style="slotProps1.style" @click="slotProps1.previewCallback" />
                             </template>
                           </Image>
                           <div class="px-3">
                             <p class="text-sm">
-                              {{ (slotProps.index + 1) + '. ' + slotProps.data.tipologia_name }}
+                              {{ (index + 1) + '. ' + item.tipologia_name }}
                             </p>
-                            <p class="text-xs font-semibold">{{ slotProps.data.name }}</p>
+                            <p class="text-xs font-semibold">{{ item.name }}</p>
                             <span class="flex space-x-2">
-                              <p class="text-xs">{{ slotProps.data.name_user }} </p>
-                              <p class="text-xs">{{ formatDateTime24h(slotProps.data.created_at) }}
+                              <p class="text-xs">{{ item.name_user }} </p>
+                              <p class="text-xs">{{ formatDateTime24h(item.created_at) }}
                               </p>
-                              <p class="text-xs">{{ formatSize(slotProps.data.file_size) }} </p>
+                              <p class="text-xs">{{ formatSize(item.file_size) }} </p>
                               <p class="text-xs"
-                                v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'">
-                                {{ slotProps.data.num_folios }} folio(s) </p>
+                                v-if="item.filePath.slice(item.filePath.lastIndexOf('.') + 1) == 'pdf'">
+                                {{ item.num_folios }} folio(s) </p>
                             </span>
                           </div>
                         </div>
                         <span class="space-x-1">
                           <Button class="!h-6 !w-6" icon="fa-regular fa-eye" outlined rounded
-                            @click="showPdf($event, slotProps.data)"
-                            v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'"
-                            severity="success">
+                            @click="showPdf($event, items)"
+                            v-if="item.filePath.slice(item.filePath.lastIndexOf('.') + 1) == 'pdf'" severity="success">
                           </Button>
-                          <Button class="!h-6 !w-6" icon="fa-regular fa-trash-can" outlined disabled @click="" rounded
+                          <!-- <Button class="!h-6 !w-6" icon="fa-regular fa-trash-can" outlined disabled @click="" rounded
                             severity="danger">
-                          </Button>
+                          </Button> -->
                         </span>
                       </div>
                     </template>
@@ -311,12 +318,12 @@ const truncateString = (string, maxLength) => {
                 </div>
               </div>
             </div>
-            <div v-else class="flex size-full justify-center items-center">
+            <!-- <div class="flex size-full justify-center items-center">
               <NoContentToShow class="mt-5" subject="Seleccione un proyecto para ver sus tipologías" />
-            </div>
+            </div> -->
           </article>
-        </Transition>
-      </section>
+        </template>
+      </CustomModal>
     </main>
   </AppLayout>
 </template>
