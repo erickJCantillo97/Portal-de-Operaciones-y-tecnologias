@@ -36,7 +36,7 @@ const props = defineProps({
     },
     autoZIndex: {
         type: Boolean,
-        default: false
+        default: true
     }
 })
 const visible = defineModel('visible')
