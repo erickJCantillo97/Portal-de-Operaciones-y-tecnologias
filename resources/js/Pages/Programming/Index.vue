@@ -214,7 +214,7 @@ const filter = ref('')
                     </div>
                 </span>
                 <Listbox :options="tasks" :filterFields="['task', 'name', 'project']" class="col-span-2" filter :pt="{
-                    list: '!h-[69vh] !px-1 !snap-y !snap-mandatory',
+                    list: '!h-[73vh] !px-1 !snap-y !snap-mandatory',
                     item: '!h-full !p-0 !rounded-md !snap-start !my-0.5',
                     filterInput: '!h-8',
                     header: '!p-1'
@@ -340,7 +340,7 @@ const filter = ref('')
                         <Loading v-if="loadingPerson" message="Cargando personas" />
                         <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy"
                             group-name="1" :get-child-payload="getChildPayload"
-                            class="!h-[75vh] space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
+                            class="!h-[72vh] space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
                             <!-- <span v-for="item in personal"> -->
                             <Draggable v-for="item in personal"
                                 :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"

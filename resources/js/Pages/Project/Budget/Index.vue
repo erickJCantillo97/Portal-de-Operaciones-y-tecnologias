@@ -24,6 +24,7 @@ const totales = ref({
     labor_ejecutados: 0,
     services_ejecutados: 0,
 })
+
 //Esto solo lo entendi cuando lo hice... si lo tocas es tu responsabilidad :D rezare por ti, aunque soy ateo...
 function sumaEjecutados(pep) {
     if (pep.peps?.length > 0) {
@@ -211,7 +212,6 @@ const option = ref('total')
                                 <p  title="Ejecutado"  class="w-full text-center !text-sm border-l"> {{ formatCurrency(totales.total_ejecutado)}}
                                 </p>
                             </div>
-                            <!-- <p class="w-full text-center !text-sm">{{ formatCurrency(totales.total) }} </p> -->
                             <div class="w-full h-4 border  rounded-sm bg-gray-400" :title="totales.total_100 + '%'">
                                 <div style="background-color: var(--primary-color);"
                                     :style="'width:' + totales.total_100 + '%'"
