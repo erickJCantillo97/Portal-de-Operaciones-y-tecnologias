@@ -57,6 +57,9 @@ class ProgrammingController extends Controller
                     ->where('fecha',$date)
                     ->get();
                    if($exist->count() > 0){
+                        $exist = $exist->each(function($DetailScheduleTime){
+                            $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
+                        });
                         $conflict[$date->format('Y-m-d')]=$exist;
                         $date = $date->addDays(1);
                    }else{
@@ -75,7 +78,6 @@ class ProgrammingController extends Controller
                     $date = $date->addDays(1);
                 }
                 }while($end_date->gte($date));
-                
                 $status = true;
                 $codigo = 0;
                 $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
