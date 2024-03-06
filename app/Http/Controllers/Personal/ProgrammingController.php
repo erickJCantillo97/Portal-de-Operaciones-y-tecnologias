@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Personal;
 
 use App\Http\Controllers\Controller;
+use App\Models\Views\DetailScheduleTime;
 use App\Models\Schedule;
 use App\Models\ScheduleTime;
 use App\Models\Shift;
@@ -11,6 +12,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
 
 class ProgrammingController extends Controller
 {
@@ -33,37 +35,63 @@ class ProgrammingController extends Controller
     public function store(Request $request)
     {
         try {
+            DB::beginTransaction();
             $validateData = $request->validate([
                 'task_id' => 'required',
                 'employee_id' => 'required',
                 'name' => 'required',
-                'fecha' => 'required|date',
+                'fecha' => 'required|date', //fecha seleccionada del calendario
             ]);
 
             $status = false;
             $codigo = 1001; //Codigo para el caso en se trate de programar alguien con mas de 9.5 horas
             $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
+            $conflict = [];
             if ($hours < 9.5) {
-                $schedule = Schedule::firstOrNew($validateData);
-                $schedule->save();
-                ScheduleTime::create([
-                    'schedule_id' => $schedule->id,
-                    'hora_inicio' => '13:00',
-                    'hora_fin' => '16:30',
-                ]);
+                $task = VirtualTask::find($validateData['task_id']);
+                $date = Carbon::parse($validateData['fecha']); 
+                $end_date = Carbon::parse($task->endDate); 
+                do{     
+                    $exist = DetailScheduleTime::
+                    where('idUsuario',$validateData['employee_id'])
+                    ->where('fecha',$date)
+                    ->get();
+                   if($exist->count() > 0){
+                        $exist = $exist->each(function($DetailScheduleTime){
+                            $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
+                        });
+                        $conflict[$date->format('Y-m-d')]=$exist;
+                        $date = $date->addDays(1);
+                   }else{
+                    $schedule = Schedule::firstOrNew([
+                        'task_id' => $validateData['task_id'],
+                        'employee_id' => $validateData['employee_id'],
+                        'name' => $validateData['name'],
+                        'fecha' => $date->format('Y-m-d'), 
+                    ]);
+                   $schedule->save();
+                    ScheduleTime::create([
+                        'schedule_id' => $schedule->id,
+                        'hora_inicio' => Carbon::parse($task->project->shiftObject->startShift)->format('H:i'),
+                        'hora_fin' => Carbon::parse($task->project->shiftObject->endShift)->format('H:i'),
+                    ]);
+                    $date = $date->addDays(1);
+                }
+                }while($end_date->gte($date));
                 $status = true;
                 $codigo = 0;
                 $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
             }
-
-
+            DB::commit();
             return response()->json([
                 'status' => $status,
                 'codigo' => $codigo,
                 'task' => $this->getSchedule($validateData['fecha'], $validateData['task_id']),
                 'hours' => $hours,
+                'conflict' => $conflict
             ], 200);
         } catch (Exception $e) {
+            DB::rollBack();
             return $e;
         }
     }
