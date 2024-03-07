@@ -126,30 +126,37 @@ onMounted(() => {
         wizard.value.activateAll()
     }
 })
-
+const errors=ref({})
 const beforeChange = async () => {
-    let switchTabsStates = false
-    loading.value = true
-    try {
-        if (!formData.value.id) {
-            await axios.post(route('projects.store'), formData.value)
-                .then((res) => {
-                    formData.value.id = res.data.project_id
-                    toast.add({ severity: 'success', group: 'customToast', text: 'Guardado', life: 2000 });
-                    switchTabsStates = true
-                })
-        } else {
-            await axios.put(route('projects.update', formData.value.id), formData.value)
-                .then((res) => {
-                    toast.add({ severity: 'success', group: 'customToast', text: 'Actualizado', life: 2000 });
-                    switchTabsStates = true
-                })
+    if (formData.value.name!=null){
+        let switchTabsStates = false
+        loading.value = true
+        try {
+            if (!formData.value.id) {
+                await axios.post(route('projects.store'), formData.value)
+                    .then((res) => {
+                        formData.value.id = res.data.project_id
+                        toast.add({ severity: 'success', group: 'customToast', text: 'Guardado', life: 2000 });
+                        switchTabsStates = true
+                    })
+            } else {
+                await axios.put(route('projects.update', formData.value.id), formData.value)
+                    .then((res) => {
+                        
+                        toast.add({ severity: 'success', group: 'customToast', text: 'Actualizado', life: 2000 });
+                        switchTabsStates = true
+                    })
+            }
+            loading.value = false
+            return switchTabsStates
+        } catch (error) {
+            errors.value=error.response.data.errors
+            console.log(error)
+            toast.add({ severity: 'error', group: 'customToast', text: errors.value.message , life: 2000 });
         }
-        loading.value = false
-        return switchTabsStates
-    } catch (error) {
-        console.log(error)
-        toast.add({ severity: 'error', group: 'customToast', text: 'Hubo un error', life: 2000 });
+    }else{
+        errors.value.name='El campo nombre es obligatorio'
+        toast.add({ severity: 'error', group: 'customToast', text: 'Se requiere un nombre' , life: 2000 });
     }
 }
 
@@ -358,8 +365,8 @@ const active = ref(0);
                         <div class="border gap-4 border-gray-200 rounded-lg p-4 md:grid md:grid-cols-2">
                             <!--CAMPO NOMBRE DEL PROYECTO (name)-->
                             <CustomInput label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
-                                v-model:input="formData.name" :errorMessage="$page.props.errors.name"
-                                :invalid="$page.props.errors.name ? true : false" />
+                                v-model:input="formData.name" :errorMessage="errors.name"
+                                :invalid="errors.name ? true : false" />
                             <!--CAMPO CÓDIGO DE SAP (SAP_code)-->
                             <CustomInput label="Código SAP" placeholder="Escriba el código de SAP"
                                 v-model:input="formData.SAP_code" :errorMessage="$page.props.errors.SAP_code"

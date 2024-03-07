@@ -58,10 +58,34 @@ const onDrop = async (collection, dropResult) => {
     }
 }
 
-const getAssignmentHours = (employee_id) => {
+const getAssignmentHoursForEmployee = (employee_id) => {
     axios.get(route('get.assignment.hours', [date.value, employee_id])).then((res) => {
         personalHours.value[(employee_id)] = res.data;
     })
+}
+
+const getAssignmentHoursAll = () => {
+    personalHours.value={}
+    personal.value.forEach(
+        element => {
+            axios.get(route('get.assignment.hours', [date.value, (element.Num_SAP)])).then((res) => {
+                personalHours.value[element.Num_SAP] = res.data;
+            });
+        })
+}
+
+const getPersonalData = () => {
+    if (personal.value) {
+        getAssignmentHoursAll()
+    } else {
+        loadingPerson.value = true
+        axios.get(route('get.personal.user')).then((res) => {
+            // console.log(res)
+            personal.value = Object.values(res.data.personal)
+            getAssignmentHoursAll()
+            loadingPerson.value = false
+        })
+    }
 }
 
 // El código anterior define una función llamada "getChildPayload" que toma un parámetro "índice". Esta
@@ -75,12 +99,13 @@ const getChildPayload = (index) => {
 // El código anterior utiliza el gancho de ciclo de vida `onMounted` de Vue para ejecutar algún código
 // cuando el componente está montado.
 onMounted(() => {
+    getPersonalData()
     getTask('tomorrow')
 })
 
 // El código anterior es una función de Vue.js que recupera tareas según la opción seleccionada.
 const getTask = async (option) => {
-    loadingPerson.value = true
+
     loadingProgram.value = true
     optionValue.value = option
     switch (option) {
@@ -107,17 +132,6 @@ const getTask = async (option) => {
             loadingTasks.value = false
         })
     });
-    axios.get(route('get.personal.user')).then((res) => {
-        personal.value = Object.values(res.data.personal)
-        personal.value.forEach(
-            async element => {
-                await axios.get(route('get.assignment.hours', [date.value, (element.Num_SAP)])).then((res) => {
-                    personalHours.value[element.Num_SAP] = res.data;
-                });
-            })
-        loadingPerson.value = false
-    })
-
 }
 
 // El código anterior es una función llamada `format24h` que toma un parámetro `hora` (que representa
@@ -140,7 +154,7 @@ const deleteSchedule = async (task, index, schedule) => {
 
     await axios.post(route('programming.delete', schedule.id)).then((res) => {
         listaDatos.value[task.id] = res.data.task
-        getAssignmentHours((schedule.employee_id))
+        getAssignmentHoursForEmployee((schedule.employee_id))
         toast('Se ha eliminado a ' + schedule.name + ' de la tarea ' + task.name, 'success');
     })
 }
@@ -213,11 +227,13 @@ const filter = ref('')
                     </span>
                     <div class="flex items-center space-x-2">
                         <ButtonGroup>
-                            <Button label="Hoy" :outlined="optionValue != 'today'" @click="getTask('today')" />
+                            <Button label="Hoy" :outlined="optionValue != 'today'"
+                                @click="getTask('today'); getPersonalData()" />
                             <!-- <Button label="Proxima Semana" :outlined="optionValue != 'today'" @click="getTask('today')" /> -->
-                            <Button label="Mañana" :outlined="optionValue != 'tomorrow'" @click="getTask('tomorrow')" />
+                            <Button label="Mañana" :outlined="optionValue != 'tomorrow'"
+                                @click="getTask('tomorrow'); getPersonalData()" />
                         </ButtonGroup>
-                        <CustomInput type="date" v-model:input="date" @change="getTask('date')" />
+                        <CustomInput type="date" v-model:input="date" @change="getTask('date'); getPersonalData()" />
                         <!-- <CustomInput type="date" id="date" v-model:input="date" @change="getTask('date')" /> -->
                     </div>
                 </span>
@@ -370,10 +386,10 @@ const filter = ref('')
                                         </p>
                                     </span>
                                     <span class="flex items-center">
-                                        <Button v-tooltip.left="'Horas programadas'" class="w-full"
+                                        <Button v-tooltip.left="'Horas programadas'" class="w-full" :key="personalHours[item.Num_SAP]"
                                             :icon="personalHours[(item.Num_SAP)] == undefined ? 'fa-solid fa-spinner animate-spin' : undefined"
-                                            :label="personalHours[(item.Num_SAP)] != undefined ? personalHours[(item.Num_SAP)] + ' horas' : undefined"
-                                            :severity="personalHours[(item.Num_SAP)] < 9.5 ? 'primary' : 'success'"
+                                            :label="personalHours[item.Num_SAP] != undefined ? personalHours[item.Num_SAP] + ' horas' : undefined"
+                                            :severity="personalHours[item.Num_SAP] < 9.5 ? 'primary' : 'success'"
                                             @click="employeeDialog(item)" :pt="{ label: '!text-xs' }" />
                                     </span>
                                 </div>
@@ -396,7 +412,6 @@ const filter = ref('')
     </AppLayout>
     <CustomModal v-model:visible="modhours" icon="fa-regular fa-clock" width="60vw"
         :titulo="'Modificar horario de ' + editHorario?.data ?? null">
-
         <template #body>
             <!-- {{ editHorario }} -->
             <div class="flex flex-col gap-1">
