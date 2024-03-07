@@ -23,7 +23,7 @@ class User extends Model
         // contained inside of an array. We will attempt to
         // retrieve the first one, or supply a default.
         if (!isset($value)) {
-            return 'sin Foto';
+            return 'https://ui-avatars.com/api/?background=2E3092&color=fff&size=64&name=' . explode(' ', $this->name[0])[0] . '+' . explode(' ', $this->sn[0])[0];
         }
         $data = $value[0];
         $image = base64_encode($data);

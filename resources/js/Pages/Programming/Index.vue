@@ -65,7 +65,7 @@ const getAssignmentHoursForEmployee = (employee_id) => {
 }
 
 const getAssignmentHoursAll = () => {
-    personalHours.value={}
+    personalHours.value = {}
     personal.value.forEach(
         element => {
             axios.get(route('get.assignment.hours', [date.value, (element.Num_SAP)])).then((res) => {
@@ -204,8 +204,8 @@ const filter = ref('')
 .custom-image {
     width: 200px;
     height: 50px;
-    object-position: 50% 30%;
-    border-radius: 10% 25%;
+    /* object-position: 50% 30%; */
+    border-radius: 5px 10px;
     object-fit: cover;
     /* Opciones: 'cover', 'contain', 'fill', etc. */
 }
@@ -353,7 +353,6 @@ const filter = ref('')
                 </Listbox>
             </span>
             <!--#region LISTA PERSONAL-->
-
             <div class="row-span-2 rounded-lg">
                 <TabView class="tabview-custom" :scrollable="true" :pt="{
                                 nav: '!flex !justify-between',
@@ -374,7 +373,7 @@ const filter = ref('')
                                 :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
                                 class="snap-start rounded-xl shadow-md cursor-pointer hover:bg-blue-200 hover:ring-1 hover:ring-primary">
                                 <div class="grid grid-cols-5 gap-x-1 p-1">
-                                    <img class="custom-image " :src="item.photo"
+                                    <img class="custom-image " :src="item.photo" align="center"
                                         onerror="this.src='/svg/cotecmar-logo.svg'" draggable="false"
                                         alt="profile-photo" />
                                     <span class="col-span-3">
@@ -386,7 +385,8 @@ const filter = ref('')
                                         </p>
                                     </span>
                                     <span class="flex items-center">
-                                        <Button v-tooltip.left="'Horas programadas'" class="w-full" :key="personalHours[item.Num_SAP]"
+                                        <Button v-tooltip.left="'Horas programadas'" class="w-full"
+                                            :key="personalHours[item.Num_SAP]"
                                             :icon="personalHours[(item.Num_SAP)] == undefined ? 'fa-solid fa-spinner animate-spin' : undefined"
                                             :label="personalHours[item.Num_SAP] != undefined ? personalHours[item.Num_SAP] + ' horas' : undefined"
                                             :severity="personalHours[item.Num_SAP] < 9.5 ? 'primary' : 'success'"
@@ -410,8 +410,11 @@ const filter = ref('')
 
         </div>
     </AppLayout>
+
+    <!--#region MODALES -->
     <CustomModal v-model:visible="modhours" icon="fa-regular fa-clock" width="60vw"
         :titulo="'Modificar horario de ' + editHorario?.data ?? null">
+
         <template #body>
             <!-- {{ editHorario }} -->
             <div class="flex flex-col gap-1">
@@ -463,7 +466,7 @@ const filter = ref('')
                 label="Guardar" />
         </template>
     </CustomModal>
-    <!--#region MODAL DE PERSONAS -->
+
     <CustomModal :auto-z-index="false" :base-z-index="10" v-model:visible="open" width="70vw"
         :titulo="'Ver detalle de horario de ' + employee.Nombres_Apellidos">
 
@@ -486,4 +489,5 @@ const filter = ref('')
             </div>
         </template>
     </CustomModal>
+    <!-- #endregion -->
 </template>
