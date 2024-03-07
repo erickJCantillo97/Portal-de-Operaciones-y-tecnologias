@@ -38,6 +38,7 @@ const personalHours = ref({});
 const loadingTasks = ref(true)
 const loadingTask = ref({})
 const optionValue = ref('today')
+const conflicts = ref()
 
 // El código anterior define una función `onDrop` en Vue. Esta función se activa cuando un elemento se
 // coloca en una colección.
@@ -49,7 +50,8 @@ const onDrop = async (collection, dropResult) => {
             listaDatos.value[collection] = res.data.task
             personalHours.value[(payload.Num_SAP)] = res.data.hours
             loadingTask.value[collection] = false
-            if (Object.values(res.data.conflict).length > 0) {
+            conflicts.value = Object.values(res.data.conflict)
+            if (conflicts.value.length > 0) {
                 openConflict.value = true;
             }
         })
@@ -220,7 +222,7 @@ const filter = ref('')
                     </div>
                 </span>
                 <Listbox :options="tasks" :filterFields="['task', 'name', 'project']" class="col-span-2" filter :pt="{
-                                list: '!h-[69vh] !px-1 !snap-y !snap-mandatory',
+                                list: '!h-[73vh] !px-1 !snap-y !snap-mandatory',
                                 item: '!h-full !p-0 !rounded-md !snap-start !my-0.5',
                                 filterInput: '!h-8',
                                 header: '!p-1'
@@ -349,7 +351,7 @@ const filter = ref('')
                         <Loading v-if="loadingPerson" message="Cargando personas" />
                         <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy"
                             group-name="1" :get-child-payload="getChildPayload"
-                            class="!h-[75vh] space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
+                            class="!h-[72vh] space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
                             <!-- <span v-for="item in personal"> -->
                             <Draggable v-for="item in personal"
                                 :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"
@@ -368,12 +370,11 @@ const filter = ref('')
                                         </p>
                                     </span>
                                     <span class="flex items-center">
-                                        <Button v-tooltip.left="'Horas programadas'"
-                                            :label="personalHours[(item.Num_SAP)] + ' horas'"
+                                        <Button v-tooltip.left="'Horas programadas'" class="w-full"
+                                            :icon="personalHours[(item.Num_SAP)] == undefined ? 'fa-solid fa-spinner animate-spin' : undefined"
+                                            :label="personalHours[(item.Num_SAP)] != undefined ? personalHours[(item.Num_SAP)] + ' horas' : undefined"
                                             :severity="personalHours[(item.Num_SAP)] < 9.5 ? 'primary' : 'success'"
-                                            @click="employeeDialog(item)" :pt="{
-                                label: '!text-xs'
-                            }" />
+                                            @click="employeeDialog(item)" :pt="{ label: '!text-xs' }" />
                                     </span>
                                 </div>
                             </Draggable>
@@ -462,8 +463,11 @@ const filter = ref('')
         titulo="Colisiones de Programación">
 
         <template #body>
-            <div class="py-2 max-h-[90vh]">
-                hay colicones
+            <div class="py-2">
+                <div v-for="conflict in conflicts">
+                    {{conflict[0]}}
+                </div>
+                <!-- {{conflicts}} -->
             </div>
         </template>
     </CustomModal>
