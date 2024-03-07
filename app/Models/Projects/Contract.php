@@ -22,7 +22,7 @@ class Contract extends Model implements Auditable
 
     protected $guarded = [];
 
-    protected $appends = ['total_cost'];
+    protected $appends = ['total_cost', 'project_count'];
 
     // public function customer()
     // {
@@ -37,5 +37,14 @@ class Contract extends Model implements Auditable
     public function getTotalCostAttribute()
     {
         return [$this->quote->total_cost ?? 0, isset($this->quote->coin) ?  $this->quote->coin : 'COP'];
+    }
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
+
+    public function getProjectCountAttribute()
+    {
+        return Project::where('contract_id', $this->id)->count();
     }
 }
