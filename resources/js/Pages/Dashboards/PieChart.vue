@@ -18,7 +18,7 @@ const props = defineProps({
     },
     series: {
         type: Array,
-        default: null
+        default: []
     },
     legend: {
         type: Array,
@@ -69,12 +69,14 @@ const option = ref({
     },
 });
 </script>
+
 <style scoped>
 .chart {
-    height: 50vh;
+    height: 30vh;
     /* El gráfico ocupa todo el espacio disponible */
 }
 </style>
+
 <template>
     <div>
         <v-chart class="chart" :option="option" />
