@@ -20,9 +20,7 @@ class ProgrammingController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Programming/Index', [
-            'hours' => Shift::get()
-        ]);
+        return Inertia::render('Programming/Index');
     }
 
     /**
