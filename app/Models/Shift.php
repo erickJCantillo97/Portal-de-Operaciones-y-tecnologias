@@ -13,4 +13,8 @@ class Shift extends Model implements Auditable
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
     protected $guarded = [];
+    protected $casts = [
+        'endShift' => 'date:hh:mm',
+        'startShift' => 'date:hh:mm'
+    ];
 }
