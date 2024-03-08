@@ -72,7 +72,7 @@ class ProjectController extends Controller
             'authorization_id' => 'nullable',
             'quote_id' => 'nullable',
             'type' => 'nullable',
-            'SAP_code' => 'nullable',
+            'SAP_code' => 'nullable|unique:projects,SAP_code',
             'status' => 'nullable',
             'scope' => 'nullable',
             'supervisor' => 'nullable',

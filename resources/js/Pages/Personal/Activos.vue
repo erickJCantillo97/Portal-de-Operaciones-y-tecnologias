@@ -48,7 +48,7 @@ function formatDate(date) {
             <!--DATATABLE-->
             <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="personal" v-model:filters="filters"
                 dataKey="id" filterDisplay="menu"
-                :globalFilterFields="['Nombres_Apellidos', 'Cargo', 'name', 'type', 'email']"
+                :globalFilterFields="['Nombres_Apellidos', 'Cargo', 'name', 'type', 'email', 'Oficina', 'Fecha_Final']"
                 currentPageReportTemplate=" {first} al {last} de {totalRecords}"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -57,7 +57,8 @@ function formatDate(date) {
                     <div class="flex justify-between w-full h-8 mb-2">
                         <div class="flex space-x-4">
                             <div class="w-8" title="Filtrar Clientes">
-                                <Button @click="clearFilter()" type="button" severity="primary" class="hover:bg-primary ">
+                                <Button @click="clearFilter()" type="button" severity="primary"
+                                    class="hover:bg-primary ">
                                     <i class="pi pi-filter-slash" style="color: 'var(--primary-color);'"></i>
                                 </Button>
                             </div>
@@ -80,6 +81,7 @@ function formatDate(date) {
 
                 <!--COLUMNAS-->
                 <Column field="Nombres_Apellidos" header="Nombre" sortable>
+
                     <template #body="slotProps">
                         <UserTable :user="slotProps.data"></UserTable>
                     </template>
@@ -87,16 +89,19 @@ function formatDate(date) {
                 <Column field="Cargo" header="cargo" sortable></Column>
                 <Column field="Oficina" header="Departamento" sortable></Column>
                 <Column field="Fecha_Final" header="Fin Contrato" sortable>
+
                     <template #body="slotProps">
                         {{ formatDate(slotProps.data.Fecha_Final) }}
                     </template>
                 </Column>
                 <Column field="Costo_Hora" header="Costo Hora" sortable>
+
                     <template #body="slotProps">
                         {{ formatCurrency(slotProps.data.Costo_Hora) }}
                     </template>
                 </Column>
                 <Column field="Costo_Mes" header="Costo Mes" sortable>
+
                     <template #body="slotProps">
                         {{ formatCurrency(slotProps.data.Costo_Mes) }}
                     </template>

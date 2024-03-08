@@ -86,21 +86,21 @@ const showEdit = (event, dato) => {
     typeShip.type = dato.type
     typeShip.disinger = dato.disinger
     typeShip.hull_material = dato.hull_material //material del casco
-    typeShip.length =dato.length? parseFloat(dato.length):null //eslra
-    typeShip.breadth = dato.breadth?parseFloat(dato.breadth):null //Manga
-    typeShip.draught = dato.draught?parseFloat(dato.draught):null //calado de diseño
-    typeShip.depth = dato.depth?parseFloat(dato.depth):null //punta
-    typeShip.full_load = dato.full_load?parseFloat(dato.full_load):null
-    typeShip.light_ship = dato.light_ship?parseFloat(dato.light_ship):null
-    typeShip.power_total = dato.power_total? parseFloat(dato.power_total):null
+    typeShip.length = dato.length ? parseFloat(dato.length) : null //eslra
+    typeShip.breadth = dato.breadth ? parseFloat(dato.breadth) : null //Manga
+    typeShip.draught = dato.draught ? parseFloat(dato.draught) : null //calado de diseño
+    typeShip.depth = dato.depth ? parseFloat(dato.depth) : null //punta
+    typeShip.full_load = dato.full_load ? parseFloat(dato.full_load) : null
+    typeShip.light_ship = dato.light_ship ? parseFloat(dato.light_ship) : null
+    typeShip.power_total = dato.power_total ? parseFloat(dato.power_total) : null
     typeShip.propulsion_type = dato.propulsion_type
-    typeShip.velocity = dato.velocity? parseFloat(dato.velocity):null
-    typeShip.autonomias = dato.autonomias? parseFloat(dato.autonomias):null
-    typeShip.autonomy = dato.autonomy? parseFloat(dato.autonomy):null
-    typeShip.crew = dato.crew? parseFloat(dato.crew):null
-    typeShip.GT = dato.GT?parseInt(dato.GT):null
-    typeShip.CGT = dato.CGT? parseInt(dato.CGT):null
-    typeShip.bollard_pull = dato.bollard_pull?parseInt(dato.bollard_pull):null
+    typeShip.velocity = dato.velocity ? parseFloat(dato.velocity) : null
+    typeShip.autonomias = dato.autonomias ? parseFloat(dato.autonomias) : null
+    typeShip.autonomy = dato.autonomy ? parseFloat(dato.autonomy) : null
+    typeShip.crew = dato.crew ? parseFloat(dato.crew) : null
+    typeShip.GT = dato.GT ? parseInt(dato.GT) : null
+    typeShip.CGT = dato.CGT ? parseInt(dato.CGT) : null
+    typeShip.bollard_pull = dato.bollard_pull ? parseInt(dato.bollard_pull) : null
     typeShip.clasification = dato.clasification
     typeShip.render = dato.render
     modalType.value = 'edit'
@@ -163,23 +163,26 @@ const showHull = (event, data) => {
         <div class="h-[89vh] overflow-y-auto">
             <CustomDataTable :rows-default="100" :data="typeShips" :columnas="columns" :actions="buttons"
                 @showHull="showHull" @rowClic="rowClick" @showEdit="showEdit" title="Clases de buque"
-                @deleteClic="deleteClic" @addClick="showNew()" >
+                @deleteClic="deleteClic" @addClick="showNew()">
                 <template #buttonHeader>
-                    <Button title="Nuevo" severity="success" label="Agregar" outlined class="!h-8" icon="fa-solid fa-plus"
-                        @click="showNew()" v-if="hasPermission('typeShip create')" />
+                    <Button title="Nuevo" severity="success" label="Agregar" outlined class="!h-8"
+                        icon="fa-solid fa-plus" @click="showNew()" v-if="hasPermission('typeShip create')" />
                 </template>
             </CustomDataTable>
         </div>
     </AppLayout>
 
     <CustomModal v-model:visible="modalVisible">
+
         <template #icon>
             <i class="text-white fa-solid fa-ship"></i>
         </template>
+
         <template #titulo>
             <span class="text-xl font-bold text-white white-space-nowrap">
                 {{ modalType == 'new' ? 'Nueva clase' : 'Editar clase' }}</span>
         </template>
+
         <template #body>
             <div class="grid md:grid-cols-4 gap-2">
                 <CustomInput label="Nombre" id='name' :showSup="true" v-model:input="typeShip.name" />
@@ -196,8 +199,10 @@ const showHull = (event, data) => {
                 <CustomInput label="Ligth Ship" type="number" id="light_ship" v-model:input="typeShip.light_ship" />
                 <CustomInput label="Potencia" type="number" id="power_total" v-model:input="typeShip.power_total"
                     suffix=" Kw" />
-                <CustomInput label="Tipo de propulsion" type="text" id="propulsion_type"
-                    v-model:input="typeShip.propulsion_type" />
+                <CustomInput label="Tipo de propulsion" type="dropdown"
+                    :options="['Convencional', 'Azimutal', 'Water jets', 'Pump Jet', 'Eléctrica', 'Híbrida', 'Voith Schneider']"
+                    id="propulsion_type" v-model:input="typeShip.propulsion_type"
+                    placeholder="Selecciona un material" />
                 <CustomInput label="Velocidad maxima" type="text" id="velocity" v-model:input="typeShip.velocity"
                     suffix=" Km/h" />
                 <CustomInput label="Autonomia" type="number" id="autonomias" v-model:input="typeShip.autonomias"
@@ -207,19 +212,23 @@ const showHull = (event, data) => {
                     suffix=" Personas" />
                 <CustomInput label="GT" type="number" id=gt v-model:input="typeShip.GT" />
                 <CustomInput label="CGT" type="number" id="cgt" v-model:input="typeShip.CGT" />
-                <CustomInput label="Bollard pull" type="number" id="bollard_pull" v-model:input="typeShip.bollard_pull" />
-                <CustomInput label="Clasificacion" type="text" id="clasification" v-model:input="typeShip.clasification" />
-                <CustomInput label="Imagen" type="file" id="image" v-model:input="typeShip.image" acceptFile="image/*" />
+                <CustomInput label="Bollard pull" type="number" id="bollard_pull"
+                    v-model:input="typeShip.bollard_pull" />
+                <CustomInput label="Clasificacion" type="text" id="clasification"
+                    v-model:input="typeShip.clasification" />
+                <CustomInput label="Imagen" type="file" id="image" v-model:input="typeShip.image"
+                    acceptFile="image/*" />
                 <span class="flex items-center justify-center">
                     <Image v-if="typeShip.image != null || typeShip.render != null" id="verFoto" alt="imagen" preview
                         height="50" width="50" :pt="{
-                        }">
+            }">
                         <template #image>
                             <div class="flex items-center justify-center w-full">
                                 <img :src="typeShip.image ? verfoto(typeShip.image) : typeShip.render" alt="image"
                                     class="h-12" />
                             </div>
                         </template>
+
                         <template #preview="slotProps">
                             <img :src="typeShip.image ? verfoto(typeShip.image) : typeShip.render"
                                 class="!max-w-[80vw] !max-h-[80vh]" alt="preview" :style="slotProps.style"
@@ -230,6 +239,7 @@ const showHull = (event, data) => {
 
             </div>
         </template>
+
         <template #footer>
             <Button severity="primary" outlined label="Guardar" icon="fa-solid fa-floppy-disk"
                 @click="modalType == 'new' ? save() : edit()" />
@@ -305,8 +315,8 @@ const showHull = (event, data) => {
         <span v-for="(project, index) in dataSidebar.projects" :key="index" class="grid gap-y-2 my-2">
             <div class="border-2 p-1 rounded-lg cursor-default">
                 <span class="flex justify-between items-center">
-                    <Link :href="route('projects.goToProjectOverview', project.id)" v-tooltip.left="'Nombre del proyecto'"
-                        class="font-bold"> {{ project.name }}</Link>
+                    <Link :href="route('projects.goToProjectOverview', project.id)"
+                        v-tooltip.left="'Nombre del proyecto'" class="font-bold"> {{ project.name }}</Link>
                     <span v-tooltip.top="'Codigo SAP'" class="text-sm">{{ project.SAP_code }}</span>
                 </span>
                 <span class="text-xs" v-tooltip.top="'Tipo de proyecto'">{{ project.type }}</span>

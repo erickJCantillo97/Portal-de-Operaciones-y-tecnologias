@@ -1,6 +1,5 @@
 import 'material-icons/iconfont/material-icons.css';
 import "../css/app.css";
-// import "../css/tailwind.css";
 import "./bootstrap";
 import "primeicons/primeicons.css";
 import "primevue/resources/themes/mdc-light-indigo/theme.css";
@@ -11,7 +10,6 @@ import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy/dist/vue.m";
 import Button from "primevue/button"
 import ConfirmationService from "primevue/confirmationservice";
-import CustomModal from '@/Components/CustomModal.vue'
 import PrimeVue from "primevue/config";
 import ToastService from "primevue/toastservice";
 import Tooltip from "primevue/tooltip";
@@ -51,7 +49,6 @@ createInertiaApp({
             .use(VueChatScroll)
             .component("Head", Head)
             .directive("tooltip", Tooltip)
-            .mixin({ component: { CustomModal } })
             .mount(el);
     },
     progress: {

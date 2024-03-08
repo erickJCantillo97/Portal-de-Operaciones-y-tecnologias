@@ -126,30 +126,37 @@ onMounted(() => {
         wizard.value.activateAll()
     }
 })
-
+const errors = ref({})
 const beforeChange = async () => {
-    let switchTabsStates = false
-    loading.value = true
-    try {
-        if (!formData.value.id) {
-            await axios.post(route('projects.store'), formData.value)
-                .then((res) => {
-                    formData.value.id = res.data.project_id
-                    toast.add({ severity: 'success', group: 'customToast', text: 'Guardado', life: 2000 });
-                    switchTabsStates = true
-                })
-        } else {
-            await axios.put(route('projects.update', formData.value.id), formData.value)
-                .then((res) => {
-                    toast.add({ severity: 'success', group: 'customToast', text: 'Actualizado', life: 2000 });
-                    switchTabsStates = true
-                })
+    if (formData.value.name != null) {
+        let switchTabsStates = false
+        loading.value = true
+        try {
+            if (!formData.value.id) {
+                await axios.post(route('projects.store'), formData.value)
+                    .then((res) => {
+                        formData.value.id = res.data.project_id
+                        toast.add({ severity: 'success', group: 'customToast', text: 'Guardado', life: 2000 });
+                        switchTabsStates = true
+                    })
+            } else {
+                await axios.put(route('projects.update', formData.value.id), formData.value)
+                    .then((res) => {
+
+                        toast.add({ severity: 'success', group: 'customToast', text: 'Actualizado', life: 2000 });
+                        switchTabsStates = true
+                    })
+            }
+            loading.value = false
+            return switchTabsStates
+        } catch (error) {
+            errors.value = error.response.data.errors
+            console.log(error)
+            toast.add({ severity: 'error', group: 'customToast', text: errors.value.message, life: 2000 });
         }
-        loading.value = false
-        return switchTabsStates
-    } catch (error) {
-        console.log(error)
-        toast.add({ severity: 'error', group: 'customToast', text: 'Hubo un error', life: 2000 });
+    } else {
+        errors.value.name = 'El campo nombre es obligatorio'
+        toast.add({ severity: 'error', group: 'customToast', text: 'Se requiere un nombre', life: 2000 });
     }
 }
 
@@ -298,6 +305,7 @@ const deleteweekTask = (id) => {
 
 const active = ref(0);
 </script>
+
 <template>
     <AppLayout>
         <div class="h-[89vh] overflow-y-auto flex flex-col ">
@@ -315,14 +323,15 @@ const active = ref(0);
                     <Button icon="fa-solid fa-gauge-high" severity="secondary" v-tooltip.left="'Avance del proyecto'"
                         @click="modalProgress = true" />
 
-                    <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP" icon-button="fa-solid fa-chart-bar"
-                        tooltip="Subir Estructura" accept=".xlsx,.xls" :url="route('upload.estructure', project.id)" />
+                    <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP"
+                        icon-button="fa-solid fa-chart-bar" tooltip="Subir Estructura" accept=".xlsx,.xls"
+                        :url="route('upload.estructure', project.id)" />
 
 
 
                     <CustomUpload mode="advanced" titleModal="Subir Curva S" icon-button="fa-solid fa-chart-line"
-                        tooltip="Subir Curva S" accept=".xlsx,.xls" :url="route('progressProjectWeek.upload', project.id)"
-                        severity="info" />
+                        tooltip="Subir Curva S" accept=".xlsx,.xls"
+                        :url="route('progressProjectWeek.upload', project.id)" severity="info" />
 
                     <CustomUpload mode="advanced" titleModal="Subir Presupuesto del proyecto"
                         icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
@@ -350,16 +359,16 @@ const active = ref(0);
             <div class="p-2">
                 <!-- AQUÍ VA EL CONTENIDO DEL FORMULARIO-->
                 <form-wizard @onComplete="finish('Guardado y saliendo')" stepSize="md" class="flex flex-col h-[75vh]"
-                    color="#2E3092" nextButtonText="Siguiente" backButtonText="Regresar" finishButtonText="Guardar y salir"
-                    ref="wizard">
+                    color="#2E3092" nextButtonText="Siguiente" backButtonText="Regresar"
+                    finishButtonText="Guardar y salir" ref="wizard">
                     <!--INFORMACIÓN CONTRACTUAL-->
                     <tab-content title="Información Contractual" class="h-[45vh] overflow-y-auto"
                         icon="fa-solid fa-file-signature" :beforeChange="beforeChange">
                         <div class="border gap-4 border-gray-200 rounded-lg p-4 md:grid md:grid-cols-2">
                             <!--CAMPO NOMBRE DEL PROYECTO (name)-->
                             <CustomInput label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
-                                v-model:input="formData.name" :errorMessage="$page.props.errors.name"
-                                :invalid="$page.props.errors.name ? true : false" />
+                                v-model:input="formData.name" :errorMessage="errors.name"
+                                :invalid="errors.name ? true : false" />
                             <!--CAMPO CÓDIGO DE SAP (SAP_code)-->
                             <CustomInput label="Código SAP" placeholder="Escriba el código de SAP"
                                 v-model:input="formData.SAP_code" :errorMessage="$page.props.errors.SAP_code"
@@ -370,11 +379,11 @@ const active = ref(0);
                                 :options="scopeOptions" :errorMessage="$page.props.errors.scope"
                                 :invalid="$page.props.errors.scope ? true : false" />
                             <CustomInput label="Contrato" type="dropdown" placeholder="Seleccione Alcance del Proyecto"
-                                optionValue="id" optionLabel="contract_id" v-model:input="formData.contract_id" showClear
-                                :options="contracts" />
+                                optionValue="id" optionLabel="contract_id" v-model:input="formData.contract_id"
+                                showClear :options="contracts" />
                             <CustomInput label="Autorizaciones" type="dropdown" placeholder="Seleccione Autorización"
-                                optionLabel="name" v-model:input="authorizationSelect" showClear :options="authorizations"
-                                :errorMessage="$page.props.errors.authorization_id"
+                                optionLabel="name" v-model:input="authorizationSelect" showClear
+                                :options="authorizations" :errorMessage="$page.props.errors.authorization_id"
                                 :invalid="$page.props.errors.authorization_id ? true : false" />
 
                             <CustomInput label="Estimaciones" type="dropdown" placeholder="Seleccione Estimación"
@@ -427,16 +436,16 @@ const active = ref(0);
                                     :disabled="!formData.contract_id" />
                                 <div class="gap-6 grid grid-cols-3">
                                     <!--CAMPO HORAS POR DÍA (hoursPerDay)-->
-                                    <CustomInput label="Horas por Dia" type="number" v-model:input="formData.hoursPerDay"
-                                        :min="0" :maxFractionDigits="2" />
+                                    <CustomInput label="Horas por Dia" type="number"
+                                        v-model:input="formData.hoursPerDay" :min="0" :maxFractionDigits="2" />
 
                                     <!--CAMPO DIAS POR SEMANA (daysPerWeek)-->
-                                    <CustomInput label="Dias por Semana" type="number" v-model:input="formData.daysPerWeek"
-                                        :min="0" :max="7" />
+                                    <CustomInput label="Dias por Semana" type="number"
+                                        v-model:input="formData.daysPerWeek" :min="0" :max="7" />
 
                                     <!--CAMPO DIAS POR MES (daysPerMonth)-->
-                                    <CustomInput label="Dias por Mes" v-model:input="formData.daysPerMonth" type="number"
-                                        :min="0" :max="31" />
+                                    <CustomInput label="Dias por Mes" v-model:input="formData.daysPerMonth"
+                                        type="number" :min="0" :max="31" />
                                 </div>
                             </div>
                             <!--CAMPO TURNO (shift)-->
@@ -478,13 +487,15 @@ const active = ref(0);
                                             </div>
                                         </div>
                                     </template>
-                                    <template #empty>
+
+<template #empty>
                                         <Empty message="No hay turnos para mostrar"></Empty>
                                     </template>
-                                    <template #emptyfilter>
+
+<template #emptyfilter>
                                         <Empty message="No se encuentran turnos"></Empty>
                                     </template>
-                                </Listbox> -->
+</Listbox> -->
                                 <CustomShiftSelector v-model:shift="formData.shift" optionValue="id" />
                             </div>
                         </div>
@@ -494,13 +505,15 @@ const active = ref(0);
                         class="h-[45vh] flex gap-2">
                         <span class="h-ful flex flex-col w-1/2">
                             <p class="font-bold text-lg">Buques agregados</p>
-                            <Listbox :options="projectShips" optionValue="id" :filterFields="['ship.name', 'ship.idHull']"
+                            <Listbox :options="projectShips" optionValue="id"
+                                :filterFields="['ship.name', 'ship.idHull']"
                                 filterPlaceholder="Filtrar Buques agregados" multiple filter optionLabel="name" :pt="{
-                                    list: projectShips.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
-                                    header: '!p-1',
-                                    filterInput: '!h-8',
-                                    item: '!h-min !rounded-lg'
-                                }">
+                        list: projectShips.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
+                        header: '!p-1',
+                        filterInput: '!h-8',
+                        item: '!h-min !rounded-lg'
+                    }">
+
                                 <template #option="slotProps">
                                     <div class="flex items-center justify-between">
                                         <ol class="h-full flex flex-col">
@@ -515,11 +528,12 @@ const active = ref(0);
                                                 </p>
                                             </li>
                                         </ol>
-                                        <Button v-tooltip="'Eliminar el buque del proyecto'" icon="fa-solid fa-trash-can"
-                                            text rounded severity="danger"
+                                        <Button v-tooltip="'Eliminar el buque del proyecto'"
+                                            icon="fa-solid fa-trash-can" text rounded severity="danger"
                                             @click="confirmDelete(slotProps.option.id, 'Buque', 'projectships')" />
                                     </div>
                                 </template>
+
                                 <template #empty>
                                     <Empty message="Aun no se agregan buques" />
                                 </template>
@@ -528,13 +542,14 @@ const active = ref(0);
                         <span class="flex flex-col w-1/2">
                             <p class="font-bold text-lg">Buques para agregar</p>
                             <Listbox :options="ships" v-model="formData.ships" optionValue="id"
-                                :filterFields="['name', 'idHull']" filterPlaceholder="Filtrar Buques sin agregar" multiple
-                                filter optionLabel="name" :pt="{
-                                    list: ships.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
-                                    header: '!p-1',
-                                    filterInput: '!h-8',
-                                    item: '!h-min !rounded-lg'
-                                }">
+                                :filterFields="['name', 'idHull']" filterPlaceholder="Filtrar Buques sin agregar"
+                                multiple filter optionLabel="name" :pt="{
+                        list: ships.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
+                        header: '!p-1',
+                        filterInput: '!h-8',
+                        item: '!h-min !rounded-lg'
+                    }">
+
                                 <template #option="slotProps">
                                     <div class="flex">
                                         <div class="h-full flex flex-col">
@@ -551,6 +566,7 @@ const active = ref(0);
                                         </div>
                                     </div>
                                 </template>
+
                                 <template #empty>
                                     <Empty message="No hay buques para mostrar" />
                                 </template>
@@ -563,13 +579,16 @@ const active = ref(0);
                             @edit="showModal" :filter="false" :showHeader="false" :showAdd="true" @addClick="showModal"
                             @delete="delMilestone" />
                     </tab-content>
+
                     <template #prev>
                         <Button label="Regresar" :loading="loading" raised icon="fa-solid fa-arrow-left" />
                     </template>
+
                     <template #next>
                         <Button label="Siguiente" :loading="loading" raised iconPos="right"
                             icon="fa-solid fa-arrow-right" />
                     </template>
+
                     <template #finish>
                         <Button label="Guardar y salir" :loading="loading" raised icon="fa-solid fa-floppy-disk" />
                     </template>
@@ -578,8 +597,9 @@ const active = ref(0);
         </div>
     </AppLayout>
 
-    <CustomModal v-model:visible="openDialogHito" width="30rem" :titulo="formMilestone.id ? 'Editar hito' : 'Agregar Hito'"
-        icon="fa-solid fa-list-check">
+    <CustomModal v-model:visible="openDialogHito" width="30rem"
+        :titulo="formMilestone.id ? 'Editar hito' : 'Agregar Hito'" icon="fa-solid fa-list-check">
+
         <template #body>
             <section class="relative space-y-6 p-2">
                 <CustomInput label="Título del Hito" id="category" type="text" v-model:input="formMilestone.title"
@@ -606,6 +626,7 @@ const active = ref(0);
                 </div>
             </section>
         </template>
+
         <template #footer>
             <Button severity="success" outlined :label="formMilestone.id ? 'Actualizar' : 'Agregar'"
                 icon="fa-solid fa-floppy-disk" @click="save()" />
@@ -614,15 +635,18 @@ const active = ref(0);
         </template>
     </CustomModal>
 
-    <CustomModal v-model:visible="modalProgress" titulo="Avance del proyecto" width="30vw" icon="fa-solid fa-bars-progress">
+    <CustomModal v-model:visible="modalProgress" titulo="Avance del proyecto" width="30vw"
+        icon="fa-solid fa-bars-progress">
+
         <template #body>
             <CustomInput label="Semana" type="week" v-model:input="avance.week" />
-            <CustomInput label="Porcentaje de avance" :maxFractionDigits="2" v-model:input="avance.real_progress"
+            <CustomInput label="Porcentaje de avance" :maxFractionDigits="4" v-model:input="avance.real_progress"
                 type="number" :max="100" :min="0" suffix="%" />
             <CustomInput label="CPI" v-model:input="avance.CPI" :errorMessage="avance.errors.CPI"
                 :invalid="avance.errors.CPI ? true : false" type="number" :maxFractionDigits="2" />
             <CustomInput label="SPI" v-model:input="avance.SPI" type="number" :maxFractionDigits="2" />
         </template>
+
         <template #footer>
             <Button label="Guardar" severity="success" :loading="avance.processing" @click="guardarAvance()" />
             <Button label="Cerrar" severity="danger" @click="modalProgress = false" />
@@ -630,6 +654,7 @@ const active = ref(0);
     </CustomModal>
 
     <CustomModal v-model:visible="modalWeekTask" titulo="Tareas semanales" width="70vw" icon="fa-solid fa-list-check">
+
         <template #body>
             <div class="grid grid-cols-4 gap-2">
                 <span class="col-span-3 grid gap-2 grid-cols-2 h-min max-h-64 overflow-y-auto justify-center ">

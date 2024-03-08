@@ -27,6 +27,8 @@ const props = defineProps({
     hours: Object
 })
 
+const openConflict = ref(false)
+
 //#region Draggable
 const listaDatos = ref({})
 const date = ref(new Date().toISOString().split("T")[0])
@@ -39,6 +41,7 @@ const personalHours = ref({});
 const loadingTasks = ref(true)
 const loadingTask = ref({})
 const optionValue = ref('today')
+const conflicts = ref()
 
 // El código anterior define una función `onDrop` en Vue. Esta función se activa cuando un elemento se
 // coloca en una colección.
@@ -50,14 +53,42 @@ const onDrop = async (collection, dropResult) => {
             listaDatos.value[collection] = res.data.task
             personalHours.value[(payload.Num_SAP)] = res.data.hours
             loadingTask.value[collection] = false
+            conflicts.value = Object.values(res.data.conflict)
+            if (conflicts.value.length > 0) {
+                openConflict.value = true;
+            }
         })
     }
 }
 
-const getAssignmentHours = (employee_id) => {
+const getAssignmentHoursForEmployee = (employee_id) => {
     axios.get(route('get.assignment.hours', [date.value, employee_id])).then((res) => {
         personalHours.value[(employee_id)] = res.data;
     })
+}
+
+const getAssignmentHoursAll = () => {
+    personalHours.value = {}
+    personal.value.forEach(
+        element => {
+            axios.get(route('get.assignment.hours', [date.value, (element.Num_SAP)])).then((res) => {
+                personalHours.value[element.Num_SAP] = res.data;
+            });
+        })
+}
+
+const getPersonalData = () => {
+    if (personal.value) {
+        getAssignmentHoursAll()
+    } else {
+        loadingPerson.value = true
+        axios.get(route('get.personal.user')).then((res) => {
+            // console.log(res)
+            personal.value = Object.values(res.data.personal)
+            getAssignmentHoursAll()
+            loadingPerson.value = false
+        })
+    }
 }
 
 // El código anterior define una función llamada "getChildPayload" que toma un parámetro "índice". Esta
@@ -71,12 +102,13 @@ const getChildPayload = (index) => {
 // El código anterior utiliza el gancho de ciclo de vida `onMounted` de Vue para ejecutar algún código
 // cuando el componente está montado.
 onMounted(() => {
+    getPersonalData()
     getTask('tomorrow')
 })
 
 // El código anterior es una función de Vue.js que recupera tareas según la opción seleccionada.
 const getTask = async (option) => {
-    loadingPerson.value = true
+
     loadingProgram.value = true
     optionValue.value = option
     switch (option) {
@@ -103,17 +135,6 @@ const getTask = async (option) => {
             loadingTasks.value = false
         })
     });
-    axios.get(route('get.personal.user')).then((res) => {
-        personal.value = Object.values(res.data.personal)
-        personal.value.forEach(
-            async element => {
-                await axios.get(route('get.assignment.hours', [date.value, (element.Num_SAP)])).then((res) => {
-                    personalHours.value[element.Num_SAP] = res.data;
-                });
-            })
-        loadingPerson.value = false
-    })
-
 }
 
 // El código anterior es una función llamada `format24h` que toma un parámetro `hora` (que representa
@@ -136,7 +157,7 @@ const deleteSchedule = async (task, index, schedule) => {
 
     await axios.post(route('programming.delete', schedule.id)).then((res) => {
         listaDatos.value[task.id] = res.data.task
-        getAssignmentHours((schedule.employee_id))
+        getAssignmentHoursForEmployee((schedule.employee_id))
         toast('Se ha eliminado a ' + schedule.name + ' de la tarea ' + task.name, 'success');
     })
 }
@@ -211,12 +232,13 @@ const save = async()=>{
 
 }
 </script>
+
 <style scoped>
 .custom-image {
     width: 200px;
     height: 50px;
-    object-position: 50% 30%;
-    border-radius: 10% 25%;
+    /* object-position: 50% 30%; */
+    border-radius: 5px 10px;
     object-fit: cover;
     /* Opciones: 'cover', 'contain', 'fill', etc. */
 }
@@ -238,20 +260,22 @@ const save = async()=>{
                     </span>
                     <div class="flex items-center space-x-2">
                         <ButtonGroup>
-                            <Button label="Hoy" :outlined="optionValue != 'today'" @click="getTask('today')" />
+                            <Button label="Hoy" :outlined="optionValue != 'today'"
+                                @click="getTask('today'); getPersonalData()" />
                             <!-- <Button label="Proxima Semana" :outlined="optionValue != 'today'" @click="getTask('today')" /> -->
-                            <Button label="Mañana" :outlined="optionValue != 'tomorrow'" @click="getTask('tomorrow')" />
+                            <Button label="Mañana" :outlined="optionValue != 'tomorrow'"
+                                @click="getTask('tomorrow'); getPersonalData()" />
                         </ButtonGroup>
-                        <CustomInput type="date" v-model:input="date" @change="getTask('date')" />
+                        <CustomInput type="date" v-model:input="date" @change="getTask('date'); getPersonalData()" />
                         <!-- <CustomInput type="date" id="date" v-model:input="date" @change="getTask('date')" /> -->
                     </div>
                 </span>
                 <Listbox :options="tasks" :filterFields="['task', 'name', 'project']" class="col-span-2" filter :pt="{
-                    list: '!h-[69vh] !px-1 !snap-y !snap-mandatory',
-                    item: '!h-full !p-0 !rounded-md !snap-start !my-0.5',
-                    filterInput: '!h-8',
-                    header: '!p-1'
-                }">
+                                list: '!h-[73vh] !px-1 !snap-y !snap-mandatory',
+                                item: '!h-full !p-0 !rounded-md !snap-start !my-0.5',
+                                filterInput: '!h-8',
+                                header: '!p-1'
+                            }">
                     <template #option="slotProps">
                         <div class="flex flex-col justify-between h-full p-2 border rounded-md shadow-md snap-start">
                             <p><b>{{ slotProps.option.task }}</b> <i class="fa-solid fa-angle-right"></i> {{
@@ -261,11 +285,11 @@ const save = async()=>{
                                 <span class="grid grid-cols-3">
                                     <p class="font-bold ">I:</p>
                                     <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha inicio'">{{
-                                        slotProps.option.startDate
-                                    }} </p>
+                                slotProps.option.startDate
+                            }} </p>
                                     <p class="font-bold">F:</p>
                                     <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha fin'">{{
-                                        slotProps.option.endDate }}
+                                slotProps.option.endDate }}
                                     </p>
                                 </span>
                                 <span class="flex justify-center">
@@ -319,14 +343,16 @@ const save = async()=>{
                                                         <i
                                                             class="fa-solid fa-trash-can text-danger text-xs hover:animate-pulse hover:scale-125"></i>
                                                     </button>
-                                                    <button v-tooltip.bottom="'Eliminar'" class="hidden group-hover:flex"
+                                                    <button v-tooltip.bottom="'Eliminar'"
+                                                        class="hidden group-hover:flex"
                                                         @click="deleteSchedule(slotProps.option, index, item)" v-else>
                                                         <i
                                                             class="fa-solid fa-trash-can text-danger text-xs hover:animate-pulse hover:scale-125"></i>
                                                     </button>
                                                     <span class="w-full text-xs tracking-tighter text-center">
-                                                        {{ format24h(horario.hora_inicio) }} {{ format24h(horario.hora_fin)
-                                                        }}
+                                                        {{ format24h(horario.hora_inicio) }} {{
+                                format24h(horario.hora_fin)
+                            }}
                                                     </span>
                                                     <button v-tooltip.bottom="'Cambiar horario'"
                                                         class="hidden group-hover:flex"
@@ -352,6 +378,7 @@ const save = async()=>{
                             </Container>
                         </div>
                     </template>
+
                     <template #empty>
                         <Loading v-if="loadingProgram" message="Cargando actividades" />
                     </template>
@@ -359,29 +386,29 @@ const save = async()=>{
                 </Listbox>
             </span>
             <!--#region LISTA PERSONAL-->
-
             <div class="row-span-2 rounded-lg">
                 <TabView class="tabview-custom" :scrollable="true" :pt="{
-                    nav: '!flex !justify-between',
-                    panelContainer: '!p-1'
-                }">
+                                nav: '!flex !justify-between',
+                                panelContainer: '!p-1'
+                            }">
                     <TabPanel header="Personas" :pt="{
-                        root: 'w-full',
-                        headerTitle: '!w-full !flex !justify-center',
-                    }">
+                                root: 'w-full',
+                                headerTitle: '!w-full !flex !justify-center',
+                            }">
                         <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
                         <Loading v-if="loadingPerson" message="Cargando personas" />
                         <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy"
                             group-name="1" :get-child-payload="getChildPayload"
-                            class="!h-[75vh] space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
+                            class="!h-[72vh] space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
                             <!-- <span v-for="item in personal"> -->
                             <Draggable v-for="item in personal"
                                 :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"
                                 :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
                                 class="snap-start rounded-xl shadow-md cursor-pointer hover:bg-blue-200 hover:ring-1 hover:ring-primary">
                                 <div class="grid grid-cols-5 gap-x-1 p-1">
-                                    <img class="custom-image " :src="item.photo" onerror="this.src='/svg/cotecmar-logo.svg'"
-                                        draggable="false" alt="profile-photo" />
+                                    <img class="custom-image " :src="item.photo" align="center"
+                                        onerror="this.src='/svg/cotecmar-logo.svg'" draggable="false"
+                                        alt="profile-photo" />
                                     <span class="col-span-3">
                                         <p class="text-sm font-semibold truncate leading-6 text-gray-900">
                                             {{ item.Nombres_Apellidos }}
@@ -391,12 +418,12 @@ const save = async()=>{
                                         </p>
                                     </span>
                                     <span class="flex items-center">
-                                        <Button v-tooltip.left="'Horas programadas'"
-                                            :label="personalHours[(item.Num_SAP)] + ' horas'"
-                                            :severity="personalHours[(item.Num_SAP)] < 9.5 ? 'primary' : 'success'"
-                                            @click="employeeDialog(item)" :pt="{
-                                                label: '!text-xs'
-                                            }" />
+                                        <Button v-tooltip.left="'Horas programadas'" class="w-full"
+                                            :key="personalHours[item.Num_SAP]"
+                                            :icon="personalHours[(item.Num_SAP)] == undefined ? 'fa-solid fa-spinner animate-spin' : undefined"
+                                            :label="personalHours[item.Num_SAP] != undefined ? personalHours[item.Num_SAP] + ' horas' : undefined"
+                                            :severity="personalHours[item.Num_SAP] < 9.5 ? 'primary' : 'success'"
+                                            @click="employeeDialog(item)" :pt="{ label: '!text-xs' }" />
                                     </span>
                                 </div>
                             </Draggable>
@@ -405,9 +432,9 @@ const save = async()=>{
                     </TabPanel>
 
                     <TabPanel header="Grupos" :pt="{
-                        root: 'w-full',
-                        headerTitle: '!w-full !flex !justify-center'
-                    }">
+                                root: 'w-full',
+                                headerTitle: '!w-full !flex !justify-center'
+                            }">
 
                     </TabPanel>
 
@@ -416,8 +443,11 @@ const save = async()=>{
 
         </div>
     </AppLayout>
+
+    <!--#region MODALES -->
     <CustomModal v-model:visible="modhours" icon="fa-regular fa-clock" width="60vw"
         :titulo="'Modificar horario de ' + editHorario?.data ?? null">
+
         <template #body>
             <!-- {{ editHorario }} -->
             <div class="flex flex-col gap-1">
@@ -452,25 +482,27 @@ const save = async()=>{
             <span class="flex items-center p-2 gap-4">
                 <div v-for="category in [{ name: 'Solo el ' + date, key: 'dia' }, { name: 'Resto de la actividad', key: 'resto' }, { name: 'Rango de fechas', key: 'range' }, { name: 'Fechas específicos', key: 'multiple' }]"
                     :key="category.key" class="flex items-center">
-                    <RadioButton v-model="nuevoHorario.type" :inputId="category.key" name="dynamic" :value="category.key"
-                        @click="nuevoHorario.days = null" />
+                    <RadioButton v-model="nuevoHorario.type" :inputId="category.key" name="dynamic"
+                        :value="category.key" @click="nuevoHorario.days = null" />
                     <label :for="category.key" class="ml-1 mb-0">{{ category.name }}</label>
                 </div>
             </span>
             <Calendar v-if="nuevoHorario.type == 'multiple' || nuevoHorario.type == 'range'" show-icon
                 v-model="nuevoHorario.days" :selectionMode="nuevoHorario.type" :manualInput="false" :pt="{
-                    root: '!w-full',
-                    input: '!h-8'
-                }" />
+                                root: '!w-full',
+                                input: '!h-8'
+                            }" />
         </template>
+
         <template #footer>
             <Button @click="save" icon="fa-solid fa-floppy-disk"
                 label="Guardar" />
         </template>
     </CustomModal>
-    <!--#region MODAL DE PERSONAS -->
+
     <CustomModal :auto-z-index="false" :base-z-index="10" v-model:visible="open" width="70vw"
         :titulo="'Ver detalle de horario de ' + employee.Nombres_Apellidos">
+
         <template #body>
             <div class="py-2 max-h-[90vh]">
                 <FullCalendar :initialEvents="events" :tasks="tasks" :date="date" :employee="employee"
@@ -478,4 +510,17 @@ const save = async()=>{
             </div>
         </template>
     </CustomModal>
+    <CustomModal :auto-z-index="false" :base-z-index="10" v-model:visible="openConflict" width="70vw"
+        titulo="Colisiones de Programación">
+
+        <template #body>
+            <div class="py-2">
+                <div v-for="conflict in conflicts">
+                    {{conflict[0]}}
+                </div>
+                <!-- {{conflicts}} -->
+            </div>
+        </template>
+    </CustomModal>
+    <!-- #endregion -->
 </template>
