@@ -229,12 +229,10 @@ const filter = ref('')
                         <ButtonGroup>
                             <Button label="Hoy" :outlined="optionValue != 'today'"
                                 @click="getTask('today'); getPersonalData()" />
-                            <!-- <Button label="Proxima Semana" :outlined="optionValue != 'today'" @click="getTask('today')" /> -->
-                            <Button label="Mañana" :outlined="optionValue != 'tomorrow'"
+                                <Button label="Mañana" :outlined="optionValue != 'tomorrow'"
                                 @click="getTask('tomorrow'); getPersonalData()" />
                         </ButtonGroup>
                         <CustomInput type="date" v-model:input="date" @change="getTask('date'); getPersonalData()" />
-                        <!-- <CustomInput type="date" id="date" v-model:input="date" @change="getTask('date')" /> -->
                     </div>
                 </span>
                 <Listbox :options="tasks" :filterFields="['task', 'name', 'project']" class="col-span-2" filter :pt="{
@@ -245,18 +243,19 @@ const filter = ref('')
                             }">
                     <template #option="slotProps">
                         <div class="flex flex-col justify-between h-full p-2 border rounded-md shadow-md snap-start">
-                            <p><b>{{ slotProps.option.task }}</b> <i class="fa-solid fa-angle-right"></i> {{
-                                slotProps.option.name }} </p>
+                            <p><b>{{ slotProps.option.task }}</b> <i class="fa-solid fa-angle-right"></i>
+                                {{ slotProps.option.name }}
+                            </p>
                             <p class="text-xs italic uppercase text-primary">{{ slotProps.option.project }}</p>
                             <span class="grid items-center text-xs grid-cols-6">
                                 <span class="grid grid-cols-3">
                                     <p class="font-bold ">I:</p>
-                                    <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha inicio'">{{
-                                slotProps.option.startDate
-                            }} </p>
+                                    <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha inicio'">
+                                        {{ slotProps.option.startDate }}
+                                    </p>
                                     <p class="font-bold">F:</p>
-                                    <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha fin'">{{
-                                slotProps.option.endDate }}
+                                    <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha fin'">
+                                        {{ slotProps.option.endDate }}
                                     </p>
                                 </span>
                                 <span class="flex justify-center">
@@ -483,7 +482,7 @@ const filter = ref('')
         <template #body>
             <div class="py-2">
                 <div v-for="conflict in conflicts">
-                    {{conflict[0]}}
+                    {{ conflict[0] }}
                 </div>
                 <!-- {{conflicts}} -->
             </div>

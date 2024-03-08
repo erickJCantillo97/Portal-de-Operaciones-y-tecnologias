@@ -20,9 +20,15 @@ const totales = ref({
     materials: 0,
     services: 0,
     labor: 0,
+    total: 0,
     materials_ejecutados: 0,
     labor_ejecutados: 0,
     services_ejecutados: 0,
+    total_ejecutado: 0,
+    materials100: 0,
+    services100: 0,
+    labor100: 0,
+    total_100: 0
 })
 
 //Esto solo lo entendi cuando lo hice... si lo tocas es tu responsabilidad :D rezare por ti, aunque soy ateo...
@@ -64,46 +70,48 @@ function sumaEjecutados(pep) {
 
 const projectSelect = async () => {
     peps.value = null
-    totales.value = {
-        materials: 0,
-        services: 0,
-        labor: 0,
-        total:0,
-        materials_ejecutados: 0,
-        labor_ejecutados: 0,
-        services_ejecutados: 0,
-        total_ejecutado:0,
-        materials_100: 0,
-        services_100: 0,
-        labor_100: 0,
-        total_100: 0
-    }
-    loading.value = true
-    try {
-        await axios.get(route('get.details.budget', project.value.id)).then((res) => {
-            peps.value = Object.values(res.data.peps)
-            peps.value.forEach((pep) => {
-                sumaEjecutados(pep)
-                totales.value.materials_ejecutados += parseInt(pep.materials_ejecutados)
-                totales.value.labor_ejecutados += parseInt(pep.labor_ejecutados)
-                totales.value.services_ejecutados += parseInt(pep.services_ejecutados)
-                totales.value.materials += parseInt(pep.materials)
-                totales.value.labor += parseInt(pep.labor)
-                totales.value.services += parseInt(pep.services)
-            });
-            totales.value.total_ejecutado = totales.value.materials_ejecutados + totales.value.services_ejecutados + totales.value.labor_ejecutados
-            totales.value.total = totales.value.materials + totales.value.services+ totales.value.labor
-            totales.value.materials_100 = (totales.value.materials_ejecutados / totales.value.materials) * 100
-            totales.value.services_100 = (totales.value.services_ejecutados / totales.value.services) * 100
-            totales.value.labor_100 = (totales.value.labor_ejecutados / totales.value.labor) * 100
-            totales.value.total_100 = ((totales.value.materials_ejecutados + totales.value.services_ejecutados + totales.value.labor_ejecutados) / (totales.value.materials + totales.value.services + totales.value.labor)) * 100
+    if (project.value.id) {
+        totales.value = {
+            materials: 0,
+            services: 0,
+            labor: 0,
+            total: 0,
+            materials_ejecutados: 0,
+            labor_ejecutados: 0,
+            services_ejecutados: 0,
+            total_ejecutado: 0,
+            materials100: 0,
+            services100: 0,
+            labor100: 0,
+            total_100: 0
+        }
+        loading.value = true
+        try {
+            await axios.get(route('get.details.budget', project.value.id)).then((res) => {
+                peps.value = Object.values(res.data.peps)
+                peps.value.forEach((pep) => {
+                    sumaEjecutados(pep)
+                    totales.value.materials_ejecutados += parseInt(pep.materials_ejecutados)
+                    totales.value.labor_ejecutados += parseInt(pep.labor_ejecutados)
+                    totales.value.services_ejecutados += parseInt(pep.services_ejecutados)
+                    totales.value.materials += parseInt(pep.materials)
+                    totales.value.labor += parseInt(pep.labor)
+                    totales.value.services += parseInt(pep.services)
+                });
+                totales.value.total_ejecutado = totales.value.materials_ejecutados + totales.value.services_ejecutados + totales.value.labor_ejecutados
+                totales.value.total = totales.value.materials + totales.value.services + totales.value.labor
+                totales.value.materials100 = (totales.value.materials_ejecutados / totales.value.materials) * 100
+                totales.value.services100 = (totales.value.services_ejecutados / totales.value.services) * 100
+                totales.value.labor100 = (totales.value.labor_ejecutados / totales.value.labor) * 100
+                totales.value.total_100 = ((totales.value.materials_ejecutados + totales.value.services_ejecutados + totales.value.labor_ejecutados) / (totales.value.materials + totales.value.services + totales.value.labor)) * 100
+                loading.value = false
+            })
+        } catch (e) {
+            peps.value = null
+            toast.add({ text: 'El proyecto no tiene presupuesto asignado', severity: 'error', life: 3000, group: 'customToast' })
+            console.log(e)
             loading.value = false
-        })
-    } catch (e) {
-        peps.value = null
-        toast.add({ text: 'El proyecto no tiene presupuesto asignado', severity: 'error', life: 3000, group: 'customToast' })
-        console.log(e)
-        loading.value = false
+        }
     }
 }
 
@@ -139,23 +147,25 @@ const option = ref('total')
                     </span>
                 </span>
                 <div v-if="peps" class="grid sm:grid-cols-4 gap-4 p-1">
-                    <Button :outlined="!(option == 'material')" raised :key="totales.materials_ejecutados"
+                    <Button :outlined="!(option == 'material')" raised :key="totales.materials"
                         @click="option = 'material'" class="min-h-16">
                         <span class="w-full -mt-1">
                             <p class="w-full text-center font-bold">Materiales</p>
                             <div class="grid-cols-2 grid py-0.5 -mt-0.5">
-                                <p title="Presupuesto" class="w-full text-center border-r !text-sm">{{ formatCurrency(totales.materials) }}
+                                <p title="Presupuesto" class="w-full text-center border-r !text-sm">{{
+                            formatCurrency(totales.materials) }}
                                 </p>
-                                <p  title="Ejecutado"  class="w-full text-center !text-sm border-l"> {{ formatCurrency(totales.materials_ejecutados) }}
+                                <p title="Ejecutado" class="w-full text-center !text-sm border-l"> {{
+                            formatCurrency(totales.materials_ejecutados) }}
                                 </p>
                             </div>
-                            <div class="w-full h-4 border rounded-sm bg-gray-400" :title="totales.materials_100 + '%'">
+                            <div class="w-full h-4 border rounded-sm bg-gray-400" :title="totales.materials100 + '%'">
                                 <div style="background-color: var(--primary-color);"
-                                    :style="'width:' + totales.materials_100 + '%;'"
+                                    :style="'width:' + totales.materials100 + '%;'"
                                     class="h-full text-center text-xs rounded-sm text-white max-w-full">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">
-                                    {{ totales.materials_100.toFixed(2) }}%
+                                    {{ totales.materials100.toFixed(2) }}%
                                 </p>
                             </div>
                         </span>
@@ -165,18 +175,20 @@ const option = ref('total')
                         <span class="w-full -mt-1">
                             <p class="w-full text-center font-bold">Mano de obra</p>
                             <div class="grid-cols-2 grid py-0.5 -mt-0.5">
-                                <p title="Presupuesto" class="w-full text-center border-r !text-sm"> {{ formatCurrency(totales.labor) }}
+                                <p title="Presupuesto" class="w-full text-center border-r !text-sm"> {{
+                            formatCurrency(totales.labor) }}
                                 </p>
-                                <p title="Ejecutado" class="w-full text-center !text-sm border-l"> {{ formatCurrency(totales.labor_ejecutados) }}
+                                <p title="Ejecutado" class="w-full text-center !text-sm border-l"> {{
+                            formatCurrency(totales.labor_ejecutados) }}
                                 </p>
                             </div>
-                            <div class="w-full h-4 border rounded-sm bg-gray-400" :title="totales.labor_100 + '%'">
+                            <div class="w-full h-4 border rounded-sm bg-gray-400" :title="totales.labor100 + '%'">
                                 <div style="background-color: var(--primary-color);"
-                                    :style="'width:' + totales.labor_100 + '%'"
+                                    :style="'width:' + totales.labor100 + '%'"
                                     class="h-full text-center text-xs rounded-sm text-white">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">
-                                    {{ totales.labor_100.toFixed(2) }}%
+                                    {{ totales.labor100.toFixed(2) }}%
                                 </p>
                             </div>
                         </span>
@@ -186,18 +198,20 @@ const option = ref('total')
                         <span class="w-full -mt-1">
                             <p class="w-full text-center font-bold">Servicios</p>
                             <div class="grid-cols-2 grid py-0.5 -mt-0.5">
-                                <p title="Presupuesto" class="w-full text-center border-r !text-sm"> {{ formatCurrency(totales.services) }}
+                                <p title="Presupuesto" class="w-full text-center border-r !text-sm"> {{
+                            formatCurrency(totales.services) }}
                                 </p>
-                                <p  title="Ejecutado"  class="w-full text-center !text-sm border-l"> {{ formatCurrency(totales.services_ejecutados)}}
+                                <p title="Ejecutado" class="w-full text-center !text-sm border-l"> {{
+                            formatCurrency(totales.services_ejecutados) }}
                                 </p>
                             </div>
-                            <div class="w-full h-4 border rounded-sm bg-gray-400" :title="totales.services_100 + '%'">
+                            <div class="w-full h-4 border rounded-sm bg-gray-400" :title="totales.services100 + '%'">
                                 <div style="background-color: var(--primary-color);"
-                                    :style="'width:' + totales.services_100 + '%'"
+                                    :style="'width:' + totales.services100 + '%'"
                                     class="h-full text-center text-xs rounded-sm text-white  ">
                                 </div>
                                 <p class="-mt-4 text-xs text-white">
-                                    {{ totales.services_100.toFixed(2) }}%
+                                    {{ totales.services100.toFixed(2) }}%
                                 </p>
                             </div>
                         </span>
@@ -207,9 +221,11 @@ const option = ref('total')
                         <span class="w-full -mt-1">
                             <p class="w-full text-center font-bold">Total</p>
                             <div class="grid-cols-2 grid py-0.5 -mt-0.5">
-                                <p title="Presupuesto" class="w-full text-center border-r !text-sm"> {{ formatCurrency(totales.total) }}
+                                <p title="Presupuesto" class="w-full text-center border-r !text-sm"> {{
+                            formatCurrency(totales.total) }}
                                 </p>
-                                <p  title="Ejecutado"  class="w-full text-center !text-sm border-l"> {{ formatCurrency(totales.total_ejecutado)}}
+                                <p title="Ejecutado" class="w-full text-center !text-sm border-l"> {{
+                            formatCurrency(totales.total_ejecutado) }}
                                 </p>
                             </div>
                             <div class="w-full h-4 border  rounded-sm bg-gray-400" :title="totales.total_100 + '%'">
