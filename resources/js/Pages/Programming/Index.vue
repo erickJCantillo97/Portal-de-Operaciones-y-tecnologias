@@ -16,6 +16,9 @@ import RadioButton from 'primevue/radiobutton';
 import Calendar from 'primevue/calendar';
 import CustomShiftSelector from '@/Components/CustomShiftSelector.vue';
 import ButtonGroup from 'primevue/buttongroup';
+import { useForm } from '@inertiajs/vue3'
+
+
 
 const { hasRole, hasPermission } = usePermissions()
 const { toast } = useSweetalert();
@@ -175,8 +178,38 @@ const toggle = (horario, data) => {
 }
 //#endregion
 
-const filter = ref('')
+const filter = ref('');
 
+
+const form = useForm({
+    name: "test", // nombre de horario personalizado
+    startShift: "07:00",// hora inicio
+    endShift: "16:30",// hora fin
+    schedule: 1, // id del schedule/cronograma (TABLA SCHEDULES)
+    idUser: 1, // Id de la persona seleccionada (COLUMNA EMPLOYEE_ID DE LA TABLA SCHEDULES)
+    date: '2024-03-07', // fecha seleccionada en el calendario
+    personalized: true, // Seleccionar turno => false, Seleccionar Horario Personalizado => false, Nuevo horario personalizado =>true
+    type: 1,// Solo el => 1; Resto de la actividad => 2; Rango de fechas => 3; Fechas específicos => 4
+    details: [1]
+    /* la propiedad details depende de la propiedad type, es decir:
+        si la opción type es 1, en details se debe enviar la fecha (Solo el =>) ej: ['2024-03-07']
+        si la opcion type es 2, en details se debe enviar el id de la actividad seleccionada (EN BASE DE DATOS ES LA TABLA TASK) ej: [7683]
+        si la opcion type es 3, en details se debe enviar la fecha inicial y la fecha final (EN LA PRIMERA POSICION SIEMPRE SE DEBE MANDAR LA FECHA INICIAL), ej: ['2024-03-01','2024-03-10']
+        si la opcion type es 4, en details se debe enviar las fechas seleccionadas en el calendario, no importa el orden ej: ['2024-03-01', '2024-03-10', '2024-01-01','2024-02-10']
+    */
+});
+const save = async()=>{
+    //aplicar validaciones de campos requeridos (TODOS LOS CAMPOS SON REQUERIDOS)
+    /* 
+    NOTA:
+    Se debe cambiar el campo de hora inicio y hora fin a un formato de 24 horas.
+    */
+     await axios.post(route('programming.saveCustomizedSchedule'), form)
+            .then((res) => {
+                console.log(res);
+            });
+
+}
 </script>
 <style scoped>
 .custom-image {
@@ -431,7 +464,7 @@ const filter = ref('')
                 }" />
         </template>
         <template #footer>
-            <Button @click="console.log('hace algo'); nuevoHorario = null; op.hide()" icon="fa-solid fa-floppy-disk"
+            <Button @click="save" icon="fa-solid fa-floppy-disk"
                 label="Guardar" />
         </template>
     </CustomModal>
