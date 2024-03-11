@@ -40,8 +40,7 @@ class ManagerDocumentController extends Controller
             'tipologia_id' => 'required|numeric',
             'project_id' => 'required|exists:projects,id',
             'files' => 'required|array',
-            'tipologia_name' => 'required',
-            'type' => 'required'
+            'tipologia_name' => 'required'
         ]);
 
         foreach ($validateData['files'] as $file) {
@@ -50,8 +49,8 @@ class ManagerDocumentController extends Controller
                 $file,
                 $file->getClientOriginalName() . '_' . Carbon::now()->format('Y-m-d') . '_' . $validateData['tipologia_id'] . '_' . FileManagerDocument::count() + 1 . '.' . $file->getClientOriginalExtension()
             );
-
             // Obtiene el número de páginas
+            dd($file->getMimeType());
             $texto_pdf = file_get_contents($file);
             $num_page = preg_match_all("/\\/Page\\W/", $texto_pdf, $dummy);
             $fileManager = FileManagerDocument::create([
@@ -63,7 +62,7 @@ class ManagerDocumentController extends Controller
                 'file_size' => $file->getSize(),
                 'name_user' => auth()->user()->short_name,
                 'num_folios' => $num_page,
-                'type' => $validateData['type']
+                'type' => $file->getMimeType()
 
             ]);
         }
