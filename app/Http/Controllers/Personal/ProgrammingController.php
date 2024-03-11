@@ -306,7 +306,7 @@ class ProgrammingController extends Controller
                             'fecha' => $date->format('Y-m-d'), 
                         ]);
                     $schedule->save();
-                        ScheduleTime::create([
+                        ScheduleTime::firstOrNew([
                             'schedule_id' => $schedule->id,
                             'hora_inicio' => Carbon::parse($request->startShift)->format('H:i'),
                             'hora_fin' => Carbon::parse($request->endShift)->format('H:i'),
