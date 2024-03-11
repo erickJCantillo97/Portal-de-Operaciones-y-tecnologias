@@ -40,7 +40,8 @@ class ManagerDocumentController extends Controller
             'tipologia_id' => 'required|numeric',
             'project_id' => 'required|exists:projects,id',
             'files' => 'required|array',
-            'tipologia_name' => 'required'
+            'tipologia_name' => 'required',
+            'type' => 'required'
         ]);
 
         foreach ($validateData['files'] as $file) {
@@ -61,7 +62,9 @@ class ManagerDocumentController extends Controller
                 'filePath' => str_replace('public', 'storage', $filePath),
                 'file_size' => $file->getSize(),
                 'name_user' => auth()->user()->short_name,
-                'num_folios' => $num_page
+                'num_folios' => $num_page,
+                'type' => $validateData['type']
+
             ]);
         }
 
