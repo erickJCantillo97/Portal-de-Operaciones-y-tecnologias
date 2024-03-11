@@ -1,21 +1,26 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue'
+import {
+    MagnifyingGlassPlusIcon,
+    SparklesIcon,
+    PhotoIcon,
+    ViewColumnsIcon
+} from '@heroicons/vue/24/outline'
 import { ref } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
-import { MagnifyingGlassPlusIcon, SparklesIcon, PhotoIcon, ViewColumnsIcon } from '@heroicons/vue/24/outline'
+import { usePermissions } from '@/composable/permission'
 import { useSweetalert } from '@/composable/sweetAlert'
-import Loading from '@/Components/Loading.vue';
-import OverlayPanel from 'primevue/overlaypanel'
-import CustomModal from '@/Components/CustomModal.vue'
+import AppLayout from '@/Layouts/AppLayout.vue'
 import axios from 'axios'
-import Listbox from 'primevue/listbox'
-import FileUpload from 'primevue/fileupload'
-import DataView from 'primevue/dataview'
 import Button from 'primevue/button'
-import Image from 'primevue/image'
-import Divider from 'primevue/divider'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
-import { usePermissions } from '@/composable/permission';
+import CustomModal from '@/Components/CustomModal.vue'
+import DataView from 'primevue/dataview'
+import Divider from 'primevue/divider'
+import FileUpload from 'primevue/fileupload'
+import Image from 'primevue/image'
+import Listbox from 'primevue/listbox'
+import Loading from '@/Components/Loading.vue'
+import OverlayPanel from 'primevue/overlaypanel'
 
 const { hasPermission } = usePermissions();
 
@@ -390,9 +395,9 @@ const goToProjectOverview = (event, data) => {
             </span>
         </div>
         <object :data="archivo + '#toolbar=0'" type="application/pdf" style="width:60vw;height:60vh;">
-            <a :href="archivo">Haz clic aquí para ver el archivo PDF</a>
+            <a :href="archivo" target="_blank">Haz clic aquí para ver el archivo PDF</a>
         </object>
-        <div class="flex justify-end p-2">
+        <div class="flex justify-end p-2a">
             <a :href="archivo" target="_blank" rel="noopener noreferrer">
                 <Button label="Descargar" icon="fa-solid fa-save" outlined rounded class="!h-8" />
             </a>
