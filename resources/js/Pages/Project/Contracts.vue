@@ -89,11 +89,21 @@ const del = (event, data) => {
 
 const columnas = [
     { field: 'contract_id', header: 'Contrato ID', filter: true, sortable: true },
+    { field: 'project_count', header: '# Proyectos', filter: true, sortable: true, rowclass: "underline", type: 'button', severity: 'info', text: true },
     { field: 'quote.consecutive', header: 'Estimacion', filter: true, sortable: true },
     // { field: 'quote.customer.name', header: 'Cliente', filter: true, sortable: true },
     { field: 'start_date', header: 'Fecha Inicio', filter: true, sortable: true, type: 'date' },
     { field: 'end_date', header: 'Fecha Finalización', filter: true, sortable: true, type: 'date' },
     { field: 'total_cost', header: 'Costo', filter: true, sortable: true, type: 'currency' },
+    // { field: 'state', header: 'Estado del contrato', filter: true, sortable: true },
+    {
+        field: 'state', header: 'Estado', filter: true, sortable: true, type: 'tag', filtertype: 'EQUALS', 
+        severitys: [
+            { text: 'EN EJECUCIÓN', severity: 'primary', class: '' },
+            { text: 'LIQUIDADO', severity: 'success', class: '' },
+        ]
+    },
+    { field: 'subject', header: 'Objeto del Contrato', filter: true, sortable: true },
 ]
 
 const buttons = [
@@ -113,6 +123,7 @@ const contractData = ref({})
 const openSlideOver = ref(false)
 
 const showClic = (event) => {
+    console.log(event.data)
     contractData.value = event.data;
     openSlideOver.value = true
 }
@@ -124,8 +135,8 @@ const showClic = (event) => {
 <template>
     <AppLayout>
         <div class="h-[89vh] overflow-y-auto">
-            <CustomDataTable :data="contracts" :rowsDefault="20" title="Contratos" :columnas="columnas" :actions="buttons"
-                @edit="editItem" @delete="del" @rowClic="showClic">
+            <CustomDataTable :data="contracts" :rowsDefault="20" title="Contratos" :columnas="columnas"
+                :actions="buttons" @edit="editItem" @delete="del" @rowClic="showClic">
                 <template #buttonHeader>
                     <Button @click="addItem()" severity="success" icon="fa-solid fa-plus" outlined label="Nuevo"
                         v-if="hasPermission('contract create')" />
@@ -135,12 +146,15 @@ const showClic = (event) => {
 
         <!--MODAL DE FORMULARIO-->
         <CustomModal v-model:visible="open">
+
             <template #icon>
                 <i class="fa-solid fa-file-contract"></i>
             </template>
+
             <template #titulo>
                 <p>{{ formData.contract.id != 0 ? 'Editar ' : 'Crear ' }} Contrato</p>
             </template>
+
             <template #body>
                 <span class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <CustomInput label="Contrato ID" placeholder="Escriba ID del Contrato" id="contrato_id"
@@ -168,24 +182,27 @@ const showClic = (event) => {
                         :invalid="$attrs.errors.end_date != null" :errorMessage="$attrs.errors.end_date">
                     </CustomInput>
 
-                    <CustomInput label="Estado del Contrato" :options="stateOptions" type="dropdown" id="estado_contrato"
-                        placeholder="Seleccione un Tipo de Venta" v-model:input="formData.contract.state"
-                        :invalid="$attrs.errors.state != null" :errorMessage="$attrs.errors.state">
+                    <CustomInput label="Estado del Contrato" :options="stateOptions" type="dropdown"
+                        id="estado_contrato" placeholder="Seleccione un Tipo de Venta"
+                        v-model:input="formData.contract.state" :invalid="$attrs.errors.state != null"
+                        :errorMessage="$attrs.errors.state">
                     </CustomInput>
 
                     <CustomInput label="Oferta" placeholder="Seleccione la oferta" type="dropdown" id="oferta"
-                        optionLabel="consecutive" :options="Object.values(quotes)" v-model:input="formData.contract.quote"
-                        :invalid="$attrs.errors.quote != null" :errorMessage="$attrs.errors.quote">
+                        optionLabel="consecutive" :options="Object.values(quotes)"
+                        v-model:input="formData.contract.quote" :invalid="$attrs.errors.quote != null"
+                        :errorMessage="$attrs.errors.quote">
                     </CustomInput>
 
-                    <CustomInput label="Adjuntar PDF" type="file" v-model:input="formData.contract.pdf" acceptFile=".pdf"
-                        id="pdf" :invalid="$attrs.errors.pdf != null" :errorMessage="$attrs.errors.pdf">
+                    <CustomInput label="Adjuntar PDF" type="file" v-model:input="formData.contract.pdf"
+                        acceptFile=".pdf" id="pdf" :invalid="$attrs.errors.pdf != null"
+                        :errorMessage="$attrs.errors.pdf">
                     </CustomInput>
                     <span v-if="formData.contract.quote">
                         <span class="flex justify-between">
                             <p class="font-bold">Valor venta: </p>
                             <p class="text-right">{{ formatCurrency(formData.contract.quote.total_cost,
-                                formData.contract.quote.coin) }}</p>
+                formData.contract.quote.coin) }}</p>
                         </span>
                         <span class="flex justify-between">
                             <p class="font-bold">Cliente: </p>
@@ -198,6 +215,7 @@ const showClic = (event) => {
                     :errorMessage="$attrs.errors.subject">
                 </CustomInput>
             </template>
+
             <template #footer>
                 <Button severity="danger" @click="open = false">Cancelar</Button>
                 <Button severity="success" :loading="false" @click="submit()">

@@ -14,7 +14,7 @@ use Inertia\Inertia;
 
 class ManagerDocumentController extends Controller
 {
-    public function index($project)
+    public function  index($project)
     {
         $tipologias =  GDTipologias()->filter(function ($t) {
             // $t['Dependencia'] == auth()->user()->gerencia &&

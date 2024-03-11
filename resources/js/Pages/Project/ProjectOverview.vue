@@ -16,7 +16,7 @@ import S_Curve from '@/Pages/Dashboards/Projects/S_Curve.vue'
 import TabPanel from 'primevue/tabpanel'
 import TabView from 'primevue/tabview'
 import Tag from 'primevue/tag'
-
+import PieChart from '@/Pages/Dashboards/PieChart.vue'
 const props = defineProps({
   project: Object,
   ships: Array,
@@ -102,37 +102,8 @@ const shipField = [
   'power_total'
 ]
 
-//#Galería
-const images = ref()
-
-
-const responsiveOptions = ref([
-  {
-    breakpoint: '1300px',
-    numVisible: 4
-  },
-  {
-    breakpoint: '575px',
-    numVisible: 1
-  }
-])
-//#endregion
-
-const applicationLogo = ref(false)
 const selectedImage = ref(props.ships[0]?.file ?? props.ships[0].type_ship.render)
-const showGalleria = ref(true)
 
-const getImagesFiles = () => {
-  props.ships.map(ship => {
-    if (ship.file === '/') {
-      applicationLogo.value = true;
-      showGalleria.value = false
-    } else {
-      selectedImage.value.push(ship.file)
-    }
-  })
-  console.log(selectedImage.value)
-}
 
 const severitys = [
   { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'primary', class: '' },
@@ -151,14 +122,110 @@ const formatCurrency = (valor, moneda) => {
       { style: 'currency', currency: moneda == null ? 'COP' : moneda, maximumFractionDigits: 0 })
   }
 }
-
+const pieChartSerie = ref([])
 const getBudges = async () => {
   loadingDashboard.value = true
+  showLineChart.value++
   await axios.get(route('budget.project', props.project.id))
     .then((res) => {
       budge.value = res.data
-      showLineChart.value++
+      pieChartSerie.value.push({
+        type: 'pie',
+        radius: '70%',
+        center: ['50%', '55%'],
+        color: ['#81BE50', '#2E3092'],
+        is3D: true,
+        data: [{
+          value: ((budge.value.total - (budge.value.materials_ejecutados + budge.value.labor_ejecutados +
+            budge.value.services_ejecutados)) / 1000000),
+          name: 'Disponible',
+          label: {
+            formatter: '{b|{b}}{abg|}\n{hr|}\n    {per|{d}%}  ',
+            backgroundColor: '#F6F8FC',
+            borderColor: '#8C8D8E',
+            borderWidth: 1,
+            borderRadius: 4,
+            rich: {
+              a: {
+                color: '#6E7079',
+                lineHeight: 22,
+                align: 'center'
+              },
+              hr: {
+                borderColor: '#8C8D8E',
+                width: '100%',
+                borderWidth: 1,
+                height: 0
+              },
+              b: {
+                align: 'center',
+                color: '#6E7079',
+                fontSize: 10,
+                fontWeight: 'bold',
+                lineHeight: 15
+              },
+              c: {
+                fontWeight: 'bold',
+              },
+              per: {
+                color: '#000',
+                fontWeight: 'bold',
+                padding: [3, 4],
+                borderRadius: 4
+              }
+            }
+          },
+
+        },
+        {
+          value: (budge.value.materials_ejecutados + budge.value.labor_ejecutados +
+            budge.value.services_ejecutados) / 1000000,
+          name: 'Ejecutado',
+          label: {
+            formatter: '{b|{b}}{abg|}\n{hr|}\n    {per|{d}%}  ',
+            backgroundColor: '#F6F8FC',
+            borderColor: '#8C8D8E',
+            borderWidth: 1,
+            borderRadius: 4,
+            rich: {
+              a: {
+                color: '#6E7079',
+                lineHeight: 22,
+                align: 'center'
+              },
+              hr: {
+                borderColor: '#8C8D8E',
+                width: '100%',
+                borderWidth: 1,
+                height: 0
+              },
+              b: {
+                align: 'center',
+                color: '#6E7079',
+                fontSize: 10,
+                fontWeight: 'bold',
+                lineHeight: 15
+              },
+              c: {
+                fontWeight: 'bold',
+              },
+              per: {
+                color: '#000',
+                fontWeight: 'bold',
+                padding: [3, 4],
+                borderRadius: 4
+              }
+            }
+          },
+
+        }]
+      }
+
+      )
+
       loadingDashboard.value = false
+      // legends.value.push(chartItemsRender.name)
+
     })
 }
 
@@ -249,6 +316,7 @@ const handleTabClick = (event) => {
 }
 //#endregion
 </script>
+
 <style scoped>
 table {
   width: 100%;
@@ -264,6 +332,7 @@ td {
   font-size: .85rem;
 }
 </style>
+
 <template>
   <main class="flex min-h-screen max-w-full flex-col justify-center overflow-hidden">
     <section class="space-y-6  pt-0.5 md:space-x-6 h-screen">
@@ -272,8 +341,8 @@ td {
         nav: '!flex !justify-between'
       }">
         <TabPanel header="Información del Proyecto" :activeIndex="0" :pt="{
-          root: 'w-full',
-        }">
+        root: 'w-full',
+      }">
           <div class="grid grid-cols-2 gap-2 h-[90vh]">
             <div class="col-span-1 mb-2 w-full rounded-lg border border-solid p-2">
               <div class="flex text-sm font-medium justify-center items-center">
@@ -302,7 +371,7 @@ td {
                 </h2>
               </div>
               <div class="flex size-full justify-center">
-                
+
                 <Image v-if="selectedImage != '/'" :src="selectedImage" alt="image" preview />
                 <div v-else class="flex justify-center mt-10">
                   <ApplicationLogo height="350" width="350" />
@@ -318,10 +387,12 @@ td {
                     {{ selectedImage }}
                     <img :src="selectedImage" />
                   </template>
-                  <template #thumbnail="slotProps">
+
+<template #thumbnail="slotProps">
                     <img :src="selectedImage" style="width: 100%;" />
                   </template>
-                  <template #caption="slotProps">
+
+<template #caption="slotProps">
                     <div class="text-xl mb-2 font-bold">
                       {{ props.ships[0].name }}
                     </div>
@@ -329,21 +400,21 @@ td {
                       No. Casco: {{ props.ships[0].idHull }}
                     </p>
                   </template>
-                </Galleria>
-                <div v-if="selectedImage == null" class="flex justify-center mt-10">
-                  <ApplicationLogo height="350" width="350" />
-                </div>
-              </article> -->
+</Galleria>
+<div v-if="selectedImage == null" class="flex justify-center mt-10">
+  <ApplicationLogo height="350" width="350" />
+</div>
+</article> -->
               </div>
             </div>
             <TabView :scrollable="true" :pt="{
-              nav: '!flex !justify-between'
-            }
-              ">
+        nav: '!flex !justify-between'
+      }
+        ">
               <!-- INFORMACIÓN DEL PROYECTO -->
               <TabPanel header="Información del Contrato" :pt="{
-                root: 'w-full',
-              }">
+        root: 'w-full',
+      }">
                 <div class="w-full p-2 first-letter:uppercase text-justify ">
                   <p>{{ project.contract.subject ? project.contract.subject : 'SIN DEFINIR' }}
                   </p>
@@ -355,15 +426,16 @@ td {
 
               <!-- BUQUES -->
               <TabPanel header="Buques" :pt="{
-                root: '!w-full ',
-                content: '!h-[80vh] !p-2 !overflow-y-auto'
-              }">
+        root: '!w-full ',
+        content: '!h-[80vh] !p-2 !overflow-y-auto'
+      }">
                 <Accordion @tab-click="handleTabClick($event)">
                   <AccordionTab :activeIndex="0" v-for="(ship, index) in ships " :key="ship.id" :pt="{
-                    headerAction: ({ props, parent }) => ({
-                      class: ['!sticky !top-0', panelClass(props, parent, index)]
-                    })
-                  }">
+        headerAction: ({ props, parent }) => ({
+          class: ['!sticky !top-0', panelClass(props, parent, index)]
+        })
+      }">
+
                     <template #header>
                       <div class=" align-items-center gap-2 w-full block space-y-2">
                         <span class="font-bold white-space-nowrap">{{ index + 1 }}. {{ ship.name }}</span>
@@ -384,8 +456,8 @@ td {
           </div>
         </TabPanel>
         <TabPanel v-if="semana" header="Dashboard" :activeIndex="1" :pt="{
-          root: '!w-full !bottom-0'
-        }">
+        root: '!w-full !bottom-0'
+      }">
           <!-- <span id="contentToCapture" class="w-full"> -->
           <article v-if="loadingDashboard" class="h-screen w-full flex flex-col justify-center items-center col-span-6">
             <Loading message="Generando Dashboard" />
@@ -401,26 +473,26 @@ td {
                 <div class="border text-center border-gray-800 bg-sky-100 font-bold">N° CONTRATO</div>
                 <div class="border text-center border-gray-800"
                   :class="project.contract.contract_id == null ? 'bg-red-400' : ''">{{
-                    project.contract?.contract_id ?? 'Sin Contrato Asignado' }}
+        project.contract?.contract_id ?? 'Sin Contrato Asignado' }}
                 </div>
 
                 <!-- Segunda fila -->
                 <div class="border text-center border-gray-800 bg-gray-100">FECHA REPORTE: </div>
                 <div class="border text-center border-gray-800"> {{
-                  Moment().format('DD/MM/YYYY') }}</div>
+        Moment().format('DD/MM/YYYY') }}</div>
                 <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE INICIO </div>
                 <div class="border text-center border-gray-800">{{
-                  Moment(project.contract.start_date).format('DD/MM/YYYY') }}</div>
+        Moment(project.contract.start_date).format('DD/MM/YYYY') }}</div>
 
                 <!-- Tercera fila -->
                 <div class="border text-center border-gray-800 bg-gray-100">SEMANA: </div>
                 <div class="border text-center border-gray-800"> {{ 'WK ' + semana.week.substr(2, 2) + ' - 20' +
-                  semana.week.substr(0, 2) }}
+        semana.week.substr(0, 2) }}
                 </div>
                 <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE FIN </div>
                 <div class="border text-center border-gray-800">{{
-                  Moment(project.contract.end_date).format('DD/MM/YYYY')
-                }}</div>
+        Moment(project.contract.end_date).format('DD/MM/YYYY')
+      }}</div>
               </div>
 
               <!--TABLA 2-->
@@ -435,10 +507,10 @@ td {
                   <div
                     class="bg-sky-300 text-xs align-self-center font-extrabold opacity-60 h-full text-black text-center p-0.5"
                     :style="'width: ' + calculatePercentage(getDays(project.contract.start_date, new Date()),
-                      getDays(project.contract.start_date, project.contract.end_date)) + '%'
-                      ">
+        getDays(project.contract.start_date, project.contract.end_date)) + '%'
+        ">
                     {{ calculatePercentage(getDays(project.contract.start_date, new Date()),
-                      getDays(project.contract.start_date, project.contract.end_date)) }}%
+        getDays(project.contract.start_date, project.contract.end_date)) }}%
                   </div>
                 </div>
                 <!-- Segunda fila -->
@@ -450,10 +522,10 @@ td {
                   <div
                     class="bg-teal-900 text-xs align-self-center font-extrabold opacity-60 h-full text-white text-center p-0.5"
                     :style="'width: ' + calculatePercentage(getDays(new Date(), project.contract.end_date),
-                      getDays(project.contract.start_date, project.contract.end_date)) + '%;color:black;'
-                      ">
+        getDays(project.contract.start_date, project.contract.end_date)) + '%;color:black;'
+        ">
                     {{ calculatePercentage(getDays(new Date(), project.contract.end_date),
-                      getDays(project.contract.start_date, project.contract.end_date)) }}%
+        getDays(project.contract.start_date, project.contract.end_date)) }}%
                   </div>
                 </div>
                 <!-- Tercera fila -->
@@ -484,12 +556,14 @@ td {
                 </div>
                 <!-- MINICARDS INFO -->
                 <div class="grid grid-cols-2 w-full">
-                  <div class="grid grid-cols-2 gap-2 mb-2">
-                    <MiniCardInfo title="Presupuesto" :value="budge.total" :valueProgressBar="50" />
+                  <div class="">
+                    <PieChart :series="pieChartSerie" :key="showLineChart" />
+
+                    <!-- <MiniCardInfo title="Presupuesto" :value="budge.total" :valueProgressBar="50" />
                     <MiniCardInfo title="Ejecutado" :value="budge.materials_ejecutados + budge.labor_ejecutados +
                       budge.services_ejecutados" :valueProgressBar="35" />
                     <MiniCardInfo title="Disponible" :value="budge.total - (budge.materials_ejecutados + budge.labor_ejecutados +
-                      budge.services_ejecutados)" :valueProgressBar="10" />
+                      budge.services_ejecutados)" :valueProgressBar="10" /> -->
                   </div>
                   <GaugeGradeChart :key="showLineChart" title="CPI" :value="semana.CPI" />
                 </div>
@@ -518,25 +592,25 @@ td {
                         <td>{{ formatCurrency(budge.labor_ejecutados) }}</td>
                         <td>{{ formatCurrency(budge.services_ejecutados) }}</td>
                         <td>{{ formatCurrency(budge.materials_ejecutados + budge.labor_ejecutados +
-                          budge.services_ejecutados) }}</td>
+        budge.services_ejecutados) }}</td>
                       </tr>
                       <tr>
                         <td class="text-left font-semibold bg-sky-100">DISPONIBLE</td>
                         <td class="font-bold"
                           :class="budge.materials - budge.materials_ejecutados < 0 ? 'text-danger' : 'text-success'">{{
-                            formatCurrency(budge.materials - budge.materials_ejecutados)
-                          }}</td>
+        formatCurrency(budge.materials - budge.materials_ejecutados)
+      }}</td>
                         <td class="font-bold"
                           :class="budge.labor - budge.labor_ejecutados < 0 ? 'text-danger' : 'text-success'">{{
-                            formatCurrency(budge.labor - budge.labor_ejecutados) }}</td>
+        formatCurrency(budge.labor - budge.labor_ejecutados) }}</td>
                         <td class="font-bold"
                           :class="budge.services - budge.services_ejecutados < 0 ? 'text-danger' : 'text-success'">{{
-                            formatCurrency(budge.services - budge.services_ejecutados)
-                          }}</td>
+        formatCurrency(budge.services - budge.services_ejecutados)
+      }}</td>
                         <td class="font-bold text-success">{{ formatCurrency(budge.total -
-                          (budge.materials_ejecutados +
-                            budge.labor_ejecutados +
-                            budge.services_ejecutados)) }}</td>
+        (budge.materials_ejecutados +
+          budge.labor_ejecutados +
+          budge.services_ejecutados)) }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -552,7 +626,7 @@ td {
                   <li v-for="(task, index) in weekTasks" class="px-4">
                     <span class="text-sm font-bold">{{ index + 1 }}</span>. <span
                       class="text-sm italic font-semibold capitalize">{{
-                        task.task }}</span>
+        task.task }}</span>
                   </li>
                 </ul>
               </article>

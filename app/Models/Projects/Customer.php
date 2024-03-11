@@ -4,6 +4,7 @@ namespace App\Models\Projects;
 
 use App\Models\Quote\QuotAuthorization;
 use App\Models\Quotes\Quote;
+use App\Models\Quotes\QuoteVersion;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,19 +29,14 @@ class Customer extends Model implements Auditable
         return $this->hasMany(Ship::class);
     }
 
-    public function project()
-    {
-        return $this->hasMany(Project::class);
-    }
-
     public function authorization()
     {
         return $this->hasMany(Authorization::class);
     }
 
-    public function quot()
+    public function quots()
     {
-        return $this->hasMany(Quote::class);
+        return $this->hasMany(QuoteVersion::class);
     }
 
     public function quote_authorization()
@@ -54,6 +50,18 @@ class Customer extends Model implements Auditable
             get: fn ($value) => strtoupper($value),
             set: fn ($value) => strtolower($value)
         );
+    }
+
+    public function getQuoteCountAttribute()
+    {
+
+        return $this->quots->count();
+    }
+
+    public function getQuoteContractAttribute()
+    {
+
+        return $this->quots->count();
     }
 
     // public function getKeyName()

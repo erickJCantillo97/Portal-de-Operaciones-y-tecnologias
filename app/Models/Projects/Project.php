@@ -60,9 +60,14 @@ class Project extends Model implements Auditable
     {
         return $this->hasMany(VirtualTask::class, 'project_id');
     }
+
     public function shiftObject()
     {
-        return $this->belongsTo(Shift::class,'shift');
+        $shipDeafult = Shift::first();
+        return $this->belongsTo(Shift::class, 'shift')->withDefault(function ($shift) use ($shipDeafult) {
+            $shift->startShift = $shipDeafult->startShift;
+            $shift->endShift = $shipDeafult->endShift;
+        });
     }
 
     public function costSale(): Attribute

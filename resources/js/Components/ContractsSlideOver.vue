@@ -11,6 +11,7 @@ import AccordionTab from 'primevue/accordiontab'
 import Button from 'primevue/button'
 import { router } from '@inertiajs/vue3'
 import { usePermissions } from '@/composable/permission';
+import Tag from 'primevue/tag'
 const { hasRole, hasPermission } = usePermissions()
 
 const { toast } = useSweetalert()
@@ -186,7 +187,8 @@ const formatCurrency = (value) => {
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Cliente:</dt>
-                          <dd class="text-gray-900">{{ data.customer_id != null ? data.customer_id : 'N/A' }}</dd>
+                          <dd class="text-gray-900">{{ data.customer_id != null ? data.quote.customer.name : 'N/A' }}
+                          </dd>
                         </div>
                         <div class="flex justify-between py-3 text-sm font-medium">
                           <dt class="text-gray-500">Supervisor:</dt>
@@ -225,6 +227,21 @@ const formatCurrency = (value) => {
                       </dl>
                     </div>
                   </header>
+                  <p v-if="data.projects.length > 0" class="font-bold text-center">Proyectos</p>
+                  <span v-for="(project, index) in data.projects" :key="index" class="grid gap-y-2 my-2">
+                    <div class="border-2 p-1 rounded-lg cursor-default">
+                      <span class="flex justify-between items-center">
+                        <Link :href="route('projects.goToProjectOverview', project.id)"
+                          v-tooltip.left="'Nombre del proyecto'" class="font-bold"> {{ project.name }}</Link>
+                        <span v-tooltip.top="'Codigo SAP'" class="text-sm">{{ project.SAP_code }}</span>
+                      </span>
+                      <span class="text-xs" v-tooltip.top="'Tipo de proyecto'">{{ project.type }}</span>
+                      <span class="flex justify-between items-center">
+                        <Tag severity="info" v-tooltip.left="'Estado'" :value="project.status" />
+                        <span class="text-sm" v-tooltip.left="'Gerencia'">{{ project.gerencia }}</span>
+                      </span>
+                    </div>
+                  </span>
                   <!-- <Accordion>
                     <AccordionTab v-for="product in  data.products " :pt="{
                       root: '!border-0 !ring-0',
@@ -240,56 +257,56 @@ const formatCurrency = (value) => {
 
                         </div>
                       </template>
-                      <div class="space-y-6">
-                        <div>
-                          <h3 class="font-medium text-gray-900">Información del producto</h3>
-                          <dl class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Clase:</dt>
-                              <dd class="text-gray-900">{{ product.name }}</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Alcance:</dt>
-                              <dd class="text-gray-900">{{ product.scope == null ? 'N/A' :
-                                product.scope }}</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Madurez:</dt>
-                              <dd class="text-gray-900">{{ product.maturity == null ? 'N/A' :
-                                product.maturity }}</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Cantidad:</dt>
-                              <dd class="text-gray-900">{{ product.units == null ? 'N/A' :
-                                product.units }}</dd>
-                            </div>
-                          </dl>
-                        </div>
-                        <div>
-                          <h3 class="font-medium text-gray-900">Información de la Oferta</h3>
-                          <dl class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Margen Estimado:</dt>
-                              <dd class="text-gray-900">{{ product.margin }}%</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Precio Original:</dt>
-                              <dd class="text-gray-900">{{
-                                formatCurrency(product.price_before_iva_original) }}</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">Tasa de Venta:</dt>
-                              <dd class="text-gray-900">0</dd>
-                            </div>
-                            <div class="flex justify-between py-3 text-sm font-medium">
-                              <dt class="text-gray-500">IVA:</dt>
-                              <dd class="text-gray-900">{{ product.iva }}</dd>
-                            </div>
-                          </dl>
-                        </div>
-                      </div>
-                    </AccordionTab>
-                  </Accordion> -->
+<div class="space-y-6">
+  <div>
+    <h3 class="font-medium text-gray-900">Información del producto</h3>
+    <dl class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
+      <div class="flex justify-between py-3 text-sm font-medium">
+        <dt class="text-gray-500">Clase:</dt>
+        <dd class="text-gray-900">{{ product.name }}</dd>
+      </div>
+      <div class="flex justify-between py-3 text-sm font-medium">
+        <dt class="text-gray-500">Alcance:</dt>
+        <dd class="text-gray-900">{{ product.scope == null ? 'N/A' :
+          product.scope }}</dd>
+      </div>
+      <div class="flex justify-between py-3 text-sm font-medium">
+        <dt class="text-gray-500">Madurez:</dt>
+        <dd class="text-gray-900">{{ product.maturity == null ? 'N/A' :
+          product.maturity }}</dd>
+      </div>
+      <div class="flex justify-between py-3 text-sm font-medium">
+        <dt class="text-gray-500">Cantidad:</dt>
+        <dd class="text-gray-900">{{ product.units == null ? 'N/A' :
+          product.units }}</dd>
+      </div>
+    </dl>
+  </div>
+  <div>
+    <h3 class="font-medium text-gray-900">Información de la Oferta</h3>
+    <dl class="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
+      <div class="flex justify-between py-3 text-sm font-medium">
+        <dt class="text-gray-500">Margen Estimado:</dt>
+        <dd class="text-gray-900">{{ product.margin }}%</dd>
+      </div>
+      <div class="flex justify-between py-3 text-sm font-medium">
+        <dt class="text-gray-500">Precio Original:</dt>
+        <dd class="text-gray-900">{{
+          formatCurrency(product.price_before_iva_original) }}</dd>
+      </div>
+      <div class="flex justify-between py-3 text-sm font-medium">
+        <dt class="text-gray-500">Tasa de Venta:</dt>
+        <dd class="text-gray-900">0</dd>
+      </div>
+      <div class="flex justify-between py-3 text-sm font-medium">
+        <dt class="text-gray-500">IVA:</dt>
+        <dd class="text-gray-900">{{ product.iva }}</dd>
+      </div>
+    </dl>
+  </div>
+</div>
+</AccordionTab>
+</Accordion> -->
                 </div>
               </DialogPanel>
             </TransitionChild>

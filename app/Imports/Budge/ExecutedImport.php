@@ -13,7 +13,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow, ShouldQueue
+class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow
 {
     /**
      * @param Collection $collection
@@ -49,13 +49,13 @@ class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow, 
                 }
                 $pep->save();
             } else {
-                dd('No hemos encontrado el grafo: ' . $row['objeto'] . ' En la Estructura');
+                // dd('No hemos encontrado el grafo: ' . $row['objeto'] . ' En la Estructura');
             }
         }
     }
 
     public function chunkSize(): int
     {
-        return 800;
+        return 1000;
     }
 }
