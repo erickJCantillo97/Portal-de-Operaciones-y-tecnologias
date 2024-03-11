@@ -49,35 +49,34 @@ class ProgrammingController extends Controller
             $conflict = [];
             if ($hours < 9.5) {
                 $task = VirtualTask::find($validateData['task_id']);
-                $date = Carbon::parse($validateData['fecha']); 
-                $end_date = Carbon::parse($task->endDate); 
-                do{     
-                    $exist = DetailScheduleTime::
-                    where('idUsuario',$validateData['employee_id'])
-                    ->where('fecha',$date)
-                    ->get();
-                   if($exist->count() > 0){
-                        $exist = $exist->each(function($DetailScheduleTime){
+                $date = Carbon::parse($validateData['fecha']);
+                $end_date = Carbon::parse($task->endDate);
+                do {
+                    $exist = DetailScheduleTime::where('idUsuario', $validateData['employee_id'])
+                        ->where('fecha', $date)
+                        ->get();
+                    if ($exist->count() > 0) {
+                        $exist = $exist->each(function ($DetailScheduleTime) {
                             $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
                         });
-                        $conflict[$date->format('Y-m-d')]=$exist;
+                        $conflict[$date->format('Y-m-d')] = $exist;
                         $date = $date->addDays(1);
-                   }else{
-                    $schedule = Schedule::firstOrNew([
-                        'task_id' => $validateData['task_id'],
-                        'employee_id' => $validateData['employee_id'],
-                        'name' => $validateData['name'],
-                        'fecha' => $date->format('Y-m-d'), 
-                    ]);
-                   $schedule->save();
-                    ScheduleTime::create([
-                        'schedule_id' => $schedule->id,
-                        'hora_inicio' => Carbon::parse($task->project->shiftObject->startShift)->format('H:i'),
-                        'hora_fin' => Carbon::parse($task->project->shiftObject->endShift)->format('H:i'),
-                    ]);
-                    $date = $date->addDays(1);
-                }
-                }while($end_date->gte($date));
+                    } else {
+                        $schedule = Schedule::firstOrNew([
+                            'task_id' => $validateData['task_id'],
+                            'employee_id' => $validateData['employee_id'],
+                            'name' => $validateData['name'],
+                            'fecha' => $date->format('Y-m-d'),
+                        ]);
+                        $schedule->save();
+                        ScheduleTime::create([
+                            'schedule_id' => $schedule->id,
+                            'hora_inicio' => Carbon::parse($task->project->shiftObject->startShift)->format('H:i'),
+                            'hora_fin' => Carbon::parse($task->project->shiftObject->endShift)->format('H:i'),
+                        ]);
+                        $date = $date->addDays(1);
+                    }
+                } while ($end_date->gte($date));
                 $status = true;
                 $codigo = 0;
                 $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
@@ -200,9 +199,9 @@ class ProgrammingController extends Controller
 
     private function getSchedule($fecha, $taskId)
     {
-        return Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get()->sortByDesc([
+        return Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get()->sortBy([
             ['is_my_personal', 'desc'],
-        ]);;
+        ]);
     }
 
     /*

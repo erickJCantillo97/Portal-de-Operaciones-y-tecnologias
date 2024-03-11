@@ -202,9 +202,10 @@ const goToProjectOverview = (event, data) => {
 <template>
     <AppLayout>
         <div class="w-full h-[89vh] overflow-y-auto">
-            <CustomDataTable title="Proyectos" :filterButtons="filterButtons" :data="projects" :rows-default="100"
-                :columnas="columnas" :actions="buttons" @addDoc="addDoc" @addAct="addAct" @editClic="editClic"
-                @deleteClic="deleteClic" @goToProjectOverview="goToProjectOverview">
+            <CustomDataTable title="Proyectos" :filterButtons="filterButtons"
+                :data="projects" :rows-default="100" :columnas="columnas" :actions="buttons" @addDoc="addDoc"
+                @addAct="addAct" @editClic="editClic" @deleteClic="deleteClic"
+                @goToProjectOverview="goToProjectOverview">
                 <template #buttonHeader>
                     <Button @click="addItem" severity="success" v-if="hasPermission('projects create')"
                         icon="fa-solid fa-plus" label="Agregar" outlined />
@@ -224,12 +225,12 @@ const goToProjectOverview = (event, data) => {
             <div v-if="tipologias[0]" class="grid grid-cols-5 gap-2 max-h-full">
                 <div class="col-span-2">
                     <p class="w-full text-center font-bold text-primary text-lg">{{
-                        tipologias[0].Subserie }}</p>
+                tipologias[0].Subserie }}</p>
                     <Listbox :key="listTipologia" v-model="tipologia" :options="tipologias" filter optionLabel="name"
                         @click="selectTipologia()" listStyle="max-height:60vh" class="w-full md:w-14rem" :pt="{
-                            filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
-                            item: { class: 'hover:bg-blue-100 text-md !px-1 !py-0.5' },
-                        }">
+                filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
+                item: { class: 'hover:bg-blue-100 text-md !px-1 !py-0.5' },
+            }">
                         <template #option="slotProps">
                             <div class="grid grid-cols-7 h-min">
                                 <p class="col-span-6 flex items-center">{{ slotProps.option.name }}</p>
@@ -264,19 +265,20 @@ const goToProjectOverview = (event, data) => {
                                                     </div>
                                                 </template>
                                                 <template #preview="slotProps1">
-                                                    <img :src="slotProps.data.filePath" class="!max-w-[80vw] !max-h-[80vh]"
-                                                        alt="preview" :style="slotProps1.style"
-                                                        @click="slotProps1.previewCallback" />
+                                                    <img :src="slotProps.data.filePath"
+                                                        class="!max-w-[80vw] !max-h-[80vh]" alt="preview"
+                                                        :style="slotProps1.style" @click="slotProps1.previewCallback" />
                                                 </template>
                                             </Image>
                                             <div class="px-3">
                                                 <p class="text-sm">{{ (slotProps.index + 1) + '. ' +
-                                                    slotProps.data.tipologia_name }}
+                slotProps.data.tipologia_name }}
                                                 </p>
                                                 <p class="text-xs font-semibold">{{ slotProps.data.name }}</p>
                                                 <span class="flex space-x-2">
                                                     <p class="text-xs">{{ slotProps.data.name_user }} </p>
-                                                    <p class="text-xs">{{ formatDateTime24h(slotProps.data.created_at) }}
+                                                    <p class="text-xs">{{ formatDateTime24h(slotProps.data.created_at)
+                                                        }}
                                                     </p>
                                                     <p class="text-xs">{{ formatSize(slotProps.data.file_size) }} </p>
                                                     <p class="text-xs"
@@ -301,7 +303,8 @@ const goToProjectOverview = (event, data) => {
                         </div>
                         <div class="flex items-center justify-center h-[30vh]" v-if="tipologiaFiles.length == 0">
                             <span>
-                                <i class="w-full text-center text-2xl text-danger fa-solid fa-file-circle-exclamation"></i>
+                                <i
+                                    class="w-full text-center text-2xl text-danger fa-solid fa-file-circle-exclamation"></i>
                                 <p class="w-full text-center font-bold text-danger">
                                     Aun no hay archivos
                                 </p>
@@ -315,9 +318,9 @@ const goToProjectOverview = (event, data) => {
                         <FileUpload ref="fileUp" :multiple="true" accept="image/*,application/pdf" :key="fileup"
                             invalidFileTypeMessage="Solo se aceptan imagenes o pdf" :maxFileSize="10000000"
                             @select="onSelectedFiles" :pt="{
-                                content: { class: '!p-0.5' },
-                                message: { class: 'py-0.5' }
-                            }">
+                content: { class: '!p-0.5' },
+                message: { class: 'py-0.5' }
+            }">
                             <template #header="{ chooseCallback, clearCallback, files }">
                                 <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">
                                     <div class="flex gap-2">
@@ -325,8 +328,8 @@ const goToProjectOverview = (event, data) => {
                                             icon="fa-solid fa-folder-open" label="Seleccionar">
                                         </Button>
                                         <Button @click="uploadEvent()" outlined severity="success" class="!h-8"
-                                            label="Subir" icon="fa-solid fa-cloud-arrow-up" :loading="uploadForm.processing"
-                                            :disabled="!files || files.length === 0">
+                                            label="Subir" icon="fa-solid fa-cloud-arrow-up"
+                                            :loading="uploadForm.processing" :disabled="!files || files.length === 0">
                                         </Button>
                                         <Button @click="clearCallback()" outlined icon="fa-regular fa-trash-can"
                                             class="!h-8" label="Quitar todo" severity="danger"
@@ -382,8 +385,9 @@ const goToProjectOverview = (event, data) => {
             <p class="text-sm font-semibold">{{ archivoData.name }}Nombre de archivo quemado</p>
             <span class="flex space-x-2 p-1 cursor-default">
                 <p title="Encargado" class="text-sm border rounded-md px-2">{{ archivoData.name_user }}</p>
-                <p title="Fecha subida" class="text-sm border rounded-md px-2">{{ formatDateTime24h(archivoData.created_at)
-                }} </p>
+                <p title="Fecha subida" class="text-sm border rounded-md px-2">{{
+                formatDateTime24h(archivoData.created_at)
+            }} </p>
                 <p title="Tamaño" class="text-sm border rounded-md px-2">{{ formatSize(archivoData.file_size) }} </p>
                 <p title="Cantidad de folios" class="text-sm border rounded-md px-2">
                     {{ archivoData.num_folios }} folio(s) </p>

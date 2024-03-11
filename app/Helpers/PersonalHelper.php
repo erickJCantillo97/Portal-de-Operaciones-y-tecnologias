@@ -2,6 +2,7 @@
 
 use App\Ldap\User;
 use App\Models\Labor;
+use App\Models\Personal\Employee;
 use App\Models\Personal\Personal;
 use App\Models\Personal\WorkingTeams;
 use Illuminate\Support\Facades\Http;
@@ -58,7 +59,30 @@ function getEmpleadosAPI(): mixed
                     ROUTE_API . '/listado_personal_cargo_costo_da_view'
                 )->json();
 
-            return collect($json);
+            foreach (collect($json) as $employee) {
+                Employee::create();
+            };
+        }
+        dd('Sin token');
+    } catch (\Throwable $th) {
+        dd($th);
+    }
+}
+function setEmpleadosAPI(): mixed
+{
+    Employee::truncate();
+    try {
+        if (getToken()) {
+            $json = Http::acceptJson()->withToken(session()->get('token'))
+                ->get(
+                    ROUTE_API . '/listado_personal_cargo_costo_da_view'
+                )->json();
+
+            foreach (collect($json) as $employee) {
+                // if (!isset($employee['JI_Num_SAP']))
+                //     dd($employee);
+                Employee::create((array) $employee);
+            };
         }
         dd('Sin token');
     } catch (\Throwable $th) {
