@@ -159,7 +159,7 @@ class ProgrammingController extends Controller
                         $query->where('enddate', '>', $date_end)
                             ->where('startdate', '<', $date_start);
                     });
-            })->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) {
+            })->whereNotIn('id', array_unique($taskWithSubTasks))->take(2)->get()->map(function ($task) {
                 return [
                     'name' => $task['name'],
                     'id' => $task['id'],
@@ -237,8 +237,9 @@ class ProgrammingController extends Controller
             'times' => $times,
         ]);
     }
-    public function saveCustomizedSchedule(Request $request ){
-        try{
+    public function saveCustomizedSchedule(Request $request)
+    {
+        try {
 
             DB::beginTransaction();
             $mensaje = '';
@@ -249,13 +250,13 @@ class ProgrammingController extends Controller
                 'startShift' => 'date_format:"H:i"|required',
                 'endShift' => 'date_format:"H:i"|required',
                 'type' => 'numeric|required',
-                'date' =>'date|required',
+                'date' => 'date|required',
                 'personalized' => 'boolean|required',
                 'idUser' => 'required',
                 'schedule' => 'required',
-                'details'=>'required'
+                'details' => 'required'
             ]);
-            if($request->personalized){
+            if ($request->personalized) {
                 Shift::firstOrCreate([
                     'name' => $validateData['name'],
                     'startShift' => new DateTime("1970-01-01T" . $validateData['startShift'] . ":00"),
@@ -266,14 +267,13 @@ class ProgrammingController extends Controller
             }
             switch ($request->type) {
                 case 1:
-                    $exist = DetailScheduleTime::
-                    where('idUsuario',$validateData['idUser'])
-                    ->where('fecha',$request->date)
-                    ->whereBetween('horaInicio',[$validateData['startShift'],$validateData['endShift']])
-                    ->whereBetween('horaFin', [$validateData['startShift'],$validateData['endShift']])
-                    ->get();
-                   if($exist->count() > 0){
-                        $mensaje = "No se pudo programar al usuario: ".$exist->nombre." porque para la fecha:".$request->date." está asignado a otra actividad: ";
+                    $exist = DetailScheduleTime::where('idUsuario', $validateData['idUser'])
+                        ->where('fecha', $request->date)
+                        ->whereBetween('horaInicio', [$validateData['startShift'], $validateData['endShift']])
+                        ->whereBetween('horaFin', [$validateData['startShift'], $validateData['endShift']])
+                        ->get();
+                    if ($exist->count() > 0) {
+                        $mensaje = "No se pudo programar al usuario: " . $exist->nombre . " porque para la fecha:" . $request->date . " está asignado a otra actividad: ";
                         DB::rollBack();
                         return response()->json([
                             'status' => false,
@@ -281,143 +281,49 @@ class ProgrammingController extends Controller
                             'response_type' => "question", //question y success
                             'conflict' => $exist
                         ]);
-                   }
+                    }
                     ScheduleTime::create([
-                        'schedule_id'=>$validateData['schedule'],
-                        'hora_inicio'=>$validateData['startShift'],
-                        'hora_fin'=>$validateData['endShift']
+                        'schedule_id' => $validateData['schedule'],
+                        'hora_inicio' => $validateData['startShift'],
+                        'hora_fin' => $validateData['endShift']
                     ]);
                     $mensaje = "Horario asignado correctamente";
                     break;
                 case 2:
                     $task = VirtualTask::find(Schedule::find($validateData['schedule'])->task_id);
-                    $date = Carbon::parse($validateData['date']); 
-                    $end_date = Carbon::parse($task->endDate); 
-                    do{
-                        $exist = DetailScheduleTime::
-                        where('idUsuario',$validateData['idUser'])
-                        ->whereBetween('horaInicio',[$validateData['startShift'],$validateData['endShift']])
-                        ->whereBetween('horaFin', [$validateData['startShift'],$validateData['endShift']])
-                        ->where('fecha',$date)
-                        ->get();
-                    if($exist->count() > 0){
-                            $exist = $exist->each(function($DetailScheduleTime){
+                    $date = Carbon::parse($validateData['date']);
+                    $end_date = Carbon::parse($task->endDate);
+                    do {
+                        $exist = DetailScheduleTime::where('idUsuario', $validateData['idUser'])
+                            ->whereBetween('horaInicio', [$validateData['startShift'], $validateData['endShift']])
+                            ->whereBetween('horaFin', [$validateData['startShift'], $validateData['endShift']])
+                            ->where('fecha', $date)
+                            ->get();
+                        if ($exist->count() > 0) {
+                            $exist = $exist->each(function ($DetailScheduleTime) {
                                 $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
                             });
-                            $conflict[$date->format('Y-m-d')]=$exist;
+                            $conflict[$date->format('Y-m-d')] = $exist;
                             $date = $date->addDays(1);
                             $error = true;
-                            $mensaje = "No se pudo programar al usuario: ".$exist->nombre." porque está asignado a otra actividad: ";
-
-                    }else{
-                        $schedule = Schedule::firstOrNew([
-                            'task_id' => $task->task_id,
-                            'employee_id' => $validateData['idUser'],
-                            'name' => $validateData['name'],
-                            'fecha' => $date->format('Y-m-d'), 
-                        ]);
-                    $schedule->save();
-                        ScheduleTime::create([
-                            'schedule_id' => $schedule->id,
-                            'hora_inicio' => Carbon::parse($validateData['startShift'])->format('H:i'),
-                            'hora_fin' => Carbon::parse($validateData['endShift'])->format('H:i'),
-                        ]);
-                        $date = $date->addDays(1);
-                    }
-                }while($end_date->gte($date));
-                if(!$error){
-                    DB::rollBack();
-                    return response()->json([
-                        'status' => false,
-                        'mensaje' => $mensaje,
-                        'response_type' => "question", //question y success
-                        'conflict' => $conflict
-                    ]);
-                }
-                $mensaje = "Horario asignado correctamente";
-                    break;
-                case 3:
-                    $task = VirtualTask::find(Schedule::find($validateData['schedule'])->task_id);
-                    $date = Carbon::parse($request->details[0]); 
-                    $end_date = Carbon::parse($request->details[1]); 
-                    do{
-                        $exist = DetailScheduleTime::
-                        where('idUsuario',$validateData['idUser'])
-                        ->whereBetween('horaInicio',[$validateData['startShift'],$validateData['endShift']])
-                        ->whereBetween('horaFin', [$validateData['startShift'],$validateData['endShift']])
-                        ->where('fecha',$date)
-                        ->get();
-                    if($exist->count() > 0){
-                            $exist = $exist->each(function($DetailScheduleTime){
-                                $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
-                            });
-                            $conflict[$date->format('Y-m-d')]=$exist;
+                            $mensaje = "No se pudo programar al usuario: " . $exist->nombre . " porque está asignado a otra actividad: ";
+                        } else {
+                            $schedule = Schedule::firstOrNew([
+                                'task_id' => $task->task_id,
+                                'employee_id' => $validateData['idUser'],
+                                'name' => $validateData['name'],
+                                'fecha' => $date->format('Y-m-d'),
+                            ]);
+                            $schedule->save();
+                            ScheduleTime::create([
+                                'schedule_id' => $schedule->id,
+                                'hora_inicio' => Carbon::parse($validateData['startShift'])->format('H:i'),
+                                'hora_fin' => Carbon::parse($validateData['endShift'])->format('H:i'),
+                            ]);
                             $date = $date->addDays(1);
-                            $error = true;
-                            $mensaje = "No se pudo programar al usuario: ".$exist->nombre." porque está asignado a otra actividad: ";
-
-                    }else{
-                        $schedule = Schedule::firstOrNew([
-                            'task_id' => $task->task_id,
-                            'employee_id' => $validateData['idUser'],
-                            'name' => $validateData['name'],
-                            'fecha' => $date->format('Y-m-d'), 
-                        ]);
-                    $schedule->save();
-                        ScheduleTime::create([
-                            'schedule_id' => $schedule->id,
-                            'hora_inicio' => Carbon::parse($validateData['startShift'])->format('H:i'),
-                            'hora_fin' => Carbon::parse($validateData['endShift'])->format('H:i'),
-                        ]);
-                        $date = $date->addDays(1);
-                    }
-                }while($end_date->gte($date));
-                if(!$error){
-                    DB::rollBack();
-                    return response()->json([
-                        'status' => false,
-                        'mensaje' => $mensaje,
-                        'response_type' => "question", //question y success
-                        'conflict' => $conflict
-                    ]);
-                }
-                $mensaje = "Horario asignado correctamente";
-                    break;
-                case 4:
-                    $task = VirtualTask::find(Schedule::find($validateData['schedule'])->task_id);
-                    foreach($request->details as $date){
-                        $exist = DetailScheduleTime::
-                        where('idUsuario',$validateData['idUser'])
-                        ->whereBetween('horaInicio',[$validateData['startShift'],$validateData['endShift']])
-                        ->whereBetween('horaFin', [$validateData['startShift'],$validateData['endShift']])
-                        ->where('fecha',$date)
-                        ->get();
-                        if($exist->count() > 0){
-                            $exist = $exist->each(function($DetailScheduleTime){
-                                $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
-                            });
-                            $conflict[$date]=$exist;
-                            $error = true;
-                            $mensaje = "No se pudo programar al usuario: ".$exist->nombre." porque está asignado a otra actividad: ";
-
-                    }else{
-                        $schedule = Schedule::firstOrNew([
-                            'task_id' => $task->task_id,
-                            'employee_id' => $validateData['idUser'],
-                            'name' => $validateData['name'],
-                            'fecha' => $date, 
-                        ]);
-                    $schedule->save();
-                        ScheduleTime::create([
-                            'schedule_id' => $schedule->id,
-                            'hora_inicio' => Carbon::parse($validateData['startShift'])->format('H:i'),
-                            'hora_fin' => Carbon::parse($validateData['endShift'])->format('H:i'),
-                        ]);
-                        $date = $date->addDays(1);
-                    }
-
-                    }
-                    if(!$error){
+                        }
+                    } while ($end_date->gte($date));
+                    if (!$error) {
                         DB::rollBack();
                         return response()->json([
                             'status' => false,
@@ -427,18 +333,105 @@ class ProgrammingController extends Controller
                         ]);
                     }
                     $mensaje = "Horario asignado correctamente";
-                        break;
+                    break;
+                case 3:
+                    $task = VirtualTask::find(Schedule::find($validateData['schedule'])->task_id);
+                    $date = Carbon::parse($request->details[0]);
+                    $end_date = Carbon::parse($request->details[1]);
+                    do {
+                        $exist = DetailScheduleTime::where('idUsuario', $validateData['idUser'])
+                            ->whereBetween('horaInicio', [$validateData['startShift'], $validateData['endShift']])
+                            ->whereBetween('horaFin', [$validateData['startShift'], $validateData['endShift']])
+                            ->where('fecha', $date)
+                            ->get();
+                        if ($exist->count() > 0) {
+                            $exist = $exist->each(function ($DetailScheduleTime) {
+                                $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
+                            });
+                            $conflict[$date->format('Y-m-d')] = $exist;
+                            $date = $date->addDays(1);
+                            $error = true;
+                            $mensaje = "No se pudo programar al usuario: " . $exist->nombre . " porque está asignado a otra actividad: ";
+                        } else {
+                            $schedule = Schedule::firstOrNew([
+                                'task_id' => $task->task_id,
+                                'employee_id' => $validateData['idUser'],
+                                'name' => $validateData['name'],
+                                'fecha' => $date->format('Y-m-d'),
+                            ]);
+                            $schedule->save();
+                            ScheduleTime::create([
+                                'schedule_id' => $schedule->id,
+                                'hora_inicio' => Carbon::parse($validateData['startShift'])->format('H:i'),
+                                'hora_fin' => Carbon::parse($validateData['endShift'])->format('H:i'),
+                            ]);
+                            $date = $date->addDays(1);
+                        }
+                    } while ($end_date->gte($date));
+                    if (!$error) {
+                        DB::rollBack();
+                        return response()->json([
+                            'status' => false,
+                            'mensaje' => $mensaje,
+                            'response_type' => "question", //question y success
+                            'conflict' => $conflict
+                        ]);
+                    }
+                    $mensaje = "Horario asignado correctamente";
+                    break;
+                case 4:
+                    $task = VirtualTask::find(Schedule::find($validateData['schedule'])->task_id);
+                    foreach ($request->details as $date) {
+                        $exist = DetailScheduleTime::where('idUsuario', $validateData['idUser'])
+                            ->whereBetween('horaInicio', [$validateData['startShift'], $validateData['endShift']])
+                            ->whereBetween('horaFin', [$validateData['startShift'], $validateData['endShift']])
+                            ->where('fecha', $date)
+                            ->get();
+                        if ($exist->count() > 0) {
+                            $exist = $exist->each(function ($DetailScheduleTime) {
+                                $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
+                            });
+                            $conflict[$date] = $exist;
+                            $error = true;
+                            $mensaje = "No se pudo programar al usuario: " . $exist->nombre . " porque está asignado a otra actividad: ";
+                        } else {
+                            $schedule = Schedule::firstOrNew([
+                                'task_id' => $task->task_id,
+                                'employee_id' => $validateData['idUser'],
+                                'name' => $validateData['name'],
+                                'fecha' => $date,
+                            ]);
+                            $schedule->save();
+                            ScheduleTime::create([
+                                'schedule_id' => $schedule->id,
+                                'hora_inicio' => Carbon::parse($validateData['startShift'])->format('H:i'),
+                                'hora_fin' => Carbon::parse($validateData['endShift'])->format('H:i'),
+                            ]);
+                            $date = $date->addDays(1);
+                        }
+                    }
+                    if (!$error) {
+                        DB::rollBack();
+                        return response()->json([
+                            'status' => false,
+                            'mensaje' => $mensaje,
+                            'response_type' => "question", //question y success
+                            'conflict' => $conflict
+                        ]);
+                    }
+                    $mensaje = "Horario asignado correctamente";
+                    break;
                 default:
-                return response()->json([
-                    'status' => false,
-                    'mensaje' => "Opcion no valida"
-                ]);
+                    return response()->json([
+                        'status' => false,
+                        'mensaje' => "Opcion no valida"
+                    ]);
             }
             DB::commit();
             return response()->json([
                 'status' => true,
                 'mensaje' => $mensaje,
-                'response_type' => "success", 
+                'response_type' => "success",
                 'conflict' => []
             ]);
         } catch (Exception $e) {

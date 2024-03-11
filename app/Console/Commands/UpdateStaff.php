@@ -27,7 +27,7 @@ class UpdateStaff extends Command
      */
     public function handle()
     {
-        //TODO Make the script for update personal table
+        setEmpleadosAPI();
         $this->info('Personal table updated successfully!');
         // $text = Carbon::now()->format('d-m-Y H:i:s') . ': Hello from TestTask';
         // Storage::append('test_task.txt', $text);
