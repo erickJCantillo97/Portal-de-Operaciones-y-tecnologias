@@ -2,6 +2,7 @@
 
 use App\Events\ContractEvent;
 use App\Events\TestWebsocket;
+use App\Exports\ProjectsDetailsExport;
 use App\Http\Controllers\Dashboard\DashboardEstimacionesController;
 use App\Http\Controllers\DatabaseBackController;
 use App\Http\Controllers\Suggestion\SuggestionController;
@@ -30,12 +31,14 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Mail\AssignmentToolsMail;
+use App\Models\Personal\Employee;
 use App\Models\Project\ProgressProjectWeek;
 use App\Models\Projects\Contract;
 use App\Models\Projects\ProjectsShip;
 use App\Models\Projects\Ship;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 Route::get('/', function () {
     // $processId = 1;// Asigna un identificador único para cada proceso de carga
@@ -188,12 +191,6 @@ Route::get('estmaciones_anterior', function () {
     }
 });
 
-
-
-
-
-
-
 Route::get('peps_anteriores', [DatabaseBackController::class, 'getPep']);
 Route::get('grafos-anteriores', [DatabaseBackController::class, 'getGrafos']);
 Route::get('operaciones-anteriores', [DatabaseBackController::class, 'getOperations']);
@@ -205,8 +202,12 @@ Route::get('/mailable', function () {
 
     return new App\Mail\AssignmentToolsMail($data);
 });
-Route::post('/prueba', function (Request $request) {
-    return back()->withErrors(['errors' => ['messaje', 'default1', 'messaje1', 'default2', 'messaje4', 'default4', 'messaje', 'default',]]);
+Route::get('/prueba', function (Request $request) {
+    setEmpleadosAPI();
+    return Employee::get();
+    // return back()->withErrors(['errors' => ['messaje', 'default1', 'messaje1', 'default2', 'messaje4', 'default4', 'messaje', 'default',]]);
+
+    // return Excel::download(new ProjectsDetailsExport, 'invoices.xlsx');
 })->name('prueba');
 
 

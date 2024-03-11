@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Projects;
 
+use App\Exports\ProjectsDetailsExport;
 use App\Http\Controllers\Controller;
 use App\Models\Projects\Customer;
 use App\Models\Projects\Ship;
@@ -10,6 +11,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ShipController extends Controller
 {
@@ -100,6 +102,12 @@ class ShipController extends Controller
     public function edit(Ship $ship)
     {
         //
+    }
+
+    public function export()
+    {
+
+        return Excel::download(new ProjectsDetailsExport, 'Buques.xlsx');
     }
 
 

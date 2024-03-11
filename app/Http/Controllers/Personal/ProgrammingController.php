@@ -49,35 +49,34 @@ class ProgrammingController extends Controller
             $conflict = [];
             if ($hours < 9.5) {
                 $task = VirtualTask::find($validateData['task_id']);
-                $date = Carbon::parse($validateData['fecha']); 
-                $end_date = Carbon::parse($task->endDate); 
-                do{     
-                    $exist = DetailScheduleTime::
-                    where('idUsuario',$validateData['employee_id'])
-                    ->where('fecha',$date)
-                    ->get();
-                   if($exist->count() > 0){
-                        $exist = $exist->each(function($DetailScheduleTime){
+                $date = Carbon::parse($validateData['fecha']);
+                $end_date = Carbon::parse($task->endDate);
+                do {
+                    $exist = DetailScheduleTime::where('idUsuario', $validateData['employee_id'])
+                        ->where('fecha', $date)
+                        ->get();
+                    if ($exist->count() > 0) {
+                        $exist = $exist->each(function ($DetailScheduleTime) {
                             $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
                         });
-                        $conflict[$date->format('Y-m-d')]=$exist;
+                        $conflict[$date->format('Y-m-d')] = $exist;
                         $date = $date->addDays(1);
-                   }else{
-                    $schedule = Schedule::firstOrNew([
-                        'task_id' => $validateData['task_id'],
-                        'employee_id' => $validateData['employee_id'],
-                        'name' => $validateData['name'],
-                        'fecha' => $date->format('Y-m-d'), 
-                    ]);
-                   $schedule->save();
-                    ScheduleTime::create([
-                        'schedule_id' => $schedule->id,
-                        'hora_inicio' => Carbon::parse($task->project->shiftObject->startShift)->format('H:i'),
-                        'hora_fin' => Carbon::parse($task->project->shiftObject->endShift)->format('H:i'),
-                    ]);
-                    $date = $date->addDays(1);
-                }
-                }while($end_date->gte($date));
+                    } else {
+                        $schedule = Schedule::firstOrNew([
+                            'task_id' => $validateData['task_id'],
+                            'employee_id' => $validateData['employee_id'],
+                            'name' => $validateData['name'],
+                            'fecha' => $date->format('Y-m-d'),
+                        ]);
+                        $schedule->save();
+                        ScheduleTime::create([
+                            'schedule_id' => $schedule->id,
+                            'hora_inicio' => Carbon::parse($task->project->shiftObject->startShift)->format('H:i'),
+                            'hora_fin' => Carbon::parse($task->project->shiftObject->endShift)->format('H:i'),
+                        ]);
+                        $date = $date->addDays(1);
+                    }
+                } while ($end_date->gte($date));
                 $status = true;
                 $codigo = 0;
                 $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
@@ -160,7 +159,7 @@ class ProgrammingController extends Controller
                         $query->where('enddate', '>', $date_end)
                             ->where('startdate', '<', $date_start);
                     });
-            })->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) {
+            })->whereNotIn('id', array_unique($taskWithSubTasks))->take(2)->get()->map(function ($task) {
                 return [
                     'name' => $task['name'],
                     'id' => $task['id'],
@@ -200,9 +199,9 @@ class ProgrammingController extends Controller
 
     private function getSchedule($fecha, $taskId)
     {
-        return Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get()->sortByDesc([
+        return Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get()->sortBy([
             ['is_my_personal', 'desc'],
-        ]);;
+        ]);
     }
 
     /*
@@ -271,7 +270,7 @@ class ProgrammingController extends Controller
                             'response_type' => "question", //question y success
                             'conflict' => $exist
                         ]);
-                   }
+                    }
                     ScheduleTime::create([
                         'schedule_id'=>$request->schedule,
                         'hora_inicio'=>$request->startShift,
@@ -294,7 +293,7 @@ class ProgrammingController extends Controller
                             $exist = $exist->each(function($DetailScheduleTime){
                                 $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
                             });
-                            $conflict[$date->format('Y-m-d')]=$exist;
+                            $conflict[$date->format('Y-m-d')] = $exist;
                             $date = $date->addDays(1);
                             $error = true;
                             $mensaje = "No se pudo programar al usuario: ".$exist->nombre." porque está asignado a otra actividad: ";
@@ -341,7 +340,7 @@ class ProgrammingController extends Controller
                             $exist = $exist->each(function($DetailScheduleTime){
                                 $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
                             });
-                            $conflict[$date->format('Y-m-d')]=$exist;
+                            $conflict[$date->format('Y-m-d')] = $exist;
                             $date = $date->addDays(1);
                             $error = true;
                             $mensaje = "No se pudo programar al usuario: ".$exist->nombre." porque está asignado a otra actividad: ";
@@ -386,7 +385,7 @@ class ProgrammingController extends Controller
                             $exist = $exist->each(function($DetailScheduleTime){
                                 $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
                             });
-                            $conflict[$date]=$exist;
+                            $conflict[$date] = $exist;
                             $error = true;
                             $mensaje = "No se pudo programar al usuario: ".$exist->nombre." porque está asignado a otra actividad: ";
 
@@ -407,7 +406,7 @@ class ProgrammingController extends Controller
                     }
 
                     }
-                    if(!$error){
+                    if (!$error) {
                         DB::rollBack();
                         return response()->json([
                             'status' => false,
@@ -417,18 +416,18 @@ class ProgrammingController extends Controller
                         ]);
                     }
                     $mensaje = "Horario asignado correctamente";
-                        break;
+                    break;
                 default:
-                return response()->json([
-                    'status' => false,
-                    'mensaje' => "Opcion no valida"
-                ]);
+                    return response()->json([
+                        'status' => false,
+                        'mensaje' => "Opcion no valida"
+                    ]);
             }
             DB::commit();
             return response()->json([
                 'status' => true,
                 'mensaje' => $mensaje,
-                'response_type' => "success", 
+                'response_type' => "success",
                 'conflict' => []
             ]);
         } catch (Exception $e) {

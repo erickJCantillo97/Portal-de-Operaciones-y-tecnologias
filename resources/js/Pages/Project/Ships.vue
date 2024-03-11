@@ -120,8 +120,8 @@ const buttons = ref([
 <template>
     <AppLayout>
         <div class="w-full h-[89vh] overflow-y-auto">
-            <CustomDataTable :data="ships" :columnas="columnas" :actions="buttons" :rowsDefault=20
-                :title="customer ? 'Unidades del cliente:' + customer.name : 'Todas las unidades'"
+            <CustomDataTable :data="ships" exportRute="export.ships" :columnas="columnas" :actions="buttons"
+                :rowsDefault=20 :title="customer ? 'Unidades del cliente:' + customer.name : 'Todas las unidades'"
                 @confirmDelete="deleteItem" @editItem="editItem" @cloneItem="cloneItem">
                 <template #buttonHeader>
                     <Button title="Agregar Estimación" @click="addItem()" severity="success" label="Agregar" outlined
@@ -157,7 +157,8 @@ const buttons = ref([
                 <CustomInput v-if="$page.props.auth.user.gerencia != 'GECON'" label="Carros de Pantoques" type="number"
                     :placeholder="'Números carros de Pantoques necesarios'" v-model:input="formData.ship.pantoque"
                     :error="router.page.props.errors.pantoque" />
-                <CustomInput type="file" label="Adjuntar foto" acceptFile="image/*" v-model:input="formData.ship.image" />
+                <CustomInput type="file" label="Adjuntar foto" acceptFile="image/*"
+                    v-model:input="formData.ship.image" />
             </span>
         </template>
         <template #footer>

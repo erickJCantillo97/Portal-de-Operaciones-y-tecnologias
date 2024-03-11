@@ -238,4 +238,8 @@ class QuoteController extends Controller
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
+
+    public function getQuoteStatus()
+    {
+    }
 }

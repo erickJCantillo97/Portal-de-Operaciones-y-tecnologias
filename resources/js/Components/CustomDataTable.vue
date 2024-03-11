@@ -113,7 +113,7 @@ const clearFilter = () => {
 //#region exportar
 const exportar = () => {
     var fileLink = document.createElement('a');
-    fileLink.href = route(exportRute);
+    fileLink.href = route(props.exportRute);
     document.body.appendChild(fileLink);
     fileLink.click();
     Swal.fire({
@@ -151,25 +151,25 @@ const formatCurrency = (valor, moneda) => {
 <template>
     <DataTable id="tabla" :value="data" :paginator="data.length > 0 && paginator" :rows="rows" selectionMode="single"
         tableStyle="" sortMode="multiple" scrollable scrollHeight="flex" :loading="loading"
-        currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort v-model:filters="filters"
-        stripedRows filterDisplay="menu" class="p-datatable-sm text-xs p-1 rounded-md" stateStorage="session"
-        :stateKey="cacheName ? 'dt-' + cacheName + '-state-session' : null" :globalFilterFields="globalFilterFields"
-        @row-click="$emit('rowClic', $event)"
+        currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort
+        v-model:filters="filters" stripedRows filterDisplay="menu" class="p-datatable-sm text-xs p-1 rounded-md"
+        stateStorage="session" :stateKey="cacheName ? 'dt-' + cacheName + '-state-session' : null"
+        :globalFilterFields="globalFilterFields" @row-click="$emit('rowClic', $event)"
         paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink" :pt="{
-            paginator: {
-                paginatorWrapper: '!p-0',
-                current: 'text-sm font-bold cursor-default !h-8 flex item-center',
-                pagebutton: {
-                    class: '!font-bold !h-8 !rounded-md !w-6',
-                },
-                firstPageButton: '!h-8 !rounded-md',
-                previousPageButton: '!h-8 !rounded-md',
-                nextPageButton: '!h-8 !rounded-md',
-                lastPageButton: '!h-8 !rounded-md'
+        paginator: {
+            paginatorWrapper: '!p-0',
+            current: 'text-sm font-bold cursor-default !h-8 flex item-center',
+            pagebutton: {
+                class: '!font-bold !h-8 !rounded-md !w-6',
             },
-            loadingOverlay: '!bg-white'
-        }
-            ">
+            firstPageButton: '!h-8 !rounded-md',
+            previousPageButton: '!h-8 !rounded-md',
+            nextPageButton: '!h-8 !rounded-md',
+            lastPageButton: '!h-8 !rounded-md'
+        },
+        loadingOverlay: '!bg-white'
+    }
+        ">
         <template #header>
             <div class="space-y-1">
                 <span class="flex justify-between ">
@@ -201,18 +201,26 @@ const formatCurrency = (valor, moneda) => {
                         </ButtonGroup>
                     </div>
                     <div class="space-x-2">
-                        <Button v-if="exportRute != ''" @click="exportar" icon="fa-solid fa-file-excel" class="!w-8" />
-                        <MultiSelect v-if="showColumns" v-model="columnasSelect" display="chip" :options="props.columnas"
-                            optionLabel="header" placeholder="Selecciona columnas a mostrar" class="w-min h-8" :pt="{
-                                root: '!border-0 !ring-0',
-                                trigger: '!hidden',
-                                labelContainer: '!p-0 ',
-                                label: '!p-0 text-center',
-                                token: '!p-0',
-                                item: ' !p-2',
-                                header: '!p-2'
-                            }
-                                ">
+                        <Button v-if="exportRute != ''" text @click="exportar" icon="fa-solid fa-download" :pt="{
+        root: '!border-0 !ring-0',
+        trigger: '!hidden',
+        labelContainer: '!p-0 ',
+        label: '!p-0 text-center',
+        token: '!p-0', item: ' !p-2',
+        header: '!p-2'
+    }" class="w-8 h-8" />
+                        <MultiSelect v-if="showColumns" v-model="columnasSelect" display="chip"
+                            :options="props.columnas" optionLabel="header" placeholder="Selecciona columnas a mostrar"
+                            class="w-min h-8" :pt="{
+        root: '!border-0 !ring-0',
+        trigger: '!hidden',
+        labelContainer: '!p-0 ',
+        label: '!p-0 text-center',
+        token: '!p-0',
+        item: ' !p-2',
+        header: '!p-2'
+    }
+        ">
                             <template #value>
                                 <Button v-tooltip="'Ver u ocultar columnas'" icon="fa-solid fa-eye" text class="!w-8" />
                             </template>
@@ -238,11 +246,11 @@ const formatCurrency = (valor, moneda) => {
         <template #paginatorstart>
             <div class="flex items-center">
                 <Dropdown v-model="rows" :options="[1, 5, 10, 20, 50, 100]" :pt="{
-                    root: '!h-8 !border-0 !ring-0',
-                    input: '!py-0 !flex !items-center',
-                    item: '!p-1 w-full text-center'
-                }
-                    " />
+        root: '!h-8 !border-0 !ring-0',
+        input: '!py-0 !flex !items-center',
+        item: '!p-1 w-full text-center'
+    }
+        " />
             </div>
         </template>
         <template #paginatorfirstpagelinkicon>
@@ -267,10 +275,10 @@ const formatCurrency = (valor, moneda) => {
             <Column v-if="col.visible == null || col.visible == true" :field="col.field" :filterField="col.field"
                 :class="col.class" :sortable="col.sortable" :show-filter-match-modes="false"
                 :filterMenuStyle="{ width: '16rem' }" :frozen="col.frozen" :pt="{
-                    headerContent: { class: '!h-8' },
-                    headerCell: { class: '!p-0.5' }
-                }
-                    ">
+        headerContent: { class: '!h-8' },
+        headerCell: { class: '!p-0.5' }
+    }
+        ">
                 <template #header>
                     <p class="text-sm text-primary uppercase font-bold truncate">{{ col.header }}</p>
                 </template>
@@ -300,7 +308,7 @@ const formatCurrency = (valor, moneda) => {
                     </p>
                     <p v-else-if="col.type == 'currency'" class="text-right">
                         {{ formatCurrency(data[col.field], !Array.isArray(data[col.field]) ? 'COP'
-                            : data[col.field][1]) }}
+        : data[col.field][1]) }}
                     </p>
                     <p v-else-if="col.type == 'customtag'"
                         :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
@@ -318,15 +326,15 @@ const formatCurrency = (valor, moneda) => {
                             class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16 object-cover" draggable="false" />
                         <div>
                             <p class="font-bold text-sm" v-if="col.objectRows.primary">{{
-                                col.objectRows.primary.subfield ?
-                                data[col.objectRows.primary.field][col.objectRows.primary.subfield] :
-                                data[col.objectRows.primary.field]
-                            }} </p>
+        col.objectRows.primary.subfield ?
+            data[col.objectRows.primary.field][col.objectRows.primary.subfield] :
+            data[col.objectRows.primary.field]
+    }} </p>
                             <p class="text-xs italic" v-if="col.objectRows.secundary">{{
-                                col.objectRows.secundary.subfield ?
-                                data[col.objectRows.secundary.field][col.objectRows.secundary.subfield] :
-                                data[col.objectRows.secundary.field]
-                            }} </p>
+        col.objectRows.secundary.subfield ?
+            data[col.objectRows.secundary.field][col.objectRows.secundary.subfield] :
+            data[col.objectRows.secundary.field]
+    }} </p>
                         </div>
                     </span>
                     <span v-else-if="col.type == 'button'" class="w-full">
@@ -343,8 +351,8 @@ const formatCurrency = (valor, moneda) => {
                     </span>
                     <p v-else class="">
                         {{
-                            data[col.field]
-                        }}
+        data[col.field]
+    }}
                     </p>
                 </template>
             </Column>
@@ -353,9 +361,10 @@ const formatCurrency = (valor, moneda) => {
             <template #body="{ data }">
                 <div class="flex items-center justify-center w-full bg-white rounded-md shadow-sm">
                     <span v-for="button in props.actions">
-                        <Button @click="$emit(button.event, $event, data)" :text="button.text" :severity="button.severity"
-                            :outlined="button.outlined" :rounded="button.rounded" :icon="button.icon" :title="button.label"
-                            :class="button.class" v-if="button.show == null ? true : button.show" />
+                        <Button @click="$emit(button.event, $event, data)" :text="button.text"
+                            :severity="button.severity" :outlined="button.outlined" :rounded="button.rounded"
+                            :icon="button.icon" :title="button.label" :class="button.class"
+                            v-if="button.show == null ? true : button.show" />
                     </span>
                 </div>
             </template>

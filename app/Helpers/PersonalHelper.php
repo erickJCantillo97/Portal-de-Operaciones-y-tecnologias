@@ -2,10 +2,12 @@
 
 use App\Ldap\User;
 use App\Models\Labor;
+use App\Models\Personal\Employee;
 use App\Models\Personal\Personal;
 use App\Models\Personal\WorkingTeams;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
+use PhpParser\Node\Expr\Empty_;
 
 function UpdateCargos()
 {
@@ -51,6 +53,11 @@ function getPersonalGerenciaOficina(string $gerencia = null, string $oficina = n
 
 function getEmpleadosAPI(): mixed
 {
+    return Employee::get();
+}
+function setEmpleadosAPI(): mixed
+{
+    Employee::truncate();
     try {
         if (getToken()) {
             $json = Http::acceptJson()->withToken(session()->get('token'))
@@ -58,7 +65,12 @@ function getEmpleadosAPI(): mixed
                     ROUTE_API . '/listado_personal_cargo_costo_da_view'
                 )->json();
 
-            return collect($json);
+            foreach (collect($json) as $employee) {
+                // if (!isset($employee['JI_Num_SAP']))
+                //     dd($employee);
+                if (isset($employee))
+                    Employee::create((array) $employee);
+            };
         }
         dd('Sin token');
     } catch (\Throwable $th) {
@@ -72,22 +84,36 @@ function searchEmpleados(string $clave, string $valor)
         return strpos($employee[$clave], $valor) !== false;
     });
 }
+// ->map(function ($person) {
+//     return [
+//         'Num_SAP' => (int) $person['Num_SAP'],
+//         'Fecha_Final' => Carbon::createFromFormat('Ymd', $person['Fecha_Final']),
+//         'Costo_Hora' => $person['Costo_Hora'],
+//         'Costo_Mes' => $person['Costo_Mes'],
+//         'Oficina' => $person['Oficina'],
+//         'canDelete' => $person['JI_Num_SAP'] != auth()->user()->num_sap,
+//         'Nombres_Apellidos' => $person['Nombres_Apellidos'],
+//         'Cargo' => $person['Cargo'],
+//         'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
+//     ];
+// });
 
 
 function getPersonalUser()
 {
-    $NumSAPPersonal = Personal::where('boss_id', auth()->user()->num_sap)->pluck('user_id')->toArray();
+    $NumSAPPersonal = Personal::where('boss_id', auth()->user()->num_sap)->pluck('user_id')->map(function ($p) {
+        return
+            str_pad(($p), 8, '0', STR_PAD_LEFT);
+    })->toArray();
 
-    $miPersonal = getEmpleadosAPI()->filter(function ($employee) use ($NumSAPPersonal) {
-        return $employee['JI_Num_SAP'] == auth()->user()->num_sap || in_array($employee['Num_SAP'], $NumSAPPersonal);
-    })->values()->map(function ($person) use ($NumSAPPersonal) {
+    $miPersonal = Employee::where('JI_Num_SAP', auth()->user()->num_sap)->orWhereIn('Num_SAP', $NumSAPPersonal)->get()->map(function ($person) {
         return [
             'Num_SAP' => (int) $person['Num_SAP'],
             'Fecha_Final' => Carbon::createFromFormat('Ymd', $person['Fecha_Final']),
             'Costo_Hora' => $person['Costo_Hora'],
             'Costo_Mes' => $person['Costo_Mes'],
             'Oficina' => $person['Oficina'],
-            'canDelete' => in_array($person['Num_SAP'], $NumSAPPersonal) && $person['JI_Num_SAP'] != auth()->user()->num_sap,
+            'canDelete' => $person['JI_Num_SAP'] != auth()->user()->num_sap,
             'Nombres_Apellidos' => $person['Nombres_Apellidos'],
             'Cargo' => $person['Cargo'],
             'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
