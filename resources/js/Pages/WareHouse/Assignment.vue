@@ -247,7 +247,7 @@ const clearModal2 = () => {
     <template #footer>
       <Button label="Cancelar" icon="fa-regular fa-circle-xmark" severity="danger" outlined @click="clearModal2()" />
       <Button label="Guardar" icon="fa-solid fa-floppy-disk" severity="success" outlined :loading="false"
-        @click="submitDownload()" />
+        @click="submitjob()" />
     </template>
   </CustomModal>
 

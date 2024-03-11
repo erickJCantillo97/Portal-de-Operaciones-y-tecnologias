@@ -16,13 +16,16 @@ import RadioButton from 'primevue/radiobutton';
 import Calendar from 'primevue/calendar';
 import CustomShiftSelector from '@/Components/CustomShiftSelector.vue';
 import ButtonGroup from 'primevue/buttongroup';
+import { useForm } from '@inertiajs/vue3'
+
+
 
 const { hasRole, hasPermission } = usePermissions()
 const { toast } = useSweetalert();
 
-const props = defineProps({
-    hours: Object
-})
+// const props = defineProps({
+//     hours: Object
+// })
 
 const openConflict = ref(false)
 
@@ -183,39 +186,73 @@ const employeeDialog = (item) => {
         })
 }
 
-
+const form = ref({
+    name: null, // nombre de horario personalizado
+    startShift: null,// hora inicio
+    endShift: null,// hora fin
+    timeBreak: null,
+    schedule: null, // id del schedule/cronograma (TABLA SCHEDULES)
+    idUser: null, // Id de la persona seleccionada (COLUMNA EMPLOYEE_ID DE LA TABLA SCHEDULES)
+    date: date, // fecha seleccionada en el calendario
+    personalized: false, // Seleccionar turno => false, Seleccionar Horario Personalizado => false, Nuevo horario personalizado =>true
+    type: 1,// Solo el => 1; Resto de la actividad => 2; Rango de fechas => 3; Fechas específicos => 4
+    details: []
+    /* la propiedad details depende de la propiedad type, es decir:
+        si la opción type es 1, en details se debe enviar la fecha (Solo el =>) ej: ['2024-03-07']
+        si la opcion type es 2, en details se debe enviar el id de la actividad seleccionada (EN BASE DE DATOS ES LA TABLA TASK) ej: [7683]
+        si la opcion type es 3, en details se debe enviar la fecha inicial y la fecha final (EN LA PRIMERA POSICION SIEMPRE SE DEBE MANDAR LA FECHA INICIAL), ej: ['2024-03-01','2024-03-10']
+        si la opcion type es 4, en details se debe enviar las fechas seleccionadas en el calendario, no importa el orden ej: ['2024-03-01', '2024-03-10', '2024-01-01','2024-02-10']
+    */
+});
 const editHorario = ref()
 const nuevoHorario = ref({})
 const optionSelectHours = ref('select')
 const modhours = ref(false)
 const toggle = (horario, data) => {
+    // console.log(data)
     editHorario.value = horario
     editHorario.value.data = data
+    form.value.idUser = data.employee_id
+    form.value.schedule = data.task_id
     nuevoHorario.value = {}
     modhours.value = true
 }
 //#endregion
 
-const filter = ref('')
+const filter = ref('');
+
+const selectDays = ref()
+const tabActive = ref()
+const save = async () => {
+    if (!form.value.personalized) {
+        form.value.startShift = new Date(nuevoHorario.value.startShift).toLocaleString('es-CO',
+            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+        form.value.endShift = new Date(nuevoHorario.value.endShift).toLocaleString('es-CO',
+            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+        form.value.timeBreak = parseFloat(nuevoHorario.value.timeBreak)
+    }
+    if (form.value.type == 1) {
+        form.value.details[0] = date.value
+    } else if (form.value.type == 2) {
+        form.value.details[0] = form.value.schedule
+    }
+    else {
+        selectDays.value.forEach((day, index) => {
+            form.value.details[index] = new Date(day).toISOString().split("T")[0]
+        })
+    }
+    //aplicar validaciones de campos requeridos (TODOS LOS CAMPOS SON REQUERIDOS)
+    /* 
+    NOTA:
+    Se debe cambiar el campo de hora inicio y hora fin a un formato de 24 horas.
+    */
+    await axios.post(route('programming.saveCustomizedSchedule'), form.value)
+        .then((res) => {
+            console.log(res);
+        });
+}
 
 </script>
-
-<style scoped>
-.custom-image {
-    width: 200px;
-    height: 50px;
-    /* object-position: 50% 30%; */
-    border-radius: 5px 10px;
-    object-fit: cover;
-    /* Opciones: 'cover', 'contain', 'fill', etc. */
-}
-
-.info-resto {
-    font-size: 15px;
-    text-wrap: balance;
-    opacity: .5;
-}
-</style>
 
 <template>
     <AppLayout>
@@ -229,12 +266,10 @@ const filter = ref('')
                         <ButtonGroup>
                             <Button label="Hoy" :outlined="optionValue != 'today'"
                                 @click="getTask('today'); getPersonalData()" />
-                            <!-- <Button label="Proxima Semana" :outlined="optionValue != 'today'" @click="getTask('today')" /> -->
                             <Button label="Mañana" :outlined="optionValue != 'tomorrow'"
                                 @click="getTask('tomorrow'); getPersonalData()" />
                         </ButtonGroup>
                         <CustomInput type="date" v-model:input="date" @change="getTask('date'); getPersonalData()" />
-                        <!-- <CustomInput type="date" id="date" v-model:input="date" @change="getTask('date')" /> -->
                     </div>
                 </span>
                 <Listbox :options="tasks" :filterFields="['task', 'name', 'project']" class="col-span-2" filter :pt="{
@@ -245,18 +280,19 @@ const filter = ref('')
                             }">
                     <template #option="slotProps">
                         <div class="flex flex-col justify-between h-full p-2 border rounded-md shadow-md snap-start">
-                            <p><b>{{ slotProps.option.task }}</b> <i class="fa-solid fa-angle-right"></i> {{
-                                slotProps.option.name }} </p>
+                            <p><b>{{ slotProps.option.task }}</b> <i class="fa-solid fa-angle-right"></i>
+                                {{ slotProps.option.name }}
+                            </p>
                             <p class="text-xs italic uppercase text-primary">{{ slotProps.option.project }}</p>
                             <span class="grid items-center text-xs grid-cols-6">
                                 <span class="grid grid-cols-3">
                                     <p class="font-bold ">I:</p>
-                                    <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha inicio'">{{
-                                slotProps.option.startDate
-                            }} </p>
+                                    <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha inicio'">
+                                        {{ slotProps.option.startDate }}
+                                    </p>
                                     <p class="font-bold">F:</p>
-                                    <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha fin'">{{
-                                slotProps.option.endDate }}
+                                    <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha fin'">
+                                        {{ slotProps.option.endDate }}
                                     </p>
                                 </span>
                                 <span class="flex justify-center">
@@ -317,13 +353,12 @@ const filter = ref('')
                                                             class="fa-solid fa-trash-can text-danger text-xs hover:animate-pulse hover:scale-125"></i>
                                                     </button>
                                                     <span class="w-full text-xs tracking-tighter text-center">
-                                                        {{ format24h(horario.hora_inicio) }} {{
-                                format24h(horario.hora_fin)
-                            }}
+                                                        {{ format24h(horario.hora_inicio) }}
+                                                        {{ format24h(horario.hora_fin) }}
                                                     </span>
                                                     <button v-tooltip.bottom="'Cambiar horario'"
                                                         class="hidden group-hover:flex"
-                                                        @click="optionSelectHours = 'select'; toggle(horario, item.name)">
+                                                        @click="optionSelectHours = 'select'; toggle(horario, item)">
                                                         <i
                                                             class="fa-solid fa-pencil text-primary text-xs hover:animate-pulse hover:scale-125"></i>
                                                     </button>
@@ -412,58 +447,73 @@ const filter = ref('')
     </AppLayout>
 
     <!--#region MODALES -->
-    <CustomModal v-model:visible="modhours" icon="fa-regular fa-clock" width="60vw"
-        :titulo="'Modificar horario de ' + editHorario?.data ?? null">
-
+    <CustomModal v-model:visible="modhours" :footer="false" icon="fa-regular fa-clock" width="60vw"
+        :titulo="'Modificar horario de ' + editHorario?.data.name ?? null">
         <template #body>
-            <!-- {{ editHorario }} -->
-            <div class="flex flex-col gap-1">
-                <div class="flex items-center justify-between col-span-3 ">
-                    <p>Horario actual:</p>
-                    <p class="px-1 py-1 text-green-900 bg-green-200 rounded-md">
-                        {{ format24h(editHorario.hora_inicio) }} {{ format24h(editHorario.hora_fin) }}
-                    </p>
+            <form @submit.prevent="save" class="pb-2">
+                <div class="flex flex-col gap-1">
+                    <div class="flex items-center justify-between col-span-3 ">
+                        <p>Horario actual:</p>
+                        <p class="px-1 py-1 text-green-900 bg-green-200 rounded-md">
+                            {{ format24h(editHorario.hora_inicio) }}
+                            {{ format24h(editHorario.hora_fin) }}
+                        </p>
+                    </div>
+                    <TabView @tab-click="form.personalized = tabActive == 2 ? true : false"
+                        v-model:activeIndex="tabActive" class="border rounded-md p-1" :pt="{
+                                nav: '!flex !justify-between',
+                                panelContainer: '!p-1'
+                            }">
+                        <TabPanel header="Seleccionar Turno" :pt="{
+                                root: 'w-full',
+                                headerTitle: '!w-full !flex !justify-center',
+                            }">
+                            <CustomShiftSelector v-model:shift="nuevoHorario" />
+                        </TabPanel>
+                        <TabPanel header="Seleccionar Horario Personalizado" :pt="{
+                                root: 'w-full',
+                                headerTitle: '!w-full !flex !justify-center',
+                            }">
+                            <CustomShiftSelector v-model:shift="nuevoHorario" />
+                        </TabPanel>
+                        <TabPanel header="Nuevo Horario Personalizado" :pt="{
+                                root: 'w-full',
+                                headerTitle: '!w-full !flex !justify-center',
+                            }">
+                            <div class="h-48 m-1">
+                                <CustomInput v-model:input="form.name" label="Nombre" type="text" id="name"
+                                    placeholder="Nombre del horario" :required="tabActive == 2" />
+                                <span class="grid grid-cols-3 gap-x-1">
+                                    <CustomInput v-model:input="form.startShift" label="Hora inicio" type="time"
+                                        id="start" placeholder="Hora de inicio" :required="tabActive == 2" />
+                                    <CustomInput v-model:input="form.endShift" label="Hora fin" type="time" id="end"
+                                        placeholder="Hora de fin" :required="tabActive == 2" />
+                                    <CustomInput v-model:input="form.timeBreak" label="Descanso" type="number"
+                                        suffix=" Hora" id="break" placeholder="Descanso en horas"
+                                        :required="tabActive == 2" />
+                                </span>
+                            </div>
+                        </TabPanel>
+                    </TabView>
                 </div>
-                <TabView class="border rounded-md p-1">
-                    <TabPanel header="Seleccionar Turno">
-                        <CustomShiftSelector v-model:shift="nuevoHorario" />
-                    </TabPanel>
-                    <TabPanel header="Selccionar Horario Personalizado">
-                        <CustomShiftSelector v-model:shift="nuevoHorario" />
-                    </TabPanel>
-                    <TabPanel header="Nuevo Horario Personalizado">
-                        <div class="h-48 m-1">
-                            <CustomInput v-model:input="nuevoHorario.name" label="Nombre" type="text" id="name"
-                                placeholder="Nombre del horario" />
-                            <span class="grid grid-cols-2 gap-x-1">
-                                <CustomInput v-model:input="nuevoHorario.startShift" label="Hora inicio" type="time"
-                                    id="start" placeholder="Hora de inicio" />
-                                <CustomInput v-model:input="nuevoHorario.endShift" label="Hora fin" type="time" id="end"
-                                    placeholder="Hora de fin" />
-                            </span>
-                        </div>
-                    </TabPanel>
-                </TabView>
-            </div>
-            <p>Aplicar por:</p>
-            <span class="flex items-center p-2 gap-4">
-                <div v-for="category in [{ name: 'Solo el ' + date, key: 'dia' }, { name: 'Resto de la actividad', key: 'resto' }, { name: 'Rango de fechas', key: 'range' }, { name: 'Fechas específicos', key: 'multiple' }]"
-                    :key="category.key" class="flex items-center">
-                    <RadioButton v-model="nuevoHorario.type" :inputId="category.key" name="dynamic"
-                        :value="category.key" @click="nuevoHorario.days = null" />
-                    <label :for="category.key" class="ml-1 mb-0">{{ category.name }}</label>
-                </div>
-            </span>
-            <Calendar v-if="nuevoHorario.type == 'multiple' || nuevoHorario.type == 'range'" show-icon
-                v-model="nuevoHorario.days" :selectionMode="nuevoHorario.type" :manualInput="false" :pt="{
+                <p>Aplicar por:</p>
+                <span class="flex items-center p-2 gap-4">
+                    <div v-for="category in [{ name: 'Solo el ' + date, key: 1 }, { name: 'Resto de la actividad', key: 2 }, { name: 'Rango de fechas', key: 3 }, { name: 'Fechas específicos', key: 4 }]"
+                        :key="category.key" class="flex items-center">
+                        <RadioButton v-model="form.type" :inputId="category.name" name="dynamic" :value="category.key"
+                            @click="form.details = []" />
+                        <label :for="category.key" class="ml-1 mb-0">{{ category.name }}</label>
+                    </div>
+                </span>
+                <span class="w-full grid grid-cols-4 justify-end gap-5 items-center">
+                    <Calendar v-if="form.type == 3 || form.type == 4" show-icon v-model="selectDays" class="col-span-3"
+                        :selectionMode="form.type == 3 ? 'range' : 'multiple'" :manualInput="false" :pt="{
                                 root: '!w-full',
                                 input: '!h-8'
                             }" />
-        </template>
-
-        <template #footer>
-            <Button @click="console.log('hace algo'); nuevoHorario = null; op.hide()" icon="fa-solid fa-floppy-disk"
-                label="Guardar" />
+                    <Button type="submit" class="col-start-4" icon="fa-solid fa-floppy-disk" label="Guardar" />
+                </span>
+            </form>
         </template>
     </CustomModal>
 
@@ -483,7 +533,7 @@ const filter = ref('')
         <template #body>
             <div class="py-2">
                 <div v-for="conflict in conflicts">
-                    {{conflict[0]}}
+                    {{ conflict[0] }}
                 </div>
                 <!-- {{conflicts}} -->
             </div>
@@ -491,3 +541,20 @@ const filter = ref('')
     </CustomModal>
     <!-- #endregion -->
 </template>
+
+<style scoped>
+.custom-image {
+    width: 200px;
+    height: 50px;
+    /* object-position: 50% 30%; */
+    border-radius: 5px 10px;
+    object-fit: cover;
+    /* Opciones: 'cover', 'contain', 'fill', etc. */
+}
+
+.info-resto {
+    font-size: 15px;
+    text-wrap: balance;
+    opacity: .5;
+}
+</style>

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->dateTime('startShift');
             $table->dateTime('endShift');
             $table->integer('timeBreak')->nullable();
+            $table->foreignId('user')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
             $table->softDeletes();
