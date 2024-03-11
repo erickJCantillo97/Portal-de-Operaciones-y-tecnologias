@@ -21,13 +21,13 @@ onMounted(() => {
 })
 
 const selectedProjects = ref([])
-const selectedFiles = ref(false)
+const selectedFiles = ref()
 const projectsOptions = ref([])
 const loadingProjects = ref(false)
 const showNoProjects = ref(true)
 const showNoTipologies = ref(false)
 const showNoImages = ref(false)
-const openDialog = ref(true)
+const openDialog = ref(false)
 
 const showArticleListTipologies = ref(true)
 const tipologia = ref() // v-model
@@ -66,20 +66,22 @@ const getTipologias = async () => {
 const files = ref([])
 const fileup = ref(Math.random() * (10))
 
-const tipologiaFiles = ref([])
+const tipologiaFiles = ref({})
 
 const selectedTipologia = async () => {
-  openDialog.value = true
   fileup.value = Math.random() * (10)
 
   if (tipologia.value) {
     await axios.get(route('get.files.project.tipologia',
       {
-        porjectID: selectedProjects.value.id,
+        projectID: selectedProjects.value.id,
         tipologiaID: tipologia.value.id
       }))
       .then((response) => {
-        tipologiaFiles.value = response.data.files
+        tipologiaFiles.value.files = response.data.files
+        tipologiaFiles.value.images = response.data.filesImages
+        if (tipologiaFiles.value.images.length > 0)
+          openDialog.value = true
       })
   } else {
     tipologiaFiles.value = []
@@ -89,9 +91,9 @@ const selectedTipologia = async () => {
 const fileListboxSelected = ref()
 
 const fileSelected = (event) => {
-  showNoImages.value = false
 
-  selectedFiles.value = tipologiaFiles.value[event.index] != null ? tipologiaFiles.value[event.index] : 'No hay imagenes que mostrar'
+  console.log(event);
+  selectedFiles.value = event.value?.filePath ?? null
 }
 
 const getProjects = async () => {
@@ -99,13 +101,6 @@ const getProjects = async () => {
     await axios(route('projects.index'))
       .then(res => {
         projectsOptions.value = res.data.projects
-        // searchProjects()
-
-        // if (res.data.projects != null) {
-        //   loadingProjects.value = false
-        // } else {
-        //   showNoProjects.value = true
-        // }
       })
   } catch (error) {
     console.log('Nada')
@@ -126,6 +121,7 @@ const getProjectDetails = (option) => {
 const pdf = ref()
 const archivo = ref()
 const archivoData = ref()
+
 const showPdf = (event, data) => {
   archivoData.value = data
   pdf.value.toggle(event)
@@ -143,15 +139,10 @@ const columnas = [
   { field: 'name_user', header: 'Usuario', filter: true, sortable: true },
   { field: 'created_at', header: 'Fecha Creación', filter: true, sortable: true, type: 'date' },
   { field: 'num_folios', header: 'No. Folio', filter: true, sortable: true },
-  { field: 'file_size', header: 'Tamaño', filter: true, sortable: true },
+  { field: 'file_size', header: 'Tamaño', filter: true, sortable: true, type: 'fileSize' },
 ]
 
-const filterButtons = [
-  // { field: 'status', label: 'CONSTRUCCIÓN', data: 'CONSTRUCCIÓN', severity: 'success' },
-  // { field: 'status', label: 'DISEÑO Y CONSTRUCCIÓN', data: 'DISEÑO Y CONSTRUCCIÓN', severity: 'primary' },
-  // { field: 'status', label: 'DISEÑO', data: 'DISEÑO', severity: 'info' },
-  // { field: 'status', label: 'GARANTIA ', data: 'GARANTIA', severity: 'warning' },
-]
+
 
 const buttons = [
   { event: 'downloadFiles', severity: 'primary', class: '', icon: 'fa-solid fa-download', text: true, outlined: false, rounded: false },
@@ -164,7 +155,7 @@ function formatDateTime24h(dateTime) {
     { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
 }
 
-const downloadFiles = async() => {
+const downloadFiles = async () => {
   await router.get(route('get.files.project.tipologia', tipologiaFiles.value.id), {}, {
     onSuccess: () => {
       toast.add({ summary: 'Asignación Descargada', life: 2000 });
@@ -194,68 +185,7 @@ const truncateString = (string, maxLength) => {
 }
 //#endregion
 
-const imageSrc = [
-  {
-    id: 1,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria1.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria1s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 2,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria2.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria2s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 3,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria3.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria3s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 4,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria4.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria4s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 5,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria5.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria5s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 6,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria6.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria6s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 7,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria7.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria7s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 8,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria8.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria8s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 9,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria9.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria9s.jpg',
-    alt: 'image-1'
-  },
-  {
-    id: 10,
-    src: 'https://primefaces.org/cdn/primevue/images/galleria/galleria10.jpg',
-    thumb: 'https://primefaces.org/cdn/primevue/images/galleria/galleria10s.jpg',
-    alt: 'image-1'
-  }
-]
+
 </script>
 
 <style scoped>
@@ -400,15 +330,15 @@ const imageSrc = [
           }">
             <TabPanel header="Documentos">
               <div class="w-full h-[89vh] overflow-y-auto">
-                <CustomDataTable :data="tipologiaFiles" :rows-default="100" :columnas="columnas" :actions="buttons"
-                  @downloadFiles="downloadFiles">
+                <CustomDataTable :data="tipologiaFiles.files" :rows-default="100" :columnas="columnas"
+                  :actions="buttons" @downloadFiles="downloadFiles">
                 </CustomDataTable>
               </div>
             </TabPanel>
             <TabPanel header="Imágenes">
               <article class="grid h-[70vh] w-full grid-cols-2 gap-x-4 overflow-y-auto">
                 <div>
-                  <Listbox :key="listTipologia" v-model="fileListboxSelected" :options="tipologiaFiles" filter
+                  <Listbox :key="listTipologia" v-model="fileListboxSelected" :options="tipologiaFiles.images" filter
                     filterPlaceholder="Seleccione un archivo" optionLabel="name" @change="fileSelected($event)"
                     listStyle="max-height:61.5vh" class="w-full md:w-14rem" :pt="{
             item: '!p-2',
@@ -436,82 +366,15 @@ const imageSrc = [
 
                 <div>
                   <div v-if="selectedFiles != null" class="flex space-x-1 rounded-md p-1 justify-center items-center">
-                    <img :src="selectedFiles" class="size-full object-cover rounded-lg" />
+                    <img :src="'/' + selectedFiles" class="size-full object-cover rounded-lg" />
                   </div>
-                  <div class="flex size-full items-center justify-center rounded-lg border border-gray-300">
+                  <div v-else class="flex size-full items-center justify-center rounded-lg border border-gray-300">
                     <NoContentToShow class="mt-5" :subject="'Por favor seleccione una imagen'" />
                   </div>
                 </div>
               </article>
             </TabPanel>
           </TabView>
-          <!--Archivos-->
-          <!-- <article class="col-span-1">
-            <div v-if="tipologia != null && selectedProjects != null" class="w-full h-[78vh] border rounded-lg">
-              <div>
-                <div class="flex w-full space-x-2 p-2">
-                  <p class="font-bold">Tipologia:</p>
-                  <p>{{ tipologia.name }}</p>
-                </div>
-                <Divider />
-                <div v-if="tipologiaFiles.length > 0" class="overflow-y-auto h-[40vh]">
-                  <DataView :value="tipologiaFiles" class="w-full overflow-y-auto">
-
-                    <template #list="slotProps">
-                      <div v-for="item in slotProps.items" class="flex w-full items-center justify-between p-1">
-                        <div class="flex">
-                          <i v-if="item.filePath.slice(item.filePath.lastIndexOf('.') + 1) == 'pdf'"
-                            class="fa-regular fa-file-pdf flex w-9 items-center justify-center rounded-md border border-danger p-1 text-xl text-danger"></i>
-                          <Image v-else :src="item.filePath" preview class="w-6">
-                            <template #image>
-                              <div class="flex items-center h-full">
-                                <img :src="item.filePath" alt="image" />
-                              </div>
-                            </template>
-
-  <template #preview="slotProps1">
-                              <img :src="item.filePath" class="!max-w-[80vw] !max-h-[80vh]" alt="preview"
-                                :style="slotProps1.style" @click="slotProps1.previewCallback" />
-                            </template>
-  </Image>
-  <div class="px-3">
-    <p class="text-sm">
-      {{ (index + 1) + '. ' + item.tipologia_name }}
-    </p>
-    <p class="text-xs font-semibold">{{ item.name }}</p>
-    <span class="flex space-x-2">
-      <p class="text-xs">{{ item.name_user }} </p>
-      <p class="text-xs">{{ formatDateTime24h(item.created_at) }}
-      </p>
-      <p class="text-xs">{{ formatSize(item.file_size) }} </p>
-      <p class="text-xs" v-if="item.filePath.slice(item.filePath.lastIndexOf('.') + 1) == 'pdf'">
-        {{ item.num_folios }} folio(s) </p>
-    </span>
-  </div>
-  </div>
-  <span class="space-x-1">
-    <Button class="!size-6" icon="fa-solid fa-download" outlined rounded @click="showPdf($event, items)"
-      v-if="item.filePath.slice(item.filePath.lastIndexOf('.') + 1) == 'pdf'" severity="success">
-    </Button>
-  </span>
-  </div>
-  </template>
-  </DataView>
-  </div>
-  <div class="flex items-center justify-center h-[50vh]" v-if="tipologiaFiles.length == 0">
-    <span>
-      <i class="w-full text-center text-2xl text-danger fa-solid fa-file-circle-exclamation"></i>
-      <p class="w-full text-center text-2xl font-bold text-danger">
-        Sin archivos
-      </p>
-    </span>
-  </div>
-  <div class="h-full flex items-center" v-if="tipologia.count > 0 && tipologiaFiles.length == 0">
-    <Loading message="Cargando archivos" />
-  </div>
-  </div>
-  </div>
-  </article> -->
         </template>
       </CustomModal>
     </main>

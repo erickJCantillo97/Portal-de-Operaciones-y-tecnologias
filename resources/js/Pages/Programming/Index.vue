@@ -208,14 +208,20 @@ const editHorario = ref()
 const nuevoHorario = ref({})
 const optionSelectHours = ref('select')
 const modhours = ref(false)
-const toggle = (horario, data) => {
-    // console.log(data)
-    editHorario.value = horario
-    editHorario.value.data = data
-    form.value.idUser = data.employee_id
-    form.value.schedule = data.task_id
-    nuevoHorario.value = {}
-    modhours.value = true
+const toggle = (horario, data, option) => {
+    console.log(data)
+    console.log(horario)
+    // try {
+        editHorario.value = horario
+        editHorario.value.data = data
+        editHorario.value.option = option
+        form.value.idUser = data.employee_id
+        form.value.schedule = data.task_id
+        nuevoHorario.value = {}
+        modhours.value = true
+    // } catch (error) {
+    //     console.log(error)
+    // }
 }
 //#endregion
 
@@ -330,7 +336,7 @@ const save = async () => {
                                         <div class="flex items-center justify-between w-full ">
                                             <p class="text-sm font-semibold ">{{ item.name }}</p>
                                             <button v-tooltip.top="'Eliminar de la Actividad'"
-                                                @click="deleteSchedule(slotProps.option, index, item)">
+                                                @click="toggle(slotProps.option, item, 'delete')">
                                                 <i
                                                     class="fa-solid fa-circle-xmark text-danger hover:animate-pulse hover:scale-125" />
                                             </button>
@@ -437,7 +443,6 @@ const save = async () => {
                                 root: 'w-full',
                                 headerTitle: '!w-full !flex !justify-center'
                             }">
-
                     </TabPanel>
 
                 </TabView>
@@ -448,11 +453,12 @@ const save = async () => {
 
     <!--#region MODALES -->
     <CustomModal v-model:visible="modhours" :footer="false" icon="fa-regular fa-clock" width="60vw"
-        :titulo="'Modificar horario de ' + editHorario?.data.name ?? null">
+    :titulo="editHorario?.option != 'delete' ? 'Modificar horario de ' + editHorario?.data.name : 'Eliminando a ' + editHorario?.data.name + 'de la actividad ' + editHorario?.task">
         <template #body>
             <form @submit.prevent="save" class="pb-2">
-                <div class="flex flex-col gap-1">
+                <div v-if="editHorario?.option != 'delete'" class="flex flex-col gap-1">
                     <div class="flex items-center justify-between col-span-3 ">
+                        <!-- {{ editHorario }} -->
                         <p>Horario actual:</p>
                         <p class="px-1 py-1 text-green-900 bg-green-200 rounded-md">
                             {{ format24h(editHorario.hora_inicio) }}
@@ -496,7 +502,7 @@ const save = async () => {
                         </TabPanel>
                     </TabView>
                 </div>
-                <p>Aplicar por:</p>
+                <p class="font-bold text-xl">Aplicar por:</p>
                 <span class="flex items-center p-2 gap-4">
                     <div v-for="category in [{ name: 'Solo el ' + date, key: 1 }, { name: 'Resto de la actividad', key: 2 }, { name: 'Rango de fechas', key: 3 }, { name: 'Fechas específicos', key: 4 }]"
                         :key="category.key" class="flex items-center">
@@ -511,7 +517,10 @@ const save = async () => {
                                 root: '!w-full',
                                 input: '!h-8'
                             }" />
-                    <Button type="submit" class="col-start-4" icon="fa-solid fa-floppy-disk" label="Guardar" />
+                    <Button type="submit" class="col-start-4"
+                        :severity="editHorario?.option != 'delete' ? 'success' : 'danger'"
+                        :icon="editHorario?.option != 'delete' ? 'fa-solid fa-floppy-disk' : 'fa-solid fa-trash-can'"
+                        :label="editHorario?.option != 'delete' ? 'Guardar' : 'Eliminar'" />
                 </span>
             </form>
         </template>

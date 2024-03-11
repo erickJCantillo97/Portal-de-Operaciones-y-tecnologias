@@ -49,7 +49,6 @@ class ManagerDocumentController extends Controller
                 $file,
                 $file->getClientOriginalName() . '_' . Carbon::now()->format('Y-m-d') . '_' . $validateData['tipologia_id'] . '_' . FileManagerDocument::count() + 1 . '.' . $file->getClientOriginalExtension()
             );
-
             // Obtiene el número de páginas
             $texto_pdf = file_get_contents($file);
             $num_page = preg_match_all("/\\/Page\\W/", $texto_pdf, $dummy);
@@ -61,7 +60,9 @@ class ManagerDocumentController extends Controller
                 'filePath' => str_replace('public', 'storage', $filePath),
                 'file_size' => $file->getSize(),
                 'name_user' => auth()->user()->short_name,
-                'num_folios' => $num_page
+                'num_folios' => $num_page,
+                'type' => $file->getMimeType()
+
             ]);
         }
 
@@ -71,10 +72,12 @@ class ManagerDocumentController extends Controller
 
     public function getFilesProjectTipologia($projectID, $tipologiaID)
     {
-        $files = FileManagerDocument::where('tipologia_id', $tipologiaID)->where('project_id', $projectID)->get();
+        $filesImages = FileManagerDocument::where('tipologia_id', $tipologiaID)->where('project_id', $projectID)->where('type', 'like', 'image%')->get();
+        $files = FileManagerDocument::where('tipologia_id', $tipologiaID)->where('project_id', $projectID)->where('type', 'not like', 'image%')->get();
 
         return response()->json([
             'files' => $files,
+            'filesImages' => $filesImages,
         ]);
     }
 

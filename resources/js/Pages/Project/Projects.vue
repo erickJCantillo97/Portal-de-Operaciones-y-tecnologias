@@ -108,7 +108,7 @@ const uploadForm = useForm({
     tipologia_name: null
 })
 
-const uploadEvent = () => {
+const uploadEvent = (data) => {
     uploadForm.files = files.value
     uploadForm.project_id = project.value.id
     uploadForm.tipologia_id = tipologia.value.id
@@ -207,10 +207,9 @@ const goToProjectOverview = (event, data) => {
 <template>
     <AppLayout>
         <div class="w-full h-[89vh] overflow-y-auto">
-            <CustomDataTable title="Proyectos" :filterButtons="filterButtons"
-                :data="projects" :rows-default="100" :columnas="columnas" :actions="buttons" @addDoc="addDoc"
-                @addAct="addAct" @editClic="editClic" @deleteClic="deleteClic"
-                @goToProjectOverview="goToProjectOverview">
+            <CustomDataTable title="Proyectos" :filterButtons="filterButtons" :data="projects" :rows-default="100"
+                :columnas="columnas" :actions="buttons" @addDoc="addDoc" @addAct="addAct" @editClic="editClic"
+                @deleteClic="deleteClic" @goToProjectOverview="goToProjectOverview">
                 <template #buttonHeader>
                     <Button @click="addItem" severity="success" v-if="hasPermission('projects create')"
                         icon="fa-solid fa-plus" label="Agregar" outlined />
@@ -259,50 +258,61 @@ const goToProjectOverview = (event, data) => {
                         <div v-if="tipologiaFiles.length > 0" class="overflow-y-auto h-[40vh]">
                             <DataView :value="tipologiaFiles" class="w-full overflow-y-auto">
                                 <template #list="slotProps">
-                                    <div class="p-1 flex justify-between items-center w-full">
-                                        <div class="flex">
-                                            <i v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'"
-                                                class=" text-danger fa-regular border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center fa-file-pdf"></i>
-                                            <Image v-else :src="slotProps.data.filePath" preview class="w-9">
-                                                <template #image>
-                                                    <div class="flex items-center h-full">
-                                                        <img :src="slotProps.data.filePath" alt="image" />
-                                                    </div>
-                                                </template>
-                                                <template #preview="slotProps1">
-                                                    <img :src="slotProps.data.filePath"
-                                                        class="!max-w-[80vw] !max-h-[80vh]" alt="preview"
-                                                        :style="slotProps1.style" @click="slotProps1.previewCallback" />
-                                                </template>
-                                            </Image>
-                                            <div class="px-3">
-                                                <p class="text-sm">{{ (slotProps.index + 1) + '. ' +
-                slotProps.data.tipologia_name }}
-                                                </p>
-                                                <p class="text-xs font-semibold">{{ slotProps.data.name }}</p>
-                                                <span class="flex space-x-2">
-                                                    <p class="text-xs">{{ slotProps.data.name_user }} </p>
-                                                    <p class="text-xs">{{ formatDateTime24h(slotProps.data.created_at)
+                                    <span v-for="(item, index) in slotProps.items">
+                                        <div class="p-1 flex justify-between items-center w-full">
+                                            <div class="flex">
+                                                <i v-if="item.filePath.slice(item.filePath.lastIndexOf('.') + 1) == 'pdf'"
+                                                    class=" text-danger fa-regular border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center fa-file-pdf"></i>
+                                                <Image v-else :src="item.filePath" preview class="w-9">
+                                                    <template #image>
+                                                        <div class="flex items-center h-full">
+                                                            <img :src="item.filePath" alt="image" />
+                                                        </div>
+                                                    </template>
+                                                    <template #preview="slotProps1">
+                                                        <img :src="slotProps.data.filePath"
+                                                            class="!max-w-[80vw] !max-h-[80vh]" alt="preview"
+                                                            :style="slotProps1.style"
+                                                            @click="slotProps1.previewCallback" />
+                                                    </template>
+                                                </Image>
+                                                <div class="px-3">
+                                                    <p class="text-sm">
+                                                        {{ (index + 1) + '. ' + item.tipologia_name
                                                         }}
                                                     </p>
-                                                    <p class="text-xs">{{ formatSize(slotProps.data.file_size) }} </p>
-                                                    <p class="text-xs"
-                                                        v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'">
-                                                        {{ slotProps.data.num_folios }} folio(s) </p>
-                                                </span>
+                                                    <p class="text-xs font-semibold">
+                                                        {{ item.name }}
+                                                    </p>
+                                                    <span class="flex space-x-2">
+                                                        <p class="text-xs">
+                                                            {{ item.name_user }}
+                                                        </p>
+                                                        <p class="text-xs">
+                                                            {{ formatDateTime24h(item.created_at) }}
+                                                        </p>
+                                                        <p class="text-xs">
+                                                            {{ formatSize(item.file_size) }}
+                                                        </p>
+                                                        <p class="text-xs"
+                                                            v-if="item.filePath.slice(item.filePath.lastIndexOf('.') + 1) == 'pdf'">
+                                                            {{ item.num_folios }} folio(s)
+                                                        </p>
+                                                    </span>
+                                                </div>
                                             </div>
+                                            <span class="space-x-1">
+                                                <Button class="!h-6 !w-6" icon="fa-regular fa-eye" outlined rounded
+                                                    @click="showPdf($event, item)"
+                                                    v-if="item.filePath.slice(item.filePath.lastIndexOf('.') + 1) == 'pdf'"
+                                                    severity="success">
+                                                </Button>
+                                                <Button class="!h-6 !w-6" icon="fa-regular fa-trash-can" outlined
+                                                    disabled @click="" rounded severity="danger">
+                                                </Button>
+                                            </span>
                                         </div>
-                                        <span class="space-x-1">
-                                            <Button class="!h-6 !w-6" icon="fa-regular fa-eye" outlined rounded
-                                                @click="showPdf($event, slotProps.data)"
-                                                v-if="slotProps.data.filePath.slice(slotProps.data.filePath.lastIndexOf('.') + 1) == 'pdf'"
-                                                severity="success">
-                                            </Button>
-                                            <Button class="!h-6 !w-6" icon="fa-regular fa-trash-can" outlined disabled
-                                                @click="" rounded severity="danger">
-                                            </Button>
-                                        </span>
-                                    </div>
+                                    </span>
                                 </template>
                             </DataView>
                         </div>
@@ -322,17 +332,15 @@ const goToProjectOverview = (event, data) => {
                     <div class="">
                         <FileUpload ref="fileUp" :multiple="true" accept="image/*,application/pdf" :key="fileup"
                             invalidFileTypeMessage="Solo se aceptan imagenes o pdf" :maxFileSize="10000000"
-                            @select="onSelectedFiles" :pt="{
-                content: { class: '!p-0.5' },
-                message: { class: 'py-0.5' }
-            }">
+                            @select="onSelectedFiles"
+                            :pt="{ content: { class: '!p-0.5' }, message: { class: 'py-0.5' } }">
                             <template #header="{ chooseCallback, clearCallback, files }">
                                 <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">
                                     <div class="flex gap-2">
                                         <Button @click="chooseCallback()" outlined class="!h-8" severity="primary"
                                             icon="fa-solid fa-folder-open" label="Seleccionar">
                                         </Button>
-                                        <Button @click="uploadEvent()" outlined severity="success" class="!h-8"
+                                        <Button @click="uploadEvent(files)" outlined severity="success" class="!h-8"
                                             label="Subir" icon="fa-solid fa-cloud-arrow-up"
                                             :loading="uploadForm.processing" :disabled="!files || files.length === 0">
                                         </Button>
@@ -347,20 +355,22 @@ const goToProjectOverview = (event, data) => {
                                 <DataView v-if="files.length > 0" :value="files"
                                     class="w-full max-h-[20vh] overflow-y-auto">
                                     <template #list="slotProps">
-                                        <div class="p-1 flex justify-between items-center w-full">
-                                            <div class="flex">
-                                                <i :class="slotProps.data.type == 'application/pdf' ? 'fa-regular fa-file-pdf' : 'fa-regular fa-image'"
-                                                    class=" text-danger border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center"></i>
-                                                <div class="px-3">
-                                                    <p class="text-sm">{{ slotProps.data.name }} </p>
-                                                    <p class="text-xs">{{ formatSize(slotProps.data.size) }} </p>
+                                        <span v-for="(item, index) in slotProps.items">
+                                            <div class="p-1 flex justify-between items-center w-full">
+                                                <div class="flex">
+                                                    <i :class="item.type == 'application/pdf' ? 'fa-regular fa-file-pdf' : 'fa-regular fa-image'"
+                                                        class=" text-danger border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center"></i>
+                                                    <div class="px-3">
+                                                        <p class="text-sm">{{ item.name }} </p>
+                                                        <p class="text-xs">{{ formatSize(item.size) }} </p>
+                                                    </div>
                                                 </div>
+                                                <Button icon="fa-regular fa-trash-can" text
+                                                    @click="onRemoveTemplatingFile(item, removeFileCallback, index)"
+                                                    severity="danger">
+                                                </Button>
                                             </div>
-                                            <Button class="!h-6 !w-6" icon="fa-regular fa-trash-can" outlined
-                                                @click="onRemoveTemplatingFile(slotProps.data, removeFileCallback, slotProps.index)"
-                                                rounded severity="danger">
-                                            </Button>
-                                        </div>
+                                        </span>
                                     </template>
                                 </DataView>
                             </template>
