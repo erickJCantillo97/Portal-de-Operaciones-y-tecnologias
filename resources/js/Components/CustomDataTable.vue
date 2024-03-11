@@ -144,6 +144,19 @@ const formatCurrency = (valor, moneda) => {
             { style: 'currency', currency: moneda == null ? 'COP' : moneda, maximumFractionDigits: 0 })
     }
 }
+const fileSize = (bytes) => {
+    const k = 1024;
+    const dm = 1;
+    const sizeType = ['B', 'KB', 'MB', 'GB']
+    if (bytes === 0) {
+        return `0 byte`;
+    }
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
+
+    return `${formattedSize} ${sizeType[i]}`;
+}
 
 //#endregion
 </script>
@@ -307,8 +320,10 @@ const formatCurrency = (valor, moneda) => {
                         {{ formatDate(data[col.field]) }}
                     </p>
                     <p v-else-if="col.type == 'currency'" class="text-right">
-                        {{ formatCurrency(data[col.field], !Array.isArray(data[col.field]) ? 'COP'
-        : data[col.field][1]) }}
+                        {{
+        formatCurrency(data[col.field], !Array.isArray(data[col.field]) ? 'COP'
+            : data[col.field][1])
+    }}
                     </p>
                     <p v-else-if="col.type == 'customtag'"
                         :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
@@ -325,16 +340,18 @@ const formatCurrency = (valor, moneda) => {
                             alt="Image" onerror="this.src='/svg/cotecmar-logo.svg'"
                             class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16 object-cover" draggable="false" />
                         <div>
-                            <p class="font-bold text-sm" v-if="col.objectRows.primary">{{
+                            <p class="font-bold text-sm" v-if="col.objectRows.primary">
+                                {{
         col.objectRows.primary.subfield ?
             data[col.objectRows.primary.field][col.objectRows.primary.subfield] :
-            data[col.objectRows.primary.field]
-    }} </p>
-                            <p class="text-xs italic" v-if="col.objectRows.secundary">{{
+            data[col.objectRows.primary.field] }}
+                            </p>
+                            <p class="text-xs italic" v-if="col.objectRows.secundary">
+                                {{
         col.objectRows.secundary.subfield ?
             data[col.objectRows.secundary.field][col.objectRows.secundary.subfield] :
-            data[col.objectRows.secundary.field]
-    }} </p>
+            data[col.objectRows.secundary.field] }}
+                            </p>
                         </div>
                     </span>
                     <span v-else-if="col.type == 'button'" class="w-full">
@@ -349,10 +366,11 @@ const formatCurrency = (valor, moneda) => {
                             {{ item }}
                         </p>
                     </span>
+                    <span v-else-if="col.type == 'fileSize'">
+                        {{ fileSize(data[col.field]) }}
+                    </span>
                     <p v-else class="">
-                        {{
-        data[col.field]
-    }}
+                        {{ data[col.field] }}
                     </p>
                 </template>
             </Column>
