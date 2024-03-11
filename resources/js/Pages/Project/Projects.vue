@@ -109,25 +109,23 @@ const uploadForm = useForm({
 })
 
 const uploadEvent = (data) => {
-    console.log(data)
     uploadForm.files = files.value
-    console.log(files.value)
     uploadForm.project_id = project.value.id
     uploadForm.tipologia_id = tipologia.value.id
     uploadForm.tipologia_name = tipologia.value.name
-    // uploadForm.post(route('gestion.documental.store'), {
-    //     onSuccess: (response) => {
-    //         toast('Se agrego la documentacion', 'success')
-    //         fileup.value = Math.random() * (10)
-    //         selectTipologia()
-    //         var index = tipologias.value.indexOf(tipologia.value)
-    //         tipologias.value[index].count = tipologias.value[index].count + files.value.length
-    //         listTipologia.value++
-    //     },
-    //     onError: (error) => {
-    //         console.log(error)
-    //     }
-    // })
+    uploadForm.post(route('gestion.documental.store'), {
+        onSuccess: (response) => {
+            toast('Se agrego la documentacion', 'success')
+            fileup.value = Math.random() * (10)
+            selectTipologia()
+            var index = tipologias.value.indexOf(tipologia.value)
+            tipologias.value[index].count = tipologias.value[index].count + files.value.length
+            listTipologia.value++
+        },
+        onError: (error) => {
+            console.log(error)
+        }
+    })
 }
 
 function formatDateTime24h(dateTime) {

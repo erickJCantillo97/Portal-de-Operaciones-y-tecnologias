@@ -9,4 +9,4 @@ Route::get('getProjectsGD', [ManagerDocumentController::class, 'getProjectsGD'])
 
 Route::post('gestionDocumentalStore', [ManagerDocumentController::class, 'store'])->name('gestion.documental.store');
 
-Route::get('getFilesProjectTipologia/{porjectID}/{tipologiaID}', [ManagerDocumentController::class, 'getFilesProjectTipologia'])->name('get.files.project.tipologia');
+Route::get('getFilesProjectTipologia/{projectID}/{tipologiaID}', [ManagerDocumentController::class, 'getFilesProjectTipologia'])->name('get.files.project.tipologia');
