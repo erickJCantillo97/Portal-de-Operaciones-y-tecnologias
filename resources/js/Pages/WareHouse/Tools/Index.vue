@@ -32,6 +32,7 @@ const form = ref({
 const columnas = [
     { field: 'name', header: 'Nombre', rowClass: "underline !text-left", sortable: true, filter: true, type: 'button', event: 'goToToolOverview', severity: 'info', text: true },
     { field: 'code', header: 'Codigo', filter: true, sortable: true },
+    { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true, visible: hasPermission('tool delete') },
     { field: 'serial', header: 'Serial', filter: true, sortable: true },
     { field: 'estado_operativo', header: 'Operatividad', filter: true, sortable: true },
     { field: 'estado', header: 'Disponibilidad', filter: true, sortable: true },

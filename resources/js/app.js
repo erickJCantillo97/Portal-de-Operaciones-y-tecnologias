@@ -15,7 +15,7 @@ import ToastService from "primevue/toastservice";
 import Tooltip from "primevue/tooltip";
 import VueApexCharts from "vue3-apexcharts";
 import VueChatScroll from 'vue3-chat-scroll'
-
+import BadgeDirective from 'primevue/badgedirective';
 const appName =
     import.meta.env.VITE_APP_NAME || "Portal";
 
@@ -49,6 +49,7 @@ createInertiaApp({
             .use(VueChatScroll)
             .component("Head", Head)
             .directive("tooltip", Tooltip)
+            .directive("badge", BadgeDirective)
             .mount(el);
     },
     progress: {

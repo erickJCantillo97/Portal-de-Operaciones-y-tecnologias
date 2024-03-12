@@ -194,7 +194,8 @@ const permissionModal = ref(false)
                 <div>
                     <h1 class="text-3xl font-bold text-primary">Roles</h1>
                     <p class="text-sm text-gray-700 italic w-1/2 text-justify">
-                        Un rol proporciona acceso a menús y funciones predefinidos para que, dependiendo del rol asignado,
+                        Un rol proporciona acceso a menús y funciones predefinidos para que, dependiendo del rol
+                        asignado,
                         un
                         administrador pueda tener acceso de lo que cada usuario necesita.
                     </p>
@@ -212,7 +213,8 @@ const permissionModal = ref(false)
                         <div class="flex justify-between w-full">
                             <span class="text-sm text-gray-600">Total {{ rol.permissions.length }} Permisos</span>
                             <span class="flex">
-                                <img :src="user.photo" v-for="(user, index) of  rol.users " alt="" :title="user.short_name"
+                                <img :src="user.photo" v-for="(user, index) of  rol.users " alt=""
+                                    :title="user.short_name"
                                     class="rounded-full size-6 object-cover -mr-2 hover:mr-0 hover:scale-150 border-2 border-white"
                                     :class="index > 4 ? 'hidden' : ''">
                                 <span v-if="rol.users.length > 4"
@@ -257,11 +259,11 @@ const permissionModal = ref(false)
                     <div class="p-1">
                         <Listbox v-model="rolDel" :options="userSelect.rolesObj" filter optionLabel="name"
                             class="w-full h-full md:w-14rem" :pt="{
-                                list: '!h-[25vh]',
-                                header: '!p-1',
-                                filterInput: '!h-8',
-                                item: '!h-8 !p-1 !flex !justify-center'
-                            }">
+                            list: '!h-[25vh]',
+                            header: '!p-1',
+                            filterInput: '!h-8',
+                            item: '!h-8 !p-1 !flex !justify-center'
+                        }">
                         </Listbox>
                     </div>
                 </div>
@@ -282,11 +284,11 @@ const permissionModal = ref(false)
                     <div class="p-1">
                         <Listbox v-model="rolAdd" filter optionLabel="name" class="w-full md:w-14rem"
                             :options="rolesFilter()" :pt="{
-                                list: '!h-[25vh]',
-                                header: '!p-1',
-                                filterInput: '!h-8',
-                                item: '!h-8 !p-1 !flex !justify-center'
-                            }" />
+                            list: '!h-[25vh]',
+                            header: '!p-1',
+                            filterInput: '!h-8',
+                            item: '!h-8 !p-1 !flex !justify-center'
+                        }" />
                     </div>
                 </div>
             </div>
@@ -301,7 +303,8 @@ const permissionModal = ref(false)
             <CustomInput v-model:input="rol.name" class="w-full" label="Nombre del rol"
                 :invalid="rol.errors.name ? true : false" :errorMessage="rol.errors.name" />
             <CustomInput v-model:input="rol.description" :rowsTextarea="2" class="w-full" label="Descripcion"
-                :invalid="rol.errors.description ? true : false" :errorMessage="rol.errors.description" type="textarea" />
+                :invalid="rol.errors.description ? true : false" :errorMessage="rol.errors.description"
+                type="textarea" />
             <!-- {{ rol.permissions }} -->
             <div class="mt-3 border rounded-md">
                 <div class="flex items-center space-x-3 border-b shadow-md py-1">
@@ -312,8 +315,10 @@ const permissionModal = ref(false)
                 <li class="grid p-1 grid-cols-4 gap-1 h-[35vh] overflow-y-auto">
                     <ul v-if="filter().length > 0"
                         class="border h-6 text-center  border-success flex justify-center items-center rounded-md cursor-pointer"
-                        :class="rol.permissions.find((permission) => permission.name === permiso.name) ? 'bg-success fa-regular fa-circle-check text-white' : 'bg-success-light'"
+                        :class="rol.permissions.find((permission) => permission.name === permiso.name) ? 'bg-success  text-white' : 'bg-success-light'"
                         v-for="permiso in filter()" @click="permissionsClic(permiso)">
+                        <i v-if="rol.permissions.find((permission) => permission.name === permiso.name)"
+                            class="fa-regular fa-circle-check"></i>
                         <p class="font-sans ml-1">{{ permiso.name }}</p>
                     </ul>
                     <div v-else class="w-full col-span-4">
@@ -324,8 +329,8 @@ const permissionModal = ref(false)
         </template>
         <template #footer>
             <Button severity="danger" label="Cancelar" :disabled="rol.processing" @click="modalRol = false" />
-            <Button severity="success" :label="rol.id ? 'Actualizar' : 'Guardar'" @click="rol.id ? updateRol() : saveRol()"
-                :loading="rol.processing" />
+            <Button severity="success" :label="rol.id ? 'Actualizar' : 'Guardar'"
+                @click="rol.id ? updateRol() : saveRol()" :loading="rol.processing" />
         </template>
     </CustomModal>
     <!-- endregion -->
@@ -337,7 +342,8 @@ const permissionModal = ref(false)
 
         </template>
         <template #footer>
-            <Button severity="danger" label="Cancelar" :disabled="permision.processing" @click="permissionModal = false" />
+            <Button severity="danger" label="Cancelar" :disabled="permision.processing"
+                @click="permissionModal = false" />
             <Button severity="success" :label="'Guardar'" @click="savePermiso()" :loading="permision.processing" />
         </template>
     </CustomModal>
