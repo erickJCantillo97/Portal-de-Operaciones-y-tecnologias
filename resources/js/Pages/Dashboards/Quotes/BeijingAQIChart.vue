@@ -9,9 +9,9 @@ import {
   DataZoomComponent,
   MarkLineComponent,
 } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
 import { LineChart } from 'echarts/charts'
 import { UniversalTransition } from 'echarts/features'
-import { CanvasRenderer } from 'echarts/renderers'
 
 echarts.use([
   TitleComponent,

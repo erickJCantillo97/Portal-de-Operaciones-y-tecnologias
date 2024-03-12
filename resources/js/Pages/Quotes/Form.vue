@@ -1,21 +1,20 @@
 <script setup>
+import { ref } from 'vue';
+import { router } from '@inertiajs/vue3';
+import { useSweetalert } from '@/composable/sweetAlert'
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Avatar from 'primevue/avatar';
+import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
 import Dropdown from 'primevue/dropdown';
+import Editor from 'primevue/editor';
+import FileUpload from 'primevue/fileupload';
 import InputText from 'primevue/inputtext';
 import MultiSelect from 'primevue/multiselect';
-import Editor from 'primevue/editor';
-import { ref } from 'vue';
-import Button from 'primevue/button';
-import TabView from 'primevue/tabview';
-import TabPanel from 'primevue/tabpanel';
-import Avatar from 'primevue/avatar';
-import { useSweetalert } from '@/composable/sweetAlert'
-import axios from 'axios';
-import Swal from 'sweetalert2';
-import { router } from '@inertiajs/vue3';
 import OverlayPanel from 'primevue/overlaypanel';
-import FileUpload from 'primevue/fileupload';
+import Swal from 'sweetalert2';
+import TabPanel from 'primevue/tabpanel';
+import TabView from 'primevue/tabview';
 
 const props = defineProps({
     estimadores: Object,
@@ -24,12 +23,15 @@ const props = defineProps({
     quote: Object,
     action: Number,
 })
+
 const errors = ref({
     name: false,
     expeted_answer_date: false,
     customer_id: false
 })
+
 const { toast } = useSweetalert();
+
 const newQuote = ref(true)
 const dataQuoteNew = ref({})
 const minDate = new Date();
@@ -46,6 +48,7 @@ const quoteShips = ref([])
 const editActive = () => {
     modEdit.value = true
 }
+
 const editInactive = () => {
     modEdit.value = false
     dataQuoteNew.expeted_answer_date = props.quote.expeted_answer_date
@@ -150,7 +153,6 @@ const quoteNewVersion = () => {
         }
         loadingButton.value = false
     })
-
 }
 
 const quoteUpdate = () => {
@@ -213,7 +215,6 @@ const toggle = (event) => {
     op.value.toggle(event);
 }
 </script>
-
 <template>
     <AppLayout>
         <div class="overflow-y-scroll space-y-2">

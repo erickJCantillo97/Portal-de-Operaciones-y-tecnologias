@@ -2,9 +2,9 @@
 import AppLayout from '@/Layouts/AppLayout.vue'
 import NotificationCard from '@/Components/NotificationCard.vue'
 </script>
-
 <template>
   <AppLayout>
+
     <body>
       <section class="block justify-between md:flex">
         <div class="p-4">

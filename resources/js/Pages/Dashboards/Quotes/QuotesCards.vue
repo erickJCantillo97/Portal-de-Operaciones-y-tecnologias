@@ -68,7 +68,6 @@ const responsiveOptions = ref([
   }
 ])
 </script>
-
 <template>
   <Carousel :value="item" :numVisible="2" :numScroll="2" circular :autoplayInterval="60000" :pt="{
     // indicatorButton: '!rounded-lg',

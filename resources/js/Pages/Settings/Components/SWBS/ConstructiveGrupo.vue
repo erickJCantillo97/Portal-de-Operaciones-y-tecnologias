@@ -1,19 +1,18 @@
 <script setup>
-import { ref, onMounted } from 'vue';
 import '/resources/sass/dataTableCustomized.scss';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
+import { ref, onMounted } from 'vue';
 import Button from '@/Components/Button.vue';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
 
 const loading = ref(false);
 const groups = ref([])
+
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
-
-
 
 onMounted(() => {
     initFilters();
@@ -21,7 +20,7 @@ onMounted(() => {
     axios.get(route('gruposConstructivos.index')).then(
         (res) => {
             groups.value = res.data[0]
-            loading.value =false;
+            loading.value = false;
         }
     );
 })
@@ -36,14 +35,12 @@ const initFilters = () => {
 const clearFilter = () => {
     initFilters();
 };
-
 </script>
-
 <template>
     <div class="px-auto  w-full">
-        <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="groups" scroll-height="300px" v-model:filters="filters"
-            dataKey="id" filterDisplay="menu" :loading="loading"
-            :globalFilterFields="['name','descripcion']"
+        <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="groups" scroll-height="300px"
+            v-model:filters="filters" dataKey="id" filterDisplay="menu" :loading="loading"
+            :globalFilterFields="['name', 'descripcion']"
             currentPageReportTemplate=" {first} al {last} de {totalRecords}"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
             :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
@@ -56,7 +53,6 @@ const clearFilter = () => {
                                 <i class="pi pi-filter-slash" style="color: 'var(--primary-color)'"></i>
                             </Button>
                         </div>
-
                         <div class="relative flex rounded-md shadow-sm">
                             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                 <MagnifyingGlassIcon class="h-4 w-5  text-gray-400" aria-hidden="true" />
@@ -72,7 +68,6 @@ const clearFilter = () => {
             <!--COLUMNAS-->
             <Column field="name" header="Codigo"></Column>
             <Column field="descripcion" header="Descripción"></Column>
-
         </DataTable>
     </div>
 </template>

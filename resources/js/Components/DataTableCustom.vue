@@ -1,23 +1,22 @@
 <script setup>
+const { confirmDelete } = useSweetalert();
+const { toast } = useSweetalert();
+import '../../sass/dataTableCustomized.scss';
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import { FilterMatchMode, FilterOperator } from 'primevue/api';
+import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import { ref, onMounted } from 'vue'
 import { router, useForm } from '@inertiajs/vue3';
-import '../../sass/dataTableCustomized.scss';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Dropdown from 'primevue/dropdown';
-import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import { useSweetalert } from '@/composable/sweetAlert'
-const { confirmDelete } = useSweetalert();
 import axios from 'axios';
+import Button from './Button.vue';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
+import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
+import Dropdown from 'primevue/dropdown';
 import plural from 'pluralize-es'
 import TextInput from './TextInput.vue';
-import Button from './Button.vue';
 
-
-const { toast } = useSweetalert();
 const loading = ref(false);
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
@@ -123,30 +122,6 @@ const getElements = () => {
 
 const clearFilter = () => {
     initFilters();
-};
-
-const formatDate = (value) => {
-    return value.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-};
-
-const exportarExcel = () => {
-    //console.log(dt.value)
-    // Acquire Data (reference to the HTML table)
-    var table_elt = document.getElementById("tabla");
-
-    var workbook = XLSX.utils.table_to_book(table_elt);
-
-    var ws = workbook.Sheets["Sheet1"];
-    XLSX.utils.sheet_add_aoa(ws, [
-        ["Creado " + new Date().toISOString()]
-    ], { origin: -1 });
-
-    // Package and Release Data (`writeFile` tries to write and save an XLSB file)
-    XLSX.writeFile(workbook, props.title + reunion.fechaInicio + ".xlsb");
 };
 
 const getPlural = (str) => {

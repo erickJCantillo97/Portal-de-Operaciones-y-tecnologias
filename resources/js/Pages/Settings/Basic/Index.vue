@@ -1,18 +1,20 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref } from 'vue'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
-import ConstructiveGrupo from './../Components/SWBS/ConstructiveGrupo.vue';
-import Systems from './../Components/SWBS/Systems.vue';
-import SubSystems from './../Components/SWBS/SubSystems.vue';
-import Processes from './../Components/SWBS/Processes.vue';
-import BaseActivities from './../Components/SWBS/BaseActivities.vue';
 import { KeyIcon, SquaresPlusIcon, ClockIcon } from '@heroicons/vue/24/outline'
-import Shifts from './../Components/Shifts.vue';
+import { ref } from 'vue'
+import AppLayout from '@/Layouts/AppLayout.vue';
+import BaseActivities from './../Components/SWBS/BaseActivities.vue';
+import ConstructiveGrupo from './../Components/SWBS/ConstructiveGrupo.vue';
 import CustomUpload from '@/Components/CustomUpload.vue';
 import Gerencias from '../Components/Gerencias.vue';
+import Processes from './../Components/SWBS/Processes.vue';
+import Shifts from './../Components/Shifts.vue';
+import SubSystems from './../Components/SWBS/SubSystems.vue';
+import Systems from './../Components/SWBS/Systems.vue';
 import Warehouses from '../Components/Warehouses.vue';
+
 const menu = ref('VB')
+
 const navigation = [
     { name: 'Variables Basicas', value: 'VB', icon: SquaresPlusIcon, current: true },
     { name: 'SWBS', value: 'SW', icon: KeyIcon, current: false },
@@ -20,9 +22,7 @@ const navigation = [
     // { name: 'Sugerencias', value: 'SU', icon: UserGroupIcon, current: false },
     // { name: 'Clases de Costo', value: 'CC', icon: SquaresPlusIcon, current: false },
 ]
-
 </script>
-
 <template>
     <AppLayout>
         <div class="p-2 lg:grid lg:grid-cols-12 lg:gap-x-2">
@@ -44,7 +44,8 @@ const navigation = [
                     <div class="w-full p-2 mx-auto bg-white rounded-2xl" v-if="menu == 'VB'">
                         <div>
                             <h3 class="text-base font-semibold leading-6 text-gray-900">Variables de Sistema</h3>
-                            <p class="mt-1 text-sm text-justify text-gray-500">Aquí encontrarás las variables en la que se
+                            <p class="mt-1 text-sm text-justify text-gray-500">Aquí encontrarás las variables en la que
+                                se
                                 sustenta la aplicación, <strong class="text-red-800">
                                     ¡proceda con precaución!
                                 </strong> o ponte en contacto con los administradores del sistema.</p>
@@ -87,7 +88,8 @@ const navigation = [
                     <div class="w-full p-2 mx-auto bg-white rounded-2xl" v-if="menu == 'SW'">
                         <div>
                             <h3 class="text-base font-semibold leading-6 text-gray-900">SWBS</h3>
-                            <p class="mt-1 text-sm text-justify text-gray-500">Aquí encontrarás la base de datos que soporta
+                            <p class="mt-1 text-sm text-justify text-gray-500">Aquí encontrarás la base de datos que
+                                soporta
                                 el SWBS en el sistema, añade nuevas actividades, sistemas, subsistemas y grupos
                                 constructivos.</p>
                         </div>
@@ -162,7 +164,5 @@ const navigation = [
                 </div>
             </div>
         </div>
-        <!--  -->
     </AppLayout>
-    
 </template>

@@ -1,10 +1,13 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+const { currencyFormat } = commonUtilities()
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/vue/20/solid'
-import OverlayPanel from 'primevue/overlaypanel';
-import VueApexCharts from 'vue3-apexcharts';
-import Toast from 'primevue/toast';
+import { commonUtilities } from '@/composable/commonUtilities';
+import { onMounted, ref } from 'vue';
 import { useToast } from "primevue/usetoast";
+import OverlayPanel from 'primevue/overlaypanel';
+import Toast from 'primevue/toast';
+import VueApexCharts from 'vue3-apexcharts';
+
 const toast = useToast();
 const rateT = ref()
 const rateY = ref()
@@ -12,6 +15,7 @@ const change = ref()
 const rate = ref(0)
 const hist = ref(0)
 const date = new Date().toLocaleDateString()
+
 var categories = []
 var data = []
 var chartOptions
@@ -102,7 +106,6 @@ const consultaTRM = async () => {
     };
 }
 
-
 onMounted(() => {
     try {
         consultaTRM()
@@ -119,11 +122,6 @@ const peso = ref(null)
 const dolar = ref(null)
 const total = ref(null)
 
-const formatCurrency = (valor, moneda, decimal) => {
-    total.value = valor
-    return total.value.toLocaleString('es-CO',
-        { style: 'currency', currency: moneda, maximumFractionDigits: decimal })
-}
 const copy = () => {
     navigator.clipboard.writeText(total.value)
     toast.add({ summary: 'Copiado  al portapapeles', life: 1500 });
@@ -149,10 +147,10 @@ const copy = () => {
             <span class="grid grid-cols-5 items-center justify-between pb-1 px-1 gap-x-2">
                 <input v-model="peso" v-if="!dolar" type="number" placeholder="Pesos" class="col-span-2 h-8 rounded-md" />
                 <span class="text-sm col-span-2" v-if="dolar">{{
-                    formatCurrency((dolar * rateT), 'COP', 0) }}</span>
+                    currencyFormat((dolar * rateT), 'COP', 0) }}</span>
                 <input v-model="dolar" v-if="!peso" type="number" placeholder="Dolares" class="col-span-2 h-8 rounded-md" />
                 <span class="text-sm col-span-2" v-if="peso">{{
-                    formatCurrency((peso / rateT), 'USD', 2) }}</span>
+                    currencyFormat((peso / rateT), 'USD', 2) }}</span>
                 <span class="w-full flex justify-center">
                     <Button icon="fa-solid fa-copy" :disabled="(!peso & !dolar)" @click="copy"
                         v-tooltip.bottom="'Copiar al portapapeles'" />

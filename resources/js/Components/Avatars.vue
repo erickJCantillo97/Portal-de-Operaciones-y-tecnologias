@@ -1,7 +1,7 @@
 <script setup>
+import { ref } from 'vue'
 import Avatar from 'primevue/avatar';
 import AvatarGroup from 'primevue/avatargroup';
-import { ref } from 'vue'
 
 const props = defineProps({
     assignments: {
@@ -40,9 +40,7 @@ const letraAvatar = (cadena) => {
     }
     return resultado.toUpperCase();
 }
-
 </script>
-
 <template>
     <AvatarGroup v-if="assignments.length > 0">
         <!-- <Avatar v-for="assignment in assignments"

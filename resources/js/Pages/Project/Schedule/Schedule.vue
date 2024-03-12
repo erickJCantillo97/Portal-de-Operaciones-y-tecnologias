@@ -20,6 +20,7 @@ const props = defineProps({
     project: Object,
     groups: Array
 })
+
 LocaleManager.applyLocale('Es');
 const ganttref = ref()
 const loading = ref(false)
@@ -299,12 +300,11 @@ class Importer {
     }
 }
 //#endregion
+
 onMounted(() => {
     onExpandAllClick()
     editMode()
 })
-
-
 
 const full = ref(false)
 const readOnly = ref()
@@ -341,6 +341,7 @@ const taskEdit = ref({
         },
     }
 })
+
 const baselines = ref({
     // Custom tooltip template for baselines
     template(data) {
@@ -381,6 +382,7 @@ const baselines = ref({
 
     renderer: baselineRenderer
 })
+
 const cellEdit = ref({
     addNewAtEnd: false,
 })
@@ -488,7 +490,7 @@ const ganttConfig = ref({
                 }
                 return `
                         <div class="flex justify-between space-x-2 text-xs"><div>${assignmentRecord.units / 100}</div><div class="italic">${assignmentRecord.name}</div><div class="font-bold">$${Math.round(task.durationUnit == 'day' ? (task.duration * (assignmentRecord.units / 100) * assignmentRecord.costo_hora) * 8.5 : (task.duration * (assignmentRecord.units / 100) * assignmentRecord.costo_hora)).toLocaleString('es')} </div></div>
-                         ${overflowCount > 0 ? `${overflowAssignments2}` : ''}
+                        ${overflowCount > 0 ? `${overflowAssignments2}` : ''}
                     `;
             }
         },
@@ -515,8 +517,6 @@ const ganttConfig = ref({
 //#endRegion
 
 //#region toolbar
-
-
 const onAddTaskClick = async () => {
     let gantt = ganttref.value.instance.value
     // console.log(gantt.value.instance.value)
@@ -545,6 +545,7 @@ const onEditTaskClick = () => {
         toast.add({ severity: 'error', group: 'customToast', text: 'Debe seleccionar la tarea a editar', life: 2000 });
     }
 }
+
 const onExpandAllClick = () => {
     let gantt = ganttref.value.instance.value
     gantt.expandAll();
@@ -583,6 +584,7 @@ function onStartDateChange(event) {
 
     gantt.project.setStartDate(event);
 }
+
 const texto = ref()
 function onFilterChange() {
     let gantt = ganttref.value.instance.value
@@ -598,6 +600,7 @@ function onFilterChange() {
         });
     }
 }
+
 const setLB = ref();
 const seeLB = ref();
 const setBaseline = (index) => {
@@ -615,6 +618,7 @@ const toggleBaselineVisible = () => {
         gantt.element.classList[element[1] ? 'remove' : 'add'](`b-hide-baseline-${element[0]}`);
     });
 }
+
 function baselineRenderer({ baselineRecord, taskRecord, renderData }) {
     if (baselineRecord.endDate.getTime() + 24 * 3600 * 1000 < taskRecord.endDate.getTime()) {
         renderData.className['b-baseline-behind'] = 1;
@@ -626,6 +630,7 @@ function baselineRenderer({ baselineRecord, taskRecord, renderData }) {
         renderData.className['b-baseline-on-time'] = 1;
     }
 }
+
 const onExport = () => {
     let gantt = ganttref.value.instance.value
     // give a filename based on task name
@@ -635,6 +640,7 @@ const onExport = () => {
         filename
     });
 }
+
 const onExportPDF = () => {
     let gantt = ganttref.value.instance.value
     gantt.features.pdfExport.showExportDialog();
@@ -652,12 +658,14 @@ const onSettingsShow = (event) => {
     barMarginMax.value = gantt.rowHeight / 2 - 5;
     setConf.value.toggle(event)
 }
+
 //ajuste de altura de filas
 const onSettingsRowHeightChange = () => {
     let gantt = ganttref.value.instance.value
     gantt.rowHeight = rowHeight.value;
     barMarginMax.value = gantt.rowHeight / 2 - 5;
 }
+
 //ajuste de margen
 const onSettingsMarginChange = () => {
     let gantt = ganttref.value.instance.value

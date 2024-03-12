@@ -208,6 +208,7 @@ const editHorario = ref()
 const nuevoHorario = ref({})
 const optionSelectHours = ref('select')
 const modhours = ref(false)
+
 const toggle = (horario, data, option) => {
     console.log(data)
     console.log(horario)
@@ -248,7 +249,7 @@ const save = async () => {
         })
     }
     //aplicar validaciones de campos requeridos (TODOS LOS CAMPOS SON REQUERIDOS)
-    /* 
+    /*
     NOTA:
     Se debe cambiar el campo de hora inicio y hora fin a un formato de 24 horas.
     */
@@ -257,7 +258,6 @@ const save = async () => {
             console.log(res);
         });
 }
-
 </script>
 
 <template>

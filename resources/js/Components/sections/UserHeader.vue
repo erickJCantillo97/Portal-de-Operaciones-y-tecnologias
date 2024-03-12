@@ -1,3 +1,25 @@
+<script setup>
+import {
+    BuildingOfficeIcon,
+    CheckCircleIcon,
+} from '@heroicons/vue/20/solid'
+</script>
+<style scoped>
+.custom-image {
+    width: 60px;
+    height: 60px;
+    object-position: 50% 30%;
+    border-radius: 50% 50%;
+    object-fit: cover;
+    /* Opciones: 'cover', 'contain', 'fill', etc. */
+}
+
+@media screen and (max-width: 640px) {
+    .custom-image2 {
+        display: none;
+    }
+}
+</style>
 <template>
     <div>
         <div class="px-4 sm:px-6 lg:px-8">
@@ -10,7 +32,8 @@
                             <div class="flex items-center">
                                 <img class="custom-image2 sm:hidden md:hidden lg:hidden xl:hidden"
                                     :src="$page.props.auth.user.photo" alt="" />
-                                <h1 class="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:leading-9">Buen
+                                <h1 class="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:leading-9">
+                                    Buen
                                     Dia, {{ $page.props.auth.user.name }}</h1>
                             </div>
                             <dl class="flex flex-col mt-6 sm:ml-3 sm:mt-1 sm:flex-row sm:flex-wrap">
@@ -38,26 +61,3 @@
         </div>
     </div>
 </template>
-
-<script setup>
-import {
-    BuildingOfficeIcon,
-    CheckCircleIcon,
-} from '@heroicons/vue/20/solid'
-</script>
-<style scoped>
-.custom-image {
-    width: 60px;
-    height: 60px;
-    object-position: 50% 30%;
-    border-radius: 50% 50%;
-    object-fit: cover;
-    /* Opciones: 'cover', 'contain', 'fill', etc. */
-}
-
-@media screen and (max-width: 640px) {
-    .custom-image2 {
-        display: none;
-    }
-}
-</style>

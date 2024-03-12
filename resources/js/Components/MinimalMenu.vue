@@ -1,7 +1,7 @@
 <script setup>
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 import { EllipsisVerticalIcon } from '@heroicons/vue/20/solid'
 import { Link } from '@inertiajs/vue3';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 
 const props = defineProps({
     items: Array,

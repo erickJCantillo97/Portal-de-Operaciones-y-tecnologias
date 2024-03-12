@@ -1,9 +1,9 @@
 <script setup>
-import axios from 'axios';
-import Dropdown from 'primevue/dropdown';
 import { ref } from 'vue';
+import Dropdown from 'primevue/dropdown';
 
 const paises = ref()
+
 axios.get('https://restcountries.com/v3.1/all?fields=flags,translations,name').then(
     (res) => {
         paises.value = res.data.map(pais => {

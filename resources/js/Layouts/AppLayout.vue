@@ -35,14 +35,15 @@
                                 <img class="custom-image" :src="$page.props.auth.user.photo" alt="" />
                                 <span class="hidden lg:flex lg:items-center">
                                     <span class="ml-4 text-xs font-semibold text-gray-900" aria-hidden="true">{{
-                                        $page.props.auth.user.short_name }}</span>
+        $page.props.auth.user.short_name }}</span>
                                 </span>
                                 <ChevronDownIcon class="w-5 h-5 ml-2 -mr-1 text-violet-200 hover:text-violet-100"
                                     aria-hidden="true" />
                             </MenuButton>
                         </div>
                         <transition enter-active-class="transition duration-100 ease-out"
-                            enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100"
+                            enter-from-class="transform scale-95 opacity-0"
+                            enter-to-class="transform scale-100 opacity-100"
                             leave-active-class="transition duration-75 ease-in"
                             leave-from-class="transform scale-100 opacity-100"
                             leave-to-class="transform scale-95 opacity-0">
@@ -51,8 +52,8 @@
                                 <div class="px-1 py-1">
                                     <MenuItem v-slot="{ active }">
                                     <button @click="logout" :class="[
-                                        active ? 'bg-primary text-white' : 'text-gray-900',
-                                        'group flex w-full items-center rounded-md px-2 py-2 text-sm',]">
+        active ? 'bg-primary text-white' : 'text-gray-900',
+        'group flex w-full items-center rounded-md px-2 py-2 text-sm',]">
                                         <ArrowLeftCircleIcon :active="active" class="w-5 h-5 mr-2 text-violet-400"
                                             aria-hidden="true" />
                                         Salir
@@ -92,8 +93,9 @@
                                     leave-from="translate-x-0" leave-to="translate-x-full">
                                     <DialogPanel class="relative w-screen max-w-md pointer-events-auto">
                                         <TransitionChild as="template" enter="ease-in-out duration-500"
-                                            enter-from="opacity-0" enter-to="opacity-100" leave="ease-in-out duration-500"
-                                            leave-from="opacity-100" leave-to="opacity-0">
+                                            enter-from="opacity-0" enter-to="opacity-100"
+                                            leave="ease-in-out duration-500" leave-from="opacity-100"
+                                            leave-to="opacity-0">
                                             <div
                                                 class="absolute left-0 right-0 z-50 flex w-12 pt-4 pr-2 -ml-8 sm:-ml-10 sm:pr-4 top-1/2">
                                                 <button type="button"
@@ -123,7 +125,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="h-full p-4 space-y-2 overflow-y-auto shadow-sm custom-scroll">
+                                                <div
+                                                    class="h-full p-4 space-y-2 overflow-y-auto shadow-sm custom-scroll">
                                                     <div v-for="suggestion in suggestions"
                                                         :class="suggestion.type == 'Error' ? 'border-danger' : 'border-primary'"
                                                         class="w-full p-2 border rounded-md shadow-lg">
@@ -143,7 +146,8 @@
                                                                     <path
                                                                         d="M287.9 0c9.2 0 17.6 5.2 21.6 13.5l68.6 141.3 153.2 22.6c9 1.3 16.5 7.6 19.3 16.3s.5 18.1-5.9 24.5L433.6 328.4l26.2 155.6c1.5 9-2.2 18.1-9.6 23.5s-17.3 6-25.3 1.7l-137-73.2L151 509.1c-8.1 4.3-17.9 3.7-25.3-1.7s-11.2-14.5-9.7-23.5l26.2-155.6L31.1 218.2c-6.5-6.4-8.7-15.9-5.9-24.5s10.3-14.9 19.3-16.3l153.2-22.6L266.3 13.5C270.4 5.2 278.7 0 287.9 0zm0 79L235.4 187.2c-3.5 7.1-10.2 12.1-18.1 13.3L99 217.9 184.9 303c5.5 5.5 8.1 13.3 6.8 21L171.4 443.7l105.2-56.2c7.1-3.8 15.6-3.8 22.6 0l105.2 56.2L384.2 324.1c-1.3-7.7 1.2-15.5 6.8-21l85.9-85.1L358.6 200.5c-7.8-1.2-14.6-6.1-18.1-13.3L287.9 79z" />
                                                                 </svg>
-                                                                <svg class="fill-danger" v-if="suggestion.type == 'Error'"
+                                                                <svg class="fill-danger"
+                                                                    v-if="suggestion.type == 'Error'"
                                                                     xmlns="http://www.w3.org/2000/svg" height="2em"
                                                                     viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
                                                                     <path
@@ -151,15 +155,17 @@
                                                                 </svg>
                                                             </div>
                                                             <div class="flex flex-col justify-between col-span-9 pl-2">
-                                                                <p class="text-xs font-bold">{{ suggestion.details }}</p>
+                                                                <p class="text-xs font-bold">{{ suggestion.details }}
+                                                                </p>
                                                                 <div class="flex pt-1 mt-1 border-t border-gray-300 ">
                                                                     <span v-if="suggestion.type == 'Error'"
                                                                         class="flex justify-center px-2 text-xs font-medium rounded-md"
                                                                         :class="suggestion.status == 1 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-success'">{{
-                                                                            suggestion.status == 1 ? 'Pendiente' : 'Resuelto'
-                                                                        }}</span>
+        suggestion.status == 1 ? 'Pendiente' :
+            'Resuelto'
+    }}</span>
                                                                     <p class="w-full text-xs text-end">{{
-                                                                        formatDateTime24h(suggestion.created_at) }}</p>
+            formatDateTime24h(suggestion.created_at) }}</p>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -176,18 +182,22 @@
                                                                 <div
                                                                     class="flex flex-wrap justify-between text-sm align-middle">
                                                                     <div class="flex align-items-center">
-                                                                        <RadioButton v-model="tipoReporte" inputId="tipo1"
-                                                                            name="sugerencia" value="Sugerencia" />
-                                                                        <label for="tipo1" class="ml-2">Sugerencia</label>
+                                                                        <RadioButton v-model="tipoReporte"
+                                                                            inputId="tipo1" name="sugerencia"
+                                                                            value="Sugerencia" />
+                                                                        <label for="tipo1"
+                                                                            class="ml-2">Sugerencia</label>
                                                                     </div>
                                                                     <div class="flex align-items-center">
-                                                                        <RadioButton v-model="tipoReporte" inputId="tipo2"
-                                                                            name="opinion" value="Opinion" />
+                                                                        <RadioButton v-model="tipoReporte"
+                                                                            inputId="tipo2" name="opinion"
+                                                                            value="Opinion" />
                                                                         <label for="tipo2" class="ml-2">Opinión</label>
                                                                     </div>
                                                                     <div class="flex align-items-center">
-                                                                        <RadioButton v-model="tipoReporte" inputId="tipo3"
-                                                                            name="error" value="Error" />
+                                                                        <RadioButton v-model="tipoReporte"
+                                                                            inputId="tipo3" name="error"
+                                                                            value="Error" />
                                                                         <label for="tipo3" class="ml-2">Error</label>
                                                                     </div>
                                                                 </div>
@@ -240,20 +250,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { Menu, MenuButton, MenuItems, MenuItem, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { router, usePage } from '@inertiajs/vue3'
-import {
-    Bars3CenterLeftIcon
-} from '@heroicons/vue/24/outline'
+import { Bars3CenterLeftIcon } from '@heroicons/vue/24/outline'
 import {
     ChevronDownIcon, ArrowLeftCircleIcon,
     QuestionMarkCircleIcon,
     XCircleIcon
 } from '@heroicons/vue/20/solid'
 const { eventListener, handleDataEvents } = useBroadcastNotifications()
+const { formatDateTime24h } = commonUtilities()
 const { toast } = useSweetalert()
 import "@/composable/push.min.js"
+import { commonUtilities } from '@/composable/commonUtilities'
+import { Menu, MenuButton, MenuItems, MenuItem, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import { ref, onMounted } from 'vue'
+import { router, usePage } from '@inertiajs/vue3'
 import { useBroadcastNotifications } from '@/composable/broadcastNotifications'
 import { useSweetalert } from '@/composable/sweetAlert'
 import Button from '@/Components/Button.vue'
@@ -320,11 +330,6 @@ const loadSuggestions = () => {
     axios.get(route('suggestion.create')).then((res) => {
         suggestions.value = res.data[0]
     })
-}
-
-function formatDateTime24h(dateTime) {
-    return new Date(dateTime).toLocaleString('es-CO',
-        { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
 }
 </script>
 <style scoped>

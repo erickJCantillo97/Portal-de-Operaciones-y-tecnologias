@@ -1,13 +1,13 @@
 <script setup>
+import { ChatBubbleLeftEllipsisIcon } from '@heroicons/vue/20/solid'
 import { ref, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
-import { ChatBubbleLeftEllipsisIcon } from '@heroicons/vue/20/solid'
-import CommentForm from '@/Components/CommentForm.vue'
-import ChatSkeleton from '@/Components/ChatSkeleton.vue'
-import NoContentToShow from '@/Components/NoContentToShow.vue'
-import Menu from 'primevue/menu'
 import Button from 'primevue/button'
+import ChatSkeleton from '@/Components/ChatSkeleton.vue'
+import CommentForm from '@/Components/CommentForm.vue'
+import Menu from 'primevue/menu'
 import Moment from 'moment'
+import NoContentToShow from '@/Components/NoContentToShow.vue'
 
 const props = defineProps({
   quoteId: Number
@@ -105,7 +105,7 @@ onMounted(() => {
   <Menu ref="menu" id="overlay_menu" :model="overlayOptions" :popup="true" />
   <div class="flow-root">
     <ChatSkeleton v-if="showChatSkeleton" />
-    <NoContentToShow subject="Comentarios" v-if="comments.length == 0 && !showChatSkeleton" />
+    <NoContentToShow subject="Esta estimación no tiene comentarios" v-if="comments.length == 0 && !showChatSkeleton" />
     <!--COMENTARIOS-->
     <div v-chat-scroll
       class="max-h-[258px] overflow-y-auto scroll-p-0 scroll-m-0 scroll-smooth p-6 mt-4 shadow-md rounded-lg">

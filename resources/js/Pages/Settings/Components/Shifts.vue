@@ -1,15 +1,15 @@
 <script setup>
-import { ref, onMounted } from 'vue';
 import '/resources/sass/dataTableCustomized.scss';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
+import { ref, onMounted } from 'vue';
 import { useSweetalert } from '@/composable/sweetAlert'
-import Calendar from 'primevue/calendar';
-import CustomModal from '@/Components/CustomModal.vue';
-import InputText from 'primevue/inputtext';
-import InputNumber from 'primevue/inputnumber';
 import Button from 'primevue/button';
+import Calendar from 'primevue/calendar';
+import Column from 'primevue/column';
+import CustomModal from '@/Components/CustomModal.vue';
+import DataTable from 'primevue/datatable';
+import InputNumber from 'primevue/inputnumber';
+import InputText from 'primevue/inputtext';
 
 const { confirmDelete } = useSweetalert();
 const { toast } = useSweetalert();
@@ -22,6 +22,7 @@ const shift = ref({
     timeBreak: 0,
     endBreak: '',
 })
+
 const shiftDialog = ref(false)
 
 const loading = ref(false);
@@ -134,8 +135,6 @@ const shiftSave = (status, shift) => {
             )
         }
     }
-
-
 }
 
 const calcularDiferencia = (start, end) => {
@@ -173,8 +172,6 @@ const calcularDiferencia = (start, end) => {
     return diferenciaMinutos / 60
 }
 </script>
-
-
 <template>
     <div class="w-full px-auto">
         <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="shifts" v-model:filters="filters" dataKey="id"
@@ -182,7 +179,6 @@ const calcularDiferencia = (start, end) => {
             currentPageReportTemplate=" {first} al {last} de {totalRecords}"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
             :paginator="true" :rows="5" :rowsPerPageOptions="[5, 10, 25, 50, 100]">
-
             <template #header>
                 <div class="flex justify-between w-full h-8 mb-2 align-middle">
                     <div class="flex space-x-4">
@@ -243,10 +239,10 @@ const calcularDiferencia = (start, end) => {
                 </template>
             </Column>
             <!-- <Column field="descripcion" header="Descripción"></Column> -->
-
         </DataTable>
     </div>
 
+    <!--MODAL-->
     <CustomModal v-model:visible=shiftDialog width="30rem">
         <template #icon>
             <i class="text-white fa-regular fa-clock"></i>

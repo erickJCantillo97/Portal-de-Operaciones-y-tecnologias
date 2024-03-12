@@ -1,9 +1,8 @@
 <script setup>
-import CustomDataTable from '@/Components/CustomDataTable.vue';
-import { router } from "@inertiajs/vue3";
 import { onMounted, ref } from 'vue';
+import { router } from "@inertiajs/vue3";
+import CustomDataTable from '@/Components/CustomDataTable.vue';
 // import DataChart from "../DataChart.vue";
-
 
 const columnas = [
     { field: 'name', header: 'Proyecto' },

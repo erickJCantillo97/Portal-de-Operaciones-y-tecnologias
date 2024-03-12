@@ -1,13 +1,10 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import GraphicMadurity from '@/Pages/Dashboards/Quotes/GraphicMadurity.vue'
-import TableQuotes from '@/Pages/Dashboards/Quotes/TableQuotes.vue';
-import GraphicStatus from '@/Pages/Dashboards/Quotes/GraphicStatus.vue';
 import DataEstimatorCard from '@/Pages/Dashboards/Quotes/DataEstimatorCard.vue';
+import GraphicMadurity from '@/Pages/Dashboards/Quotes/GraphicMadurity.vue'
 import GraphicMadurityTime from './Quotes/GraphicMadurityTime.vue';
 import GraphicQuoteCountry from './Quotes/GraphicQuoteCountry.vue';
-
-const prueba2 = ref()
+import GraphicStatus from '@/Pages/Dashboards/Quotes/GraphicStatus.vue';
+import TableQuotes from '@/Pages/Dashboards/Quotes/TableQuotes.vue';
 </script>
 
 <template>
