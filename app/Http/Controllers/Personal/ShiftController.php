@@ -14,10 +14,26 @@ class ShiftController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index(String $user = ""): JsonResponse
     {
+        if(empty($user))
+                return response()->json([
+                    Shift::whereNull('user')->orderBy('name')->get()->map(function ($shift) {
+                        return [
+                            'id' => $shift['id'],
+                            'name' => $shift['name'],
+                            'startShift' => $shift['startShift'],
+                            'endShift' => $shift['endShift'],
+                            'timeBreak'=>$shift['timeBreak'],
+                            'hours' => $shift['hours'],
+                            'status' => $shift['status'],
+                            'description' => $shift['description']
+                        ];
+                    })
+                ], 200);
+
         return response()->json([
-            Shift::orderBy('name')->get()->map(function ($shift) {
+            Shift::where('user',$user)->orderBy('name')->get()->map(function ($shift) {
                 return [
                     'id' => $shift['id'],
                     'name' => $shift['name'],
@@ -29,7 +45,7 @@ class ShiftController extends Controller
                     'description' => $shift['description']
                 ];
             })
-        ], 200);
+                ], 200);
     }
 
     /**
