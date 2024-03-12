@@ -317,8 +317,10 @@ const permissionModal = ref(false)
                 <li class="grid p-1 grid-cols-4 gap-1 h-[35vh] overflow-y-auto">
                     <ul v-if="filter().length > 0"
                         class="border h-6 text-center  border-success flex justify-center items-center rounded-md cursor-pointer"
-                        :class="rol.permissions.find((permission) => permission.name === permiso.name) ? 'bg-success fa-regular fa-circle-check text-white' : 'bg-success-light'"
+                        :class="rol.permissions.find((permission) => permission.name === permiso.name) ? 'bg-success  text-white' : 'bg-success-light'"
                         v-for="permiso in filter()" @click="permissionsClic(permiso)">
+                        <i v-if="rol.permissions.find((permission) => permission.name === permiso.name)"
+                            class="fa-regular fa-circle-check"></i>
                         <p class="font-sans ml-1">{{ permiso.name }}</p>
                     </ul>
                     <div v-else class="w-full col-span-4">

@@ -259,6 +259,12 @@ const input = defineModel('input', {
             input: '!h-8'
         }" />
                 </span>
+                <span v-else-if="type == 'time'">
+                    <Calendar :id v-model="input" timeOnly hourFormat="24" showIcon dateFormat="dd/mm/yy" :pt="{
+            root: '!w-full',
+            input: '!h-8'
+        }" />
+                </span>
                 <IconField v-else-if="loading || icon" iconPosition="left" class="w-full">
                     <InputIcon :class="loading ? 'fa-solid fa-spinner animate-spin' : icon" />
                     <InputText size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''"

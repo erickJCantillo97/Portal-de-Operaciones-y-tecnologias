@@ -108,8 +108,8 @@ const uploadArchives = (event) => {
             visible.value = false
         },
         onError: (e) => {
-            console.log(usePage().props.errorBags.default.errors)
-            errors.value = usePage().props.errorBags.default
+            console.log(e)
+            errors.value = e
             toast.add({ severity: 'error', group: "customToast", text: 'Error al guardar', life: 2000 })
             loading.value = false
         }

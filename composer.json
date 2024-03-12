@@ -47,6 +47,7 @@
         "files": [
             "app/Helpers/ConsultApiHelper.php",
             "app/Helpers/CotecmarServices.php",
+            "app/Helpers/NotificationUsersHelper.php",
             "app/Helpers/PersonalHelper.php"
         ]
     },

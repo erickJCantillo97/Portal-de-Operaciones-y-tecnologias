@@ -17,7 +17,7 @@ class Tool extends Model implements Auditable
 
     protected $guarded = [];
 
-    protected $appends = ['name'];
+    protected $appends = ['name', 'assignment_name'];
 
     protected static function booted(): void
     {
@@ -46,5 +46,13 @@ class Tool extends Model implements Auditable
     public function getNameAttribute()
     {
         return $this->category->name;
+    }
+
+    public function getAssignmentNameAttribute()
+    {
+        if ($this->estado == 'ASIGNADO') {
+            return AssignmentTool::where('tool_id', $this->id)->orderBy('assigment_date')->first()->employee_name ?? '-';
+        }
+        return '-';
     }
 }

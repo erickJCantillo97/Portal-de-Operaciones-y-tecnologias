@@ -16,9 +16,6 @@ import RadioButton from 'primevue/radiobutton';
 import Calendar from 'primevue/calendar';
 import CustomShiftSelector from '@/Components/CustomShiftSelector.vue';
 import ButtonGroup from 'primevue/buttongroup';
-import { useForm } from '@inertiajs/vue3'
-
-
 
 const { hasRole, hasPermission } = usePermissions()
 const { toast } = useSweetalert();
@@ -210,19 +207,13 @@ const optionSelectHours = ref('select')
 const modhours = ref(false)
 
 const toggle = (horario, data, option) => {
-    console.log(data)
-    console.log(horario)
-    // try {
-        editHorario.value = horario
-        editHorario.value.data = data
-        editHorario.value.option = option
-        form.value.idUser = data.employee_id
-        form.value.schedule = data.task_id
-        nuevoHorario.value = {}
-        modhours.value = true
-    // } catch (error) {
-    //     console.log(error)
-    // }
+    editHorario.value = horario
+    editHorario.value.data = data
+    editHorario.value.option = option
+    form.value.idUser = data.employee_id
+    form.value.schedule = data.task_id
+    nuevoHorario.value = {}
+    modhours.value = true
 }
 //#endregion
 
@@ -453,7 +444,7 @@ const save = async () => {
 
     <!--#region MODALES -->
     <CustomModal v-model:visible="modhours" :footer="false" icon="fa-regular fa-clock" width="60vw"
-    :titulo="editHorario?.option != 'delete' ? 'Modificar horario de ' + editHorario?.data.name : 'Eliminando a ' + editHorario?.data.name + 'de la actividad ' + editHorario?.task">
+        :titulo="editHorario?.option != 'delete' ? 'Modificar horario de ' + editHorario?.data.name : 'Eliminando a ' + editHorario?.data.name + 'de la actividad ' + editHorario?.task">
         <template #body>
             <form @submit.prevent="save" class="pb-2">
                 <div v-if="editHorario?.option != 'delete'" class="flex flex-col gap-1">
@@ -498,6 +489,7 @@ const save = async () => {
                                         suffix=" Hora" id="break" placeholder="Descanso en horas"
                                         :required="tabActive == 2" />
                                 </span>
+                                <!-- {{ form }} -->
                             </div>
                         </TabPanel>
                     </TabView>

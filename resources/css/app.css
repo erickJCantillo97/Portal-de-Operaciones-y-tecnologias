@@ -921,4 +921,16 @@ h4.statusmessage {
     transition: none !important;
 }
 
-/*# sourceMappingURL=app.css.map */
+/* Primevue fondo */
+.p-datatable {
+    position: relative;
+    background-image: url('images/cotecmar-logo-opacity-20.png') !important;
+    background-repeat: no-repeat !important;
+    background-position: 50% 50% !important;
+}
+.p-dialog-content{
+    position: relative;
+    background-image: url('images/cotecmar-logo-opacity-20.png') !important;
+    background-repeat: no-repeat !important;
+    background-position: 50% 50% !important;
+}
