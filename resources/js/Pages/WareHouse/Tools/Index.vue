@@ -35,6 +35,7 @@ const columnas = [
     { field: 'serial', header: 'Serial', filter: true, sortable: true },
     { field: 'estado_operativo', header: 'Operatividad', filter: true, sortable: true },
     { field: 'estado', header: 'Disponibilidad', filter: true, sortable: true },
+    { field: 'assignment_name', header: 'Persona Asignada', filter: true, sortable: true },
 ]
 
 const filterButtons = [
@@ -191,7 +192,8 @@ const save = () => {
                 <CustomInput label="estado_operativo" id="estado_operativo" v-model:input="form.estado_operativo"
                     type="dropdown" placeholder="Selecciona un estado_operativo"
                     :options="['OPERATIVA', 'CON LIMITACIONES', 'FUERA DE SERVICIO', 'BAJA']"
-                    :invalid="form.errors.estado_operativo ? true : false" :errorMessage="form.errors.estado_operativo" />
+                    :invalid="form.errors.estado_operativo ? true : false"
+                    :errorMessage="form.errors.estado_operativo" />
 
                 <CustomInput label="Imagen" type="file" id="imagen" v-model:input="form.imagen"
                     placeholder="Nombre para mostrar" :invalid="form.errors.imagen ? true : false"
@@ -209,13 +211,13 @@ const save = () => {
         </template>
     </CustomModal>
     <Toast position="bottom-center" :pt="{
-        root: '!h-10 !w-64',
-        container: {
-            class: form.error ? '!bg-danger !h-10 !rounded-lg' : '!bg-primary !h-10 !rounded-lg'
-        },
-        content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
-        buttonContainer: '!hidden',
-        icon: '!hidden',
-        detail: '!hidden'
-    }" />
+                root: '!h-10 !w-64',
+                container: {
+                    class: form.error ? '!bg-danger !h-10 !rounded-lg' : '!bg-primary !h-10 !rounded-lg'
+                },
+                content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
+                buttonContainer: '!hidden',
+                icon: '!hidden',
+                detail: '!hidden'
+            }" />
 </template>

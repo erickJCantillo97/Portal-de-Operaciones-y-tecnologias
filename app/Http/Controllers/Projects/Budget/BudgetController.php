@@ -121,6 +121,8 @@ class BudgetController extends Controller
             ]);
 
             Excel::import(new ExecutedImport($project), $request->docs);
+            return back()->withErrors(session('grafos_errors'));
+            // dd(session('grafos_errors'));
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
             foreach ($failures as $failure) {

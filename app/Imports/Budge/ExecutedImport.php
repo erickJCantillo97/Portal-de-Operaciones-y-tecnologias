@@ -9,6 +9,7 @@ use App\Models\TypeAccount;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -20,11 +21,13 @@ class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow
      */
     public function collection(Collection $collection)
     {
+
         Validator::make($collection->toArray(), [
             '*.objeto' => 'required',
             '*.clase_de_coste' => 'required',
             '*.valor' => 'required|numeric',
         ])->validate();
+        $grafos = [];
         foreach ($collection as $key => $row) {
 
             $pep = Pep::where('grafo_id', 'LIKE', $row['objeto'])->first();
@@ -49,9 +52,13 @@ class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow
                 }
                 $pep->save();
             } else {
+                array_push($grafos, 'No hemos encontrado el grafo: ' . $row['objeto'] . ' En la Estructura');
+                break;
                 // dd('No hemos encontrado el grafo: ' . $row['objeto'] . ' En la Estructura');
             }
         }
+        Session::put('grafos_errors', $grafos);
+        // session('grafos_errors', $grafos);
     }
 
     public function chunkSize(): int
