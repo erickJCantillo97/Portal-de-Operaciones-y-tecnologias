@@ -23,7 +23,7 @@ const callsToAction = [
 
 <template>
   <Popover class="relative">
-    <PopoverButton 
+    <PopoverButton
       class="focus:outline-none inline-flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900">
       <div class="relative mt-2 hover:bg-gray-100 p-1 rounded-full">
         <!-- <i p-badge="2" class="pi pi-bell p-overlay-badge" style="font-size: 1rem" /> -->
@@ -40,7 +40,7 @@ const callsToAction = [
     <transition enter-active-class="transition ease-out duration-200" enter-from-class="opacity-0 translate-y-0"
       enter-to-class="opacity-100 translate-y-0" leave-active-class="transition ease-in duration-150"
       leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 translate-y-0">
-      <PopoverPanel class="absolute -right-24 z-10  flex w-[30vw] max-w-max  px-4">
+      <PopoverPanel class="absolute lg:-right-28 z-10  flex -right-28 md:w-[30vw] max-w-max  px-4">
         <section
           class="w-screen flex-auto overflow-hidden rounded-xl bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
 
@@ -51,20 +51,23 @@ const callsToAction = [
             </div>
           </div>
           <div class="divide-x divide-gray-200 border-b border-gray-200"></div>
-          <div class="flex items-center justify-center">
+          <div class="px-2 space-y-2">
             <!--Lista de Notificaciones-->
-            <div v-for="item in notifications" :key="item.name"
-              class="p-1 flex justify-between items-center rounded-lg">
-              <i class="fa-regular fa-circle-xmark text-2xl text-gray-600 w-4"></i>
-              <div class="col-span-2 mx-4 w-full">
-                <a :href="item.href" class="font-semibold text-gray-900">
-                  {{ item.title }}
-                </a>
-                <p class="text-gray-600 text-sm">{{ item.message }}</p>
+            <div v-for="item in notifications" :key="item.name">
+              <div class="p-1 flex justify-between items-center rounded-lg border-b space-x-6">
+                <i class="fa-regular fa-circle-xmark text-2xl  w-4"
+                  :class="item.type == 'error' ? 'text-danger' : 'text-gray-600'"></i>
+                <div class="col-span-2 mx-4 w-full">
+                  <a :href="item.href" class="font-semibold text-gray-900">
+                    {{ item.title }}
+                  </a>
+                  <p class="text-gray-600 text-sm">{{ item.message }}</p>
+                </div>
+                <div class="cursor-pointer col-span-1 text-end">
+                  <i class="text-danger fa-solid fa-trash text-sm " aria-hidden="true" />
+                </div>
               </div>
-              <div class="cursor-pointer col-span-1 text-end">
-                <i class="text-gray-400 hover:text-gray-500 fa-solid fa-xmark text-end " aria-hidden="true" />
-              </div>
+
             </div>
           </div>
 

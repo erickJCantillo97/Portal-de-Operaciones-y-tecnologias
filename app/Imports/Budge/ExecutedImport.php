@@ -63,7 +63,7 @@ class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow, 
                     }
                     $pep->save();
                 } else {
-                    addNotification('Error al Subir el Costo de ' . $this->project->name, 'error', 'No hemos encontrado el grafo: ' . $row['objeto'] . ' En la Estructura');
+                    addNotification('Error al Subir el Costo de ' . $this->project->name, 'error', 'No hemos encontrado el grafo: ' . $row['objeto']);
                     array_push($grafos, 'No hemos encontrado el grafo: ' . $row['objeto'] . ' En la Estructura');
                     break;
                     // dd('No hemos encontrado el grafo: ' . $row['objeto'] . ' En la Estructura');
