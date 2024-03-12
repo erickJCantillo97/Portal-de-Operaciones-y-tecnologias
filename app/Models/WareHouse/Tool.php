@@ -51,7 +51,7 @@ class Tool extends Model implements Auditable
     public function getAssignmentNameAttribute()
     {
         if ($this->estado == 'ASIGNADO') {
-            return AssignmentTool::where('tool_id', $this->id)->orderBy('assigment_date')->first()->employee_name;
+            return AssignmentTool::where('tool_id', $this->id)->orderBy('assigment_date')->first()->employee_name ?? '-';
         }
         return '-';
     }
