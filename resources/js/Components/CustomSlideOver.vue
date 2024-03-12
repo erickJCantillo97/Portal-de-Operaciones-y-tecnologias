@@ -1,24 +1,25 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { Link } from '@inertiajs/vue3'
-import { XMarkIcon } from '@heroicons/vue/24/outline'
+const { currencyFormat } = commonUtilities()
+const { hasRole, hasPermission } = usePermissions()
+const { toast } = useSweetalert()
+import { commonUtilities } from '@/composable/commonUtilities';
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { useSweetalert } from '@/composable/sweetAlert'
-import Moment from 'moment'
-import Swal from 'sweetalert2'
-import Accordion from 'primevue/accordion'
-import AccordionTab from 'primevue/accordiontab'
-import CustomModal from '@/Components/CustomModal.vue'
-import Feed from '@/Components/Feed.vue'
-import FeedWithComments from '@/Components/FeedWithComments.vue'
-import Dropdown from 'primevue/dropdown'
-import Calendar from 'primevue/calendar'
-import Button from 'primevue/button'
+import { Link } from '@inertiajs/vue3'
+import { ref, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { usePermissions } from '@/composable/permission';
-const { hasRole, hasPermission } = usePermissions()
-
-const { toast } = useSweetalert()
+import { useSweetalert } from '@/composable/sweetAlert'
+import { XMarkIcon } from '@heroicons/vue/24/outline'
+import Accordion from 'primevue/accordion'
+import AccordionTab from 'primevue/accordiontab'
+import Button from 'primevue/button'
+import Calendar from 'primevue/calendar'
+import CustomModal from '@/Components/CustomModal.vue'
+import Dropdown from 'primevue/dropdown'
+import Feed from '@/Components/Feed.vue'
+import FeedWithComments from '@/Components/FeedWithComments.vue'
+import Moment from 'moment'
+import Swal from 'sweetalert2'
 
 const emit = defineEmits(['closeSlideOver'])
 
@@ -143,16 +144,7 @@ const deleteQuoteVersion = () => {
     }
 }
 //#endregion
-
-// Formatear el número en moneda (USD)
-const formatCurrency = (value) => {
-    return !value ? 0 : parseFloat(value).toLocaleString('es-CO', {
-        style: 'currency',
-        currency: 'COP',
-    })
-}
 </script>
-
 <template>
     <TransitionRoot as="template" :show="show">
         <Dialog as="div" class="relative z-10" @close="$emit('closeSlideOver')">
@@ -235,7 +227,7 @@ const formatCurrency = (value) => {
                                                 <div v-if="showDateResponse"
                                                     class="flex justify-between py-3 text-sm font-medium">
                                                     <dt class="text-gray-500">Precio antes de Iva:</dt>
-                                                    <dd class="text-gray-900">{{ formatCurrency(quote.total_cost) }}</dd>
+                                                    <dd class="text-gray-900">{{ currencyFormat(quote.total_cost) }}</dd>
                                                 </div>
                                                 <div class="flex justify-between py-3 text-sm font-medium">
                                                     <dt class="text-gray-500">Estado:</dt>
@@ -261,7 +253,7 @@ const formatCurrency = (value) => {
                                                 <div class="block gap-2 w-full">
                                                     <p class="white-space-nowrap font-semibold">{{ product.name }}</p>
                                                     <p class=" white-space-nowrap text-xs">{{
-                                                        formatCurrency(product.price_before_iva_original)
+                                                        currencyFormat(product.price_before_iva_original)
                                                     }}</p>
 
                                                 </div>
@@ -303,7 +295,7 @@ const formatCurrency = (value) => {
                                                         <div class="flex justify-between py-3 text-sm font-medium">
                                                             <dt class="text-gray-500">Precio Original:</dt>
                                                             <dd class="text-gray-900">{{
-                                                                formatCurrency(product.price_before_iva_original) }}</dd>
+                                                                currencyFormat(product.price_before_iva_original) }}</dd>
                                                         </div>
                                                         <div class="flex justify-between py-3 text-sm font-medium">
                                                             <dt class="text-gray-500">Tasa de Venta:</dt>

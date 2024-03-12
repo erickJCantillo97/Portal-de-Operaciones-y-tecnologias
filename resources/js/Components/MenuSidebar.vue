@@ -62,12 +62,6 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { Link } from '@inertiajs/vue3'
-import ApplicationLogo from '@/Components/ApplicationLogo.vue'
-import { usePermissions } from '@/composable/permission';
-const { hasRole, hasPermission } = usePermissions()
-import VueCollapsible from 'vue-height-collapsible/vue3';
 import {
     CalendarIcon,
     CreditCardIcon,
@@ -78,7 +72,13 @@ import {
     UsersIcon,
     WrenchScrewdriverIcon
 } from '@heroicons/vue/24/outline'
+const { hasRole, hasPermission } = usePermissions()
+import { Link } from '@inertiajs/vue3'
+import { ref } from 'vue'
 import { usePage } from "@inertiajs/vue3"
+import { usePermissions } from '@/composable/permission';
+import ApplicationLogo from '@/Components/ApplicationLogo.vue'
+import VueCollapsible from 'vue-height-collapsible/vue3';
 
 const debug = import.meta.env.VITE_APP_DEBUG
 const activeDropdown = ref();

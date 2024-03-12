@@ -1,22 +1,22 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue'
-import { ref } from 'vue'
-import { router, useForm } from '@inertiajs/vue3'
 import '../../../sass/dataTableCustomized.scss'
 import { FilterMatchMode, FilterOperator } from 'primevue/api'
+import { ref } from 'vue'
+import { router, useForm } from '@inertiajs/vue3'
 import { usePermissions } from '@/composable/permission';
 import { useSweetalert } from '@/composable/sweetAlert'
-import Textarea from 'primevue/textarea'
-import InputText from 'primevue/inputtext'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
-import UserTable from '@/Components/UserTable.vue'
-import Listbox from 'primevue/listbox'
+import AppLayout from '@/Layouts/AppLayout.vue'
+import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomModal from '@/Components/CustomModal.vue'
+import Dropdown from 'primevue/dropdown'
+import InputText from 'primevue/inputtext'
+import Listbox from 'primevue/listbox'
 import Loading from '@/Components/Loading.vue'
 import NoContentToShow from '@/Components/NoContentToShow.vue'
-import CustomDataTable from '@/Components/CustomDataTable.vue'
-import Dropdown from 'primevue/dropdown'
+import Textarea from 'primevue/textarea'
+import UserTable from '@/Components/UserTable.vue'
 
 const { confirmDelete } = useSweetalert()
 const { hasRole, hasPermission } = usePermissions()
@@ -228,7 +228,6 @@ const buttons = [
     { event: 'delete', severity: 'danger', class: '', icon: 'fa-regular fa-trash-can', text: true, outlined: false, rounded: false, show: hasPermission('programming delete') },
 ]
 </script>
-
 <template>
     <AppLayout>
         <div class="w-full overflow-y-auto custom-scroll">
@@ -240,12 +239,12 @@ const buttons = [
                         <span v-if="filterGroup" class="mr-10">Filtrado por grupo "{{ filterGroup.name }}"</span>
                         <Dropdown v-model="filterGroup" @change="getPersonalFilter" :options="groups" showClear
                             optionLabel="name" placeholder="Mis grupos" :pt="{
-                                root: '!h-8',
-                                input: '!py-0 !flex !items-center',
-                                item: '!p-1 w-full'
-                            }" />
-                        <Button severity=" success" type="button" outlined label="Agregar Personal" icon="pi pi-user-plus"
-                            @click="showNew()" v-if="hasPermission('programming create')" />
+                    root: '!h-8',
+                    input: '!py-0 !flex !items-center',
+                    item: '!p-1 w-full'
+                }" />
+                        <Button severity=" success" type="button" outlined label="Agregar Personal"
+                            icon="pi pi-user-plus" @click="showNew()" v-if="hasPermission('programming create')" />
                         <Button icon="pi pi-users" severity="primary" outlined label="Crear Grupo"
                             @click="openGroupDialog()" v-if="hasPermission('programming create')" />
                     </template>
@@ -268,8 +267,8 @@ const buttons = [
                         <div class="p-fluid border-0 p-2 ">
                             <label for="">Seleccionar Personal</label>
                             <Listbox multiple v-model="form.users" listStyle="height:230px"
-                                :filterFields="['Nombres_Apellidos', 'Cargo', 'Identificacion', 'Oficina']" :filter="true"
-                                :options="personal" filter optionLabel="name" class="w-full md:w-14rem"
+                                :filterFields="['Nombres_Apellidos', 'Cargo', 'Identificacion', 'Oficina']"
+                                :filter="true" :options="personal" filter optionLabel="name" class="w-full md:w-14rem"
                                 :loading="personal.length == 0">
                                 <template #option="slotProps">
                                     <UserTable :user="slotProps.option"></UserTable>
@@ -289,7 +288,8 @@ const buttons = [
                                 <UserTable :user="persona" :photo="false">
                                 </UserTable>
                                 <div>
-                                    <Button severity="danger" @click="quitar(persona)" icon="fa-regular fa-trash-can" text>
+                                    <Button severity="danger" @click="quitar(persona)" icon="fa-regular fa-trash-can"
+                                        text>
                                     </Button>
                                 </div>
                             </div>
@@ -326,19 +326,21 @@ const buttons = [
                 <div class="flex py-2 space-x-4">
                     <div class="grid max-w-full w-full space-x-2 grid-cols-2">
                         <!--COLUMNA CREACIÓN DEL GRUPO-->
-                        <div v-if="showCreateGroupSection" class=" border border-gray-300 p-2 max-w-full w-full rounded-lg">
+                        <div v-if="showCreateGroupSection"
+                            class=" border border-gray-300 p-2 max-w-full w-full rounded-lg">
                             <div class="mb-2">
                                 <label>Nombre del Grupo</label>
-                                <InputText type="text" v-model="teamworkName" placeholder="Escriba nombre del grupo" :pt="{
-                                    root: '!w-full'
-                                }" />
+                                <InputText type="text" v-model="teamworkName" placeholder="Escriba nombre del grupo"
+                                    :pt="{
+                    root: '!w-full'
+                }" />
                             </div>
                             <div>
                                 <label>Descripción</label>
                                 <Textarea v-model="descriptionValue" rows="15" col="60"
                                     placeholder="Agregue una descripción al grupo" autoResize :pt="{
-                                        root: '!w-full !text-sm'
-                                    }" />
+                    root: '!w-full !text-sm'
+                }" />
                             </div>
                             <div class="flex justify-end space-x-2 mt-2">
                                 <Button severity="success" label="Guardar" size="small" @click="createGroup()" />
@@ -354,8 +356,8 @@ const buttons = [
                                     @click="showCreateGroupSection = true" size="small" />
                                 <Button v-if="groupSelected != 0 && !showCreateGroupSection" label="Editar"
                                     icon="pi pi-pencil" severity="warning" size="small" @click="editGroup()" :pt="{
-                                        label: '!text-slate-900'
-                                    }" />
+                    label: '!text-slate-900'
+                }" />
                                 <Button v-if="groupSelected != 0 && !showCreateGroupSection" label="Eliminar"
                                     icon="pi pi-trash" severity="danger" size="small" @click="deleteGroup()" />
                             </div>
@@ -384,17 +386,18 @@ const buttons = [
                             <div class="bg-blue-900 rounded-t-lg">
                                 <h3 class="text-center font-bold text-lg text-white">
                                     Personal del Grupo:
-                                    "{{ props.groups[0].name != null ? props.groups[0].name : 'No hay Grupos Creados' }}"
+                                    "{{ props.groups[0].name != null ? props.groups[0].name : 'No hay Grupos Creados'
+                                    }}"
                                 </h3>
                             </div>
                             <Accordion :activeIndex="0">
                                 <!--Miembros del grupo-->
                                 <AccordionTab header="Miembros del Grupo" :pt="{
-                                    root: '!border-0 !ring-0',
-                                    headerAction: '!bg-slate-200 !px-4 !py-1 mb-1',
-                                    headerTitle: '!text-sm',
-                                    // content: '!h-52'
-                                }">
+                    root: '!border-0 !ring-0',
+                    headerAction: '!bg-slate-200 !px-4 !py-1 mb-1',
+                    headerTitle: '!text-sm',
+                    // content: '!h-52'
+                }">
                                     <!-- <div class="block space-y-4 h-[475px] custom-scroll overflow-y-auto shadow-lg rounded-lg p-2"> -->
                                     <div v-for="member of groupPersonal" class="flex justify-between">
                                         <UserTable :user="member" :photo="true" />
@@ -412,11 +415,11 @@ const buttons = [
 
                                 <!--Agregar personal al grupo-->
                                 <AccordionTab header="Agregar personal al grupo" :pt="{
-                                    root: '!border-0 !ring-0',
-                                    headerAction: '!bg-slate-200 !px-4 !py-1 mb-1',
-                                    headerTitle: '!text- sm',
-                                    // content: '!h-20'
-                                }">
+                    root: '!border-0 !ring-0',
+                    headerAction: '!bg-slate-200 !px-4 !py-1 mb-1',
+                    headerTitle: '!text- sm',
+                    // content: '!h-20'
+                }">
                                     <div v-for="member of props.miPersonal" class="flex justify-between space-y-4">
                                         <UserTable :user="member" :photo="true" />
                                         <div>

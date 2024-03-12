@@ -3,18 +3,14 @@ import { ref, onMounted } from 'vue'
 import AdvancedBarChart from '@/Pages/Dashboards/Projects/AdvancedBarChart.vue'
 import GaugeGradeChart from '@/Pages/Dashboards/Projects/GaugeGradeChart.vue'
 import SimpleScatterChart from '@/Pages/Dashboards/Projects/SimpleScatterChart.vue'
-import MiniCardInfo from '@/Components/MiniCardInfo.vue'
-
-const props = defineProps({
-
-})
-
 
 onMounted(() => {
   getData()
 })
+
 const projects = ref([])
 const scatterSeries = ref([])
+
 const getData = () => {
   axios.get(route('progressProjectWeek.get.data.week')).then((res) => {
     projects.value = res.data.indicators.map(p => p.project)

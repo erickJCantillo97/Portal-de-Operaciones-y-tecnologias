@@ -1,31 +1,25 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
+const { confirmDelete } = useSweetalert();
+const { toast } = useSweetalert();
+const confirm = useConfirm();
+const loading = ref(false);
+import '../../../sass/dataTableCustomized.scss';
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import { FilterMatchMode, FilterOperator } from 'primevue/api';
+import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline';
 import { ref, onMounted } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
-import '../../../sass/dataTableCustomized.scss';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Calendar from 'primevue/calendar';
-import Tag from 'primevue/tag';
-import Dropdown from 'primevue/dropdown';
-import Combobox from '@/Components/Combobox.vue';
-import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import DownloadExcelIcon from '@/Components/DownloadExcelIcon.vue';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline';
-import { useSweetalert } from '@/composable/sweetAlert';
 import { useConfirm } from "primevue/useconfirm";
-import axios from 'axios';
-// import plural from 'pluralize-es'
-import TextInput from '../../Components/TextInput.vue';
+import { useSweetalert } from '@/composable/sweetAlert';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import Button from '../../Components/Button.vue';
+import Column from 'primevue/column';
+import Combobox from '@/Components/Combobox.vue';
+import DataTable from 'primevue/datatable';
 import FileUpload from 'primevue/fileupload';
-// import Button from 'primevue/button';
+import Tag from 'primevue/tag';
+import TextInput from '../../Components/TextInput.vue';
 
-const confirm = useConfirm();
-const { toast } = useSweetalert();
-const loading = ref(false);
-const { confirmDelete } = useSweetalert();
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
@@ -127,7 +121,6 @@ const editItem = (authorization) => {
     open.value = true;
 };
 
-
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -141,22 +134,6 @@ const clearFilter = () => {
 
 const clearErrors = () => {
     router.page.props.errors = {};
-};
-
-const formatDate = (value) => {
-    return value.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-};
-
-// Formatear el número en moneda (USD)
-const formatCurrency = (value) => {
-    return parseFloat(value).toLocaleString('es-CO', {
-        style: 'currency',
-        currency: 'COP'
-    });
 };
 
 const getContractStatusSeverity = (authorization) => {
@@ -177,24 +154,6 @@ const getContractStatusSeverity = (authorization) => {
             return null;
     }
 };
-
-const exportarExcel = () => {
-    //console.log(dt.value)
-    // Acquire Data (reference to the HTML table)
-    var table_elt = document.getElementById("tabla");
-
-    var workbook = XLSX.utils.table_to_book(table_elt);
-
-    var ws = workbook.Sheets["Sheet1"];
-    XLSX.utils.sheet_add_aoa(ws, [
-        ["Creado " + new Date().toISOString()]
-    ], { origin: -1 });
-
-    // Package and Release Data (`writeFile` tries to write and save an XLSB file)
-    XLSX.writeFile(workbook, 'Lista de Contratos_' + authorization.nit + '_' + authorization.name + ".xlsb");
-};
-
-
 </script>
 
 <template>
@@ -350,6 +309,5 @@ const exportarExcel = () => {
                 </div>
             </Dialog>
         </TransitionRoot>
-
     </AppLayout>
 </template>

@@ -1,20 +1,19 @@
 <script setup>
+import { commonUtilities } from '@/composable/commonUtilities'
 import { ref, onMounted } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import Button from 'primevue/button'
 import CustomModal from '@/Components/CustomModal.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
-import DataView from 'primevue/dataview'
-import Divider from 'primevue/divider'
 import Image from 'primevue/image'
 import Listbox from 'primevue/listbox'
 import Loading from '@/Components/Loading.vue'
-import Moment from 'moment'
 import NoContentToShow from '@/Components/NoContentToShow.vue'
 import OverlayPanel from 'primevue/overlaypanel'
 import ProjectsCard from '@/Components/ProjectsCard.vue'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
+
+const { truncateString } = commonUtilities()
 
 onMounted(() => {
   getProjects()
@@ -73,8 +72,8 @@ const selectedTipologia = async () => {
 
   if (tipologia.value) {
     await axios.get(route('get.files.project.tipologia',
-      {
-        projectID: selectedProjects.value.id,
+    {
+      projectID: selectedProjects.value.id,
         tipologiaID: tipologia.value.id
       }))
       .then((response) => {
@@ -91,8 +90,6 @@ const selectedTipologia = async () => {
 const fileListboxSelected = ref()
 
 const fileSelected = (event) => {
-
-  console.log(event);
   selectedFiles.value = event.value?.filePath ?? null
 }
 
@@ -142,19 +139,12 @@ const columnas = [
   { field: 'file_size', header: 'Tamaño', filter: true, sortable: true, type: 'fileSize' },
 ]
 
-
-
 const buttons = [
   { event: 'downloadFiles', severity: 'primary', class: '', icon: 'fa-solid fa-download', text: true, outlined: false, rounded: false },
 ]
 //#endregion
 
 //#region Utilities
-function formatDateTime24h(dateTime) {
-  return new Date(dateTime).toLocaleString('es-CO',
-    { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
-}
-
 const downloadFiles = async () => {
   await router.get(route('get.files.project.tipologia', tipologiaFiles.value.id), {}, {
     onSuccess: () => {
@@ -162,26 +152,6 @@ const downloadFiles = async () => {
       clearModal2()
     }
   });
-}
-
-const formatSize = (bytes) => {
-  const k = 1024;
-  const dm = 1;
-  const sizeType = ['B', 'KB', 'MB', 'GB']
-
-  if (bytes === 0) {
-    return `0 byte`;
-  }
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
-
-  return `${formattedSize} ${sizeType[i]}`;
-}
-
-const truncateString = (string, maxLength) => {
-  let truncatedString = string.length > maxLength ? string.substring(0, maxLength) + "..." : string
-  return truncatedString
 }
 //#endregion
 

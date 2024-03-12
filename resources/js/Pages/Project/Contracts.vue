@@ -1,18 +1,20 @@
 <script setup>
 const { confirmDelete } = useSweetalert()
+const { currencyFormat } = commonUtilities()
 const { eventListener } = useBroadcastNotifications()
 const { hasRole, hasPermission } = usePermissions();
 const { toast } = useSweetalert()
-import { usePermissions } from '@/composable/permission';
-import { useBroadcastNotifications } from '@/composable/broadcastNotifications'
+import { commonUtilities } from '@/composable/commonUtilities';
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
+import { useBroadcastNotifications } from '@/composable/broadcastNotifications'
+import { usePermissions } from '@/composable/permission';
 import { useSweetalert } from '@/composable/sweetAlert'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import ContractsSlideOver from '@/Components/ContractsSlideOver.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
-import ContractsSlideOver from '@/Components/ContractsSlideOver.vue'
 
 const loading = ref(false)
 
@@ -97,7 +99,7 @@ const columnas = [
     { field: 'total_cost', header: 'Costo', filter: true, sortable: true, type: 'currency' },
     // { field: 'state', header: 'Estado del contrato', filter: true, sortable: true },
     {
-        field: 'state', header: 'Estado', filter: true, sortable: true, type: 'tag', filtertype: 'EQUALS', 
+        field: 'state', header: 'Estado', filter: true, sortable: true, type: 'tag', filtertype: 'EQUALS',
         severitys: [
             { text: 'EN EJECUCIÓN', severity: 'primary', class: '' },
             { text: 'LIQUIDADO', severity: 'success', class: '' },
@@ -110,14 +112,6 @@ const buttons = [
     { event: 'edit', severity: 'primary', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false, show: hasPermission('contract edit') },
     { event: 'delete', severity: 'danger', class: '', icon: 'fa-regular fa-trash-can', text: true, outlined: false, rounded: false, show: hasPermission('contract delete') },
 ]
-const formatCurrency = (valor, moneda) => {
-    if (valor == undefined || valor == null) {
-        return 'Sin definir'
-    } else {
-        return parseInt(valor).toLocaleString('es-CO',
-            { style: 'currency', currency: moneda, maximumFractionDigits: 0 })
-    }
-}
 
 const contractData = ref({})
 const openSlideOver = ref(false)
@@ -201,7 +195,7 @@ const showClic = (event) => {
                     <span v-if="formData.contract.quote">
                         <span class="flex justify-between">
                             <p class="font-bold">Valor venta: </p>
-                            <p class="text-right">{{ formatCurrency(formData.contract.quote.total_cost,
+                            <p class="text-right">{{ currencyFormat(formData.contract.quote.total_cost,
                 formData.contract.quote.coin) }}</p>
                         </span>
                         <span class="flex justify-between">

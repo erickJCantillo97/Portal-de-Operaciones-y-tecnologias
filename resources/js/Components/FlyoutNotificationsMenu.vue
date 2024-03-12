@@ -1,11 +1,8 @@
 <script setup>
-import { Link } from '@inertiajs/vue3'
-import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue'
 import { BellIcon, XMarkIcon } from '@heroicons/vue/20/solid'
 import { ChartPieIcon, CursorArrowRaysIcon } from '@heroicons/vue/24/outline'
-import OverlayPanel from 'primevue/overlaypanel';
 import { onMounted, ref } from 'vue'
-import axios from 'axios'
+import OverlayPanel from 'primevue/overlaypanel';
 
 const notifications = ref([])
 

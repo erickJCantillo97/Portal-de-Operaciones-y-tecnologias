@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { GChart } from 'vue-google-charts'
 
 
@@ -8,6 +8,7 @@ const empty = ref(false)
 const chartData = ref([
     ['country', 'Ofertas'],
 ])
+
 const getData = () => {
     loading.value = true
     axios.get(route("get.quotes.country")).then((res) => {
@@ -21,14 +22,15 @@ const getData = () => {
         loading.value = false
     });
 }
-getData()
 
+onMounted(() => {
+    getData()
+})
 
 const chartOptions = ref({
     height: "300",
     colorAxis: { colors: ['#D7DA0F', 'rgb(46, 48, 146)'] }
 })
-
 </script>
 
 <template>

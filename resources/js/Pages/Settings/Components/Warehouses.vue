@@ -1,11 +1,12 @@
 <script setup>
-import CustomDataTable from '@/Components/CustomDataTable.vue';
-import CustomModal from '@/Components/CustomModal.vue';
-import CustomInput from '@/Components/CustomInput.vue';
-import { useToast } from "primevue/usetoast";
+import { ref, onMounted } from 'vue'
 import { useConfirm } from "primevue/useconfirm"
+import { useToast } from "primevue/usetoast";
+import CustomDataTable from '@/Components/CustomDataTable.vue';
+import CustomInput from '@/Components/CustomInput.vue';
+import CustomModal from '@/Components/CustomModal.vue';
+
 const confirm = useConfirm();
-import { ref } from 'vue'
 
 const toast = useToast()
 
@@ -26,7 +27,11 @@ const getWarehouses = () => {
         }
     )
 }
-getWarehouses()
+
+onMounted(() => {
+    getWarehouses()
+})
+
 const columnsAlmacen = [
     { field: 'name', header: 'Nombre', filter: true, sortable: true, },
     { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true, },
@@ -37,6 +42,7 @@ const buttonsAlmacen = [
     { event: 'edit', severity: 'warning', class: '', icon: 'fa-solid fa-pen', text: true, outlined: false, rounded: false },
     { event: 'delete', severity: 'danger', class: '', icon: 'fa-solid fa-trash-can', text: true, outlined: false, rounded: false },
 ]
+
 const modalAlmacen = ref(false)
 const formAlmacen = ref({
     id: null,
@@ -46,6 +52,7 @@ const formAlmacen = ref({
     error: {}
 
 })
+
 const openModal = (event, data) => {
     if (data) {
         formAlmacen.value.error = {}
@@ -85,6 +92,7 @@ const saveAlmacen = async () => {
         formAlmacen.value.error.name = 'El campo es requerido'
     }
 }
+
 const deleteAlmacen = async (event, data) => {
     confirm.require({
         target: event.currentTarget,
@@ -104,9 +112,7 @@ const deleteAlmacen = async (event, data) => {
         },
     })
 }
-
 </script>
-
 <template>
     <CustomDataTable :loading :rowsDefault="10" :data="warehouses" :columnas="columnsAlmacen" :actions="buttonsAlmacen"
         :showAdd="true" title="Almacenes" :showColumns="false" :filter="false" @addClick="openModal" @edit="openModal"
@@ -115,12 +121,14 @@ const deleteAlmacen = async (event, data) => {
     <CustomModal v-model:visible="modalAlmacen" width="30rem"
         :titulo="formAlmacen.id ? 'Editar almacen' : 'Añadir almacen'">
         <template #body>
-                <CustomInput @input="formAlmacen.error = {}" :required="true" v-model:input="formAlmacen.name" label="Nombre"
-                :invalid="formAlmacen.error.name ? true : false" :errorMessage="formAlmacen.error.name" />
-        
+            <CustomInput @input="formAlmacen.error = {}" :required="true" v-model:input="formAlmacen.name"
+                label="Nombre" :invalid="formAlmacen.error.name ? true : false"
+                :errorMessage="formAlmacen.error.name" />
+
         </template>
         <template #footer>
-            <Button severity="danger" label="Cancelar" :disabled="formAlmacen.processing" @click="modalAlmacen = false" />
+            <Button severity="danger" label="Cancelar" :disabled="formAlmacen.processing"
+                @click="modalAlmacen = false" />
             <Button type="submit" severity="success" label="Guardar" :loading="formAlmacen.processing"
                 @click="saveAlmacen" />
         </template>

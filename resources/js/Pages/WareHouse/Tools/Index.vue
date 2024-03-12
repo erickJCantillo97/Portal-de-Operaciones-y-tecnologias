@@ -11,6 +11,7 @@ import CustomModal from '@/Components/CustomModal.vue'
 import Toast from 'primevue/toast'
 
 const toast = useToast()
+
 const props = defineProps({
     tools: {
         type: Array,
@@ -76,6 +77,7 @@ const showModal = (event, data) => {
         modalVisible.value = true
     }
 }
+
 const showModalClone = (event, data) => {
     form.value = { error: false, errors: {} }
     modalType.value = 'Nuevo'
@@ -142,7 +144,6 @@ const save = () => {
     }
 }
 </script>
-
 <template>
     <AppLayout>
         <div class="w-full h-[89vh] overflow-y-auto">

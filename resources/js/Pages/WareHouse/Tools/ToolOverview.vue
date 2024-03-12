@@ -1,9 +1,12 @@
 <script setup>
+import { commonUtilities } from '@/composable/commonUtilities'
 import { ref } from 'vue'
-import TabView from 'primevue/tabview'
-import TabPanel from 'primevue/tabpanel'
-import Galleria from 'primevue/galleria'
 import Footer from '@/Components/Footer.vue'
+import Galleria from 'primevue/galleria'
+import TabPanel from 'primevue/tabpanel'
+import TabView from 'primevue/tabview'
+
+const { currencyFormat } = commonUtilities()
 
 const props = defineProps({
   tool: Object
@@ -102,15 +105,6 @@ const responsiveOptions = ref([
     numVisible: 1
   }
 ])
-
-const formatCurrency = (valor, moneda) => {
-  if (valor == undefined || valor == null) {
-    return 'Sin definir'
-  } else {
-    return parseInt(valor).toLocaleString('es-CO',
-      { style: 'currency', currency: moneda == null ? 'COP' : moneda, maximumFractionDigits: 0 })
-  }
-}
 </script>
 <!-- <style scoped>
 .custom {
@@ -142,11 +136,11 @@ const formatCurrency = (valor, moneda) => {
           </h2>
         </div>
         <TabView :scrollable="true" :pt="{
-          nav: '!flex !justify-between'
-        }">
+              nav: '!flex !justify-between'
+            }">
           <TabPanel header="Detalles del Equipo" :pt="{
-            content: '!h-[18rem] !p-2 !overflow-y-auto'
-          }">
+              content: '!h-[18rem] !p-2 !overflow-y-auto'
+            }">
             <div class="custom border border-solid rounded-lg p-2 mb-2">
               <dl class="divide-y divide-gray-200 border-b border-t border-gray-200">
                 <div class="flex justify-between py-3 text-sm font-medium">
@@ -159,7 +153,7 @@ const formatCurrency = (valor, moneda) => {
                 </div>
                 <div class="flex justify-between py-3 text-sm font-medium">
                   <dt class="text-gray-900">Costo:</dt>
-                  <dd class="text-gray-500 uppercase">{{ formatCurrency(tool.value, 'COP') }}</dd>
+                  <dd class="text-gray-500 uppercase">{{ currencyFormat(tool.value, 'COP') }}</dd>
                 </div>
                 <div class="flex justify-between py-3 text-sm font-medium">
                   <dt class="text-gray-900">Fecha de préstamo:</dt>
@@ -193,8 +187,8 @@ const formatCurrency = (valor, moneda) => {
             </div>
           </TabPanel>
           <TabPanel header="Lista de Préstamos" :pt="{
-            content: '!h-[18rem] !p-2 !overflow-y-auto'
-          }">
+              content: '!h-[18rem] !p-2 !overflow-y-auto'
+            }">
             <p class="m-0">
               Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam
               rem
@@ -206,8 +200,8 @@ const formatCurrency = (valor, moneda) => {
             </p>
           </TabPanel>
           <TabPanel header="Otros Datos" :pt="{
-            content: '!h-[18rem] !p-2 !overflow-y-auto'
-          }">
+              content: '!h-[18rem] !p-2 !overflow-y-auto'
+            }">
             <p class="m-0">
               At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti
               atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique
@@ -226,10 +220,10 @@ const formatCurrency = (valor, moneda) => {
         <Galleria :value="imageSrc" :responsiveOptions="responsiveOptions" numVisible="5" indicatorsPosition="bottom"
           :circular="true" :autoPlay="true" :transitionInterval="2000" :showThumbnails="false" :showIndicators="true"
           :changeItemOnIndicatorHover="true" containerStyle="max-width: 640px" :pt="{
-            itemContainer: '!border !border-gray-200 !rounded-lg',
-            indicatorButton: '!bg-blue-800'
-            // thumbnailItemsContainer: '!opacity-0',
-          }">
+              itemContainer: '!border !border-gray-200 !rounded-lg',
+              indicatorButton: '!bg-blue-800'
+              // thumbnailItemsContainer: '!opacity-0',
+            }">
           <template #item="slotProps">
             <img :src="slotProps.item.src" :alt="slotProps.item.alt" />
           </template>

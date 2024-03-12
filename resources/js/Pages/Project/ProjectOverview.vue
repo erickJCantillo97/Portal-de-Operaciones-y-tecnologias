@@ -1,5 +1,5 @@
 <script setup>
-// import html2canvas from 'html2canvas'
+import { commonUtilities } from '@/composable/commonUtilities'
 import { ref, onMounted } from 'vue'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
@@ -17,6 +17,9 @@ import TabPanel from 'primevue/tabpanel'
 import TabView from 'primevue/tabview'
 import Tag from 'primevue/tag'
 import PieChart from '@/Pages/Dashboards/PieChart.vue'
+
+const { calculatePercentage, currencyFormat, getDays } = commonUtilities();
+
 const props = defineProps({
   project: Object,
   ships: Array,
@@ -26,7 +29,6 @@ const props = defineProps({
 
 const budge = ref({
 })
-
 
 onMounted(() => {
   getBudges()
@@ -114,15 +116,8 @@ const severitys = [
   { text: 'SIN ESTADO', severity: 'danger', class: 'animate-pulse' }
 ]
 
-const formatCurrency = (valor, moneda) => {
-  if (valor == undefined || valor == null) {
-    return 'Sin definir'
-  } else {
-    return parseInt(valor).toLocaleString('es-CO',
-      { style: 'currency', currency: moneda == null ? 'COP' : moneda, maximumFractionDigits: 0 })
-  }
-}
 const pieChartSerie = ref([])
+
 const getBudges = async () => {
   loadingDashboard.value = true
   showLineChart.value++
@@ -248,47 +243,6 @@ const getDataSeriesBar = () => {
 }
 
 //#region Utilities
-const captureAndDownloadImage = async () => {
-  showLineChart.value++
-  const contentToCapture = document.getElementById('contentToCapture')
-  await html2canvas(contentToCapture, {
-    windowWidth: 1280,
-    windowHeight: 720,
-  }).then(canvas => {
-    const imageUrl = canvas.toDataURL('image/png')
-    const link = document.createElement('a')
-    link.href = imageUrl
-    link.download = 'captura_de_pantalla.png'
-    link.click()
-  })
-}
-
-const getDays = (startDate, endData) => {
-  let date_1 = new Date(startDate)
-  let date_2 = new Date(endData)
-
-  // Calcular la diferencia en milisegundos
-  let diffMiliseconds = date_2 - date_1
-
-  // Calcular la diferencia en días
-  let milisecondsPerDay = 24 * 60 * 60 * 1000; // Número de milisegundos en un día
-  return Math.round(diffMiliseconds / milisecondsPerDay) < 0 ? 0 : Math.round(diffMiliseconds / milisecondsPerDay)
-}
-
-const calculatePercentage = (data, total) => {
-  let percentage = (data / total) * 100;
-
-  if (percentage > 100) {
-    percentage = 100;
-  }
-
-  if (percentage < 0) {
-    percentage = 0;
-  }
-
-  return percentage.toFixed(0) > 100 ? 0 : percentage.toFixed(0);
-}
-
 const facturado = props.project.milestone.filter(hito => hito.advance == 100)
   .reduce((sum, hito) => sum + parseInt(hito.value), 0);
 const porFacturar = props.project.milestone.filter(hito => hito.advance != 100)
@@ -431,10 +385,10 @@ td {
       }">
                 <Accordion @tab-click="handleTabClick($event)">
                   <AccordionTab :activeIndex="0" v-for="(ship, index) in ships " :key="ship.id" :pt="{
-        headerAction: ({ props, parent }) => ({
-          class: ['!sticky !top-0', panelClass(props, parent, index)]
-        })
-      }">
+                      headerAction: ({ props, parent }) => ({
+                        class: ['!sticky !top-0', panelClass(props, parent, index)]
+                      })
+                    }">
 
                     <template #header>
                       <div class=" align-items-center gap-2 w-full block space-y-2">
@@ -477,9 +431,12 @@ td {
                 </div>
 
                 <!-- Segunda fila -->
-                <div class="border text-center border-gray-800 bg-gray-100">FECHA REPORTE: </div>
-                <div class="border text-center border-gray-800"> {{
-        Moment().format('DD/MM/YYYY') }}</div>
+                <div class="border text-center border-gray-800 bg-gray-100">
+                  FECHA REPORTE:
+                </div>
+                <div class="border text-center border-gray-800">
+                  {{ Moment().format('DD/MM/YYYY') }}
+                </div>
                 <div class="border text-center border-gray-800 bg-sky-100 font-bold">FECHA DE INICIO </div>
                 <div class="border text-center border-gray-800">{{
         Moment(project.contract.start_date).format('DD/MM/YYYY') }}</div>
@@ -581,33 +538,33 @@ td {
                     <tbody>
                       <tr>
                         <td class="text-left font-semibold bg-sky-100">PRESUPUESTO</td>
-                        <td>{{ formatCurrency(budge.materials) }}</td>
-                        <td>{{ formatCurrency(budge.labor) }}</td>
-                        <td>{{ formatCurrency(budge.services) }}</td>
-                        <td>{{ formatCurrency(budge.total) }}</td>
+                        <td>{{ currencyFormat(budge.materials) }}</td>
+                        <td>{{ currencyFormat(budge.labor) }}</td>
+                        <td>{{ currencyFormat(budge.services) }}</td>
+                        <td>{{ currencyFormat(budge.total) }}</td>
                       </tr>
                       <tr>
                         <td class="text-left font-semibold bg-sky-100">CONSUMO ACTUAL</td>
-                        <td>{{ formatCurrency(budge.materials_ejecutados) }}</td>
-                        <td>{{ formatCurrency(budge.labor_ejecutados) }}</td>
-                        <td>{{ formatCurrency(budge.services_ejecutados) }}</td>
-                        <td>{{ formatCurrency(budge.materials_ejecutados + budge.labor_ejecutados +
+                        <td>{{ currencyFormat(budge.materials_ejecutados) }}</td>
+                        <td>{{ currencyFormat(budge.labor_ejecutados) }}</td>
+                        <td>{{ currencyFormat(budge.services_ejecutados) }}</td>
+                        <td>{{ currencyFormat(budge.materials_ejecutados + budge.labor_ejecutados +
         budge.services_ejecutados) }}</td>
                       </tr>
                       <tr>
                         <td class="text-left font-semibold bg-sky-100">DISPONIBLE</td>
                         <td class="font-bold"
                           :class="budge.materials - budge.materials_ejecutados < 0 ? 'text-danger' : 'text-success'">{{
-        formatCurrency(budge.materials - budge.materials_ejecutados)
+        currencyFormat(budge.materials - budge.materials_ejecutados)
       }}</td>
                         <td class="font-bold"
                           :class="budge.labor - budge.labor_ejecutados < 0 ? 'text-danger' : 'text-success'">{{
-        formatCurrency(budge.labor - budge.labor_ejecutados) }}</td>
+        currencyFormat(budge.labor - budge.labor_ejecutados) }}</td>
                         <td class="font-bold"
                           :class="budge.services - budge.services_ejecutados < 0 ? 'text-danger' : 'text-success'">{{
-        formatCurrency(budge.services - budge.services_ejecutados)
+        currencyFormat(budge.services - budge.services_ejecutados)
       }}</td>
-                        <td class="font-bold text-success">{{ formatCurrency(budge.total -
+                        <td class="font-bold text-success">{{ currencyFormat(budge.total -
         (budge.materials_ejecutados +
           budge.labor_ejecutados +
           budge.services_ejecutados)) }}</td>
@@ -637,7 +594,7 @@ td {
                   <h2 class="font-semibold">HITOS CONTRACTUALES</h2>
                 </div>
                 <p class="w-full text-sm text-center text-primary bg-yellow-100 italic my-1 font-bold">
-                  {{ formatCurrency(facturado) }} Facturados
+                  {{ currencyFormat(facturado) }} Facturados
                 </p>
                 <table>
                   <thead>
@@ -653,12 +610,12 @@ td {
                         {{ hito.title }}
                       </td>
                       <td>{{ Moment().format(hito.end_date) }}</td>
-                      <td>{{ formatCurrency(hito.value, 'COP') }}</td>
+                      <td>{{ currencyFormat(hito.value, 'COP') }}</td>
                     </tr>
                   </tbody>
                 </table>
                 <p class="w-full text-sm text-center text-primary bg-yellow-100 italic my-1 font-bold">
-                  {{ formatCurrency(porFacturar) }} Por Facturar
+                  {{ currencyFormat(porFacturar) }} Por Facturar
                 </p>
               </article>
             </div>

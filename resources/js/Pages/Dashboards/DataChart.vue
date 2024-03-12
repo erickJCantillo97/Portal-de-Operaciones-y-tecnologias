@@ -1,12 +1,15 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
+import { commonUtilities } from '@/composable/commonUtilities';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid';
+import { ref, onMounted } from 'vue'
+import axios from 'axios';
 import Button from '@/Components/Button.vue';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
 import PieChart from './PieChart.vue';
+
+const { currencyFormat } = commonUtilities()
 
 onMounted(() => {
     initFilters();
@@ -69,14 +72,6 @@ const onRowUnselect = (event) => {
     selectedContracts.value = selectedContracts.value.filter((contract) => contract.id !== event.data.id)
     contractsList()
 }
-
-const formatCurrency = (value) => {
-    return parseFloat(value).toLocaleString('es-CO', {
-        style: 'currency',
-        currency: 'COP',
-        maximumFractionDigits: 0
-    });
-};
 
 const title = ref({
     text: 'Contratos',
@@ -189,7 +184,7 @@ const contractsList = () => {
             <Column field="contract_id" header="Contrato"></Column>
             <Column field="cost" header="Costo">
                 <template #body="slotProps">
-                    {{ formatCurrency(slotProps.data.cost) }}
+                    {{ currencyFormat(slotProps.data.cost) }}
                 </template>
             </Column>
             <Column field="end_date" header="Fecha Finalización"></Column>

@@ -1,8 +1,6 @@
 <script setup>
 import Skeleton from 'primevue/skeleton'
-
 </script>
-
 <template>
   <div class="border-round border-1 surface-border p-4 surface-card">
     <ul class="m-0 p-0 list-none">

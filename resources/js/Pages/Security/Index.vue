@@ -1,17 +1,19 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue'
-import CustomDataTable from '@/Components/CustomDataTable.vue';
-import CustomInput from '@/Components/CustomInput.vue';
-import Button from 'primevue/button';
-import CustomModal from '@/Components/CustomModal.vue';
 import { ref } from 'vue';
-import Listbox from 'primevue/listbox';
-import Empty from '@/Components/Empty.vue';
 import { router, useForm, usePage } from '@inertiajs/vue3';
 import { useSweetalert } from '@/composable/sweetAlert'
 import { useToast } from "primevue/usetoast";
+import AppLayout from '@/Layouts/AppLayout.vue'
+import Button from 'primevue/button';
+import CustomDataTable from '@/Components/CustomDataTable.vue';
+import CustomInput from '@/Components/CustomInput.vue';
+import CustomModal from '@/Components/CustomModal.vue';
+import Empty from '@/Components/Empty.vue';
+import Listbox from 'primevue/listbox';
+
 const toast = useToast();
 const { confirmDelete } = useSweetalert();
+
 const props = defineProps({
     users: Array,
     roles: Array,
@@ -34,7 +36,7 @@ const columnas = [
     },
     // { field: 'roles', header: 'Roles',type:'array', filter:true, itemClass:'border px-2 border-primary rounded-lg' },
     { field: 'gerencia', header: 'Gerencia' },
-    // { field: 'status', header: 'Estado' }, 
+    // { field: 'status', header: 'Estado' },
 ]
 const buttons = [
     { event: 'userDetalis', severity: 'info', icon: 'fa-solid fa-user-tag', text: true },
@@ -42,7 +44,6 @@ const buttons = [
 
 const modalUserDetails = ref(false)
 const userSelect = ref({})
-
 
 function userDetalis(event, data) {
     modalUserDetails.value = true
@@ -52,6 +53,7 @@ function userDetalis(event, data) {
 const rolAdd = ref(null)
 const rolDel = ref(null)
 const processing = ref(false)
+
 const userRolUpdate = (option) => {
     processing.value = true
     if (option == 'add') {
@@ -87,7 +89,7 @@ const rolesFilter = () => {
     return props.roles.filter(rol => !userSelect.value.rolesObj.some(userRol => rol.name === userRol.name));
 }
 
-//#region crud Roles 
+//#region crud Roles
 const modalRol = ref(false)
 const rol = useForm({
     id: null,
@@ -126,6 +128,7 @@ const saveRol = () => {
         }
     })
 }
+
 const updateRol = () => {
     rol.transform((data) => ({
         ...data,
@@ -161,7 +164,6 @@ const savePermiso = () => {
     })
 }
 
-
 const permissionsClic = async (permiso) => {
     const indice = await rol.permissions.findIndex((permission) => permission.name === permiso.name)
     if (indice !== -1) {
@@ -171,6 +173,7 @@ const permissionsClic = async (permiso) => {
         rol.permissions.push(permiso)
     )
 }
+
 const permissionsfilter = ref('')
 
 function filter() {
@@ -185,7 +188,6 @@ function filter() {
 
 const permissionModal = ref(false)
 //#endregion
-
 </script>
 <template>
     <AppLayout>
