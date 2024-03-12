@@ -177,7 +177,6 @@ if (props.type == 'country') {
 const input = defineModel('input', {
     required: true
 })
-
 </script>
 
 <template>
@@ -259,6 +258,12 @@ const input = defineModel('input', {
                 <span v-else-if="type == 'datetime'">
                     <Calendar :id v-model="input" :minDate :maxDate showTime hourFormat="24" showIcon
                         dateFormat="dd/mm/yy" :pt="{
+            root: '!w-full',
+            input: '!h-8'
+        }" />
+                </span>
+                <span v-else-if="type == 'time'">
+                    <Calendar :id v-model="input" timeOnly hourFormat="24" showIcon dateFormat="dd/mm/yy" :pt="{
             root: '!w-full',
             input: '!h-8'
         }" />

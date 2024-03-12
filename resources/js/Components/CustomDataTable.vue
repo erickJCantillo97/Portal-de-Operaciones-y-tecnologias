@@ -171,7 +171,7 @@ const fileSize = (bytes) => {
         paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink" :pt="{
         paginator: {
             paginatorWrapper: '!p-0',
-            current: 'text-sm font-bold cursor-default !h-8 flex item-center',
+            current: 'text-sm font-bold cursor-default !h-8 hidden sm:flex item-center',
             pagebutton: {
                 class: '!font-bold !h-8 !rounded-md !w-6',
             },
@@ -196,24 +196,29 @@ const fileSize = (bytes) => {
                     </span>
                 </span>
                 <div class="flex items-center " :class="filter ? 'justify-between' : 'justify-end'" v-if="showHeader">
-                    <div class="space-x-2 flex" v-if="filter">
-                        <Button v-tooltip.top="'Quitar filtros'" @click="clearFilter()" outlined
-                            icon="fa-solid fa-filter-circle-xmark" />
-                        <IconField iconPosition="left">
-                            <InputIcon>
-                                <i class="fa-solid fa-magnifying-glass" />
-                            </InputIcon>
-                            <InputText v-model="filters.global.value" type="search" size="small" placeholder="Buscar" />
-                        </IconField>
-                        <ButtonGroup v-if="props.filterButtons && filterOK">
-                            <Button v-for="button in props.filterButtons"
-                                :label="button.label + ': ' + getTotalStatus(button.field, button.data)"
-                                :severity=button.severity
-                                @click="filters[button.field].value == button.data ? filters[button.field].value = null : filters[button.field].value = button.data"
-                                :outlined="filters[button.field].value != button.data" icon="" />
-                        </ButtonGroup>
+                    <div class="grid gap-2 sm:grid-cols-2" v-if="filter">
+                        <div class="flex gap-2">
+                            <Button v-tooltip.top="'Quitar filtros'" @click="clearFilter()" outlined
+                                icon="fa-solid fa-filter-circle-xmark" />
+                            <IconField iconPosition="left">
+                                <InputIcon>
+                                    <i class="fa-solid fa-magnifying-glass" />
+                                </InputIcon>
+                                <InputText v-model="filters.global.value" type="search" size="small"
+                                    placeholder="Buscar" />
+                            </IconField>
+                        </div>
+                        <div class="w-full overflow-x-auto">
+                            <ButtonGroup v-if="props.filterButtons && filterOK" class="flex">
+                                <Button v-for="button in props.filterButtons" class="!text-xs sm:!text-md font-bold"
+                                    :label="button.label + ': ' + getTotalStatus(button.field, button.data)"
+                                    :severity=button.severity
+                                    @click="filters[button.field].value == button.data ? filters[button.field].value = null : filters[button.field].value = button.data"
+                                    :outlined="filters[button.field].value != button.data" icon="" />
+                            </ButtonGroup>
+                        </div>
                     </div>
-                    <div class="space-x-2">
+                    <div class="space-x-2 hidden sm:block">
                         <Button v-if="exportRute != ''" text @click="exportar" icon="fa-solid fa-download" :pt="{
         root: '!border-0 !ring-0',
         trigger: '!hidden',
@@ -341,16 +346,14 @@ const fileSize = (bytes) => {
                             class="min-w-16 py-0.5 rounded-lg sm:h-12 sm:w-16 object-cover" draggable="false" />
                         <div>
                             <p class="font-bold text-sm" v-if="col.objectRows.primary">
-                                {{
-        col.objectRows.primary.subfield ?
-            data[col.objectRows.primary.field][col.objectRows.primary.subfield] :
-            data[col.objectRows.primary.field] }}
+                                {{ col.objectRows.primary.subfield ?
+        data[col.objectRows.primary.field][col.objectRows.primary.subfield] :
+        data[col.objectRows.primary.field] }}
                             </p>
                             <p class="text-xs italic" v-if="col.objectRows.secundary">
-                                {{
-        col.objectRows.secundary.subfield ?
-            data[col.objectRows.secundary.field][col.objectRows.secundary.subfield] :
-            data[col.objectRows.secundary.field] }}
+                                {{ col.objectRows.secundary.subfield ?
+        data[col.objectRows.secundary.field][col.objectRows.secundary.subfield] :
+        data[col.objectRows.secundary.field] }}
                             </p>
                         </div>
                     </span>
