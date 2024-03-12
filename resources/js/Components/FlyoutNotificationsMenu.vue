@@ -50,29 +50,30 @@ const callsToAction = [
               <h2 class="text-lg font-extrabold text-white">Notificaciones</h2>
             </div>
           </div>
-          <div class="divide-x divide-gray-200 border-b border-gray-200"></div>
-          <div class="px-2 space-y-2">
+          <div class="px-2 space-y-2 border-b">
             <!--Lista de Notificaciones-->
-            <div v-for="item in notifications" :key="item.name">
-              <div class="p-1 flex justify-between items-center rounded-lg border-b space-x-6">
-                <i class="fa-regular fa-circle-xmark text-2xl  w-4"
+            <div v-for="item in notifications" :key="item.name" class="border-b">
+              <div class="p-1 flex justify-between items-center rounded-lg space-x-6">
+                <i class="fa-regular fa-circle-xmark text-2xl "
                   :class="item.type == 'error' ? 'text-danger' : 'text-gray-600'"></i>
-                <div class="col-span-2 mx-4 w-full">
-                  <a :href="item.href" class="font-semibold text-gray-900">
+                <div class="col-span-2 w-full">
+                  <a :href="item.href" class="font-semibold text-gray-900 w-4 mt-1">
+
                     {{ item.title }}
                   </a>
                   <p class="text-gray-600 text-sm">{{ item.message }}</p>
+                  <span class="text-xs italic text-gray-500 flex">{{ item.ago }}</span>
                 </div>
-                <div class="cursor-pointer col-span-1 text-end">
-                  <i class="text-danger fa-solid fa-trash text-sm " aria-hidden="true" />
+                <div class="cursor-pointer col-span-1 text-end ">
+
+                  <i class="text-danger fa-solid fa-trash text-sm" aria-hidden="true" />
                 </div>
               </div>
 
             </div>
           </div>
-
           <!--Ver Todas las Notificaciones-->
-          <a>
+          <a v-if="notifications.length > 4">
             <div class=" grid grid-cols-1 divide-x divide-gray-900/5 bg-primary">
               <div
                 class="flex items-center justify-center gap-x-2.5 p-3 font-semibold cursor-pointer text-white hover:bg-blue-800">

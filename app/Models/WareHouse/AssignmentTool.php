@@ -17,10 +17,6 @@ class AssignmentTool extends Model implements Auditable
 
     protected $guarded = [];
 
-    protected static function booted(): void
-    {
-        static::addGlobalScope(new GerenciaScope);
-    }
 
     public function tool()
     {
