@@ -184,7 +184,7 @@ const employeeDialog = (item) => {
 }
 
 const form = ref({
-    name: null, // nombre de horario personalizado
+    name: null, // nombre de horario personalizado o nombre de la persona
     startShift: null,// hora inicio
     endShift: null,// hora fin
     timeBreak: null,
@@ -212,7 +212,8 @@ const toggle = (horario, data, option) => {
     editHorario.value.data = data
     editHorario.value.option = option
     form.value.idUser = data.employee_id
-    form.value.schedule = data.task_id
+    form.value.schedule = data.id
+    form.value.schedule_time = horario.id
     nuevoHorario.value = {}
     modhours.value = true
 }
