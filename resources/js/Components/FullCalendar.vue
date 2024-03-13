@@ -1,20 +1,20 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import FullCalendar from '@fullcalendar/vue3'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import timeGridPlugin from '@fullcalendar/timegrid'
-import interactionPlugin from '@fullcalendar/interaction'
-import esLocale from '@fullcalendar/core/locales/es'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import { ref, onMounted } from 'vue';
 import { XMarkIcon } from '@heroicons/vue/20/solid'
-import TextInput from '@/Components/TextInput.vue'
 import Button from 'primevue/button'
 import Combobox from '@/Components/Combobox.vue'
-import Moment from "moment"
-import CustomModal from './CustomModal.vue';
 import CustomInput from './CustomInput.vue';
-import Listbox from 'primevue/listbox';
+import CustomModal from './CustomModal.vue';
 import CustomShiftSelector from './CustomShiftSelector.vue';
+import dayGridPlugin from '@fullcalendar/daygrid'
+import esLocale from '@fullcalendar/core/locales/es'
+import FullCalendar from '@fullcalendar/vue3'
+import interactionPlugin from '@fullcalendar/interaction'
+import Listbox from 'primevue/listbox';
+import Moment from "moment"
+import TextInput from '@/Components/TextInput.vue'
+import timeGridPlugin from '@fullcalendar/timegrid'
 
 const props = defineProps({
   initialEvents: Array,
@@ -34,6 +34,7 @@ const turnSelect = ref([])
 const showHours = ref('Hours')
 const currentEvents = ref([])
 const eventguid = ref(1)
+
 const calendarOptions = ref({
   plugins: [
     dayGridPlugin,
@@ -102,11 +103,11 @@ onMounted(() => {
   eventguid.value++
 })
 
-function handleWeekendsToggle() {
+const handleWeekendsToggle = () => {
   calendarOptions.value.weekends = !calendarOptions.value.weekends // update a property
 }
 
-function handleDateSelect(selectInfo) {
+const handleDateSelect = (selectInfo) =>  {
   // console.log(selectInfo)
   isOpen.value = true
   selectedEvent.value = selectInfo
@@ -119,29 +120,32 @@ function handleDateSelect(selectInfo) {
   getEndDateEvent.value = formatEndDate
 }
 
-function handleEditEventClick(clickInfo) {
+const handleEditEventClick = (clickInfo) => {
   //TODO Permitir editar el modal
   isOpen.value = true
   // console.log(clickInfo)
   selectedEvent.value = clickInfo
   canDeleteEvent.value = true
 }
-function handleDeleteEventClick(selectedEvent) {
+
+const handleDeleteEventClick = (selectedEvent) => {
   // console.log(selectedEvent)
   if (selectedEvent) {
     selectedEvent.event.remove(); // Elimina el evento
     isOpen.value = false; // Cierra el modal
   }
 }
-function handleEvents(events) {
+
+const handleEvents = (events) => {
   // console.log(events)
   currentEvents.value = events
 }
-function handleItem() {
+
+const handleItem = () => {
   console.log('Hello World')
 }
 
-function submit(idTask, schedule) {
+const submit = (idTask, schedule) => {
   console.log(schedule)
   console.log(idTask)
 
@@ -175,10 +179,9 @@ function submit(idTask, schedule) {
   //     });
   // }
 }
-function closeDialog() {
+const closeDialog = () => {
   isOpen.value = false
 }
-
 </script>
 
 <template>
@@ -283,7 +286,7 @@ function closeDialog() {
                       Nuevo Horario
                     </DialogTitle>
 
-                    
+
                     <div class="w-8 h-8">
                       <button v-tooltip.top="'Cerrar'" @click="closeDialog()">
                         <XMarkIcon
@@ -292,7 +295,7 @@ function closeDialog() {
                     </div>
                   </div>
 
-                 
+
                   <Combobox class="mt-2 text-left" label="Actividad" placeholder="Seleccione Actividad" :options="tasks"
                     v-model="idTaskSelected">
                   </Combobox>
@@ -312,20 +315,20 @@ function closeDialog() {
                     </div>
                   </div>
 
-           
+
                   <div v-if="showHours === 'Hours'" class="w-full h-auto">
 
-                 
+
                     <TextInput class="mt-2 text-left" type="time" label="Hora de inicio" v-model="getStartDateEvent">
                     </TextInput>
 
-             
+
                     <TextInput class="mt-2 text-left" type="time" label="Hora de Finalización" v-model="getEndDateEvent">
                     </TextInput>
                   </div>
 
                   <div v-if="showHours === 'Turno'" class="w-full h-64">
-            
+
                     <Combobox class="mt-2 text-left" label="Turnos" placeholder="Seleccione Turno" :options="tasks"
                       v-model="turnSelect">
                     </Combobox>
@@ -337,7 +340,7 @@ function closeDialog() {
                     </span>
                   </div>
 
-                  
+
                   <div class="flex px-2 mt-2 space-x-4">
                     <Button v-if="canDeleteEvent" class="hover:bg-danger text-danger border-danger" severity="danger"
                       @click="handleEditEventClick(selectedEvent)">

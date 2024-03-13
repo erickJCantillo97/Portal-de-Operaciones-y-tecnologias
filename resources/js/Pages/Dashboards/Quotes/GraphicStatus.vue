@@ -1,14 +1,13 @@
 <script setup>
-import { ref } from 'vue';
-import axios from "axios";
-import VueApexCharts from 'vue3-apexcharts';
+import { ref, onMounted } from 'vue';
 import Empty from '@/Components/Empty.vue';
 import Loading from '@/Components/Loading.vue';
-import Card from 'primevue/card';
+import VueApexCharts from 'vue3-apexcharts';
 
 const series = ref([])
 const loading = ref(true)
 const empty = ref()
+
 const chartOptions = ref({
     title: {
         text: 'Estimaciones por estado',
@@ -76,9 +75,10 @@ const getQuotesMadurity = () => {
         loading.value = false
     });
 }
-getQuotesMadurity()
 
-
+onMounted(() => {
+    getQuotesMadurity()
+})
 </script>
 <template>
     <Loading v-if="loading"></loading>

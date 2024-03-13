@@ -1,20 +1,21 @@
 <script setup>
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import { onMounted, ref } from 'vue';
+const { byteSizeFormatter, currencyFormat } = commonUtilities()
+import { commonUtilities } from '@/composable/commonUtilities';
 import { FilterMatchMode } from 'primevue/api'
-import InputText from 'primevue/inputtext';
-import Dropdown from 'primevue/dropdown';
-import MultiSelect from 'primevue/multiselect';
-import Swal from 'sweetalert2';
-import ProgressBar from 'primevue/progressbar';
-import ButtonGroup from 'primevue/buttongroup';
-import Tag from 'primevue/tag';
-import InputNumber from 'primevue/inputnumber';
+import { onMounted, ref } from 'vue';
 import ApplicationLogo from './ApplicationLogo.vue';
+import ButtonGroup from 'primevue/buttongroup';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
+import Dropdown from 'primevue/dropdown';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
+import InputNumber from 'primevue/inputnumber';
+import InputText from 'primevue/inputtext';
 import Loading from './Loading.vue';
+import MultiSelect from 'primevue/multiselect';
+import Swal from 'sweetalert2';
+import Tag from 'primevue/tag';
 
 const props = defineProps({
     data: {
@@ -81,11 +82,13 @@ const filters = ref({});
 const globalFilterFields = ref([])
 const columnasSelect = ref()
 const filterOK = ref(false)
+
 if (props.columnas.length > 7) {
     columnasSelect.value = props.columnas.slice(0, 7)
 } else {
     columnasSelect.value = props.columnas
 }
+
 const initFilters = async () => {
     globalFilterFields.value = ['id']
     filters.value.global = { value: null, matchMode: FilterMatchMode.CONTAINS }
@@ -97,7 +100,9 @@ const initFilters = async () => {
     }
     filterOK.value = true
 };
+
 initFilters()
+
 onMounted(() => {
     initFilters()
 })
@@ -105,6 +110,7 @@ onMounted(() => {
 const getTotalStatus = (field, data) => {
     return props.data.filter(obj => obj[field] == data).length
 }
+
 const clearFilter = () => {
     initFilters();
 };
@@ -136,28 +142,6 @@ const formatDate = (date) => {
         return fecha == '30/11/2' ? 'INDEFINIDO' : fecha;
     }
 }
-const formatCurrency = (valor, moneda) => {
-    if (valor == undefined || valor == null) {
-        return 'Sin definir'
-    } else {
-        return parseInt(valor).toLocaleString('es-CO',
-            { style: 'currency', currency: moneda == null ? 'COP' : moneda, maximumFractionDigits: 0 })
-    }
-}
-const fileSize = (bytes) => {
-    const k = 1024;
-    const dm = 1;
-    const sizeType = ['B', 'KB', 'MB', 'GB']
-    if (bytes === 0) {
-        return `0 byte`;
-    }
-
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
-
-    return `${formattedSize} ${sizeType[i]}`;
-}
-
 //#endregion
 </script>
 
@@ -326,9 +310,9 @@ const fileSize = (bytes) => {
                     </p>
                     <p v-else-if="col.type == 'currency'" class="text-right">
                         {{
-        formatCurrency(data[col.field], !Array.isArray(data[col.field]) ? 'COP'
-            : data[col.field][1])
-    }}
+                        currencyFormat(data[col.field], !Array.isArray(data[col.field]) ? 'COP'
+                        : data[col.field][1])
+                        }}
                     </p>
                     <p v-else-if="col.type == 'customtag'"
                         :class="col.severitys.find((severity) => severity.text == data[col.field]).class"
@@ -370,7 +354,7 @@ const fileSize = (bytes) => {
                         </p>
                     </span>
                     <span v-else-if="col.type == 'fileSize'">
-                        {{ fileSize(data[col.field]) }}
+                        {{ byteSizeFormatter(data[col.field]) }}
                     </span>
                     <p v-else class="">
                         {{ data[col.field] }}

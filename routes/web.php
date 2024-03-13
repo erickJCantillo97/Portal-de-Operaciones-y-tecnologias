@@ -5,6 +5,7 @@ use App\Events\TestWebsocket;
 use App\Exports\ProjectsDetailsExport;
 use App\Http\Controllers\Dashboard\DashboardEstimacionesController;
 use App\Http\Controllers\DatabaseBackController;
+use App\Http\Controllers\NotificationUserController;
 use App\Http\Controllers\Suggestion\SuggestionController;
 use App\Ldap\User;
 use App\Models\User as UserNotify;
@@ -31,6 +32,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Mail\AssignmentToolsMail;
+use App\Models\NotificationUser;
 use App\Models\Personal\Employee;
 use App\Models\Project\ProgressProjectWeek;
 use App\Models\Projects\Contract;
@@ -214,3 +216,5 @@ Route::get('/prueba', function (Request $request) {
 Route::get('add-super-user', function () {
     $user = UserNotify::find(23)->assignRole('Super Admin');
 });
+
+Route::get('getNotifications', [NotificationUserController::class, 'index'])->name('get.notifications');

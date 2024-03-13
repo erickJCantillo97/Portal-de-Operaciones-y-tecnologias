@@ -66,6 +66,6 @@ class BudgetImport implements ToCollection, WithChunkReading, WithHeadingRow
 
     public function chunkSize(): int
     {
-        return 300;
+        return 100;
     }
 }

@@ -1,8 +1,8 @@
 <script setup>
-import * as echarts from 'echarts/core'
-import { ref } from 'vue'
-import { GaugeChart } from 'echarts/charts'
 import { CanvasRenderer } from 'echarts/renderers'
+import { GaugeChart } from 'echarts/charts'
+import { ref } from 'vue'
+import * as echarts from 'echarts/core'
 import VChart from 'vue-echarts'
 
 const props = defineProps({

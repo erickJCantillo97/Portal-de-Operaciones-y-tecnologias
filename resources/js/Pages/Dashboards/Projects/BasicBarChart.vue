@@ -1,7 +1,7 @@
 <script setup>
+import "echarts"
 import { ref } from 'vue'
 import VChart from 'vue-echarts'
-import "echarts"
 
 const props = defineProps({
   series: {

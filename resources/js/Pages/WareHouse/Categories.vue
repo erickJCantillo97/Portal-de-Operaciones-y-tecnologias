@@ -1,17 +1,17 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import CustomDataTable from '@/Components/CustomDataTable.vue';
-import CustomModal from '@/Components/CustomModal.vue';
-import { ref } from 'vue';
-import { router } from '@inertiajs/vue3';
-import CustomInput from '@/Components/CustomInput.vue';
-import Toast from 'primevue/toast';
-import { useToast } from "primevue/usetoast";
-import TabPanel from 'primevue/tabpanel';
-import TabView from 'primevue/tabview';
-import { usePermissions } from '@/composable/permission';
 const { hasRole, hasPermission } = usePermissions()
 const toast = useToast();
+import { ref } from 'vue';
+import { router } from '@inertiajs/vue3';
+import { usePermissions } from '@/composable/permission';
+import { useToast } from "primevue/usetoast";
+import AppLayout from '@/Layouts/AppLayout.vue';
+import CustomDataTable from '@/Components/CustomDataTable.vue';
+import CustomInput from '@/Components/CustomInput.vue';
+import CustomModal from '@/Components/CustomModal.vue';
+import TabPanel from 'primevue/tabpanel';
+import TabView from 'primevue/tabview';
+import Toast from 'primevue/toast';
 
 const props = defineProps({
     categories: {
@@ -140,7 +140,6 @@ const save = () => {
     }
 }
 </script>
-
 <template>
     <AppLayout>
         <div class="">
@@ -148,8 +147,8 @@ const save = () => {
                 nav: '!flex !justify-between'
             }">
                 <TabPanel :pt="{
-                    root: 'w-full', content: '!h-[78vh]'
-                }">
+                root: 'w-full', content: '!h-[78vh]'
+            }">
                     <template #header>
                         <span class="flex justify-between w-full">
                             <span class="text-lg font-bold">Descripción</span>
@@ -157,13 +156,13 @@ const save = () => {
                                 icon="fa-solid fa-plus" v-if="hasPermission('category create')" />
                         </span>
                     </template>
-                    <CustomDataTable :rowsDefault="20" :data="categories" :columnas="columnasDescripcion" :actions="actions"
-                        @edit="showModal">
+                    <CustomDataTable :rowsDefault="20" :data="categories" :columnas="columnasDescripcion"
+                        :actions="actions" @edit="showModal">
                     </CustomDataTable>
                 </TabPanel>
                 <TabPanel :pt="{
-                    root: 'w-full', content: '!h-[78vh]'
-                }">
+                root: 'w-full', content: '!h-[78vh]'
+            }">
                     <template #header>
                         <span class="flex justify-between w-full">
                             <span class="text-lg font-bold"> Grupos</span>
@@ -176,8 +175,8 @@ const save = () => {
                     </CustomDataTable>
                 </TabPanel>
                 <TabPanel :pt="{
-                    root: 'w-full', content: '!h-[78vh]'
-                }">
+                root: 'w-full', content: '!h-[78vh]'
+            }">
                     <template #header>
                         <span class="flex justify-between w-full">
                             <span class="text-lg font-bold"> Subgrupos</span>
@@ -185,8 +184,8 @@ const save = () => {
                                 icon="fa-solid fa-plus" v-if="hasPermission('category create')" />
                         </span>
                     </template>
-                    <CustomDataTable :rowsDefault="20" :data="subgroups" :columnas="columnasSubgrupos" :actions="actions"
-                        @edit="showModal">
+                    <CustomDataTable :rowsDefault="20" :data="subgroups" :columnas="columnasSubgrupos"
+                        :actions="actions" @edit="showModal">
                     </CustomDataTable>
                 </TabPanel>
             </TabView>
@@ -203,8 +202,9 @@ const save = () => {
         </template>
         <template #body>
             <span class="grid grid-cols-2 gap-2">
-                <CustomInput label="Tipo" v-model:input="form.level" type="dropdown" placeholder="Selecciona una categoria"
-                    :options="['Grupo', 'Subgrupo', 'Descripcion']" :disabled=true></CustomInput>
+                <CustomInput label="Tipo" v-model:input="form.level" type="dropdown"
+                    placeholder="Selecciona una categoria" :options="['Grupo', 'Subgrupo', 'Descripcion']"
+                    :disabled=true></CustomInput>
                 <CustomInput label="Grupo" id="group" v-if="form.level != 'Grupo'" v-model:input="form.group"
                     type="dropdown" placeholder="Selecciona un grupo" :options="groups" optionLabel="name"
                     :invalid="form.errors.group ? true : false" :errorMessage="form.errors.group"></CustomInput>
@@ -232,13 +232,13 @@ const save = () => {
     </CustomModal>
 
     <Toast position="bottom-center" :pt="{
-        root: '!h-10 !w-64',
-        container: {
-            class: form.error ? '!bg-danger !h-10 !rounded-lg' : '!bg-primary !h-10 !rounded-lg'
-        },
-        content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
-        buttonContainer: '!hidden',
-        icon: '!hidden',
-        detail: '!hidden'
-    }" />
+                root: '!h-10 !w-64',
+                container: {
+                    class: form.error ? '!bg-danger !h-10 !rounded-lg' : '!bg-primary !h-10 !rounded-lg'
+                },
+                content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
+                buttonContainer: '!hidden',
+                icon: '!hidden',
+                detail: '!hidden'
+            }" />
 </template>

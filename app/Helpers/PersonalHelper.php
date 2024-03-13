@@ -43,9 +43,7 @@ function getPersonalGerenciaOficina(string $gerencia = null, string $oficina = n
     } elseif ($gerencia != null && $oficina == null) {
         $personal = searchEmpleados('Gerencia', $gerencia);
     } elseif ($gerencia != null && $oficina != null) {
-        $personal = searchEmpleados('Gerencia', $gerencia)->filter(function ($employee) use ($gerencia, $oficina) {
-            return $employee['Gerencia'] == $gerencia && $employee['Oficina'] == $oficina;
-        });
+        $personal = Employee::where('Gerencia', $gerencia)->where('Oficina', $oficina)->get();
     }
 
     return $personal;
@@ -72,7 +70,8 @@ function setEmpleadosAPI(): mixed
                     Employee::create((array) $employee);
             };
         }
-        dd('Sin token');
+        return Employee::get();
+        // dd('Sin token');
     } catch (\Throwable $th) {
         dd($th);
     }
@@ -80,24 +79,8 @@ function setEmpleadosAPI(): mixed
 
 function searchEmpleados(string $clave, string $valor)
 {
-    return getEmpleadosAPI()->filter(function ($employee) use ($clave, $valor) {
-        return strpos($employee[$clave], $valor) !== false;
-    });
+    return Employee::where($clave, $valor)->get();
 }
-// ->map(function ($person) {
-//     return [
-//         'Num_SAP' => (int) $person['Num_SAP'],
-//         'Fecha_Final' => Carbon::createFromFormat('Ymd', $person['Fecha_Final']),
-//         'Costo_Hora' => $person['Costo_Hora'],
-//         'Costo_Mes' => $person['Costo_Mes'],
-//         'Oficina' => $person['Oficina'],
-//         'canDelete' => $person['JI_Num_SAP'] != auth()->user()->num_sap,
-//         'Nombres_Apellidos' => $person['Nombres_Apellidos'],
-//         'Cargo' => $person['Cargo'],
-//         'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
-//     ];
-// });
-
 
 function getPersonalUser()
 {

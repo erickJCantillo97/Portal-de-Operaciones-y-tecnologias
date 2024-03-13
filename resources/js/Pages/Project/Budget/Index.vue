@@ -1,12 +1,15 @@
 <script setup>
-import Empty from '@/Components/Empty.vue';
-import Loading from '@/Components/Loading.vue';
-import AppLayout from '@/Layouts/AppLayout.vue'
-import AccordionBudget from '@/Pages/Project/Budget/Components/AccordionBudget.vue'
-import Dropdown from 'primevue/dropdown';
+import { commonUtilities } from '@/composable/commonUtilities';
 import { ref } from 'vue';
 import { useToast } from "primevue/usetoast";
+import AccordionBudget from '@/Pages/Project/Budget/Components/AccordionBudget.vue'
+import AppLayout from '@/Layouts/AppLayout.vue'
+import Dropdown from 'primevue/dropdown';
+import Empty from '@/Components/Empty.vue';
+import Loading from '@/Components/Loading.vue';
+
 const toast = useToast();
+const { currencyFormat } = commonUtilities()
 
 const props = defineProps({
     projects: Array,
@@ -115,14 +118,6 @@ const projectSelect = async () => {
     }
 }
 
-const formatCurrency = (valor, moneda) => {
-    if (valor == undefined || valor == null) {
-        return 'Sin definir'
-    } else {
-        return parseInt(valor).toLocaleString('es-CO',
-            { style: 'currency', currency: moneda == null ? 'COP' : moneda, maximumFractionDigits: 0 })
-    }
-}
 const option = ref('total')
 
 </script>
@@ -153,10 +148,10 @@ const option = ref('total')
                             <p class="w-full text-center font-bold">Materiales</p>
                             <div class="grid-cols-2 grid py-0.5 -mt-0.5">
                                 <p title="Presupuesto" class="w-full text-center border-r !text-sm">{{
-                            formatCurrency(totales.materials) }}
+                            currencyFormat(totales.materials) }}
                                 </p>
                                 <p title="Ejecutado" class="w-full text-center !text-sm border-l"> {{
-                            formatCurrency(totales.materials_ejecutados) }}
+                            currencyFormat(totales.materials_ejecutados) }}
                                 </p>
                             </div>
                             <div class="w-full h-4 border rounded-sm bg-gray-400" :title="totales.materials100 + '%'">
@@ -176,10 +171,10 @@ const option = ref('total')
                             <p class="w-full text-center font-bold">Mano de obra</p>
                             <div class="grid-cols-2 grid py-0.5 -mt-0.5">
                                 <p title="Presupuesto" class="w-full text-center border-r !text-sm"> {{
-                            formatCurrency(totales.labor) }}
+                            currencyFormat(totales.labor) }}
                                 </p>
                                 <p title="Ejecutado" class="w-full text-center !text-sm border-l"> {{
-                            formatCurrency(totales.labor_ejecutados) }}
+                            currencyFormat(totales.labor_ejecutados) }}
                                 </p>
                             </div>
                             <div class="w-full h-4 border rounded-sm bg-gray-400" :title="totales.labor100 + '%'">
@@ -199,10 +194,10 @@ const option = ref('total')
                             <p class="w-full text-center font-bold">Servicios</p>
                             <div class="grid-cols-2 grid py-0.5 -mt-0.5">
                                 <p title="Presupuesto" class="w-full text-center border-r !text-sm"> {{
-                            formatCurrency(totales.services) }}
+                            currencyFormat(totales.services) }}
                                 </p>
                                 <p title="Ejecutado" class="w-full text-center !text-sm border-l"> {{
-                            formatCurrency(totales.services_ejecutados) }}
+                            currencyFormat(totales.services_ejecutados) }}
                                 </p>
                             </div>
                             <div class="w-full h-4 border rounded-sm bg-gray-400" :title="totales.services100 + '%'">
@@ -222,10 +217,10 @@ const option = ref('total')
                             <p class="w-full text-center font-bold">Total</p>
                             <div class="grid-cols-2 grid py-0.5 -mt-0.5">
                                 <p title="Presupuesto" class="w-full text-center border-r !text-sm"> {{
-                            formatCurrency(totales.total) }}
+                            currencyFormat(totales.total) }}
                                 </p>
                                 <p title="Ejecutado" class="w-full text-center !text-sm border-l"> {{
-                            formatCurrency(totales.total_ejecutado) }}
+                            currencyFormat(totales.total_ejecutado) }}
                                 </p>
                             </div>
                             <div class="w-full h-4 border  rounded-sm bg-gray-400" :title="totales.total_100 + '%'">

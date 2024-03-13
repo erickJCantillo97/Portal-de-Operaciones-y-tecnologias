@@ -1,8 +1,8 @@
 <script setup>
-import { ref } from 'vue';
-import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { PieChart } from 'echarts/charts';
+import { ref } from 'vue';
+import { use } from 'echarts/core';
 import {
     TitleComponent,
     TooltipComponent,

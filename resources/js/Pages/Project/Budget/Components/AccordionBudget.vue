@@ -1,7 +1,10 @@
 <script setup>
+const { currencyFormat } = commonUtilities()
+import { commonUtilities } from '@/composable/commonUtilities';
 import Accordion from 'primevue/accordion';
-import AccordionTab from 'primevue/accordiontab';
 import AccordionBudget from '@/Pages/Project/Budget/Components/AccordionBudget.vue'
+import AccordionTab from 'primevue/accordiontab';
+
 const props = defineProps({
     data: Object,
     option: {
@@ -10,18 +13,7 @@ const props = defineProps({
     },
     level: String
 })
-
-const formatCurrency = (valor, moneda) => {
-    if (valor == undefined || valor == null) {
-        return 'Sin definir'
-    } else {
-        return parseInt(valor).toLocaleString('es-CO',
-            { style: 'currency', currency: moneda == null ? 'COP' : moneda, maximumFractionDigits: 0 })
-    }
-}
-
 </script>
-
 <template>
     <Accordion v-if="data">
         <AccordionTab v-for="pep in data" :pt="{
@@ -39,53 +31,53 @@ const formatCurrency = (valor, moneda) => {
                     </span>
                     <span v-if="option == 'material'" class="col-span-3 grid grid-cols-3">
                         <p class="h-full flex items-center justify-end">
-                            {{ formatCurrency(pep.materials) }}
+                            {{ currencyFormat(pep.materials) }}
                         </p>
                         <p class="h-full flex items-center justify-end">
-                            {{ formatCurrency(pep.materials_ejecutados) }}
+                            {{ currencyFormat(pep.materials_ejecutados) }}
                         </p>
                         <p class="h-full flex items-center justify-end"
                             :class="(pep.materials - pep.materials_ejecutados) < 0 ? 'text-danger' : ''">
-                            {{ formatCurrency((pep.materials - pep.materials_ejecutados)) }}
+                            {{ currencyFormat((pep.materials - pep.materials_ejecutados)) }}
                         </p>
                     </span>
                     <span v-if="option == 'obra'" class="col-span-3 grid grid-cols-3">
                         <p class="h-full flex items-center justify-end">
-                            {{ formatCurrency(pep.labor) }}
+                            {{ currencyFormat(pep.labor) }}
                         </p>
                         <p class="h-full flex items-center justify-end">
-                            {{ formatCurrency(pep.labor_ejecutados) }}
+                            {{ currencyFormat(pep.labor_ejecutados) }}
                         </p>
                         <p class="h-full flex items-center justify-end"
                             :class="(pep.labor - pep.labor_ejecutados) < 0 ? 'text-danger' : ''">
-                            {{ formatCurrency((pep.labor - pep.labor_ejecutados)) }}
+                            {{ currencyFormat((pep.labor - pep.labor_ejecutados)) }}
                         </p>
                     </span>
                     <span v-if="option == 'servicio'" class="col-span-3 grid grid-cols-3">
                         <p class="h-full flex items-center justify-end">
-                            {{ formatCurrency(pep.services) }}
+                            {{ currencyFormat(pep.services) }}
                         </p>
                         <p class="h-full flex items-center justify-end">
-                            {{ formatCurrency(pep.services_ejecutados) }}
+                            {{ currencyFormat(pep.services_ejecutados) }}
                         </p>
                         <p class="h-full flex items-center justify-end"
                             :class="(pep.services - pep.services_ejecutados) < 0 ? 'text-danger' : ''">
-                            {{ formatCurrency((pep.services - pep.services_ejecutados)) }}
+                            {{ currencyFormat((pep.services - pep.services_ejecutados)) }}
                         </p>
                     </span>
                     <span v-if="option == 'total'" class="col-span-3 grid grid-cols-3">
                         <p class="h-full flex items-center justify-end">
-                            {{ formatCurrency(parseInt(pep.materials) + parseInt(pep.labor) + parseInt(pep.services)) }}
+                            {{ currencyFormat(parseInt(pep.materials) + parseInt(pep.labor) + parseInt(pep.services)) }}
                         </p>
                         <p class="h-full flex items-center justify-end">
-                            {{ formatCurrency(parseInt(pep.materials_ejecutados) + parseInt(pep.labor_ejecutados) +
+                            {{ currencyFormat(parseInt(pep.materials_ejecutados) + parseInt(pep.labor_ejecutados) +
         parseInt(pep.services_ejecutados)) }}
                         </p>
                         <p class="h-full flex items-center justify-end"
                             :class="((parseInt(pep.materials) + parseInt(pep.labor) + parseInt(pep.services)) -
         (parseInt(pep.materials_ejecutados) + parseInt(pep.labor_ejecutados) + parseInt(pep.services_ejecutados))) < 0 ? 'text-danger' : ''">
                             {{
-        formatCurrency(((parseInt(pep.materials) + parseInt(pep.labor) + parseInt(pep.services)) -
+        currencyFormat(((parseInt(pep.materials) + parseInt(pep.labor) + parseInt(pep.services)) -
             (parseInt(pep.materials_ejecutados) + parseInt(pep.labor_ejecutados) +
                 parseInt(pep.services_ejecutados))))
     }}
@@ -106,57 +98,57 @@ const formatCurrency = (valor, moneda) => {
                         </span>
                         <span v-if="option == 'material'" class="col-span-3 grid grid-cols-3">
                             <p class="h-full flex items-center justify-end">
-                                {{ formatCurrency(operacion.materials) }}
+                                {{ currencyFormat(operacion.materials) }}
                             </p>
                             <p class="h-full flex items-center justify-end">
-                                {{ formatCurrency(operacion.materials_ejecutados) }}
+                                {{ currencyFormat(operacion.materials_ejecutados) }}
                             </p>
                             <p class="h-full flex items-center justify-end"
                                 :class="(parseInt(operacion.materials) - operacion.materials_ejecutados) < 0 ? 'text-danger' : ''">
-                                {{ formatCurrency((parseInt(operacion.materials) - operacion.materials_ejecutados)) }}
+                                {{ currencyFormat((parseInt(operacion.materials) - operacion.materials_ejecutados)) }}
                             </p>
                         </span>
                         <span v-if="option == 'obra'" class="col-span-3 grid grid-cols-3">
                             <p class="h-full flex items-center justify-end">
-                                {{ formatCurrency(operacion.labor) }}
+                                {{ currencyFormat(operacion.labor) }}
                             </p>
                             <p class="h-full flex items-center justify-end">
-                                {{ formatCurrency(operacion.labor_ejecutados) }}
+                                {{ currencyFormat(operacion.labor_ejecutados) }}
                             </p>
                             <p class="h-full flex items-center justify-end"
                                 :class="(parseInt(operacion.labor) - operacion.labor_ejecutados) < 0 ? 'text-danger' : ''">
-                                {{ formatCurrency((parseInt(operacion.labor) - operacion.labor_ejecutados)) }}
+                                {{ currencyFormat((parseInt(operacion.labor) - operacion.labor_ejecutados)) }}
                             </p>
                         </span>
                         <span v-if="option == 'servicio'" class="col-span-3 grid grid-cols-3">
                             <p class="h-full flex items-center justify-end">
-                                {{ formatCurrency(operacion.services) }}
+                                {{ currencyFormat(operacion.services) }}
                             </p>
                             <p class="h-full flex items-center justify-end">
-                                {{ formatCurrency(operacion.services_ejecutados) }}
+                                {{ currencyFormat(operacion.services_ejecutados) }}
                             </p>
                             <p class="h-full flex items-center justify-end"
                                 :class="(operacion.services - operacion.services_ejecutados) < 0 ? 'text-danger' : ''">
-                                {{ formatCurrency((operacion.services - operacion.services_ejecutados)) }}
+                                {{ currencyFormat((operacion.services - operacion.services_ejecutados)) }}
                             </p>
                         </span>
                         <span v-if="option == 'total'" class="col-span-3 grid grid-cols-3">
                             <p class="h-full flex items-center justify-end">
                                 {{
-        formatCurrency(parseInt(operacion.materials) + parseInt(operacion.labor) +
+        currencyFormat(parseInt(operacion.materials) + parseInt(operacion.labor) +
             parseInt(operacion.services))
     }}
                             </p>
                             <p class="h-full flex items-center justify-end">
                                 {{
-            formatCurrency(operacion.materials_ejecutados + operacion.labor_ejecutados +
+            currencyFormat(operacion.materials_ejecutados + operacion.labor_ejecutados +
                 operacion.services_ejecutados)
         }}
                             </p>
                             <p class="h-full flex items-center justify-end"
                                 :class="((parseInt(operacion.materials) + parseInt(operacion.labor) + parseInt(operacion.services)) - parseInt(operacion.materials_ejecutados + operacion.labor_ejecutados + operacion.services_ejecutados)) < 0 ? 'text-danger' : ''">
                                 {{
-        formatCurrency(((parseInt(operacion.materials) + parseInt(operacion.labor) +
+        currencyFormat(((parseInt(operacion.materials) + parseInt(operacion.labor) +
                                 parseInt(operacion.services)) - parseInt(operacion.materials_ejecutados +
                                 operacion.labor_ejecutados + operacion.services_ejecutados)))
                                 }}

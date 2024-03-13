@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Loading from '@/Components/Loading.vue'
 import NoContentToShow from '@/Components/NoContentToShow.vue'
 
@@ -51,7 +51,7 @@ const format_ES_Date = (date) => {
 <template>
   <div class="flow-root">
     <Loading v-if="showLoading" message="Cargando Estados" class="mt-12" />
-    <NoContentToShow v-if="showNoContent" subject="Estados" />
+    <NoContentToShow v-if="showNoContent" subject="Esta estimación no tiene estados" />
     <ul role="list" class="shadow-md rounded-lg p-8 max-h-[258px] overflow-y-auto">
       <li v-for="(event, eventIdx) in status" :key="event.id">
         <div class="relative pb-8">

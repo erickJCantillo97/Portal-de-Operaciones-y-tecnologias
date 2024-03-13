@@ -1,21 +1,21 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useForm, router } from '@inertiajs/vue3'
-import { useSweetalert } from '@/composable/sweetAlert'
-import AppLayout from '@/Layouts/AppLayout.vue'
-import CustomDataTable from '@/Components/CustomDataTable.vue'
-import CustomModal from '@/Components/CustomModal.vue'
-import CustomInput from '@/Components/CustomInput.vue'
-import RadioGroups from '@/Components/RadioGroups.vue'
-import Listbox from 'primevue/listbox'
-import Textarea from 'primevue/textarea'
-import Toast from 'primevue/toast';
-import { useToast } from "primevue/usetoast";
-import { usePermissions } from '@/composable/permission';
-import Empty from '@/Components/Empty.vue'
+const { confirmDelete } = useSweetalert()
 const { hasRole, hasPermission } = usePermissions()
 const toast = useToast();
-const { confirmDelete } = useSweetalert()
+import { ref, onMounted } from 'vue'
+import { useForm, router } from '@inertiajs/vue3'
+import { usePermissions } from '@/composable/permission';
+import { useSweetalert } from '@/composable/sweetAlert'
+import { useToast } from "primevue/usetoast";
+import AppLayout from '@/Layouts/AppLayout.vue'
+import CustomDataTable from '@/Components/CustomDataTable.vue'
+import CustomInput from '@/Components/CustomInput.vue'
+import CustomModal from '@/Components/CustomModal.vue'
+import Empty from '@/Components/Empty.vue'
+import Listbox from 'primevue/listbox'
+import RadioGroups from '@/Components/RadioGroups.vue'
+import Textarea from 'primevue/textarea'
+import Toast from 'primevue/toast';
 
 const props = defineProps({
   assignmentsTool: {
@@ -88,7 +88,6 @@ const deleteAssignment = (event, data) => {
 }
 
 const submit = () => {
-
   try {
     if (form.tools == null) {
       toast.add({ severity: 'error', group: 'customToast', text: 'Seleccione los Equipos a Asignar', life: 2000 });
@@ -144,7 +143,6 @@ const clearModal2 = () => {
   form.reset()
 }
 </script>
-
 <template>
   <AppLayout>
     <div class="w-full h-[89vh] overflow-y-auto">
@@ -172,7 +170,8 @@ const clearModal2 = () => {
       <section class="grid grid-cols-2 gap-4">
         <!--CAMPO SELECCIÓN DE PERSONA (personal)-->
         <CustomInput type="dropdown" :loading label="Seleccionar Persona" :options="personal"
-          v-model:input="selectedEmployee" optionLabel="Nombres_Apellidos" placeholder="Seleccione Personal" showClear />
+          v-model:input="selectedEmployee" optionLabel="Nombres_Apellidos" placeholder="Seleccione Personal"
+          showClear />
 
         <!--CAMPO SELECCIÓN DE SUPERVISOR (supervisor)-->
         <CustomInput type="dropdown" :loading label="Seleccionar Supervisor" :options="personal"
@@ -194,8 +193,8 @@ const clearModal2 = () => {
           <Listbox v-model="form.tools" :options="tools" multiple filter :filterFields="['name', 'serial']"
             optionLabel="name" optionValue="id" filterPlaceholder="Seleccione el/los equipo(s) para asignar."
             class="w-full md:w-14rem" :virtualScrollerOptions="{ itemSize: 38 }" listStyle="height:15rem" :pt="{
-              filterInput: '!text-sm'
-            }">
+        filterInput: '!text-sm'
+      }">
             <template #option="slotProps">
               <div class="items-center flex justify-between">
                 <div> {{ slotProps.option.name }}</div>
@@ -232,15 +231,15 @@ const clearModal2 = () => {
           <label>Estado de la herramienta <span class="text-red-700 italic mt-2 font-serif">*</span></label>
           <RadioGroups v-model="toolStatus" />
           <span class="text-red-700 text-xs italic mt-2 font-serif" v-if="!toolStatus">{{
-            $page.props.errors.status
-          }}</span>
+        $page.props.errors.status
+      }}</span>
         </div>
         <div class="col-span-4">
           <label>Descripción de Estado de la herramienta</label>
-          <Textarea v-model="descriptionValue" rows="5" col="10" placeholder="Agregue una descripción al grupo" autoResize
-            :pt="{
-              root: '!w-full !text-sm'
-            }" />
+          <Textarea v-model="descriptionValue" rows="5" col="10" placeholder="Agregue una descripción al grupo"
+            autoResize :pt="{
+        root: '!w-full !text-sm'
+      }" />
         </div>
       </section>
     </template>
@@ -252,13 +251,13 @@ const clearModal2 = () => {
   </CustomModal>
 
   <Toast position="bottom-center" :pt="{
-    root: '!h-10 !w-64',
-    container: {
-      class: form.error ? '!bg-danger !h-10 !rounded-lg' : '!bg-primary !h-10 !rounded-lg'
-    },
-    content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
-    buttonContainer: '!hidden',
-    icon: '!hidden',
-    detail: '!hidden'
-  }" />
+        root: '!h-10 !w-64',
+        container: {
+          class: form.error ? '!bg-danger !h-10 !rounded-lg' : '!bg-primary !h-10 !rounded-lg'
+        },
+        content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
+        buttonContainer: '!hidden',
+        icon: '!hidden',
+        detail: '!hidden'
+      }" />
 </template>

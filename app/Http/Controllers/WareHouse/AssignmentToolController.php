@@ -24,7 +24,8 @@ class AssignmentToolController extends Controller
      */
     public function index()
     {
-        $assignmentsTool = AssignmentTool::orderBy('assigment_date', 'DESC')->has('tool')->where('status', 'ASIGNADO')->with('tool', 'project')->get();
+        $assignmentsTool = AssignmentTool::orderBy('assigment_date', 'DESC')->where('tool_id', 1213)->get();
+        return $assignmentsTool;
         $projects = Project::orderBy('created_at', 'DESC')->get();
         $warehouse = Warehouse::where('department', auth()->user()->oficina)->first()->id ?? 4;
         $tools = Tool::where('warehouse_id', $warehouse)->with('category', 'warehouse')->orderBy('category_id')->where('estado', '!=', 'ASIGNADO')->get();
@@ -39,7 +40,7 @@ class AssignmentToolController extends Controller
         // $asignaciones = AssignmentTool::where('assigment_date', '<', '09/02/2023')->forceDelete();
         // return $asignaciones;
         $equipos = DB::connection('sqlsrv_anterior')->table('asignacions')->join('CORPORATIVA_INTERFACE.dbo.LISTADO_PERSONAL_SAP_TODOS_View as l', 'l.ID', DB::raw('asignacions.persona_id'))->orderBy('asignacions.id')->get();
-       
+
         foreach ($equipos as $e) {
 
             // $empleado = collect(searchEmpleados('Num_SAP', $e->persona_id))->first();

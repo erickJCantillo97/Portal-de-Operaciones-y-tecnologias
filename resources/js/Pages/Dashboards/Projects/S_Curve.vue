@@ -1,11 +1,11 @@
 <script setup>
-import * as echarts from 'echarts/core'
-import { ref, onMounted } from 'vue'
-import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { UniversalTransition } from 'echarts/features'
-import { LineChart } from 'echarts/charts'
 import { GridComponent } from 'echarts/components'
+import { LineChart } from 'echarts/charts'
+import { ref, onMounted } from 'vue'
+import { UniversalTransition } from 'echarts/features'
+import { use } from 'echarts/core'
+import * as echarts from 'echarts/core'
 import VChart from 'vue-echarts'
 
 const props = defineProps({

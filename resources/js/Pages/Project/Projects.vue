@@ -1,4 +1,5 @@
 <script setup>
+import { commonUtilities } from '@/composable/commonUtilities'
 import { ref } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
 import { usePermissions } from '@/composable/permission'
@@ -18,6 +19,7 @@ import OverlayPanel from 'primevue/overlaypanel'
 import Empty from '@/Components/Empty.vue'
 
 const { hasPermission } = usePermissions();
+const { byteSizeFormatter, formatDateTime24h } = commonUtilities();
 
 const props = defineProps({
     projects: Array,
@@ -80,20 +82,6 @@ const onSelectedFiles = (event) => {
 
 const onRemoveTemplatingFile = (file, removeFileCallback, index) => {
     removeFileCallback(index);
-};
-
-const formatSize = (bytes) => {
-    const k = 1024;
-    const dm = 1;
-    const sizeType = ['B', 'KB', 'MB', 'GB']
-    if (bytes === 0) {
-        return `0 byte`;
-    }
-
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
-
-    return `${formattedSize} ${sizeType[i]}`;
 }
 
 const uploadForm = useForm({
@@ -123,22 +111,17 @@ const uploadEvent = (data) => {
     })
 }
 
-function formatDateTime24h(dateTime) {
-    return new Date(dateTime).toLocaleString('es-CO',
-        { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
-}
-
 const tipologiaFiles = ref([])
 const selectTipologia = () => {
     fileup.value = Math.random() * (10)
     if (tipologia.value) {
-        axios.get(route('get.files.project.tipologia', { porjectID: project.value.id, tipologiaID: tipologia.value.id })).then((response) => {
-            tipologiaFiles.value = response.data.files;
-            Array.prototype.push.apply(tipologiaFiles.value, response.data.filesImages);
-            // tipologiaFiles.value = response.data.files
-            // console.log(response.data)
-            // tipologiaFiles.value.push(response.data.filesImages)
-        })
+        axios.get(route('get.files.project.tipologia', {
+            projectID: project.value.id,
+            tipologiaID: tipologia.value.id
+        }))
+            .then((response) => {
+                tipologiaFiles.value = response.data.files
+            })
     } else {
         tipologiaFiles.value = []
     }
@@ -290,7 +273,7 @@ const goToProjectOverview = (event, data) => {
                                                     {{ formatDateTime24h(item.created_at) }}
                                                 </p>
                                                 <p class="text-xs">
-                                                    {{ formatSize(item.file_size) }}
+                                                    {{ byteSizeFormatter(item.file_size) }}
                                                 </p>
                                                 <p class="text-xs"
                                                     v-if="item.filePath.slice(item.filePath.lastIndexOf('.') + 1) == 'pdf'">
@@ -361,7 +344,7 @@ const goToProjectOverview = (event, data) => {
 
                                                     <div class="px-3">
                                                         <p class="text-sm">{{ item.name }} </p>
-                                                        <p class="text-xs">{{ formatSize(item.size) }} </p>
+                                                        <p class="text-xs">{{ byteSizeFormatter(item.size) }} </p>
                                                     </div>
                                                 </div>
                                                 <Button icon="fa-regular fa-trash-can" text
@@ -397,13 +380,18 @@ const goToProjectOverview = (event, data) => {
 
     <OverlayPanel ref="pdf">
         <div class="">
-            <p class="text-sm font-semibold">{{ archivoData.name }}</p>
+            <p class="text-sm font-semibold">
+                {{ archivoData.name }}
+            </p>
             <span class="flex space-x-2 p-1 cursor-default">
-                <p title="Encargado" class="text-sm border rounded-md px-2">{{ archivoData.name_user }}</p>
-                <p title="Fecha subida" class="text-sm border rounded-md px-2">
-                    {{ formatDateTime24h(archivoData.created_at) }}
+                <p title="Encargado" class="text-sm border rounded-md px-2">
+                    {{ archivoData.name_user }}
                 </p>
-                <p title="Tamaño" class="text-sm border rounded-md px-2">{{ formatSize(archivoData.file_size) }} </p>
+                <p title="Fecha subida" class="text-sm border rounded-md px-2">
+                    {{ formatDateTime24h(archivoData.created_at) }} </p>
+                <p title="Tamaño" class="text-sm border rounded-md px-2">
+                    {{ byteSizeFormatter(archivoData.file_size) }}
+                </p>
                 <p title="Cantidad de folios" class="text-sm border rounded-md px-2">
                     {{ archivoData.num_folios }} folio(s) </p>
             </span>

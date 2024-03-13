@@ -1,28 +1,28 @@
 <script setup>
-import { useForm } from '@inertiajs/vue3';
-import AppLayout from "@/Layouts/AppLayout.vue";
-import { ref } from 'vue';
-import Button from 'primevue/button';
-import CustomModal from '@/Components/CustomModal.vue';
-import Image from 'primevue/image';
-import { usePermissions } from '@/composable/permission';
-import { useSweetalert } from '@/composable/sweetAlert';
-import CustomDataTable from '@/Components/CustomDataTable.vue';
-import CustomInput from '@/Components/CustomInput.vue';
-import Sidebar from 'primevue/sidebar';
-import OverlayPanel from 'primevue/overlaypanel';
-import axios from 'axios';
-import Card from 'primevue/card'
-import Tag from 'primevue/tag';
-import { Link } from '@inertiajs/vue3';
-
+const { confirmDelete } = useSweetalert();
 const { hasRole, hasPermission } = usePermissions()
 const { toast } = useSweetalert();
-const { confirmDelete } = useSweetalert();
+import { Link } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import { useForm } from '@inertiajs/vue3';
+import { usePermissions } from '@/composable/permission';
+import { useSweetalert } from '@/composable/sweetAlert';
+import AppLayout from "@/Layouts/AppLayout.vue";
+import axios from 'axios';
+import Button from 'primevue/button';
+import Card from 'primevue/card'
+import CustomDataTable from '@/Components/CustomDataTable.vue';
+import CustomInput from '@/Components/CustomInput.vue';
+import CustomModal from '@/Components/CustomModal.vue';
+import Image from 'primevue/image';
+import OverlayPanel from 'primevue/overlaypanel';
+import Sidebar from 'primevue/sidebar';
+import Tag from 'primevue/tag';
 
 const props = defineProps({
     typeShips: Object
 })
+
 const hull_materials = ['ACERO', 'ALUMINIO', 'MATERIALES COMPUESTOS']
 const modalVisible = ref(false)
 const modalType = ref('new')
@@ -61,6 +61,7 @@ const typeShip = useForm(
         image: null
     }
 )
+
 const showNew = () => {
     typeShip.reset()
     modalType.value = 'new'
@@ -106,6 +107,7 @@ const showEdit = (event, dato) => {
     modalType.value = 'edit'
     modalVisible.value = true
 }
+
 const edit = () => {
     typeShip.post(route('typeShips.update', typeShip.id), {
         onSuccess: (response) => {
@@ -125,6 +127,7 @@ const deleteClic = (event, dato) => {
 
 const visibleSidebar = ref(false)
 const dataSidebar = ref()
+
 const rowClick = (event) => {
     dataSidebar.value = event.data
     dataSidebar.value.projects = []
@@ -157,7 +160,6 @@ const showHull = (event, data) => {
     }
 }
 </script>
-
 <template>
     <AppLayout>
         <div class="h-[89vh] overflow-y-auto">
@@ -172,8 +174,8 @@ const showHull = (event, data) => {
         </div>
     </AppLayout>
 
+    <!--MODAL-->
     <CustomModal v-model:visible="modalVisible">
-
         <template #icon>
             <i class="text-white fa-solid fa-ship"></i>
         </template>
@@ -248,6 +250,7 @@ const showHull = (event, data) => {
         </template>
     </CustomModal>
 
+    <!--SIDEBAR-->
     <Sidebar v-model:visible="visibleSidebar" :showCloseIcon="false" position="right">
         <span class="flex justify-center">
             <img :src="dataSidebar.render" alt="ImageShip" onerror="this.src='/svg/cotecmar-logo.svg'"
@@ -328,6 +331,7 @@ const showHull = (event, data) => {
         </span>
     </Sidebar>
 
+    <!--OVERLAYPANEL-->
     <OverlayPanel ref="op">
         <ul class="list-none p-0 m-0 flex flex-col gap-2 w-96 max-w-96 max-h-52 overflow-y-auto">
             <li v-for="hull in hullsSelect" :key="hull.name" class="flex items-center gap-2">

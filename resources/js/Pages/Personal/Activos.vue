@@ -1,13 +1,16 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref } from 'vue';
+import { commonUtilities } from '@/composable/commonUtilities';
 import '../../../sass/dataTableCustomized.scss';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
 import { FilterMatchMode } from 'primevue/api';
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
+import { ref } from 'vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import Button from '../../Components/Button.vue';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
 import UserTable from '@/Components/UserTable.vue';
+
+const { currencyFormat, formatDate } = commonUtilities()
 
 const props = defineProps({
     personal: Array
@@ -16,25 +19,7 @@ const props = defineProps({
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
-
-const formatCurrency = (value) => {
-    return parseFloat(value).toLocaleString('es-CO', {
-        style: 'currency',
-        currency: 'COP',
-    });
-};
-
-function formatDate(date) {
-    // Extraer año, mes y día
-    var anho = date.slice(0, 4);
-    var mes = date.slice(4, 6);
-    var dia = date.slice(6, 8);
-
-    // Formato de salida: dd/mm/aaaa
-    return dia === '00' ? 'Indefinido' : `${dia}/${mes}/${anho}`;
-}
 </script>
-
 <template>
     <AppLayout>
         <div class="w-full overflow-y-auto custom-scroll p-2">
@@ -97,13 +82,13 @@ function formatDate(date) {
                 <Column field="Costo_Hora" header="Costo Hora" sortable>
 
                     <template #body="slotProps">
-                        {{ formatCurrency(slotProps.data.Costo_Hora) }}
+                        {{ currencyFormat(slotProps.data.Costo_Hora) }}
                     </template>
                 </Column>
                 <Column field="Costo_Mes" header="Costo Mes" sortable>
 
                     <template #body="slotProps">
-                        {{ formatCurrency(slotProps.data.Costo_Mes) }}
+                        {{ currencyFormat(slotProps.data.Costo_Mes) }}
                     </template>
                 </Column>
 
