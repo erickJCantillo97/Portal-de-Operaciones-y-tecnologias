@@ -922,15 +922,15 @@ h4.statusmessage {
 }
 
 /* Primevue fondo */
-.p-datatable {
+/* .p-datatable {
     position: relative;
     background-image: url('images/cotecmar-logo-opacity-20.png') !important;
     background-repeat: no-repeat !important;
     background-position: 50% 50% !important;
-}
-.p-dialog-content{
+} */
+/* .p-dialog-content{
     position: relative;
     background-image: url('images/cotecmar-logo-opacity-20.png') !important;
     background-repeat: no-repeat !important;
     background-position: 50% 50% !important;
-}
+} */

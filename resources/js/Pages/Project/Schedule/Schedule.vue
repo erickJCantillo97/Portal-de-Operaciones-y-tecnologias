@@ -305,7 +305,7 @@ onMounted(() => {
 })
 
 
-
+const today = new Date()
 const full = ref(false)
 const readOnly = ref()
 
@@ -390,6 +390,7 @@ const cellEdit = ref({
 const ganttConfig = ref({
     rowHeight: 28,
     dependencyIdField: 'sequenceNumber',
+    visibleDate: { date: today, block: 'center', animate: true },
     project: {
         autoSync: true,
         autoLoad: true,
@@ -427,6 +428,7 @@ const ganttConfig = ref({
     },
     columns: [
         { id: 'wbs', type: 'wbs', text: 'EDT' },
+        { id: 'sequence', type: 'sequence', text: 'Secuencia' },
         { id: 'name', type: 'name', },
         { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true },
         { id: 'duration', type: 'duration', text: 'Duración' },
@@ -510,6 +512,7 @@ const ganttConfig = ref({
         'Ctrl+o': 'outdent',
     },
     // features: features,
+    
 })
 
 //#endRegion
@@ -576,12 +579,14 @@ function onZoomToFitClick() {
 }
 
 const fecha = ref()
-function onStartDateChange(event) {
+function onStartDateChange() {
+    // console.log(event)
     let gantt = ganttref.value.instance.value
+    gantt.scrollToDate(fecha.value, { animate: 300, block: 'start' });
 
-    gantt.startDate = DateHelper.add(event, -1, "week");
+    // gantt.startDate = DateHelper.add(event, -1, "week");
 
-    gantt.project.setStartDate(event);
+    // gantt.project.setStartDate(event);
 }
 const texto = ref()
 function onFilterChange() {
@@ -674,6 +679,7 @@ const ganttConfigImporter = ref({
     dependencyIdField: 'sequenceNumber',
     columns: [
         { id: 'wbs', type: 'wbs', text: 'EDT' },
+        { id: 'sequence', type: 'sequence', text: 'Secuencia' },
         { id: 'name', type: 'name', },
         { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true },
         { id: 'duration', type: 'duration', text: 'Duración' },
@@ -821,15 +827,15 @@ const pruebas = () => {
                         @click="onEditTaskClick()" v-if="!readOnly" />
                     <!-- <Button icon="fa-solid fa-rotate-left" severity="secondary" @click="onUndo()" />
                             <Button icon="fa-solid fa-rotate-right" severity="secondary" @click="onRedo()" /> -->
-                    <Button raised icon="fa-solid fa-chevron-down" v-tooltip.bottom="'Expandir todo'" severity="secondary"
-                        @click="onExpandAllClick()" />
+                    <Button raised icon="fa-solid fa-chevron-down" v-tooltip.bottom="'Expandir todo'"
+                        severity="secondary" @click="onExpandAllClick()" />
                     <Button raised icon="fa-solid fa-chevron-up" v-tooltip.bottom="'Contraer todo'" severity="secondary"
                         @click="onCollapseAllClick()" />
                     <Button raised icon="fa-solid fa-gear" v-tooltip.bottom="'Ajustes'" severity="secondary"
                         @click="onSettingsShow" />
                     <Button raised icon="fa-solid fa-magnifying-glass" v-tooltip.bottom="'Zoom'" severity="secondary"
                         @click="zoom.toggle($event)" />
-                    <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange()"
+                    <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange"
                         placeholder="Buscar por fecha" class=" !h-8 shadow-md" showIcon :pt="{ input: '!h-8' }" />
                     <InputText v-model="texto" @input="onFilterChange" placeholder="Buscar por actividad"
                         class="shadow-md" />
@@ -837,7 +843,8 @@ const pruebas = () => {
                         @click="setLB.toggle($event);" v-if="!readOnly" />
                     <Button raised v-tooltip.bottom="'Ver lineas base'" icon="fa-solid fa-eye"
                         @click="seeLB.toggle($event)" />
-                    <Button raised v-tooltip.bottom="'Exportar a PDF'" icon="fa-solid fa-file-pdf" @click="onExportPDF()" />
+                    <Button raised v-tooltip.bottom="'Exportar a PDF'" icon="fa-solid fa-file-pdf"
+                        @click="onExportPDF()" />
                     <Button raised v-tooltip.bottom="'Exportar a XML'" icon="fa-solid fa-file-arrow-down"
                         @click="onExport()" />
                     <Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input"
@@ -853,8 +860,8 @@ const pruebas = () => {
                         @click="full = !full" />
                 </span>
             </span>
-            <BryntumGantt :filterFeature="true" :taskEditFeature="taskEdit" :projectLinesFeature="false"
-                :cellEditFeature="cellEdit" :pdfExportFeature="pdfExport" :mspExportFeature="true"
+            <BryntumGantt :filterFeature="true" :taskEditFeature="taskEdit" :projectLinesFeature="false" :timelineScrollButtons="true"
+                :cellEditFeature="cellEdit" :pdfExportFeature="pdfExport" :mspExportFeature="true" :timeRanges="true" :projectLines="false"
                 :baselinesFeature="baselines" ref="ganttref" class="h-full" :printFeature="true" v-bind="ganttConfig" />
         </div>
     </AppLayout>
@@ -913,7 +920,8 @@ const pruebas = () => {
         </template>
         <template #footer>
             <Button severity="danger" label="Cancelar" :disabled="loadImport" @click="modalImport = false" />
-            <Button severity="success" :loading="loadImport" label="Importar" :disabled="btnImport" @click="importMSP" />
+            <Button severity="success" :loading="loadImport" label="Importar" :disabled="btnImport"
+                @click="importMSP" />
         </template>
 
     </CustomModal>
