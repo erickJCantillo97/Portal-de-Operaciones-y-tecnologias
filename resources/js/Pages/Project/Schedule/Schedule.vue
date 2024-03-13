@@ -409,6 +409,7 @@ const cellEdit = ref({
 const ganttConfig = ref({
     rowHeight: 28,
     dependencyIdField: 'sequenceNumber',
+    // visibleDate: { date: today, block: 'center', animate: true },
     project: {
         taskModelClass: Task,
         autoSync: true,
@@ -447,6 +448,7 @@ const ganttConfig = ref({
     },
     columns: [
         { id: 'wbs', type: 'wbs', text: 'EDT' },
+        { id: 'sequence', type: 'sequence', text: 'Secuencia' },
         {
             id: 'name', type: 'name', renderer: ({ record }) => ({
                 // Return a DomConfig object describing our custom markup with the task name and a child count badge
@@ -572,6 +574,7 @@ const ganttConfig = ref({
     }
 
     // features: features,
+    
 })
 
 //#endRegion
@@ -637,12 +640,14 @@ function onZoomToFitClick() {
 }
 
 const fecha = ref()
-function onStartDateChange(event) {
+function onStartDateChange() {
+    // console.log(event)
     let gantt = ganttref.value.instance.value
+    gantt.scrollToDate(fecha.value, { animate: 300, block: 'start' });
 
-    gantt.startDate = DateHelper.add(event, -1, "week");
+    // gantt.startDate = DateHelper.add(event, -1, "week");
 
-    gantt.project.setStartDate(event);
+    // gantt.project.setStartDate(event);
 }
 
 const texto = ref()
@@ -742,6 +747,7 @@ const ganttConfigImporter = ref({
     dependencyIdField: 'sequenceNumber',
     columns: [
         { id: 'wbs', type: 'wbs', text: 'EDT' },
+        { id: 'sequence', type: 'sequence', text: 'Secuencia' },
         { id: 'name', type: 'name', },
         { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true },
         { id: 'duration', type: 'duration', text: 'Duración' },
@@ -897,9 +903,8 @@ const pruebas = () => {
                         @click="onSettingsShow" />
                     <Button raised icon="fa-solid fa-magnifying-glass" v-tooltip.bottom="'Zoom'" severity="secondary"
                         @click="zoom.toggle($event)" />
-                    <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha"
-                        @dateSelect="onStartDateChange()" placeholder="Buscar por fecha" class=" !h-8 shadow-md"
-                        showIcon :pt="{ input: '!h-8' }" />
+                    <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange"
+                        placeholder="Buscar por fecha" class=" !h-8 shadow-md" showIcon :pt="{ input: '!h-8' }" />
                     <InputText v-model="texto" @input="onFilterChange" placeholder="Buscar por actividad"
                         class="shadow-md" />
                     <Button raised v-tooltip.bottom="'Guardar en linea base'" icon="fa-solid fa-grip-lines"
@@ -923,8 +928,8 @@ const pruebas = () => {
                         @click="full = !full" />
                 </span>
             </span>
-            <BryntumGantt :filterFeature="true" :taskEditFeature="taskEdit" :projectLinesFeature="false"
-                :cellEditFeature="cellEdit" :pdfExportFeature="pdfExport" :mspExportFeature="true"
+            <BryntumGantt :filterFeature="true" :taskEditFeature="taskEdit" :projectLinesFeature="false" :timelineScrollButtons="true"
+                :cellEditFeature="cellEdit" :pdfExportFeature="pdfExport" :mspExportFeature="true" :timeRanges="true" :projectLines="false"
                 :baselinesFeature="baselines" ref="ganttref" class="h-full" :printFeature="true" v-bind="ganttConfig" />
         </div>
     </AppLayout>

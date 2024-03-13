@@ -3,6 +3,7 @@ import AppLayout from "@/Layouts/AppLayout.vue"
 import Planning from "@/Pages/Dashboards/Projects/Planning.vue"
 import QuotesCard from "@/Pages/Dashboards/Quotes/QuotesCards.vue"
 import UserHeader from "@/Components/sections/UserHeader.vue"
+import Quotes from "./Dashboards/Quotes.vue";
 
 const props = defineProps({
     projects: Array,

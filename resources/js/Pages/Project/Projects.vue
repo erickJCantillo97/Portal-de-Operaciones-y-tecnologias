@@ -16,6 +16,7 @@ import Image from 'primevue/image'
 import Listbox from 'primevue/listbox'
 import Loading from '@/Components/Loading.vue'
 import OverlayPanel from 'primevue/overlaypanel'
+import Empty from '@/Components/Empty.vue'
 
 const { hasPermission } = usePermissions();
 const { byteSizeFormatter, formatDateTime24h } = commonUtilities();
@@ -129,13 +130,14 @@ const selectTipologia = () => {
 const pdf = ref()
 const archivo = ref()
 const archivoData = ref()
-const showPdf = (event, data) => {
+const showFile = (event, data, index) => {
     archivoData.value = data
-    pdf.value.toggle(event)
+    archivoData.value.name = (index + 1) + '.' + (data.tipologia_name)
     fetch(data.filePath).then(response => response.blob()).then(blob => {
-        const file = new File([blob], 'Documento.pdf', { type: 'application/pdf' });
+        const file = new File([blob], archivoData.name + data.filePath.substring(data.filePath.lastIndexOf('.') + 1), { type: data.type });
         archivo.value = URL.createObjectURL(file)
     })
+    pdf.value.toggle(event)
 }
 //#endregion
 
@@ -199,7 +201,7 @@ const goToProjectOverview = (event, data) => {
         </div>
     </AppLayout>
 
-    <CustomModal v-model:visible="modalDocument" :maximizable="true" width="95vw">
+    <CustomModal v-model:visible="modalDocument" width="95vw">
         <template #icon>
             <i class="fa-solid fa-cloud-arrow-up text-white text-xl"></i>
         </template>
@@ -207,12 +209,13 @@ const goToProjectOverview = (event, data) => {
             <p class="text-white">Agregar archivos al proyecto {{ project.name }}</p>
         </template>
         <template #body>
-            <div v-if="tipologias[0]" class="grid grid-cols-5 gap-2 max-h-full">
-                <div class="col-span-2">
-                    <p class="w-full text-center font-bold text-primary text-lg">{{
-                tipologias[0].Subserie }}</p>
+            <div v-if="tipologias[0]" class="grid items-center grid-cols-5 gap-2 h-[75vh] md:h-[74vh]">
+                <div class="col-span-2 h-full flex flex-col justify-between">
+                    <p class="w-full h-full flex items-center justify-center pb-1 font-bold text-primary text-lg">
+                        {{ tipologias[0].Subserie }}
+                    </p>
                     <Listbox :key="listTipologia" v-model="tipologia" :options="tipologias" filter optionLabel="name"
-                        @click="selectTipologia()" listStyle="max-height:60vh" class="w-full md:w-14rem" :pt="{
+                        @click="selectTipologia()" listStyle="max-height:59vh" class="w-full md:w-14rem" :pt="{
                 filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
                 item: { class: 'hover:bg-blue-100 text-md !px-1 !py-0.5' },
             }">
@@ -229,75 +232,65 @@ const goToProjectOverview = (event, data) => {
                         </template>
                     </Listbox>
                 </div>
-                <div v-if="tipologia" class="col-span-3 h-[60vh] space-y-2">
-                    <div class="border rounded-md">
-                        <span class="flex space-x-2 p-2">
-                            <p class="font-bold">Tipologia:</p>
+                <div v-if="tipologia" class="col-span-3 h-[75vh] md:h-[74vh] space-y-2 flex flex-col justify-between">
+                    <div class="border rounded-md overflow-y-auto h-full flex flex-col">
+                        <span class="flex h-10 p-2 border-b">
+                            <p class="font-bold mr-2">Tipologia:</p>
                             <p>{{ tipologia.name }}</p>
                         </span>
-                        <Divider />
-                        <div v-if="tipologiaFiles.length > 0" class="overflow-y-auto h-[40vh]">
-                            <DataView :value="tipologiaFiles" class="w-full overflow-y-auto">
-                                <template #list="slotProps">
-                                    <span v-for="(item, index) in slotProps.items">
-                                        <div class="p-1 flex justify-between items-center w-full">
-                                            <div class="flex">
-                                                <i v-if="item.filePath.slice(item.filePath.lastIndexOf('.') + 1) == 'pdf'"
-                                                    class=" text-danger fa-regular border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center fa-file-pdf"></i>
-                                                <Image v-else :src="item.filePath" preview class="w-9">
-                                                    <template #image>
-                                                        <div class="flex items-center h-full">
-                                                            <img :src="item.filePath" alt="image" />
-                                                        </div>
-                                                    </template>
-                                                    <template #preview="slotProps1">
-                                                        <img :src="slotProps.data.filePath"
-                                                            class="!max-w-[80vw] !max-h-[80vh]" alt="preview"
-                                                            :style="slotProps1.style"
-                                                            @click="slotProps1.previewCallback" />
-                                                    </template>
-                                                </Image>
-                                                <div class="px-3">
-                                                    <p class="text-sm">
-                                                        {{ (index + 1) + '. ' + item.tipologia_name
-                                                        }}
-                                                    </p>
-                                                    <p class="text-xs font-semibold">
-                                                        {{ item.name }}
-                                                    </p>
-                                                    <span class="flex space-x-2">
-                                                        <p class="text-xs">
-                                                            {{ item.name_user }}
-                                                        </p>
-                                                        <p class="text-xs">
-                                                            {{ formatDateTime24h(item.created_at) }}
-                                                        </p>
-                                                        <p class="text-xs">
-                                                            {{ byteSizeFormatter(item.file_size) }}
-                                                        </p>
-                                                        <p class="text-xs"
-                                                            v-if="item.filePath.slice(item.filePath.lastIndexOf('.') + 1) == 'pdf'">
-                                                            {{ item.num_folios }} folio(s)
-                                                        </p>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <span class="space-x-1">
-                                                <Button class="!h-6 !w-6" icon="fa-regular fa-eye" outlined rounded
-                                                    @click="showPdf($event, item)"
-                                                    v-if="item.filePath.slice(item.filePath.lastIndexOf('.') + 1) == 'pdf'"
-                                                    severity="success">
-                                                </Button>
-                                                <Button class="!h-6 !w-6" icon="fa-regular fa-trash-can" outlined
-                                                    disabled @click="" rounded severity="danger">
-                                                </Button>
+                        <div class="h-full flex flex-col items-center"
+                            v-if="tipologia.count > 0 && tipologiaFiles.length == 0">
+                            <Loading message="Cargando archivos" />
+                        </div>
+                        <div v-else-if="tipologiaFiles.length > 0" class="h-full overflow-y-auto">
+                            <span v-for="(item, index) in tipologiaFiles" class="">
+                                <div class="p-1 flex justify-between items-center w-full">
+                                    <div class="flex">
+                                        <i v-if="item.type.includes('image')"
+                                            class="fa-regular text-5xl fa-file-image text-warning" />
+                                        <i v-else-if="item.type.includes('pdf')"
+                                            class="fa-solid fa-file-pdf text-5xl text-danger" />
+                                        <i v-else-if="item.type == 'text/plain'"
+                                            class="fa-regular fa-file-lines text-5xl  text-gray-600" />
+                                        <i v-else-if="item.type.includes('spreadsheet') || item.type.includes('excel')"
+                                            class="fa-solid fa-file-excel text-5xl  text-green-600" />
+                                        <i v-else-if="item.type.includes('word')"
+                                            class="fa-solid fa-file-word text-5xl  text-primary" />
+                                        <i v-else class="fa-solid fa-file text-5xl  text-gray-600" />
+                                        <div class="px-3 flex flex-col justify-center">
+                                            <p class="text-sm">
+                                                {{ (index + 1) + '. ' + item.tipologia_name
+                                                }}
+                                            </p>
+                                            <!-- <p class="text-xs font-bold">
+                                                            {{ item.name }}
+                                                        </p> -->
+                                            <span class="flex space-x-2">
+                                                <p class="text-xs">
+                                                    {{ item.name_user }}
+                                                </p>
+                                                <p class="text-xs">
+                                                    {{ formatDateTime24h(item.created_at) }}
+                                                </p>
+                                                <p class="text-xs">
+                                                    {{ byteSizeFormatter(item.file_size) }}
+                                                </p>
+                                                <p class="text-xs"
+                                                    v-if="item.filePath.slice(item.filePath.lastIndexOf('.') + 1) == 'pdf'">
+                                                    {{ item.num_folios }} folio(s)
+                                                </p>
                                             </span>
                                         </div>
+                                    </div>
+                                    <span class="space-x-1">
+                                        <Button class="!h-6 !w-6" icon="fa-regular fa-eye" text
+                                            @click="showFile($event, item, index)" severity="success">
+                                        </Button>
                                     </span>
-                                </template>
-                            </DataView>
+                                </div>
+                            </span>
                         </div>
-                        <div class="flex items-center justify-center h-[30vh]" v-if="tipologiaFiles.length == 0">
+                        <div class="flex items-center justify-center h-full" v-else>
                             <span>
                                 <i
                                     class="w-full text-center text-2xl text-danger fa-solid fa-file-circle-exclamation"></i>
@@ -305,9 +298,6 @@ const goToProjectOverview = (event, data) => {
                                     Aun no hay archivos
                                 </p>
                             </span>
-                        </div>
-                        <div class="h-full flex items-center" v-if="tipologia.count > 0 && tipologiaFiles.length == 0">
-                            <Loading message="Cargando archivos" />
                         </div>
                     </div>
                     <div class="">
@@ -336,11 +326,22 @@ const goToProjectOverview = (event, data) => {
                                 <DataView v-if="files.length > 0" :value="files"
                                     class="w-full max-h-[20vh] overflow-y-auto">
                                     <template #list="slotProps">
-                                        <span v-for="(item, index) in slotProps.items">
+                                        <!-- {{slotProps.items}} -->
+                                        <span v-for="(item, index) in slotProps.items" :key="index">
                                             <div class="p-1 flex justify-between items-center w-full">
                                                 <div class="flex">
-                                                    <i :class="item.type == 'application/pdf' ? 'fa-regular fa-file-pdf' : 'fa-regular fa-image'"
-                                                        class=" text-danger border p-1 rounded-md border-danger text-xl w-9 flex items-center justify-center"></i>
+                                                    <i v-if="item.type.includes('image')"
+                                                        class="fa-regular text-5xl fa-file-image text-warning" />
+                                                    <i v-else-if="item.type.includes('pdf')"
+                                                        class="fa-solid fa-file-pdf text-6xl text-red-600" />
+                                                    <i v-else-if="item.type == 'text/plain'"
+                                                        class="fa-regular fa-file-lines text-6xl  text-gray-600" />
+                                                    <i v-else-if="item.type.includes('spreadsheet') || item.type.includes('excel')"
+                                                        class="fa-solid fa-file-excel text-6xl  text-green-600" />
+                                                    <i v-else-if="item.type.includes('word')"
+                                                        class="fa-solid fa-file-word text-6xl  text-primary" />
+                                                    <i v-else class="fa-solid fa-file text-6xl  text-gray-600" />
+
                                                     <div class="px-3">
                                                         <p class="text-sm">{{ item.name }} </p>
                                                         <p class="text-xs">{{ byteSizeFormatter(item.size) }} </p>
@@ -363,10 +364,11 @@ const goToProjectOverview = (event, data) => {
                                 </div>
                             </template>
                         </FileUpload>
-
                     </div>
                 </div>
-                <Loading v-else class="col-span-3 h-full pt-10" message="Seleccione una tipologia" />
+                <div v-else class="col-span-3 flex items-center">
+                    <Empty message="Seleccione una tipologia" />
+                </div>
             </div>
             <Loading class="mt-5" v-else message="Cargando tipologias" />
         </template>
@@ -379,7 +381,7 @@ const goToProjectOverview = (event, data) => {
     <OverlayPanel ref="pdf">
         <div class="">
             <p class="text-sm font-semibold">
-                {{ archivoData.name }} Nombre de archivo quemado
+                {{ archivoData.name }}
             </p>
             <span class="flex space-x-2 p-1 cursor-default">
                 <p title="Encargado" class="text-sm border rounded-md px-2">
@@ -394,8 +396,8 @@ const goToProjectOverview = (event, data) => {
                     {{ archivoData.num_folios }} folio(s) </p>
             </span>
         </div>
-        <object :data="archivo + '#toolbar=0'" type="application/pdf" style="width:60vw;height:60vh;">
-            <a :href="archivo" target="_blank">Haz clic aquí para ver el archivo PDF</a>
+        <object class="" :data="archivo + '#toolbar=0'" :type="archivoData.type" style="width:60vw;height:60vh;">
+            <a :href="archivo" target="_blank">Haz clic aquí para ver el archivo</a>
         </object>
         <div class="flex justify-end p-2a">
             <a :href="archivo" target="_blank" rel="noopener noreferrer">
