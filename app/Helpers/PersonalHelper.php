@@ -8,6 +8,7 @@ use App\Models\Personal\WorkingTeams;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use PhpParser\Node\Expr\Empty_;
+use Spatie\Holidays\Holidays;
 
 function UpdateCargos()
 {
@@ -111,4 +112,44 @@ function getPersonalGroup($grupo_id)
     return getPersonalUser()->filter(function ($persona) use ($users_SAP) {
         return in_array($persona['Num_SAP'], $users_SAP);
     });
+}
+
+
+/*
+esta función valida que la fecha enviada $date sea una fecha valida, 
+excluyendo o incluyendo los fines de semana y feriados
+*/
+function getWorkingDays(string $date, int $Workingdays = 5)
+{
+    /* Preguntamos cuando dias de trabajos habiles se quiere usar.
+       Si $workingdays = 5, quiere decir que se trabaja de lunes a viernes
+       Si $workingdays = 6, quiere decir que se trabaja de lunes a sabados
+    */
+    $validDate = [];
+    switch ($Workingdays){
+        case 5:
+            array_push($validDate,'Saturday', 'Sunday');
+            break;
+        case 6:
+            array_push($validDate,'Sunday');
+            break;
+        default:
+            array_push($validDate,'');
+            break;
+        }
+        //obtenemos el nombre del dia
+        $dayName = Carbon::parse($date)->format('l');
+
+        //validamos que la fecha seleccionada no sea fin de semana
+        if(in_array($dayName, $validDate)){
+            return false;
+        }else{
+            //validamos que la fecha seleccionada no sea dia feriado
+            if(Holidays::for('co')->isHoliday($date)){
+                return false;
+        }
+        //si llegamos a este punto, quiere decir que la fecha no es fin de semana ni es feriado.
+        return true;
+        }
+
 }
