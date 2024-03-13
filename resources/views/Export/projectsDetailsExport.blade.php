@@ -5,7 +5,6 @@
             <th>Nombre del Buque</th>
             <th>Clase</th>
             <th>Tipo de Buque</th>
-            <th>Tipo de Buque</th>
             <th>Material del Casco</th>
             <th>Eslora</th>
             <th>Manga</th>
