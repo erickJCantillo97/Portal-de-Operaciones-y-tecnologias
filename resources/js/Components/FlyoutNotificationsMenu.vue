@@ -3,6 +3,7 @@ import { BellIcon, XMarkIcon } from '@heroicons/vue/20/solid'
 import { ChartPieIcon, CursorArrowRaysIcon } from '@heroicons/vue/24/outline'
 import { onMounted, ref } from 'vue'
 import OverlayPanel from 'primevue/overlaypanel';
+import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
 
 const notifications = ref([])
 

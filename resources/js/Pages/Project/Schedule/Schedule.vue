@@ -409,7 +409,7 @@ const cellEdit = ref({
 const ganttConfig = ref({
     rowHeight: 28,
     dependencyIdField: 'sequenceNumber',
-    visibleDate: { date: today, block: 'center', animate: true },
+    // visibleDate: { date: today, block: 'center', animate: true },
     project: {
         taskModelClass: Task,
         autoSync: true,
