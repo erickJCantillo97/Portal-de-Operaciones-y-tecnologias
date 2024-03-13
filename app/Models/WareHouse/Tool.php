@@ -19,10 +19,7 @@ class Tool extends Model implements Auditable
 
     protected $appends = ['name', 'assignment_name'];
 
-    protected static function booted(): void
-    {
-        static::addGlobalScope(new GerenciaScope);
-    }
+
 
     public function category()
     {

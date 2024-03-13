@@ -188,6 +188,7 @@ const form = ref({
     startShift: null,// hora inicio
     endShift: null,// hora fin
     timeBreak: null,
+    schedule_time: null,
     schedule: null, // id del schedule/cronograma (TABLA SCHEDULES)
     idUser: null, // Id de la persona seleccionada (COLUMNA EMPLOYEE_ID DE LA TABLA SCHEDULES)
     date: date, // fecha seleccionada en el calendario

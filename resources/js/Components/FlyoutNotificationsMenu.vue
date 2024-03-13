@@ -3,6 +3,7 @@ import { BellIcon, XMarkIcon } from '@heroicons/vue/20/solid'
 import { ChartPieIcon, CursorArrowRaysIcon } from '@heroicons/vue/24/outline'
 import { onMounted, ref } from 'vue'
 import OverlayPanel from 'primevue/overlaypanel';
+import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
 
 const notifications = ref([])
 
@@ -47,8 +48,7 @@ const callsToAction = [
               <h2 class="text-lg font-extrabold text-white">Notificaciones</h2>
             </div>
           </div>
-          <div class="divide-x divide-gray-200 border-b border-gray-200"></div>
-          <div class="px-2 space-y-2">
+          <div class="px-2 space-y-2 border-b">
             <!--Lista de Notificaciones-->
             <div v-for="item in notifications" :key="item.name">
               <div class="flex items-center justify-center space-x-6 rounded-lg border-b p-1">
@@ -60,6 +60,7 @@ const callsToAction = [
                     {{ item.title }}
                   </a>
                   <p class="text-gray-600 text-sm">{{ item.message }}</p>
+                  <span class="text-xs italic text-gray-500 flex">{{ item.ago }}</span>
                 </div>
                 <div
                   class="col-span-1 flex size-8 cursor-pointer items-center justify-center rounded-2xl text-end hover:bg-gray-100">
@@ -68,7 +69,6 @@ const callsToAction = [
               </div>
             </div>
           </div>
-
           <!--Ver Todas las Notificaciones-->
           <a>
             <div class="grid grid-cols-1 divide-x divide-gray-900/5 bg-primary">

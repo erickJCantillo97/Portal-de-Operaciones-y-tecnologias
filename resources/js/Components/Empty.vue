@@ -21,21 +21,6 @@ defineProps({
     inset: 0;
     box-shadow: 0 0 10px 2px rgb(46, 48, 146, 0.3) inset;
 }
-
-/* .loader:after {
-    box-shadow: 0 2px 0 rgb(46 48 146) inset;
-    animation: rotate 2s linear infinite;
-} */
-
-/* @keyframes rotate {
-    0% {
-        transform: rotate(0)
-    }
-
-    100% {
-        transform: rotate(360deg)
-    }
-} */
 </style>
 
 <template>
