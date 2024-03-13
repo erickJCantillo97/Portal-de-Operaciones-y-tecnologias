@@ -1,18 +1,16 @@
 <script setup>
-import { Link } from '@inertiajs/vue3'
-import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue'
 import { BellIcon, XMarkIcon } from '@heroicons/vue/20/solid'
 import { ChartPieIcon, CursorArrowRaysIcon } from '@heroicons/vue/24/outline'
-import Badge from 'primevue/badge'
+import { onMounted, ref } from 'vue'
+import OverlayPanel from 'primevue/overlaypanel';
 
-const notifications = [
-  { name: 'Notificación 1', description: 'Lorem Ipsum', icon: ChartPieIcon },
-  { name: 'Notificación 2', description: 'Lorem Ipsum', icon: ChartPieIcon },
-  { name: 'Notificación 3', description: 'Lorem Ipsum', icon: ChartPieIcon },
-  { name: 'Notificación 4', description: 'Lorem Ipsum', icon: ChartPieIcon },
-  { name: 'Notificación 5', description: 'Lorem Ipsum', icon: ChartPieIcon },
-  // { name: 'Notificación 6', description: 'Lorem Ipsum', href:'#' icon: ChartPieIcon },
-]
+const notifications = ref([])
+
+onMounted(() => {
+  axios.get(route('get.notifications')).then((res) => {
+    notifications.value = res.data.notifications
+  })
+})
 
 const callsToAction = [
   { name: 'Ver Todas', icon: CursorArrowRaysIcon },
@@ -31,59 +29,56 @@ const callsToAction = [
           class="absolute inline-flex size-4 z-[1] bg-blue-500 rounded-full -mt-7 animate-[ping_3s_ease-in-out_infinite]">
         </div>
         <div class="absolute inline-flex size-4 bg-blue-500 rounded-full -mt-7 ">
-          <span class="text-white text-xs z-[2] ml-[0.3rem]">5</span>
+          <span class="text-white text-xs z-[2] ml-[0.3rem]">{{ notifications.length }}</span>
         </div>
       </div>
     </PopoverButton>
 
-    <transition enter-active-class="transition ease-out duration-200" enter-from-class="opacity-0 translate-y-1"
+    <transition enter-active-class="transition ease-out duration-200" enter-from-class="opacity-0 translate-y-0"
       enter-to-class="opacity-100 translate-y-0" leave-active-class="transition ease-in duration-150"
-      leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 translate-y-1">
-      <PopoverPanel class="absolute left-1/2 z-10 mt-3 flex w-96 max-w-max -translate-x-1/2 px-4">
+      leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 translate-y-0">
+      <PopoverPanel class="absolute lg:-right-28 z-10  flex -right-28 md:w-[30vw] max-w-max  px-4">
         <section
-          class="w-screen max-w-md flex-auto overflow-hidden rounded-xl bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
-          <div class="p-2">
-            <!--Encabezado de Notificaciones-->
-            <div class="flex flex-nowrap place-content-between w-full align-middle p-2">
-              <div>
-                <h2 class="text-lg font-extrabold">Notificaciones</h2>
-              </div>
-              <div class="bg-gray-100 rounded-sm pl-[0.45rem] pr-[0.45rem]">
-                <span class="text-xs text-blue-500 font-extrabold">5 no leídos</span>
-              </div>
-            </div>
-            <div class="divide-x divide-gray-200 border-b border-gray-200"></div>
+          class="w-screen flex-auto overflow-hidden rounded-xl bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
 
+          <!--Encabezado de Notificaciones-->
+          <div class="flex flex-nowrap place-content-between w-full align-middle p-2 bg-primary">
+            <div>
+              <h2 class="text-lg font-extrabold text-white">Notificaciones</h2>
+            </div>
+          </div>
+          <div class="px-2 space-y-2 border-b">
             <!--Lista de Notificaciones-->
-            <div v-for="item in notifications" :key="item.name"
-              class="group relative flex gap-x-6 rounded-lg p-2 hover:bg-gray-50">
-              <div
-                class="mt-1 flex size-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                <component :is="item.icon" class="size-6 text-gray-600 group-hover:text-indigo-600" aria-hidden="true" />
-              </div>
-              <div>
-                <a :href="item.href" class="font-semibold text-gray-900">
-                  {{ item.name }}
-                  <span class="absolute inset-0" />
-                </a>
-                <p class="mt-1 text-gray-600">{{ item.description }}</p>
-              </div>
-              <div class="absolute size-6 end-0 mr-4 mt-2 cursor-pointer p-1">
-                <XMarkIcon class="size-5 text-gray-400 hover:text-gray-500" aria-hidden="true" />
-              </div>
-            </div>
-          </div>
+            <div v-for="item in notifications" :key="item.name" class="border-b">
+              <div class="p-1 flex justify-between items-center rounded-lg space-x-6">
+                <i class="fa-regular fa-circle-xmark text-2xl "
+                  :class="item.type == 'error' ? 'text-danger' : 'text-gray-600'"></i>
+                <div class="col-span-2 w-full">
+                  <a :href="item.href" class="font-semibold text-gray-900 w-4 mt-1">
 
-          <!--Ver Todas las Notificaciones-->
-          <Link :href="route('notifications.index')">
-          <div class="grid grid-cols-1 divide-x divide-gray-900/5 bg-blue-900">
-            <div v-for="item in callsToAction" :key="item.name"
-              class="flex items-center justify-center gap-x-2.5 p-3 font-semibold cursor-pointer text-white hover:bg-blue-800">
-              <component :is="item.icon" class="size-5 flex-none text-gray-400" aria-hidden="true" />
-              {{ item.name }}
+                    {{ item.title }}
+                  </a>
+                  <p class="text-gray-600 text-sm">{{ item.message }}</p>
+                  <span class="text-xs italic text-gray-500 flex">{{ item.ago }}</span>
+                </div>
+                <div class="cursor-pointer col-span-1 text-end ">
+
+                  <i class="text-danger fa-solid fa-trash text-sm" aria-hidden="true" />
+                </div>
+              </div>
+
             </div>
           </div>
-          </Link>
+          <!--Ver Todas las Notificaciones-->
+          <a v-if="notifications.length > 4">
+            <div class=" grid grid-cols-1 divide-x divide-gray-900/5 bg-primary">
+              <div
+                class="flex items-center justify-center gap-x-2.5 p-3 font-semibold cursor-pointer text-white hover:bg-blue-800">
+                <component :is="CursorArrowRaysIcon" class="size-5 flex-none text-gray-400" aria-hidden="true" />
+                Ver Todas
+              </div>
+            </div>
+          </a>
         </section>
       </PopoverPanel>
     </transition>

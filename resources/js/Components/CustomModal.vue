@@ -1,6 +1,7 @@
 <script setup>
 import { defineModel } from 'vue';
 import Dialog from 'primevue/dialog';
+
 const props = defineProps({
     width: {
         type: String,
@@ -39,6 +40,7 @@ const props = defineProps({
         default: true
     }
 })
+
 const visible = defineModel('visible')
 </script>
 

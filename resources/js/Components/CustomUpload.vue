@@ -1,15 +1,15 @@
 <script setup>
-import Button from 'primevue/button';
-import CustomModal from './CustomModal.vue';
+const toast = useToast();
 import { ref } from 'vue';
-import FileUpload from 'primevue/fileupload';
-import Empty from './Empty.vue';
-import Badge from 'primevue/badge';
 import { router, usePage } from '@inertiajs/vue3';
 import { useToast } from "primevue/usetoast";
+import Badge from 'primevue/badge';
+import Button from 'primevue/button';
+import CustomModal from './CustomModal.vue';
+import Empty from './Empty.vue';
+import FileUpload from 'primevue/fileupload';
 import Loading from './Loading.vue';
 import Toast from 'primevue/toast';
-const toast = useToast();
 
 const props = defineProps({
     labelButton: {
@@ -108,8 +108,8 @@ const uploadArchives = (event) => {
             visible.value = false
         },
         onError: (e) => {
-            console.log(usePage().props.errorBags.default.errors)
-            errors.value = usePage().props.errorBags.default
+            console.log(e)
+            errors.value = e
             toast.add({ severity: 'error', group: "customToast", text: 'Error al guardar', life: 2000 })
             loading.value = false
         }

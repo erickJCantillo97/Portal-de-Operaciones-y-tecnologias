@@ -1,19 +1,22 @@
 <script setup>
+import '/resources/sass/dataTableCustomized.scss';
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import { FilterMatchMode, FilterOperator } from 'primevue/api';
+import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline';
 import { ref, onMounted } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
-import '/resources/sass/dataTableCustomized.scss';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import Button from '@/Components/Button.vue';
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { MagnifyingGlassIcon, PencilIcon, TrashIcon, PlusIcon } from '@heroicons/vue/24/outline';
 import { useSweetalert } from '@/composable/sweetAlert'
+import Button from '@/Components/Button.vue';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
 import TextInput from '@/Components/TextInput.vue';
+
 const { confirmDelete, toast } = useSweetalert();
+
 const loading = ref(false);
 const open = ref(false)
 const groups = ref([])
+
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
@@ -39,6 +42,7 @@ const initFilters = () => {
 const clearFilter = () => {
     initFilters();
 };
+
 const formData = useForm({});
 
 const editItem = (system) => {
@@ -80,17 +84,15 @@ const submit = () => {
         }
     })
 }
-
 </script>
-
 <template>
     <div class="px-auto  w-full">
         <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="groups" scroll-height="300px"
             v-model:filters="filters" dataKey="id" filterDisplay="menu" :loading="loading"
-            :globalFilterFields="['name', 'descripcion']" currentPageReportTemplate=" {first} al {last} de {totalRecords}"
+            :globalFilterFields="['name', 'descripcion']"
+            currentPageReportTemplate=" {first} al {last} de {totalRecords}"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
             :paginator="true" :rows="10" :rowsPerPageOptions="[10, 25, 50, 100]">
-
             <template #header>
                 <div class="flex justify-between w-full h-8 mb-2">
                     <div class="flex space-x-4">
@@ -136,9 +138,7 @@ const submit = () => {
                     </div>
                 </template>
             </Column>
-
             <!-- <Column field="descripcion" header="Descripción"></Column> -->
-
         </DataTable>
     </div>
     <TransitionRoot as="template" :show="open">
@@ -159,8 +159,8 @@ const submit = () => {
                             class="relative px-2 pt-2 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg ">
                             <div>
                                 <div class="px-2 mt-2 text-center">
-                                    <DialogTitle as="h3" class="text-xl font-semibold text-primary ">{{ formData.id !=
-                                        0 ? 'Editar ' : 'Crear' }} Sistema
+                                    <DialogTitle as="h3" class="text-xl font-semibold text-primary ">
+                                        {{ formData.id != 0 ? 'Editar ' : 'Crear' }} Sistema
                                     </DialogTitle> <!--Se puede usar {{ tittle }}-->
                                     <div class="p-2 mt-2 space-y-4 border border-gray-200 rounded-lg">
                                         <div class="col-span-1 py-2 md:col-span-4 p-fluid p-input-filled">

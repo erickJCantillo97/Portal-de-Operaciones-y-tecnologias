@@ -89,6 +89,7 @@ class ScheduleController extends Controller
         $rows = [];
         $removed = [];
         $assgimentRows = [];
+
         if (isset($request->tasks['added'])) {
             foreach ($request->tasks['added'] as $task) {
                 if (!isset($task['parentId'])) {
@@ -113,10 +114,11 @@ class ScheduleController extends Controller
                     'durationUnit' => $task['durationUnit'],
                     'startDate' => $task['startDate'],
                     'endDate' => $task['endDate'],
+                    'manuallyScheduled' => $task['manuallyScheduled']
                 ]);
                 array_push($rows, [
-                    '$PhantomId' => end($task),
-                    'id' => $taskCreate['id'],
+                    '$PhantomId' => $task['$PhantomId'],
+                    'id' => $taskCreate->id,
                     'added_dt' => $taskCreate->created_at,
                 ]);
             }
@@ -132,6 +134,7 @@ class ScheduleController extends Controller
                     'duration' => $task['duration'] ?? $taskUpdate->duration,
                     'startDate' => $task['startDate'] ?? $taskUpdate->startDate,
                     'endDate' => $task['endDate'] ?? $taskUpdate->endDate,
+                    'manuallyScheduled' => $task['manuallyScheduled'] ?? $taskUpdate->manuallyScheduled,
                 ]);
                 // dd($taskUpdate);
             }
@@ -144,6 +147,13 @@ class ScheduleController extends Controller
         }
         if (isset($request->dependencies['added'])) {
             foreach ($request->dependencies['added'] as $dependency) {
+                if (count($rows) > 0) {
+                    $collections = collect($rows);
+
+                    $dependency['from'] =  $collections->where('$PhantomId', $dependency['from'])->first()['id'];
+
+                    $dependency['to'] =  $collections->where('$PhantomId', $dependency['to'])->first()['id'];
+                }
                 Dependecy::create([
                     'from' => $dependency['from'],
                     'to' => $dependency['to'],

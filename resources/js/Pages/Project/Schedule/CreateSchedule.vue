@@ -1,11 +1,9 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref } from 'vue';
-import { CheckIcon } from '@heroicons/vue/24/solid'
-import Button from '@/Components/Button.vue';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { Link, router, useForm } from '@inertiajs/vue3';
-import { EllipsisVerticalIcon } from '@heroicons/vue/20/solid'
+import { router, useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import Button from '@/Components/Button.vue';
 
 const grupo = ref();
 const system = ref();
@@ -16,7 +14,6 @@ const subSystems = ref([])
 
 const processes = ref([])
 const open = ref(false);
-
 
 const props = defineProps({
     groups: Array,
@@ -112,9 +109,7 @@ const openModal = (processes) => {
 const clearErrors = () => {
     router.page.props.errors = {};
 };
-
 </script>
-
 <template>
     <AppLayout>
         <div class="flex justify-between w-full px-4 py-1">
@@ -195,8 +190,8 @@ const clearErrors = () => {
         <!--MODAL DE FORMULARIO-->
         <TransitionRoot as="template" :show="open">
             <Dialog as="div" class="relative z-30" @close="open = false">
-                <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
-                    leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+                <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0"
+                    enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
                     <div class="fixed inset-0 z-30 w-screen h-screen transition-opacity bg-gray-500 bg-opacity-75" />
                 </TransitionChild>
 
@@ -214,7 +209,6 @@ const clearErrors = () => {
                                         <DialogTitle as="h3" class="text-xl font-semibold text-primary ">
                                             Cargar Actividades
                                         </DialogTitle>
-
 
                                         <TextInput v-for="s of processes" :key="s.id" class="mt-2 text-left"
                                             :label="'Dias por Mes' + s.name"

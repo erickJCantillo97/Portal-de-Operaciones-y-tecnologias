@@ -1,19 +1,17 @@
 <script setup>
-import InputText from 'primevue/inputtext';
-import InputNumber from 'primevue/inputnumber';
-import Textarea from 'primevue/textarea';
+import { ref } from 'vue';
+import Calendar from 'primevue/calendar';
+import Checkbox from 'primevue/checkbox';
 import Dropdown from 'primevue/dropdown';
 import FileUpload from 'primevue/fileupload';
-import MultiSelect from 'primevue/multiselect';
-import Checkbox from 'primevue/checkbox';
-
-import { ref } from 'vue';
-import ToggleButton from 'primevue/togglebutton';
-import RadioButton from 'primevue/radiobutton';
-import Calendar from 'primevue/calendar';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
-
+import InputNumber from 'primevue/inputnumber';
+import InputText from 'primevue/inputtext';
+import MultiSelect from 'primevue/multiselect';
+import RadioButton from 'primevue/radiobutton';
+import Textarea from 'primevue/textarea';
+import ToggleButton from 'primevue/togglebutton';
 
 const props = defineProps({
     //general
@@ -177,9 +175,7 @@ if (props.type == 'country') {
 const input = defineModel('input', {
     required: true
 })
-
 </script>
-
 <template>
     <div class="flex flex-col">
         <div v-if="type == 'radiobutton'" class="w-full flex h-8"
@@ -259,6 +255,12 @@ const input = defineModel('input', {
                 <span v-else-if="type == 'datetime'">
                     <Calendar :id v-model="input" :minDate :maxDate showTime hourFormat="24" showIcon
                         dateFormat="dd/mm/yy" :pt="{
+            root: '!w-full',
+            input: '!h-8'
+        }" />
+                </span>
+                <span v-else-if="type == 'time'">
+                    <Calendar :id v-model="input" timeOnly hourFormat="24" showIcon dateFormat="dd/mm/yy" :pt="{
             root: '!w-full',
             input: '!h-8'
         }" />

@@ -1,20 +1,21 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref } from 'vue';
-import { router, useForm } from '@inertiajs/vue3';
-import { useSweetalert } from '@/composable/sweetAlert';
-import Button from 'primevue/button';
-import CustomDataTable from '@/Components/CustomDataTable.vue';
-import CustomModal from '@/Components/CustomModal.vue';
-import CustomInput from '@/Components/CustomInput.vue';
-import { usePermissions } from '@/composable/permission';
-const { hasRole, hasPermission } = usePermissions()
-
+const { confirmDelete } = useSweetalert();
+const { hasPermission } = usePermissions()
 const { toast } = useSweetalert();
 const loading = ref(false);
-const { confirmDelete } = useSweetalert();
+import { ref } from 'vue';
+import { router, useForm } from '@inertiajs/vue3';
+import { usePermissions } from '@/composable/permission';
+import { useSweetalert } from '@/composable/sweetAlert';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import Button from 'primevue/button';
+import CustomDataTable from '@/Components/CustomDataTable.vue';
+import CustomInput from '@/Components/CustomInput.vue';
+import CustomModal from '@/Components/CustomModal.vue';
+
 const open = ref(false)
 const country = ref()
+
 const props = defineProps({
     customers: Array,
 })

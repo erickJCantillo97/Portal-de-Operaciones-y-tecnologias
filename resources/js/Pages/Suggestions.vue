@@ -1,11 +1,15 @@
 <script setup>
-import AppLayout from "@/Layouts/AppLayout.vue"
-import { router } from '@inertiajs/vue3'
-import Image from 'primevue/image'
-import OverlayPanel from 'primevue/overlaypanel'
+import { commonUtilities } from '@/composable/commonUtilities'
 import { ref } from 'vue'
+import { router } from '@inertiajs/vue3'
 import { useSweetalert } from '@/composable/sweetAlert'
+import AppLayout from "@/Layouts/AppLayout.vue"
+import Image from 'primevue/image'
 import Loading from "@/Components/Loading.vue"
+import OverlayPanel from 'primevue/overlaypanel'
+
+const { toast } = useSweetalert()
+const { formatDateTime24h } = commonUtilities()
 
 const props = defineProps({
     suggestions: Array,
@@ -16,12 +20,12 @@ const props = defineProps({
 })
 
 const op = ref()
-const { toast } = useSweetalert()
 const suggestionSelect = ref()
 const loading = ref(false)
 const date = ref(null)
 const today = ref(new Date().toISOString().split('T')[0])
 const type = ref(null)
+
 const updateSuggestion = (s, n) => {
     router.put(route('suggestion.update', s), { answer: n }, {
         onSuccess: () => {
@@ -48,11 +52,6 @@ const filter = () => {
     )
 }
 
-function formatDateTime24h(dateTime) {
-    return new Date(dateTime).toLocaleString('es-CO',
-        { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
-}
-
 const toggle = (event) => {
     op.value.toggle(event)
 }
@@ -63,7 +62,7 @@ const toggle = (event) => {
             <button :class="type == null && date == null ? 'bg-primary text-white scale-105' : ''"
                 class="w-8 border rounded-md shadow-xl text-primary hover:text-white border-primary alturah8 pi pi-filter-slash hover:bg-primary"
                 @click="type = null;
-                date = null; filter()">
+            date = null; filter()">
             </button>
             <div class="shadow-xl w-72">
                 <button type="button" @click="type = 'Sugerencia'; filter()"
@@ -117,23 +116,25 @@ const toggle = (event) => {
                                     <span v-if="suggestion.type == 'Error'"
                                         class="flex justify-center px-2 text-xs font-medium rounded-md"
                                         :class="suggestion.status == 1 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-success'">{{
-                                            suggestion.status == 1 ? 'Pendiente' : 'Resuelto'
-                                        }}</span>
+                suggestion.status == 1 ? 'Pendiente' : 'Resuelto'
+            }}</span>
                                     <p class="w-full text-xs text-end">{{
-                                        formatDateTime24h(suggestion.created_at) }}</p>
+                    formatDateTime24h(suggestion.created_at) }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="h-full col-span-2 px-2 overflow-y-auto custom-scroll " v-if="suggestionSelect">
-                    <span class="flex justify-center w-full p-2 text-lg font-bold text-primary">Detalles del reporte</span>
+                    <span class="flex justify-center w-full p-2 text-lg font-bold text-primary">Detalles del
+                        reporte</span>
                     <p class="w-full h-auto p-2 border border-blue-100 rounded-md">{{ suggestionSelect.details }}</p>
                     <span class="flex justify-center w-full p-2 text-lg text-primary">Datos tecnicos</span>
                     <div class="grid grid-cols-2 gap-2 ">
                         <div class="grid grid-cols-4 gap-1 border border-red-500">
                             <span class="flex items-center col-span-1 text-primary">URL:</span>
-                            <p class="flex items-center max-w-full col-span-3 break-all">{{ suggestionSelect.urlAddress }}
+                            <p class="flex items-center max-w-full col-span-3 break-all">{{ suggestionSelect.urlAddress
+                                }}
                             </p>
                             <span class="flex items-center col-span-1 text-primary">Tipo:</span>
                             <p class="flex items-center col-span-3">{{ suggestionSelect.type }}</p>
@@ -149,7 +150,8 @@ const toggle = (event) => {
                                 </button>
                                 <OverlayPanel class="w-96" ref="op">
                                     <div class="grid justify-center grid-cols-5 gap-2 text-xs">
-                                        <div class="flex-col items-center justify-center h-full col-span-4 align-middle">
+                                        <div
+                                            class="flex-col items-center justify-center h-full col-span-4 align-middle">
                                             <div class="grid w-full grid-cols-4">
                                                 <span class="flex items-center col-span-1 text-primary">Nombre:</span>
                                                 <p class="flex items-center col-span-3 ">
@@ -177,7 +179,8 @@ const toggle = (event) => {
                                 </OverlayPanel>
                             </div>
                             <span class="flex items-center col-span-1 text-primary">Fecha:</span>
-                            <p class="flex items-center col-span-3">{{ formatDateTime24h(suggestionSelect.created_at) }}</p>
+                            <p class="flex items-center col-span-3">{{ formatDateTime24h(suggestionSelect.created_at) }}
+                            </p>
                             <span class="flex items-center col-span-1 text-primary"
                                 v-if="suggestionSelect.type == 'Error'">Estado:</span>
                             <span v-if="suggestionSelect.type == 'Error'"
@@ -198,7 +201,7 @@ const toggle = (event) => {
                         <div class="flex space-x-2">
                             <span class="flex items-center text-primary">Fecha ultima respuesta:</span>
                             <p class="flex items-center">{{ suggestionSelect.created_at == suggestionSelect.updated_at ?
-                                'Sin respuesta' : formatDateTime24h(suggestionSelect.updated_at) }}</p>
+                'Sin respuesta' : formatDateTime24h(suggestionSelect.updated_at) }}</p>
                         </div>
                         <button @click="updateSuggestion(suggestionSelect.id, suggestionSelect.answer)"
                             v-if="props.permission" v-tooltip="'¿Solucionado?'"

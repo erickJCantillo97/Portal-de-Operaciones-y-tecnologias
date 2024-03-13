@@ -4,7 +4,7 @@ import { onMounted, ref } from 'vue';
 import "@bryntum/gantt/gantt.material.css";
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
 import { BryntumGantt } from '@bryntum/gantt-vue-3';
-import { AjaxHelper, DateHelper, List, LocaleManager, StringHelper, Widget } from '@bryntum/gantt';
+import { AjaxHelper, DateHelper, List, LocaleManager, StringHelper, Widget, TaskModel, Combo } from '@bryntum/gantt';
 import Slider from 'primevue/slider'
 import { useToast } from "primevue/usetoast";
 import InputText from 'primevue/inputtext';
@@ -20,10 +20,28 @@ const props = defineProps({
     project: Object,
     groups: Array
 })
+
 LocaleManager.applyLocale('Es');
 const ganttref = ref()
 const loading = ref(false)
 const error = ref(false)
+
+class Task extends TaskModel {
+    // Add a stable class name that survives code minification
+    static $name = 'Task';
+
+    static get fields() {
+
+    }
+
+    // For this demo, tasks are styled based on the first-level parent nodes (unless defined on task level)
+    get eventColor() {
+        if (!this.get('eventColor')) {
+            return this.parent.eventColor;
+        }
+        return super.eventColor;
+    }
+}
 
 //#region funciones
 const headerTpl = ({ currentPage, totalPages }) => `
@@ -299,12 +317,11 @@ class Importer {
     }
 }
 //#endregion
+
 onMounted(() => {
     onExpandAllClick()
     editMode()
 })
-
-
 
 const full = ref(false)
 const readOnly = ref()
@@ -341,6 +358,7 @@ const taskEdit = ref({
         },
     }
 })
+
 const baselines = ref({
     // Custom tooltip template for baselines
     template(data) {
@@ -381,6 +399,7 @@ const baselines = ref({
 
     renderer: baselineRenderer
 })
+
 const cellEdit = ref({
     addNewAtEnd: false,
 })
@@ -391,6 +410,7 @@ const ganttConfig = ref({
     rowHeight: 28,
     dependencyIdField: 'sequenceNumber',
     project: {
+        taskModelClass: Task,
         autoSync: true,
         autoLoad: true,
         transport: {
@@ -427,7 +447,23 @@ const ganttConfig = ref({
     },
     columns: [
         { id: 'wbs', type: 'wbs', text: 'EDT' },
-        { id: 'name', type: 'name', },
+        {
+            id: 'name', type: 'name', renderer: ({ record }) => ({
+                // Return a DomConfig object describing our custom markup with the task name and a child count badge
+                // See https://bryntum.com/products/grid/docs/api/Core/helper/DomHelper#typedef-DomConfig for more information.
+                children: [
+                    {
+                        tag: 'span',
+                        text: record.name
+                    },
+                    record.children?.length > 0 ? {
+                        class: 'b-child-count',
+                        text: record.children.length
+                    } : null
+                ]
+            })
+        },
+
         { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true },
         { id: 'duration', type: 'duration', text: 'Duración' },
         { id: 'startdate', type: 'startdate', text: 'Fecha Inicio' },
@@ -462,6 +498,7 @@ const ganttConfig = ref({
                         filterBar: {
                             compactMode: true,
                         },
+
                         headerMenu: false,
                         cellMenu: false,
                     },
@@ -488,7 +525,7 @@ const ganttConfig = ref({
                 }
                 return `
                         <div class="flex justify-between space-x-2 text-xs"><div>${assignmentRecord.units / 100}</div><div class="italic">${assignmentRecord.name}</div><div class="font-bold">$${Math.round(task.durationUnit == 'day' ? (task.duration * (assignmentRecord.units / 100) * assignmentRecord.costo_hora) * 8.5 : (task.duration * (assignmentRecord.units / 100) * assignmentRecord.costo_hora)).toLocaleString('es')} </div></div>
-                         ${overflowCount > 0 ? `${overflowAssignments2}` : ''}
+                        ${overflowCount > 0 ? `${overflowAssignments2}` : ''}
                     `;
             }
         },
@@ -509,14 +546,37 @@ const ganttConfig = ref({
         'Ctrl+i': 'indent',
         'Ctrl+o': 'outdent',
     },
+    features: {
+        timeRanges: {
+            enableResizing: true,
+            showCurrentTimeLine: true,
+        },
+        dependencies: {
+            // Rounded line joints
+            radius: 10
+        },
+    },
+    taskTooltip: {
+        textContent: false,
+        template({ taskRecord }) {
+            return `<div class="field"><label>Task</label><span>${StringHelper.encodeHtml(taskRecord.name)}</span></div>
+                        <div class="field"><label>Module</label><span>${StringHelper.encodeHtml(taskRecord.parent?.name) || ''}</span></div>
+                        <div class="field"><label>Critical</label><span>${taskRecord.critical ? this.L('Yes') : this.L('No')}</span></div>
+                        <div class="field"><label>Start</label><span>${DateHelper.format(taskRecord.startDate, 'MMM DD')}</span></div>
+                        <div class="field"><label>Duration</label><span>${taskRecord.fullDuration}</span></div>
+                        <div class="field"><label>Assigned to</label>
+                        <div class="b-avatar-container">${taskRecord.resources.map(resourceRecord =>
+                `<img class="b-resource-avatar b-resource-image"  alt="${StringHelper.encodeHtml(resourceRecord.name)}" src="${getResourceImage(resourceRecord)}"/>`).join('')}</div>
+                    `;
+        }
+    }
+
     // features: features,
 })
 
 //#endRegion
 
 //#region toolbar
-
-
 const onAddTaskClick = async () => {
     let gantt = ganttref.value.instance.value
     // console.log(gantt.value.instance.value)
@@ -545,6 +605,7 @@ const onEditTaskClick = () => {
         toast.add({ severity: 'error', group: 'customToast', text: 'Debe seleccionar la tarea a editar', life: 2000 });
     }
 }
+
 const onExpandAllClick = () => {
     let gantt = ganttref.value.instance.value
     gantt.expandAll();
@@ -583,6 +644,7 @@ function onStartDateChange(event) {
 
     gantt.project.setStartDate(event);
 }
+
 const texto = ref()
 function onFilterChange() {
     let gantt = ganttref.value.instance.value
@@ -598,6 +660,7 @@ function onFilterChange() {
         });
     }
 }
+
 const setLB = ref();
 const seeLB = ref();
 const setBaseline = (index) => {
@@ -615,6 +678,7 @@ const toggleBaselineVisible = () => {
         gantt.element.classList[element[1] ? 'remove' : 'add'](`b-hide-baseline-${element[0]}`);
     });
 }
+
 function baselineRenderer({ baselineRecord, taskRecord, renderData }) {
     if (baselineRecord.endDate.getTime() + 24 * 3600 * 1000 < taskRecord.endDate.getTime()) {
         renderData.className['b-baseline-behind'] = 1;
@@ -626,6 +690,7 @@ function baselineRenderer({ baselineRecord, taskRecord, renderData }) {
         renderData.className['b-baseline-on-time'] = 1;
     }
 }
+
 const onExport = () => {
     let gantt = ganttref.value.instance.value
     // give a filename based on task name
@@ -635,6 +700,7 @@ const onExport = () => {
         filename
     });
 }
+
 const onExportPDF = () => {
     let gantt = ganttref.value.instance.value
     gantt.features.pdfExport.showExportDialog();
@@ -652,12 +718,14 @@ const onSettingsShow = (event) => {
     barMarginMax.value = gantt.rowHeight / 2 - 5;
     setConf.value.toggle(event)
 }
+
 //ajuste de altura de filas
 const onSettingsRowHeightChange = () => {
     let gantt = ganttref.value.instance.value
     gantt.rowHeight = rowHeight.value;
     barMarginMax.value = gantt.rowHeight / 2 - 5;
 }
+
 //ajuste de margen
 const onSettingsMarginChange = () => {
     let gantt = ganttref.value.instance.value
@@ -821,23 +889,25 @@ const pruebas = () => {
                         @click="onEditTaskClick()" v-if="!readOnly" />
                     <!-- <Button icon="fa-solid fa-rotate-left" severity="secondary" @click="onUndo()" />
                             <Button icon="fa-solid fa-rotate-right" severity="secondary" @click="onRedo()" /> -->
-                    <Button raised icon="fa-solid fa-chevron-down" v-tooltip.bottom="'Expandir todo'" severity="secondary"
-                        @click="onExpandAllClick()" />
+                    <Button raised icon="fa-solid fa-chevron-down" v-tooltip.bottom="'Expandir todo'"
+                        severity="secondary" @click="onExpandAllClick()" />
                     <Button raised icon="fa-solid fa-chevron-up" v-tooltip.bottom="'Contraer todo'" severity="secondary"
                         @click="onCollapseAllClick()" />
                     <Button raised icon="fa-solid fa-gear" v-tooltip.bottom="'Ajustes'" severity="secondary"
                         @click="onSettingsShow" />
                     <Button raised icon="fa-solid fa-magnifying-glass" v-tooltip.bottom="'Zoom'" severity="secondary"
                         @click="zoom.toggle($event)" />
-                    <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange()"
-                        placeholder="Buscar por fecha" class=" !h-8 shadow-md" showIcon :pt="{ input: '!h-8' }" />
+                    <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha"
+                        @dateSelect="onStartDateChange()" placeholder="Buscar por fecha" class=" !h-8 shadow-md"
+                        showIcon :pt="{ input: '!h-8' }" />
                     <InputText v-model="texto" @input="onFilterChange" placeholder="Buscar por actividad"
                         class="shadow-md" />
                     <Button raised v-tooltip.bottom="'Guardar en linea base'" icon="fa-solid fa-grip-lines"
                         @click="setLB.toggle($event);" v-if="!readOnly" />
                     <Button raised v-tooltip.bottom="'Ver lineas base'" icon="fa-solid fa-eye"
                         @click="seeLB.toggle($event)" />
-                    <Button raised v-tooltip.bottom="'Exportar a PDF'" icon="fa-solid fa-file-pdf" @click="onExportPDF()" />
+                    <Button raised v-tooltip.bottom="'Exportar a PDF'" icon="fa-solid fa-file-pdf"
+                        @click="onExportPDF()" />
                     <Button raised v-tooltip.bottom="'Exportar a XML'" icon="fa-solid fa-file-arrow-down"
                         @click="onExport()" />
                     <Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input"
@@ -913,7 +983,8 @@ const pruebas = () => {
         </template>
         <template #footer>
             <Button severity="danger" label="Cancelar" :disabled="loadImport" @click="modalImport = false" />
-            <Button severity="success" :loading="loadImport" label="Importar" :disabled="btnImport" @click="importMSP" />
+            <Button severity="success" :loading="loadImport" label="Importar" :disabled="btnImport"
+                @click="importMSP" />
         </template>
 
     </CustomModal>

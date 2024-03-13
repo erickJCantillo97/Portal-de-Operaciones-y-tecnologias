@@ -4,6 +4,7 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import AuthenticationCard from '@/Components/AuthenticationCard.vue';
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
+
 defineProps({
     canResetPassword: Boolean,
     status: String,
@@ -25,8 +26,6 @@ const submit = () => {
     });
 };
 </script>
-
-
 <template>
     <div class="min-w-full min-h-screen flex justify-center items-center text-white">
         <div class="max-w-sm md:min-w-max px-2">
@@ -60,9 +59,10 @@ const submit = () => {
                     <div>
                         <div class="flex flex-col gap-1">
                             <label for="password">Contraseña</label>
-                            <Password id="password" v-model="form.password" toggleMask :feedback="false" class="!h-8" :pt="{
-                                root:'!grid'
-                            }" />
+                            <Password id="password" v-model="form.password" toggleMask :feedback="false" class="!h-8"
+                                :pt="{
+                        root: '!grid'
+                    }" />
                         </div>
                         <p class="text-xs font-bold text-red-800" id="email-error">{{ $page.props.errors.password }}
                         </p>
@@ -76,13 +76,12 @@ const submit = () => {
                         </div>
                     </div>
                     <div class="flex justify-center">
-                        <Button type="submit" class="!h-8 !w-full" :label="!form.processing?'Iniciar sesion':'Iniciando sesion...'" :loading="form.processing" />
+                        <Button type="submit" class="!h-8 !w-full"
+                            :label="!form.processing ? 'Iniciar sesion' : 'Iniciando sesion...'"
+                            :loading="form.processing" />
                     </div>
                 </form>
             </AuthenticationCard>
         </div>
     </div>
 </template>
-<style scoped>
-
-</style>

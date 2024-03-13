@@ -1,21 +1,21 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
+const { confirmDelete } = useSweetalert();
+const { hasRole, hasPermission } = usePermissions()
+const { toast } = useSweetalert();
+const customerSelect = ref();
+const loading = ref(false);
+const modalType = ref('Nueva unidad')
+const typeSelect = ref();
+const visible = ref(false)
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
+import { usePermissions } from '@/composable/permission';
 import { useSweetalert } from '@/composable/sweetAlert';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import Button from 'primevue/button';
-import CustomModal from '@/Components/CustomModal.vue';
 import CustomDataTable from '@/Components/CustomDataTable.vue';
 import CustomInput from '@/Components/CustomInput.vue';
-import { usePermissions } from '@/composable/permission';
-const { hasRole, hasPermission } = usePermissions()
-const modalType = ref('Nueva unidad')
-const customerSelect = ref();
-const typeSelect = ref();
-const { toast } = useSweetalert();
-const loading = ref(false);
-const { confirmDelete } = useSweetalert();
-const visible = ref(false)
+import CustomModal from '@/Components/CustomModal.vue';
 
 const props = defineProps({
     ships: Array,

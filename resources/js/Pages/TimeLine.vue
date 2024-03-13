@@ -1,13 +1,14 @@
 <script setup>
-import ProjectCard from '@/Components/ProjectCard.vue';
 import { ref } from 'vue';
-import PickList from 'primevue/picklist';
 import MultiSelect from 'primevue/multiselect';
+import ProjectCard from '@/Components/ProjectCard.vue';
+
 const props = defineProps({
     projects: Array,
 })
 
 var datos = [];
+
 const getRandomColor = () => {
     const getRandomNumber = (maxNum) => {
         return Math.floor(Math.random() * maxNum);
@@ -90,7 +91,7 @@ const chartOptions = {
 // const id = ref(null)
 const tasks = ref();
 const loading = ref(true)
-const tasksSelect=ref()
+const tasksSelect = ref()
 
 const getTasks = (project) => {
     console.log(project)
@@ -102,7 +103,6 @@ const getTasks = (project) => {
     })
 }
 </script>
-
 <template>
     <div class="max-w-full p-3 m-3 border-2 border-blue-100 rounded-xl">
         <h3 class="text-xl font-medium text-primary">Seleciona un proyecto</h3>
@@ -127,7 +127,7 @@ const getTasks = (project) => {
                 <template #footer>
                     <div class="py-2 px-3">
                         <b>{{ tasksSelect ? tasksSelect.length : 0 }}</b> item{{ (tasksSelect ?
-                            tasksSelect.length : 0) > 1 ? 's' : '' }} selected.
+                tasksSelect.length : 0) > 1 ? 's' : '' }} selected.
                     </div>
                 </template>
             </MultiSelect>
@@ -138,4 +138,5 @@ const getTasks = (project) => {
         <div class="relative">
             <apexchart type="rangeBar" height="350" :options="chartOptions" :series="series"></apexchart>
         </div>
-</div></template>
+    </div>
+</template>
