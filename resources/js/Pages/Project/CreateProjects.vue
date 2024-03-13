@@ -74,7 +74,6 @@ const typeOptions = [
 
 //Estado de Proyecto
 const statusOptions = [
-    'DISEÑO Y CONSTRUCCIÓN',
     'CONSTRUCCIÓN',
     'DISEÑO',
     'GARANTIA',
