@@ -51,28 +51,29 @@ const callsToAction = [
           <div class="px-2 space-y-2">
             <!--Lista de Notificaciones-->
             <div v-for="item in notifications" :key="item.name">
-              <div class="p-1 flex justify-between items-center rounded-lg border-b space-x-6">
-                <i class="fa-regular fa-circle-xmark text-2xl  w-4"
-                  :class="item.type == 'error' ? 'text-danger' : 'text-gray-600'"></i>
+              <div class="flex items-center justify-center space-x-6 rounded-lg border-b p-1">
+                <i class="fa-regular fa-circle-xmark text-2xl w-4" aria-hidden="true"
+                  :class="item.type == 'error' ? 'text-danger' : 'text-gray-600'">
+                </i>
                 <div class="col-span-2 mx-4 w-full">
                   <a :href="item.href" class="font-semibold text-gray-900">
                     {{ item.title }}
                   </a>
                   <p class="text-gray-600 text-sm">{{ item.message }}</p>
                 </div>
-                <div class="cursor-pointer col-span-1 text-end">
-                  <i class="text-danger fa-solid fa-trash text-sm " aria-hidden="true" />
+                <div
+                  class="col-span-1 flex size-8 cursor-pointer items-center justify-center rounded-2xl text-end hover:bg-gray-100">
+                  <i class="text-danger fa-solid fa-trash text-sm" aria-hidden="true" />
                 </div>
               </div>
-
             </div>
           </div>
 
           <!--Ver Todas las Notificaciones-->
           <a>
-            <div class=" grid grid-cols-1 divide-x divide-gray-900/5 bg-primary">
+            <div class="grid grid-cols-1 divide-x divide-gray-900/5 bg-primary">
               <div
-                class="flex items-center justify-center gap-x-2.5 p-3 font-semibold cursor-pointer text-white hover:bg-blue-800">
+                class="flex items-center justify-center gap-x-2.5 p-1 font-semibold cursor-pointer text-white hover:bg-blue-800">
                 <component :is="CursorArrowRaysIcon" class="size-5 flex-none text-gray-400" aria-hidden="true" />
                 Ver Todas
               </div>
