@@ -4,7 +4,7 @@ import Moment from "moment";
 /**
  * This function exports common utilities in JavaScript.
  */
-export function commonUtilities() {
+export function useCommonUtilities() {
     /**
      * The function `byteSizeFormatter` converts a given number of bytes into a human-readable format
      * with appropriate units (B, KB, MB, GB).

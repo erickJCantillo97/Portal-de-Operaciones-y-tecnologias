@@ -1,5 +1,5 @@
 <script setup>
-import { commonUtilities } from '@/composable/commonUtilities'
+import { useCommonUtilities } from '@/composable/useCommonUtilities'
 import { ref, onMounted } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomModal from '@/Components/CustomModal.vue'
@@ -13,7 +13,7 @@ import ProjectsCard from '@/Components/ProjectsCard.vue'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 
-const { truncateString } = commonUtilities()
+const { truncateString } = useCommonUtilities()
 
 onMounted(() => {
   getProjects()

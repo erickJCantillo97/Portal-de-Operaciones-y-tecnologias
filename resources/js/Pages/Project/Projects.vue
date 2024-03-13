@@ -1,5 +1,5 @@
 <script setup>
-import { commonUtilities } from '@/composable/commonUtilities'
+import { useCommonUtilities } from '@/composable/useCommonUtilities'
 import { ref } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
 import { usePermissions } from '@/composable/permission'
@@ -19,7 +19,7 @@ import OverlayPanel from 'primevue/overlaypanel'
 import Empty from '@/Components/Empty.vue'
 
 const { hasPermission } = usePermissions();
-const { byteSizeFormatter, formatDateTime24h } = commonUtilities();
+const { byteSizeFormatter, formatDateTime24h } = useCommonUtilities();
 
 const props = defineProps({
     projects: Array,

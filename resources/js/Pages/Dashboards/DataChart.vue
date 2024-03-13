@@ -1,5 +1,5 @@
 <script setup>
-import { commonUtilities } from '@/composable/commonUtilities';
+import { useCommonUtilities } from '@/composable/useCommonUtilities';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid';
 import { ref, onMounted } from 'vue'
@@ -9,7 +9,7 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import PieChart from './PieChart.vue';
 
-const { currencyFormat } = commonUtilities()
+const { currencyFormat } = useCommonUtilities()
 
 onMounted(() => {
     initFilters();
