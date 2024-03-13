@@ -1,7 +1,7 @@
 <script setup>
-const { currencyFormat } = commonUtilities()
+const { currencyFormat } = useCommonUtilities()
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/vue/20/solid'
-import { commonUtilities } from '@/composable/commonUtilities';
+import { useCommonUtilities } from '@/composable/useCommonUtilities';
 import { onMounted, ref } from 'vue';
 import { useToast } from "primevue/usetoast";
 import OverlayPanel from 'primevue/overlaypanel';

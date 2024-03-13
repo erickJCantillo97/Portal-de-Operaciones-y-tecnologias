@@ -1,8 +1,8 @@
 <script setup>
-const { currencyFormat } = commonUtilities()
+const { currencyFormat } = useCommonUtilities()
 const { hasRole, hasPermission } = usePermissions()
 const { toast } = useSweetalert()
-import { commonUtilities } from '@/composable/commonUtilities';
+import { useCommonUtilities } from '@/composable/useCommonUtilities';
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { Link } from '@inertiajs/vue3'
 import { ref, onMounted } from 'vue'

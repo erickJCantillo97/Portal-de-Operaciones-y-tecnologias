@@ -1,5 +1,5 @@
 <script setup>
-import { commonUtilities } from '@/composable/commonUtilities';
+import { useCommonUtilities } from '@/composable/useCommonUtilities';
 import '../../../sass/dataTableCustomized.scss';
 import { FilterMatchMode } from 'primevue/api';
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
@@ -10,7 +10,7 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import UserTable from '@/Components/UserTable.vue';
 
-const { currencyFormat, formatDate } = commonUtilities()
+const { currencyFormat, formatDate } = useCommonUtilities()
 
 const props = defineProps({
     personal: Array

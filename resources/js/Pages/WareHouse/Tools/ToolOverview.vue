@@ -1,12 +1,12 @@
 <script setup>
-import { commonUtilities } from '@/composable/commonUtilities'
+import { useCommonUtilities } from '@/composable/useCommonUtilities'
 import { ref } from 'vue'
 import Footer from '@/Components/Footer.vue'
 import Galleria from 'primevue/galleria'
 import TabPanel from 'primevue/tabpanel'
 import TabView from 'primevue/tabview'
 
-const { currencyFormat } = commonUtilities()
+const { currencyFormat } = useCommonUtilities()
 
 const props = defineProps({
   tool: Object

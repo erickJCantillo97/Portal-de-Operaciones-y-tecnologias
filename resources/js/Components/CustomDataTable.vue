@@ -1,6 +1,6 @@
 <script setup>
-const { byteSizeFormatter, currencyFormat } = commonUtilities()
-import { commonUtilities } from '@/composable/commonUtilities';
+const { byteSizeFormatter, currencyFormat } = useCommonUtilities()
+import { useCommonUtilities } from '@/composable/useCommonUtilities';
 import { FilterMatchMode } from 'primevue/api'
 import { onMounted, ref } from 'vue';
 import ApplicationLogo from './ApplicationLogo.vue';

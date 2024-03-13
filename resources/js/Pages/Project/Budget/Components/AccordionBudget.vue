@@ -1,6 +1,6 @@
 <script setup>
-const { currencyFormat } = commonUtilities()
-import { commonUtilities } from '@/composable/commonUtilities';
+const { currencyFormat } = useCommonUtilities()
+import { useCommonUtilities } from '@/composable/useCommonUtilities';
 import Accordion from 'primevue/accordion';
 import AccordionBudget from '@/Pages/Project/Budget/Components/AccordionBudget.vue'
 import AccordionTab from 'primevue/accordiontab';

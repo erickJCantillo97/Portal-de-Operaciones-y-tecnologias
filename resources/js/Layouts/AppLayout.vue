@@ -257,14 +257,14 @@ import {
     XCircleIcon
 } from '@heroicons/vue/20/solid'
 const { eventListener, handleDataEvents } = useBroadcastNotifications()
-const { formatDateTime24h } = commonUtilities()
+const { formatDateTime24h } = useCommonUtilities()
 const { toast } = useSweetalert()
 import "@/composable/push.min.js"
-import { commonUtilities } from '@/composable/commonUtilities'
+import { useCommonUtilities } from '@/composable/useCommonUtilities'
 import { Menu, MenuButton, MenuItems, MenuItem, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { ref, onMounted } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
-import { useBroadcastNotifications } from '@/composable/broadcastNotifications'
+import { useBroadcastNotifications } from '@/composable/useBroadcastNotifications'
 import { useSweetalert } from '@/composable/sweetAlert'
 import Button from '@/Components/Button.vue'
 import ConfirmPopup from 'primevue/confirmpopup';
