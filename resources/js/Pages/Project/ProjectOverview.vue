@@ -1,5 +1,5 @@
 <script setup>
-import { commonUtilities } from '@/composable/commonUtilities'
+import { useCommonUtilities } from '@/composable/useCommonUtilities'
 import { ref, onMounted } from 'vue'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
@@ -18,7 +18,7 @@ import TabView from 'primevue/tabview'
 import Tag from 'primevue/tag'
 import PieChart from '@/Pages/Dashboards/PieChart.vue'
 
-const { calculatePercentage, currencyFormat, getDays } = commonUtilities();
+const { calculatePercentage, currencyFormat, getDays } = useCommonUtilities();
 
 const props = defineProps({
   project: Object,

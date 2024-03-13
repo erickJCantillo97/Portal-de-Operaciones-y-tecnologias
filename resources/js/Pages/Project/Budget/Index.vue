@@ -1,5 +1,5 @@
 <script setup>
-import { commonUtilities } from '@/composable/commonUtilities';
+import { useCommonUtilities } from '@/composable/useCommonUtilities';
 import { ref } from 'vue';
 import { useToast } from "primevue/usetoast";
 import AccordionBudget from '@/Pages/Project/Budget/Components/AccordionBudget.vue'
@@ -9,7 +9,7 @@ import Empty from '@/Components/Empty.vue';
 import Loading from '@/Components/Loading.vue';
 
 const toast = useToast();
-const { currencyFormat } = commonUtilities()
+const { currencyFormat } = useCommonUtilities()
 
 const props = defineProps({
     projects: Array,

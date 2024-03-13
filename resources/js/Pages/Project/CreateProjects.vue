@@ -58,8 +58,8 @@ const columnas = [
 
 const actions = [
     { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
-    { event: 'delete', severity: 'danger', icon: 'fa-solid fa-trash-can', text: true, outlined: false, rounded: false },]
-
+    { event: 'delete', severity: 'danger', icon: 'fa-solid fa-trash-can', text: true, outlined: false, rounded: false },
+]
 //#endregion
 
 //#region ENUMS
@@ -74,7 +74,6 @@ const typeOptions = [
 
 //Estado de Proyecto
 const statusOptions = [
-    'DISEÑO Y CONSTRUCCIÓN',
     'CONSTRUCCIÓN',
     'DISEÑO',
     'GARANTIA',
@@ -225,7 +224,6 @@ const getShift = () => {
         })
 }
 
-
 //#region Avance proyectos
 const modalProgress = ref(false)
 const avance = useForm({
@@ -235,6 +233,7 @@ const avance = useForm({
     CPI: null,
     SPI: null
 })
+
 const guardarAvance = () => {
     avance.post(route('ProgressProjectWeek.store'), {
         onSuccess: () => {
@@ -248,9 +247,7 @@ const guardarAvance = () => {
 }
 //#endregion
 
-
 //#region Tareas semanales
-
 const modalWeekTask = ref()
 const weekTask = useForm({
     id: null,
@@ -259,6 +256,7 @@ const weekTask = useForm({
     project_id: null
 
 })
+
 const saveweekTask = () => {
     weekTask.project_id = props.project.id
     loading.value = true
@@ -288,8 +286,8 @@ const saveweekTask = () => {
         })
     }
 }
-const deleteweekTask = (id) => {
 
+const deleteweekTask = (id) => {
     router.delete(route('weektasks.destroy', id), {
         onSuccess: () => {
             weekTask.reset()
@@ -326,8 +324,6 @@ const active = ref(0);
                     <CustomUpload mode="advanced" titleModal="Subir Estructura de SAP"
                         icon-button="fa-solid fa-chart-bar" tooltip="Subir Estructura" accept=".xlsx,.xls"
                         :url="route('upload.estructure', project.id)" />
-
-
 
                     <CustomUpload mode="advanced" titleModal="Subir Curva S" icon-button="fa-solid fa-chart-line"
                         tooltip="Subir Curva S" accept=".xlsx,.xls"

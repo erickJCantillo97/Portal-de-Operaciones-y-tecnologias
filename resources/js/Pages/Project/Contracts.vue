@@ -1,13 +1,13 @@
 <script setup>
 const { confirmDelete } = useSweetalert()
-const { currencyFormat } = commonUtilities()
+const { currencyFormat } = useCommonUtilities()
 const { eventListener } = useBroadcastNotifications()
 const { hasRole, hasPermission } = usePermissions();
 const { toast } = useSweetalert()
-import { commonUtilities } from '@/composable/commonUtilities';
+import { useCommonUtilities } from '@/composable/useCommonUtilities';
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
-import { useBroadcastNotifications } from '@/composable/broadcastNotifications'
+import { useBroadcastNotifications } from '@/composable/useBroadcastNotifications'
 import { usePermissions } from '@/composable/permission';
 import { useSweetalert } from '@/composable/sweetAlert'
 import AppLayout from '@/Layouts/AppLayout.vue'

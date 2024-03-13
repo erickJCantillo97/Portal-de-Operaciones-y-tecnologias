@@ -1,5 +1,5 @@
 <script setup>
-import { commonUtilities } from '@/composable/commonUtilities'
+import { useCommonUtilities } from '@/composable/useCommonUtilities'
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { useSweetalert } from '@/composable/sweetAlert'
@@ -9,7 +9,7 @@ import Loading from "@/Components/Loading.vue"
 import OverlayPanel from 'primevue/overlaypanel'
 
 const { toast } = useSweetalert()
-const { formatDateTime24h } = commonUtilities()
+const { formatDateTime24h } = useCommonUtilities()
 
 const props = defineProps({
     suggestions: Array,
