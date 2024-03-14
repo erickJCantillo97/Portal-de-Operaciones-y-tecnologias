@@ -252,7 +252,8 @@ const buttons = [
             </div>
         </div>
 
-        <CustomModal v-model:visible="modalVisible" :closable="false" :closeOnEscape="false">
+        <CustomModal v-model:visible="modalVisible" width="80vw" :footer="false" :closable="false"
+            :closeOnEscape="false">
             <template #icon>
                 <span class="text-white material-symbols-outlined text-4xl">
                     engineering
@@ -262,11 +263,11 @@ const buttons = [
                 <span class="text-xl font-bold text-white white-space-nowrap">Añadir Personal</span>
             </template>
             <template #body>
-                <div class="flex py-2 space-x-4">
+                <div class="flex space-x-4 h-[70vh]">
                     <div class="w-1/2 space-y-8">
-                        <div class="p-fluid border-0 p-2 ">
+                        <div class="p-fluid border-0 p-1 ">
                             <label for="">Seleccionar Personal</label>
-                            <Listbox multiple v-model="form.users" listStyle="height:230px"
+                            <Listbox multiple v-model="form.users" listStyle="height:58vh"
                                 :filterFields="['Nombres_Apellidos', 'Cargo', 'Identificacion', 'Oficina']"
                                 :filter="true" :options="personal" filter optionLabel="name" class="w-full md:w-14rem"
                                 :loading="personal.length == 0">
@@ -283,9 +284,9 @@ const buttons = [
                         <div class="bg-blue-900 rounded-t-lg">
                             <h3 class="text-center font-bold text-lg text-white">Personal Seleccionado</h3>
                         </div>
-                        <div class="block space-y-4 h-[320px] custom-scroll overflow-y-auto shadow-lg rounded-lg p-2">
-                            <div v-for="persona of form.users" class="flex justify-between">
-                                <UserTable :user="persona" :photo="false">
+                        <div class="block space-y-4 h-[66vh] custom-scroll overflow-y-auto shadow-lg rounded-lg p-2">
+                            <div v-for="persona of form.users" class="flex justify-between border-b rounded-b-lg p-1">
+                                <UserTable :user="persona" :photo="true">
                                 </UserTable>
                                 <div>
                                     <Button severity="danger" @click="quitar(persona)" icon="fa-regular fa-trash-can"
@@ -298,16 +299,7 @@ const buttons = [
                     </div>
                 </div>
             </template>
-            <template #footer>
-                <Button severity="success" v-if="form.users.length > 0" @click="submit()">
-                    <i class="fa-solid fa-floppy-disk"></i>
-                    <p class="pl-2">Guardar</p>
-                </Button>
-                <Button severity="danger" @click="modalVisible = false" class="hover:bg-danger">
-                    <i class="fa-regular fa-circle-xmark"></i>
-                    <p class="pl-2">Cancelar</p>
-                </Button>
-            </template>
+
         </CustomModal>
 
         <!--MODAL CREACIÓN DE GRUPOS-->
