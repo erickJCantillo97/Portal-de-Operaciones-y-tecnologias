@@ -1,6 +1,6 @@
 import 'material-icons/iconfont/material-icons.css';
 import "../css/app.css";
-import "../css/schedule.css";
+// import "../css/schedule.css";
 import "./bootstrap";
 import "primeicons/primeicons.css";
 import "primevue/resources/themes/mdc-light-indigo/theme.css";

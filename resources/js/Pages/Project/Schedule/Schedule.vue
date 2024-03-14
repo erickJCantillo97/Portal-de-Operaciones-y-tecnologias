@@ -15,7 +15,7 @@ import CustomModal from '@/Components/CustomModal.vue';
 import FileUpload from 'primevue/fileupload';
 
 const toast = useToast();
-
+const today = ref(new Date())
 const props = defineProps({
     project: Object,
     groups: Array
@@ -359,6 +359,15 @@ const taskEdit = ref({
     }
 })
 
+const timeRanges = ref({
+    enableResizing: false,
+    showCurrentTimeLine: true,
+    showHeaderElements:true,
+    headerRenderer({ timeRange }) {
+        return `<span class="text-xs">${timeRange.id=='currentTime'?'Hoy':timeRange.name}</span>`
+      }
+})
+
 const baselines = ref({
     // Custom tooltip template for baselines
     template(data) {
@@ -402,6 +411,36 @@ const baselines = ref({
 
 const cellEdit = ref({
     addNewAtEnd: false,
+})
+
+const taskTooltip = ref({
+    textContent: false,
+    bodyCls: 'background-color=white;',
+    template({ taskRecord }) {
+        return `<span class="text-sm">
+                    <div class="">
+                        <p class="font-bold text-center w-full text-md" >${StringHelper.encodeHtml(taskRecord.name)}</p>
+                    </div>
+                    <div class="" >
+                        <label class="-mb-1">Predecesora</label>
+                        <span>${StringHelper.encodeHtml(taskRecord.parent?.name) || 'N/A'}</span>
+                    </div>
+                    <div class="grid grid-cols-2"> 
+                        <div class="flexjustify-between">
+                            <span class="">Critico:</span>
+                            <span>${taskRecord.critical ? this.L('Si') : this.L('No')}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="">Inicio:</span>
+                            <span>${DateHelper.format(taskRecord.startDate, 'DD MMM YYYY')}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="">Duracion:</span>
+                            <span>${taskRecord.fullDuration}</span>
+                        </div>
+                    </div>
+                </span>`;
+    }
 })
 //#endRegion
 
@@ -465,7 +504,6 @@ const ganttConfig = ref({
                 ]
             })
         },
-
         { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true },
         { id: 'duration', type: 'duration', text: 'Duración' },
         { id: 'startdate', type: 'startdate', text: 'Fecha Inicio' },
@@ -548,35 +586,7 @@ const ganttConfig = ref({
         'Ctrl+i': 'indent',
         'Ctrl+o': 'outdent',
     },
-    features: {
-        timeRanges: {
-            enableResizing: true,
-            showCurrentTimeLine: true,
-        },
-        dependencies: {
-            // Rounded line joints
-            radius: 10
-        },
-    },
-    taskTooltip: {
-        textContent: false,
-        template({ taskRecord }) {
-            return `<div class="field"><label>Task</label><span>${StringHelper.encodeHtml(taskRecord.name)}</span></div>
-                        <div class="field"><label>Module</label><span>${StringHelper.encodeHtml(taskRecord.parent?.name) || ''}</span></div>
-                        <div class="field"><label>Critical</label><span>${taskRecord.critical ? this.L('Yes') : this.L('No')}</span></div>
-                        <div class="field"><label>Start</label><span>${DateHelper.format(taskRecord.startDate, 'MMM DD')}</span></div>
-                        <div class="field"><label>Duration</label><span>${taskRecord.fullDuration}</span></div>
-                        <div class="field"><label>Assigned to</label>
-                        <div class="b-avatar-container">${taskRecord.resources.map(resourceRecord =>
-                `<img class="b-resource-avatar b-resource-image"  alt="${StringHelper.encodeHtml(resourceRecord.name)}" src="${getResourceImage(resourceRecord)}"/>`).join('')}</div>
-                    `;
-        }
-    }
-
-    // features: features,
-    
 })
-
 //#endRegion
 
 //#region toolbar
@@ -928,9 +938,11 @@ const pruebas = () => {
                         @click="full = !full" />
                 </span>
             </span>
-            <BryntumGantt :filterFeature="true" :taskEditFeature="taskEdit" :projectLinesFeature="false" :timelineScrollButtons="true"
-                :cellEditFeature="cellEdit" :pdfExportFeature="pdfExport" :mspExportFeature="true" :timeRanges="true" :projectLines="false"
-                :baselinesFeature="baselines" ref="ganttref" class="h-full" :printFeature="true" v-bind="ganttConfig" />
+            <BryntumGantt :filterFeature="true" :taskEditFeature="taskEdit" :projectLinesFeature="false"
+                :timelineScrollButtons="true" :cellEditFeature="cellEdit" :pdfExportFeature="pdfExport"
+                :mspExportFeature="true" :projectLines="true" :baselinesFeature="baselines" ref="ganttref"
+                class="h-full" :printFeature="true" v-bind="ganttConfig" :dependenciesFeature="{ radius: 5 }"
+                :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip" />
         </div>
     </AppLayout>
     <OverlayPanel id="setLB" ref="setLB" :pt="{ content: '!p-1' }">
@@ -994,6 +1006,8 @@ const pruebas = () => {
 
     </CustomModal>
 </template>
+
+
 <style>
 /* .b-export .b-panel {
     overflow: visible !important;
@@ -1046,7 +1060,24 @@ const pruebas = () => {
     background-position: 50% 50% !important;
 }
 
+.b-gantt-task {
+    border-radius: 3px !important;
+}
+
 #id {
     font-size: 12px !important;
+}
+
+.b-child-count{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:1.8em;
+  height:1.8em;
+  background:var(--color-blue);
+  color:#fff;
+  border-radius:0.5em;
+  font-size:0.8em;
+  margin-inline-start:2em;
 }
 </style>
