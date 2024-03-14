@@ -3,6 +3,7 @@
 namespace App\Models\Gantt;
 
 use App\Models\Projects\Project;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,5 +37,17 @@ class Task extends Model implements Auditable
     {
         
         return  strpos($this->name, 'EJECUCION') !== false ? 'green' : '';
+    }
+    public function executor(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => json_encode($value),
+            get: fn ($value) => json_decode($value),
+        );
+    }
+
+    public function scopeForExecutor(Builder $query, $executor)
+    {
+        $query->where('executor', 'like', '%'.$executor.'%');
     }
 }
