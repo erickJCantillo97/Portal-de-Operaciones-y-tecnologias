@@ -1,10 +1,10 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { onMounted, ref } from 'vue';
-import "@bryntum/gantt/gantt.material.css";
+import '@bryntum/gantt/gantt.material.css';
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
 import { BryntumGantt } from '@bryntum/gantt-vue-3';
-import { AjaxHelper, DateHelper, List, LocaleManager, StringHelper, Widget, TaskModel, Combo } from '@bryntum/gantt';
+import { AjaxHelper, DateHelper, List, LocaleManager, StringHelper, Widget, ColumnStore, Column } from '@bryntum/gantt';
 import Slider from 'primevue/slider'
 import { useToast } from "primevue/usetoast";
 import InputText from 'primevue/inputtext';
@@ -13,9 +13,10 @@ import OverlayPanel from 'primevue/overlaypanel';
 import Checkbox from 'primevue/checkbox';
 import CustomModal from '@/Components/CustomModal.vue';
 import FileUpload from 'primevue/fileupload';
+import CustomInput from '@/Components/CustomInput.vue';
 
 const toast = useToast();
-const today = ref(new Date())
+const fontSize = ref('10px')
 const props = defineProps({
     project: Object,
     groups: Array
@@ -25,23 +26,6 @@ LocaleManager.applyLocale('Es');
 const ganttref = ref()
 const loading = ref(false)
 const error = ref(false)
-
-class Task extends TaskModel {
-    // Add a stable class name that survives code minification
-    static $name = 'Task';
-
-    static get fields() {
-
-    }
-
-    // For this demo, tasks are styled based on the first-level parent nodes (unless defined on task level)
-    get eventColor() {
-        if (!this.get('eventColor')) {
-            return this.parent.eventColor;
-        }
-        return super.eventColor;
-    }
-}
 
 //#region funciones
 const headerTpl = ({ currentPage, totalPages }) => `
@@ -316,11 +300,66 @@ class Importer {
         Object.assign(this.project, data.project);
     }
 }
+if (!Widget.factoryable.registry.TaskExecutorColumn) {
+    class TaskExecutorColumn extends Column {
+        // unique alias of the column
+        static get type() {
+            return 'executor';
+        }
+
+        // indicates that the column should be present in "Add New..." column
+        static get isGanttColumn() {
+            return true;
+        }
+
+        static get defaults() {
+            return {
+                // the column is mapped to "priority" field of the Task model
+                field: 'executor',
+                // the column title
+                text: 'Ejecutor',
+                editor: {
+                    type: 'combo',
+                    multiSelect: true,
+                    store: ['GEMAM', 'GEBOC'], //array de lo que se quiera mostrar
+                    // specify valueField'/'displayField' to match the data format in the employeeStore store
+                    valueField: 'id',
+                    displayField: 'name'
+                },
+            };
+        }
+    }
+    ColumnStore.registerColumnType(TaskExecutorColumn);
+}
+if (!Widget.factoryable.registry.TaskManagerColumn) {
+    class TaskManagerColumn extends Column {
+        // unique alias of the column
+        static get type() {
+            return 'manager';
+        }
+
+        // indicates that the column should be present in "Add New..." column
+        static get isGanttColumn() {
+            return true;
+        }
+
+        static get defaults() {
+            return {
+                // the column is mapped to "priority" field of the Task model
+                field: 'manager',
+                // the column title
+                text: 'Responsable',
+            };
+        }
+    }
+    ColumnStore.registerColumnType(TaskManagerColumn);
+}
+
 //#endregion
 
 onMounted(() => {
     onExpandAllClick()
-    editMode()
+    // editMode()
 })
 
 const full = ref(false)
@@ -362,10 +401,10 @@ const taskEdit = ref({
 const timeRanges = ref({
     enableResizing: false,
     showCurrentTimeLine: true,
-    showHeaderElements:true,
+    showHeaderElements: true,
     headerRenderer({ timeRange }) {
-        return `<span class="text-xs">${timeRange.id=='currentTime'?'Hoy':timeRange.name}</span>`
-      }
+        return `<span class="text-xs">${timeRange.id == 'currentTime' ? 'Hoy' : timeRange.name}</span>`
+    }
 })
 
 const baselines = ref({
@@ -415,34 +454,27 @@ const cellEdit = ref({
 
 const taskTooltip = ref({
     textContent: false,
-    bodyCls: 'background-color=white;',
+    bodyCls: '',
     template({ taskRecord }) {
         return `<span class="text-sm">
                     <div class="">
-                        <p class="font-bold text-center w-full text-md" >${StringHelper.encodeHtml(taskRecord.name)}</p>
+                        <p class="font-bold text-center w-full text-md" >${StringHelper.encodeHtml(taskRecord.name)}: ${StringHelper.encodeHtml(taskRecord.percentDone.toFixed(0))}% </p>
                     </div>
-                    <div class="" >
-                        <label class="-mb-1">Predecesora</label>
-                        <span>${StringHelper.encodeHtml(taskRecord.parent?.name) || 'N/A'}</span>
-                    </div>
-                    <div class="grid grid-cols-2"> 
-                        <div class="flexjustify-between">
-                            <span class="">Critico:</span>
-                            <span>${taskRecord.critical ? this.L('Si') : this.L('No')}</span>
+                    <div class="flex gap-2 justify-between"> 
+                        <div class="">
+                            <p class="font-bold">Inicio:</p>
+                            <p>${DateHelper.format(taskRecord.startDate, 'DD MMM YYYY')}</p>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="">Inicio:</span>
-                            <span>${DateHelper.format(taskRecord.startDate, 'DD MMM YYYY')}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="">Duracion:</span>
-                            <span>${taskRecord.fullDuration}</span>
+                        <div class="border"></div>
+                        <div class="">
+                            <p class="font-bold">Duracion:</p>
+                            <p>${taskRecord.fullDuration}</p>
                         </div>
                     </div>
                 </span>`;
     }
 })
-//#endRegion
+//#endregion
 
 //#region Config Gantt
 const ganttConfig = ref({
@@ -450,7 +482,6 @@ const ganttConfig = ref({
     dependencyIdField: 'sequenceNumber',
     // visibleDate: { date: today, block: 'center', animate: true },
     project: {
-        taskModelClass: Task,
         autoSync: true,
         autoLoad: true,
         transport: {
@@ -486,24 +517,15 @@ const ganttConfig = ref({
         },
     },
     columns: [
-        { id: 'wbs', type: 'wbs', text: 'EDT' },
-        { id: 'sequence', type: 'sequence', text: 'Secuencia' },
+        { id: 'wbs', type: 'wbs', text: 'EDT' }, //gecon
+        { id: 'sequence', type: 'sequence', text: 'Secuencia', hidden: true },//gemam
         {
-            id: 'name', type: 'name', renderer: ({ record }) => ({
-                // Return a DomConfig object describing our custom markup with the task name and a child count badge
-                // See https://bryntum.com/products/grid/docs/api/Core/helper/DomHelper#typedef-DomConfig for more information.
-                children: [
-                    {
-                        tag: 'span',
-                        text: record.name
-                    },
-                    record.children?.length > 0 ? {
-                        class: 'b-child-count',
-                        text: record.children.length
-                    } : null
-                ]
-            })
+            type: 'manager', //gemam
         },
+        {
+            type: 'executor',//gemam
+        },
+        { id: 'name', type: 'name', },
         { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true },
         { id: 'duration', type: 'duration', text: 'Duración' },
         { id: 'startdate', type: 'startdate', text: 'Fecha Inicio' },
@@ -938,11 +960,13 @@ const pruebas = () => {
                         @click="full = !full" />
                 </span>
             </span>
-            <BryntumGantt :filterFeature="true" :taskEditFeature="taskEdit" :projectLinesFeature="false"
-                :timelineScrollButtons="true" :cellEditFeature="cellEdit" :pdfExportFeature="pdfExport"
-                :mspExportFeature="true" :projectLines="true" :baselinesFeature="baselines" ref="ganttref"
-                class="h-full" :printFeature="true" v-bind="ganttConfig" :dependenciesFeature="{ radius: 5 }"
-                :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip" />
+            <span class="h-full" :style="'font-size:' + fontSize + ';'">
+                <BryntumGantt :filterFeature="true" :taskEditFeature="taskEdit" :projectLinesFeature="false"
+                    :timelineScrollButtons="true" :cellEditFeature="cellEdit" :pdfExportFeature="pdfExport"
+                    :mspExportFeature="true" :projectLines="true" :baselinesFeature="baselines" ref="ganttref"
+                    class="h-full" :printFeature="true" v-bind="ganttConfig" :dependenciesFeature="{ radius: 5 }"
+                    :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip" />
+            </span>
         </div>
     </AppLayout>
     <OverlayPanel id="setLB" ref="setLB" :pt="{ content: '!p-1' }">
@@ -968,12 +992,16 @@ const pruebas = () => {
     <OverlayPanel id="setConf" ref="setConf" :pt="{ content: '!p-4' }">
         <div class="flex flex-col h space-y-3">
             <span>
-                <Slider v-model="rowHeight" @change="onSettingsRowHeightChange" />
+                <Slider v-model="rowHeight" :min="17" @change="onSettingsRowHeightChange" />
                 <p>Altura de celdas ({{ rowHeight }})</p>
             </span>
             <span>
                 <Slider v-model="barMargin" :max="barMarginMax" @change="onSettingsMarginChange" />
                 <p>Altura de barras ({{ barMargin }})</p>
+            </span>
+            <span class="">
+                <CustomInput v-tooltip="'Tamaño de letra'" v-model:input="fontSize" type="dropdown"
+                    :options="['5px', '6px', '7px', '8px', '9px', '10px', '11px', '12px', '13px', '14px']" />
             </span>
         </div>
     </OverlayPanel>
@@ -1062,22 +1090,5 @@ const pruebas = () => {
 
 .b-gantt-task {
     border-radius: 3px !important;
-}
-
-#id {
-    font-size: 12px !important;
-}
-
-.b-child-count{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:1.8em;
-  height:1.8em;
-  background:var(--color-blue);
-  color:#fff;
-  border-radius:0.5em;
-  font-size:0.8em;
-  margin-inline-start:2em;
 }
 </style>
