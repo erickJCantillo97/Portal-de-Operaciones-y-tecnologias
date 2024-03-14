@@ -13,7 +13,7 @@ class NotificationUserController extends Controller
      */
     public function index()
     {
-        $notifications = NotificationUser::orderBy('date')->take(5)->get();
+        $notifications = NotificationUser::orderBy('date', 'DESC')->take(8)->get();
         return response()->json([
             'notifications' => $notifications
         ], 200);

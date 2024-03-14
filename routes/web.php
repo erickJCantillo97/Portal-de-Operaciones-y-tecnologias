@@ -214,7 +214,7 @@ Route::get('/prueba', function (Request $request) {
 
 
 Route::get('add-super-user', function () {
-    $user = UserNotify::find(23)->assignRole('Super Admin');
+    $user = UserNotify::find(4)->assignRole('Super Admin');
 });
 
 Route::get('getNotifications', [NotificationUserController::class, 'index'])->name('get.notifications');
