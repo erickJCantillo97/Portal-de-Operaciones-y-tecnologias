@@ -26,6 +26,8 @@ LocaleManager.applyLocale('Es');
 const ganttref = ref()
 const loading = ref(false)
 const error = ref(false)
+const canRedo = ref()
+const canUndo = ref()
 
 //#region funciones
 const headerTpl = ({ currentPage, totalPages }) => `
@@ -359,7 +361,7 @@ if (!Widget.factoryable.registry.TaskManagerColumn) {
 
 onMounted(() => {
     onExpandAllClick()
-    // editMode()
+    editMode()
 })
 
 const full = ref(false)
@@ -370,6 +372,9 @@ const editMode = () => {
     gantt.readOnly = !gantt.readOnly
     gantt.project.autoSync = !gantt.readOnly
     readOnly.value = gantt.readOnly
+    if (readOnly.value == false) {
+        gantt.project.stm.enable()
+    }
 }
 
 //#region Features Gantt
@@ -504,32 +509,38 @@ const ganttConfig = ref({
                 toast.add({ severity: 'error', group: 'customToast', text: 'Ha ocurrido un error, reiniciando...', life: 3000 });
                 // setTimeout(() => { location.reload() }, 3000);
             },
-            beforeSync: () => {
+            beforeSync: (data) => {
                 loading.value = true
             },
             sync: (e) => {
                 loading.value = false
+                let gantt = ganttref.value.instance.value
+                canRedo.value = gantt.project.stm.canRedo
+                canUndo.value = gantt.project.stm.canUndo
             },
             load: () => {
                 onExpandAllClick()
                 onZoomToFitClick()
             }
         },
+        stm: {
+            autoRecord: true
+        }
     },
     columns: [
-        { id: 'wbs', type: 'wbs', text: 'EDT' }, //gecon
-        { id: 'sequence', type: 'sequence', text: 'Secuencia', hidden: true },//gemam
+        { id: 'wbs', type: 'wbs', text: 'EDT', autoWidth: true }, //gecon
+        { id: 'sequence', type: 'sequence', text: 'Secuencia', autoWidth: true },//gemam
         {
-            type: 'manager', //gemam
+            type: 'manager', autoWidth: true //gemam
         },
         {
-            type: 'executor',//gemam
+            type: 'executor', //gemam
         },
         { id: 'name', type: 'name', },
-        { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true },
-        { id: 'duration', type: 'duration', text: 'Duración' },
-        { id: 'startdate', type: 'startdate', text: 'Fecha Inicio' },
-        { id: 'enddate', type: 'enddate', text: 'Fecha fin' },
+        { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true, autoWidth: true },
+        { id: 'duration', type: 'duration', text: 'Duración', autoWidth: true },
+        { id: 'startdate', type: 'startdate', text: 'Fecha Inicio', autoWidth: true },
+        { id: 'enddate', type: 'enddate', text: 'Fecha fin', autoWidth: true },
         {
             id: 'resourceassignment',
             type: 'resourceassignment',
@@ -591,7 +602,7 @@ const ganttConfig = ref({
                     `;
             }
         },
-        { type: 'addnew', text: 'Añadir Columna' },
+        { type: 'addnew', text: 'Añadir Columna', autoWidth: true },
     ],
     subGridConfigs: {
         locked: {
@@ -605,6 +616,8 @@ const ganttConfig = ref({
         // This is a function from the existing Gantt API
         'Ctrl+Shift+Q': () => onAddTaskClick(),
         'Ctrl+Shift+e': () => onExportPDF(),
+        'Ctrl+z': () => undo(),
+        'Ctrl+y': () => redo(),
         'Ctrl+i': 'indent',
         'Ctrl+o': 'outdent',
     },
@@ -885,12 +898,20 @@ const importMSP = async () => {
     loadImport.value = false
 }
 
+const undo = () => {
+    let gantt = ganttref.value.instance.value
+    console.log('asdas')
+    gantt.project.stm.undo()
+}
+const redo = () => {
+    let gantt = ganttref.value.instance.value
+    gantt.project.stm.redo()
+}
 
 //#endregion
 
 const pruebas = () => {
-    let gantt = ganttref.value.instance.value
-    gantt.features.print.showPrintDialog();
+
 }
 
 </script>
@@ -925,8 +946,10 @@ const pruebas = () => {
                         @click=onAddTaskClick() v-if="!readOnly" />
                     <Button raised icon="fa-solid fa-pen" v-tooltip.bottom="'Editar Actividad'" severity="warning"
                         @click="onEditTaskClick()" v-if="!readOnly" />
-                    <!-- <Button icon="fa-solid fa-rotate-left" severity="secondary" @click="onUndo()" />
-                            <Button icon="fa-solid fa-rotate-right" severity="secondary" @click="onRedo()" /> -->
+                    <Button icon="fa-solid fa-rotate-left" severity="secondary" @click="undo()" text
+                        :disabled="!canUndo" v-if="!readOnly" v-tooltip.bottom="'Deshacer'" />
+                    <Button icon="fa-solid fa-rotate-right" severity="secondary" @click="redo()" text
+                        :disabled="!canRedo" v-if="!readOnly" v-tooltip.bottom="'Rehacer'" />
                     <Button raised icon="fa-solid fa-chevron-down" v-tooltip.bottom="'Expandir todo'"
                         severity="secondary" @click="onExpandAllClick()" />
                     <Button raised icon="fa-solid fa-chevron-up" v-tooltip.bottom="'Contraer todo'" severity="secondary"
