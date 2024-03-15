@@ -69,18 +69,16 @@ const tipologiaFiles = ref({})
 
 const selectedTipologia = async () => {
   fileup.value = Math.random() * (10)
-
   if (tipologia.value) {
     await axios.get(route('get.files.project.tipologia',
-    {
-      projectID: selectedProjects.value.id,
+      {
+        projectID: selectedProjects.value.id,
         tipologiaID: tipologia.value.id
       }))
       .then((response) => {
         tipologiaFiles.value.files = response.data.files
         tipologiaFiles.value.images = response.data.filesImages
-        if (tipologiaFiles.value.images.length > 0)
-          openDialog.value = true
+        openDialog.value = true
       })
   } else {
     tipologiaFiles.value = []
@@ -291,7 +289,7 @@ const downloadFiles = async () => {
         </template>
 
         <template #titulo>
-          <p>Archivos</p>
+          <p class="uppercase">Archivos de "{{ tipologia.name }}" - {{ selectedProjects.name }}</p>
         </template>
 
         <template #body>
@@ -305,7 +303,7 @@ const downloadFiles = async () => {
                 </CustomDataTable>
               </div>
             </TabPanel>
-            <TabPanel header="Imágenes">
+            <TabPanel header="Imágenes" v-if="tipologiaFiles.images.length > 0">
               <article class="grid h-[70vh] w-full grid-cols-2 gap-x-4 overflow-y-auto">
                 <div>
                   <Listbox :key="listTipologia" v-model="fileListboxSelected" :options="tipologiaFiles.images" filter

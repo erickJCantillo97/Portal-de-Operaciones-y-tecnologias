@@ -23,7 +23,7 @@ class ToolController extends Controller
     {
 
         $warehouse = Warehouse::where('department', auth()->user()->oficina)->first()->id ?? 4;
-        $tools = Tool::with('category', 'warehouse')->orderBy('category_id')->get();
+        $tools = Tool::where('warehouse_id', $warehouse)->with('category', 'warehouse')->orderBy('category_id')->get();
         // foreach ($tools as $tool) {
         //     $user =  User::where('id', $tool->responsible_id)->first();
         //     $oficina = $user->oficina == 'DEPPC' ? 'DVMAP' : $user->oficina;

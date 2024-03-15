@@ -79,6 +79,6 @@ class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow
 
     public function chunkSize(): int
     {
-        return 1000;
+        return 300;
     }
 }

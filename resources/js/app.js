@@ -1,6 +1,6 @@
 import 'material-icons/iconfont/material-icons.css';
 import "../css/app.css";
-import "../css/schedule.css";
+// import "../css/schedule.css";
 import "./bootstrap";
 import "primeicons/primeicons.css";
 import "primevue/resources/themes/mdc-light-indigo/theme.css";
@@ -17,6 +17,7 @@ import Tooltip from "primevue/tooltip";
 import VueApexCharts from "vue3-apexcharts";
 import VueChatScroll from 'vue3-chat-scroll'
 import BadgeDirective from 'primevue/badgedirective';
+
 const appName =
     import.meta.env.VITE_APP_NAME || "Portal";
 

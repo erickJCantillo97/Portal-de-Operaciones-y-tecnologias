@@ -19,32 +19,12 @@ import ToggleButton from 'primevue/togglebutton'
 
 const props = defineProps({
     project: Object,
-    contracts: Array,
-    authorizations: Array,
-    quotes: Array,
-    ships: Array,
-    milestones: {
-        type: Array,
-        default: []
-    },
-    tools: {
-        type: Array,
-        default: []
-    },
-    weekTasks: Array,
-    gerentes: Object,
-    projectShips: {
-        type: Array,
-        default: []
-    }
+    contracts: Array
 })
 
 //#region Referencias (v-model)
-const authorizationSelect = ref()
-const shiftOptions = ref([])
 const loading = ref(false)
 //#endregion
-
 
 //#region CustomDataTable hitos
 const columnas = [
@@ -54,7 +34,6 @@ const columnas = [
     { field: 'end_date', header: 'Fecha de terminación', filter: true, sortable: true },
     { field: 'advance', header: 'Avance', type: 'number', filter: true, sortable: true },
 ]
-
 
 const actions = [
     { event: 'edit', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
@@ -113,17 +92,108 @@ const formData = ref({
     daysPerMonth: parseInt(props.project?.daysPerMonth ?? 20),
     shift: parseInt(props.project?.shift) ?? null,
     ships: props.project?.ships ?? []
-
 })
 //#endregion
 
 const wizard = ref()
 onMounted(() => {
-    getShift()
+    // getAuthorizations()
+    // getContracts()
+    // getMilestones()
+    // getProjectShips()
+    // getQuotes()
+    // getShift()
+    getShips()
+    // getWeekTasks()
+    contractsOptions.value = props.contracts
     if (props.project) {
         wizard.value.activateAll()
     }
 })
+
+//#region Requests
+//Turnos
+const shipsOptions = ref([])
+
+const getShips = async () => {
+    await axios.get(route('ships.index'))
+        .then(response => {
+            shipsOptions.value = response.data.ships
+        })
+}
+
+//Clases (typeShips)
+const projectShipsOptions = ref([])
+
+const getProjectShips = async () => {
+    await axios.get(route('projectShips.index'))
+        .then(response => {
+            projectShipsOptions.value = response.data.ships
+        })
+}
+
+//Hitos (Milestones)
+const milestonesOptions = ref([])
+const gerentes = ref([])
+
+const getMilestones = async () => {
+    await axios.get(route('milestones.index'))
+        .then(response => {
+            milestonesOptions.value = response.data[0]
+        })
+}
+
+//Turnos
+const shiftOptions = ref([])
+
+const getShift = async () => {
+    await axios.get(route('shift.index'))
+        .then(response => {
+            shiftOptions.value = response.data[0]
+        })
+}
+
+//Contratos
+const contractsOptions = ref([])
+
+const getContracts = async () => {
+    await axios.get(route('contracts.index'))
+        .then(response => {
+            contractsOptions.value = response.data[0]
+        })
+}
+
+//Estimaciones (Quotes)
+const quotesOptions = ref([])
+
+const getQuotes = async () => {
+    await axios.get(route('quotes.index'))
+        .then(response => {
+            quotesOptions.value = response.data[0]
+        })
+}
+
+//Autorizaciones (Quotes)
+const authorizationSelect = ref()
+const authorizationsOptions = ref([])
+
+const getAuthorizations = async () => {
+    await axios.get(route('authorizations.index'))
+        .then(response => {
+            authorizationsOptions.value = response.data[0]
+        })
+}
+
+//Tareas Semanales (weekTasks)
+const weekTasksOptions = ref([])
+
+const getWeekTasks = async () => {
+    await axios.get(route('week_tasks.index'))
+        .then(response => {
+            weekTasksOptions.value = response.data[0]
+        })
+}
+//#endregion
 
 const errors = ref({})
 const beforeChange = async () => {
@@ -215,13 +285,6 @@ const save = () => {
             }
         })
     }
-}
-
-const getShift = () => {
-    axios.get(route('shift.index'))
-        .then(response => {
-            shiftOptions.value = response.data[0]
-        })
 }
 
 //#region Avance proyectos
@@ -376,15 +439,15 @@ const active = ref(0);
                                 :invalid="$page.props.errors.scope ? true : false" />
                             <CustomInput label="Contrato" type="dropdown" placeholder="Seleccione Alcance del Proyecto"
                                 optionValue="id" optionLabel="contract_id" v-model:input="formData.contract_id"
-                                showClear :options="contracts" />
+                                showClear :options="contractsOptions" />
                             <CustomInput label="Autorizaciones" type="dropdown" placeholder="Seleccione Autorización"
                                 optionLabel="name" v-model:input="authorizationSelect" showClear
-                                :options="authorizations" :errorMessage="$page.props.errors.authorization_id"
+                                :options="authorizationsOptions" :errorMessage="$page.props.errors.authorization_id"
                                 :invalid="$page.props.errors.authorization_id ? true : false" />
 
                             <CustomInput label="Estimaciones" type="dropdown" placeholder="Seleccione Estimación"
                                 optionLabel="consecutive" v-model:input="formData.quote_id" optionValue="id" showClear
-                                :options="Object.values(quotes)" :errorMessage="$page.props.errors.quote_id"
+                                :options="Object.values(quotesOptions)" :errorMessage="$page.props.errors.quote_id"
                                 :invalid="$page.props.errors.quote_id ? true : false" />
                         </div>
                     </tab-content>
@@ -501,10 +564,10 @@ const active = ref(0);
                         class="h-[45vh] flex gap-2">
                         <span class="h-ful flex flex-col w-1/2">
                             <p class="font-bold text-lg">Buques agregados</p>
-                            <Listbox :options="projectShips" optionValue="id"
+                            <Listbox :options="projectShipsOptions" optionValue="id"
                                 :filterFields="['ship.name', 'ship.idHull']"
                                 filterPlaceholder="Filtrar Buques agregados" multiple filter optionLabel="name" :pt="{
-                        list: projectShips.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
+                        list: projectShipsOptions.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
                         header: '!p-1',
                         filterInput: '!h-8',
                         item: '!h-min !rounded-lg'
@@ -537,10 +600,10 @@ const active = ref(0);
                         </span>
                         <span class="flex flex-col w-1/2">
                             <p class="font-bold text-lg">Buques para agregar</p>
-                            <Listbox :options="ships" v-model="formData.ships" optionValue="id"
+                            <Listbox :options="shipsOptions" v-model="formData.ships" optionValue="id"
                                 :filterFields="['name', 'idHull']" filterPlaceholder="Filtrar Buques sin agregar"
                                 multiple filter optionLabel="name" :pt="{
-                        list: ships.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
+                        list: shipsOptions.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
                         header: '!p-1',
                         filterInput: '!h-8',
                         item: '!h-min !rounded-lg'
@@ -571,9 +634,9 @@ const active = ref(0);
                     </tab-content>
                     <tab-content title="Hitos" icon="fa-solid fa-list-check"
                         class=" h-[45vh] w-full border rounded-lg p-1 overflow-y-auto">
-                        <CustomDataTable :rowsDefault="5" :data="milestones" :columnas="columnas" :actions="actions"
-                            @edit="showModal" :filter="false" :showHeader="false" :showAdd="true" @addClick="showModal"
-                            @delete="delMilestone" />
+                        <CustomDataTable :rowsDefault="5" :data="milestonesOptions" :columnas="columnas"
+                            :actions="actions" @edit="showModal" :filter="false" :showHeader="false" :showAdd="true"
+                            @addClick="showModal" @delete="delMilestone" />
                     </tab-content>
 
                     <template #prev>
