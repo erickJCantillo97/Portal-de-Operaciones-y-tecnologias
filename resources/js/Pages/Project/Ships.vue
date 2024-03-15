@@ -1,7 +1,6 @@
 <script setup>
-const { confirmDelete } = useSweetalert();
 const { hasRole, hasPermission } = usePermissions()
-const { toast } = useSweetalert();
+const { toast, confirmDelete } = useSweetalert();
 const customerSelect = ref();
 const loading = ref(false);
 const modalType = ref('Nueva unidad')
