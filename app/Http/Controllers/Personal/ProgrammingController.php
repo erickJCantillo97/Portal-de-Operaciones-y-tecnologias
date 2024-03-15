@@ -260,12 +260,20 @@ class ProgrammingController extends Controller
             switch ($request->type) {
                 //SOLO EL $request->date
                 case 1:
-                    $exist = DetailScheduleTime::
-                        where('idUsuario', $request->idUser)
-                        ->where('fecha', $request->date)
-                        ->whereBetween('horaInicio', [$request->startShift, $request->endShift])
-                        ->whereBetween('horaFin', [$request->startShift, $request->endShift])
-                        ->get();
+                    $exist = DetailScheduleTime::where('fecha', $request->date)
+                    ->where('idSchedule','!=',$request->schedule)
+                    ->where(function($query) use ($request){
+                        $query->where(function($subquery) use ($request) {
+                            $subquery->whereTime('horaInicio', '<=', $request->startShift)
+                                ->whereTime('horaFin', '>=', $request->startShift);
+                    })->orWhere(function($subquery) use ($request) {
+                        $subquery->whereTime('horaInicio', '<=', $request->endShift)
+                                ->whereTime('horaFin', '>=',  $request->endShift);
+                    })->orWhere(function($subquery) use ($request) {
+                        $subquery->whereBetween('horaInicio', [$request->startShift,$request->endShift])
+                                ->whereBetween('horaFin', [$request->startShift,$request->endShift]);
+                    });
+                    })->get();
                     if ($exist->count() > 0) {
                         $exist = $exist->each(function ($DetailScheduleTime) {
                             $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
@@ -288,14 +296,22 @@ class ProgrammingController extends Controller
                     $end_date = Carbon::parse($task->endDate);
                     //esta consulta se usa para saber si la persona está programada en una actividad
                     //diferente a la actual (La primera)
-                    $firts = DetailScheduleTime::
-                    where('idUsuario', $request->idUser)
-                    ->where('fecha', $date)
-                    ->where('idScheduleTime','!=',$request->schedule_time)
-                    ->where(function ($sql) use ($request){
-                        $sql->orWhereBetween('horaInicio', [$request->startShift, $request->endShift]);
-                        $sql->orWhereBetween('horaFin', [$request->startShift, $request->endShift]);
+                    $firts  = DetailScheduleTime::where('fecha', $request->date)
+                    ->where('idSchedule','!=',$request->schedule)
+                    ->where('idUsuario', $request->idUser)
+                    ->where(function($query) use ($request){
+                        $query->where(function($subquery) use ($request) {
+                            $subquery->whereTime('horaInicio', '<=', $request->startShift)
+                                ->whereTime('horaFin', '>=', $request->startShift);
+                    })->orWhere(function($subquery) use ($request) {
+                        $subquery->whereTime('horaInicio', '<=', $request->endShift)
+                                ->whereTime('horaFin', '>=',  $request->endShift);
+                    })->orWhere(function($subquery) use ($request) {
+                        $subquery->whereBetween('horaInicio', [$request->startShift,$request->endShift])
+                                ->whereBetween('horaFin', [$request->startShift,$request->endShift]);
+                    });
                     })->get();
+
                     if ($firts->count() > 0) {
                         $firts = $firts->each(function ($DetailScheduleTime) {
                             $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
@@ -309,15 +325,20 @@ class ProgrammingController extends Controller
                     }
                     $date = $date->addDays(1);
                     do {
-                        $exist = DetailScheduleTime::
-                            where('idUsuario', $request->idUser)
-                            ->where('fecha', $date)
-                            ->where(function ($sql) use ($request){
-                                $sql->where('horaInicio','<=', $request->startShift);
-                                $sql->where('horaFin','>=', $request->startShift);
-                                $sql->orWhere('horaInicio','<=', $request->startShift);
-                                $sql->where('horaFin','>=', $request->startShift);
-                            })->get();
+                        $exist  = DetailScheduleTime::where('fecha', $date)
+                        ->where('idUsuario', $request->idUser)
+                        ->where(function($query) use ($request){
+                            $query->where(function($subquery) use ($request) {
+                                $subquery->whereTime('horaInicio', '<=', $request->startShift)
+                                    ->whereTime('horaFin', '>=', $request->startShift);
+                        })->orWhere(function($subquery) use ($request) {
+                            $subquery->whereTime('horaInicio', '<=', $request->endShift)
+                                    ->whereTime('horaFin', '>=',  $request->endShift);
+                        })->orWhere(function($subquery) use ($request) {
+                            $subquery->whereBetween('horaInicio', [$request->startShift,$request->endShift])
+                                    ->whereBetween('horaFin', [$request->startShift,$request->endShift]);
+                        });
+                        })->get();
                         if ($exist->count() > 0) {
                             $exist = $exist->each(function ($DetailScheduleTime) {
                                 $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
@@ -358,14 +379,19 @@ class ProgrammingController extends Controller
                         ]);   
                     }
                     do {
-                        $exist = DetailScheduleTime::
-                        where('idUsuario', $request->idUser)
-                        ->where('fecha', $date)
-                        ->where(function ($sql) use ($request){
-                            $sql->where('horaInicio','<=', $request->startShift);
-                            $sql->where('horaFin','>=', $request->startShift);
-                            $sql->orWhere('horaInicio','<=', $request->startShift);
-                            $sql->where('horaFin','>=', $request->startShift);
+                        $exist  = DetailScheduleTime::where('fecha', $date)
+                        ->where('idUsuario', $request->idUser)
+                        ->where(function($query) use ($request){
+                            $query->where(function($subquery) use ($request) {
+                                $subquery->whereTime('horaInicio', '<=', $request->startShift)
+                                    ->whereTime('horaFin', '>=', $request->startShift);
+                        })->orWhere(function($subquery) use ($request) {
+                            $subquery->whereTime('horaInicio', '<=', $request->endShift)
+                                    ->whereTime('horaFin', '>=',  $request->endShift);
+                        })->orWhere(function($subquery) use ($request) {
+                            $subquery->whereBetween('horaInicio', [$request->startShift,$request->endShift])
+                                    ->whereBetween('horaFin', [$request->startShift,$request->endShift]);
+                        });
                         })->get();
                         if ($exist->count() > 0) {
                             $exist = $exist->each(function ($DetailScheduleTime) {
@@ -395,13 +421,20 @@ class ProgrammingController extends Controller
                 case 4:
                     // FECHAS ESPECIFICAS
                     foreach ($request->details as $date) {
-                        $exist = DetailScheduleTime::
-                            where('idUsuario', $request->idUser)
-                            ->whereBetween('horaInicio', [$request->startShift, $request->endShift])
-                            ->whereBetween('horaFin', [$request->startShift, $request->endShift])
-                            ->where('fecha', $date)
-                            ->get();
-                            return $exist;
+                        $exist  = DetailScheduleTime::where('fecha', $date)
+                        ->where('idUsuario', $request->idUser)
+                        ->where(function($query) use ($request){
+                            $query->where(function($subquery) use ($request) {
+                                $subquery->whereTime('horaInicio', '<=', $request->startShift)
+                                    ->whereTime('horaFin', '>=', $request->startShift);
+                        })->orWhere(function($subquery) use ($request) {
+                            $subquery->whereTime('horaInicio', '<=', $request->endShift)
+                                    ->whereTime('horaFin', '>=',  $request->endShift);
+                        })->orWhere(function($subquery) use ($request) {
+                            $subquery->whereBetween('horaInicio', [$request->startShift,$request->endShift])
+                                    ->whereBetween('horaFin', [$request->startShift,$request->endShift]);
+                        });
+                        })->get();
                         if ($exist->count() > 0) {
                             $exist = $exist->each(function ($DetailScheduleTime) {
                                 $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
