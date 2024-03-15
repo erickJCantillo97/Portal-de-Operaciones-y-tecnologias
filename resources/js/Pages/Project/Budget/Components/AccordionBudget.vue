@@ -141,8 +141,9 @@ const props = defineProps({
                             </p>
                             <p class="h-full flex items-center justify-end">
                                 {{
-            currencyFormat(operacion.materials_ejecutados + operacion.labor_ejecutados +
-                operacion.services_ejecutados)
+            currencyFormat(parseInt(operacion.materials_ejecutados) +
+                parseInt(operacion.labor_ejecutados) +
+                parseInt(operacion.services_ejecutados))
         }}
                             </p>
                             <p class="h-full flex items-center justify-end"
