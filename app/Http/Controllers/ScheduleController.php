@@ -126,6 +126,10 @@ class ScheduleController extends Controller
         if (isset($request->tasks['updated'])) {
             foreach ($request->tasks['updated'] as $task) {
                 $taskUpdate = Task::where('id', $task['id'])->first();
+                $manager = $taskUpdate->manager;
+                if (isset($task['manager'])) {
+                    $manager = $task['manager'] != '-' ? $task['manager'] : null;
+                }
                 $taskUpdate->update([
                     'name' => $task['name'] ?? $taskUpdate->name,
                     'task_id' => $task['parentId'] ?? $taskUpdate->task_id,
@@ -135,7 +139,7 @@ class ScheduleController extends Controller
                     'startDate' => $task['startDate'] ?? $taskUpdate->startDate,
                     'endDate' => $task['endDate'] ?? $taskUpdate->endDate,
                     'executor' => $task['executor'] ?? $taskUpdate->executor,
-                    'manager' => $task['manager'] ? $task['manager'] : $taskUpdate->manager,
+                    'manager' =>  $manager,
                     'manuallyScheduled' => $task['manuallyScheduled'] ?? $taskUpdate->manuallyScheduled,
                 ]);
             }
