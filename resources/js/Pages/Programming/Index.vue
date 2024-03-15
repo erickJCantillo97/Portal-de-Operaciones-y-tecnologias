@@ -184,7 +184,8 @@ const employeeDialog = (item) => {
 }
 
 const form = ref({
-    name: null, // nombre de horario personalizado o nombre de la persona
+    userName: null, //nombre de la persona
+    timeName: null, // nombre del horario personalizado
     startShift: null,// hora inicio
     endShift: null,// hora fin
     timeBreak: null,
@@ -214,6 +215,7 @@ const toggle = (horario, data, option) => {
     form.value.idUser = data.employee_id
     form.value.schedule = data.id
     form.value.schedule_time = horario.id
+    form.value.userName = data.name
     nuevoHorario.value = {}
     modhours.value = true
 }
@@ -480,7 +482,7 @@ const save = async () => {
                                 headerTitle: '!w-full !flex !justify-center',
                             }">
                             <div class="h-48 m-1">
-                                <CustomInput v-model:input="form.name" label="Nombre" type="text" id="name"
+                                <CustomInput v-model:input="form.timeName" label="Nombre" type="text" id="name"
                                     placeholder="Nombre del horario" :required="tabActive == 2" />
                                 <span class="grid grid-cols-3 gap-x-1">
                                     <CustomInput v-model:input="form.startShift" label="Hora inicio" type="time"
