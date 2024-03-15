@@ -3,8 +3,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { onMounted, ref } from 'vue';
 import '@bryntum/gantt/gantt.material.css';
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
-import { BryntumGantt } from '@bryntum/gantt-vue-3';
-import { AjaxHelper, DateHelper, List, LocaleManager, StringHelper, Widget, ColumnStore, Column } from '@bryntum/gantt';
+import { BryntumGantt, BryntumResourceUtilization } from '@bryntum/gantt-vue-3';
+import { AjaxHelper, DateHelper, List, LocaleManager, StringHelper, Widget, ColumnStore, Column, TaskModel } from '@bryntum/gantt';
 import Slider from 'primevue/slider'
 import { useToast } from "primevue/usetoast";
 import InputText from 'primevue/inputtext';
@@ -316,14 +316,13 @@ if (!Widget.factoryable.registry.TaskExecutorColumn) {
 
         static get defaults() {
             return {
-                // the column is mapped to "priority" field of the Task model
                 field: 'executor',
-                // the column title
                 text: 'Ejecutor',
+                align: 'center',
                 editor: {
                     type: 'combo',
                     multiSelect: true,
-                    store: ['GEMAM',
+                    items: ['GEMAM',
                         'GEBOC',
                         'DEEST',
                         'DEGPM',
@@ -342,8 +341,17 @@ if (!Widget.factoryable.registry.TaskExecutorColumn) {
                         'DEINE',
                         'DEMTO',
                         'CLIENTE'
-                    ], //array de lo que se quiera mostrar
-                    // specify valueField'/'displayField' to match the data format in the employeeStore store
+                    ],
+                    listItemTpl: ({ text }) => `<div class="text-xs">${text}</div>`,
+                    picker: {
+                        height: 300,
+                        width: 100,
+                        features: {
+                            filterBar: {
+                                compactMode: true,
+                            },
+                        },
+                    }
                 },
             };
         }
@@ -368,10 +376,11 @@ if (!Widget.factoryable.registry.TaskManagerColumn) {
                 field: 'manager',
                 // the column title
                 text: 'Responsable',
+                align: 'center',
                 editor: {
                     type: 'combo',
                     multiSelect: true,
-                    store: ['GEMAM',
+                    items: ['GEMAM',
                         'GEBOC',
                         'JDEEST',
                         'JDEGPM',
@@ -390,19 +399,17 @@ if (!Widget.factoryable.registry.TaskManagerColumn) {
                         'JDEINE',
                         'JDEMTO',
                         'CLIENTE',
-                    ], //array de lo que se quiera mostrar
-                    // specify valueField'/'displayField' to match the data format in the employeeStore store
+                    ],
+                    listItemTpl: ({ text }) => `<div class="text-xs">${text}</div>`,
+                    listCls: 'padding=0px',
                     picker: {
                         height: 300,
-                        width: 150,
+                        width: 100,
                         features: {
                             filterBar: {
                                 compactMode: true,
                             },
-                            headerMenu: false,
-                            cellMenu: false,
                         },
-                        // The extra columns are concatenated onto the base column set.
                     }
                 },
             };
@@ -410,7 +417,16 @@ if (!Widget.factoryable.registry.TaskManagerColumn) {
     }
     ColumnStore.registerColumnType(TaskManagerColumn);
 }
+class Task extends TaskModel {
 
+    static $name = 'Task';
+
+    get cls() {
+        // adds 'b-critical' CSS class to critical tasks
+        return Object.assign(super.cls, { 'b-critical': this.critical });
+    }
+
+}
 //#endregion
 
 onMounted(() => {
@@ -513,7 +529,6 @@ const cellEdit = ref({
 
 const taskTooltip = ref({
     textContent: false,
-    bodyCls: '',
     template({ taskRecord }) {
         return `<span class="text-sm">
                     <div class="">
@@ -533,14 +548,15 @@ const taskTooltip = ref({
                 </span>`;
     }
 })
+const criticalPaths = ref({
+    disabled: false
+})
 //#endregion
 
 //#region Config Gantt
-const ganttConfig = ref({
-    rowHeight: 28,
-    dependencyIdField: 'sequenceNumber',
-    // visibleDate: { date: today, block: 'center', animate: true },
-    project: {
+const project = ref(
+    {
+        taskModelClass: Task,
         autoSync: true,
         autoLoad: true,
         transport: {
@@ -578,6 +594,12 @@ const ganttConfig = ref({
             }
         },
     },
+)
+const ganttConfig = ref({
+    rowHeight: 28,
+    dependencyIdField: 'sequenceNumber',
+    // visibleDate: { date: today, block: 'center', animate: true },
+    project,
     columns: [
         { id: 'wbs', type: 'wbs', text: 'EDT', autoWidth: true }, //gecon
         { id: 'sequence', type: 'sequence', text: 'Secuencia', autoWidth: true },//gemam
@@ -951,7 +973,6 @@ const importMSP = async () => {
 
 const undo = () => {
     let gantt = ganttref.value.instance.value
-    console.log('asdas')
     gantt.project.stm.undo()
 }
 const redo = () => {
@@ -959,11 +980,14 @@ const redo = () => {
     gantt.project.stm.redo()
 }
 
-//#endregion
-
-const pruebas = () => {
-
+const critical =ref(false)
+const showCritical = () => {
+    critical.value=!critical.value
+    let gantt = ganttref.value.instance.value
+    gantt.features.criticalPaths.disabled = critical.value
 }
+
+//#endregion
 
 </script>
 <template>
@@ -1023,7 +1047,8 @@ const pruebas = () => {
                         @click="onExport()" />
                     <Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input"
                         icon="fa-solid fa-upload" @click="modalImport = true" />
-                    <!-- <Button raised v-tooltip.bottom="'undo'" icon="fa-solid fa-print" @click="pruebas" /> -->
+                    <Button raised v-tooltip.bottom="'Ruta critica'" severity="danger" icon="fa-solid fa-circle-exclamation"
+                        @click="showCritical()" />
                 </span>
                 <span class="flex space-x-1">
                     <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"
@@ -1039,7 +1064,8 @@ const pruebas = () => {
                     :timelineScrollButtons="true" :cellEditFeature="cellEdit" :pdfExportFeature="pdfExport"
                     :mspExportFeature="true" :projectLines="true" :baselinesFeature="baselines" ref="ganttref"
                     class="h-full" :printFeature="true" v-bind="ganttConfig" :dependenciesFeature="{ radius: 5 }"
-                    :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip" />
+                    :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip"
+                    :criticalPathsFeature="criticalPaths" />
             </span>
         </div>
     </AppLayout>
@@ -1111,10 +1137,6 @@ const pruebas = () => {
 
 
 <style>
-/* .b-export .b-panel {
-    overflow: visible !important;
-    contain: none !important;
-} */
 
 .b-export-header,
 .b-export-footer {
