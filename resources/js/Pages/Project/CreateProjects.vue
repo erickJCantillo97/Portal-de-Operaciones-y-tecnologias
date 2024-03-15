@@ -19,6 +19,7 @@ import ToggleButton from 'primevue/togglebutton'
 
 const props = defineProps({
     project: Object,
+    contracts: Array
 })
 
 //#region Referencias (v-model)
@@ -96,15 +97,15 @@ const formData = ref({
 
 const wizard = ref()
 onMounted(() => {
-    getAuthorizations()
-    getContracts()
-    getMilestones()
-    getProjectShips()
-    getQuotes()
-    getShift()
+    // getAuthorizations()
+    // getContracts()
+    // getMilestones()
+    // getProjectShips()
+    // getQuotes()
+    // getShift()
     getShips()
-    getWeekTasks()
-
+    // getWeekTasks()
+    contractsOptions.value = props.contracts
     if (props.project) {
         wizard.value.activateAll()
     }
@@ -114,27 +115,28 @@ onMounted(() => {
 //Turnos
 const shipsOptions = ref([])
 
-const getShips = async() => {
+const getShips = async () => {
     await axios.get(route('ships.index'))
         .then(response => {
-            shipsOptions.value = response.data[0]
+            shipsOptions.value = response.data.ships
         })
 }
 
 //Clases (typeShips)
 const projectShipsOptions = ref([])
 
-const getProjectShips = async() => {
+const getProjectShips = async () => {
     await axios.get(route('projectShips.index'))
         .then(response => {
-            projectShipsOptions.value = response.data[0]
+            projectShipsOptions.value = response.data.ships
         })
 }
 
 //Hitos (Milestones)
 const milestonesOptions = ref([])
+const gerentes = ref([])
 
-const getMilestones = async() => {
+const getMilestones = async () => {
     await axios.get(route('milestones.index'))
         .then(response => {
             milestonesOptions.value = response.data[0]
@@ -144,7 +146,7 @@ const getMilestones = async() => {
 //Turnos
 const shiftOptions = ref([])
 
-const getShift = async() => {
+const getShift = async () => {
     await axios.get(route('shift.index'))
         .then(response => {
             shiftOptions.value = response.data[0]
@@ -154,7 +156,7 @@ const getShift = async() => {
 //Contratos
 const contractsOptions = ref([])
 
-const getContracts = async() => {
+const getContracts = async () => {
     await axios.get(route('contracts.index'))
         .then(response => {
             contractsOptions.value = response.data[0]
@@ -164,7 +166,7 @@ const getContracts = async() => {
 //Estimaciones (Quotes)
 const quotesOptions = ref([])
 
-const getQuotes = async() => {
+const getQuotes = async () => {
     await axios.get(route('quotes.index'))
         .then(response => {
             quotesOptions.value = response.data[0]
@@ -175,17 +177,17 @@ const getQuotes = async() => {
 const authorizationSelect = ref()
 const authorizationsOptions = ref([])
 
-const getAuthorizations = async() => {
+const getAuthorizations = async () => {
     await axios.get(route('authorizations.index'))
-    .then(response => {
-        authorizationsOptions.value = response.data[0]
-    })
+        .then(response => {
+            authorizationsOptions.value = response.data[0]
+        })
 }
 
 //Tareas Semanales (weekTasks)
 const weekTasksOptions = ref([])
 
-const getWeekTasks = async() => {
+const getWeekTasks = async () => {
     await axios.get(route('week_tasks.index'))
         .then(response => {
             weekTasksOptions.value = response.data[0]
@@ -565,7 +567,7 @@ const active = ref(0);
                             <Listbox :options="projectShipsOptions" optionValue="id"
                                 :filterFields="['ship.name', 'ship.idHull']"
                                 filterPlaceholder="Filtrar Buques agregados" multiple filter optionLabel="name" :pt="{
-                        list: projectShips.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
+                        list: projectShipsOptions.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
                         header: '!p-1',
                         filterInput: '!h-8',
                         item: '!h-min !rounded-lg'
@@ -601,7 +603,7 @@ const active = ref(0);
                             <Listbox :options="shipsOptions" v-model="formData.ships" optionValue="id"
                                 :filterFields="['name', 'idHull']" filterPlaceholder="Filtrar Buques sin agregar"
                                 multiple filter optionLabel="name" :pt="{
-                        list: ships.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
+                        list: shipsOptions.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
                         header: '!p-1',
                         filterInput: '!h-8',
                         item: '!h-min !rounded-lg'
@@ -632,9 +634,9 @@ const active = ref(0);
                     </tab-content>
                     <tab-content title="Hitos" icon="fa-solid fa-list-check"
                         class=" h-[45vh] w-full border rounded-lg p-1 overflow-y-auto">
-                        <CustomDataTable :rowsDefault="5" :data="milestonesOptions" :columnas="columnas" :actions="actions"
-                            @edit="showModal" :filter="false" :showHeader="false" :showAdd="true" @addClick="showModal"
-                            @delete="delMilestone" />
+                        <CustomDataTable :rowsDefault="5" :data="milestonesOptions" :columnas="columnas"
+                            :actions="actions" @edit="showModal" :filter="false" :showHeader="false" :showAdd="true"
+                            @addClick="showModal" @delete="delMilestone" />
                     </tab-content>
 
                     <template #prev>
