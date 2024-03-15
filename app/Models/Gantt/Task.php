@@ -45,13 +45,15 @@ class Task extends Model implements Auditable
             get: fn ($value) => json_decode($value),
         );
     }
+    
     public function manager(): Attribute
     {
         return Attribute::make(
             set: fn ($value) => json_encode($value),
-            get: fn ($value) => $value ?? '-',
+            get: fn ($value) => json_decode($value),
         );
     }
+
 
     public function scopeForExecutor(Builder $query, $executor)
     {
