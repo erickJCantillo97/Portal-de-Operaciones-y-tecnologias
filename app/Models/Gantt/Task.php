@@ -35,7 +35,7 @@ class Task extends Model implements Auditable
 
     public function getEventColorAttribute()
     {
-        
+
         return  strpos($this->name, 'EJECUCION') !== false ? 'green' : '';
     }
     public function executor(): Attribute
@@ -45,6 +45,7 @@ class Task extends Model implements Auditable
             get: fn ($value) => json_decode($value),
         );
     }
+    
     public function manager(): Attribute
     {
         return Attribute::make(
@@ -55,6 +56,6 @@ class Task extends Model implements Auditable
 
     public function scopeForExecutor(Builder $query, $executor)
     {
-        $query->where('executor', 'like', '%'.$executor.'%');
+        $query->where('executor', 'like', '%' . $executor . '%');
     }
 }

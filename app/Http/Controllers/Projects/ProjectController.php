@@ -44,20 +44,16 @@ class ProjectController extends Controller
     public function create()
     {
         $contracts = Contract::orderBy('contract_id')->get();
-        $authorizations = Authorization::orderBy('contract_id')->get();
-        $quotes = QuoteVersion::with('customer')->get()->filter(function ($quote) {
-            return $quote['get_status'] === 'Contratada';
-        });
-        $ships = Ship::with('customer', 'typeShip')->doesnthave('projectsShip')->get();
-        $gerentes = getPersonalGerenciaOficina('GECON', 'DEGPC')->map(function ($estimador) {
-            return [
-                'user_id' => $estimador['Num_SAP'],
-                'name' => $estimador['Nombres_Apellidos'],
-                'email' => $estimador['Correo']
-            ];
-        })->toArray();
+
+        // $gerentes = getPersonalGerenciaOficina('GECON', 'DEGPC')->map(function ($estimador) {
+        //     return [
+        //         'user_id' => $estimador['Num_SAP'],
+        //         'name' => $estimador['Nombres_Apellidos'],
+        //         'email' => $estimador['Correo']
+        //     ];
+        // })->toArray();
         // return $ships;
-        return Inertia::render('Project/CreateProjects', compact('contracts', 'authorizations', 'quotes', 'ships', 'gerentes'));
+        return Inertia::render('Project/CreateProjects', compact('contracts'));
     }
 
     /**

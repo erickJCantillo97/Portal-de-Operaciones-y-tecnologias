@@ -126,6 +126,7 @@ class ScheduleController extends Controller
         if (isset($request->tasks['updated'])) {
             foreach ($request->tasks['updated'] as $task) {
                 $taskUpdate = Task::where('id', $task['id'])->first();
+
                 $taskUpdate->update([
                     'name' => $task['name'] ?? $taskUpdate->name,
                     'task_id' => $task['parentId'] ?? $taskUpdate->task_id,
