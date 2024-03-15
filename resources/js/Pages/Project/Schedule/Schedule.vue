@@ -323,10 +323,27 @@ if (!Widget.factoryable.registry.TaskExecutorColumn) {
                 editor: {
                     type: 'combo',
                     multiSelect: true,
-                    store: ['GEMAM', 'GEBOC'], //array de lo que se quiera mostrar
+                    store: ['GEMAM',
+                        'GEBOC',
+                        'DEEST',
+                        'DEGPM',
+                        'DEPRO',
+                        'DVPCP',
+                        'DVARD',
+                        'DVSOL',
+                        'DVMEC',
+                        'DVPIN',
+                        'DVELC',
+                        'DVHAB',
+                        'DVAIR',
+                        'DVEAT',
+                        'DVMOT',
+                        'DVADQ',
+                        'DEINE',
+                        'DEMTO',
+                        'CLIENTE'
+                    ], //array de lo que se quiera mostrar
                     // specify valueField'/'displayField' to match the data format in the employeeStore store
-                    valueField: 'id',
-                    displayField: 'name'
                 },
             };
         }
@@ -351,6 +368,43 @@ if (!Widget.factoryable.registry.TaskManagerColumn) {
                 field: 'manager',
                 // the column title
                 text: 'Responsable',
+                editor: {
+                    type: 'combo',
+                    multiSelect: true,
+                    store: ['GEMAM',
+                        'GEBOC',
+                        'JDEEST',
+                        'JDEGPM',
+                        'JDEPRO',
+                        'JDVPCP',
+                        'JDVARD',
+                        'JDVSOL',
+                        'JDVMEC',
+                        'JDVPIN',
+                        'JDVELC',
+                        'JDVHAB',
+                        'JDVAIR',
+                        'JDVEAT',
+                        'JDVMOT',
+                        'JDVADQ',
+                        'JDEINE',
+                        'JDEMTO',
+                        'CLIENTE',
+                    ], //array de lo que se quiera mostrar
+                    // specify valueField'/'displayField' to match the data format in the employeeStore store
+                    picker: {
+                        height: 300,
+                        width: 150,
+                        features: {
+                            filterBar: {
+                                compactMode: true,
+                            },
+                            headerMenu: false,
+                            cellMenu: false,
+                        },
+                        // The extra columns are concatenated onto the base column set.
+                    }
+                },
             };
         }
     }
@@ -523,9 +577,6 @@ const ganttConfig = ref({
                 onZoomToFitClick()
             }
         },
-        stm: {
-            autoRecord: true
-        }
     },
     columns: [
         { id: 'wbs', type: 'wbs', text: 'EDT', autoWidth: true }, //gecon

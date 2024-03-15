@@ -135,7 +135,7 @@ class ScheduleController extends Controller
                     'startDate' => $task['startDate'] ?? $taskUpdate->startDate,
                     'endDate' => $task['endDate'] ?? $taskUpdate->endDate,
                     'executor' => $task['executor'] ?? $taskUpdate->executor,
-                    'manager' => $task['manager'] ? $task['manager'] : $taskUpdate->manager,
+                    'manager' => $task['manager'] ?? $taskUpdate->manager,
                     'manuallyScheduled' => $task['manuallyScheduled'] ?? $taskUpdate->manuallyScheduled,
                 ]);
             }
