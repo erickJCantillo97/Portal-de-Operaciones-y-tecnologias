@@ -16,8 +16,9 @@ import RadioButton from 'primevue/radiobutton';
 import Calendar from 'primevue/calendar';
 import CustomShiftSelector from '@/Components/CustomShiftSelector.vue';
 import ButtonGroup from 'primevue/buttongroup';
+import Breadcrumb from 'primevue/breadcrumb';
 
-const { hasRole, hasPermission } = usePermissions()
+// const { hasRole, hasPermission } = usePermissions()
 const { toast } = useSweetalert();
 
 // const props = defineProps({
@@ -30,7 +31,6 @@ const openConflict = ref(false)
 const listaDatos = ref({})
 const date = ref(new Date().toISOString().split("T")[0])
 const personal = ref()
-const op = ref()
 const tasks = ref([]);
 const loadingProgram = ref(true);
 const loadingPerson = ref(true);
@@ -39,20 +39,22 @@ const loadingTasks = ref(true)
 const loadingTask = ref({})
 const optionValue = ref('today')
 const conflicts = ref()
+const task = ref()
 
 // El código anterior define una función `onDrop` en Vue. Esta función se activa cuando un elemento se
 // coloca en una colección.
 const onDrop = async (collection, dropResult) => {
     const { addedIndex, payload } = dropResult;
     if (addedIndex !== null) {
-        loadingTask.value[collection] = true
-        await axios.post(route('programming.store'), { task_id: collection, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: date.value }).then((res) => {
-            listaDatos.value[collection] = res.data.task
+        loadingTask.value[collection.id] = true
+        await axios.post(route('programming.store'), { task_id: collection.id, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: date.value }).then((res) => {
+            listaDatos.value[collection.id] = res.data.task
             personalHours.value[(payload.Num_SAP)] = res.data.hours
-            loadingTask.value[collection] = false
+            loadingTask.value[collection.id] = false
             conflicts.value = Object.values(res.data.conflict)
             if (conflicts.value.length > 0) {
                 openConflict.value = true;
+                task.value = collection
             }
         })
     }
@@ -195,7 +197,8 @@ const form = ref({
     date: date, // fecha seleccionada en el calendario
     personalized: false, // Seleccionar turno => false, Seleccionar Horario Personalizado => false, Nuevo horario personalizado =>true
     type: 1,// Solo el => 1; Resto de la actividad => 2; Rango de fechas => 3; Fechas específicos => 4
-    details: []
+    details: [],
+    loading: false
     /* la propiedad details depende de la propiedad type, es decir:
         si la opción type es 1, en details se debe enviar la fecha (Solo el =>) ej: ['2024-03-07']
         si la opcion type es 2, en details se debe enviar el id de la actividad seleccionada (EN BASE DE DATOS ES LA TABLA TASK) ej: [7683]
@@ -226,20 +229,21 @@ const filter = ref('');
 const selectDays = ref()
 const tabActive = ref()
 const save = async () => {
+    form.value.loading = true
     if (!form.value.personalized) {
         form.value.startShift = new Date(nuevoHorario.value.startShift).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
         form.value.endShift = new Date(nuevoHorario.value.endShift).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
         form.value.timeBreak = parseFloat(nuevoHorario.value.timeBreak)
-    }else{
+    } else {
         form.value.startShift = new Date(form.value.startShift).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
         form.value.endShift = new Date(form.value.endShift).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
         form.value.timeBreak = parseFloat(form.value.timeBreak)
     }
-    
+
     if (form.value.type == 1) {
         form.value.details[0] = date.value
     } else if (form.value.type == 2) {
@@ -257,7 +261,17 @@ const save = async () => {
     */
     await axios.post(route('programming.saveCustomizedSchedule'), form.value)
         .then((res) => {
+            if (res.data.status) {
+                modhours.value = false
+                editHorario.value.data.hora_inicio = form.value.startShift
+                editHorario.value.data.hora_fin = form.value.endShift
+                toast(res.data.mensaje, 'success')
+            }
+            else {
+                toast(res.data.mensaje, 'danger')
+            }
             console.log(res);
+            form.value.loading = false
         });
 }
 </script>
@@ -330,7 +344,7 @@ const save = async () => {
                             </div>
                             <Container v-if="!loadingTask[slotProps.option.id]"
                                 class="h-full p-2 overflow-auto border border-blue-400 border-dashed rounded-lg shadow-sm hover:bg-blue-50 shadow-primary custom-scroll"
-                                @drop="onDrop(slotProps.option.id, $event)" group-name="1">
+                                @drop="onDrop(slotProps.option, $event)" group-name="1">
                                 <div class="grid grid-cols-2 gap-1"
                                     v-if="listaDatos[slotProps.option.id] !== undefined && listaDatos[slotProps.option.id].length != 0">
                                     <div v-for="(item, index) in listaDatos[slotProps.option.id]"
@@ -521,7 +535,7 @@ const save = async () => {
                                 root: '!w-full',
                                 input: '!h-8'
                             }" />
-                    <Button type="submit" class="col-start-4"
+                    <Button type="submit" class="col-start-4" :loading="form.loading"
                         :severity="editHorario?.option != 'delete' ? 'success' : 'danger'"
                         :icon="editHorario?.option != 'delete' ? 'fa-solid fa-floppy-disk' : 'fa-solid fa-trash-can'"
                         :label="editHorario?.option != 'delete' ? 'Guardar' : 'Eliminar'" />
@@ -539,14 +553,14 @@ const save = async () => {
             </div>
         </template>
     </CustomModal>
-    <CustomModal :base-z-index="10" v-model:visible="openConflict" width="70vw"
-        titulo="Existen colisiones de Programación">
-
+    <CustomModal :base-z-index="10" v-model:visible="openConflict" width="90vw"
+        :titulo="'Existen colisiones de Programación de la tarea: '+ task.name">
         <template #body>
-            <div class="py-2 flex flex-col gap-2">
-                <div v-for="conflictForDay in conflicts" class="border p-1">
-                    <span class="flex space-x-2 font-bold jus">
-                        <span class="w-72 flex items-center gap-2 p-2">
+            <div class="py-2 flex flex-col gap-4">
+                <div v-for="conflictForDay in conflicts"
+                    class="border ring-success ring-1 rounded-md p-1 hover:shadow-lg hover:shadow-primary-light">
+                    <span class="flex space-x-2 font-bold">
+                        <span class="text-lg flex items-center gap-2 p-2">
                             <p>
                                 Fecha:
                             </p>
@@ -554,26 +568,60 @@ const save = async () => {
                                 {{ conflictForDay[0].fecha }}
                             </p>
                         </span>
-                        <span class="flex gap-2">
-                            <Button label="Reemplazar todo" />
-                            <Button label="Omitir todo" />
+                        <span v-if="conflictForDay.length > 1" class="flex p-2 justify-end items-center gap-2  w-[400px]">
+                            <Button class="!w-full" label="Reemplazar todo" severity="contrast"  />
+                            <Button class="!w-full" label="Omitir todo" severity="success" />
                         </span>
                     </span>
-                    <div v-for="conflict in conflictForDay" class="flex border p-1 gap-2">
-                        <div class="border w-full">
-                            {{ conflict }}
-                        </div>
-                        <div class="flex flex-wrap w-32 p-2 justify-center items-center gap-2">
-                            <Button class="!w-full" label="Reemplazar" />
-                            <Button label="Omitir" class="!w-full" />
+                    <div class="flex flex-col gap-2">
+                        <div v-for="conflict in conflictForDay" class="">
+                            <div class="flex border rounded-md">
+                                <div class="flex w-full">
+                                    <Breadcrumb
+                                        :model="[{ label: conflict.NombreProyecto, tooltip: 'Nombre del proyecto' }, { label: conflict.nombrePadreTask, tooltip: 'Nombre del proceso' }, { label: conflict.nombreTask, tooltip: 'Nombre de la actividad' }]">
+                                        <template #item="item">
+                                            <p v-tooltip.bottom="{ value: item.item.tooltip, pt: { text: 'text-center' } }"
+                                                :class="item.props.action.class"
+                                                class="cursor-default font-bold truncate">{{ item.label
+                                                }}</p>
+                                        </template>
+                                    </Breadcrumb>
+                                    <div class="flex items-center space-x-20">
+                                        <div class="px-4 flex w-min space-x-2">
+                                            <p class="flex space-x-2">
+                                                <span class="font-bold">Inicio: </span>
+                                                <span>
+                                                    {{ conflict.horaInicio.slice(0, conflict.horaInicio.lastIndexOf(':')) }}
+                                                </span>
+                                            </p>
+                                            <p class="flex space-x-2">
+                                                <span class="font-bold"> Fin: </span>
+                                                <span>
+                                                    {{ conflict.horaFin.slice(0, conflict.horaFin.lastIndexOf(':')) }}
+                                                </span>
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <!-- {{ conflict }} -->
+                                            <Knob v-tooltip.top="'Avance: ' + (conflict.taskDetails.percentDone) + '%'"
+                                                :model-value="parseFloat(conflict.taskDetails.percentDone)" :size=50
+                                                valueTemplate="{value}%" readonly />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex p-2 justify-center items-center gap-2 w-[450px]">
+                                    <Button class="!w-full" label="Reemplazar" severity="warning" />
+                                    <Button label="Omitir" class="!w-full"  severity="success" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </template>
         <template #footer>
-            <Button label="Reemplazar todas las coliciones" />
-            <Button label="Omitir todas las coliciones" />
+            <Button label="Reemplazar todas las coliciones" severity="danger" />
+            <Button label="Omitir todas las coliciones" severity="success" />
         </template>
     </CustomModal>
     <!-- #endregion -->
