@@ -11,9 +11,7 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import esLocale from '@fullcalendar/core/locales/es'
 import FullCalendar from '@fullcalendar/vue3'
 import interactionPlugin from '@fullcalendar/interaction'
-import Listbox from 'primevue/listbox';
 import Moment from "moment"
-import TextInput from '@/Components/TextInput.vue'
 import timeGridPlugin from '@fullcalendar/timegrid'
 
 const props = defineProps({
@@ -34,70 +32,6 @@ const turnSelect = ref([])
 const showHours = ref('Hours')
 const currentEvents = ref([])
 const eventguid = ref(1)
-
-const calendarOptions = ref({
-  plugins: [
-    dayGridPlugin,
-    timeGridPlugin,
-    interactionPlugin // needed for dateClick
-  ],
-  headerToolbar: {
-    left: 'dayGridMonth,timeGridWeek,timeGridDay',
-    center: 'title',
-    right: ''
-    // right: 'dayGridMonth,timeGridWeek,timeGridDay'
-  },
-  initialView: 'dayGridMonth', //onMounted type calendar view
-  initialDate: props.date,
-  initialEvents: props.initialEvents, // alternatively, use the `events` setting to fetch from a feed
-  allDaySlot: true,
-  editable: true,
-  selectable: true,
-  selectMirror: true,
-  dayMaxEvents: true,
-  weekends: true,
-  select: handleDateSelect,
-  eventClick: handleEditEventClick,
-  eventsSet: handleEvents,
-  locale: esLocale,
-  eventOverlap: false,
-  nowIndicator: true,
-  selectable: true,
-  eventConstraint: {
-    startTime: '07:00',
-    endTime: '16:30',
-  },
-  // selectConstraint: {
-  //   startTime: "07:00",
-  //   endTime: "16:30",
-  // },
-  businessHours: {
-    // days of week. an array of zero-based day of week integers (0=Sunday)
-    daysOfWeek: [1, 2, 3, 4, 5], // Monday - Friday
-    // startTime: '07:00', // a start time (07am in this example)
-    // endTime: '16:30', // an end time (4:30pm in this example)
-  },
-  // eventColor: '#378006',
-  // eventClassNames: 'custom-event-class',
-  eventTimeFormat: { // like '14:30:00'
-    hour: '2-digit',
-    minute: '2-digit',
-    meridiem: 'short',
-    hour12: true
-  },
-  slotLabelFormat: {
-    hour: 'numeric',
-    minute: '2-digit',
-    meridiem: 'short',
-    hour12: false
-  },
-  // you can update a remote database when these fire:
-  // eventAdd: this.submit,
-  // eventChange: this.submit,
-  // eventRemove: this.handleDeleteEventClick,
-
-  // tasks: [],
-})
 
 onMounted(() => {
   eventguid.value++
@@ -182,6 +116,65 @@ const submit = (idTask, schedule) => {
 const closeDialog = () => {
   isOpen.value = false
 }
+
+const calendarOptions = ref({
+  plugins: [
+    dayGridPlugin,
+    timeGridPlugin,
+    interactionPlugin // needed for dateClick
+  ],
+  headerToolbar: {
+    left: 'dayGridMonth,timeGridWeek,timeGridDay',
+    center: 'title',
+    right: ''
+    // right: 'dayGridMonth,timeGridWeek,timeGridDay'
+  },
+  initialView: 'dayGridMonth', //onMounted type calendar view
+  initialDate: props.date,
+  initialEvents: props.initialEvents, // alternatively, use the `events` setting to fetch from a feed
+  allDaySlot: true,
+  editable: true,
+  selectable: true,
+  selectMirror: true,
+  dayMaxEvents: true,
+  weekends: true,
+  select: handleDateSelect,
+  eventClick: handleEditEventClick,
+  eventsSet: handleEvents,
+  locale: esLocale,
+  eventOverlap: false,
+  nowIndicator: true,
+  selectable: true,
+  eventConstraint: {
+    startTime: '07:00',
+    endTime: '16:30',
+  },
+  // selectConstraint: {
+  //   startTime: "07:00",
+  //   endTime: "16:30",
+  // },
+  businessHours: {
+    // days of week. an array of zero-based day of week integers (0=Sunday)
+    daysOfWeek: [1, 2, 3, 4, 5], // Monday - Friday
+    // startTime: '07:00', // a start time (07am in this example)
+    // endTime: '16:30', // an end time (4:30pm in this example)
+  },
+  // eventColor: '#378006',
+  // eventClassNames: 'custom-event-class',
+  eventTimeFormat: { // like '14:30:00'
+    hour: '2-digit',
+    minute: '2-digit',
+    meridiem: 'short',
+    hour12: true
+  },
+  slotLabelFormat: {
+    hour: 'numeric',
+    minute: '2-digit',
+    meridiem: 'short',
+    hour12: false
+  },
+})
+
 </script>
 
 <template>
@@ -195,7 +188,6 @@ const closeDialog = () => {
   </FullCalendar>
   <!--MODAL DE FORMULARIO-->
   <CustomModal v-model:visible="isOpen" :titulo="(currentEvents != 0 ? 'Editar ' : 'Crear') + ' nuevo horario'">
-
     <template #body>
       <div class="h-full w-full space-y-3">
         <!--COLUMNA 3 - SELECCIÓN DE ACTIVIDADES-->
@@ -207,29 +199,15 @@ const closeDialog = () => {
         <CustomInput type="radiobutton" v-model:input="showHours"
           :options="[{ name: 'Intervalo', key: 'intervalo' }, { name: 'Resto', key: 'resto' }, { name: 'Turno', key: 'turno' }]">
         </CustomInput>
-        <!-- <div class="flex flex-wrap w-full justify-around text-left align-items-center h-10 mt-4 space-x-2">
-          <div>
-            <input type="radio" name="action" value="Hours" v-model="showHours">
-            <label for="Hours">Intervalo</label>
-          </div>
-          <div>
-            <input type="radio" name="action" value="Resto" v-model="showHours">
-            <label for="Resto">Resto</label>
-          </div>
-          <div>
-            <input type="radio" name="action" value="Turno" v-model="showHours">
-            <label for="Turno">Turno</label>
-          </div>
-        </div> -->
 
         <!--SELECCIÓN DE HORAS-->
         <div v-if="showHours === 'Intervalo'" class="w-full grid grid-cols-2 gap-4 mt-">
           <!--campo hora inicio-->
-          <CustomInput type="time" label="Hora de inicio" v-model="getStartDateEvent">
+          <CustomInput type="time" label="Hora de inicio" v-model:input="getStartDateEvent">
           </CustomInput>
 
           <!--campo hora finalización-->
-          <CustomInput type="time" label="Hora de Finalización" v-model="getEndDateEvent">
+          <CustomInput type="time" label="Hora de Finalización" v-model:input="getEndDateEvent">
           </CustomInput>
         </div>
 
@@ -237,10 +215,7 @@ const closeDialog = () => {
         <div v-if="showHours === 'Turno'" class="w-full h-64">
           <!--campo selección de turnos-->
           <CustomShiftSelector optionValue="id" v-model:shift="turnSelect" />
-          <!-- {{ turnSelect }} -->
-          <!-- <CustomInput type="dropdown" class="mt-2 text-left" label="Turnos" placeholder="Seleccione Turno"
-            :options="tasks" v-model="turnSelect">
-          </CustomInput> -->
+
         </div>
 
 

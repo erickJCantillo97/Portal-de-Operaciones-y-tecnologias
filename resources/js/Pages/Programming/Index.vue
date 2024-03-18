@@ -184,7 +184,8 @@ const employeeDialog = (item) => {
 }
 
 const form = ref({
-    name: null, // nombre de horario personalizado o nombre de la persona
+    userName: null, //nombre de la persona
+    timeName: null, // nombre del horario personalizado
     startShift: null,// hora inicio
     endShift: null,// hora fin
     timeBreak: null,
@@ -214,6 +215,7 @@ const toggle = (horario, data, option) => {
     form.value.idUser = data.employee_id
     form.value.schedule = data.id
     form.value.schedule_time = horario.id
+    form.value.userName = data.name
     nuevoHorario.value = {}
     modhours.value = true
 }
@@ -473,14 +475,15 @@ const save = async () => {
                                 root: 'w-full',
                                 headerTitle: '!w-full !flex !justify-center',
                             }">
-                            <CustomShiftSelector v-model:shift="nuevoHorario" />
+                            <CustomShiftSelector :shiftUser="parseInt($page.props.auth.user.id)"
+                                v-model:shift="nuevoHorario" />
                         </TabPanel>
                         <TabPanel header="Nuevo Horario Personalizado" :pt="{
                                 root: 'w-full',
                                 headerTitle: '!w-full !flex !justify-center',
                             }">
                             <div class="h-48 m-1">
-                                <CustomInput v-model:input="form.name" label="Nombre" type="text" id="name"
+                                <CustomInput v-model:input="form.timeName" label="Nombre" type="text" id="name"
                                     placeholder="Nombre del horario" :required="tabActive == 2" />
                                 <span class="grid grid-cols-3 gap-x-1">
                                     <CustomInput v-model:input="form.startShift" label="Hora inicio" type="time"
@@ -520,11 +523,10 @@ const save = async () => {
         </template>
     </CustomModal>
 
-    <CustomModal :auto-z-index="false" :base-z-index="10" v-model:visible="open" width="70vw"
+    <CustomModal v-model:visible="open" width="90vw" :close-on-escape="false"
         :titulo="'Ver detalle de horario de ' + employee.Nombres_Apellidos">
-
         <template #body>
-            <div class="py-2 max-h-[90vh]">
+            <div class="py-2 max-h-[80vh] w-[40vw]">
                 <FullCalendar :initialEvents="events" :tasks="tasks" :date="date" :employee="employee"
                     :key="rendersCalendars" />
             </div>

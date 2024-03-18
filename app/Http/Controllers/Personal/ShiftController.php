@@ -14,9 +14,9 @@ class ShiftController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(String $user = ""): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        if(empty($user))
+        if(empty($request->user))
                 return response()->json([
                     Shift::whereNull('user')->orderBy('name')->get()->map(function ($shift) {
                         return [
@@ -33,7 +33,7 @@ class ShiftController extends Controller
                 ], 200);
 
         return response()->json([
-            Shift::where('user',$user)->orderBy('name')->get()->map(function ($shift) {
+            Shift::where('user',$request->user)->orderBy('name')->get()->map(function ($shift) {
                 return [
                     'id' => $shift['id'],
                     'name' => $shift['name'],

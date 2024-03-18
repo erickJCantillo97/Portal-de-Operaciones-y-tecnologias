@@ -298,6 +298,7 @@ const buttons = [
                         </div>
                     </div>
                 </div>
+                <Button @click="submit()"></Button>
             </template>
 
         </CustomModal>
