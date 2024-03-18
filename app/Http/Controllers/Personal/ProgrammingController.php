@@ -35,7 +35,6 @@ class ProgrammingController extends Controller
      */
     public function store(Request $request)
     {
-        
         try {
             DB::beginTransaction();
             $validateData = $request->validate([
@@ -58,7 +57,7 @@ class ProgrammingController extends Controller
                     if (getWorkingDays($date->format('Y-m-d'), intval($project->daysPerWeek))) {
                         $exist = DetailScheduleTime::where('idUsuario', $validateData['employee_id'])
                             ->where('fecha', $date)
-                            ->where('idSchedule',)
+                            ->where('idTask','!=', $validateData['task_id'])
                             ->get();
                         if ($exist->count() > 0) {
                             $exist = $exist->each(function ($DetailScheduleTime) {
@@ -275,8 +274,8 @@ class ProgrammingController extends Controller
                         $subquery->whereBetween('horaInicio', [$request->startShift,$request->endShift])
                                 ->whereBetween('horaFin', [$request->startShift,$request->endShift]);
                     });
-                    })->toRawSql();
-                    return $exist;
+                    })->get();
+                   // return $exist;
                     if ($exist->count() > 0) {
                         $exist = $exist->each(function ($DetailScheduleTime) {
                             $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
@@ -493,17 +492,40 @@ class ProgrammingController extends Controller
             switch ($request->type) {
                 //SOLO EL $request->date
             case 1:
-                Schedule::find($request->schedule)->delete();
+                $schedule = Schedule::find($request->schedule);
+                $schedule->delete();
+                ScheduleTime::where('schedule_id',$schedule->id)->delete();
                 break;
             case 2:
                 //RESTO DE LA ACTIVIDAD
-                $idTask = Schedule::find($request->schedule)->task_id;
-                $items = DetailScheduleTime::select('idScheduleTime')
-                        ->where('idUsuario',$request->idUser)
-                        ->where('idTask',$idTask)
-                        ->where('fecha','<=',$request->date)
-                        ->get()->toArray();
-                return ScheduleTime::whereIn('id',$items)->get();
+                $schedule = Schedule::where('fecha','>=',$request->date)
+                            ->where('employee_id',$request->idUser);
+                $itemsToRemove = $schedule->get()->map(function ($item){
+                    return $item->id;
+                });
+                ScheduleTime::whereIn('schedule_id', $itemsToRemove)->delete();
+                $schedule->delete();
+                break;
+            case 3:
+                //RANGO DE FECHAS
+                $schedule = Schedule::where('employee_id',$request->idUser)
+                ->whereBetween('fecha',[$request->details[0], $request->details[1]])->get();
+                $itemsToRemove = $schedule->map(function ($item){
+                    return $item->id;
+                });
+                ScheduleTime::whereIn('schedule_id', $itemsToRemove)->delete();
+                Schedule::whereBetween('fecha',[$request->details[0], $request->details[1]])->delete();
+                break;
+            case 4:
+                //FECHAS ESPECIFICAS
+                foreach ($request->details as $date) {
+                    $schedule = Schedule::where('fecha','=',$date)
+                    ->where('employee_id','=',$request->idUser)->get()->first();
+                    ScheduleTime::where('schedule_id',$schedule->id)->delete();
+                    Schedule::where('fecha',$date)
+                    ->where('employee_id',$request->idUser)->delete();
+                    break;
+                }
             default:
                 break;
             }
