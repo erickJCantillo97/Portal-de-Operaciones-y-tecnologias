@@ -475,7 +475,8 @@ const save = async () => {
                                 root: 'w-full',
                                 headerTitle: '!w-full !flex !justify-center',
                             }">
-                            <CustomShiftSelector v-model:shift="nuevoHorario" />
+                            <CustomShiftSelector :shiftUser="parseInt($page.props.auth.user.id)"
+                                v-model:shift="nuevoHorario" />
                         </TabPanel>
                         <TabPanel header="Nuevo Horario Personalizado" :pt="{
                                 root: 'w-full',
@@ -522,11 +523,10 @@ const save = async () => {
         </template>
     </CustomModal>
 
-    <CustomModal :auto-z-index="false" :base-z-index="10" v-model:visible="open" width="70vw"
+    <CustomModal v-model:visible="open" width="90vw" :close-on-escape="false"
         :titulo="'Ver detalle de horario de ' + employee.Nombres_Apellidos">
-
         <template #body>
-            <div class="py-2 max-h-[90vh]">
+            <div class="py-2 max-h-[80vh] w-[40vw]">
                 <FullCalendar :initialEvents="events" :tasks="tasks" :date="date" :employee="employee"
                     :key="rendersCalendars" />
             </div>

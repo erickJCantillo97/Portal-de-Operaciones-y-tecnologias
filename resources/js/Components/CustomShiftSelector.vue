@@ -5,16 +5,20 @@ import axios from 'axios';
 import { ref } from 'vue';
 import Loading from './Loading.vue';
 
-defineProps({
+const props=defineProps({
     optionValue: {
         type: String,
         default: undefined
+    },
+    shiftUser:{
+        type:Number,
+        default:null
     }
 })
 
 const loading = ref(true)
 const shifts = ref([])
-axios.get(route('shift.index')).then((res) => {
+axios.get(route('shift.index'),{user:props.user}).then((res) => {
     // console.log(res)
     shifts.value = res.data[0]
     loading.value = false
