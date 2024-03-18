@@ -225,7 +225,7 @@ const filter = ref('');
 
 const selectDays = ref()
 const tabActive = ref()
-const save = async () => {
+const remove = async () => {
     if (!form.value.personalized) {
         form.value.startShift = new Date(nuevoHorario.value.startShift).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
@@ -248,7 +248,11 @@ const save = async () => {
     NOTA:
     Se debe cambiar el campo de hora inicio y hora fin a un formato de 24 horas.
     */
-    await axios.post(route('programming.saveCustomizedSchedule'), form.value)
+    // await axios.post(route('programming.saveCustomizedSchedule'), form.value)
+    //     .then((res) => {
+    //         console.log(res);
+    //     });
+    await axios.post(route('programming.removeSchedule'), form.value)
         .then((res) => {
             console.log(res);
         });
@@ -450,7 +454,7 @@ const save = async () => {
     <CustomModal v-model:visible="modhours" :footer="false" icon="fa-regular fa-clock" width="60vw"
         :titulo="editHorario?.option != 'delete' ? 'Modificar horario de ' + editHorario?.data.name : 'Eliminando a ' + editHorario?.data.name + 'de la actividad ' + editHorario?.task">
         <template #body>
-            <form @submit.prevent="save" class="pb-2">
+            <form @submit.prevent="remove" class="pb-2">
                 <div v-if="editHorario?.option != 'delete'" class="flex flex-col gap-1">
                     <div class="flex items-center justify-between col-span-3 ">
                         <!-- {{ editHorario }} -->

@@ -35,6 +35,7 @@ class ProgrammingController extends Controller
      */
     public function store(Request $request)
     {
+        
         try {
             DB::beginTransaction();
             $validateData = $request->validate([
@@ -57,6 +58,7 @@ class ProgrammingController extends Controller
                     if (getWorkingDays($date->format('Y-m-d'), intval($project->daysPerWeek))) {
                         $exist = DetailScheduleTime::where('idUsuario', $validateData['employee_id'])
                             ->where('fecha', $date)
+                            ->where('idSchedule',)
                             ->get();
                         if ($exist->count() > 0) {
                             $exist = $exist->each(function ($DetailScheduleTime) {
@@ -273,7 +275,8 @@ class ProgrammingController extends Controller
                         $subquery->whereBetween('horaInicio', [$request->startShift,$request->endShift])
                                 ->whereBetween('horaFin', [$request->startShift,$request->endShift]);
                     });
-                    })->get();
+                    })->toRawSql();
+                    return $exist;
                     if ($exist->count() > 0) {
                         $exist = $exist->each(function ($DetailScheduleTime) {
                             $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
@@ -421,6 +424,7 @@ class ProgrammingController extends Controller
                 case 4:
                     // FECHAS ESPECIFICAS
                     foreach ($request->details as $date) {
+                        
                         $exist  = DetailScheduleTime::where('fecha', $date)
                         ->where('idUsuario', $request->idUser)
                         ->where(function($query) use ($request){
@@ -479,10 +483,36 @@ class ProgrammingController extends Controller
         }
     }
 
-    public function collision(Request $request){
+    public function collisions(Request $request){
+     return "Controller";
+    }
 
-
-
+    public function removeSchedule(Request $request){
+        try {
+            DB::beginTransaction();
+            switch ($request->type) {
+                //SOLO EL $request->date
+            case 1:
+                Schedule::find($request->schedule)->delete();
+                break;
+            case 2:
+                //RESTO DE LA ACTIVIDAD
+                $idTask = Schedule::find($request->schedule)->task_id;
+                $items = DetailScheduleTime::select('idScheduleTime')
+                        ->where('idUsuario',$request->idUser)
+                        ->where('idTask',$idTask)
+                        ->where('fecha','<=',$request->date)
+                        ->get()->toArray();
+                return ScheduleTime::whereIn('id',$items)->get();
+            default:
+                break;
+            }
+            DB::commit();
+            return response()->json(['status' => true, 'mensaje'=> 'Horario eliminado']);
+        }catch (Exception $e) {
+            DB::rollBack();
+            return $e;
+        }
     }
 }
 
