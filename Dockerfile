@@ -1,6 +1,6 @@
 #COTECMAR DOCKERFILE
 #COTECMAR
-FROM php:8.1.0-apache
+FROM php:8.2.0-apache
 ARG XDEBUG_VERSION="xdebug-3.1.1"
 ENV TZ=America/Bogota
 USER root
