@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
+use App\Models\Personal\Employee;
 use App\Models\Project\ProgressProjectWeek;
 use App\Models\Project\WeekTask;
 use App\Models\Projects\Authorization;
@@ -45,13 +46,9 @@ class ProjectController extends Controller
     {
         $contracts = Contract::orderBy('contract_id')->get();
 
-        // $gerentes = getPersonalGerenciaOficina('GECON', 'DEGPC')->map(function ($estimador) {
-        //     return [
-        //         'user_id' => $estimador['Num_SAP'],
-        //         'name' => $estimador['Nombres_Apellidos'],
-        //         'email' => $estimador['Correo']
-        //     ];
-        // })->toArray();
+        $gerentes = Employee::where('Gerencia', auth()->user()->gerencia)->where('Oficina', auth()->user()->oficina)->get();
+        return $gerentes;
+
         // return $ships;
         return Inertia::render('Project/CreateProjects', compact('contracts'));
     }
