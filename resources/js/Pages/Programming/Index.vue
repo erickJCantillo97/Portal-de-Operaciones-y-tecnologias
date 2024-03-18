@@ -232,7 +232,14 @@ const remove = async () => {
         form.value.endShift = new Date(nuevoHorario.value.endShift).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
         form.value.timeBreak = parseFloat(nuevoHorario.value.timeBreak)
+    }else{
+        form.value.startShift = new Date(form.value.startShift).toLocaleString('es-CO',
+            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+        form.value.endShift = new Date(form.value.endShift).toLocaleString('es-CO',
+            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+        form.value.timeBreak = parseFloat(form.value.timeBreak)
     }
+    
     if (form.value.type == 1) {
         form.value.details[0] = date.value
     } else if (form.value.type == 2) {
@@ -536,16 +543,41 @@ const remove = async () => {
             </div>
         </template>
     </CustomModal>
-    <CustomModal :auto-z-index="false" :base-z-index="10" v-model:visible="openConflict" width="70vw"
-        titulo="Colisiones de Programación">
+    <CustomModal :base-z-index="10" v-model:visible="openConflict" width="70vw"
+        titulo="Existen colisiones de Programación">
 
         <template #body>
-            <div class="py-2">
-                <div v-for="conflict in conflicts">
-                    {{ conflict[0] }}
+            <div class="py-2 flex flex-col gap-2">
+                <div v-for="conflictForDay in conflicts" class="border p-1">
+                    <span class="flex space-x-2 font-bold jus">
+                        <span class="w-72 flex items-center gap-2 p-2">
+                            <p>
+                                Fecha:
+                            </p>
+                            <p>
+                                {{ conflictForDay[0].fecha }}
+                            </p>
+                        </span>
+                        <span class="flex gap-2">
+                            <Button label="Reemplazar todo" />
+                            <Button label="Omitir todo" />
+                        </span>
+                    </span>
+                    <div v-for="conflict in conflictForDay" class="flex border p-1 gap-2">
+                        <div class="border w-full">
+                            {{ conflict }}
+                        </div>
+                        <div class="flex flex-wrap w-32 p-2 justify-center items-center gap-2">
+                            <Button class="!w-full" label="Reemplazar" />
+                            <Button label="Omitir" class="!w-full" />
+                        </div>
+                    </div>
                 </div>
-                <!-- {{conflicts}} -->
             </div>
+        </template>
+        <template #footer>
+            <Button label="Reemplazar todas las coliciones" />
+            <Button label="Omitir todas las coliciones" />
         </template>
     </CustomModal>
     <!-- #endregion -->
