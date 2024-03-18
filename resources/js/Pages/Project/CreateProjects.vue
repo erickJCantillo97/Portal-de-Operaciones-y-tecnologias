@@ -19,7 +19,8 @@ import ToggleButton from 'primevue/togglebutton'
 
 const props = defineProps({
     project: Object,
-    contracts: Array
+    contracts: Array,
+    gerentes: Array
 })
 
 //#region Referencias (v-model)
@@ -134,7 +135,6 @@ const getProjectShips = async () => {
 
 //Hitos (Milestones)
 const milestonesOptions = ref([])
-const gerentes = ref([])
 
 const getMilestones = async () => {
     await axios.get(route('milestones.index'))
