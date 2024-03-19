@@ -479,7 +479,7 @@ const save = async () => {
                 <div v-if="editHorario?.option != 'delete'" class="flex flex-col gap-1">
                     <div class="flex items-center justify-between col-span-3 ">
                         <!-- {{ editHorario }} -->
-                        <p>Horario actual:</p>
+                        <p class="font-bold">Horario actual:</p>
                         <p class="px-1 py-1 text-green-900 bg-green-200 rounded-md">
                             {{ format24h(editHorario.hora_inicio) }}
                             {{ format24h(editHorario.hora_fin) }}
@@ -528,7 +528,7 @@ const save = async () => {
                 <span class="flex items-center p-2 gap-4">
                     <div v-for="category in [{ name: 'Solo el ' + date, key: 1 }, { name: 'Resto de la actividad', key: 2 }, { name: 'Rango de fechas', key: 3 }, { name: 'Fechas específicos', key: 4 }]"
                         :key="category.key" class="flex items-center">
-                        <RadioButton v-model="form.type" :inputId="category.name" name="dynamic" :value="category.key"
+                        <RadioButton v-model="form.type" :inputId="category.key" name="dynamic" :value="category.key"
                             @click="form.details = []" />
                         <label :for="category.key" class="ml-1 mb-0">{{ category.name }}</label>
                     </div>
