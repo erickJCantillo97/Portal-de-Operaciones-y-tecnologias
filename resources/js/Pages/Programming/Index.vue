@@ -140,22 +140,6 @@ function format24h(hora) {
 }
 //#region
 
-// El código anterior define una función llamada "quitar" que toma tres parámetros: "tarea", "índice" y
-// "persona". Dentro de la función realiza una solicitud POST asíncrona usando axios a una ruta llamada
-// "programming.delete" con los datos { task_id: tarea, empleado_id: persona.Num_SAP, fecha: fecha}. Si
-// la solicitud tiene éxito, registra la respuesta en la consola, elimina un elemento de la matriz
-// "listaDatos.value[task.id]" en el índice especificado y muestra un mensaje de notificación de éxito.
-// También hay definida una función "editar" vacía.
-
-const deleteSchedule = async (task, index, schedule) => {
-
-    await axios.post(route('programming.delete', schedule.id)).then((res) => {
-        listaDatos.value[task.id] = res.data.task
-        getAssignmentHoursForEmployee((schedule.employee_id))
-        toast('Se ha eliminado a ' + schedule.name + ' de la tarea ' + task.name, 'success');
-    })
-}
-
 //#endregion
 
 //#region Modal Persona
