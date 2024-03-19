@@ -11,9 +11,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
-        integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100" rel="stylesheet" />
 
     <!-- Scripts -->
@@ -32,7 +30,6 @@
             backdrop-filter: blur(3px);
         }
 
-
         @keyframes appear {
             from {
                 opacity: 0;
@@ -43,6 +40,24 @@
                 opacity: 1;
                 transform: translateX(0);
             }
+        }
+
+        @font-face {
+            font-family: "Gotham";
+            font-weight: 100 900;
+            font-display: swap;
+            font-style: normal;
+            font-named-instance: "Regular";
+            src: url("../css/fonts/Gotham-Book.otf") format("otf");
+        }
+
+        @font-face {
+            font-family: "Gotham";
+            font-weight: 100 900;
+            font-display: swap;
+            font-style: italic;
+            font-named-instance: "Italic";
+            src: url("../css/fonts/Gotham-BookItalic.otf") format("otf");
         }
     </style>
 </head>

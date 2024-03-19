@@ -1,9 +1,9 @@
 import 'material-icons/iconfont/material-icons.css';
 import "../css/app.css";
-// import "../css/schedule.css";
+import "../css/aura-light-indigo/theme.css"
 import "./bootstrap";
 import "primeicons/primeicons.css";
-import "primevue/resources/themes/aura-light-indigo/theme.css";
+// import "primevue/resources/themes/aura-light-indigo/theme.css";
 import { createApp, h } from "vue";
 import { createInertiaApp } from "@inertiajs/vue3";
 import { Head } from '@inertiajs/vue3';
