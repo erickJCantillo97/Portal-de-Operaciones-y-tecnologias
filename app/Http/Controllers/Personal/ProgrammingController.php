@@ -57,13 +57,23 @@ class ProgrammingController extends Controller
                     if (getWorkingDays($date->format('Y-m-d'), intval($project->daysPerWeek))) {
                         $exist = DetailScheduleTime::where('idUsuario', $validateData['employee_id'])
                             ->where('fecha', $date)
-                            ->where('idTask','!=', $validateData['task_id'])
                             ->get();
                         if ($exist->count() > 0) {
-                            $exist = $exist->each(function ($DetailScheduleTime) {
-                                $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
+                            //obtengo las actividades diferentes a la actual
+                            $exist = $exist->filter(function ($item) use ($validateData) {
+                                return $item->idTask != $validateData['task_id'];
+                            })->values()->all();
+                            
+                            
+                            // se agrega el task a las actividades que generan conflictos.
+                            $exist = collect($exist)->each(function ($DetailScheduleTime) {
+                                    $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
                             });
-                            $conflict[$date->format('Y-m-d')] = $exist;
+                               // se guardan las actividades que generan conflictos
+                            if($exist->count()>0){
+                                $conflict[$date->format('Y-m-d')] = $exist;
+                                $status = false;
+                            }
                         } else {
                             $schedule = Schedule::firstOrNew([
                                 'task_id' => $validateData['task_id'],
@@ -81,7 +91,6 @@ class ProgrammingController extends Controller
                     }
                     $date = $date->addDays(1); 
                 } while ($end_date->gte($date));
-                $status = true;
                 $codigo = 0;
                 $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
             }

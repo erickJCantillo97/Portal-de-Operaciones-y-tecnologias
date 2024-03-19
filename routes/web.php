@@ -41,8 +41,11 @@ use App\Models\Projects\Ship;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
+use Spatie\Holidays\Countries\Colombia;
+use Spatie\Holidays\Holidays;
 
 Route::get('/', function () {
+
     // $processId = 1;// Asigna un identificador único para cada proceso de carga
     // return event(new ContractEvent($processId));
     if (auth()->user() != null)
@@ -64,6 +67,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     })->name('get.foto');
 
     Route::get('/dashboard', function () {
+
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
@@ -200,9 +204,10 @@ Route::get('hitos-anteriores', [DatabaseBackController::class, 'getHitos']);
 Route::get('avance_anteriores', [DatabaseBackController::class, 'getProgress']);
 
 Route::get('/mailable', function () {
-    $data = 'Hello';
-
-    return new App\Mail\AssignmentToolsMail($data);
+    $project = Project::first();
+    // dd($project);
+    $customer = Customer::first()->name;
+    return new App\Mail\CreateProjectMail($project, $customer);
 });
 Route::get('/prueba', function (Request $request) {
     setEmpleadosAPI();

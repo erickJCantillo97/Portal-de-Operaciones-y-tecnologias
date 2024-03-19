@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
+use App\Mail\CreateProjectMail;
 use App\Models\Personal\Employee;
 use App\Models\Project\ProgressProjectWeek;
 use App\Models\Project\WeekTask;
@@ -18,6 +19,7 @@ use App\Models\VirtualTask;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
@@ -47,10 +49,10 @@ class ProjectController extends Controller
         $contracts = Contract::orderBy('contract_id')->get();
 
         $gerentes = Employee::where('Gerencia', auth()->user()->gerencia)->where('Oficina', auth()->user()->oficina)->get();
-        return $gerentes;
+
 
         // return $ships;
-        return Inertia::render('Project/CreateProjects', compact('contracts'));
+        return Inertia::render('Project/CreateProjects', compact('contracts', 'gerentes'));
     }
 
     /**
@@ -82,16 +84,20 @@ class ProjectController extends Controller
 
         try {
             $validateData['gerencia'] = auth()->user()->gerencia;
-            $id = Project::create($validateData)->id;
+            $project = Project::create($validateData);
             foreach ($request->ships as $ship) {
                 ProjectsShip::create([
-                    'project_id' => $id,
+                    'project_id' => $project->id,
                     'ship_id' => $ship,
                 ]);
             }
+            Mail::to([$project->contract->quote->customer->email])->send(
+                new CreateProjectMail($project, $project->contract->quote->customer->name)
+            );
+
 
             return response()->json([
-                'project_id' => $id
+                'project_id' => $project->id
             ]);
         } catch (Exception $e) {
             return back()->withErrors(['message' => 'Ocurrió un error al crear el proyecto: ' . $e->getMessage()], 500);
