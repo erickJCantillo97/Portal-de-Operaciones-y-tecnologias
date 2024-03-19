@@ -249,7 +249,12 @@ const save = async () => {
                 toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
             }
             else {
-                toast.add({ severity: 'danger', group: "customToast", text: res.data.mensaje, life: 2000 })
+                conflicts.value = Object.values(res.data.conflict)
+                if (conflicts.value.length > 0) {
+                    openConflict.value = true;
+                    // task.value.id = schedule
+                }
+                // toast.add({ severity: 'danger', group: "customToast", text: res.data.mensaje, life: 2000 })
             }
             console.log(res);
             form.value.loading = false
@@ -487,7 +492,7 @@ const save = async () => {
                             <CustomShiftSelector :shiftUser="parseInt($page.props.auth.user.id)"
                                 v-model:shift="nuevoHorario" />
                         </TabPanel>
-                        <TabPanel header="Nuevo Horario Personalizado" :pt="{
+                        <TabPanel header="Personalizado" :pt="{
                                 root: 'w-full',
                                 headerTitle: '!w-full !flex !justify-center',
                             }">
