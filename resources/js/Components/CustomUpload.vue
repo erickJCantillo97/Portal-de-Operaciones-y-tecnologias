@@ -1,5 +1,5 @@
 <script setup>
-const toast = useToast();
+
 import { ref } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import { useToast } from "primevue/usetoast";
@@ -10,6 +10,7 @@ import Empty from './Empty.vue';
 import FileUpload from 'primevue/fileupload';
 import Loading from './Loading.vue';
 import Toast from 'primevue/toast';
+const toast = useToast();
 
 const props = defineProps({
     labelButton: {

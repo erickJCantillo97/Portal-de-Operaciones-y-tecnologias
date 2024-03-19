@@ -59,10 +59,21 @@ class ProgrammingController extends Controller
                             ->where('fecha', $date)
                             ->get();
                         if ($exist->count() > 0) {
-                            $exist = $exist->each(function ($DetailScheduleTime) {
-                                $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
+                            //obtengo las actividades diferentes a la actual
+                            $exist = $exist->filter(function ($item) use ($validateData) {
+                                return $item->idTask != $validateData['task_id'];
+                            })->values()->all();
+                            
+                            
+                            // se agrega el task a las actividades que generan conflictos.
+                            $exist = collect($exist)->each(function ($DetailScheduleTime) {
+                                    $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
                             });
-                            $conflict[$date->format('Y-m-d')] = $exist;
+                               // se guardan las actividades que generan conflictos
+                            if($exist->count()>0){
+                                $conflict[$date->format('Y-m-d')] = $exist;
+                                $status = false;
+                            }
                         } else {
                             $schedule = Schedule::firstOrNew([
                                 'task_id' => $validateData['task_id'],
@@ -80,7 +91,6 @@ class ProgrammingController extends Controller
                     }
                     $date = $date->addDays(1); 
                 } while ($end_date->gte($date));
-                $status = true;
                 $codigo = 0;
                 $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
             }
@@ -194,7 +204,7 @@ class ProgrammingController extends Controller
         $schedule = Schedule::where('fecha', $date)->with('scheduleTimes')->where('task_id', $request->task_id)->get()->sortByDesc([
             ['is_my_personal', 'desc'],
         ]);
-
+        
         return response()->json([
             'schedule' => $schedule,
         ], 200);
@@ -274,6 +284,7 @@ class ProgrammingController extends Controller
                                 ->whereBetween('horaFin', [$request->startShift,$request->endShift]);
                     });
                     })->get();
+                   // return $exist;
                     if ($exist->count() > 0) {
                         $exist = $exist->each(function ($DetailScheduleTime) {
                             $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
@@ -421,6 +432,7 @@ class ProgrammingController extends Controller
                 case 4:
                     // FECHAS ESPECIFICAS
                     foreach ($request->details as $date) {
+                        
                         $exist  = DetailScheduleTime::where('fecha', $date)
                         ->where('idUsuario', $request->idUser)
                         ->where(function($query) use ($request){
@@ -470,8 +482,8 @@ class ProgrammingController extends Controller
             }
             DB::commit();
             if (count($conflict) > 0) 
-                return response()->json(['status' => false,'conflict' => $conflict, 'mensaje'=> '']);
-            return response()->json(['status' => true,'conflict' => [], 'mensaje'=>'Horario asignado']);
+                return response()->json(['status' => false,'conflict' => $conflict, 'mensaje'=> '', 'task' => $this->getSchedule($request->date, $task->id)]);
+            return response()->json(['status' => true,'conflict' => [], 'mensaje'=>'Horario asignado', 'task' => $this->getSchedule($request->date, $task->id)]);
 
         } catch (Exception $e) {
             DB::rollBack();
@@ -479,10 +491,78 @@ class ProgrammingController extends Controller
         }
     }
 
-    public function collision(Request $request){
+    public function collisions(Request $request){
+        try {
+            DB::beginTransaction();
+            switch ($request->actionType) {
+            case 1:
+                break;
+            case 2:
+                //Reemplazar todo en una fecha
+                break;
+            case 3:
+                //reemplazar todas las colisiones
+                break;
+            default:
+                break;
+            }
+            DB::commit();
+            return response()->json(['status' => true, 'mensaje'=> 'Horario eliminado']);
+        }catch (Exception $e) {
+            DB::rollBack();
+            return $e;
+        }
+    }
 
-
-
+    public function removeSchedule(Request $request){
+        try {
+            DB::beginTransaction();
+            switch ($request->type) {
+                //SOLO EL $request->date
+            case 1:
+                $schedule = Schedule::find($request->schedule);
+                $schedule->delete();
+                ScheduleTime::where('schedule_id',$schedule->id)->delete();
+                break;
+            case 2:
+                //RESTO DE LA ACTIVIDAD
+                $schedule = Schedule::where('fecha','>=',$request->date)
+                            ->where('employee_id',$request->idUser);
+                $itemsToRemove = $schedule->get()->map(function ($item){
+                    return $item->id;
+                });
+                ScheduleTime::whereIn('schedule_id', $itemsToRemove)->delete();
+                $schedule->delete();
+                break;
+            case 3:
+                //RANGO DE FECHAS
+                $schedule = Schedule::where('employee_id',$request->idUser)
+                ->whereBetween('fecha',[$request->details[0], $request->details[1]])->get();
+                $itemsToRemove = $schedule->map(function ($item){
+                    return $item->id;
+                });
+                ScheduleTime::whereIn('schedule_id', $itemsToRemove)->delete();
+                Schedule::whereBetween('fecha',[$request->details[0], $request->details[1]])->delete();
+                break;
+            case 4:
+                //FECHAS ESPECIFICAS
+                foreach ($request->details as $date) {
+                    $schedule = Schedule::where('fecha','=',$date)
+                    ->where('employee_id','=',$request->idUser)->get()->first();
+                    ScheduleTime::where('schedule_id',$schedule->id)->delete();
+                    Schedule::where('fecha',$date)
+                    ->where('employee_id',$request->idUser)->delete();
+                }
+                break;
+            default:
+                break;
+            }
+            DB::commit();
+            return response()->json(['status' => true, 'mensaje'=> 'Horario eliminado']);
+        }catch (Exception $e) {
+            DB::rollBack();
+            return $e;
+        }
     }
 }
 

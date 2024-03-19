@@ -999,23 +999,3 @@ h4.statusmessage {
 .no-animation [data-height-collapsible] {
     transition: none !important;
 }
-
-/* Primevue fondo */
-/* .p-datatable {
-    position: relative;
-    background-image: url('images/cotecmar-logo-opacity-20.png') !important;
-    background-repeat: no-repeat !important;
-    background-position: 50% 50% !important;
-<<<<<<< HEAD
-} */
-/* .p-dialog-content{
-=======
-}
-
-.p-dialog-content {
->>>>>>> 357a7a4f1be615ee478103913f1c3453fe5c2356
-    position: relative;
-    background-image: url('images/cotecmar-logo-opacity-20.png') !important;
-    background-repeat: no-repeat !important;
-    background-position: 50% 50% !important;
-} */
