@@ -243,7 +243,7 @@ const buttons = [
                     input: '!py-0 !flex !items-center',
                     item: '!p-1 w-full'
                 }" />
-                        <Button severity=" success" type="button" outlined label="Agregar Personal"
+                        <Button severity="success" type="button" outlined label="Agregar Personal"
                             icon="pi pi-user-plus" @click="showNew()" v-if="hasPermission('programming create')" />
                         <Button icon="pi pi-users" severity="primary" outlined label="Crear Grupo"
                             @click="openGroupDialog()" v-if="hasPermission('programming create')" />
@@ -252,8 +252,7 @@ const buttons = [
             </div>
         </div>
 
-        <CustomModal v-model:visible="modalVisible" width="80vw" :footer="false" :closable="false"
-            :closeOnEscape="false">
+        <CustomModal v-model:visible="modalVisible" width="80vw" :closable="true" :closeOnEscape="false">
             <template #icon>
                 <span class="text-white material-symbols-outlined text-4xl">
                     engineering
@@ -297,8 +296,17 @@ const buttons = [
 
                         </div>
                     </div>
-                </div>
-                <Button @click="submit()"></Button>
+                </div>|
+            </template>
+            <template #footer>
+                <Button severity="success" v-if="form.users.length > 0" @click="submit()">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <p class="pl-2">Guardar</p>
+                </Button>
+                <Button severity="danger" @click="modalVisible = false" class="hover:bg-danger">
+                    <i class="fa-regular fa-circle-xmark"></i>
+                    <p class="pl-2">Cancelar</p>
+                </Button>
             </template>
 
         </CustomModal>

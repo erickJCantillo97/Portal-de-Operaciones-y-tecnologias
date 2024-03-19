@@ -165,11 +165,11 @@ const employeeDialog = (item) => {
 }
 
 const form2 = ref({
-    actionType:null, // accion a realizar: 1: reemplazar tarea, 2: reemplazar todo en la fecha, 3: reemplazar todas las colisiones
-    idUser:null,//employee_id
-    idTask:null, //id de la tabla tasks
-    idSchedule:null, // id de la actividad (schedules)
-    idScheduleTime:null, // id del detalle de la actividad
+    actionType: null, // accion a realizar: 1: reemplazar tarea, 2: reemplazar todo en la fecha, 3: reemplazar todas las colisiones
+    idUser: null,//employee_id
+    idTask: null, //id de la tabla tasks
+    idSchedule: null, // id de la actividad (schedules)
+    idScheduleTime: null, // id del detalle de la actividad
     startShift: null, // hora de inicio de la nueva tarea
     endShift: null, // hora final de la nueva tarea
     details: [] //arreglo especificando el id de la tabla schedule_times EJ: [1,2,3,4]

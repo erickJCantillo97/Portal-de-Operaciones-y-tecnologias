@@ -117,7 +117,7 @@ function getPersonalUser()
             'canDelete' => $person['JI_Num_SAP'] != auth()->user()->num_sap,
             'Nombres_Apellidos' => $person['Nombres_Apellidos'],
             'Cargo' => $person['Cargo'],
-          //  'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
+            'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
         ];
     });
     return $miPersonal;
@@ -143,37 +143,37 @@ function getWorkingDays(string $date, int $Workingdays = 5)
        Si $workingdays = 6, quiere decir que se trabaja de lunes a sabados
     */
     $validDate = [];
-    switch ($Workingdays){
+    switch ($Workingdays) {
         case 5:
-            array_push($validDate,'Saturday', 'Sunday');
+            array_push($validDate, 'Saturday', 'Sunday');
             break;
         case 6:
-            array_push($validDate,'Sunday');
+            array_push($validDate, 'Sunday');
             break;
         default:
-            array_push($validDate,'');
+            array_push($validDate, '');
             break;
-        }
-        //obtenemos el nombre del dia
-        $dayName = Carbon::parse($date)->format('l');
+    }
+    //obtenemos el nombre del dia
+    $dayName = Carbon::parse($date)->format('l');
 
-        //validamos que la fecha seleccionada no sea fin de semana
-        if(in_array($dayName, $validDate)){
+    //validamos que la fecha seleccionada no sea fin de semana
+    if (in_array($dayName, $validDate)) {
+        return false;
+        // return response()->json([
+        //     'status' => false,
+        //     'mensaje' => 'No se puede trabajar un fin de semana: '.$dayName,
+        //     'date' => $date
+        // ]);
+    } else {
+        //validamos que la fecha seleccionada no sea dia feriado
+        if (Holidays::for('co')->isHoliday($date)) {
             return false;
             // return response()->json([
             //     'status' => false,
-            //     'mensaje' => 'No se puede trabajar un fin de semana: '.$dayName,
+            //     'mensaje' => 'No se puede trabajar un día feriado: '.Holidays::for('co')->getName($date),
             //     'date' => $date
             // ]);
-        }else{
-            //validamos que la fecha seleccionada no sea dia feriado
-            if(Holidays::for('co')->isHoliday($date)){
-                return false;
-                // return response()->json([
-                //     'status' => false,
-                //     'mensaje' => 'No se puede trabajar un día feriado: '.Holidays::for('co')->getName($date),
-                //     'date' => $date
-                // ]);
         }
         return true;
         // return response()->json([
@@ -181,6 +181,5 @@ function getWorkingDays(string $date, int $Workingdays = 5)
         //     'mensaje' => 'Fecha valida',
         //     'date' => $date
         // ]);
-        }
-
+    }
 }
