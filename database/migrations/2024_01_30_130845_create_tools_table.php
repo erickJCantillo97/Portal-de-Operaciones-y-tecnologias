@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('SAP_code')->nullable();
             $table->string('value')->nullable();
             $table->string('brand')->nullable()->index();
+            
             $table->string('entry_date')->nullable();
             $table->boolean('is_small')->default(false);
             $table->string('estado')->default('DISPONIBLE');

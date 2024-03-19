@@ -1,11 +1,12 @@
 @props([
   'inner_footer_url',
+  'inner_footer_text'
 ])
 <x-mail::layout>
 {{-- Header --}}
 <x-slot:header>
-<x-mail::header :url="config('app.url')">
-{{ config('app.name') }}
+<x-mail::header :url="$inner_footer_url ?? config('app.url')">
+{{ $inner_footer_text ?? config('app.name') }}
 </x-mail::header>
 </x-slot:header>
 {{-- @component('mail::image',  [
@@ -31,7 +32,7 @@
 
 {{-- Inner Footer --}}
 Para más información visitar:
-@component('mail::inner-footer',  ['url' => $inner_footer_url])@endcomponent
+@component('mail::inner-footer', ['url' => $inner_footer_url, 'text' => $inner_footer_text ?? config('app.name') ])@endcomponent
 
 {{-- Footer --}}
 <x-slot:footer>

@@ -436,6 +436,7 @@ onMounted(() => {
 
 const full = ref(false)
 const readOnly = ref()
+const nonWorkingTime = ref(false)
 
 const editMode = () => {
     let gantt = ganttref.value.instance.value
@@ -609,7 +610,7 @@ const ganttConfig = ref({
         {
             type: 'executor', //gemam
         },
-        { id: 'name', type: 'name', },
+        { id: 'name', type: 'name', autoWidth: true },
         { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true, autoWidth: true },
         { id: 'duration', type: 'duration', text: 'Duración', autoWidth: true },
         { id: 'startdate', type: 'startdate', text: 'Fecha Inicio', autoWidth: true },
@@ -980,9 +981,9 @@ const redo = () => {
     gantt.project.stm.redo()
 }
 
-const critical =ref(false)
+const critical = ref(false)
 const showCritical = () => {
-    critical.value=!critical.value
+    critical.value = !critical.value
     let gantt = ganttref.value.instance.value
     gantt.features.criticalPaths.disabled = critical.value
 }
@@ -1047,8 +1048,8 @@ const showCritical = () => {
                         @click="onExport()" />
                     <Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input"
                         icon="fa-solid fa-upload" @click="modalImport = true" />
-                    <Button raised v-tooltip.bottom="'Ruta critica'" severity="danger" icon="fa-solid fa-circle-exclamation"
-                        @click="showCritical()" />
+                    <Button raised v-tooltip.bottom="'Ruta critica'" severity="danger"
+                        icon="fa-solid fa-circle-exclamation" @click="showCritical()" />
                 </span>
                 <span class="flex space-x-1">
                     <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"
@@ -1065,7 +1066,7 @@ const showCritical = () => {
                     :mspExportFeature="true" :projectLines="true" :baselinesFeature="baselines" ref="ganttref"
                     class="h-full" :printFeature="true" v-bind="ganttConfig" :dependenciesFeature="{ radius: 5 }"
                     :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip"
-                    :criticalPathsFeature="criticalPaths" />
+                    :criticalPathsFeature="criticalPaths" :nonWorkingTimeFeature="nonWorkingTime" />
             </span>
         </div>
     </AppLayout>
@@ -1136,7 +1137,6 @@ const showCritical = () => {
 
 
 <style>
-
 .b-export-header,
 .b-export-footer {
     display: flex;

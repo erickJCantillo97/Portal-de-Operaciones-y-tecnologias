@@ -21,7 +21,7 @@ import BadgeDirective from 'primevue/badgedirective';
 const appName =
     import.meta.env.VITE_APP_NAME || "Portal";
 
-createInertiaApp({
+createInertiaApp({      
     title: (title) => `${title} - ${appName}`,
     resolve: (name) =>
         resolvePageComponent(

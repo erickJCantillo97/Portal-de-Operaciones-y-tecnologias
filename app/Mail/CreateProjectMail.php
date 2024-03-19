@@ -2,9 +2,6 @@
 
 namespace App\Mail;
 
-use App\Models\WareHouse\Tool;
-use Carbon\Carbon;
-use Illuminate\Mail\Mailables\Address;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -12,28 +9,19 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class AssignmentToolsMail extends Mailable implements ShouldQueue
+class CreateProjectMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $data;
-
-    public $employee;
-
-    public $tools;
-
-    public $date;
-
-    public $subject;
-
+    public $project;
+    public $customer;
     /**
      * Create a new message instance.
      */
-    public function __construct($employee, $tools = [0])
+    public function __construct($project, $customer)
     {
-        $this->employee = $employee;
-        $this->tools = Tool::whereIn('id', $tools)->get();
-        $this->date = Carbon::now()->format('d/m/Y');
+        $this->project = $project;
+        $this->customer = $customer;
     }
 
     /**
@@ -42,8 +30,7 @@ class AssignmentToolsMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            // subject: $this->subject,
-            subject: 'Nueva Asignacion de Equipos',
+            subject: 'Tiene un nuevo Proyecto con nosotros',
         );
     }
 
@@ -53,7 +40,7 @@ class AssignmentToolsMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'mail.assignment-tools-mail',
+            markdown: 'mail.create-project-mail',
         );
     }
 
