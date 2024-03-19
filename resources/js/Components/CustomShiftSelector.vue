@@ -18,7 +18,7 @@ const props=defineProps({
 
 const loading = ref(true)
 const shifts = ref([])
-axios.get(route('shift.index'),{user:props.user}).then((res) => {
+axios.get(route('shift.index'),{user:props.shiftUser}).then((res) => {
     // console.log(res)
     shifts.value = res.data[0]
     loading.value = false

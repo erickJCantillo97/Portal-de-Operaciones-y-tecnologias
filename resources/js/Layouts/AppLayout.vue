@@ -246,7 +246,14 @@
             </div>
         </template>
     </Toast>
-    <ConfirmPopup></ConfirmPopup>
+    <ConfirmPopup>
+        <template #message="slotProps">
+            <div class="flex flex-col items-center w-full gap-3 p-3">
+                <i :class="slotProps.message.icon" class="text-4xl"></i>
+                <p class="font-bold">{{ slotProps.message.message }}</p>
+            </div>
+        </template>
+    </ConfirmPopup>
 </template>
 
 <script setup>
