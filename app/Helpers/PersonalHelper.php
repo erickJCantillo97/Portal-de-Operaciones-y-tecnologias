@@ -117,7 +117,7 @@ function getPersonalUser()
             'canDelete' => $person['JI_Num_SAP'] != auth()->user()->num_sap,
             'Nombres_Apellidos' => $person['Nombres_Apellidos'],
             'Cargo' => $person['Cargo'],
-            'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
+          //  'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
         ];
     });
     return $miPersonal;

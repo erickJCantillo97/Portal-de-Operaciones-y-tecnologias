@@ -39,7 +39,7 @@ const loadingTasks = ref(true)
 const loadingTask = ref({})
 const optionValue = ref('today')
 const conflicts = ref()
-const task = ref()
+const task = ref({})
 
 // El código anterior define una función `onDrop` en Vue. Esta función se activa cuando un elemento se
 // coloca en una colección.
@@ -259,7 +259,11 @@ const save = async () => {
     NOTA:
     Se debe cambiar el campo de hora inicio y hora fin a un formato de 24 horas.
     */
-    await axios.post(route('programming.saveCustomizedSchedule'), form.value)
+    // await axios.post(route('programming.saveCustomizedSchedule'), form.value)
+    //     .then((res) => {
+    //         console.log(res);
+    //     });
+    await axios.post(route('programming.removeSchedule'), form.value)
         .then((res) => {
             if (res.data.status) {
                 modhours.value = false
