@@ -195,7 +195,7 @@ class ProgrammingController extends Controller
         $schedule = Schedule::where('fecha', $date)->with('scheduleTimes')->where('task_id', $request->task_id)->get()->sortByDesc([
             ['is_my_personal', 'desc'],
         ]);
-
+        
         return response()->json([
             'schedule' => $schedule,
         ], 200);
@@ -473,8 +473,8 @@ class ProgrammingController extends Controller
             }
             DB::commit();
             if (count($conflict) > 0) 
-                return response()->json(['status' => false,'conflict' => $conflict, 'mensaje'=> '']);
-            return response()->json(['status' => true,'conflict' => [], 'mensaje'=>'Horario asignado']);
+                return response()->json(['status' => false,'conflict' => $conflict, 'mensaje'=> '', 'task' => $this->getSchedule($request->date, $task->id)]);
+            return response()->json(['status' => true,'conflict' => [], 'mensaje'=>'Horario asignado', 'task' => $this->getSchedule($request->date, $task->id)]);
 
         } catch (Exception $e) {
             DB::rollBack();
@@ -483,7 +483,26 @@ class ProgrammingController extends Controller
     }
 
     public function collisions(Request $request){
-     return "Controller";
+        try {
+            DB::beginTransaction();
+            switch ($request->actionType) {
+            case 1:
+                break;
+            case 2:
+                //Reemplazar todo en una fecha
+                break;
+            case 3:
+                //reemplazar todas las colisiones
+                break;
+            default:
+                break;
+            }
+            DB::commit();
+            return response()->json(['status' => true, 'mensaje'=> 'Horario eliminado']);
+        }catch (Exception $e) {
+            DB::rollBack();
+            return $e;
+        }
     }
 
     public function removeSchedule(Request $request){
@@ -524,8 +543,8 @@ class ProgrammingController extends Controller
                     ScheduleTime::where('schedule_id',$schedule->id)->delete();
                     Schedule::where('fecha',$date)
                     ->where('employee_id',$request->idUser)->delete();
-                    break;
                 }
+                break;
             default:
                 break;
             }
