@@ -557,7 +557,7 @@ const save = async () => {
             </div>
         </template>
     </CustomModal>
-    <CustomModal :base-z-index="10" v-model:visible="openConflict" width="90vw"
+    <CustomModal :base-z-index="10" v-model:visible="openConflict" :closable="false" :close-on-escape="false" width="90vw"
         :titulo="'Existen colisiones de Programación de la tarea: ' + task.name">
         <template #body>
             <div class="py-2 flex flex-col gap-4">
@@ -627,7 +627,7 @@ const save = async () => {
         </template>
         <template #footer>
             <Button label="Reemplazar todas las coliciones" severity="danger" />
-            <Button label="Omitir todas las coliciones" severity="success" />
+            <Button label="Omitir todas las coliciones" severity="success" @click="open=false"/>
         </template>
     </CustomModal>
     <!-- #endregion -->
