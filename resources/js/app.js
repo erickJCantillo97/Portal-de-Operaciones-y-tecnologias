@@ -3,7 +3,7 @@ import "../css/app.css";
 // import "../css/schedule.css";
 import "./bootstrap";
 import "primeicons/primeicons.css";
-import "primevue/resources/themes/mdc-light-indigo/theme.css";
+import "primevue/resources/themes/aura-light-indigo/theme.css";
 import { createApp, h } from "vue";
 import { createInertiaApp } from "@inertiajs/vue3";
 import { Head } from '@inertiajs/vue3';
