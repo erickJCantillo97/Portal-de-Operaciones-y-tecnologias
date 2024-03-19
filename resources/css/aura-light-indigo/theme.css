@@ -1,6 +1,6 @@
 :root {
   --primary-color: #2E3092;
-  --secundary-color: #cbd5e1;
+  --secundary-color: #f7f7fe;
   --success-color: #00ab55;
   --danger-color: #DC2626;
   --warning-color: #EA580C;
@@ -62,20 +62,30 @@
 
 @font-face {
   font-family: "Gotham";
-  font-weight: 100 900;
+  font-weight: 100 200 300 400 500 600 700 800 900;
   font-display: swap;
   font-style: normal;
   font-named-instance: "Regular";
-  src: url("./fonts/Gotham-Book.otf") format("otf");
+  src: url("./fonts/Gotham-Book.otf") format("opentype");
 }
 @font-face {
   font-family: "Gotham";
-  font-weight: 100 900;
+  font-weight: 100 200 300 400 500 600 700 800 900;
   font-display: swap;
   font-style: italic;
   font-named-instance: "Italic";
-  src: url("./fonts/Gotham-BookItalic.otf") format("otf");
+  src: url("./fonts/Gotham-BookItalic.otf") format("opentype");
 }
+
+/* @font-face {
+  font-family: "Gotham";
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: bold;
+  font-named-instance: "Bold";
+  src: url("./fonts/Gotham-Bold.otf") format("opentype");
+} */
+
 :root {
   --blue-50:#f5f9ff;
   --blue-100:#d0e1fd;

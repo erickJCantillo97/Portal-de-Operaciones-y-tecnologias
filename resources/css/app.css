@@ -572,6 +572,10 @@
     }
 }
 
+body {
+    font-family: 'Gotham';
+}
+
 /* swal2 */
 .swal2-container .swal2-close {
     @apply text-white hover:text-dark-light focus:shadow-none;
