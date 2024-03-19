@@ -3,7 +3,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, onMounted } from 'vue';
 import { Container, Draggable } from "vue-dndrop";
 import { usePermissions } from '@/composable/permission';
-import { useSweetalert } from '@/composable/sweetAlert';
 import Knob from 'primevue/knob';
 import FullCalendar from '@/Components/FullCalendar.vue'
 import Loading from '@/Components/Loading.vue';
@@ -17,13 +16,9 @@ import Calendar from 'primevue/calendar';
 import CustomShiftSelector from '@/Components/CustomShiftSelector.vue';
 import ButtonGroup from 'primevue/buttongroup';
 import Breadcrumb from 'primevue/breadcrumb';
-
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 // const { hasRole, hasPermission } = usePermissions()
-const { toast } = useSweetalert();
-
-// const props = defineProps({
-//     hours: Object
-// })
 
 const openConflict = ref(false)
 
@@ -259,24 +254,23 @@ const save = async () => {
     NOTA:
     Se debe cambiar el campo de hora inicio y hora fin a un formato de 24 horas.
     */
-    // await axios.post(route('programming.saveCustomizedSchedule'), form.value)
-    //     .then((res) => {
-    //         console.log(res);
-    //     });
-    await axios.post(route('programming.removeSchedule'), form.value)
+    await axios.post(route(editHorario.value.option != 'delete' ? 'programming.saveCustomizedSchedule' : 'programming.removeSchedule'), form.value)
         .then((res) => {
             if (res.data.status) {
                 modhours.value = false
+                listaDatos.value[form.value.schedule] = res.data.task
                 editHorario.value.data.hora_inicio = form.value.startShift
                 editHorario.value.data.hora_fin = form.value.endShift
-                toast(res.data.mensaje, 'success')
+                getAssignmentHoursForEmployee((form.value.idUser))
+                toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
             }
             else {
-                toast(res.data.mensaje, 'danger')
+                toast.add({ severity: 'danger', group: "customToast", text: res.data.mensaje, life: 2000 })
             }
             console.log(res);
             form.value.loading = false
         });
+
 }
 </script>
 
@@ -367,17 +361,23 @@ const save = async () => {
                                                     class="flex items-center justify-between px-1 py-1 text-green-900 bg-green-200 rounded-md cursor-default group">
                                                     <button v-tooltip.bottom="'En desarrollo'"
                                                         class="hidden group-hover:flex"
+                                                        @click="console.log('En desarrollo')">
+                                                        <i
+                                                            class="fa-solid fa-trash-can text-danger text-xs hover:animate-pulse hover:scale-125"></i>
+                                                    </button>
+                                                    <!-- <button v-tooltip.bottom="'En desarrollo'"
+                                                        class="hidden group-hover:flex"
                                                         @click="console.log('En desarrollo')"
                                                         v-if="item.schedule_times.length > 1">
                                                         <i
                                                             class="fa-solid fa-trash-can text-danger text-xs hover:animate-pulse hover:scale-125"></i>
-                                                    </button>
-                                                    <button v-tooltip.bottom="'Eliminar'"
+                                                    </button> -->
+                                                    <!-- <button v-tooltip.bottom="'Eliminar'"
                                                         class="hidden group-hover:flex"
                                                         @click="deleteSchedule(slotProps.option, index, item)" v-else>
                                                         <i
                                                             class="fa-solid fa-trash-can text-danger text-xs hover:animate-pulse hover:scale-125"></i>
-                                                    </button>
+                                                    </button> -->
                                                     <span class="w-full text-xs tracking-tighter text-center">
                                                         {{ format24h(horario.hora_inicio) }}
                                                         {{ format24h(horario.hora_fin) }}
@@ -558,7 +558,7 @@ const save = async () => {
         </template>
     </CustomModal>
     <CustomModal :base-z-index="10" v-model:visible="openConflict" width="90vw"
-        :titulo="'Existen colisiones de Programación de la tarea: '+ task.name">
+        :titulo="'Existen colisiones de Programación de la tarea: ' + task.name">
         <template #body>
             <div class="py-2 flex flex-col gap-4">
                 <div v-for="conflictForDay in conflicts"
@@ -572,8 +572,9 @@ const save = async () => {
                                 {{ conflictForDay[0].fecha }}
                             </p>
                         </span>
-                        <span v-if="conflictForDay.length > 1" class="flex p-2 justify-end items-center gap-2  w-[400px]">
-                            <Button class="!w-full" label="Reemplazar todo" severity="contrast"  />
+                        <span v-if="conflictForDay.length > 1"
+                            class="flex p-2 justify-end items-center gap-2  w-[400px]">
+                            <Button class="!w-full" label="Reemplazar todo" severity="contrast" />
                             <Button class="!w-full" label="Omitir todo" severity="success" />
                         </span>
                     </span>
@@ -595,7 +596,8 @@ const save = async () => {
                                             <p class="flex space-x-2">
                                                 <span class="font-bold">Inicio: </span>
                                                 <span>
-                                                    {{ conflict.horaInicio.slice(0, conflict.horaInicio.lastIndexOf(':')) }}
+                                                    {{ conflict.horaInicio.slice(0,
+                                conflict.horaInicio.lastIndexOf(':')) }}
                                                 </span>
                                             </p>
                                             <p class="flex space-x-2">
@@ -615,7 +617,7 @@ const save = async () => {
                                 </div>
                                 <div class="flex p-2 justify-center items-center gap-2 w-[450px]">
                                     <Button class="!w-full" label="Reemplazar" severity="warning" />
-                                    <Button label="Omitir" class="!w-full"  severity="success" />
+                                    <Button label="Omitir" class="!w-full" severity="success" />
                                 </div>
                             </div>
                         </div>
