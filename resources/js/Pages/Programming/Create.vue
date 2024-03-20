@@ -566,7 +566,7 @@ const confirm1 = (event, data) => {
                                 input: '!h-8'
                             }" />
                     <Button type="submit" class="col-start-4" :loading="formEditHour.loading"
-                        :disabled="(!nuevoHorario & tabActive != 2)"
+                        :disabled="(!(nuevoHorario?.startShift) & tabActive != 2)"
                         :severity="editHorario?.option != 'delete' ? 'success' : 'danger'"
                         :icon="editHorario?.option != 'delete' ? 'fa-solid fa-floppy-disk' : 'fa-solid fa-trash-can'"
                         :label="editHorario?.option != 'delete' ? 'Guardar' : 'Eliminar'" />
