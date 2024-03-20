@@ -30,7 +30,7 @@ class Project extends Model implements Auditable
     public function contract()
     {
         return $this->belongsTo(Contract::class)->withDefault(function ($contract) {
-            $contract->name = 'Sin Contrato';
+            $contract->contract_id = 'Sin Contrato';
         });
     }
 

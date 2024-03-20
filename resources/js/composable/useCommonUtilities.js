@@ -67,16 +67,16 @@ export function useCommonUtilities() {
      * Otherwise, it formats the `value` as a currency value using the `toLocaleString` method with the
      * specified options, including the currency symbol based on the `currency` parameter (defaulting
      */
-    const currencyFormat = (value, currency) => {
-        if (value == undefined || value == null) {
+    const currencyFormat = (value, currency = "COP") => {
+        if (value == null) {
             return "Sin definir";
-        } else {
-            return parseInt(value).toLocaleString("es-CO", {
-                style: "currency",
-                currency: currency == null ? "COP" : currency,
-                maximumFractionDigits: 0,
-            });
         }
+        const formattedValue = new Intl.NumberFormat("es-CO", {
+            style: "currency",
+            currency,
+            maximumFractionDigits: 0,
+        }).format(parseInt(value));
+        return formattedValue.replace(/\s/g, " "); // Elimina los espacios en blanco
     };
 
     /**

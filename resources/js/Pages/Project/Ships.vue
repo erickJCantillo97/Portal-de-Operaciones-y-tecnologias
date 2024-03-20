@@ -118,7 +118,7 @@ const buttons = ref([
 
 <template>
     <AppLayout>
-        <div class="w-full h-[89vh] overflow-y-auto">
+        <div class="w-full h-full overflow-y-auto">
             <CustomDataTable :data="ships" exportRute="export.ships" :columnas="columnas" :actions="buttons"
                 :rowsDefault=20 :title="customer ? 'Unidades del cliente:' + customer.name : 'Todas las unidades'"
                 @confirmDelete="deleteItem" @editItem="editItem" @cloneItem="cloneItem">

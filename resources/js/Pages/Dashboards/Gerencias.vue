@@ -31,7 +31,7 @@ onMounted(() => {
 </script>
 <template>
     <AppLayout>
-        <div class="mt-4 px-4 sm:px-6 lg:px-8">
+        <div class=" h-full w-full mt-4 px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between">
                 <h2 class="font-medium text-primary text-xl">
                     Personal Corporativo {{ GERENCIA }}

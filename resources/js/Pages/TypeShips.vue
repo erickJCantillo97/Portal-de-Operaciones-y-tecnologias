@@ -162,7 +162,7 @@ const showHull = (event, data) => {
 </script>
 <template>
     <AppLayout>
-        <div class="h-[89vh] overflow-y-auto">
+        <div class="h-full w-full overflow-y-auto">
             <CustomDataTable :rows-default="100" :data="typeShips" :columnas="columns" :actions="buttons"
                 @showHull="showHull" @rowClic="rowClick" @showEdit="showEdit" title="Clases de buque"
                 @deleteClic="deleteClic" @addClick="showNew()">

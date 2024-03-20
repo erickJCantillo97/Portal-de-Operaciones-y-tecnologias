@@ -7,11 +7,11 @@
         </div>
     </div>
     <div class="max-h-screen collapsible-vertical" :class="menu ? 'toggle-sidebar' : ''">
-        <main>
+        <main class="h-screen flex flex-col">
             <div class="fixed inset-0 bg-[black]/60 z-10" :class="{ hidden: !menu }" @click="menu = !menu"></div>
             <MenuSidebar class="lg:block " :class="{ hidden: !menu }"></MenuSidebar>
             <div
-                class="max-h-[6vh] z-10 flex items-center justify-between h-auto px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 md:ml-16">
+                class="max-h-[6vh] z-10 flex items-center justify-between h-auto px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 md:ml-24">
                 <div class="w-full">
                     <button type="button" class="-ml-7 p-2.5 text-gray-700 lg:hidden" @click="menu = !menu">
                         <span class="sr-only">Open sidebar</span>
@@ -66,7 +66,7 @@
                 </div>
             </div>
             <div
-                class="max-h-[85vh] flex flex-col min-h-[85vh] p-1 gap-1 border border-gray-200 bg-white rounded-lg shadow-2xl g-white sm:ml-20 sm:mr-1">
+                class="h-[87vh] items-center flex p-1 gap-1 border border-gray-200 bg-white rounded-lg shadow-2xl g-white sm:ml-24 sm:mr-1">
                 <slot />
             </div>
             <div class="fixed right-[-5px] z-50 w-10 top-1/4 animate-pulse" data-html2canvas-ignore>
