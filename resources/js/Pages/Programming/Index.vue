@@ -2,7 +2,9 @@
 import { Link } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import WeekTable from '@/Components/WeekTable.vue'
-
+import Dropdown from 'primevue/dropdown';
+import { onMounted, onUnmounted, ref } from 'vue'
+import NoContentToShow from '@/Components/NoContentToShow.vue'
 /**
  * The above code is a JavaScript function that takes a time string in 24-hour format (e.g., "13:30")
 // and converts it to a 12-hour format with AM/PM indicator. It creates a new Date object with the time
@@ -15,6 +17,15 @@ function format24h(hora) {
     return new Date("1970-01-01T" + hora).toLocaleString('es-CO',
         { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 }
+
+const props = defineProps({
+    projects: Array,
+})
+
+
+const loading = ref(false)
+const project = ref()
+
 //#endregion
 </script>
 
@@ -27,13 +38,26 @@ function format24h(hora) {
                     <!-- <CustomInput type="week" v-model:input="date" @change="getTask('date'); getPersonalData()" /> -->
                 </span>
                 <div class="flex items-center space-x-2">
+                    <span class="flex flex-col sm:flex-row items-center sm:space-x-2">
+                        <p>Selecciona un proyecto</p>
+                        <Dropdown :options="projects" class="w-96" optionLabel="name" optionValue="id" showClear
+                            v-model="project" :pt="{
+                            root: '!h-8',
+                            input: '!py-0 !flex !items-center !text-sm !font-normal',
+                            item: '!py-1 !px-3 !text-sm !font-normal',
+                            filterInput: '!h-8'
+                        }" />
+                    </span>
                     <Link :href="route('programming.create')">
-                    <Button label="Programar Personal" severity="success" icon="fa-solid fa-plus" />
+                    <Button label="Programar Personal" severity="success" icon="fa-solid fa-plus" :project="project" />
                     </Link>
                 </div>
             </div>
             <div class="mt-2 px-4 h-[79vh] overflow-y-auto">
-                <WeekTable />
+                <div v-if="!project && !loading" class="flex items-center">
+                    <NoContentToShow class="mt-5" :subject="'Por favor seleccione un Proyecto'" />
+                </div>
+                <WeekTable v-else />
             </div>
         </div>
     </AppLayout>
