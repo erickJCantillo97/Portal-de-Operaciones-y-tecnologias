@@ -21,7 +21,10 @@ class ProgrammingController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Programming/Index');
+        $projects = Project::active()->get();
+        return Inertia::render('Programming/Index', [
+            'projects' => $projects,
+        ]);
     }
     public function create()
     {
@@ -144,11 +147,12 @@ class ProgrammingController extends Controller
         $taskWithSubTasks = VirtualTask::has('project')->whereNotNull('task_id')->select('task_id')->get()->map(function ($task) {
             return $task['task_id'];
         })->toArray();
-        $date = Carbon::now();
+        $date = Carbon::parse($request->date);
         return response()->json(
-            VirtualTask::has('project')->has('task')->whereDate('startDate', '>=', $date)
+            VirtualTask::has('project')->has('task')
+                ->where('startDate', '<=', $date)
                 ->where('percentDone', '<', 100)
-                ->where('executor', 'like', '%DVPIN%')
+                ->where('executor', 'like', '%' . $request->division . '%')
                 ->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) {
                     return [
                         'name' => $task['name'],
