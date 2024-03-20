@@ -22,8 +22,10 @@
       </div>
       <!-- Iterar los días de la semana -->
       <div class="border border-gray-600 text-center" v-for="day in daysOfWeek">
-        <div class="block" :key="ninjaJutsu">
-          {{ getTask(getFormattedDate(day), division) }}
+        <div class="block" :key="getTask(getFormattedDate(day), division)" >
+          <div v-if="tasks[getFormattedDate(day)]">
+          {{ tasks[getFormattedDate(day)][division.name] }}
+          </div>
         </div>
       </div>
     </div>
@@ -36,10 +38,7 @@ import { ref } from 'vue'
 const daysOfWeek = ref(
   [
     'Lunes',
-    'Martes',
-    'Miércoles',
-    'Jueves',
-    'Viernes',
+
   ])
 
 const divisions = ref([
@@ -47,10 +46,6 @@ const divisions = ref([
     name: 'PINTURA',
     short: 'DVPIN'
   },
-  {
-    name: 'MECÁNICA',
-    short: 'DVMEC'
-  }
 ])
 
 const getFormattedDate = (day) => {
@@ -75,18 +70,18 @@ const formatDate = (date) => {
 
 const tasks = ref([])
 const ninjaJutsu = ref(0)
-const getTask = async(day, division) => {
-
-  let tasks = []
+const getTask = async (day, division) => {
+  console.log(tasks.value[day][division.name] )
 
   await axios.get(route('get.task.date.division'), {
     date: day,
-    division: division
+    division: division.name
   }).then(res => {
-      tasks = res.data
-      ninjaJutsu.value++
+      console.log(tasks.value[day][division.name] )
+      console.log(tasks.value[day][division.name] )
+      tasks.value[day][division.name] = res.data
     })
 
-  return tasks
+  return day
 }
 </script>
