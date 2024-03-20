@@ -236,7 +236,7 @@
         <Footer fontSize="xs" fontColor="white" marginTop="0" class="bg-gray-500 py-1" />
     </div>
     <Toast position="bottom-center" group="customToast"
-        :pt="{ content: '!py-1 !items-center !flex !justify-between !px-3 ', }">
+        :pt="{ content: '!py-1 !items-center !flex !justify-between !px-3 !border-0'}">
         <template #message="slotProps">
             <i v-if="slotProps.message.icon" class="text-3xl" :class="slotProps.message.icon" />
             <i v-else class="text-3xl"

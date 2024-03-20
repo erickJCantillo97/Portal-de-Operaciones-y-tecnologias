@@ -138,8 +138,13 @@ const getTask = async (option) => {
 // una hora en formato de 24 horas) y devuelve una cadena de hora formateada en formato de 12 horas con
 // AM/PM.
 function format24h(hora) {
-    return new Date("1970-01-01T" + hora).toLocaleString('es-CO',
-        { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+    if (hora.length > 5) {
+        return new Date(hora).toLocaleString('es-CO',
+            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+    } else {
+        return new Date("1970-01-01T" + hora).toLocaleString('es-CO',
+            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+    }
 }
 //#region
 
@@ -168,11 +173,8 @@ const employeeDialog = (item) => {
 }
 
 const formColision = ref({
-    actionType: null, // accion a realizar: 1: reemplazar tarea, 2: reemplazar todo en la fecha, 3: reemplazar todas las colisiones
-    idUser: null,//employee_id
-    idTask: null, //id de la tabla tasks
-    idSchedule: null, // id de la actividad (schedules)
-    idScheduleTime: null, // id del detalle de la actividad
+    actionType: null, // accion a realizar: 1: mantener, 2: Reemplazar , 3: Reemplazar todo en una fecha, 4: mantener todas las colisiones en una fecha, 5: Mantener todas las tareas, 6: reemplazar todas las colisiones
+    idTask: null,
     startShift: null, // hora de inicio de la nueva tarea
     endShift: null, // hora final de la nueva tarea
     details: [] //arreglo especificando el id de la tabla schedule_times EJ: [1,2,3,4]
@@ -204,7 +206,7 @@ const nuevoHorario = ref({})
 const optionSelectHours = ref('select')
 const modhours = ref(false)
 
-const toggle = (horario, data, option) => {
+const editHour = (horario, data, option) => {
     editHorario.value = horario
     editHorario.value.data = data
     editHorario.value.option = option
@@ -222,8 +224,10 @@ const filter = ref('');
 const selectDays = ref()
 const tabActive = ref()
 const save = async () => {
+    task.value = tasks.value.find((task) => task.id = editHorario.value.data.task_id)
     formEditHour.value.loading = true
     if (tabActive.value != 2) {
+        formEditHour.value.personalized = false
         formEditHour.value.startShift = new Date(nuevoHorario.value.startShift).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
         formEditHour.value.endShift = new Date(nuevoHorario.value.endShift).toLocaleString('es-CO',
@@ -274,31 +278,63 @@ const save = async () => {
             formEditHour.value.loading = false
         }).catch((error) => {
             console.log(error)
-            toast.add({ severity: 'danger', group: "customToast", text: 'Error no controlado', life: 2000 })
+            toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 2000 })
         });
-
 }
-
-
 //# region popup confirmacion coliciones
 
-const confirm1 = (event, data) => {
-    confirm.require({
-        target: event.currentTarget,
-        message: '¿Está totalmente seguro?',
-        icon: 'pi pi-exclamation-triangle text-danger',
-        rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
-        acceptClass: 'p-button-sm p-button-success',
-        rejectLabel: 'No',
-        acceptLabel: 'Sí',
-        accept: () => {
-            console.log(data)
-            toast.add({ severity: 'info', group: "customToast", text: 'You have accepted', life: 3000 });
-        },
-        reject: () => {
-            toast.add({ severity: 'error', group: "customToast", text: 'You have rejected', life: 3000 });
-        }
-    });
+const confirm1 = (event, data, option) => {
+    formColision.value.idTask = task.value.id
+    formColision.value.startShift = format24h(task.value.shift.startShift)
+    formColision.value.endShift = format24h(task.value.shift.endShift)
+    if (option == 'omit') {
+        formColision.value.actionType = 1
+        formColision.value.details = [data.idScheduleTime]
+        toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
+    } else if (option == 'remplace') {
+        formColision.value.actionType = 2
+        formColision.value.details = [data.idScheduleTime]
+        toast.add({ severity: 'info', group: "customToast", text: 'Remplazada', life: 3000 });
+    } else {
+        formColision.value.details = data.map(obj => obj.idScheduleTime);
+        confirm.require({
+            target: event.currentTarget,
+            message: '¿Está totalmente seguro?',
+            icon: 'pi pi-exclamation-triangle text-danger',
+            rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+            acceptClass: 'p-button-sm p-button-success',
+            rejectLabel: 'No',
+            acceptLabel: 'Sí',
+            accept: () => {
+                // formColision.value.details = data.map(obj => obj.idScheduleTime);
+                console.log(formColision.value)
+                if (option == 'omitAll') {
+                    modhours.value = false
+                    openConflict.value = false
+                    formColision.value.actionType = 5
+                    toast.add({ severity: 'info', group: "customToast", text: 'Se omitieron todas', life: 3000 });
+                } else if (option == 'omitAllDay') {
+                    formColision.value.actionType = 4
+                    formColision.value.details = data.map(obj => obj.idScheduleTime);
+                    toast.add({ severity: 'info', group: "customToast", text: 'Se omitieron todas las del dia', life: 3000 });
+                } else if (option == 'remplaceAll') {
+                    modhours.value = false
+                    openConflict.value = false
+                    formColision.value.actionType = 6
+                    toast.add({ severity: 'info', group: "customToast", text: 'Se remplazaron todas', life: 3000 });
+                } else if (option == 'remplaceAllDay') {
+                    formColision.value.actionType = 3
+                    formColision.value.details = data.map(obj => obj.idScheduleTime);
+                    toast.add({ severity: 'info', group: "customToast", text: 'Se remplazaron todas las del dia', life: 3000 });
+                }
+            },
+            reject: () => {
+
+                toast.add({ severity: 'error', group: "customToast", text: 'You have rejected', life: 3000 });
+            }
+        });
+    }
+    console.log(formColision.value)
 };
 
 //#endregion
@@ -334,7 +370,7 @@ const confirm1 = (event, data) => {
                             <p><b>{{ slotProps.option.task }}</b> <i class="fa-solid fa-angle-right"></i>
                                 {{ slotProps.option.name }}
                             </p>
-                            <p class="text-xs italic uppercase text-primary">{{ slotProps.option.project }}</p>
+                            <p class="text-xs italic uppercase text-primary">{{ slotProps.option.project.name }}</p>
                             <span class="grid items-center text-xs grid-cols-6">
                                 <span class="grid grid-cols-3">
                                     <p class="font-bold ">I:</p>
@@ -351,6 +387,17 @@ const confirm1 = (event, data) => {
                                         :model-value=parseInt(slotProps.option.percentDone) :size=50
                                         valueTemplate="{value}%" readonly />
                                 </span>
+                                <div class="text-center justify-center">
+                                    <p class="font-bold">Horario predefinido</p>
+                                    <span class="flex items-center justify-center space-x-2">
+                                        <p class="">
+                                            {{ format24h(slotProps.option.shift.startShift) }}
+                                        </p>
+                                        <p class="">
+                                            {{ format24h(slotProps.option.shift.endShift) }}
+                                        </p>
+                                    </span>
+                                </div>
                                 <div class="text-center justify-center">
                                     <p class="font-bold">Valor estimado</p>
                                     <p class="">$1.000.000
@@ -380,8 +427,9 @@ const confirm1 = (event, data) => {
                                         class="p-1 mt-1 border-2 rounded-md">
                                         <div class="flex items-center justify-between w-full ">
                                             <p class="text-sm font-semibold ">{{ item.name }}</p>
-                                            <button v-tooltip.top="'Eliminar de la Actividad'" v-if="item.is_my_personal"
-                                                @click="toggle(slotProps.option, item, 'delete')">
+                                            <button v-tooltip.top="'Eliminar de la Actividad'"
+                                                v-if="item.is_my_personal"
+                                                @click="editHour(slotProps.option, item, 'delete')">
                                                 <i
                                                     class="fa-solid fa-circle-xmark text-danger hover:animate-pulse hover:scale-125" />
                                             </button>
@@ -390,19 +438,25 @@ const confirm1 = (event, data) => {
                                             <div class="grid w-full grid-cols-3 gap-2">
                                                 <div v-for="horario in item.schedule_times"
                                                     class="flex items-center justify-between px-1 py-1 text-green-900 bg-green-200 rounded-md cursor-default group">
-                                                    <button v-tooltip.bottom="'En desarrollo'" v-if="item.is_my_personal"
-                                                        class="hidden group-hover:flex"
+                                                    <button v-tooltip.bottom="'En desarrollo'"
+                                                        v-if="item.is_my_personal" class="hidden group-hover:flex"
                                                         @click="console.log('En desarrollo')">
                                                         <i
                                                             class="fa-solid fa-trash-can text-danger text-xs hover:animate-pulse hover:scale-125"></i>
                                                     </button>
                                                     <span class="w-full text-xs tracking-tighter text-center">
-                                                        {{ format24h(horario.hora_inicio) }}
-                                                        {{ format24h(horario.hora_fin) }}
+                                                        {{
+                                format24h(horario.hora_inicio.slice(0,
+                                    horario.hora_inicio.lastIndexOf(':')))
+                            }}
+                                                        {{
+                                    format24h(horario.hora_fin.slice(0,
+                                        horario.hora_fin.lastIndexOf(':')))
+                                }}
                                                     </span>
-                                                    <button v-tooltip.bottom="'Cambiar horario'"v-if="item.is_my_personal"
-                                                        class="hidden group-hover:flex"
-                                                        @click="optionSelectHours = 'select'; toggle(horario, item, 'modify')">
+                                                    <button v-tooltip.bottom="'Cambiar horario'"
+                                                        v-if="item.is_my_personal" class="hidden group-hover:flex"
+                                                        @click="optionSelectHours = 'select'; editHour(horario, item, 'modify')">
                                                         <i
                                                             class="fa-solid fa-pencil text-primary text-xs hover:animate-pulse hover:scale-125"></i>
                                                     </button>
@@ -501,8 +555,10 @@ const confirm1 = (event, data) => {
                         <!-- {{ editHorario }} -->
                         <p class="font-bold">Horario actual:</p>
                         <p class="px-1 py-1 text-green-900 bg-green-200 rounded-md">
-                            {{ format24h(editHorario.hora_inicio) }}
-                            {{ format24h(editHorario.hora_fin) }}
+                            {{ format24h(editHorario.hora_inicio.slice(0,
+                                editHorario.hora_inicio.lastIndexOf(':'))) }}
+                            {{ format24h(editHorario.hora_fin.slice(0,
+                                editHorario.hora_fin.lastIndexOf(':'))) }}
                         </p>
                     </div>
                     <TabView v-model:activeIndex="tabActive" class="border rounded-md p-1" :pt="{
@@ -585,8 +641,9 @@ const confirm1 = (event, data) => {
         </template>
     </CustomModal>
 
-    <CustomModal :base-z-index="10" v-model:visible="openConflict" :closable="false" :close-on-escape="false"
-        width="90vw" :titulo="'Existen colisiones de Programación de la tarea: ' + task.name">
+    <CustomModal icon="fa-solid fa-triangle-exclamation" :base-z-index="10" v-model:visible="openConflict"
+        severity="danger" :closable="false" :close-on-escape="false" width="90vw"
+        :titulo="'Existen colisiones al programar tarea: ' + task.name">
         <template #body>
             <div class="py-2 flex flex-col gap-4">
                 <div v-for="conflictForDay in conflicts"
@@ -648,9 +705,9 @@ const confirm1 = (event, data) => {
                                 </div>
                                 <div class="flex p-2 justify-center items-center gap-2 w-[450px]">
                                     <Button class="!w-full" label="Reemplazar" severity="warning"
-                                        @click="console.log(conflict)" />
+                                        @click="confirm1($event, conflict, 'remplace')" />
                                     <Button label="Omitir" class="!w-full" severity="success"
-                                        @click="console.log(conflict)" />
+                                        @click="confirm1($event, conflict, 'omit')" />
                                 </div>
                             </div>
                         </div>

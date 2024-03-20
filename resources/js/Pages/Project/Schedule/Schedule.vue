@@ -993,7 +993,7 @@ const showCritical = () => {
 </script>
 <template>
     <AppLayout>
-        <div id="ganttContainer" :class="full ? 'fixed bg-white z-50 top-0 left-0 h-screen w-screen' : 'h-[89vh]'"
+        <div id="ganttContainer" :class="full ? 'fixed bg-white z-50 top-0 left-0 h-screen w-screen' : 'h-full w-full'"
             class="flex flex-col overflow-y-auto gap-y-1">
             <div class="rounded-t-lg h-8 flex justify-between cursor-default">
                 <span class="bg-blue-800 flex justify-between rounded-tl-lg w-full">
