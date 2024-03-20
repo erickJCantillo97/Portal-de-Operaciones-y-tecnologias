@@ -23,6 +23,10 @@ class ProgrammingController extends Controller
     {
         return Inertia::render('Programming/Index');
     }
+    public function create()
+    {
+        return Inertia::render('Programming/Create');
+    }
 
     /**
      * La función almacena una programación y crea un horario para una tarea y luego devuelve la

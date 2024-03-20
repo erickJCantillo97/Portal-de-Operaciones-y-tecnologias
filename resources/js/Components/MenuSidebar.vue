@@ -15,7 +15,8 @@
                             <li v-for="item in navigation" :key="item.name" class=" nav-item">
                                 <Link v-if="!item.children" v-show="item.show" :href="route(item.href)" class="group">
                                 <div class="flex items-center group-hover:!text-primary">
-                                    <component :is="item.icon" class="w-6 h-6 text-gray-400 shrink-0" aria-hidden="true" />
+                                    <component :is="item.icon" class="w-6 h-6 text-gray-400 shrink-0"
+                                        aria-hidden="true" />
                                     <h3 class="pl-3 text-black dark:text-[#506690] dark:group-hover:text-white">
                                         {{ item.name }}
                                     </h3>
@@ -25,8 +26,8 @@
                                     :class="{ active: activeDropdown === item.name }"
                                     @click="activeDropdown === item.name ? (activeDropdown = null) : (activeDropdown = item.name)">
                                     <div class="flex items-center">
-                                        <component :is="item.icon" class="w-6 h-6 text-gray-100 shrink-0 dark:text-white"
-                                            aria-hidden="true" />
+                                        <component :is="item.icon"
+                                            class="w-6 h-6 text-gray-100 shrink-0 dark:text-white" aria-hidden="true" />
                                         <h3 class="pl-3  text-black dark:text-[#506690] dark:group-hover:text-white">
                                             {{ item.name }}
                                         </h3>
@@ -43,7 +44,8 @@
                                                 <Link :href="!children.dev ? route(children.href) : route('dashboard')">
                                                 <span class="">
                                                     <p :class="children.dev ? '-mb-2' : ''">{{ children.name }}</p>
-                                                    <small v-if="children.dev" class="text-xs text-red-300 animate-pulse">
+                                                    <small v-if="children.dev"
+                                                        class="text-xs text-red-300 animate-pulse">
                                                         En desarrollo
                                                     </small>
                                                 </span>
@@ -106,7 +108,7 @@ const navigation = [
             },
             {
                 name: 'Programación',
-                href: 'programming',
+                href: 'programming.create',
                 // dev: true
                 show: hasPermission('programming create'),
             },
