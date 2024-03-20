@@ -231,25 +231,22 @@ const buttons = [
 <template>
     <AppLayout>
         <div class="w-full h-full overflow-y-auto">
-            <!--DATATABLE-->
-            <div class="h-[89vh] overflow-y-auto">
-                <CustomDataTable title="Mi personal" :loading :rowsDefault="20" :data="miPersonal" :columnas="columnas"
-                    :actions="buttons" @delete="del">
-                    <template #buttonHeader>
-                        <span v-if="filterGroup" class="mr-10">Filtrado por grupo "{{ filterGroup.name }}"</span>
-                        <Dropdown v-model="filterGroup" @change="getPersonalFilter" :options="groups" showClear
-                            optionLabel="name" placeholder="Mis grupos" :pt="{
-                    root: '!h-8',
-                    input: '!py-0 !flex !items-center',
-                    item: '!p-1 w-full'
-                }" />
-                        <Button severity="success" type="button" outlined label="Agregar Personal"
-                            icon="pi pi-user-plus" @click="showNew()" v-if="hasPermission('programming create')" />
-                        <Button icon="pi pi-users" severity="primary" outlined label="Crear Grupo"
-                            @click="openGroupDialog()" v-if="hasPermission('programming create')" />
-                    </template>
-                </CustomDataTable>
-            </div>
+            <CustomDataTable title="Mi personal" :loading :rowsDefault="20" :data="miPersonal" :columnas="columnas"
+                :actions="buttons" @delete="del">
+                <template #buttonHeader>
+                    <span v-if="filterGroup" class="mr-10">Filtrado por grupo "{{ filterGroup.name }}"</span>
+                    <Dropdown v-model="filterGroup" @change="getPersonalFilter" :options="groups" showClear
+                        optionLabel="name" placeholder="Mis grupos" :pt="{
+                root: '!h-8',
+                input: '!py-0 !flex !items-center',
+                item: '!p-1 w-full'
+            }" />
+                    <Button severity="success" type="button" outlined label="Agregar Personal" icon="pi pi-user-plus"
+                        @click="showNew()" v-if="hasPermission('programming create')" />
+                    <Button icon="pi pi-users" severity="primary" outlined label="Crear Grupo"
+                        @click="openGroupDialog()" v-if="hasPermission('programming create')" />
+                </template>
+            </CustomDataTable>
         </div>
 
         <CustomModal v-model:visible="modalVisible" width="80vw" :closable="true" :closeOnEscape="false">
@@ -333,15 +330,15 @@ const buttons = [
                                 <label>Nombre del Grupo</label>
                                 <InputText type="text" v-model="teamworkName" placeholder="Escriba nombre del grupo"
                                     :pt="{
-                    root: '!w-full'
-                }" />
+                root: '!w-full'
+            }" />
                             </div>
                             <div>
                                 <label>Descripción</label>
                                 <Textarea v-model="descriptionValue" rows="15" col="60"
                                     placeholder="Agregue una descripción al grupo" autoResize :pt="{
-                    root: '!w-full !text-sm'
-                }" />
+                root: '!w-full !text-sm'
+            }" />
                             </div>
                             <div class="flex justify-end space-x-2 mt-2">
                                 <Button severity="success" label="Guardar" size="small" @click="createGroup()" />
@@ -357,8 +354,8 @@ const buttons = [
                                     @click="showCreateGroupSection = true" size="small" />
                                 <Button v-if="groupSelected != 0 && !showCreateGroupSection" label="Editar"
                                     icon="pi pi-pencil" severity="warning" size="small" @click="editGroup()" :pt="{
-                    label: '!text-slate-900'
-                }" />
+                label: '!text-slate-900'
+            }" />
                                 <Button v-if="groupSelected != 0 && !showCreateGroupSection" label="Eliminar"
                                     icon="pi pi-trash" severity="danger" size="small" @click="deleteGroup()" />
                             </div>
@@ -394,11 +391,11 @@ const buttons = [
                             <Accordion :activeIndex="0">
                                 <!--Miembros del grupo-->
                                 <AccordionTab header="Miembros del Grupo" :pt="{
-                    root: '!border-0 !ring-0',
-                    headerAction: '!bg-slate-200 !px-4 !py-1 mb-1',
-                    headerTitle: '!text-sm',
-                    // content: '!h-52'
-                }">
+                root: '!border-0 !ring-0',
+                headerAction: '!bg-slate-200 !px-4 !py-1 mb-1',
+                headerTitle: '!text-sm',
+                // content: '!h-52'
+            }">
                                     <!-- <div class="block space-y-4 h-[475px] custom-scroll overflow-y-auto shadow-lg rounded-lg p-2"> -->
                                     <div v-for="member of groupPersonal" class="flex justify-between">
                                         <UserTable :user="member" :photo="true" />
@@ -416,11 +413,11 @@ const buttons = [
 
                                 <!--Agregar personal al grupo-->
                                 <AccordionTab header="Agregar personal al grupo" :pt="{
-                    root: '!border-0 !ring-0',
-                    headerAction: '!bg-slate-200 !px-4 !py-1 mb-1',
-                    headerTitle: '!text- sm',
-                    // content: '!h-20'
-                }">
+                root: '!border-0 !ring-0',
+                headerAction: '!bg-slate-200 !px-4 !py-1 mb-1',
+                headerTitle: '!text- sm',
+                // content: '!h-20'
+            }">
                                     <div v-for="member of props.miPersonal" class="flex justify-between space-y-4">
                                         <UserTable :user="member" :photo="true" />
                                         <div>
