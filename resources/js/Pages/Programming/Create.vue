@@ -307,7 +307,7 @@ const confirm1 = (event, data) => {
 
 <template>
     <AppLayout>
-        <div class="h-[89vh] grid grid-cols-3">
+        <div class="h-full w-full grid grid-cols-3">
             <span class="col-span-2 space-y-1 pt-1 px-1">
                 <span class="flex justify-between items-center">
                     <span class="text-xl font-bold text-primary h-full items-center flex">

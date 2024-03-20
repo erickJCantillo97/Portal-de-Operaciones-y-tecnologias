@@ -22,7 +22,7 @@ const filters = ref({
 </script>
 <template>
     <AppLayout>
-        <div class="w-full overflow-y-auto custom-scroll p-2">
+        <div class="w-full h-full overflow-y-auto p-2">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">
                     <h1 class="text-xl font-semibold leading-6 capitalize text-primary">

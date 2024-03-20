@@ -572,8 +572,9 @@
     }
 }
 
-body {
+html {
     font-family: 'Gotham';
+    font-size: 12px;
 }
 
 /* swal2 */

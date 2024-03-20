@@ -124,7 +124,7 @@ const option = ref('total')
 
 <template>
     <AppLayout>
-        <div class="h-[85vh] overflow-y-auto px-3">
+        <div class="h-full w-full overflow-y-auto px-3">
             <div class="sm:max-h-[20vh] py-1">
                 <span class="sm:flex justify-between mb-2">
                     <p class="text-xl flex items-center font-semibold leading-6 capitalize text-primary">

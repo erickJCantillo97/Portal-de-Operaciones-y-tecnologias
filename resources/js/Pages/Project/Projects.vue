@@ -189,7 +189,7 @@ const goToProjectOverview = (event, data) => {
 
 <template>
     <AppLayout>
-        <div class="w-full h-[89vh] overflow-y-auto">
+        <div class="w-full h-full overflow-y-auto">
             <CustomDataTable title="Proyectos" :filterButtons="filterButtons" :data="projects" :rows-default="100"
                 :columnas="columnas" :actions="buttons" @addDoc="addDoc" @addAct="addAct" @editClic="editClic"
                 @deleteClic="deleteClic" @goToProjectOverview="goToProjectOverview">

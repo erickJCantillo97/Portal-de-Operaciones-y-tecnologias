@@ -230,7 +230,7 @@ const buttons = [
 </script>
 <template>
     <AppLayout>
-        <div class="w-full overflow-y-auto custom-scroll">
+        <div class="w-full h-full overflow-y-auto">
             <!--DATATABLE-->
             <div class="h-[89vh] overflow-y-auto">
                 <CustomDataTable title="Mi personal" :loading :rowsDefault="20" :data="miPersonal" :columnas="columnas"

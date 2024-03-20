@@ -25,7 +25,7 @@ const navigation = [
 </script>
 <template>
     <AppLayout>
-        <div class="p-2 lg:grid lg:grid-cols-12 lg:gap-x-2">
+        <div class=" h-full w-full p-2 lg:grid lg:grid-cols-12 lg:gap-x-2">
             <aside class="px-2 py-6 sm:px-6 lg:col-span-2 lg:px-0 lg:py-0">
                 <nav class="space-y-1">
                     <a v-for="item in navigation" :key="item.name"

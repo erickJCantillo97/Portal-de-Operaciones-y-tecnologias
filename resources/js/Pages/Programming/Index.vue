@@ -37,7 +37,7 @@ function format24h(hora) {
 
 <template>
     <AppLayout>
-        <div class="h-[89vh] ">
+        <div class="h-full w-full">
             <div class="flex justify-between items-center px-4 h-min">
                 <span class="text-xl font-bold text-primary h-full items-center flex">
                     <p> Programación de Actividades </p>

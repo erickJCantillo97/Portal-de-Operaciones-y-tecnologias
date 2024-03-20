@@ -369,7 +369,7 @@ const active = ref(0);
 
 <template>
     <AppLayout>
-        <div class="h-[89vh] overflow-y-auto flex flex-col ">
+        <div class="h-full w-full overflow-y-auto flex flex-col ">
             <div class="flex justify-between items-center px-2 h-[8vh]">
                 <span class="w-full flex space-x-1">
                     <Button v-tooltip="'Volver a proyectos'" text raised rounded icon="fa-solid fa-arrow-left"

@@ -112,7 +112,7 @@ const clearErrors = () => {
 </script>
 <template>
     <AppLayout>
-        <div class="flex justify-between w-full px-4 py-1">
+        <div class="flex h-full justify-between w-full px-4 py-1">
             <div></div>
             <h2 class="text-xl font-bold text-center text-primary">Crear un Cronograma</h2>
             <div class="justify-end">
