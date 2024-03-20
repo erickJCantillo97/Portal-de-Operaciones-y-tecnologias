@@ -211,7 +211,6 @@ const beforeChange = async () => {
             } else {
                 await axios.put(route('projects.update', formData.value.id), formData.value)
                     .then((res) => {
-
                         toast.add({ severity: 'success', group: 'customToast', text: 'Actualizado', life: 2000 });
                         switchTabsStates = true
                     })
