@@ -178,21 +178,20 @@ const formColision = ref({
     details: [] //arreglo especificando el id de la tabla schedule_times EJ: [1,2,3,4]
 });
 
-const form = ref({
+const formEditHour = ref({
     userName: null, //nombre de la persona
     timeName: null, // nombre del horario personalizado
-    startShift: null,// hora inicio
-    endShift: null,// hora fin
+    startShift: '07:00',// hora inicio
+    endShift: '16:30',// hora fin
     timeBreak: null,
     schedule_time: null,
     schedule: null, // id del schedule/cronograma (TABLA SCHEDULES)
     idUser: null, // Id de la persona seleccionada (COLUMNA EMPLOYEE_ID DE LA TABLA SCHEDULES)
     date: date, // fecha seleccionada en el calendario
-    personalized: false, // Seleccionar turno => false, Seleccionar Horario Personalizado => false, Nuevo horario personalizado =>true
+    personalized: true, // Seleccionar turno => false, Seleccionar Horario Personalizado => false, Nuevo horario personalizado =>true
     type: 1,// Solo el => 1; Resto de la actividad => 2; Rango de fechas => 3; Fechas específicos => 4
     details: [],
     loading: false,
-    type: ''
     /* la propiedad details depende de la propiedad type, es decir:
         si la opción type es 1, en details se debe enviar la fecha (Solo el =>) ej: ['2024-03-07']
         si la opcion type es 2, en details se debe enviar el id de la actividad seleccionada (EN BASE DE DATOS ES LA TABLA TASK) ej: [7683]
@@ -209,10 +208,10 @@ const toggle = (horario, data, option) => {
     editHorario.value = horario
     editHorario.value.data = data
     editHorario.value.option = option
-    form.value.idUser = data.employee_id
-    form.value.schedule = data.id
-    form.value.schedule_time = horario.id
-    form.value.userName = data.name
+    formEditHour.value.idUser = data.employee_id
+    formEditHour.value.schedule = data.id
+    formEditHour.value.schedule_time = horario.id
+    formEditHour.value.userName = data.name
     nuevoHorario.value = {}
     modhours.value = true
 }
@@ -223,29 +222,29 @@ const filter = ref('');
 const selectDays = ref()
 const tabActive = ref()
 const save = async () => {
-    form.value.loading = true
-    if (!form.value.personalized) {
-        form.value.startShift = new Date(nuevoHorario.value.startShift).toLocaleString('es-CO',
+    formEditHour.value.loading = true
+    if (tabActive.value != 2) {
+        formEditHour.value.startShift = new Date(nuevoHorario.value.startShift).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-        form.value.endShift = new Date(nuevoHorario.value.endShift).toLocaleString('es-CO',
+        formEditHour.value.endShift = new Date(nuevoHorario.value.endShift).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-        form.value.timeBreak = parseFloat(nuevoHorario.value.timeBreak)
+        formEditHour.value.timeBreak = parseFloat(nuevoHorario.value.timeBreak)
     } else {
-        form.value.startShift = new Date(form.value.startShift).toLocaleString('es-CO',
+        formEditHour.value.startShift = new Date(formEditHour.value.startShift).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-        form.value.endShift = new Date(form.value.endShift).toLocaleString('es-CO',
+        formEditHour.value.endShift = new Date(formEditHour.value.endShift).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-        form.value.timeBreak = parseFloat(form.value.timeBreak)
+        formEditHour.value.timeBreak = parseFloat(formEditHour.value.timeBreak)
     }
 
-    if (form.value.type == 1) {
-        form.value.details[0] = date.value
-    } else if (form.value.type == 2) {
-        form.value.details[0] = form.value.schedule
+    if (formEditHour.value.type == 1) {
+        formEditHour.value.details[0] = date.value
+    } else if (formEditHour.value.type == 2) {
+        formEditHour.value.details[0] = formEditHour.value.schedule
     }
     else {
         selectDays.value.forEach((day, index) => {
-            form.value.details[index] = new Date(day).toISOString().split("T")[0]
+            formEditHour.value.details[index] = new Date(day).toISOString().split("T")[0]
         })
     }
     //aplicar validaciones de campos requeridos (TODOS LOS CAMPOS SON REQUERIDOS)
@@ -253,14 +252,14 @@ const save = async () => {
     NOTA:
     Se debe cambiar el campo de hora inicio y hora fin a un formato de 24 horas.
     */
-    await axios.post(route(editHorario.value.option != 'delete' ? 'programming.saveCustomizedSchedule' : 'programming.removeSchedule'), form.value)
+    await axios.post(route(editHorario.value.option != 'delete' ? 'programming.saveCustomizedSchedule' : 'programming.removeSchedule'), formEditHour.value)
         .then((res) => {
             if (res.data.status) {
                 modhours.value = false
-                listaDatos.value[form.value.schedule] = res.data.task
-                editHorario.value.data.hora_inicio = form.value.startShift
-                editHorario.value.data.hora_fin = form.value.endShift
-                getAssignmentHoursForEmployee((form.value.idUser))
+                listaDatos.value[formEditHour.value.schedule] = res.data.task
+                editHorario.value.data.hora_inicio = formEditHour.value.startShift
+                editHorario.value.data.hora_fin = formEditHour.value.endShift
+                getAssignmentHoursForEmployee((formEditHour.value.idUser))
                 toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
             }
             else {
@@ -272,7 +271,7 @@ const save = async () => {
                 // toast.add({ severity: 'danger', group: "customToast", text: res.data.mensaje, life: 2000 })
             }
             console.log(res);
-            form.value.loading = false
+            formEditHour.value.loading = false
         }).catch((error) => {
             console.log(error)
             toast.add({ severity: 'danger', group: "customToast", text: 'Error no controlado', life: 2000 })
@@ -286,7 +285,7 @@ const save = async () => {
 const confirm1 = (event, data) => {
     confirm.require({
         target: event.currentTarget,
-        message: '¿Esta totalmente seguro?',
+        message: '¿Está totalmente seguro?',
         icon: 'pi pi-exclamation-triangle text-danger',
         rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
         acceptClass: 'p-button-sm p-button-success',
@@ -381,7 +380,7 @@ const confirm1 = (event, data) => {
                                         class="p-1 mt-1 border-2 rounded-md">
                                         <div class="flex items-center justify-between w-full ">
                                             <p class="text-sm font-semibold ">{{ item.name }}</p>
-                                            <button v-tooltip.top="'Eliminar de la Actividad'"
+                                            <button v-tooltip.top="'Eliminar de la Actividad'" v-if="item.is_my_personal"
                                                 @click="toggle(slotProps.option, item, 'delete')">
                                                 <i
                                                     class="fa-solid fa-circle-xmark text-danger hover:animate-pulse hover:scale-125" />
@@ -391,32 +390,19 @@ const confirm1 = (event, data) => {
                                             <div class="grid w-full grid-cols-3 gap-2">
                                                 <div v-for="horario in item.schedule_times"
                                                     class="flex items-center justify-between px-1 py-1 text-green-900 bg-green-200 rounded-md cursor-default group">
-                                                    <button v-tooltip.bottom="'En desarrollo'"
+                                                    <button v-tooltip.bottom="'En desarrollo'" v-if="item.is_my_personal"
                                                         class="hidden group-hover:flex"
                                                         @click="console.log('En desarrollo')">
                                                         <i
                                                             class="fa-solid fa-trash-can text-danger text-xs hover:animate-pulse hover:scale-125"></i>
                                                     </button>
-                                                    <!-- <button v-tooltip.bottom="'En desarrollo'"
-                                                        class="hidden group-hover:flex"
-                                                        @click="console.log('En desarrollo')"
-                                                        v-if="item.schedule_times.length > 1">
-                                                        <i
-                                                            class="fa-solid fa-trash-can text-danger text-xs hover:animate-pulse hover:scale-125"></i>
-                                                    </button> -->
-                                                    <!-- <button v-tooltip.bottom="'Eliminar'"
-                                                        class="hidden group-hover:flex"
-                                                        @click="deleteSchedule(slotProps.option, index, item)" v-else>
-                                                        <i
-                                                            class="fa-solid fa-trash-can text-danger text-xs hover:animate-pulse hover:scale-125"></i>
-                                                    </button> -->
                                                     <span class="w-full text-xs tracking-tighter text-center">
                                                         {{ format24h(horario.hora_inicio) }}
                                                         {{ format24h(horario.hora_fin) }}
                                                     </span>
-                                                    <button v-tooltip.bottom="'Cambiar horario'"
+                                                    <button v-tooltip.bottom="'Cambiar horario'"v-if="item.is_my_personal"
                                                         class="hidden group-hover:flex"
-                                                        @click="optionSelectHours = 'select'; toggle(horario, item)">
+                                                        @click="optionSelectHours = 'select'; toggle(horario, item, 'modify')">
                                                         <i
                                                             class="fa-solid fa-pencil text-primary text-xs hover:animate-pulse hover:scale-125"></i>
                                                     </button>
@@ -508,6 +494,7 @@ const confirm1 = (event, data) => {
         :closeOnEscape="false"
         :titulo="editHorario?.option != 'delete' ? 'Modificar horario de ' + editHorario?.data.name : 'Eliminando a ' + editHorario?.data.name + 'de la actividad ' + editHorario?.task">
         <template #body>
+            <!-- {{console.log(editHorario)}} -->
             <form @submit.prevent="save" class="pb-2">
                 <div v-if="editHorario?.option != 'delete'" class="flex flex-col gap-1">
                     <div class="flex items-center justify-between col-span-3 ">
@@ -518,8 +505,7 @@ const confirm1 = (event, data) => {
                             {{ format24h(editHorario.hora_fin) }}
                         </p>
                     </div>
-                    <TabView @tab-click="form.personalized = tabActive == 2 ? true : false"
-                        v-model:activeIndex="tabActive" class="border rounded-md p-1" :pt="{
+                    <TabView v-model:activeIndex="tabActive" class="border rounded-md p-1" :pt="{
                                 nav: '!flex !justify-between',
                                 panelContainer: '!p-1'
                             }">
@@ -540,24 +526,25 @@ const confirm1 = (event, data) => {
                                 root: 'w-full',
                                 headerTitle: '!w-full !flex !justify-center',
                             }">
-                            <div class="h-48 m-1">
+                            <div class="h-52 space-y-2 m-1 mt-3">
                                 <span class="flex gap-2 items-center">
                                     <label class="-mb-0.5" for="switch1">Guardar en personalizados?</label>
-                                    <InputSwitch inputId="switch1" />
+                                    <InputSwitch inputId="switch1" v-model="formEditHour.personalized" />
                                 </span>
-                                <CustomInput v-model:input="form.timeName" label="Nombre" type="text" id="name"
-                                    placeholder="Nombre del horario" :required="tabActive == 2" />
+                                <CustomInput v-if="formEditHour.personalized" v-model:input="formEditHour.timeName"
+                                    label="Nombre" type="text" id="name" placeholder="Nombre del horario"
+                                    :required="tabActive == 2" />
                                 <span class="grid grid-cols-3 gap-x-1">
-                                    <CustomInput v-model:input="form.startShift" label="Hora inicio" type="time"
+                                    <CustomInput v-model:input="formEditHour.startShift" label="Hora inicio" type="time"
                                         :stepMinute="30" id="start" placeholder="Hora de inicio"
-                                        :required="tabActive == 2" />
-                                    <CustomInput v-model:input="form.endShift" label="Hora fin" type="time" id="end"
-                                        :stepMinute="30" placeholder="Hora de fin" :required="tabActive == 2" />
-                                    <CustomInput v-model:input="form.timeBreak" label="Descanso" type="number"
+                                        :required="tabActive === 2" />
+                                    <CustomInput v-model:input="formEditHour.endShift" label="Hora fin" type="time"
+                                        id="end" :stepMinute="30" placeholder="Hora de fin"
+                                        :required="tabActive === 2" />
+                                    <CustomInput v-model:input="formEditHour.timeBreak" label="Descanso" type="number"
                                         suffix=" Hora" id="break" placeholder="Descanso en horas"
-                                        :required="tabActive == 2" />
+                                        :required="tabActive === 2" />
                                 </span>
-                                <!-- {{ form }} -->
                             </div>
                         </TabPanel>
                     </TabView>
@@ -566,18 +553,20 @@ const confirm1 = (event, data) => {
                 <span class="flex items-center p-2 gap-4">
                     <div v-for="category in [{ name: 'Solo el ' + date, key: 1 }, { name: 'Resto de la actividad', key: 2 }, { name: 'Rango de fechas', key: 3 }, { name: 'Fechas específicos', key: 4 }]"
                         :key="category.key" class="flex items-center">
-                        <RadioButton v-model="form.type" :inputId="category.key + category.name" name="dynamic"
-                            :value="category.key" @click="form.details = []" />
+                        <RadioButton v-model="formEditHour.type" :inputId="category.key + category.name" name="dynamic"
+                            :value="category.key" @click="formEditHour.details = []" />
                         <label :for="category.key" class="ml-1 mb-0">{{ category.name }}</label>
                     </div>
                 </span>
                 <span class="w-full grid grid-cols-4 justify-end gap-5 items-center">
-                    <Calendar v-if="form.type == 3 || form.type == 4" show-icon v-model="selectDays" class="col-span-3"
-                        :selectionMode="form.type == 3 ? 'range' : 'multiple'" :manualInput="false" :pt="{
+                    <Calendar v-if="formEditHour.type == 3 || formEditHour.type == 4" show-icon v-model="selectDays"
+                        class="col-span-3" :selectionMode="formEditHour.type == 3 ? 'range' : 'multiple'"
+                        :manualInput="false" :pt="{
                                 root: '!w-full',
                                 input: '!h-8'
                             }" />
-                    <Button type="submit" class="col-start-4" :loading="form.loading"
+                    <Button type="submit" class="col-start-4" :loading="formEditHour.loading"
+                        :disabled="(!nuevoHorario & tabActive != 2)"
                         :severity="editHorario?.option != 'delete' ? 'success' : 'danger'"
                         :icon="editHorario?.option != 'delete' ? 'fa-solid fa-floppy-disk' : 'fa-solid fa-trash-can'"
                         :label="editHorario?.option != 'delete' ? 'Guardar' : 'Eliminar'" />
