@@ -108,9 +108,9 @@ const navigation = [
             },
             {
                 name: 'Programación',
-                href: 'programming.create',
+                href: 'programming',
                 // dev: true
-                show: hasPermission('programming create'),
+                show: hasPermission('programming read'),
             },
             {
                 name: 'Parte Actual',
