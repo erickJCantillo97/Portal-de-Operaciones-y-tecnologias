@@ -212,6 +212,7 @@ class ProgrammingController extends Controller
                     'endDate' => $task['endDate'],
                     'percentDone' => $task['percentDone'],
                     'project' => $task->project->name,
+                    'shift' => $task->project->shift? Shift::where('id',$task->project->shift)->first():null,
                     'startDate' => $task['startDate'],
                 ];
             }),
