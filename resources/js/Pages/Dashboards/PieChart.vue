@@ -72,7 +72,7 @@ const option = ref({
 
 <style scoped>
 .chart {
-    height: 30vh;
+    height: 32vh;
     /* El gráfico ocupa todo el espacio disponible */
 }
 </style>
