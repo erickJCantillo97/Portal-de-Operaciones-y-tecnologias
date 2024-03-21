@@ -297,7 +297,10 @@ async function confirm1(event, scheduleTime, option, data) {
         formColision.value.actionType = 1
         formColision.value.endSchedule=data.find((a)=>{a.status==null}) == undefined
         let status = resolveCollision(formColision)
-        if (!status) { } else {
+        if (!status) {
+            scheduleTime.status = undefined
+            toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+        } else {
             toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
         }
     } else if (option == 'remplace') {
@@ -305,7 +308,10 @@ async function confirm1(event, scheduleTime, option, data) {
         formColision.value.actionType = 2
         formColision.value.endSchedule=data.find((a)=>{a.status==null}) == undefined
         let status = resolveCollision(formColision)
-        if (!status) { } else {
+        if (!status) {
+            scheduleTime.status = undefined
+            toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+        } else {
             toast.add({ severity: 'info', group: "customToast", text: 'Remplazada', life: 3000 });
         }
     } else {
@@ -347,7 +353,7 @@ async function confirm1(event, scheduleTime, option, data) {
                     let error
                     data.forEach((scheduleD) => {
                         const endIndex = scheduleD.findLastIndex((element) => element.status == null)
-                        scheduleD.forEach((scheduleT) => {
+                        scheduleD.forEach((scheduleT, index) => {
                             if (scheduleT.status == null) {
                                 formColision.value.endSchedule = endIndex == index ? true : false
                                 formColision.value.actionType = 1
@@ -370,7 +376,7 @@ async function confirm1(event, scheduleTime, option, data) {
                 } else if (option == 'omitAllDay') {
                     let error
                     const endIndex = data.findLastIndex((element) => element.status == null)
-                    await data.forEach((scheduleT) => {
+                    await data.forEach((scheduleT, index) => {
                         if (scheduleT.status == null) {
                             formColision.value.endSchedule = endIndex == index ? true : false
                             formColision.value.actionType = 2
@@ -392,7 +398,7 @@ async function confirm1(event, scheduleTime, option, data) {
                 } else if (option == 'remplaceAllDay') {
                     let error
                     const endIndex = data.findLastIndex((element) => element.status == null)
-                    await data.forEach((scheduleT) => {
+                    await data.forEach((scheduleT, index) => {
                         if (scheduleT.status == null) {
                             formColision.value.endSchedule = endIndex == index ? true : false
                             formColision.value.actionType = 1
