@@ -1,5 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useCommonUtilities } from '@/composable/useCommonUtilities'
+import OverlayPanel from 'primevue/overlaypanel'
+import Loading from '@/Components/Loading.vue'
+
+const { truncateString } = useCommonUtilities()
 
 const props = defineProps({
   project: Number
@@ -70,18 +75,22 @@ const formatDate = (date) => {
   return `${year}-${month}-${day}`
 }
 
-onMounted(() => {
-  for (let day of daysOfWeek.value) {
+const loadingWeekTable = ref(false)
+onMounted(async () => {
+  loadingWeekTable.value = true
+  for (const day of daysOfWeek.value) {
+    const formattedDate = getFormattedDate(day);
     dates.value.push({
       name: day,
-      date: getFormattedDate(day)
-    })
-    tasks.value[getFormattedDate(day)] = []
-    for (let division of divisions.value) {
-      tasks.value[getFormattedDate(day)][division.short] = [];
-      getTask(getFormattedDate(day), division)
+      date: formattedDate
+    });
+    tasks.value[formattedDate] = {}
+    for (const division of divisions.value) {
+      tasks.value[formattedDate][division.short] = []
+      await getTask(formattedDate, division);
     }
   }
+  loadingWeekTable.value = false
 })
 
 const tasks = ref([])
@@ -96,13 +105,22 @@ const getTask = async (day, division) => {
 
   return day
 }
+
+//#region OverlayPanel
+const op = ref()
+const toggle = (event, data) => {
+
+  op.value.toggle(event)
+}
+//#endregion
 </script>
 <template>
-  <div>
+  <Loading v-if="loadingWeekTable"
+    :message="`Por favor espere un momento mientras se cargan las actividades. \n Puede tardar unos minutos`" />
+  <div v-else>
     <div class="grid grid-cols-6 w-full">
       <div class="text-center border border-gray-600 bg-blue-300 font-extrabold">
         <p>División</p>
-        <div class="loader-cell"></div>
       </div>
       <!-- Iterar los días de la semana -->
       <div class="border border-gray-600 text-center bg-blue-300 font-extrabold" v-for="(day, index) in dates"
@@ -116,7 +134,7 @@ const getTask = async (day, division) => {
       </div>
     </div>
     <!-- Iterar las divisiones -->
-    <div class="grid grid-cols-6 w-full items-center" v-for="division in    divisions   " :key="division.name">
+    <div class="grid grid-cols-6 w-full items-center" v-for="division in divisions" :key="division.name">
       <div class="text-center  border-b p-5 border-gray-600 h-[9.4vh]">
         <p>{{ division.name }}</p>
         <p>{{ division.short }}</p>
@@ -129,12 +147,24 @@ const getTask = async (day, division) => {
           <ul v-for="(task, index) in tasks[day.date][division.short]" class="block text-left truncate ">
             <li class="flex items-center space-x-2">
               <i class="fa-solid fa-caret-right"></i>
-              <span>
-                {{ task.name }}</span>
+              <button class="cursor-pointer text-blue-600 underline" @click="toggle($event, data)"
+                v-tooltip.left="`${task.name} \n (Click para ver detalles)`">
+                {{ truncateString(task.name, 40) }}
+              </button>
             </li>
           </ul>
         </div>
       </div>
     </div>
   </div>
+
+  <!--OverlayPanel-->
+  <OverlayPanel ref="op" class="size-72" :pt="{
+    content: '!p-0'
+  }">
+    <div class="size-12">
+      lo que sea
+      <!-- {{ truncateString(task.name, 40) }} -->
+    </div>
+  </OverlayPanel>
 </template>
