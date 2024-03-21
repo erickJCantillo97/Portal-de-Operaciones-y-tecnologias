@@ -52,6 +52,9 @@ class PersonalScheduleDayJob implements ShouldQueue
                     'hora_inicio' => $this->task->project->shiftObject->startShift,
                     'hora_fin' => $this->task->project->shiftObject->endShift,
                 ]);
+            } else {
+                if ($horarios[0]->hora_incio > $this->task->project->shiftObject->startShift) {
+                }
             }
         } else {
             for ($i = 0; $i < count($horarios); $i++) {
@@ -62,18 +65,7 @@ class PersonalScheduleDayJob implements ShouldQueue
                                 'hora_inicio' => $this->task->project->shiftObject->startShift,
                             ]);
                         } else {
-                            $schedule = Schedule::firstOrNew([
-                                'task_id' => $this->task->id,
-                                'employee_id' => $this->personal_id,
-                                'name' => $this->persona->Nombres_Apellidos,
-                                'fecha' => Carbon::parse($this->date)->format('Y-m-d'),
-                            ]);
-                            $schedule->save();
-                            ScheduleTime::create([
-                                'schedule_id' => $schedule->id,
-                                'hora_inicio' => Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i'),
-                                'hora_fin' => $horarios[0]->hora_incio,
-                            ]);
+                            programming(Carbon::parse($this->date)->format('Y-m-d'), $this->personal_id, Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i'), $horarios[0]->hora_incio, $this->task->id, $this->persona->Nombres_Apellidos);
                         }
                     }
                 }

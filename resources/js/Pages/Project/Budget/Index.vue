@@ -132,8 +132,8 @@ const option = ref('total')
                     </p>
                     <span class="flex flex-col sm:flex-row items-center sm:space-x-2">
                         <p>Selecciona un proyecto</p>
-                        <Dropdown :options="projects" class="w-96" optionLabel="name" @change="projectSelect()"
-                            showClear v-model="project" :pt="{
+                        <Dropdown :options="projects" class="w-96" optionLabel="name" filter="true"
+                            @change="projectSelect()" showClear v-model="project" :pt="{
                             root: '!h-8',
                             input: '!py-0 !flex !items-center !text-sm !font-normal',
                             item: '!py-1 !px-3 !text-sm !font-normal',
