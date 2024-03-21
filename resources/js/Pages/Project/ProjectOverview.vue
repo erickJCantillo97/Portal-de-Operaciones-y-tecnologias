@@ -288,9 +288,8 @@ td {
   font-size: .85rem;
 }
 </style>
-
 <template>
-  <main class="!main-project-overview flex min-h-screen max-w-full flex-col justify-center overflow-hidden">
+  <main class="flex min-h-screen max-w-full flex-col justify-center overflow-hidden">
     <section class="space-y-6  pt-0.5 md:space-x-6 h-screen">
       <!--Project Details-->
       <TabView @tab-click="toggleTabClicked($event)" :scrollable="true" :pt="{

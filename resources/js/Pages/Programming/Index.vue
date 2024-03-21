@@ -1,10 +1,10 @@
 <script setup>
 import { Link } from '@inertiajs/vue3'
+import { ref } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import WeekTable from '@/Components/WeekTable.vue'
 import Dropdown from 'primevue/dropdown';
-import { onMounted, onUnmounted, ref } from 'vue'
 import NoContentToShow from '@/Components/NoContentToShow.vue'
+import WeekTable from '@/Pages/Programming/WeekTable.vue'
 /**
  * The above code is a JavaScript function that takes a time string in 24-hour format (e.g., "13:30")
 // and converts it to a 12-hour format with AM/PM indicator. It creates a new Date object with the time
@@ -22,13 +22,11 @@ const props = defineProps({
     projects: Array,
 })
 
-
 const loading = ref(false)
 const project = ref()
 
 //#endregion
 </script>
-
 <template>
     <AppLayout>
         <div class="h-full w-full">
