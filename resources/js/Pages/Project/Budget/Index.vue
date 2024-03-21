@@ -124,7 +124,7 @@ const option = ref('total')
 
 <template>
     <AppLayout>
-        <div class="h-[85vh] overflow-y-auto px-3">
+        <div class="h-full w-full overflow-y-auto px-3">
             <div class="sm:max-h-[20vh] py-1">
                 <span class="sm:flex justify-between mb-2">
                     <p class="text-xl flex items-center font-semibold leading-6 capitalize text-primary">
@@ -132,8 +132,8 @@ const option = ref('total')
                     </p>
                     <span class="flex flex-col sm:flex-row items-center sm:space-x-2">
                         <p>Selecciona un proyecto</p>
-                        <Dropdown :options="projects" class="w-96" optionLabel="name" @change="projectSelect()"
-                            showClear v-model="project" :pt="{
+                        <Dropdown :options="projects" class="w-96" optionLabel="name" filter="true"
+                            @change="projectSelect()" showClear v-model="project" :pt="{
                             root: '!h-8',
                             input: '!py-0 !flex !items-center !text-sm !font-normal',
                             item: '!py-1 !px-3 !text-sm !font-normal',

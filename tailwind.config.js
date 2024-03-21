@@ -22,7 +22,7 @@ export default {
                 },
                 GECON: { DEFAULT: "#22c55e" },
                 secondary: {
-                    DEFAULT: "#805dca",
+                    DEFAULT: "#dadafc",
                     light: "#ebe4f7",
                     "dark-light": "rgb(128 93 202 / 15%)",
                 },

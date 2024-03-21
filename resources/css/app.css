@@ -572,6 +572,11 @@
     }
 }
 
+html {
+    font-family: 'Gotham';
+    font-size: 12px;
+}
+
 /* swal2 */
 .swal2-container .swal2-close {
     @apply text-white hover:text-dark-light focus:shadow-none;
@@ -908,6 +913,12 @@ h4.statusmessage {
     min-width: 300%;
     height: auto;
     z-index: -1;
+}
+
+.fondo {
+    right: 0;
+    bottom: 0;
+    position: absolute;
 }
 
 ::-webkit-scrollbar {

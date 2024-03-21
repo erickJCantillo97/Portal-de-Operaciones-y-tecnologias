@@ -142,7 +142,7 @@ const save = () => {
 </script>
 <template>
     <AppLayout>
-        <div class="">
+        <div class="h-full w-full">
             <TabView class="tabview-custom" :scrollable="true" :pt="{
                 nav: '!flex !justify-between'
             }">

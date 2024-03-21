@@ -117,7 +117,7 @@ return [
     */
 
     'markdown' => [
-        'theme' => 'assignmentsTools',
+        'theme' => 'mail',
 
         'paths' => [
             resource_path('views/vendor/mail'),

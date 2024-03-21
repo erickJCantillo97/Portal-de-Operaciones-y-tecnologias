@@ -1,5 +1,5 @@
 <script setup>
-const { byteSizeFormatter, currencyFormat } = useCommonUtilities()
+const { byteSizeFormatter,currencyFormat } = useCommonUtilities()
 import { useCommonUtilities } from '@/composable/useCommonUtilities';
 import { FilterMatchMode } from 'primevue/api'
 import { onMounted, ref } from 'vue';
@@ -170,7 +170,7 @@ const formatDate = (date) => {
         <template #header>
             <div class="space-y-1">
                 <span class="flex justify-between ">
-                    <p class="text-xl h-ful flex items-center font-semibold leading-6 capitalize text-primary">
+                    <p class="text-lg h-ful flex items-center font-semibold leading-6 capitalize text-primary">
                         {{ title }}
                     </p>
                     <span class="space-x-1">
@@ -194,7 +194,7 @@ const formatDate = (date) => {
                         </div>
                         <div class="w-full overflow-x-auto">
                             <ButtonGroup v-if="props.filterButtons && filterOK" class="flex">
-                                <Button v-for="button in props.filterButtons" class="!text-xs sm:!text-md font-bold"
+                                <Button v-for="button in props.filterButtons" class="font-bold truncate"
                                     :label="button.label + ': ' + getTotalStatus(button.field, button.data)"
                                     :severity=button.severity
                                     @click="filters[button.field].value == button.data ? filters[button.field].value = null : filters[button.field].value = button.data"
@@ -310,9 +310,9 @@ const formatDate = (date) => {
                     </p>
                     <p v-else-if="col.type == 'currency'" class="text-right">
                         {{
-                        currencyFormat(data[col.field], !Array.isArray(data[col.field]) ? 'COP'
-                        : data[col.field][1])
-                        }}
+        currencyFormat(data[col.field], !Array.isArray(data[col.field]) ? 'COP'
+            : data[col.field][1]).trim()
+    }}
                     </p>
                     <p v-else-if="col.type == 'customtag'"
                         :class="col.severitys.find((severity) => severity.text == data[col.field]).class"

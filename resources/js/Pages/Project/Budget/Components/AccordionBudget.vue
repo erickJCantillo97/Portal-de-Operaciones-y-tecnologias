@@ -147,11 +147,13 @@ const props = defineProps({
         }}
                             </p>
                             <p class="h-full flex items-center justify-end"
-                                :class="((parseInt(operacion.materials) + parseInt(operacion.labor) + parseInt(operacion.services)) - parseInt(operacion.materials_ejecutados + operacion.labor_ejecutados + operacion.services_ejecutados)) < 0 ? 'text-danger' : ''">
+                                :class="(((parseInt(operacion.materials) + parseInt(operacion.labor) +
+            parseInt(operacion.services)) - (parseInt(operacion.materials_ejecutados) + parseInt(
+                operacion.labor_ejecutados) + parseInt(operacion.services_ejecutados)))) < 0 ? 'text-danger' : ''">
                                 {{
         currencyFormat(((parseInt(operacion.materials) + parseInt(operacion.labor) +
-                                parseInt(operacion.services)) - parseInt(operacion.materials_ejecutados +
-                                operacion.labor_ejecutados + operacion.services_ejecutados)))
+                                parseInt(operacion.services)) - (parseInt(operacion.materials_ejecutados) +parseInt(
+                                operacion.labor_ejecutados) + parseInt(operacion.services_ejecutados))))
                                 }}
                             </p>
                         </span>

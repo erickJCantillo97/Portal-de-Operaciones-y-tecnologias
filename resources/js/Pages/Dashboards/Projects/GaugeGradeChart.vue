@@ -82,17 +82,17 @@ const option = ref({
       },
       axisLabel: {
         color: '#464646',
-        fontSize: 12,
+        fontSize: 10,
         distance: -30,
         rotate: 'tangential',
 
       },
       title: {
         offsetCenter: [0, '30%'],
-        fontSize: 15
+        fontSize: 12
       },
       detail: {
-        fontSize: 14,
+        fontSize: 12,
         offsetCenter: [0, 0],
         formatter: function (value) {
           return new Intl.NumberFormat().format(Number(value).toFixed(3))
@@ -112,7 +112,7 @@ const option = ref({
 </script>
 <style scoped>
 .chart {
-  height: 15rem;
+  height: 32vh;
   width: 100%;
 }
 </style>

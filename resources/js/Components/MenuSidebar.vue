@@ -1,10 +1,10 @@
 <template>
     <div
-        class="sidebar fixed min-h-screen h-full top-0 bottom-0 w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] z-20 transition-all duration-300">
+        class="sidebar fixed min-h-screen h-full top-0 bottom-0 w-[200px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] z-20 transition-all duration-300">
         <div class="h-full bg-white dark:bg-dark">
             <div class="flex items-center justify-center px-2 py-3">
                 <div class="flex items-center main-logo shrink-0">
-                    <ApplicationLogo class="justify-center" :letras="true" :width-logo="50" :height-logo="50" />
+                    <ApplicationLogo class="justify-center" :letras="true" :width-logo="40" :height-logo="40" />
                 </div>
             </div>
 
@@ -14,8 +14,9 @@
                         <ul>
                             <li v-for="item in navigation" :key="item.name" class=" nav-item">
                                 <Link v-if="!item.children" v-show="item.show" :href="route(item.href)" class="group">
-                                <div class="flex items-center group-hover:!text-primary">
-                                    <component :is="item.icon" class="w-6 h-6 text-gray-400 shrink-0" aria-hidden="true" />
+                                <div class="flex pl-3 space-x-2 items-center group-hover:!text-primary">
+                                    <component :is="item.icon" class="w-8 h-8 text-gray-400 shrink-0"
+                                        aria-hidden="true" />
                                     <h3 class="pl-3 text-black dark:text-[#506690] dark:group-hover:text-white">
                                         {{ item.name }}
                                     </h3>
@@ -24,9 +25,9 @@
                                 <button v-else type="button" v-show="item.show" class="w-full nav-link group"
                                     :class="{ active: activeDropdown === item.name }"
                                     @click="activeDropdown === item.name ? (activeDropdown = null) : (activeDropdown = item.name)">
-                                    <div class="flex items-center">
-                                        <component :is="item.icon" class="w-6 h-6 text-gray-100 shrink-0 dark:text-white"
-                                            aria-hidden="true" />
+                                    <div class="pl-3 space-x-2 flex items-center">
+                                        <component :is="item.icon"
+                                            class="w-8 h-8 text-gray-100 shrink-0 dark:text-white" aria-hidden="true" />
                                         <h3 class="pl-3  text-black dark:text-[#506690] dark:group-hover:text-white">
                                             {{ item.name }}
                                         </h3>
@@ -43,7 +44,8 @@
                                                 <Link :href="!children.dev ? route(children.href) : route('dashboard')">
                                                 <span class="">
                                                     <p :class="children.dev ? '-mb-2' : ''">{{ children.name }}</p>
-                                                    <small v-if="children.dev" class="text-xs text-red-300 animate-pulse">
+                                                    <small v-if="children.dev"
+                                                        class="text-xs text-red-300 animate-pulse">
                                                         En desarrollo
                                                     </small>
                                                 </span>
@@ -108,7 +110,7 @@ const navigation = [
                 name: 'Programación',
                 href: 'programming',
                 // dev: true
-                show: hasPermission('programming create'),
+                show: hasPermission('programming read'),
             },
             {
                 name: 'Parte Actual',
@@ -265,6 +267,12 @@ const navigation = [
                 href: 'assignmentTool.index',
                 dev: false,
                 show: hasPermission('assignmentTool read'),
+            },
+            {
+                name: 'requirements',
+                href: 'requirements.index',
+                dev: false,
+                show: true
             },
         ],
         icon: WrenchScrewdriverIcon,

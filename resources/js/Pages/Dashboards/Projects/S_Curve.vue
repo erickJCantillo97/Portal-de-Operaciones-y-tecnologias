@@ -51,7 +51,7 @@ Valores formatter:
 */
 const option = ref({
   title: {
-    text: 'Curva S'
+    text: 'Curva S',
   },
   toolbox: {
     show: true,
@@ -81,7 +81,10 @@ const option = ref({
   xAxis: {
     type: 'category',
     boundaryGap: false,
-    data: labels
+    data: labels,
+    axisLabel: {
+      fontSize: 8,
+    }
   },
   yAxis: {
     show: false,
@@ -102,13 +105,13 @@ const option = ref({
       type: 'line'
     }
   ],
-  width: 300,
+  width: 250,
   height: 100,
 })
 </script>
 <style scoped>
 .chart {
-  height: 12rem;
+  height: 32vh;
   width: 100%;
   /* El gr4fico ocupa todo el espacio disponible */
 }

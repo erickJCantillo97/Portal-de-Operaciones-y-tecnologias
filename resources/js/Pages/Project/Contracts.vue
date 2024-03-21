@@ -128,7 +128,7 @@ const showClic = (event) => {
 
 <template>
     <AppLayout>
-        <div class="h-[89vh] overflow-y-auto">
+        <div class="h-full w-full overflow-y-auto">
             <CustomDataTable :data="contracts" :rowsDefault="20" title="Contratos" :columnas="columnas"
                 :actions="buttons" @edit="editItem" @delete="del" @rowClic="showClic">
                 <template #buttonHeader>

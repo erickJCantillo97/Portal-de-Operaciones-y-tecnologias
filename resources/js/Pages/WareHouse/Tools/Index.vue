@@ -146,7 +146,7 @@ const save = () => {
 </script>
 <template>
     <AppLayout>
-        <div class="w-full h-[89vh] overflow-y-auto">
+        <div class="w-full h-full overflow-y-auto">
             <CustomDataTable :rowsDefault="100" title="Herramientas y equipos" :data="tools" :columnas="columnas"
                 :actions="actions" @edit="showModal" @goToToolOverview="goToToolOverview" @cloneItem="showModalClone"
                 :filterButtons="filterButtons">

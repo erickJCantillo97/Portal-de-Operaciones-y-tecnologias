@@ -14,5 +14,11 @@ class Operation extends Model implements Auditable
 
     public $timestamps = false;
 
+    protected $casts = [
+        'materials_ejecutados' => 'integer',
+        'labors_ejecutados' => 'integer',
+        'services_ejecutados' => 'integer',
+    ];
+
     protected $guarded = [];
 }

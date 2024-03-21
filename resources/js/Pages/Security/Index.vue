@@ -191,7 +191,7 @@ const permissionModal = ref(false)
 </script>
 <template>
     <AppLayout>
-        <div class="h-[89vh] overflow-y-auto">
+        <div class="h-full w-full overflow-y-auto">
             <div class="px-4 space-y-2 flex ">
                 <div>
                     <h1 class="text-3xl font-bold text-primary">Roles</h1>

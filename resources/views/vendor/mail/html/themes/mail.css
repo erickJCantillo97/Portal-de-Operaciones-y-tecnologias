@@ -115,12 +115,13 @@ img {
 .container_logo {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .logo_cotecmar {
-  height: 30%;
-  width: 30%;
-  margin-left: 70%;
+  height: 20%;
+  width: 20%;
+  margin-top: -10%;
 }
 
 .logo_gobierno {
@@ -171,6 +172,7 @@ img {
 /* Inner Footer */
 .inner-footer {
   text-align: left;
+  margin-top: -10%;
 }
 
 /* Footer */
@@ -315,4 +317,9 @@ img {
   font-size: .8rem;
   font-style: italic;
   color: #74787e;
+}
+
+.primary {
+  color: #2E3092;
+  text-transform: uppercase;
 }

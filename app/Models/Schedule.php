@@ -15,6 +15,9 @@ class Schedule extends Model
 
     protected $appends = ['is_my_personal'];
     protected $guarded = [];
+    protected $casts = [
+        'is_my_personal' => 'boolean',
+    ];
 
     public function scheduleTimes()
     {
@@ -23,7 +26,7 @@ class Schedule extends Model
 
     public function task()
     {
-        return $this->belongsTo(Task::class,);
+        return $this->belongsTo(Task::class);
     }
 
     public function getIsMyPersonalAttribute()
@@ -32,6 +35,6 @@ class Schedule extends Model
         return in_array(
             $this->employee_id,
             $personal
-        ) ? '1' : '0';
+        ) ? true : false;
     }
 }

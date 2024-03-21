@@ -11,6 +11,8 @@ use App\Models\VirtualTask;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Spatie\Holidays\Countries\Colombia;
+use Spatie\Holidays\Holidays;
 
 class ScheduleController extends Controller
 {
@@ -50,6 +52,16 @@ class ScheduleController extends Controller
 
     public function get(Project $project)
     {
+        // $holidays = collect(Holidays::for(Colombia::make())->get())->map(function ($day) {
+
+        //     return [
+        //         "startDate" => $day['date'],
+        //         "endDate" => $day['date'],
+        //         "isWorking" => false,
+        //         'name' => $day['name']
+        //     ];
+        // });
+
         $project->programming_resources = 'CARGO';
         $personal = getPersonalUser()->map(function ($p) {
             return [
@@ -70,12 +82,28 @@ class ScheduleController extends Controller
         return response()->json([
             'success' => true,
             'proyect' => ['rows' => [
-                'calendar' => 'general',
+                'calendar' => 10,
                 'startDate' => '2022-05-31',
                 'hoursPerDay' => 9,
                 'daysPerWeek' => 5,
                 'daysPerMonth' => 20,
+
             ]],
+            'calendars' => [
+                "rows" => [
+                    [
+                        'id' => 10,
+                        'name' => 'GENERAL',
+                        "intervals" => [
+                            [
+                                "recurrentStartDate" => "on Sat at 0:00",
+                                "recurrentEndDate"   => "on Mon at 0:00",
+                                "isWorking"          => false
+                            ]
+                        ]
+                    ]
+                ]
+            ],
             'tasks' => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
             'dependencies' => ['rows' => Dependecy::get()],
             'resources' => ['rows' => $recursos],

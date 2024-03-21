@@ -20,7 +20,8 @@ import ToggleButton from 'primevue/togglebutton'
 const props = defineProps({
     project: Object,
     contracts: Array,
-    gerentes: Array
+    gerentes: Array,
+    weekTasks: Array
 })
 
 //#region Referencias (v-model)
@@ -211,7 +212,6 @@ const beforeChange = async () => {
             } else {
                 await axios.put(route('projects.update', formData.value.id), formData.value)
                     .then((res) => {
-
                         toast.add({ severity: 'success', group: 'customToast', text: 'Actualizado', life: 2000 });
                         switchTabsStates = true
                     })
@@ -369,7 +369,7 @@ const active = ref(0);
 
 <template>
     <AppLayout>
-        <div class="h-[89vh] overflow-y-auto flex flex-col ">
+        <div class="h-full w-full overflow-y-auto flex flex-col ">
             <div class="flex justify-between items-center px-2 h-[8vh]">
                 <span class="w-full flex space-x-1">
                     <Button v-tooltip="'Volver a proyectos'" text raised rounded icon="fa-solid fa-arrow-left"

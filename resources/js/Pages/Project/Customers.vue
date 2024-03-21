@@ -89,6 +89,7 @@ const deleteItem = (event, data) => {
 
 const columnas = [
     { field: 'name', header: 'Nombre', filter: true, sortable: true },
+    { field: 'email', header: 'Correo Electronico', filter: true, sortable: true },
     { field: 'country', header: 'Pais', filter: true, sortable: true },
     { field: 'type', header: 'Tipo', filter: true, sortable: true },
 ]
@@ -101,7 +102,7 @@ const buttons = [
 
 <template>
     <AppLayout>
-        <div class="h-[89vh] overflow-y-auto">
+        <div class="h-full w-full overflow-y-auto">
             <CustomDataTable :data="customers" :rows-default="100" title="Clientes" cacheName="customers"
                 :columnas="columnas" :actions="buttons" @showShips="showShips" @deleteItem="deleteItem"
                 @editItem="editItem">
@@ -125,8 +126,10 @@ const buttons = [
         <template #body>
             <CustomInput label="Nombre del Cliente" placeholder="Escriba el nombre del Cliente" id="name"
                 v-model:input="formData.customer.name" :error="router.page.props.errors.name" />
-            <CustomInput label="Pais" placeholder="Seleccione un pais" id="country" type="country" v-model:input="country"
-                :error="router.page.props.errors.country" />
+            <CustomInput label="Correo Electronico" placeholder="Por favor escriba un Correo" id="email" type="email"
+                v-model:input="formData.customer.email" :error="router.page.props.errors.email" />
+            <CustomInput label="Pais" placeholder="Seleccione un pais" id="country" type="country"
+                v-model:input="country" :error="router.page.props.errors.country" />
             <CustomInput label="Tipo de Cliente" placeholder="Selecciona un Tipo de Cliente"
                 :options="['GOBIERNO', 'ARMADOR CIVIL', 'FUERZAS ARMADAS']" id="type" type="dropdown"
                 v-model:input="formData.customer.type" :error="router.page.props.errors.type" />

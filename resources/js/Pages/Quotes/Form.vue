@@ -217,7 +217,7 @@ const toggle = (event) => {
 </script>
 <template>
     <AppLayout>
-        <div class="overflow-y-scroll space-y-2">
+        <div class=" h-full w-full overflow-y-scroll space-y-2">
             <span>
                 <span class="flex justify-between p-1">
                     <p class="text-primary font-bold text-xl">

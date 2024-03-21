@@ -38,6 +38,10 @@ const props = defineProps({
     autoZIndex: {
         type: Boolean,
         default: true
+    },
+    severity:{
+        type:String,
+        default:'primary'
     }
 })
 
@@ -47,7 +51,7 @@ const visible = defineModel('visible')
 <template>
     <Dialog v-model:visible="visible" :maximizable="maximizable" modal :closable :closeOnEscape :autoZIndex :baseZIndex
         :style="{ width: props.width }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" :pt="{
-            header: { class: '!bg-primary !h-10' },
+            header: { class: '!bg-'+ severity +' !h-10' },
             closeButtonIcon: { class: 'text-white' },
             content: { class: '!pb-0 !pt-2' },
             footer: { class: '!p-2 !h-min !items-end !flex !justify-end' }
