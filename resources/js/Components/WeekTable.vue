@@ -102,6 +102,7 @@ const getTask = async (day, division) => {
     <div class="grid grid-cols-6 w-full">
       <div class="text-center border border-gray-600 bg-blue-300 font-extrabold">
         <p>División</p>
+        <div class="loader-cell"></div>
       </div>
       <!-- Iterar los días de la semana -->
       <div class="border border-gray-600 text-center bg-blue-300 font-extrabold" v-for="(day, index) in dates"
@@ -124,7 +125,7 @@ const getTask = async (day, division) => {
       <div class="border-l border-b border-gray-600 text-center h-[9.4vh]" v-for="day in dates"
         :class="tasks[day.date][division.short].length == 0 ? 'bg-gray-300' : 'bg-white'">
         <div class="text-sm space-y-1 " v-if="tasks[day.date]"
-        :class="$page.props.auth.user.oficina == division.short ? 'bg-blue-500' : ''">
+          :class="$page.props.auth.user.oficina == division.short ? 'bg-blue-500' : ''">
           <ul v-for="(task, index) in tasks[day.date][division.short]" class="block text-left truncate ">
             <li class="flex items-center space-x-2">
               <i class="fa-solid fa-caret-right"></i>
