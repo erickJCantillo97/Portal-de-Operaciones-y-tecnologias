@@ -5,6 +5,9 @@ use App\Models\Labor;
 use App\Models\Personal\Employee;
 use App\Models\Personal\Personal;
 use App\Models\Personal\WorkingTeams;
+use App\Models\Schedule;
+use App\Models\ScheduleTime;
+use App\Models\VirtualTask;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use PhpParser\Node\Expr\Empty_;
@@ -182,4 +185,21 @@ function getWorkingDays(string $date, int $Workingdays = 5)
         //     'date' => $date
         // ]);
     }
+}
+
+function programming($date, $user, $star, $end, $task, $name)
+{
+
+    $schedule = Schedule::firstOrNew([
+        'task_id' => $task,
+        'employee_id' => $user,
+        'name' => $name,
+        'fecha' => $date,
+    ]);
+    $schedule->save();
+    ScheduleTime::create([
+        'schedule_id' => $schedule->id,
+        'hora_inicio' => $star,
+        'hora_fin' => $end,
+    ]);
 }

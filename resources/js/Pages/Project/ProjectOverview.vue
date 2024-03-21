@@ -126,7 +126,7 @@ const getBudges = async () => {
       budge.value = res.data
       pieChartSerie.value.push({
         type: 'pie',
-        radius: '70%',
+        radius: '55%',
         center: ['50%', '55%'],
         color: ['#81BE50', '#2E3092'],
         is3D: true,
@@ -155,7 +155,7 @@ const getBudges = async () => {
               b: {
                 align: 'center',
                 color: '#6E7079',
-                fontSize: 10,
+                fontSize: 8,
                 fontWeight: 'bold',
                 lineHeight: 15
               },
@@ -164,6 +164,7 @@ const getBudges = async () => {
               },
               per: {
                 color: '#000',
+                fontSize: 8,
                 fontWeight: 'bold',
                 padding: [3, 4],
                 borderRadius: 4
@@ -206,6 +207,7 @@ const getBudges = async () => {
               },
               per: {
                 color: '#000',
+                fontSize: 8,
                 fontWeight: 'bold',
                 padding: [3, 4],
                 borderRadius: 4
@@ -286,7 +288,6 @@ td {
   font-size: .85rem;
 }
 </style>
-
 <template>
   <main class="flex min-h-screen max-w-full flex-col justify-center overflow-hidden">
     <section class="space-y-6  pt-0.5 md:space-x-6 h-screen">
@@ -385,10 +386,10 @@ td {
       }">
                 <Accordion @tab-click="handleTabClick($event)">
                   <AccordionTab :activeIndex="0" v-for="(ship, index) in ships " :key="ship.id" :pt="{
-                      headerAction: ({ props, parent }) => ({
-                        class: ['!sticky !top-0', panelClass(props, parent, index)]
-                      })
-                    }">
+        headerAction: ({ props, parent }) => ({
+          class: ['!sticky !top-0', panelClass(props, parent, index)]
+        })
+      }">
 
                     <template #header>
                       <div class=" align-items-center gap-2 w-full block space-y-2">

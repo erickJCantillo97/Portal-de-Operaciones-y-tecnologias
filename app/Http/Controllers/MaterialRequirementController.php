@@ -2,25 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Imports\UsersImport;
-use App\Models\Gantt\Task;
-use App\Models\VirtualTask;
+use App\Models\WareHouse\MaterialRequirement;
 use Exception;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
 
-class TaskController extends Controller
+class MaterialRequirementController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
-        $tasks = VirtualTask::where('project_id', $request->id)->get();
-
-        return response()->json([
-            'tasks' => $tasks,
-        ]);
+        //
     }
 
     /**
@@ -40,9 +33,9 @@ class TaskController extends Controller
             //
         ]);
 
-        try {
-            Task::create($validateData);
-        } catch (Exception $e) {
+        try{
+            MaterialRequirement::create($validateData);
+        }catch(Exception $e){
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
     }
@@ -50,15 +43,15 @@ class TaskController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(VirtualTask $task, Request $request)
+    public function show(MaterialRequirement $materialRequirement)
     {
-        $p = Schedule::where();
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Task $task)
+    public function edit(MaterialRequirement $materialRequirement)
     {
         //
     }
@@ -66,15 +59,15 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Task $task)
+    public function update(Request $request, MaterialRequirement $materialRequirement)
     {
         $validateData = $request->validate([
             //
         ]);
 
-        try {
-            $task->update($validateData);
-        } catch (Exception $e) {
+        try{
+            $materialRequirement->update($validateData);
+        }catch(Exception $e){
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
@@ -82,21 +75,12 @@ class TaskController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Task $task)
+    public function destroy(MaterialRequirement $materialRequirement)
     {
-        try {
-            $task->delete();
-        } catch (Exception $e) {
+        try{
+            $materialRequirement->delete();
+        }catch(Exception $e){
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
-    }
-
-    public function excelImport(Request $request)
-    {
-
-        Excel::import(new UsersImport($request->project_id), $request->file);
-
-        return back()->with('message', 'Archivo cargado correctamente');
-
     }
 }

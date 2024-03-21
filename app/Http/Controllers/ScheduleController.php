@@ -52,15 +52,15 @@ class ScheduleController extends Controller
 
     public function get(Project $project)
     {
-        $holidays = collect(Holidays::for(Colombia::make())->get())->map(function ($day) {
+        // $holidays = collect(Holidays::for(Colombia::make())->get())->map(function ($day) {
 
-            return [
-                "startDate" => $day['date'],
-                "endDate" => $day['date'],
-                "isWorking" => false,
-                'name' => $day['name']
-            ];
-        });
+        //     return [
+        //         "startDate" => $day['date'],
+        //         "endDate" => $day['date'],
+        //         "isWorking" => false,
+        //         'name' => $day['name']
+        //     ];
+        // });
 
         $project->programming_resources = 'CARGO';
         $personal = getPersonalUser()->map(function ($p) {

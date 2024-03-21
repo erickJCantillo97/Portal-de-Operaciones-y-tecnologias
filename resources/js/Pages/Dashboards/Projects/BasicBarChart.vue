@@ -81,7 +81,7 @@ const option = ref({
 </script>
 <style scoped>
 .chart {
-  height: 180px;
+  height: 32vh;
   width: 100%;
 }
 </style>
