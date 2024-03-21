@@ -309,20 +309,21 @@ class ProgrammingController extends Controller
                 //SOLO EL $request->date
                 case 1:
                     $exist = DetailScheduleTime::where('fecha', $request->date)
-                        ->where('idSchedule', '!=', $request->schedule)
-                        ->where(function ($query) use ($request) {
-                            $query->where(function ($subquery) use ($request) {
-                                $subquery->whereTime('horaInicio', '<=', $request->startShift)
-                                    ->whereTime('horaFin', '>=', $request->startShift);
-                            })->orWhere(function ($subquery) use ($request) {
-                                $subquery->whereTime('horaInicio', '<=', $request->endShift)
-                                    ->whereTime('horaFin', '>=', $request->endShift);
-                            })->orWhere(function ($subquery) use ($request) {
-                                $subquery->whereBetween('horaInicio', [$request->startShift, $request->endShift])
-                                    ->whereBetween('horaFin', [$request->startShift, $request->endShift]);
-                            });
-                        })->get();
-                    // return $exist;
+                    ->where('idSchedule','!=',$request->schedule)
+                    ->where('idUsuario', $request->idUser)
+                    ->where(function($query) use ($request){
+                        $query->where(function($subquery) use ($request) {
+                            $subquery->whereTime('horaInicio', '<=', $request->startShift)
+                                ->whereTime('horaFin', '>=', $request->startShift);
+                    })->orWhere(function($subquery) use ($request) {
+                        $subquery->whereTime('horaInicio', '<=', $request->endShift)
+                                ->whereTime('horaFin', '>=',  $request->endShift);
+                    })->orWhere(function($subquery) use ($request) {
+                        $subquery->whereBetween('horaInicio', [$request->startShift,$request->endShift])
+                                ->whereBetween('horaFin', [$request->startShift,$request->endShift]);
+                    });
+                    })->get();
+                   // return $exist;
                     if ($exist->count() > 0) {
                         $exist = $exist->each(function ($DetailScheduleTime) {
                             $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
@@ -531,26 +532,30 @@ class ProgrammingController extends Controller
         }
     }
 
-    public function collisions(Request $request)
-    {
+    public function collisions(Request $request){
         try {
-            DB::beginTransaction();
             switch ($request->actionType) {
-                case 1:
-                    break;
-                case 2:
-                    //Reemplazar todo en una fecha
-                    break;
-                case 3:
-                    //reemplazar todas las colisiones
-                    break;
-                default:
-                    break;
+            case 1:
+                $schedule = Schedule::find(DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->idSchedule);
+                $schedule->task_id = $request->idTask;
+                $schedule->save();
+                $mensaje = 'Horario reemplazado';
+
+                if($request->endSchedule){
+                    
+                }
+                break;
+            case 2:
+                if($request->endSchedule){
+                    
+                }
+                break;
+            default:
+                break;
             }
             DB::commit();
-
-            return response()->json(['status' => true, 'mensaje' => 'Horario eliminado']);
-        } catch (Exception $e) {
+            return response()->json(['status' => true, 'mensaje'=> 'Horario eliminado']);
+        }catch (Exception $e) {
             DB::rollBack();
 
             return $e;
