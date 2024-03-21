@@ -268,6 +268,12 @@ const navigation = [
                 dev: false,
                 show: hasPermission('assignmentTool read'),
             },
+            {
+                name: 'requirements',
+                href: 'requirements.index',
+                dev: false,
+                show: true
+            },
         ],
         icon: WrenchScrewdriverIcon,
         current: false

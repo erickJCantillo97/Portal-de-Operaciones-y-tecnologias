@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Projects\Project;
 use App\Models\WareHouse\Requirement;
 use Exception;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class RequirementController extends Controller
 {
@@ -13,7 +15,10 @@ class RequirementController extends Controller
      */
     public function index()
     {
-        //
+        $projects = Project::active()->get();
+        return Inertia::render('WareHouse/Requirements/Index', [
+            'projects' => $projects
+        ]);
     }
 
     /**
@@ -33,10 +38,10 @@ class RequirementController extends Controller
             //
         ]);
 
-        try{
+        try {
             Requirement::create($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
     }
 
@@ -65,10 +70,10 @@ class RequirementController extends Controller
             //
         ]);
 
-        try{
+        try {
             $requirement->update($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -77,10 +82,10 @@ class RequirementController extends Controller
      */
     public function destroy(Requirement $requirement)
     {
-        try{
+        try {
             $requirement->delete();
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }
