@@ -29,9 +29,10 @@ const submit = () => {
 <template>
     <div class="min-w-full min-h-screen flex justify-center items-center text-white">
         <div class="max-w-sm md:min-w-max px-2">
-            <video autoplay="autoplay" class="video hidden md:block" loop="loop" muted="muted" preload="">
-                <source src="/video/video_margen_completa_home.mp4" type="video/mp4">
-            </video>
+            <!-- <video autoplay="autoplay" class="video hidden md:block" loop="loop" muted="muted" preload="">
+                <source src="/images/video_margen_completa_home.mp4" type="video/mp4">
+            </video> -->
+            <img src="images/fondo.webp" class="fondo" alt="login-background">
             <AuthenticationCard>
                 <template #logo>
                     <ApplicationLogo :height-logo=100 :width-logo=100 />
