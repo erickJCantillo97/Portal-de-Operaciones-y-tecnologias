@@ -272,6 +272,7 @@ class ProgrammingController extends Controller
                 case 1:
                     $exist = DetailScheduleTime::where('fecha', $request->date)
                     ->where('idSchedule','!=',$request->schedule)
+                    ->where('idUsuario', $request->idUser)
                     ->where(function($query) use ($request){
                         $query->where(function($subquery) use ($request) {
                             $subquery->whereTime('horaInicio', '<=', $request->startShift)
@@ -492,22 +493,29 @@ class ProgrammingController extends Controller
     }
 
     public function collisions(Request $request){
+        $mensaje ='';
         try {
-            DB::beginTransaction();
             switch ($request->actionType) {
             case 1:
+                $schedule = Schedule::find(DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->idSchedule);
+                $schedule->task_id = $request->idTask;
+                $schedule->save();
+                $mensaje = 'Horario reemplazado';
+
+                if($request->endSchedule){
+                    
+                }
                 break;
             case 2:
-                //Reemplazar todo en una fecha
-                break;
-            case 3:
-                //reemplazar todas las colisiones
+                if($request->endSchedule){
+                    
+                }
                 break;
             default:
                 break;
             }
             DB::commit();
-            return response()->json(['status' => true, 'mensaje'=> 'Horario eliminado']);
+            return response()->json(['status' => true, 'mensaje'=> $mensaje]);
         }catch (Exception $e) {
             DB::rollBack();
             return $e;
