@@ -20,7 +20,8 @@ import ToggleButton from 'primevue/togglebutton'
 const props = defineProps({
     project: Object,
     contracts: Array,
-    gerentes: Array
+    gerentes: Array,
+    weekTasks: Array
 })
 
 //#region Referencias (v-model)

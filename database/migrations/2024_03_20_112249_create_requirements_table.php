@@ -16,8 +16,9 @@ return new class extends Migration
             $table->string('consecutive')->unique();
             $table->integer('project_id')->index();
             $table->bigInteger('user_id')->index();
+            $table->bigInteger('intendente_id')->index();
             $table->string('document')->nullable();
-            $table->string('note')->nullable();
+            $table->string('note', 4000)->nullable();
             $table->string('bloque');
             $table->string('sistema_grupo');
             $table->date('preeliminar_date');
