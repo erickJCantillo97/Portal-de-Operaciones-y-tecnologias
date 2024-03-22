@@ -450,6 +450,7 @@ async function confirm1(event, scheduleTime, option, data) {
                     if (error) {
                         toast.add({ severity: 'warn', group: "customToast", text: 'Se omitieron todas las del dia con errores', life: 3000 });
                     } else {
+                        conflicts.value.splice(conflicts.value.indexOf(data), 1);
                         openConflict.value=conflicts.value.length>0
                         toast.add({ severity: 'success', group: "customToast", text: 'Se omitieron todas las del dia', life: 3000 });
                     }
@@ -473,6 +474,7 @@ async function confirm1(event, scheduleTime, option, data) {
                     if (error) {
                         toast.add({ severity: 'warn', group: "customToast", text: 'Se remplazaron todas las del dia con errores', life: 3000 });
                     } else {
+                        conflicts.value.splice(conflicts.value.indexOf(data), 1);
                         openConflict.value=conflicts.value.length>0
                         toast.add({ severity: 'success', group: "customToast", text: 'Se remplazaron todas las del dia', life: 3000 });
                     }
