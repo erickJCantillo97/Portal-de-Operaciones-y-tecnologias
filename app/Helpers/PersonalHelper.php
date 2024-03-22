@@ -163,27 +163,12 @@ function getWorkingDays(string $date, int $Workingdays = 5)
     //validamos que la fecha seleccionada no sea fin de semana
     if (in_array($dayName, $validDate)) {
         return false;
-        // return response()->json([
-        //     'status' => false,
-        //     'mensaje' => 'No se puede trabajar un fin de semana: '.$dayName,
-        //     'date' => $date
-        // ]);
     } else {
         //validamos que la fecha seleccionada no sea dia feriado
         if (Holidays::for('co')->isHoliday($date)) {
             return false;
-            // return response()->json([
-            //     'status' => false,
-            //     'mensaje' => 'No se puede trabajar un día feriado: '.Holidays::for('co')->getName($date),
-            //     'date' => $date
-            // ]);
         }
         return true;
-        // return response()->json([
-        //     'status' => true,
-        //     'mensaje' => 'Fecha valida',
-        //     'date' => $date
-        // ]);
     }
 }
 
