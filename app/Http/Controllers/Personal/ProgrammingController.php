@@ -547,7 +547,7 @@ class ProgrammingController extends Controller
     public function collisionsPerDay(Request $request){
         try {
             // return response()->json(['status' => false, 'mensaje'=> 'Mensaje desde el controlador']);
-            DB::beginTransaction();
+            //DB::beginTransaction();
             switch ($request->actionType) {
             case 1:
                 $schedule = Schedule::find(DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->idSchedule);
@@ -565,7 +565,7 @@ class ProgrammingController extends Controller
             default:
                 break;
             }
-            DB::commit();
+            // DB::commit();
             return response()->json(['status' => true, 'mensaje'=> 'Horario reemplazado']);
         }catch (Exception $e) {
             DB::rollBack();
