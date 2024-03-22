@@ -429,13 +429,12 @@ async function confirm1(event, scheduleTime, option, data) {
 };
 
 async function resolveCollision(form) {
-    // await axios.get(route('programming.collisions', form)).then((r) => {
-    //      return true
-    // }).catch((e) => {
-    //     console.log(e)
-    //     return false
-    // })
-    return true
+    await axios.post(route('programming.collisionsPerDay', form)).then((r) => {
+         return true
+    }).catch((e) => {
+        console.log(e)
+        return false
+    })
 }
 
 //#endregion

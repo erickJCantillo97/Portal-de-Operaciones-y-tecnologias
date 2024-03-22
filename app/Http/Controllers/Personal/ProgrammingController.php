@@ -56,11 +56,22 @@ class ProgrammingController extends Controller
             $codigo = 1001; //Codigo para el caso en se trate de programar alguien con mas de 9.5 horas
             $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
             $conflict = [];
+            $end_date = '';
             $project = Project::find(VirtualTask::find($request->task_id)->project_id);
             if ($hours < 9.5) {
                 $task = VirtualTask::find($validateData['task_id']);
                 $date = Carbon::parse($validateData['fecha']);
-                $end_date = Carbon::parse($task->endDate);
+                if($project->daysPerWeek == 5){
+                    $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::FRIDAY);
+                }else if($project->daysPerWeek == 6){
+                    $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::SATURDAY);
+                }else{
+                    $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::SUNDAY);
+                }
+                // if($end_date < Carbon::parse($validateData['fecha'])){
+                //     return $end_date." es menor";
+                // }
+                // return $end_date." es mayor";
                 do {
                     if (getWorkingDays($date->format('Y-m-d'), intval($project->daysPerWeek))) {
                         $exist = DetailScheduleTime::where('idUsuario', $validateData['employee_id'])
@@ -532,33 +543,34 @@ class ProgrammingController extends Controller
         }
     }
 
-    public function collisions(Request $request){
+    public function collisionsPerDay(Request $request){
         try {
+            return response()->json(['status' => false, 'mensaje'=> 'Mensaje desde el controlador']);
+            DB::beginTransaction();
+            $mensaje = '';
             switch ($request->actionType) {
             case 1:
                 $schedule = Schedule::find(DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->idSchedule);
                 $schedule->task_id = $request->idTask;
                 $schedule->save();
                 $mensaje = 'Horario reemplazado';
-
-                if($request->endSchedule){
-                    
+                if($request->endSchedule){   
+                    //aqui va el job de Erik
                 }
                 break;
             case 2:
                 if($request->endSchedule){
-                    
+                    //aqui va el job de Erik
                 }
                 break;
             default:
                 break;
             }
             DB::commit();
-            return response()->json(['status' => true, 'mensaje'=> 'Horario eliminado']);
+            return response()->json(['status' => true, 'mensaje'=> $mensaje]);
         }catch (Exception $e) {
             DB::rollBack();
-
-            return $e;
+            return response()->json(['status' => true, 'mensaje'=> 'Se ha generado un error: '.$e->getMessage()]);
         }
     }
 
