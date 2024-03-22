@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useCommonUtilities } from '@/composable/useCommonUtilities'
 import OverlayPanel from 'primevue/overlaypanel'
 import Loading from '@/Components/Loading.vue'
+import axios from 'axios';
 
 const { truncateString } = useCommonUtilities()
 
@@ -77,7 +78,6 @@ const formatDate = (date) => {
 
 const loadingWeekTable = ref(false)
 onMounted(async () => {
-  loadingWeekTable.value = true
   for (const day of daysOfWeek.value) {
     const formattedDate = getFormattedDate(day);
     dates.value.push({
@@ -90,7 +90,6 @@ onMounted(async () => {
       await getTask(formattedDate, division);
     }
   }
-  loadingWeekTable.value = false
 })
 
 const tasks = ref([])
@@ -108,16 +107,25 @@ const getTask = async (day, division) => {
 
 //#region OverlayPanel
 const op = ref()
-const toggle = (event, data) => {
-
+const task = ref({})
+const personals = ref()
+const toggle = (event, data, fecha) => {
+  console.log(fecha)
+  task.value = data
+  axios.get(route('get.schedule.task.date', {
+    task: data.id,
+    date: fecha
+  })).then((res) => {
+    personals.value = res.data.schedules
+  })
   op.value.toggle(event)
 }
 //#endregion
 </script>
 <template>
-  <Loading v-if="loadingWeekTable"
-    :message="`Por favor espere un momento mientras se cargan las actividades. \n Puede tardar unos minutos`" />
-  <div v-else>
+  <!-- <Loading v-if="loadingWeekTable"
+    :message="`Por favor espere un momento mientras se cargan las actividades. \n Puede tardar unos minutos`" /> -->
+  <div>
     <div class="grid grid-cols-6 w-full">
       <div class="text-center border border-gray-600 bg-blue-300 font-extrabold">
         <p>División</p>
@@ -140,30 +148,43 @@ const toggle = (event, data) => {
         <p>{{ division.short }}</p>
       </div>
       <!-- Iterar los días de la semana -->
-      <div class="border-l border-b border-gray-600 text-center h-[9.4vh]" v-for="day in dates"
-        :class="tasks[day.date][division.short].length == 0 ? 'bg-gray-300' : 'bg-white'">
-        <div class="text-sm space-y-1 " v-if="tasks[day.date]"
-          :class="$page.props.auth.user.oficina == division.short ? 'bg-blue-500' : ''">
-          <ul v-for="(task, index) in tasks[day.date][division.short]" class="block text-left truncate ">
-            <li class="flex items-center space-x-2">
-              <i class="fa-solid fa-caret-right"></i>
-              <button class="cursor-pointer text-blue-600 underline" @click="toggle($event, data)"
-                v-tooltip.left="`${task.name} \n (Click para ver detalles)`">
-                {{ truncateString(task.name, 40) }}
-              </button>
-            </li>
-          </ul>
+      <div v-for="day in dates" class="border-l border-b border-gray-600 text-center h-[9.4vh] ">
+        <div v-if="tasks[day.date][division.short] != undefined" class="size-full"
+          :class="tasks[day.date][division.short].length == 0 ? 'bg-gray-300' : 'bg-white'">
+          <div class="text-sm space-y-1 " v-if="tasks[day.date]"
+            :class="$page.props.auth.user.oficina == division.short ? 'bg-blue-500' : ''">
+            <ul v-for="(task, index) in tasks[day.date][division.short]" class="block text-left truncate ">
+              <li class="flex items-center space-x-2">
+                <i class="fa-solid fa-caret-right"></i>
+                <button class="cursor-pointer text-blue-600 underline" @click="toggle($event, task, day.date)"
+                  v-tooltip.left="`${task.name} \n (Click para ver detalles)`">
+                  {{ truncateString(task.name, 40) }}
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
+
       </div>
     </div>
   </div>
 
   <!--OverlayPanel-->
   <OverlayPanel ref="op" class="size-72" :pt="{
-    content: '!p-0'
-  }">
-    <div class="size-12">
-      lo que sea
+        content: '!p-0'
+      }">
+    <div class="p-4">
+      <div class="text-primary font-bold">
+        {{ task.process }}
+      </div>
+      <div class="text-primary">
+        {{ task.name }}
+      </div>
+      Avance {{ parseFloat(task.percentDone).toFixed(2) }} %
+      <div class="grid grid-cols-5 gap-2 ">
+        <img src="/images/men.gif" v-for="personal in personals" class="size-10 border rounded-full p-1" alt=""
+          v-tooltip.bottom="personal.name">
+      </div>
       <!-- {{ truncateString(task.name, 40) }} -->
     </div>
   </OverlayPanel>

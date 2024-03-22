@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Gantt\Task;
+use App\Models\Personal\Employee;
 use App\Models\Personal\Personal;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,5 +37,10 @@ class Schedule extends Model
             $this->employee_id,
             $personal
         ) ? true : false;
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class, 'Num_SAP', 'employee_id');
     }
 }

@@ -11,7 +11,6 @@ class Employee extends Model
 {
     public $timestamps = false;
     protected $guarded = [];
-
     protected $appends = [
         'short_name',
     ];
