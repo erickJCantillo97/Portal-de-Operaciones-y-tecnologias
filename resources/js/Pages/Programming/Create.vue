@@ -295,7 +295,7 @@ async function confirm1(event, scheduleTime, option, data) {
     if (option == 'omit') {
         scheduleTime.status = option
         formColision.value.actionType = 1
-        formColision.value.endSchedule=data.find((a)=>{a.status==null}) == undefined
+        formColision.value.endSchedule = data.find((a) => { a.status == null }) == undefined
         let status = resolveCollision(formColision)
         if (!status) {
             scheduleTime.status = undefined
@@ -306,7 +306,7 @@ async function confirm1(event, scheduleTime, option, data) {
     } else if (option == 'remplace') {
         scheduleTime.status = option
         formColision.value.actionType = 2
-        formColision.value.endSchedule=data.find((a)=>{a.status==null}) == undefined
+        formColision.value.endSchedule = data.find((a) => { a.status == null }) == undefined
         let status = resolveCollision(formColision)
         if (!status) {
             scheduleTime.status = undefined
@@ -444,7 +444,7 @@ async function resolveCollision(form) {
 
 <template>
     <AppLayout>
-        <div class="h-full w-full grid grid-cols-3">
+        <div class="h-full w-full grid grid-cols-3 ">
             <span class="col-span-2 space-y-1 pt-1 px-1">
                 <span class="flex justify-between items-center">
                     <span class="text-xl font-bold text-primary h-full items-center flex">
@@ -461,7 +461,7 @@ async function resolveCollision(form) {
                     </div>
                 </span>
                 <Listbox :options="tasks" :filterFields="['task', 'name', 'project']" class="col-span-2" filter :pt="{
-                                list: '!h-[73vh] !px-1 !snap-y !snap-mandatory',
+                                list: '!h-[76vh] !px-1 !snap-y !snap-mandatory',
                                 item: '!h-full !p-0 !rounded-md !snap-start !my-0.5',
                                 filterInput: '!h-8',
                                 header: '!p-1'
@@ -472,7 +472,7 @@ async function resolveCollision(form) {
                                 {{ slotProps.option.name }}
                             </p>
                             <p class="text-xs italic uppercase text-primary">{{ slotProps.option.project.name }}</p>
-                            <span class="grid items-center text-xs grid-cols-6">
+                            <span class="grid items-center text-xs grid-cols-6 space-x-2">
                                 <span class="grid grid-cols-3">
                                     <p class="font-bold ">I:</p>
                                     <p class="font-mono col-span-2 cursor-default" v-tooltip="'Fecha inicio'">
@@ -490,7 +490,7 @@ async function resolveCollision(form) {
                                 </span>
                                 <div class="text-center justify-center">
                                     <p class="font-bold">Horario predefinido</p>
-                                    <span class="flex items-center justify-center space-x-2">
+                                    <span class="flex items-center justify-center space-x-2 text-green-900 bg-green-200 rounded-md p-1">
                                         <p class="">
                                             {{ format24h(slotProps.option.shift.startShift) }}
                                         </p>
@@ -501,17 +501,17 @@ async function resolveCollision(form) {
                                 </div>
                                 <div class="text-center justify-center">
                                     <p class="font-bold">Valor estimado</p>
-                                    <p class="">$1.000.000
+                                    <p class="text-green-900 bg-green-200 rounded-md p-1">$1.000.000
                                     </p>
                                 </div>
                                 <div class="text-center justify-center">
                                     <p class="font-bold">Valor programado</p>
-                                    <p class="">$1.000.000
+                                    <p class="text-green-900 bg-green-200 rounded-md p-1">$1.000.000
                                     </p>
                                 </div>
                                 <div class="text-center justify-center">
                                     <p class="font-bold">Diferencia</p>
-                                    <p class="">$1.000.000
+                                    <p class="text-green-900 bg-green-200 rounded-md p-1">$1.000.000
                                     </p>
                                 </div>
                             </span>
@@ -587,35 +587,39 @@ async function resolveCollision(form) {
                 </Listbox>
             </span>
             <!--#region LISTA PERSONAL-->
-            <div class="row-span-2 rounded-lg">
-                <TabView class="tabview-custom" :scrollable="true" :pt="{
+            <div class="row-span-2 rounded-lg border">
+                <TabView class="tabview-custom h-full" :scrollable="true" :pt="{
                                 nav: '!flex !justify-between',
                                 panelContainer: '!p-1'
                             }">
                     <TabPanel header="Personas" :pt="{
-                                root: 'w-full',
+                                root: 'w-full !p-0',
+                                header:'!p-0 w-full',
                                 headerTitle: '!w-full !flex !justify-center',
                             }">
                         <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
                         <Loading v-if="loadingPerson" message="Cargando personas" />
                         <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy"
                             group-name="1" :get-child-payload="getChildPayload"
-                            class="!h-[72vh] space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
+                            class="h-[74vh] flex flex-col space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
                             <!-- <span v-for="item in personal"> -->
                             <Draggable v-for="item in personal"
                                 :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"
                                 :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
-                                class="snap-start rounded-xl shadow-md cursor-pointer hover:bg-blue-200 hover:ring-1 hover:ring-primary">
+                                class="snap-start rounded-xl shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
                                 <div class="grid grid-cols-5 gap-x-1 p-1">
                                     <img class="custom-image " :src="item.photo" align="center"
                                         onerror="this.src='/svg/cotecmar-logo.svg'" draggable="false"
                                         alt="profile-photo" />
-                                    <span class="col-span-3">
-                                        <p class="text-sm font-semibold truncate leading-6 text-gray-900">
+                                    <span class="col-span-3 flex flex-col justify-center">
+                                        <p class="text-sm font-semibold truncate  text-gray-900">
                                             {{ item.Nombres_Apellidos }}
                                         </p>
-                                        <p class="flex mt-1 text-xs truncate leading-5 text-gray-500">
+                                        <p class="flex mt-1 text-xs truncate  text-gray-500">
                                             {{ item.Cargo }}
+                                        </p>
+                                        <p class="flex mt-1 text-xs truncate  text-gray-500">
+                                            {{ item.Oficina }}
                                         </p>
                                     </span>
                                     <span class="flex items-center">
