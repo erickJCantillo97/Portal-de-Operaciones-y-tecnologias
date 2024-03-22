@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Personal;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\Personal\PersonalScheduleDayJob;
 use App\Models\Projects\Project;
 use App\Models\Schedule;
 use App\Models\ScheduleTime;
@@ -545,29 +546,27 @@ class ProgrammingController extends Controller
 
     public function collisionsPerDay(Request $request){
         try {
-            return response()->json(['status' => false, 'mensaje'=> 'Mensaje desde el controlador']);
+            // return response()->json(['status' => false, 'mensaje'=> 'Mensaje desde el controlador']);
             DB::beginTransaction();
-            $mensaje = '';
             switch ($request->actionType) {
             case 1:
                 $schedule = Schedule::find(DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->idSchedule);
                 $schedule->task_id = $request->idTask;
                 $schedule->save();
-                $mensaje = 'Horario reemplazado';
                 if($request->endSchedule){   
-                    //aqui va el job de Erik
+                    PersonalScheduleDayJob::dispatch($schedule->fecha,$schedule->idUsuario, $schedule->idTask);
                 }
                 break;
             case 2:
                 if($request->endSchedule){
-                    //aqui va el job de Erik
+                    PersonalScheduleDayJob::dispatch();
                 }
                 break;
             default:
                 break;
             }
             DB::commit();
-            return response()->json(['status' => true, 'mensaje'=> $mensaje]);
+            return response()->json(['status' => true, 'mensaje'=> 'Horario reemplazado']);
         }catch (Exception $e) {
             DB::rollBack();
             return response()->json(['status' => true, 'mensaje'=> 'Se ha generado un error: '.$e->getMessage()]);
