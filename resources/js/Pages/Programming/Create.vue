@@ -295,16 +295,24 @@ async function confirm1(event, scheduleTime, option, data) {
     if (option == 'omit') {
         scheduleTime.status = option
         formColision.value.actionType = 1
-        formColision.value.scheduleTime = scheduleTime.idScheduleTime
-        if (resolveCollision(formColision)) {
+        formColision.value.endSchedule=data.find((a)=>{a.status==null}) == undefined
+        let status = resolveCollision(formColision)
+        if (!status) {
+            scheduleTime.status = undefined
+            toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+        } else {
             toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
         }
     } else if (option == 'remplace') {
         scheduleTime.status = option
         formColision.value.actionType = 2
-        formColision.value.scheduleTime = scheduleTime.idScheduleTime
-        if (resolveCollision(formColision)) {
-            toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
+        formColision.value.endSchedule=data.find((a)=>{a.status==null}) == undefined
+        let status = resolveCollision(formColision)
+        if (!status) {
+            scheduleTime.status = undefined
+            toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+        } else {
+            toast.add({ severity: 'info', group: "customToast", text: 'Remplazada', life: 3000 });
         }
     } else {
         // formColision.value.details = data.map(obj => obj.idScheduleTime);
@@ -320,8 +328,10 @@ async function confirm1(event, scheduleTime, option, data) {
                 if (option == 'omitAll') {
                     let error
                     data.forEach((scheduleD) => {
-                        scheduleD.forEach((scheduleT) => {
+                        const endIndex = scheduleD.findLastIndex((element) => element.status == null)
+                        scheduleD.forEach((scheduleT, index) => {
                             if (scheduleT.status == null) {
+                                formColision.value.endSchedule = endIndex == index ? true : false
                                 formColision.value.actionType = 2
                                 formColision.value.scheduleTime = scheduleT.idScheduleTime
                                 let status = resolveCollision(formColision)
@@ -342,8 +352,10 @@ async function confirm1(event, scheduleTime, option, data) {
                 } else if (option == 'remplaceAll') {
                     let error
                     data.forEach((scheduleD) => {
-                        scheduleD.forEach((scheduleT) => {
+                        const endIndex = scheduleD.findLastIndex((element) => element.status == null)
+                        scheduleD.forEach((scheduleT, index) => {
                             if (scheduleT.status == null) {
+                                formColision.value.endSchedule = endIndex == index ? true : false
                                 formColision.value.actionType = 1
                                 formColision.value.scheduleTime = scheduleT.idScheduleTime
                                 let status = resolveCollision(formColision)
@@ -363,8 +375,10 @@ async function confirm1(event, scheduleTime, option, data) {
                     }
                 } else if (option == 'omitAllDay') {
                     let error
-                    await data.forEach((scheduleT) => {
+                    const endIndex = data.findLastIndex((element) => element.status == null)
+                    await data.forEach((scheduleT, index) => {
                         if (scheduleT.status == null) {
+                            formColision.value.endSchedule = endIndex == index ? true : false
                             formColision.value.actionType = 2
                             formColision.value.scheduleTime = scheduleT.idScheduleTime
                             let status = resolveCollision(formColision)
@@ -383,8 +397,10 @@ async function confirm1(event, scheduleTime, option, data) {
                     }
                 } else if (option == 'remplaceAllDay') {
                     let error
-                    data.forEach((scheduleT) => {
+                    const endIndex = data.findLastIndex((element) => element.status == null)
+                    await data.forEach((scheduleT, index) => {
                         if (scheduleT.status == null) {
+                            formColision.value.endSchedule = endIndex == index ? true : false
                             formColision.value.actionType = 1
                             formColision.value.scheduleTime = scheduleT.idScheduleTime
                             let status = resolveCollision(formColision)
@@ -769,9 +785,9 @@ async function resolveCollision(form) {
                                             <p class="flex space-x-2">
                                                 <span class="font-bold">Inicio: </span>
                                                 <span>
-                                                    {{ conflict.horaInicio.slice(0,
-                                conflict.horaInicio.lastIndexOf(':'))
-                                                    }}
+                                                    {{
+                                conflict.horaInicio.slice(0, conflict.horaInicio.lastIndexOf(':'))
+                            }}
                                                 </span>
                                             </p>
                                             <p class="flex space-x-2">
@@ -791,9 +807,9 @@ async function resolveCollision(form) {
                             </div>
                             <div v-if="conflict.status == null" class="flex p-2 justify-center items-center gap-2">
                                 <Button class="!w-full" label="Reemplazar" severity="warning"
-                                    @click="confirm1($event, conflict, 'remplace')" />
+                                    @click="confirm1($event, conflict, 'remplace', conflictForDay)" />
                                 <Button label="Omitir" class="!w-full" severity="success"
-                                    @click="confirm1($event, conflict, 'omit')" />
+                                    @click="confirm1($event, conflict, 'omit', conflictForDay)" />
                             </div>
                             <div v-else class="flex p-2 justify-between items-center">
                                 <p>{{ conflict.status == 'omit' ? 'Sin modificaciones' : 'Remplazada' }}</p>
