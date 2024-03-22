@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Imports\UsersImport;
+use App\Ldap\User;
 use App\Models\Gantt\Task;
+use App\Models\Schedule;
 use App\Models\VirtualTask;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -43,16 +46,40 @@ class TaskController extends Controller
         try {
             Task::create($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(VirtualTask $task, Request $request)
+    public function show(Request $request, VirtualTask $task)
     {
-        $p = Schedule::where();
+        $division = $request->division;
+        $date = Carbon::parse($request->date)->format('Y-m-d');
+        $schedules = Schedule::with('employee')->where('fecha', $date)->where('task_id', $task->id)->get();
+
+        return response()->json([
+            'schedules' => $schedules,
+        ]);
+        // $p = Schedule::where();
+    }
+    public function getScheduleTaskDate(Request $request)
+    {
+        $division = $request->division;
+        $date = Carbon::parse($request->date)->format('Y-m-d');
+        $schedules = Schedule::where('fecha', $date)->where('task_id', $request->task)->get()->map(
+            function ($e) {
+                return [
+                    'name' => $e['name'],
+                    'photo' =>  User::where('userprincipalname', $e['employee']['Correo'])->first()->photo(),
+                ];
+            }
+        );
+        return response()->json([
+            'schedules' => $schedules,
+        ]);
+        // $p = Schedule::where();
     }
 
     /**
@@ -75,7 +102,7 @@ class TaskController extends Controller
         try {
             $task->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -87,7 +114,7 @@ class TaskController extends Controller
         try {
             $task->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 
@@ -97,6 +124,5 @@ class TaskController extends Controller
         Excel::import(new UsersImport($request->project_id), $request->file);
 
         return back()->with('message', 'Archivo cargado correctamente');
-
     }
 }

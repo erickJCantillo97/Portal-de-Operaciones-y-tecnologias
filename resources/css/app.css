@@ -915,12 +915,6 @@ h4.statusmessage {
     z-index: -1;
 }
 
-.fondo {
-    right: 0;
-    bottom: 0;
-    position: absolute;
-}
-
 ::-webkit-scrollbar {
     width: 10px;
     height: 10px;

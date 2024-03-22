@@ -43,7 +43,7 @@ createInertiaApp({
                     },
                     inputtext: {
                         root: '!h-8'
-                    }
+                    },
                 }
             })
             .component('Button', Button)

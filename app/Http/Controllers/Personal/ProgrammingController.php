@@ -167,7 +167,7 @@ class ProgrammingController extends Controller
             VirtualTask::has('project')->has('task')
                 ->where('startDate', '<=', $date)
                 ->where('percentDone', '<', 100)
-                ->where('executor', 'like', '%'.$request->division.'%')
+                ->where('executor', 'like', '%' . $request->division . '%')
                 ->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) {
                     return [
                         'name' => $task['name'],
@@ -219,7 +219,7 @@ class ProgrammingController extends Controller
                         $query->where('enddate', '>', $date_end)
                             ->where('startdate', '<', $date_start);
                     });
-            })->whereNotIn('id', array_unique($taskWithSubTasks))->take(2)->get()->map(function ($task) {
+            })->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) {
                 return [
                     'name' => $task['name'],
                     'id' => $task['id'],
@@ -288,9 +288,9 @@ class ProgrammingController extends Controller
         $times = ScheduleTime::whereIn('schedule_id', $schedulesIds)->with('schedule', 'schedule.task', 'schedule.task.project')->get()->map(function ($time) use ($date) {
             return [
                 'id' => $time['id'],
-                'start' => $date.'T'.Carbon::parse($time['hora_inicio'])->format('H:i:s'),
-                'end' => $date.'T'.Carbon::parse($time['hora_fin'])->format('H:i:s'),
-                'title' => $time['schedule']['task']['name'].' - ('.$time['schedule']['task']['project']['name'].')',
+                'start' => $date . 'T' . Carbon::parse($time['hora_inicio'])->format('H:i:s'),
+                'end' => $date . 'T' . Carbon::parse($time['hora_fin'])->format('H:i:s'),
+                'title' => $time['schedule']['task']['name'] . ' - (' . $time['schedule']['task']['project']['name'] . ')',
                 'project' => $time['schedule']['task']['project']['name'],
             ];
         });
@@ -310,32 +310,32 @@ class ProgrammingController extends Controller
             if ($request->personalized) {
                 Shift::firstOrCreate([
                     'name' => $request->timeName,
-                    'startShift' => new DateTime('1970-01-01T'.$request->startShift.':00'),
-                    'endShift' => new DateTime('1970-01-01T'.$request->endShift.':00'),
+                    'startShift' => new DateTime('1970-01-01T' . $request->startShift . ':00'),
+                    'endShift' => new DateTime('1970-01-01T' . $request->endShift . ':00'),
                     'timeBreak' => $request->timeBreak,
                     'status' => false,
                     'user' => $request->idUser,
                 ]);
             }
             switch ($request->type) {
-                //SOLO EL $request->date
+                    //SOLO EL $request->date
                 case 1:
                     $exist = DetailScheduleTime::where('fecha', $request->date)
-                    ->where('idSchedule','!=',$request->schedule)
-                    ->where('idUsuario', $request->idUser)
-                    ->where(function($query) use ($request){
-                        $query->where(function($subquery) use ($request) {
-                            $subquery->whereTime('horaInicio', '<=', $request->startShift)
-                                ->whereTime('horaFin', '>=', $request->startShift);
-                    })->orWhere(function($subquery) use ($request) {
-                        $subquery->whereTime('horaInicio', '<=', $request->endShift)
-                                ->whereTime('horaFin', '>=',  $request->endShift);
-                    })->orWhere(function($subquery) use ($request) {
-                        $subquery->whereBetween('horaInicio', [$request->startShift,$request->endShift])
-                                ->whereBetween('horaFin', [$request->startShift,$request->endShift]);
-                    });
-                    })->get();
-                   // return $exist;
+                        ->where('idSchedule', '!=', $request->schedule)
+                        ->where('idUsuario', $request->idUser)
+                        ->where(function ($query) use ($request) {
+                            $query->where(function ($subquery) use ($request) {
+                                $subquery->whereTime('horaInicio', '<=', $request->startShift)
+                                    ->whereTime('horaFin', '>=', $request->startShift);
+                            })->orWhere(function ($subquery) use ($request) {
+                                $subquery->whereTime('horaInicio', '<=', $request->endShift)
+                                    ->whereTime('horaFin', '>=',  $request->endShift);
+                            })->orWhere(function ($subquery) use ($request) {
+                                $subquery->whereBetween('horaInicio', [$request->startShift, $request->endShift])
+                                    ->whereBetween('horaFin', [$request->startShift, $request->endShift]);
+                            });
+                        })->get();
+                    // return $exist;
                     if ($exist->count() > 0) {
                         $exist = $exist->each(function ($DetailScheduleTime) {
                             $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
@@ -578,7 +578,7 @@ class ProgrammingController extends Controller
         try {
             DB::beginTransaction();
             switch ($request->type) {
-                //SOLO EL $request->date
+                    //SOLO EL $request->date
                 case 1:
                     $schedule = Schedule::find($request->schedule);
                     $schedule->delete();
