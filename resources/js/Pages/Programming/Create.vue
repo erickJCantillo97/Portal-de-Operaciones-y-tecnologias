@@ -28,7 +28,7 @@ const openConflict = ref(false)
 
 //#region Draggable
 const listaDatos = ref({})
-const date = ref(new Date().toISOString().split("T")[0])
+const date = ref(new Date())
 const personal = ref()
 const tasks = ref([]);
 const loadingProgram = ref(true);
@@ -46,7 +46,7 @@ const onDrop = async (collection, dropResult) => {
     const { addedIndex, payload } = dropResult;
     if (addedIndex !== null) {
         loadingTask.value[collection.id] = true
-        await axios.post(route('programming.store'), { task_id: collection.id, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: date.value }).then((res) => {
+        await axios.post(route('programming.store'), { task_id: collection.id, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: date.value.toISOString().split("T")[0] }).then((res) => {
             listaDatos.value[collection.id] = res.data.task
             personalHours.value[(payload.Num_SAP)] = res.data.hours
             loadingTask.value[collection.id] = false
@@ -60,7 +60,7 @@ const onDrop = async (collection, dropResult) => {
 }
 
 const getAssignmentHoursForEmployee = (employee_id) => {
-    axios.get(route('get.assignment.hours', [date.value, employee_id])).then((res) => {
+    axios.get(route('get.assignment.hours', [date.value.toISOString().split("T")[0], employee_id])).then((res) => {
         personalHours.value[(employee_id)] = res.data;
     })
 }
@@ -69,7 +69,7 @@ const getAssignmentHoursAll = () => {
     personalHours.value = {}
     personal.value.forEach(
         element => {
-            axios.get(route('get.assignment.hours', [date.value, (element.Num_SAP)])).then((res) => {
+            axios.get(route('get.assignment.hours', [date.value.toISOString().split("T")[0], (element.Num_SAP)])).then((res) => {
                 personalHours.value[element.Num_SAP] = res.data;
             });
         })
@@ -106,28 +106,27 @@ onMounted(() => {
 
 // El código anterior es una función de Vue.js que recupera tareas según la opción seleccionada.
 const getTask = async (option) => {
-
     loadingProgram.value = true
     optionValue.value = option
     switch (option) {
         case 'today':
-            date.value = new Date().toISOString().split("T")[0];
+            date.value = new Date();
             break;
         case 'tomorrow':
             var tomorrow = new Date()
-            date.value = new Date(tomorrow.setDate(tomorrow.getDate() + 1)).toISOString().split("T")[0];
+            date.value = new Date(tomorrow.setDate(tomorrow.getDate() + 1));
             break;
         default:
             break;
     }
     tasks.value = [];
-    await axios.get(route('actividadesDeultimonivel', { date: date.value })).then((res) => {
+    await axios.get(route('actividadesDeultimonivel', { date: date.value.toISOString().split("T")[0] })).then((res) => {
         tasks.value = res.data
         loadingProgram.value = false;
     })
     tasks.value.forEach(element => {
         loadingTask.value[element.id] = true
-        axios.get(route('get.schedule.task', { task_id: element.id, date: date.value })).then((res) => {
+        axios.get(route('get.schedule.task', { task_id: element.id, date: date.value.toISOString().split("T")[0] })).then((res) => {
             listaDatos.value[element.id] = res.data.schedule
             loadingTask.value[element.id] = false
             loadingTasks.value = false
@@ -163,7 +162,7 @@ const rendersCalendars = ref(0)
 const employeeDialog = (item) => {
     open.value = true
     employee.value = item
-    axios.get(route('get.times.employees', { date: date.value, employee_id: item.Num_SAP }))
+    axios.get(route('get.times.employees', { date: date.value.toISOString().split("T")[0], employee_id: item.Num_SAP }))
         .then((res) => {
             events.value = res.data.times
             rendersCalendars.value++;
@@ -237,7 +236,7 @@ const save = async () => {
     }
 
     if (formEditHour.value.type == 1) {
-        formEditHour.value.details[0] = date.value
+        formEditHour.value.details[0] = date.value.toISOString().split("T")[0]
     } else if (formEditHour.value.type == 2) {
         formEditHour.value.details[0] = formEditHour.value.schedule
     }
@@ -291,34 +290,88 @@ async function confirm1(event, scheduleTime, option, data) {
     formColision.value.idTask = task.value.id
     formColision.value.startShift = format24h(task.value.shift.startShift)
     formColision.value.endShift = format24h(task.value.shift.endShift)
-
     if (option == 'omit') {
         scheduleTime.status = option
         formColision.value.actionType = 1
         formColision.value.endSchedule = data.find((a) => { a.status == null }) == undefined
-        let status = resolveCollision(formColision)
-        if (!status) {
-            scheduleTime.status = undefined
-            toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+        scheduleTime.status = undefined
+        if (formColision.value.endSchedule) {
+            confirm.require({
+                target: event.currentTarget,
+                message: '¿Está totalmente seguro? No se puede deshacer',
+                icon: 'pi pi-exclamation-triangle text-danger',
+                rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+                acceptClass: 'p-button-sm p-button-success',
+                rejectLabel: 'No',
+                acceptLabel: 'Sí',
+                accept: async () => {
+                    scheduleTime.status = option
+                    let status = resolveCollision(formColision)
+                    if (!status) {
+                        scheduleTime.status = undefined
+                        toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+                    } else {
+                        conflicts.value.splice(conflicts.value.indexOf(data), 1);
+                        openConflict.value=conflicts.value.length>0
+                        toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
+                    }
+                }, reject: () => {
+                    scheduleTime.status = undefined
+                    formColision.value.endSchedule = false
+                }
+            })
         } else {
-            toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
+            let status = resolveCollision(formColision)
+            if (!status) {
+                scheduleTime.status = undefined
+                toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+            } else {
+                toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
+            }
         }
     } else if (option == 'remplace') {
         scheduleTime.status = option
         formColision.value.actionType = 2
         formColision.value.endSchedule = data.find((a) => { a.status == null }) == undefined
-        let status = resolveCollision(formColision)
-        if (!status) {
-            scheduleTime.status = undefined
-            toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+        scheduleTime.status = undefined
+        if (formColision.value.endSchedule) {
+            confirm.require({
+                target: event.currentTarget,
+                message: '¿Está totalmente seguro? No se puede deshacer',
+                icon: 'pi pi-exclamation-triangle text-danger',
+                rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+                acceptClass: 'p-button-sm p-button-success',
+                rejectLabel: 'No',
+                acceptLabel: 'Sí',
+                accept: async () => {
+                    scheduleTime.status = option
+                    let status = resolveCollision(formColision)
+                    if (!status) {
+                        scheduleTime.status = undefined
+                        toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+                    } else {
+                        conflicts.value.splice(conflicts.value.indexOf(data), 1);
+                        openConflict.value=conflicts.value.length>0
+                        toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
+                    }
+                }, reject: () => {
+                    scheduleTime.status = undefined
+                    formColision.value.endSchedule = false
+                }
+            })
         } else {
-            toast.add({ severity: 'info', group: "customToast", text: 'Remplazada', life: 3000 });
+            let status = resolveCollision(formColision)
+            if (!status) {
+                scheduleTime.status = undefined
+                toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+            } else {
+                toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
+            }
         }
     } else {
-        // formColision.value.details = data.map(obj => obj.idScheduleTime);
         confirm.require({
             target: event.currentTarget,
-            message: '¿Está totalmente seguro?',
+            message: '¿Está totalmente seguro? No se puede deshacer',
             icon: 'pi pi-exclamation-triangle text-danger',
             rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
             acceptClass: 'p-button-sm p-button-success',
@@ -347,6 +400,8 @@ async function confirm1(event, scheduleTime, option, data) {
                     if (error) {
                         toast.add({ severity: 'warn', group: "customToast", text: 'Se remplazaron todas con errores', life: 3000 });
                     } else {
+                        conflicts.value=[]
+                        openConflict.value=conflicts.value.length>0
                         toast.add({ severity: 'success', group: "customToast", text: 'Se remplazaron todas', life: 3000 });
                     }
                 } else if (option == 'remplaceAll') {
@@ -371,6 +426,8 @@ async function confirm1(event, scheduleTime, option, data) {
                     if (error) {
                         toast.add({ severity: 'warn', group: "customToast", text: 'Se remplazaron todas con errores', life: 3000 });
                     } else {
+                        conflicts.value=[]
+                        openConflict.value=conflicts.value.length>0
                         toast.add({ severity: 'success', group: "customToast", text: 'Se remplazaron todas', life: 3000 });
                     }
                 } else if (option == 'omitAllDay') {
@@ -393,6 +450,7 @@ async function confirm1(event, scheduleTime, option, data) {
                     if (error) {
                         toast.add({ severity: 'warn', group: "customToast", text: 'Se omitieron todas las del dia con errores', life: 3000 });
                     } else {
+                        openConflict.value=conflicts.value.length>0
                         toast.add({ severity: 'success', group: "customToast", text: 'Se omitieron todas las del dia', life: 3000 });
                     }
                 } else if (option == 'remplaceAllDay') {
@@ -415,9 +473,9 @@ async function confirm1(event, scheduleTime, option, data) {
                     if (error) {
                         toast.add({ severity: 'warn', group: "customToast", text: 'Se remplazaron todas las del dia con errores', life: 3000 });
                     } else {
+                        openConflict.value=conflicts.value.length>0
                         toast.add({ severity: 'success', group: "customToast", text: 'Se remplazaron todas las del dia', life: 3000 });
                     }
-
                 }
             },
             reject: () => {
@@ -429,12 +487,13 @@ async function confirm1(event, scheduleTime, option, data) {
 };
 
 async function resolveCollision(form) {
-    await axios.post(route('programming.collisionsPerDay', form)).then((r) => {
-         return true
-    }).catch((e) => {
-        console.log(e)
-        return false
-    })
+    // await axios.post(route('programming.collisionsPerDay', form)).then((r) => {
+    //      return true
+    // }).catch((e) => {
+    //     console.log(e)
+    //     return false
+    // })
+    return true
 }
 
 //#endregion
@@ -456,7 +515,11 @@ async function resolveCollision(form) {
                             <Button label="Mañana" :outlined="optionValue != 'tomorrow'"
                                 @click="getTask('tomorrow'); getPersonalData()" />
                         </ButtonGroup>
-                        <CustomInput type="date" v-model:input="date" @change="getTask('date'); getPersonalData()" />
+                        <Calendar :disabledDays="[0]" v-model="date" showIcon :manualInput="false" dateFormat="dd/mm/yy"
+                            @date-select="getTask('date'); getPersonalData()" :pt="{
+                                root: '!w-44',
+                                input: '!h-8 text-center'
+                            }" />
                     </div>
                 </span>
                 <Listbox :options="tasks" :filterFields="['task', 'name', 'project']" class="col-span-2" filter :pt="{
@@ -489,7 +552,8 @@ async function resolveCollision(form) {
                                 </span>
                                 <div class="text-center justify-center">
                                     <p class="font-bold">Horario predefinido</p>
-                                    <span class="flex items-center justify-center space-x-2 text-green-900 bg-green-200 rounded-md p-1">
+                                    <span
+                                        class="flex items-center justify-center space-x-2 text-green-900 bg-green-200 rounded-md p-1">
                                         <p class="">
                                             {{ format24h(slotProps.option.shift.startShift) }}
                                         </p>
@@ -580,7 +644,7 @@ async function resolveCollision(form) {
                     </template>
 
                     <template #empty>
-                        <Loading v-if="loadingProgram" message="Cargando actividades" />
+                        <Loading v-if="loadingProgram" class="mt-10" message="Cargando actividades" />
                     </template>
 
                 </Listbox>
@@ -593,11 +657,11 @@ async function resolveCollision(form) {
                             }">
                     <TabPanel header="Personas" :pt="{
                                 root: 'w-full !p-0',
-                                header:'!p-0 w-full',
+                                header: '!p-0 w-full',
                                 headerTitle: '!w-full !flex !justify-center',
                             }">
                         <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
-                        <Loading v-if="loadingPerson" message="Cargando personas" />
+                        <Loading v-if="loadingPerson" class="mt-10" message="Cargando personas" />
                         <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy"
                             group-name="1" :get-child-payload="getChildPayload"
                             class="h-[74vh] flex flex-col space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
@@ -652,11 +716,10 @@ async function resolveCollision(form) {
         :closeOnEscape="false"
         :titulo="editHorario?.option != 'delete' ? 'Modificar horario de ' + editHorario?.data.name : 'Eliminando a ' + editHorario?.data.name + 'de la actividad ' + editHorario?.task">
         <template #body>
-            <!-- {{console.log(editHorario)}} -->
             <form @submit.prevent="save" class="pb-2">
                 <div v-if="editHorario?.option != 'delete'" class="flex flex-col gap-1">
                     <div class="flex items-center justify-between col-span-3 ">
-                        <!-- {{ editHorario }} -->
+
                         <p class="font-bold">Horario actual:</p>
                         <p class="px-1 py-1 text-green-900 bg-green-200 rounded-md">
                             {{ format24h(editHorario.hora_inicio.slice(0,
@@ -711,7 +774,7 @@ async function resolveCollision(form) {
                 </div>
                 <p class="font-bold text-xl">Aplicar por:</p>
                 <span class="flex items-center p-2 gap-4">
-                    <div v-for="category in [{ name: 'Solo el ' + date, key: 1 }, { name: 'Resto de la actividad', key: 2 }, { name: 'Rango de fechas', key: 3 }, { name: 'Fechas específicos', key: 4 }]"
+                    <div v-for="category in [{ name: 'Solo el ' + date.toISOString().split('T')[0], key: 1 }, { name: 'Resto de la actividad', key: 2 }, { name: 'Rango de fechas', key: 3 }, { name: 'Fechas específicos', key: 4 }]"
                         :key="category.key" class="flex items-center">
                         <RadioButton v-model="formEditHour.type" :inputId="category.key + category.name" name="dynamic"
                             :value="category.key" @click="formEditHour.details = []" />
@@ -758,7 +821,7 @@ async function resolveCollision(form) {
                                 Fecha:
                             </p>
                             <p>
-                                {{ conflictForDay[0].fecha }}
+                                {{ conflictForDay[0]?.fecha }}
                             </p>
                         </span>
                         <span v-if="conflictForDay.length > 1"
@@ -775,11 +838,11 @@ async function resolveCollision(form) {
                             <div class="flex  p-0.5 col-span-4">
                                 <div class="flex justify-between items-center w-full">
                                     <Breadcrumb :pt="{ root: '!bg-transparent' }"
-                                        :model="[{ label: conflict.NombreProyecto, tooltip: 'Nombre del proyecto' }, { label: conflict.nombrePadreTask, tooltip: 'Nombre del proceso' }, { label: conflict.nombreTask, tooltip: 'Nombre de la actividad' }]">
+                                        :model="[{ label: conflict.NombreProyecto, tooltip: 'Nombre del proyecto',class:'font-bold' }, { label: conflict.nombrePadreTask, tooltip: 'Nombre del proceso' }, { label: conflict.nombreTask, tooltip: 'Nombre de la actividad',class:'font-bold italic' }]">
                                         <template #item="item">
                                             <p v-tooltip.bottom="{ value: item.item.tooltip, pt: { text: 'text-center' } }"
-                                                :class="item.props.action.class"
-                                                class="cursor-default font-bold truncate w-full">
+                                                :class="item.item.class"
+                                                class="cursor-default truncate w-full">
                                                 {{ item.label }}
                                             </p>
                                         </template>
@@ -810,9 +873,9 @@ async function resolveCollision(form) {
                                 </div>
                             </div>
                             <div v-if="conflict.status == null" class="flex p-2 justify-center items-center gap-2">
-                                <Button class="!w-full" label="Reemplazar" severity="warning"
+                                <Button class="!w-full" label="Reemplazar" severity="warning" v-tooltip.top="'Remplaza esta actividad por la nueva'"
                                     @click="confirm1($event, conflict, 'remplace', conflictForDay)" />
-                                <Button label="Omitir" class="!w-full" severity="success"
+                                <Button label="Omitir" class="!w-full" severity="success"  v-tooltip.top="'Omite esta actividad y programa el restante del horario'"
                                     @click="confirm1($event, conflict, 'omit', conflictForDay)" />
                             </div>
                             <div v-else class="flex p-2 justify-between items-center">
