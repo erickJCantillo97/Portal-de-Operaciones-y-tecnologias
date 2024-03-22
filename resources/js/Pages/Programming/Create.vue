@@ -781,6 +781,7 @@ async function resolveCollision(form) {
                         <label :for="category.key" class="ml-1 mb-0">{{ category.name }}</label>
                     </div>
                 </span>
+                <!-- {{editHorario?.option != 'delete'?tabActive != 2? nuevoHorario?.startShift!=null?false:true:false:false }} -->
                 <span class="w-full grid grid-cols-4 justify-end gap-5 items-center">
                     <Calendar v-if="formEditHour.type == 3 || formEditHour.type == 4" show-icon v-model="selectDays"
                         class="col-span-3" :selectionMode="formEditHour.type == 3 ? 'range' : 'multiple'"
@@ -789,7 +790,7 @@ async function resolveCollision(form) {
                                 input: '!h-8'
                             }" />
                     <Button type="submit" class="col-start-4" :loading="formEditHour.loading"
-                        :disabled="(!(nuevoHorario?.startShift) & tabActive != 2)"
+                        :disabled=" (editHorario?.option !== 'delete') && (tabActive !== 2) && (nuevoHorario?.startShift !== null) "
                         :severity="editHorario?.option != 'delete' ? 'success' : 'danger'"
                         :icon="editHorario?.option != 'delete' ? 'fa-solid fa-floppy-disk' : 'fa-solid fa-trash-can'"
                         :label="editHorario?.option != 'delete' ? 'Guardar' : 'Eliminar'" />
