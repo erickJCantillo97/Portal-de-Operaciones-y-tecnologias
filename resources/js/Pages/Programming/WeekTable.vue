@@ -182,7 +182,8 @@ const toggle = (event, data, fecha) => {
       </div>
       Avance {{ parseFloat(task.percentDone).toFixed(2) }} %
       <div class="grid grid-cols-5 gap-2 ">
-        <img src="/images/men.gif" v-for="personal in personals" class="size-10 border rounded-full p-1" alt=""
+
+        <img :src="personal.photo" v-for="personal in personals" class="size-12 border rounded-full" alt=""
           v-tooltip.bottom="personal.name">
       </div>
       <!-- {{ truncateString(task.name, 40) }} -->

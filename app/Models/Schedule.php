@@ -14,7 +14,7 @@ class Schedule extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $appends = ['is_my_personal'];
+    protected $appends = ['is_my_personal', 'employee'];
     protected $guarded = [];
     protected $casts = [
         'is_my_personal' => 'boolean',
@@ -39,8 +39,8 @@ class Schedule extends Model
         ) ? true : false;
     }
 
-    public function employee()
+    public function getEmployeeAttribute()
     {
-        return $this->belongsTo(Employee::class, 'Num_SAP', 'employee_id');
+        return Employee::where('Num_SAP', 'LIKE', '%' . $this->employee_id)->first();
     }
 }

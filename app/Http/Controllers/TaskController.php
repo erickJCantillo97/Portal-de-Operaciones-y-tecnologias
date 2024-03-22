@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Imports\UsersImport;
+use App\Ldap\User;
 use App\Models\Gantt\Task;
 use App\Models\Schedule;
 use App\Models\VirtualTask;
@@ -67,8 +68,14 @@ class TaskController extends Controller
     {
         $division = $request->division;
         $date = Carbon::parse($request->date)->format('Y-m-d');
-        $schedules = Schedule::with('employee')->where('fecha', $date)->where('task_id', $request->task)->get();
-
+        $schedules = Schedule::where('fecha', $date)->where('task_id', $request->task)->get()->map(
+            function ($e) {
+                return [
+                    'name' => $e['name'],
+                    'photo' =>  User::where('userprincipalname', $e['employee']['Correo'])->first()->photo(),
+                ];
+            }
+        );
         return response()->json([
             'schedules' => $schedules,
         ]);
