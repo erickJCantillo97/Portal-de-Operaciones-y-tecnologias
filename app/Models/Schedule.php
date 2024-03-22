@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Gantt\Task;
+use App\Models\Personal\Employee;
 use App\Models\Personal\Personal;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +14,7 @@ class Schedule extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $appends = ['is_my_personal'];
+    protected $appends = ['is_my_personal', 'employee'];
     protected $guarded = [];
     protected $casts = [
         'is_my_personal' => 'boolean',
@@ -36,5 +37,10 @@ class Schedule extends Model
             $this->employee_id,
             $personal
         ) ? true : false;
+    }
+
+    public function getEmployeeAttribute()
+    {
+        return Employee::where('Num_SAP', 'LIKE', '%' . $this->employee_id)->first();
     }
 }

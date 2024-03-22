@@ -56,11 +56,22 @@ class ProgrammingController extends Controller
             $codigo = 1001; //Codigo para el caso en se trate de programar alguien con mas de 9.5 horas
             $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
             $conflict = [];
+            $end_date = '';
             $project = Project::find(VirtualTask::find($request->task_id)->project_id);
             if ($hours < 9.5) {
                 $task = VirtualTask::find($validateData['task_id']);
                 $date = Carbon::parse($validateData['fecha']);
-                $end_date = Carbon::parse($task->endDate);
+                if($project->daysPerWeek == 5){
+                    $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::FRIDAY);
+                }else if($project->daysPerWeek == 6){
+                    $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::SATURDAY);
+                }else{
+                    $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::SUNDAY);
+                }
+                // if($end_date < Carbon::parse($validateData['fecha'])){
+                //     return $end_date." es menor";
+                // }
+                // return $end_date." es mayor";
                 do {
                     if (getWorkingDays($date->format('Y-m-d'), intval($project->daysPerWeek))) {
                         $exist = DetailScheduleTime::where('idUsuario', $validateData['employee_id'])
@@ -155,7 +166,7 @@ class ProgrammingController extends Controller
             VirtualTask::has('project')->has('task')
                 ->where('startDate', '<=', $date)
                 ->where('percentDone', '<', 100)
-                ->where('executor', 'like', '%'.$request->division.'%')
+                ->where('executor', 'like', '%' . $request->division . '%')
                 ->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) {
                     return [
                         'name' => $task['name'],
@@ -207,7 +218,7 @@ class ProgrammingController extends Controller
                         $query->where('enddate', '>', $date_end)
                             ->where('startdate', '<', $date_start);
                     });
-            })->whereNotIn('id', array_unique($taskWithSubTasks))->take(2)->get()->map(function ($task) {
+            })->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) {
                 return [
                     'name' => $task['name'],
                     'id' => $task['id'],
@@ -276,9 +287,9 @@ class ProgrammingController extends Controller
         $times = ScheduleTime::whereIn('schedule_id', $schedulesIds)->with('schedule', 'schedule.task', 'schedule.task.project')->get()->map(function ($time) use ($date) {
             return [
                 'id' => $time['id'],
-                'start' => $date.'T'.Carbon::parse($time['hora_inicio'])->format('H:i:s'),
-                'end' => $date.'T'.Carbon::parse($time['hora_fin'])->format('H:i:s'),
-                'title' => $time['schedule']['task']['name'].' - ('.$time['schedule']['task']['project']['name'].')',
+                'start' => $date . 'T' . Carbon::parse($time['hora_inicio'])->format('H:i:s'),
+                'end' => $date . 'T' . Carbon::parse($time['hora_fin'])->format('H:i:s'),
+                'title' => $time['schedule']['task']['name'] . ' - (' . $time['schedule']['task']['project']['name'] . ')',
                 'project' => $time['schedule']['task']['project']['name'],
             ];
         });
@@ -298,25 +309,26 @@ class ProgrammingController extends Controller
             if ($request->personalized) {
                 Shift::firstOrCreate([
                     'name' => $request->timeName,
-                    'startShift' => new DateTime('1970-01-01T'.$request->startShift.':00'),
-                    'endShift' => new DateTime('1970-01-01T'.$request->endShift.':00'),
+                    'startShift' => new DateTime('1970-01-01T' . $request->startShift . ':00'),
+                    'endShift' => new DateTime('1970-01-01T' . $request->endShift . ':00'),
                     'timeBreak' => $request->timeBreak,
                     'status' => false,
                     'user' => $request->idUser,
                 ]);
             }
             switch ($request->type) {
-                //SOLO EL $request->date
+                    //SOLO EL $request->date
                 case 1:
                     $exist = DetailScheduleTime::where('fecha', $request->date)
                         ->where('idSchedule', '!=', $request->schedule)
+                        ->where('idUsuario', $request->idUser)
                         ->where(function ($query) use ($request) {
                             $query->where(function ($subquery) use ($request) {
                                 $subquery->whereTime('horaInicio', '<=', $request->startShift)
                                     ->whereTime('horaFin', '>=', $request->startShift);
                             })->orWhere(function ($subquery) use ($request) {
                                 $subquery->whereTime('horaInicio', '<=', $request->endShift)
-                                    ->whereTime('horaFin', '>=', $request->endShift);
+                                    ->whereTime('horaFin', '>=',  $request->endShift);
                             })->orWhere(function ($subquery) use ($request) {
                                 $subquery->whereBetween('horaInicio', [$request->startShift, $request->endShift])
                                     ->whereBetween('horaFin', [$request->startShift, $request->endShift]);
@@ -531,29 +543,34 @@ class ProgrammingController extends Controller
         }
     }
 
-    public function collisions(Request $request)
-    {
+    public function collisionsPerDay(Request $request){
         try {
+            return response()->json(['status' => false, 'mensaje'=> 'Mensaje desde el controlador']);
             DB::beginTransaction();
+            $mensaje = '';
             switch ($request->actionType) {
-                case 1:
-                    break;
-                case 2:
-                    //Reemplazar todo en una fecha
-                    break;
-                case 3:
-                    //reemplazar todas las colisiones
-                    break;
-                default:
-                    break;
+            case 1:
+                $schedule = Schedule::find(DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->idSchedule);
+                $schedule->task_id = $request->idTask;
+                $schedule->save();
+                $mensaje = 'Horario reemplazado';
+                if($request->endSchedule){   
+                    //aqui va el job de Erik
+                }
+                break;
+            case 2:
+                if($request->endSchedule){
+                    //aqui va el job de Erik
+                }
+                break;
+            default:
+                break;
             }
             DB::commit();
-
-            return response()->json(['status' => true, 'mensaje' => 'Horario eliminado']);
-        } catch (Exception $e) {
+            return response()->json(['status' => true, 'mensaje'=> $mensaje]);
+        }catch (Exception $e) {
             DB::rollBack();
-
-            return $e;
+            return response()->json(['status' => true, 'mensaje'=> 'Se ha generado un error: '.$e->getMessage()]);
         }
     }
 
@@ -562,7 +579,7 @@ class ProgrammingController extends Controller
         try {
             DB::beginTransaction();
             switch ($request->type) {
-                //SOLO EL $request->date
+                    //SOLO EL $request->date
                 case 1:
                     $schedule = Schedule::find($request->schedule);
                     $schedule->delete();

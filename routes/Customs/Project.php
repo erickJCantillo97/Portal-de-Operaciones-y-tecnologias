@@ -54,6 +54,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('projects/addShips/{project}', [ProjectController::class, 'addShips'])->name('project.add.ships');
 
     Route::resource('tasks', TaskController::class);
+    Route::get('getScheduleTaskDate/', [TaskController::class, 'getScheduleTaskDate'])->name('get.schedule.task.date');
 
     Route::resource('typeShips', TypeShipController::class)->except('update');
     Route::post('typeShips/{typeShip}/update', [TypeShipController::class, 'update'])->name('typeShips.update');
