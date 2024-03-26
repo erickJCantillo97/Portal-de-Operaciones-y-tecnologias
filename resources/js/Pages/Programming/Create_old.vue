@@ -19,7 +19,6 @@ import Breadcrumb from 'primevue/breadcrumb';
 import { useToast } from "primevue/usetoast";
 import { useConfirm } from "primevue/useconfirm";
 import InputSwitch from 'primevue/inputswitch';
-import ModalColisions from './Components/ModalColisions.vue'
 import axios from 'axios';
 const toast = useToast();
 const confirm = useConfirm();
@@ -275,6 +274,231 @@ const save = async () => {
             toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 2000 })
         });
 }
+
+
+//# region popup confirmacion coliciones
+const formColision = ref({
+    actionType: null, // accion a realizar: 1: Reemplazar , 2: Omitir
+    idTask: null,// idTask de la Nueva tarea
+    scheduleTime: null, // id del schedule time
+    endSchedule: null, // se manda true si es la ultima colisión
+    startShift: null, // hora de inicio de la nueva tarea
+    endShift: null, // hora final de la nueva tarea
+});
+
+async function confirm1(event, scheduleTime, option, data) {
+    formColision.value.idTask = task.value.id
+    formColision.value.startShift = format24h(task.value.shift.startShift)
+    formColision.value.endShift = format24h(task.value.shift.endShift)
+    if (option == 'omit') {
+        scheduleTime.status = option
+        formColision.value.actionType = 1
+        formColision.value.endSchedule = data.find((a) => { a.status == null }) == undefined
+        scheduleTime.status = undefined
+        if (formColision.value.endSchedule) {
+            confirm.require({
+                target: event.currentTarget,
+                message: '¿Está totalmente seguro? No se puede deshacer',
+                icon: 'pi pi-exclamation-triangle text-danger',
+                rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+                acceptClass: 'p-button-sm p-button-success',
+                rejectLabel: 'No',
+                acceptLabel: 'Sí',
+                accept: async () => {
+                    scheduleTime.status = option
+                    let status = resolveCollision(formColision)
+                    if (!status) {
+                        scheduleTime.status = undefined
+                        toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+                    } else {
+                        conflicts.value.splice(conflicts.value.indexOf(data), 1);
+                        openConflict.value=conflicts.value.length>0
+                        toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
+                    }
+                }, reject: () => {
+                    scheduleTime.status = undefined
+                    formColision.value.endSchedule = false
+                }
+            })
+        } else {
+            let status = resolveCollision(formColision)
+            if (!status) {
+                scheduleTime.status = undefined
+                toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+            } else {
+                toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
+            }
+        }
+    } else if (option == 'remplace') {
+        scheduleTime.status = option
+        formColision.value.actionType = 2
+        formColision.value.endSchedule = data.find((a) => { a.status == null }) == undefined
+        scheduleTime.status = undefined
+        if (formColision.value.endSchedule) {
+            confirm.require({
+                target: event.currentTarget,
+                message: '¿Está totalmente seguro? No se puede deshacer',
+                icon: 'pi pi-exclamation-triangle text-danger',
+                rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+                acceptClass: 'p-button-sm p-button-success',
+                rejectLabel: 'No',
+                acceptLabel: 'Sí',
+                accept: async () => {
+                    scheduleTime.status = option
+                    let status = resolveCollision(formColision)
+                    if (!status) {
+                        scheduleTime.status = undefined
+                        toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+                    } else {
+                        conflicts.value.splice(conflicts.value.indexOf(data), 1);
+                        openConflict.value=conflicts.value.length>0
+                        toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
+                    }
+                }, reject: () => {
+                    scheduleTime.status = undefined
+                    formColision.value.endSchedule = false
+                }
+            })
+        } else {
+            let status = resolveCollision(formColision)
+            if (!status) {
+                scheduleTime.status = undefined
+                toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+            } else {
+                toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
+            }
+        }
+    } else {
+        confirm.require({
+            target: event.currentTarget,
+            message: '¿Está totalmente seguro? No se puede deshacer',
+            icon: 'pi pi-exclamation-triangle text-danger',
+            rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+            acceptClass: 'p-button-sm p-button-success',
+            rejectLabel: 'No',
+            acceptLabel: 'Sí',
+            accept: async () => {
+                if (option == 'omitAll') {
+                    let error
+                    data.forEach((scheduleD) => {
+                        const endIndex = scheduleD.findLastIndex((element) => element.status == null)
+                        scheduleD.forEach((scheduleT, index) => {
+                            if (scheduleT.status == null) {
+                                formColision.value.endSchedule = endIndex == index ? true : false
+                                formColision.value.actionType = 2
+                                formColision.value.scheduleTime = scheduleT.idScheduleTime
+                                let status = resolveCollision(formColision)
+                                if (!status) {
+                                    error = scheduleT
+                                    toast.add({ severity: 'error', group: "error", text: 'Hubo un error inesperado', life: 3000 });
+                                } else {
+                                    scheduleT.status = 'remplace'
+                                }
+                            }
+                        })
+                    })
+                    if (error) {
+                        toast.add({ severity: 'warn', group: "customToast", text: 'Se remplazaron todas con errores', life: 3000 });
+                    } else {
+                        conflicts.value=[]
+                        openConflict.value=conflicts.value.length>0
+                        toast.add({ severity: 'success', group: "customToast", text: 'Se remplazaron todas', life: 3000 });
+                    }
+                } else if (option == 'remplaceAll') {
+                    let error
+                    data.forEach((scheduleD) => {
+                        const endIndex = scheduleD.findLastIndex((element) => element.status == null)
+                        scheduleD.forEach((scheduleT, index) => {
+                            if (scheduleT.status == null) {
+                                formColision.value.endSchedule = endIndex == index ? true : false
+                                formColision.value.actionType = 1
+                                formColision.value.scheduleTime = scheduleT.idScheduleTime
+                                let status = resolveCollision(formColision)
+                                if (!status) {
+                                    error = scheduleT
+                                    toast.add({ severity: 'error', group: "error", text: 'Hubo un error inesperado', life: 3000 });
+                                } else {
+                                    scheduleT.status = 'remplace'
+                                }
+                            }
+                        })
+                    })
+                    if (error) {
+                        toast.add({ severity: 'warn', group: "customToast", text: 'Se remplazaron todas con errores', life: 3000 });
+                    } else {
+                        conflicts.value=[]
+                        openConflict.value=conflicts.value.length>0
+                        toast.add({ severity: 'success', group: "customToast", text: 'Se remplazaron todas', life: 3000 });
+                    }
+                } else if (option == 'omitAllDay') {
+                    let error
+                    const endIndex = data.findLastIndex((element) => element.status == null)
+                    await data.forEach((scheduleT, index) => {
+                        if (scheduleT.status == null) {
+                            formColision.value.endSchedule = endIndex == index ? true : false
+                            formColision.value.actionType = 2
+                            formColision.value.scheduleTime = scheduleT.idScheduleTime
+                            let status = resolveCollision(formColision)
+                            if (!status) {
+                                error = scheduleT
+                                toast.add({ severity: 'error', group: "error", text: 'Hubo un error inesperado', life: 3000 });
+                            } else {
+                                scheduleT.status = 'omit'
+                            }
+                        }
+                    })
+                    if (error) {
+                        toast.add({ severity: 'warn', group: "customToast", text: 'Se omitieron todas las del dia con errores', life: 3000 });
+                    } else {
+                        conflicts.value.splice(conflicts.value.indexOf(data), 1);
+                        openConflict.value=conflicts.value.length>0
+                        toast.add({ severity: 'success', group: "customToast", text: 'Se omitieron todas las del dia', life: 3000 });
+                    }
+                } else if (option == 'remplaceAllDay') {
+                    let error
+                    const endIndex = data.findLastIndex((element) => element.status == null)
+                    await data.forEach((scheduleT, index) => {
+                        if (scheduleT.status == null) {
+                            formColision.value.endSchedule = endIndex == index ? true : false
+                            formColision.value.actionType = 1
+                            formColision.value.scheduleTime = scheduleT.idScheduleTime
+                            let status = resolveCollision(formColision)
+                            if (!status) {
+                                error = scheduleT
+                                toast.add({ severity: 'error', group: "error", text: 'Hubo un error inesperado', life: 3000 });
+                            } else {
+                                scheduleT.status = 'remplace'
+                            }
+                        }
+                    })
+                    if (error) {
+                        toast.add({ severity: 'warn', group: "customToast", text: 'Se remplazaron todas las del dia con errores', life: 3000 });
+                    } else {
+                        conflicts.value.splice(conflicts.value.indexOf(data), 1);
+                        openConflict.value=conflicts.value.length>0
+                        toast.add({ severity: 'success', group: "customToast", text: 'Se remplazaron todas las del dia', life: 3000 });
+                    }
+                }
+            },
+            reject: () => {
+
+                // toast.add({ severity: 'error', group: "customToast", text: 'You have rejected', life: 3000 });
+            }
+        });
+    }
+};
+
+async function resolveCollision(form) {
+    await axios.post(route('programming.collisionsPerDay', form)).then((r) => {
+         return true
+    }).catch((e) => {
+        console.log(e)
+        return false
+    })
+    return true
+}
+
+//#endregion
 
 </script>
 
@@ -587,9 +811,7 @@ const save = async () => {
         </template>
     </CustomModal>
 
-    <ModalColisions v-model:visible="openConflict"  v-model:conflicts="conflicts"  v-model:task="task">
-    </ModalColisions>
-    <!-- <CustomModal icon="fa-solid fa-triangle-exclamation" :base-z-index="10" v-model:visible="openConflict"
+    <CustomModal icon="fa-solid fa-triangle-exclamation" :base-z-index="10" v-model:visible="openConflict"
         severity="danger" :closable="false" :close-on-escape="false" width="90vw"
         :titulo="'Existen colisiones al programar tarea: ' + task.name">
         <template #body>
@@ -675,7 +897,7 @@ const save = async () => {
             <Button label="Omitir todas las coliciones" severity="success"
                 @click="confirm1($event, null, 'omitAll',conflicts)" />
         </template>
-    </CustomModal> -->
+    </CustomModal>
     <!-- #endregion -->
 </template>
 
