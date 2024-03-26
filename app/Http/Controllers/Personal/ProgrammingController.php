@@ -548,9 +548,9 @@ class ProgrammingController extends Controller
         try {
             // return response()->json(['status' => false, 'mensaje'=> 'Mensaje desde el controlador']);
             //DB::beginTransaction();
+            $schedule = Schedule::find(DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->idSchedule);
             switch ($request->actionType) {
             case 1:
-                $schedule = Schedule::find(DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->idSchedule);
                 $schedule->task_id = $request->idTask;
                 $schedule->save();
                 if($request->endSchedule){   
@@ -559,7 +559,7 @@ class ProgrammingController extends Controller
                 break;
             case 2:
                 if($request->endSchedule){
-                    PersonalScheduleDayJob::dispatch();
+                    PersonalScheduleDayJob::dispatch($schedule->fecha,$schedule->idUsuario, $schedule->idTask);
                 }
                 break;
             default:
