@@ -429,61 +429,44 @@ const save = async () => {
             </span>
             <!--#region LISTA PERSONAL-->
             <div class="row-span-2 rounded-lg border">
-                <TabView class="tabview-custom h-full" :scrollable="true" :pt="{
-                                nav: '!flex !justify-between',
-                                panelContainer: '!p-1'
-                            }">
-                    <TabPanel header="Personas" :pt="{
-                                root: 'w-full !p-0',
-                                header: '!p-0 w-full',
-                                headerTitle: '!w-full !flex !justify-center',
-                            }">
-                        <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
-                        <Loading v-if="loadingPerson" class="mt-10" message="Cargando personas" />
-                        <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy"
-                            group-name="1" :get-child-payload="getChildPayload"
-                            class="h-[74vh] flex flex-col space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
-                            <!-- <span v-for="item in personal"> -->
-                            <Draggable v-for="item in personal" v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt:{text:'text-center'} }"
-                                :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"
-                                :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
-                                class="snap-start rounded-xl shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
-                                <div class="grid grid-cols-5 gap-x-1 p-1">
-                                    <img class="custom-image " :src="item.photo" align="center"
-                                        onerror="this.src='/svg/cotecmar-logo.svg'" draggable="false"
-                                        alt="profile-photo" />
-                                    <span class="col-span-3 flex flex-col justify-center">
-                                        <p class="text-sm font-semibold truncate  text-gray-900">
-                                            {{ item.Nombres_Apellidos }}
-                                        </p>
-                                        <p class="flex mt-1 text-xs truncate  text-gray-500">
-                                            {{ item.Cargo }}
-                                        </p>
-                                        <p class="flex mt-1 text-xs truncate  text-gray-500">
-                                            {{ item.Oficina }}
-                                        </p>
-                                    </span>
-                                    <span class="flex items-center">
-                                        <Button v-tooltip.left="'Horas programadas'" class="w-full"
-                                            :key="personalHours[item.Num_SAP]"
-                                            :icon="personalHours[(item.Num_SAP)] == undefined ? 'fa-solid fa-spinner animate-spin' : undefined"
-                                            :label="personalHours[item.Num_SAP] != undefined ? personalHours[item.Num_SAP] + ' horas' : undefined"
-                                            :severity="personalHours[item.Num_SAP] < 9.5 ? 'primary' : 'success'"
-                                            @click="employeeDialog(item)" :pt="{ label: '!text-xs' }" />
-                                    </span>
-                                </div>
-                            </Draggable>
-                            <!-- </span> -->
-                        </Container>
-                    </TabPanel>
-
-                    <TabPanel header="Grupos" :pt="{
-                                root: 'w-full',
-                                headerTitle: '!w-full !flex !justify-center'
-                            }">
-                    </TabPanel>
-
-                </TabView>
+                <Loading v-if="loadingPerson" class="mt-10" message="Cargando personas" />
+                <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy" group-name="1"
+                    :get-child-payload="getChildPayload"
+                    class="h-[74vh] flex flex-col space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
+                    <!-- <span v-for="item in personal"> -->
+                    <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
+                    
+                    <Draggable v-for="item in personal"
+                        v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
+                        :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"
+                        :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
+                        class="snap-start rounded-xl shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
+                        <div class="grid grid-cols-5 gap-x-1 p-1">
+                            <img class="custom-image " :src="item.photo" align="center"
+                                onerror="this.src='/svg/cotecmar-logo.svg'" draggable="false" alt="profile-photo" />
+                            <span class="col-span-3 flex flex-col justify-center">
+                                <p class="text-sm font-semibold truncate  text-gray-900">
+                                    {{ item.Nombres_Apellidos }}
+                                </p>
+                                <p class="flex mt-1 text-xs truncate  text-gray-500">
+                                    {{ item.Cargo }}
+                                </p>
+                                <p class="flex mt-1 text-xs truncate  text-gray-500">
+                                    {{ item.Oficina }}
+                                </p>
+                            </span>
+                            <span class="flex items-center">
+                                <Button v-tooltip.left="'Horas programadas'" class="w-full"
+                                    :key="personalHours[item.Num_SAP]"
+                                    :icon="personalHours[(item.Num_SAP)] == undefined ? 'fa-solid fa-spinner animate-spin' : undefined"
+                                    :label="personalHours[item.Num_SAP] != undefined ? personalHours[item.Num_SAP] + ' horas' : undefined"
+                                    :severity="personalHours[item.Num_SAP] < 9.5 ? 'primary' : 'success'"
+                                    @click="employeeDialog(item)" :pt="{ label: '!text-xs' }" />
+                            </span>
+                        </div>
+                    </Draggable>
+                    <!-- </span> -->
+                </Container>
             </div>
 
         </div>
@@ -568,7 +551,7 @@ const save = async () => {
                                 input: '!h-8'
                             }" />
                     <Button type="submit" class="col-start-4" :loading="formEditHour.loading"
-                        :disabled=" (editHorario?.option !== 'delete') && (tabActive !== 2) && (nuevoHorario?.startShift !== null) "
+                        :disabled="(editHorario?.option !== 'delete') && (tabActive !== 2) && (nuevoHorario?.startShift !== null)"
                         :severity="editHorario?.option != 'delete' ? 'success' : 'danger'"
                         :icon="editHorario?.option != 'delete' ? 'fa-solid fa-floppy-disk' : 'fa-solid fa-trash-can'"
                         :label="editHorario?.option != 'delete' ? 'Guardar' : 'Eliminar'" />
@@ -587,7 +570,7 @@ const save = async () => {
         </template>
     </CustomModal>
 
-    <ModalColisions v-model:visible="openConflict"  v-model:conflicts="conflicts"  v-model:task="task">
+    <ModalColisions v-model:visible="openConflict" v-model:conflicts="conflicts" v-model:task="task">
     </ModalColisions>
     <!-- <CustomModal icon="fa-solid fa-triangle-exclamation" :base-z-index="10" v-model:visible="openConflict"
         severity="danger" :closable="false" :close-on-escape="false" width="90vw"

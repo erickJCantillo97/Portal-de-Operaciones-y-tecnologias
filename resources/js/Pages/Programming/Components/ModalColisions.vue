@@ -8,7 +8,7 @@ import { ref } from "vue";
 const toast = useToast();
 const confirm = useConfirm();
 
-const visible = defineModel('visible')
+const openConflict = defineModel('visible')
 const conflicts = defineModel('conflicts')
 const task = defineModel('task')
 
@@ -245,7 +245,7 @@ async function resolveCollision(form) {
 
 </script>
 <template>
-        <CustomModal icon="fa-solid fa-triangle-exclamation" :base-z-index="10" v-model:visible="visible"
+        <CustomModal icon="fa-solid fa-triangle-exclamation" :base-z-index="10" v-model:visible="openConflict"
             severity="danger" :closable="false" :close-on-escape="false" width="90vw"
             :titulo="'Existen colisiones al programar tarea: ' + task.name">
             <template #body>
