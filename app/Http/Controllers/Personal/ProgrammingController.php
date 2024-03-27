@@ -546,27 +546,34 @@ class ProgrammingController extends Controller
 
     public function collisionsPerDay(Request $request){
         try {
+            //return $request->endSchedule;
+            // return DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->first()->idSchedule;
             // return response()->json(['status' => false, 'mensaje'=> 'Mensaje desde el controlador']);
             //DB::beginTransaction();
-            $schedule = Schedule::find(DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->idSchedule);
+            $DetailScheduleTime = DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->first();
+            $mensaje = '';
+            $schedule = Schedule::find($DetailScheduleTime->idSchedule);
             switch ($request->actionType) {
             case 1:
+
                 $schedule->task_id = $request->idTask;
                 $schedule->save();
                 if($request->endSchedule){   
-                    PersonalScheduleDayJob::dispatch($schedule->fecha,$schedule->idUsuario, $schedule->idTask);
+                    PersonalScheduleDayJob::dispatch($DetailScheduleTime->fecha,$DetailScheduleTime->idUsuario, $request->idTask);
+                    $mensaje = 'registro actualizado';               
                 }
                 break;
             case 2:
                 if($request->endSchedule){
-                    PersonalScheduleDayJob::dispatch($schedule->fecha,$schedule->idUsuario, $schedule->idTask);
+                    PersonalScheduleDayJob::dispatch($DetailScheduleTime->fecha,$DetailScheduleTime->idUsuario, $request->idTask);
+                    $mensaje = 'registro actualizado';                
                 }
                 break;
             default:
                 break;
             }
             // DB::commit();
-            return response()->json(['status' => true, 'mensaje'=> 'Horario reemplazado']);
+            return response()->json(['status' => true, 'mensaje'=> $mensaje]);
         }catch (Exception $e) {
             DB::rollBack();
             return response()->json(['status' => true, 'mensaje'=> 'Se ha generado un error: '.$e->getMessage()]);
@@ -629,42 +636,24 @@ class ProgrammingController extends Controller
 
     public function endNivelActivitiesByProject(Request $request)
     {
-        if (isset($request->dates[0])) {
-            $date_start = Carbon::parse($request->dates[0])->format('Y-m-d');
-            $date_end = Carbon::parse($request->dates[1])->format('Y-m-d');
-        } elseif (isset($request->date)) {
-            $date_start = Carbon::parse($request->date)->format('Y-m-d');
-            $date_end = Carbon::parse($request->date)->format('Y-m-d');
-        } else {
-            $date_start = Carbon::tomorrow()->format('Y-m-d');
-            $date_end = Carbon::tomorrow()->format('Y-m-d');
-        }
-
-        $taskWithSubTasks = VirtualTask::has('project')->whereNotNull('task_id')->select('task_id')->get()->map(function ($task) {
-            return $task['task_id'];
-        })->toArray();
-
-        return response()->json(
-            VirtualTask::has('project')->has('task')->where(function ($query) use ($date_start, $date_end) {
-                $query->whereBetween('startdate', [$date_start, $date_end])
-                    ->orWhereBetween('enddate', [$date_start, $date_end])
-                    ->orWhere(function ($query) use ($date_start, $date_end) {
-                        $query->where('enddate', '>', $date_end)
-                            ->where('startdate', '<', $date_start);
-                    });
-            })->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) {
-                return [
-                    $task->project->name =>[$task['id']]
-                    // 'name' => $task['name'],
-                    // 'id' => $task['id'],
-                    // 'task' => $task->task->name,
-                    // 'endDate' => $task['endDate'],
-                    // 'percentDone' => $task['percentDone'],
-                    // 'project' => $task->project->name,
-                    // 'shift' => $task->project->shift ? Shift::where('id', $task->project->shift)->first() : null,
-                    // 'startDate' => $task['startDate'],
-                ];
-            }),
-        );
+      return [
+        ['proyecto_1',[
+            'P1_actividad_1',
+            'P1_actividad_2',
+            'P1_actividad_3',
+            'P1_actividad_4'
+        ],'proyecto_2',[
+            'P2_actividad_1',
+            'P2_actividad_2',
+            'P2_actividad_3',
+            'P2_actividad_4'
+        ],'proyecto_3',[
+            'P3_actividad_1',
+            'P3_actividad_2',
+            'P3_actividad_3',
+            'P3_actividad_4'
+        ]
+        ]
+      ];
     }
 }
