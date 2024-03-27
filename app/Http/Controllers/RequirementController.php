@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\RequirementImport;
 use App\Models\Projects\Project;
+use App\Models\WareHouse\MaterialRequirement;
 use App\Models\WareHouse\Requirement;
 use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RequirementController extends Controller
 {
@@ -16,8 +19,11 @@ class RequirementController extends Controller
     public function index()
     {
         $projects = Project::active()->get();
+        $requirements = Requirement::with('project', 'user')->get();
         return Inertia::render('WareHouse/Requirements/Index', [
-            'projects' => $projects
+            'projects' => $projects,
+            'requirements' => $requirements
+
         ]);
     }
 
@@ -35,11 +41,15 @@ class RequirementController extends Controller
     public function store(Request $request)
     {
         $validateData = $request->validate([
-            //
+            'project_id' => 'required',
+            'document' => 'nullable',
+            'bloque' => 'required|numeric',
+            'sistema_grupo' => 'nullable',
+            'note' => 'nullable',
         ]);
-
         try {
-            Requirement::create($validateData);
+            Excel::import(new RequirementImport($validateData), $request->data);
+            // Requirement::create($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
@@ -58,7 +68,6 @@ class RequirementController extends Controller
      */
     public function edit(Requirement $requirement)
     {
-        //
     }
 
     /**
@@ -66,6 +75,7 @@ class RequirementController extends Controller
      */
     public function update(Request $request, Requirement $requirement)
     {
+
         $validateData = $request->validate([
             //
         ]);
@@ -87,5 +97,15 @@ class RequirementController extends Controller
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
+    }
+
+    public function manageRequirements(Request $request)
+    {
+        // dd($request->all());
+        $materials = MaterialRequirement::with('material')->whereIn('requirement_id', $request->requirements)->get();
+
+        return Inertia::render('WareHouse/Requirements/Form', [
+            'materials' => $materials
+        ]);
     }
 }
