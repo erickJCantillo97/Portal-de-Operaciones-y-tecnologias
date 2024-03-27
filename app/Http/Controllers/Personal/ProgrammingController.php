@@ -626,4 +626,45 @@ class ProgrammingController extends Controller
             return $e;
         }
     }
+
+    public function endNivelActivitiesByProject(Request $request)
+    {
+        if (isset($request->dates[0])) {
+            $date_start = Carbon::parse($request->dates[0])->format('Y-m-d');
+            $date_end = Carbon::parse($request->dates[1])->format('Y-m-d');
+        } elseif (isset($request->date)) {
+            $date_start = Carbon::parse($request->date)->format('Y-m-d');
+            $date_end = Carbon::parse($request->date)->format('Y-m-d');
+        } else {
+            $date_start = Carbon::tomorrow()->format('Y-m-d');
+            $date_end = Carbon::tomorrow()->format('Y-m-d');
+        }
+
+        $taskWithSubTasks = VirtualTask::has('project')->whereNotNull('task_id')->select('task_id')->get()->map(function ($task) {
+            return $task['task_id'];
+        })->toArray();
+
+        return response()->json(
+            VirtualTask::has('project')->has('task')->where(function ($query) use ($date_start, $date_end) {
+                $query->whereBetween('startdate', [$date_start, $date_end])
+                    ->orWhereBetween('enddate', [$date_start, $date_end])
+                    ->orWhere(function ($query) use ($date_start, $date_end) {
+                        $query->where('enddate', '>', $date_end)
+                            ->where('startdate', '<', $date_start);
+                    });
+            })->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) {
+                return [
+                    $task->project->name =>[$task['id']]
+                    // 'name' => $task['name'],
+                    // 'id' => $task['id'],
+                    // 'task' => $task->task->name,
+                    // 'endDate' => $task['endDate'],
+                    // 'percentDone' => $task['percentDone'],
+                    // 'project' => $task->project->name,
+                    // 'shift' => $task->project->shift ? Shift::where('id', $task->project->shift)->first() : null,
+                    // 'startDate' => $task['startDate'],
+                ];
+            }),
+        );
+    }
 }
