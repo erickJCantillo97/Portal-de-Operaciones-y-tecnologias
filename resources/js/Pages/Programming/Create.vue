@@ -82,7 +82,6 @@ const getPersonalData = () => {
     } else {
         loadingPerson.value = true
         axios.get(route('get.personal.user')).then((res) => {
-            // console.log(res)
             personal.value = Object.values(res.data.personal)
             getAssignmentHoursAll()
             loadingPerson.value = false
@@ -429,17 +428,16 @@ const save = async () => {
             </span>
             <!--#region LISTA PERSONAL-->
             <div class="row-span-2 rounded-lg border">
+                <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
                 <Loading v-if="loadingPerson" class="mt-10" message="Cargando personas" />
                 <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy" group-name="1"
                     :get-child-payload="getChildPayload"
                     class="h-[74vh] flex flex-col space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
                     <!-- <span v-for="item in personal"> -->
-                    <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
-                    
                     <Draggable v-for="item in personal"
                         v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
                         :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"
-                        :drag-not-allowed="personalHours[(item.Num_SAP)] < 9.5 ? false : true"
+                        :drag-not-allowed="personalHours[item.Num_SAP] < 9.5 ? false : true"
                         class="snap-start rounded-xl shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
                         <div class="grid grid-cols-5 gap-x-1 p-1">
                             <img class="custom-image " :src="item.photo" align="center"
@@ -572,94 +570,6 @@ const save = async () => {
 
     <ModalColisions v-model:visible="openConflict" v-model:conflicts="conflicts" v-model:task="task">
     </ModalColisions>
-    <!-- <CustomModal icon="fa-solid fa-triangle-exclamation" :base-z-index="10" v-model:visible="openConflict"
-        severity="danger" :closable="false" :close-on-escape="false" width="90vw"
-        :titulo="'Existen colisiones al programar tarea: ' + task.name">
-        <template #body>
-            <div class="py-2 flex flex-col gap-4">
-                <div v-for="conflictForDay in conflicts"
-                    class="border ring-success ring-1 rounded-md p-1 hover:shadow-lg hover:shadow-primary-light">
-                    <span class="flex space-x-2 font-bold">
-                        <span class="text-lg flex items-center gap-2 p-2">
-                            <p>
-                                Fecha:
-                            </p>
-                            <p>
-                                {{ conflictForDay[0]?.fecha }}
-                            </p>
-                        </span>
-                        <span v-if="conflictForDay.length > 1"
-                            class="flex p-2 justify-end items-center gap-2  w-[400px]">
-                            <Button class="!w-full" label="Reemplazar todo" severity="contrast"
-                                @click="confirm1($event, null, 'remplaceAllDay', conflictForDay)" />
-                            <Button class="!w-full" label="Omitir todo" severity="success"
-                                @click="confirm1($event, null, 'omitAllDay', conflictForDay)" />
-                        </span>
-                    </span>
-                    <div class="flex flex-col gap-2">
-                        <div v-for="conflict in conflictForDay" class="grid grid-cols-5 border rounded-md"
-                            :class="conflict.status ? conflict.status == 'omit' ? '!bg-green-100' : '!bg-red-100' : ''">
-                            <div class="flex  p-0.5 col-span-4">
-                                <div class="flex justify-between items-center w-full">
-                                    <Breadcrumb :pt="{ root: '!bg-transparent' }"
-                                        :model="[{ label: conflict.NombreProyecto, tooltip: 'Nombre del proyecto',class:'font-bold' }, { label: conflict.nombrePadreTask, tooltip: 'Nombre del proceso' }, { label: conflict.nombreTask, tooltip: 'Nombre de la actividad',class:'font-bold italic' }]">
-                                        <template #item="item">
-                                            <p v-tooltip.bottom="{ value: item.item.tooltip, pt: { text: 'text-center' } }"
-                                                :class="item.item.class"
-                                                class="cursor-default truncate w-full">
-                                                {{ item.label }}
-                                            </p>
-                                        </template>
-                                    </Breadcrumb>
-                                    <div class="flex items-center">
-                                        <div class="px-4 flex w-min space-x-2">
-                                            <p class="flex space-x-2">
-                                                <span class="font-bold">Inicio: </span>
-                                                <span>
-                                                    {{
-                                conflict.horaInicio.slice(0, conflict.horaInicio.lastIndexOf(':'))
-                            }}
-                                                </span>
-                                            </p>
-                                            <p class="flex space-x-2">
-                                                <span class="font-bold"> Fin: </span>
-                                                <span>
-                                                    {{ conflict.horaFin.slice(0, conflict.horaFin.lastIndexOf(':')) }}
-                                                </span>
-                                            </p>
-                                        </div>
-                                        <div class="pr-10">
-                                            <Knob v-tooltip.top="'Avance: ' + (conflict.taskDetails.percentDone) + '%'"
-                                                :model-value="parseFloat(conflict.taskDetails.percentDone)" :size=50
-                                                valueTemplate="{value}%" readonly />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div v-if="conflict.status == null" class="flex p-2 justify-center items-center gap-2">
-                                <Button class="!w-full" label="Reemplazar" severity="warning" v-tooltip.top="'Remplaza esta actividad por la nueva'"
-                                    @click="confirm1($event, conflict, 'remplace', conflictForDay)" />
-                                <Button label="Omitir" class="!w-full" severity="success"  v-tooltip.top="'Omite esta actividad y programa el restante del horario'"
-                                    @click="confirm1($event, conflict, 'omit', conflictForDay)" />
-                            </div>
-                            <div v-else class="flex p-2 justify-between items-center">
-                                <p>{{ conflict.status == 'omit' ? 'Sin modificaciones' : 'Remplazada' }}</p>
-                                <Button icon="fa-solid fa-rotate-left" text severity="danger" v-tooltip="'Deshacer'"
-                                    @click="conflict.status = null" rounded />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </template>
-        <template #footer>
-            <Button label="Reemplazar todas las coliciones" severity="danger"
-                @click="confirm1($event, null, 'remplaceAll',conflicts)" />
-            <Button label="Omitir todas las coliciones" severity="success"
-                @click="confirm1($event, null, 'omitAll',conflicts)" />
-        </template>
-    </CustomModal> -->
-    <!-- #endregion -->
 </template>
 
 <style scoped>
