@@ -162,6 +162,13 @@ const props = defineProps({
     stepMinute: {
         type: Number,
         default: null
+<<<<<<< HEAD
+=======
+    },
+    disabledDays:{
+        type: Array,
+        default: null
+>>>>>>> b026c0fcfaecbfe49fe751f4ff12a23558d9de2e
     }
 })
 
@@ -259,9 +266,16 @@ const input = defineModel('input', {
 
                 <span v-else-if="type == 'datetime'">
                     <Calendar :id v-model="input" :minDate :maxDate showTime :required hourFormat="24" showIcon
-                        :stepMinute dateFormat="dd/mm/yy" :pt="{
+                        :stepMinute dateFormat="dd/mm/yy" :disabledDays :pt="{
             root: '!w-full',
             input: '!h-8'
+        }" />
+                </span>
+                <span v-else-if="type == 'date'">
+                    <Calendar :id v-model="input" :minDate :maxDate :required showIcon :disabledDays
+                        dateFormat="dd/mm/yy" :pt="{
+            root: '!w-44',
+            input: '!h-8 text-center'
         }" />
                 </span>
                 <span v-else-if="type == 'time'">

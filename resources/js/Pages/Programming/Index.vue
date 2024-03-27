@@ -5,6 +5,7 @@ import AppLayout from '@/Layouts/AppLayout.vue'
 import Dropdown from 'primevue/dropdown';
 import NoContentToShow from '@/Components/NoContentToShow.vue'
 import WeekTable from '@/Pages/Programming/WeekTable.vue'
+import CustomInput from '@/Components/CustomInput.vue';
 /**
  * The above code is a JavaScript function that takes a time string in 24-hour format (e.g., "13:30")
 // and converts it to a 12-hour format with AM/PM indicator. It creates a new Date object with the time
@@ -25,6 +26,28 @@ const props = defineProps({
 const loading = ref(false)
 const project = ref()
 
+const divisionsOptions = ref(
+    ['GEMAM',
+    'GEBOC',
+    'DEEST',
+    'DEGPM',
+    'DEPRO',
+    'DVPCP',
+    'DVARD',
+    'DVSOL',
+    'DVMEC',
+    'DVPIN',
+    'DVELC',
+    'DVHAB',
+    'DVAIR',
+    'DVEAT',
+    'DVMOT',
+    'DVADQ',
+    'DEINE',
+    'DEMTO',
+    'CLIENTE'
+])
+
 //#endregion
 </script>
 <template>
@@ -37,8 +60,8 @@ const project = ref()
                 </span>
                 <div class="flex items-center space-x-2">
                     <span class="flex flex-col sm:flex-row items-center sm:space-x-2">
-                        <p>Selecciona un proyecto</p>
-                        <Dropdown :options="projects" class="w-96" optionLabel="name" optionValue="id" showClear
+                        <Dropdown :options="projects" placeholder="Seleccione un proyecto" optionLabel="name"
+                            optionValue="id" showClear :filter="true" filterPlaceholder="Buscar proyecto"
                             v-model="project" :pt="{
                             root: '!h-8',
                             input: '!py-0 !flex !items-center !text-sm !font-normal',
@@ -46,6 +69,17 @@ const project = ref()
                             filterInput: '!h-8'
                         }" />
                     </span>
+                    <span class="flex flex-col sm:flex-row items-center sm:space-x-2">
+                        <Dropdown :options="divisionsOptions" placeholder="Seleccione una división"
+                            showClear :filter="true" filterPlaceholder="Buscar proyecto"
+                            v-model="project" :pt="{
+                            root: '!h-8',
+                            input: '!py-0 !flex !items-center !text-sm !font-normal',
+                            item: '!py-1 !px-3 !text-sm !font-normal',
+                            filterInput: '!h-8'
+                        }" />
+                    </span>
+                    <CustomInput type="week" placeholder="Seleccione una semana"></CustomInput>
                     <Link :href="route('programming.create')">
                     <Button label="Programar Personal" severity="success" icon="fa-solid fa-plus" :project="project" />
                     </Link>

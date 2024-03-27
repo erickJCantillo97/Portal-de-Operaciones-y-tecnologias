@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Personal;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\Personal\PersonalScheduleDayJob;
 use App\Models\Projects\Project;
 use App\Models\Schedule;
 use App\Models\ScheduleTime;
@@ -545,28 +546,33 @@ class ProgrammingController extends Controller
 
     public function collisionsPerDay(Request $request){
         try {
-            return response()->json(['status' => false, 'mensaje'=> 'Mensaje desde el controlador']);
-            DB::beginTransaction();
+            //return $request->endSchedule;
+            // return DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->first()->idSchedule;
+            // return response()->json(['status' => false, 'mensaje'=> 'Mensaje desde el controlador']);
+            //DB::beginTransaction();
+            $DetailScheduleTime = DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->first();
             $mensaje = '';
+            $schedule = Schedule::find($DetailScheduleTime->idSchedule);
             switch ($request->actionType) {
             case 1:
-                $schedule = Schedule::find(DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->idSchedule);
+
                 $schedule->task_id = $request->idTask;
                 $schedule->save();
-                $mensaje = 'Horario reemplazado';
                 if($request->endSchedule){   
-                    //aqui va el job de Erik
+                    PersonalScheduleDayJob::dispatch($DetailScheduleTime->fecha,$DetailScheduleTime->idUsuario, $request->idTask);
+                    $mensaje = 'registro actualizado';               
                 }
                 break;
             case 2:
                 if($request->endSchedule){
-                    //aqui va el job de Erik
+                    PersonalScheduleDayJob::dispatch($DetailScheduleTime->fecha,$DetailScheduleTime->idUsuario, $request->idTask);
+                    $mensaje = 'registro actualizado';                
                 }
                 break;
             default:
                 break;
             }
-            DB::commit();
+            // DB::commit();
             return response()->json(['status' => true, 'mensaje'=> $mensaje]);
         }catch (Exception $e) {
             DB::rollBack();
@@ -626,5 +632,28 @@ class ProgrammingController extends Controller
 
             return $e;
         }
+    }
+
+    public function endNivelActivitiesByProject(Request $request)
+    {
+      return [
+        ['proyecto_1',[
+            'P1_actividad_1',
+            'P1_actividad_2',
+            'P1_actividad_3',
+            'P1_actividad_4'
+        ],'proyecto_2',[
+            'P2_actividad_1',
+            'P2_actividad_2',
+            'P2_actividad_3',
+            'P2_actividad_4'
+        ],'proyecto_3',[
+            'P3_actividad_1',
+            'P3_actividad_2',
+            'P3_actividad_3',
+            'P3_actividad_4'
+        ]
+        ]
+      ];
     }
 }

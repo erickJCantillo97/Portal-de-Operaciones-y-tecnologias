@@ -24,4 +24,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/programming/removeSchedule', [ProgrammingController::class, 'removeSchedule'])->name('programming.removeSchedule');
 
     Route::get('/gettaskdatedivision', [ProgrammingController::class, 'getTaskDateDivision'])->name('get.task.date.division');
+
+    Route::get('actividadesDeultimonivelPorProyectos', [ProgrammingController::class, 'endNivelActivitiesByProject'])->name('actividadesDeultimonivelPorProyectos');
+
 });
