@@ -162,13 +162,10 @@ const props = defineProps({
     stepMinute: {
         type: Number,
         default: null
-<<<<<<< HEAD
-=======
     },
-    disabledDays:{
+    disabledDays: {
         type: Array,
         default: null
->>>>>>> b026c0fcfaecbfe49fe751f4ff12a23558d9de2e
     }
 })
 
