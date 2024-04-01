@@ -9,6 +9,9 @@ import axios from 'axios';
 import { usePage } from '@inertiajs/vue3';
 import MultiSelect from 'primevue/multiselect';
 import ButtonGroup from 'primevue/buttongroup';
+import ProgressBar from 'primevue/progressbar';
+import Avatar from 'primevue/avatar';
+import AvatarGroup from 'primevue/avatargroup';
 // const { hasRole, hasPermission } = usePermissions()
 const divisiones = ['GEMAM',
     'GEBOC',
@@ -37,6 +40,15 @@ defineProps({
 })
 
 const openConflict = ref(false)
+function format24h(hora) {
+    if (hora.length > 5) {
+        return new Date(hora).toLocaleString('es-CO',
+            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+    } else {
+        return new Date("1970-01-01T" + hora).toLocaleString('es-CO',
+            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+    }
+}
 
 //#region Draggable
 const date = ref(new Date())
@@ -131,8 +143,8 @@ const projectsSelected = ref()
 
 <template>
     <AppLayout>
-        <div class="h-full w-full grid grid-cols-5">
-            <div class="col-span-4 h-full space-y-1 pt-1 px-1 flex flex-col">
+        <div class="h-full w-full grid grid-cols-8">
+            <div class="col-span-7 h-full space-y-1 pt-1 px-1 flex flex-col">
                 <div class="flex justify-between h-10 items-center">
                     <span class="flex space-x-2">
                         <p class="text-xl font-bold text-primary h-full items-center flex">
@@ -154,10 +166,9 @@ const projectsSelected = ref()
                     </div>
                 </div>
                 <!-- region calendario -->
-                <div class="h-[77vh]">
+                <div class="h-[75vh]">
                     <!-- region Cabezeras -->
-                    <div
-                        class="grid-cols-7 h-6 text-lg border-gray-100 leading-6 text-gray-500 grid mr-4 shadow-md">
+                    <div class="grid-cols-7 h-6 text-lg leading-6 text-gray-500 grid mr-4 shadow-md">
                         <div class="flex flex-col items-center">
                             <p class="flex border-b w-full justify-center items-baseline font-bold">Proyecto</p>
                         </div>
@@ -174,23 +185,50 @@ const projectsSelected = ref()
                     </div>
                     <!-- region Cabezeras -->
                     <div v-for="data in projectData"
-                        class="grid-cols-7 h-full divide-x divide-y divide-gray-100 text-lg border-gray-100 leading-6 text-gray-500 grid overflow-y-scroll mr-1" >
+                        class="grid-cols-7 h-full divide-x divide-y divide-gray-100 text-lg border-gray-100 leading-6 text-gray-500 grid overflow-y-scroll mr-1">
                         <div class="flex flex-col items-center px-2 h-full">
                             <div class="flex h-full w-full items-center justify-center font-bold">
                                 <p>
                                     {{ data.name }}
                                 </p>
+                                {{ data.percentDone }}
                             </div>
                         </div>
                         <div v-for="dia, index in diasSemana" class="flex flex-col items-center justify-center"
-                            :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary font-bold' : '']">
+                            :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
                             <span v-for="task in data.tasks" class="w-full p-0.5">
-                                <div class="border h-32 rounded-md"
+                                <div class="border border-primary h-32 rounded-md flex flex-col justify-between"
                                     v-if="fechaEnRango(task.startDate, task.endDate, dia.toISOString().split('T')[0])">
-                                    <p class="border-b text-xs w-full text-center">
-                                        {{ task.name }}
-                                    </p>
-                                    <p class="text-xs font-thin text-center w-full">{{task.task}}</p>
+                                    <div class="flex flex-col justify-between h-full">
+                                        <p class="border-b font-bold border-primary  text-xs px-0.5 w-full text-center">
+                                            {{ task.name }}
+                                        </p>
+                                        <p class="text-xs px-1 text-center w-full">{{ task.task }}</p>
+                                        <div class="grid grid-cols-4 items-center px-1">
+                                            <div
+                                                class="px-1 flex cursor-default flex-col justify-center border rounded-md h-full">
+                                                <p v-tooltip.left="'Hora inicio'" class="text-sm">
+                                                    {{ format24h(task.shift.startShift) }}
+                                                </p>
+                                                <p v-tooltip.left="'Hora Fin'" class="text-sm">
+                                                    {{ format24h(task.shift.endShift) }}
+                                                </p>
+                                            </div>
+                                            <div class="col-span-3 flex justify-center">
+                                                <AvatarGroup>
+                                                    <Avatar image="/images/avatar/amyelsner.png" shape="circle" />
+                                                    <Avatar image="/images/avatar/asiyajavayant.png" shape="circle" />
+                                                    <Avatar image="/images/avatar/onyamalimba.png" shape="circle" />
+                                                    <Avatar label="+2" shape="circle" />
+                                                </AvatarGroup>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-1">
+                                        <!-- {{ task.percentDone }} -->
+                                        <ProgressBar :value="task.percentDone" class=""
+                                            :pt="{ label: 'text-xs font-thin' }"></ProgressBar>
+                                    </div>
                                 </div>
                             </span>
 
@@ -198,6 +236,47 @@ const projectsSelected = ref()
                         <!-- endregion -->
                     </div>
                     <!-- endregion -->
+                    <div class="grid-cols-7 divide-x-2 text-sm leading-6 text-gray-500 grid mr-4 shadow-md">
+                        <div>
+                            
+                        </div>
+                        <div class="grid grid-cols-4">
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                        </div>
+                        <div class="grid grid-cols-4">
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                        </div>
+                        <div class="grid grid-cols-4">
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                        </div>
+                        <div class="grid grid-cols-4">
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                        </div>
+                        <div class="grid grid-cols-4">
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                        </div>
+                        <div class="grid grid-cols-4">
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                            <p class="w-full text-center">10</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- <Listbox :options="tasks" :filterFields="['task', 'name', 'project']" class="col-span-2" filter :pt="{
@@ -328,7 +407,7 @@ const projectsSelected = ref()
 </Listbox> -->
             </div>
             <!--#region LISTA PERSONAL-->
-            <div class="row-span-2 h-full rounded-lg border p-1">
+            <div class="row-span-2 rounded-lg border p-1">
                 <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
                 <Loading v-if="loadingPerson" class="mt-10" message="Cargando personas" />
                 <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy" group-name="1"
@@ -339,10 +418,8 @@ const projectsSelected = ref()
                         :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"
                         :drag-not-allowed="personalHours[item.Num_SAP] < 9.5 ? false : true"
                         class="snap-start rounded-xl shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
-                        <div class="grid grid-cols-5 gap-x-1 p-1">
-                            <img class="custom-image " :src="item.photo" align="center"
-                                onerror="this.src='/svg/cotecmar-logo.svg'" draggable="false" alt="profile-photo" />
-                            <span class="col-span-3 flex flex-col justify-center">
+                        <div class="flex flex-col gap-x-1 p-1">
+                            <span class=" flex flex-col justify-center">
                                 <p class="text-sm font-semibold truncate  text-gray-900">
                                     {{ item.Nombres_Apellidos }}
                                 </p>
@@ -365,6 +442,7 @@ const projectsSelected = ref()
                     </Draggable>
                     <!-- </span> -->
                 </Container>
+
             </div>
         </div>
     </AppLayout>
