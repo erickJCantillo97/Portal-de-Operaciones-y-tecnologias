@@ -21,7 +21,7 @@ import BadgeDirective from 'primevue/badgedirective';
 const appName =
     import.meta.env.VITE_APP_NAME || "Portal";
 
-createInertiaApp({      
+createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) =>
         resolvePageComponent(
@@ -44,6 +44,21 @@ createInertiaApp({
                     inputtext: {
                         root: '!h-8'
                     },
+                    dropdown: {
+                        root: '!h-8',
+                        input: '!py-0 !flex !items-center !text-sm !font-normal',
+                        item: '!py-1 !px-3 !text-sm !font-normal',
+                        filterInput: '!h-8'
+                    },
+                    multiselect: {
+                        root: '!h-8',
+            label: '!py-0.5 !flex !h-full !items-center !text-sm !font-normal',
+            token: '!py-0 !px-1',
+            tokenLabel: '!text-sm',
+            item: '!py-1 !px-3 !text-sm !font-normal',
+            filterInput: '!h-8',
+            header: '!h-min !py-0.5'
+                    }
                 }
             })
             .component('Button', Button)

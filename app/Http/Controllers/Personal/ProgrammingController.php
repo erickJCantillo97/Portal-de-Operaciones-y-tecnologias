@@ -30,7 +30,11 @@ class ProgrammingController extends Controller
 
     public function create()
     {
-        return Inertia::render('Programming/Create');
+        $projects = Project::active()->get();
+
+        return Inertia::render('Programming/Create', [
+            'projects' => $projects,
+        ]);
     }
 
     /**
