@@ -636,24 +636,34 @@ class ProgrammingController extends Controller
 
     public function endNivelActivitiesByProject(Request $request)
     {
-      return [
-        ['proyecto_1',[
-            'P1_actividad_1',
-            'P1_actividad_2',
-            'P1_actividad_3',
-            'P1_actividad_4'
-        ],'proyecto_2',[
-            'P2_actividad_1',
-            'P2_actividad_2',
-            'P2_actividad_3',
-            'P2_actividad_4'
-        ],'proyecto_3',[
-            'P3_actividad_1',
-            'P3_actividad_2',
-            'P3_actividad_3',
-            'P3_actividad_4'
-        ]
-        ]
-      ];
+        $taskWithSubTasks = VirtualTask::has('project')->whereNotNull('task_id')->select('task_id')->get()->map(function ($task) {
+            return $task['task_id'];
+        })->toArray();
+        
+        return response()->json(
+            VirtualTask::whereHas('project', function ($query) use ($request){
+                $query->where('id', $request->idProject);
+                // $query->where('executor','LIKE', '%'.trim(auth()->user()->gerencia).'%');
+            })->has('task')
+            ->where(function ($query) use ($request) {
+                $query->whereBetween('startdate', [$request->date_start, $request->date_end])
+                    ->orWhereBetween('enddate', [$request->date_start, $request->date_end])
+                    ->orWhere(function ($query) use ($request) {
+                        $query->where('enddate', '>', $request->date_end)
+                            ->where('startdate', '<', $request->date_start);
+                    });
+            })->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) {
+                return [
+                    'name' => $task['name'],
+                    'id' => $task['id'],
+                    'task' => $task->task->name,
+                    'endDate' => $task['endDate'],
+                    'percentDone' => $task['percentDone'],
+                    'project' => $task->project->name,
+                    'shift' => $task->project->shift ? Shift::where('id', $task->project->shift)->first() : null,
+                    'startDate' => $task['startDate'],
+                ];
+            }),
+        );
     }
 }
