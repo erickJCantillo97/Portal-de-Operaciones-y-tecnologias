@@ -41,7 +41,7 @@ const handleWeekendsToggle = () => {
   calendarOptions.value.weekends = !calendarOptions.value.weekends // update a property
 }
 
-const handleDateSelect = (selectInfo) =>  {
+const handleDateSelect = (selectInfo) => {
   // console.log(selectInfo)
   isOpen.value = true
   selectedEvent.value = selectInfo
@@ -90,7 +90,7 @@ const submit = (idTask, schedule) => {
 
   if (title != null) {
     calendarApi.addEvent({
-      id: String(eventguid++),
+      id: String(eventguid.value++),
       title,
       start: schedule.startStr,
       end: schedule.endStr,
