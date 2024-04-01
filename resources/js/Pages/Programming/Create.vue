@@ -2,97 +2,62 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, onMounted } from 'vue';
 import { Container, Draggable } from "vue-dndrop";
-import { usePermissions } from '@/composable/permission';
-import Knob from 'primevue/knob';
-import FullCalendar from '@/Components/FullCalendar.vue'
 import Loading from '@/Components/Loading.vue';
 import CustomInput from '@/Components/CustomInput.vue';
-import TabView from 'primevue/tabview';
-import TabPanel from 'primevue/tabpanel';
-import Listbox from 'primevue/listbox';
-import CustomModal from '@/Components/CustomModal.vue';
-import RadioButton from 'primevue/radiobutton';
-import Calendar from 'primevue/calendar';
-import CustomShiftSelector from '@/Components/CustomShiftSelector.vue';
-import ButtonGroup from 'primevue/buttongroup';
-import Breadcrumb from 'primevue/breadcrumb';
-import { useToast } from "primevue/usetoast";
-import { useConfirm } from "primevue/useconfirm";
-import InputSwitch from 'primevue/inputswitch';
 import ModalColisions from './Components/ModalColisions.vue'
 import axios from 'axios';
-const toast = useToast();
-const confirm = useConfirm();
+import { usePage } from '@inertiajs/vue3';
+import MultiSelect from 'primevue/multiselect';
+import ButtonGroup from 'primevue/buttongroup';
 // const { hasRole, hasPermission } = usePermissions()
+const divisiones = ['GEMAM',
+    'GEBOC',
+    'JDEEST',
+    'JDEGPM',
+    'JDEPRO',
+    'JDVPCP',
+    'JDVARD',
+    'JDVSOL',
+    'JDVMEC',
+    'JDVPIN',
+    'JDVELC',
+    'JDVHAB',
+    'JDVAIR',
+    'JDVEAT',
+    'JDVMOT',
+    'JDVADQ',
+    'JDEINE',
+    'JDEMTO',
+    'OFTIC',
+    'CLIENTE',
+]
+
+defineProps({
+    projects: Array
+})
 
 const openConflict = ref(false)
 
 //#region Draggable
-const listaDatos = ref({})
 const date = ref(new Date())
 const personal = ref()
 const tasks = ref([]);
 const loadingProgram = ref(true);
 const loadingPerson = ref(true);
 const personalHours = ref({});
-const loadingTasks = ref(true)
-const loadingTask = ref({})
-const optionValue = ref('today')
 const conflicts = ref()
 const task = ref({})
 
 // El código anterior define una función `onDrop` en Vue. Esta función se activa cuando un elemento se
 // coloca en una colección.
-const onDrop = async (collection, dropResult) => {
-    const { addedIndex, payload } = dropResult;
-    if (addedIndex !== null) {
-        loadingTask.value[collection.id] = true
-        await axios.post(route('programming.store'), { task_id: collection.id, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: date.value.toISOString().split("T")[0] }).then((res) => {
-            listaDatos.value[collection.id] = res.data.task
-            personalHours.value[(payload.Num_SAP)] = res.data.hours
-            loadingTask.value[collection.id] = false
-            conflicts.value = Object.values(res.data.conflict)
-            if (conflicts.value.length > 0) {
-                openConflict.value = true;
-                task.value = collection
-            }
-        })
-    }
-}
 
-const getAssignmentHoursForEmployee = (employee_id) => {
-    axios.get(route('get.assignment.hours', [date.value.toISOString().split("T")[0], employee_id])).then((res) => {
-        personalHours.value[(employee_id)] = res.data;
-    })
-}
-
-const getAssignmentHoursAll = () => {
-    personalHours.value = {}
-    personal.value.forEach(
-        element => {
-            axios.get(route('get.assignment.hours', [date.value.toISOString().split("T")[0], (element.Num_SAP)])).then((res) => {
-                personalHours.value[element.Num_SAP] = res.data;
-            });
-        })
-}
 
 const getPersonalData = () => {
-    if (personal.value) {
-        getAssignmentHoursAll()
-    } else {
-        loadingPerson.value = true
-        axios.get(route('get.personal.user')).then((res) => {
-            personal.value = Object.values(res.data.personal)
-            getAssignmentHoursAll()
-            loadingPerson.value = false
-        })
-    }
-}
-
-// El código anterior define una función llamada "getChildPayload" que toma un parámetro "índice". Esta
-// función devuelve el valor en el índice especificado en la variable "personal".
-const getChildPayload = (index) => {
-    return personal.value[index];
+    loadingPerson.value = true
+    axios.get(route('get.personal.user')).then((res) => {
+        personal.value = Object.values(res.data.personal)
+        loadingPerson.value = false
+    })
 }
 
 //#endregion
@@ -107,199 +72,97 @@ onMounted(() => {
 // El código anterior es una función de Vue.js que recupera tareas según la opción seleccionada.
 const getTask = async (option) => {
     loadingProgram.value = true
-    optionValue.value = option
-    switch (option) {
-        case 'today':
-            date.value = new Date();
-            break;
-        case 'tomorrow':
-            var tomorrow = new Date()
-            date.value = new Date(tomorrow.setDate(tomorrow.getDate() + 1));
-            break;
-        default:
-            break;
-    }
-    tasks.value = [];
-    await axios.get(route('actividadesDeultimonivel', { date: date.value.toISOString().split("T")[0] })).then((res) => {
-        tasks.value = res.data
+    await axios.get(route('actividadesDeultimonivelPorProyectos')).then((res) => {
+        console.log(res.data[0])
+        tasks.value = res.data[0]
         loadingProgram.value = false;
     })
-    tasks.value.forEach(element => {
-        loadingTask.value[element.id] = true
-        axios.get(route('get.schedule.task', { task_id: element.id, date: date.value.toISOString().split("T")[0] })).then((res) => {
-            listaDatos.value[element.id] = res.data.schedule
-            loadingTask.value[element.id] = false
-            loadingTasks.value = false
-        })
-    });
-}
-
-// El código anterior es una función llamada `format24h` que toma un parámetro `hora` (que representa
-// una hora en formato de 24 horas) y devuelve una cadena de hora formateada en formato de 12 horas con
-// AM/PM.
-function format24h(hora) {
-    if (hora.length > 5) {
-        return new Date(hora).toLocaleString('es-CO',
-            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-    } else {
-        return new Date("1970-01-01T" + hora).toLocaleString('es-CO',
-            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-    }
 }
 //#region
 
 //#endregion
-
-//#region Modal Persona
-const employee = ref([])
-const open = ref(false)
-const events = ref([])
-const rendersCalendars = ref(0)
-
-// El código anterior define una función llamada `employeeDialog` que toma un parámetro `item`. Dentro
-// de la función, establece el valor de "open" en "verdadero" y el valor de "employee" en el
-// parámetro "elemento".
-const employeeDialog = (item) => {
-    open.value = true
-    employee.value = item
-    axios.get(route('get.times.employees', { date: date.value.toISOString().split("T")[0], employee_id: item.Num_SAP }))
-        .then((res) => {
-            events.value = res.data.times
-            rendersCalendars.value++;
-        })
-        .catch(error => {
-            console.log(error);
-        })
-}
-
-
-
-const formEditHour = ref({
-    userName: null, //nombre de la persona
-    timeName: null, // nombre del horario personalizado
-    startShift: '07:00',// hora inicio
-    endShift: '16:30',// hora fin
-    timeBreak: null,
-    schedule_time: null,
-    schedule: null, // id del schedule/cronograma (TABLA SCHEDULES)
-    idUser: null, // Id de la persona seleccionada (COLUMNA EMPLOYEE_ID DE LA TABLA SCHEDULES)
-    date: date, // fecha seleccionada en el calendario
-    personalized: true, // Seleccionar turno => false, Seleccionar Horario Personalizado => false, Nuevo horario personalizado =>true
-    type: 1,// Solo el => 1; Resto de la actividad => 2; Rango de fechas => 3; Fechas específicos => 4
-    details: [],
-    loading: false,
-    /* la propiedad details depende de la propiedad type, es decir:
-        si la opción type es 1, en details se debe enviar la fecha (Solo el =>) ej: ['2024-03-07']
-        si la opcion type es 2, en details se debe enviar el id de la actividad seleccionada (EN BASE DE DATOS ES LA TABLA TASK) ej: [7683]
-        si la opcion type es 3, en details se debe enviar la fecha inicial y la fecha final (EN LA PRIMERA POSICION SIEMPRE SE DEBE MANDAR LA FECHA INICIAL), ej: ['2024-03-01','2024-03-10']
-        si la opcion type es 4, en details se debe enviar las fechas seleccionadas en el calendario, no importa el orden ej: ['2024-03-01', '2024-03-10', '2024-01-01','2024-02-10']
-    */
-});
-const editHorario = ref()
-const nuevoHorario = ref({})
-const optionSelectHours = ref('select')
-const modhours = ref(false)
-
-const editHour = (horario, data, option) => {
-    editHorario.value = horario
-    editHorario.value.data = data
-    editHorario.value.option = option
-    formEditHour.value.idUser = data.employee_id
-    formEditHour.value.schedule = data.id
-    formEditHour.value.schedule_time = horario.id
-    formEditHour.value.userName = data.name
-    nuevoHorario.value = {}
-    modhours.value = true
-}
-//#endregion
-
 const filter = ref('');
 
-const selectDays = ref()
-const tabActive = ref()
-const save = async () => {
-    task.value = tasks.value.find((task) => task.id = editHorario.value.data.task_id)
-    formEditHour.value.loading = true
-    if (tabActive.value != 2) {
-        formEditHour.value.personalized = false
-        formEditHour.value.startShift = new Date(nuevoHorario.value.startShift).toLocaleString('es-CO',
-            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-        formEditHour.value.endShift = new Date(nuevoHorario.value.endShift).toLocaleString('es-CO',
-            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-        formEditHour.value.timeBreak = parseFloat(nuevoHorario.value.timeBreak)
-    } else {
-        formEditHour.value.startShift = new Date(formEditHour.value.startShift).toLocaleString('es-CO',
-            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-        formEditHour.value.endShift = new Date(formEditHour.value.endShift).toLocaleString('es-CO',
-            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-        formEditHour.value.timeBreak = parseFloat(formEditHour.value.timeBreak)
+function obtenerFormatoSemana(fecha) {
+    const fechaActual = fecha;
+    const año = fechaActual.getFullYear();
+    const diferencia = fecha - (new Date(fecha.getFullYear(), 0, 1));
+    const diasTranscurridos = Math.floor(diferencia / (24 * 60 * 60 * 1000));
+    const semana = Math.ceil((diasTranscurridos + (new Date(fecha.getFullYear(), 0, 1)).getDay() + 1) / 7); // Función para obtener el número de la semana
+    return `${año}-W${semana}`;
+}
+function obtenerFechasSemana(diaSeleccionado) {
+    const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    const fechasSemana = [];
+
+    // Asegurémonos de que el día seleccionado sea un objeto Date
+    const fechaSeleccionada = new Date(diaSeleccionado);
+
+    // Restamos los días necesarios para llegar al lunes
+    fechaSeleccionada.setDate(fechaSeleccionada.getDate() - fechaSeleccionada.getDay() + 1);
+
+    // Generamos las fechas para cada día de la semana
+    for (let i = 0; i < 6; i++) {
+        fechasSemana.push(new Date(fechaSeleccionada));
+        fechaSeleccionada.setDate(fechaSeleccionada.getDate() + 1);
     }
 
-    if (formEditHour.value.type == 1) {
-        formEditHour.value.details[0] = date.value.toISOString().split("T")[0]
-    } else if (formEditHour.value.type == 2) {
-        formEditHour.value.details[0] = formEditHour.value.schedule
-    }
-    else {
-        selectDays.value.forEach((day, index) => {
-            formEditHour.value.details[index] = new Date(day).toISOString().split("T")[0]
-        })
-    }
-    //aplicar validaciones de campos requeridos (TODOS LOS CAMPOS SON REQUERIDOS)
-    /*
-    NOTA:
-    Se debe cambiar el campo de hora inicio y hora fin a un formato de 24 horas.
-    */
-    await axios.post(route(editHorario.value.option != 'delete' ? 'programming.saveCustomizedSchedule' : 'programming.removeSchedule'), formEditHour.value)
-        .then((res) => {
-            if (res.data.status) {
-                modhours.value = false
-                listaDatos.value[formEditHour.value.schedule] = res.data.task
-                editHorario.value.data.hora_inicio = formEditHour.value.startShift
-                editHorario.value.data.hora_fin = formEditHour.value.endShift
-                getAssignmentHoursForEmployee((formEditHour.value.idUser))
-                toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
-            }
-            else {
-                conflicts.value = Object.values(res.data.conflict)
-                if (conflicts.value.length > 0) {
-                    openConflict.value = true;
-                    // task.value.id = schedule
-                }
-                // toast.add({ severity: 'danger', group: "customToast", text: res.data.mensaje, life: 2000 })
-            }
-            formEditHour.value.loading = false
-        }).catch((error) => {
-            console.log(error)
-            toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 2000 })
-        });
+    return fechasSemana;
 }
 
+const week = ref(obtenerFormatoSemana(date.value))
+const diasSemana = obtenerFechasSemana(date.value)
+const projectsSelected = ref()
 </script>
 
 <template>
     <AppLayout>
-        <div class="h-full w-full grid grid-cols-3 ">
-            <span class="col-span-2 space-y-1 pt-1 px-1">
-                <span class="flex justify-between items-center">
-                    <span class="text-xl font-bold text-primary h-full items-center flex">
-                        Programación de actividades
+        <div class="h-full w-full grid grid-cols-5">
+            <div class="col-span-4 h-full space-y-1 pt-1 px-1 flex flex-col">
+                <div class="flex justify-between h-10 items-center">
+                    <span class="flex space-x-2">
+                        <p class="text-xl font-bold text-primary h-full items-center flex">
+                            Programación de actividades
+                        </p>
+                        <p class="border px-2 bg-primary rounded-lg text-white items-center">
+                            {{ $page.props.auth.user.oficina }}
+                        </p>
                     </span>
                     <div class="flex items-center space-x-2">
+                        <MultiSelect v-model="projectsSelected" display="chip" :options="projects" optionLabel="name"
+                            class="w-56" placeholder="Seleccione un proyecto" />
                         <ButtonGroup>
-                            <Button label="Hoy" :outlined="optionValue != 'today'"
-                                @click="getTask('today'); getPersonalData()" />
-                            <Button label="Mañana" :outlined="optionValue != 'tomorrow'"
-                                @click="getTask('tomorrow'); getPersonalData()" />
+                            <Button label="Mes" disabled />
+                            <Button label="Semana" />
+                            <Button label="dia" disabled />
                         </ButtonGroup>
-                        <Calendar :disabledDays="[0]" v-model="date" showIcon :manualInput="false" dateFormat="dd/mm/yy"
-                            @date-select="getTask('date'); getPersonalData()" :pt="{
-                                root: '!w-44',
-                                input: '!h-8 text-center'
-                            }" />
+                        <CustomInput v-model:input="week" type="week"></CustomInput>
                     </div>
-                </span>
-                <Listbox :options="tasks" :filterFields="['task', 'name', 'project']" class="col-span-2" filter :pt="{
+                </div>
+                <!-- region calendario -->
+                <!-- region Cabezeras -->
+                <div
+                    class="grid-cols-7 divide-x divide-y divide-gray-100 border-r border-gray-100 text-sm leading-6 text-gray-500 grid">
+                    <div class="flex flex-col items-center">
+                        <p class="flex border-b w-full justify-center items-baseline font-bold">Proyecto</p>
+                    </div>
+                    <div v-for="dia, index in diasSemana" class="flex flex-col items-center"
+                        :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary font-bold' : '']">
+                        <p class="flex border-b w-full justify-center items-baseline">{{
+                                dia.toLocaleDateString('es-CO', {
+                                    weekday: 'long', year: 'numeric', month: 'numeric', day:
+                                        'numeric'
+                                }) }}
+                        </p>
+                    </div>
+                    <!-- endregion -->
+                </div>
+                <div class="w-12 px-1">
+                    <p class="w-full text-">Proyecto</p>
+                </div>
+                <!-- endregion -->
+
+                <!-- <Listbox :options="tasks" :filterFields="['task', 'name', 'project']" class="col-span-2" filter :pt="{
                                 list: '!h-[76vh] !px-1 !snap-y !snap-mandatory',
                                 item: '!h-full !p-0 !rounded-md !snap-start !my-0.5',
                                 filterInput: '!h-8',
@@ -420,18 +283,17 @@ const save = async () => {
                         </div>
                     </template>
 
-                    <template #empty>
+<template #empty>
                         <Loading v-if="loadingProgram" class="mt-10" message="Cargando actividades" />
                     </template>
 
-                </Listbox>
-            </span>
+</Listbox> -->
+            </div>
             <!--#region LISTA PERSONAL-->
-            <div class="row-span-2 rounded-lg border">
+            <div class="row-span-2 h-full rounded-lg border p-1">
                 <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
                 <Loading v-if="loadingPerson" class="mt-10" message="Cargando personas" />
                 <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy" group-name="1"
-                    :get-child-payload="getChildPayload"
                     class="h-[74vh] flex flex-col space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
                     <!-- <span v-for="item in personal"> -->
                     <Draggable v-for="item in personal"
@@ -453,14 +315,14 @@ const save = async () => {
                                     {{ item.Oficina }}
                                 </p>
                             </span>
-                            <span class="flex items-center">
+                            <!-- <span class="flex items-center">
                                 <Button v-tooltip.left="'Horas programadas'" class="w-full"
                                     :key="personalHours[item.Num_SAP]"
                                     :icon="personalHours[(item.Num_SAP)] == undefined ? 'fa-solid fa-spinner animate-spin' : undefined"
                                     :label="personalHours[item.Num_SAP] != undefined ? personalHours[item.Num_SAP] + ' horas' : undefined"
                                     :severity="personalHours[item.Num_SAP] < 9.5 ? 'primary' : 'success'"
                                     @click="employeeDialog(item)" :pt="{ label: '!text-xs' }" />
-                            </span>
+                            </span> -->
                         </div>
                     </Draggable>
                     <!-- </span> -->
@@ -471,102 +333,6 @@ const save = async () => {
     </AppLayout>
 
     <!--#region MODALES -->
-    <CustomModal v-model:visible="modhours" :footer="false" icon="fa-regular fa-clock" width="60vw"
-        :closeOnEscape="false"
-        :titulo="editHorario?.option != 'delete' ? 'Modificar horario de ' + editHorario?.data.name : 'Eliminando a ' + editHorario?.data.name + 'de la actividad ' + editHorario?.task">
-        <template #body>
-            <form @submit.prevent="save" class="pb-2">
-                <div v-if="editHorario?.option != 'delete'" class="flex flex-col gap-1">
-                    <div class="flex items-center justify-between col-span-3 ">
-
-                        <p class="font-bold">Horario actual:</p>
-                        <p class="px-1 py-1 text-green-900 bg-green-200 rounded-md">
-                            {{ format24h(editHorario.hora_inicio.slice(0,
-                                editHorario.hora_inicio.lastIndexOf(':'))) }}
-                            {{ format24h(editHorario.hora_fin.slice(0,
-                                editHorario.hora_fin.lastIndexOf(':'))) }}
-                        </p>
-                    </div>
-                    <TabView v-model:activeIndex="tabActive" class="border rounded-md p-1" :pt="{
-                                nav: '!flex !justify-between',
-                                panelContainer: '!p-1'
-                            }">
-                        <TabPanel header="Seleccionar Turno" :pt="{
-                                root: 'w-full',
-                                headerTitle: '!w-full !flex !justify-center',
-                            }">
-                            <CustomShiftSelector v-model:shift="nuevoHorario" />
-                        </TabPanel>
-                        <TabPanel header="Seleccionar Horario Personalizado" :pt="{
-                                root: 'w-full',
-                                headerTitle: '!w-full !flex !justify-center',
-                            }">
-                            <CustomShiftSelector :shiftUser="parseInt($page.props.auth.user.id)"
-                                v-model:shift="nuevoHorario" />
-                        </TabPanel>
-                        <TabPanel header="Personalizado" :pt="{
-                                root: 'w-full',
-                                headerTitle: '!w-full !flex !justify-center',
-                            }">
-                            <div class="h-52 space-y-2 m-1 mt-3">
-                                <span class="flex gap-2 items-center">
-                                    <label class="-mb-0.5" for="switch1">Guardar en personalizados?</label>
-                                    <InputSwitch inputId="switch1" v-model="formEditHour.personalized" />
-                                </span>
-                                <CustomInput v-if="formEditHour.personalized" v-model:input="formEditHour.timeName"
-                                    label="Nombre" type="text" id="name" placeholder="Nombre del horario"
-                                    :required="tabActive == 2" />
-                                <span class="grid grid-cols-3 gap-x-1">
-                                    <CustomInput v-model:input="formEditHour.startShift" label="Hora inicio" type="time"
-                                        :stepMinute="30" id="start" placeholder="Hora de inicio"
-                                        :required="tabActive === 2" />
-                                    <CustomInput v-model:input="formEditHour.endShift" label="Hora fin" type="time"
-                                        id="end" :stepMinute="30" placeholder="Hora de fin"
-                                        :required="tabActive === 2" />
-                                    <CustomInput v-model:input="formEditHour.timeBreak" label="Descanso" type="number"
-                                        suffix=" Hora" id="break" placeholder="Descanso en horas"
-                                        :required="tabActive === 2" />
-                                </span>
-                            </div>
-                        </TabPanel>
-                    </TabView>
-                </div>
-                <p class="font-bold text-xl">Aplicar por:</p>
-                <span class="flex items-center p-2 gap-4">
-                    <div v-for="category in [{ name: 'Solo el ' + date.toISOString().split('T')[0], key: 1 }, { name: 'Resto de la actividad', key: 2 }, { name: 'Rango de fechas', key: 3 }, { name: 'Fechas específicos', key: 4 }]"
-                        :key="category.key" class="flex items-center">
-                        <RadioButton v-model="formEditHour.type" :inputId="category.key + category.name" name="dynamic"
-                            :value="category.key" @click="formEditHour.details = []" />
-                        <label :for="category.key" class="ml-1 mb-0">{{ category.name }}</label>
-                    </div>
-                </span>
-                <!-- {{editHorario?.option != 'delete'?tabActive != 2? nuevoHorario?.startShift!=null?false:true:false:false }} -->
-                <span class="w-full grid grid-cols-4 justify-end gap-5 items-center">
-                    <Calendar v-if="formEditHour.type == 3 || formEditHour.type == 4" show-icon v-model="selectDays"
-                        class="col-span-3" :selectionMode="formEditHour.type == 3 ? 'range' : 'multiple'"
-                        :manualInput="false" :pt="{
-                                root: '!w-full',
-                                input: '!h-8'
-                            }" />
-                    <Button type="submit" class="col-start-4" :loading="formEditHour.loading"
-                        :disabled="(editHorario?.option !== 'delete') && (tabActive !== 2) && (nuevoHorario?.startShift !== null)"
-                        :severity="editHorario?.option != 'delete' ? 'success' : 'danger'"
-                        :icon="editHorario?.option != 'delete' ? 'fa-solid fa-floppy-disk' : 'fa-solid fa-trash-can'"
-                        :label="editHorario?.option != 'delete' ? 'Guardar' : 'Eliminar'" />
-                </span>
-            </form>
-        </template>
-    </CustomModal>
-
-    <CustomModal v-model:visible="open" width="90vw" :close-on-escape="false"
-        :titulo="'Ver detalle de horario de ' + employee.Nombres_Apellidos">
-        <template #body>
-            <div class="py-2 max-h-[80vh] w-[40vw]">
-                <FullCalendar :initialEvents="events" :tasks="tasks" :date="date" :employee="employee"
-                    :key="rendersCalendars" />
-            </div>
-        </template>
-    </CustomModal>
 
     <ModalColisions v-model:visible="openConflict" v-model:conflicts="conflicts" v-model:task="task">
     </ModalColisions>

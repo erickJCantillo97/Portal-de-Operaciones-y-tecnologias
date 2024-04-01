@@ -3,7 +3,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { onMounted, ref } from 'vue';
 import '@bryntum/gantt/gantt.material.css';
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
-import { BryntumGantt, BryntumResourceUtilization } from '@bryntum/gantt-vue-3';
+import { BryntumGantt } from '@bryntum/gantt-vue-3';
 import { AjaxHelper, DateHelper, List, LocaleManager, StringHelper, Widget, ColumnStore, Column, TaskModel } from '@bryntum/gantt';
 import Slider from 'primevue/slider'
 import { useToast } from "primevue/usetoast";
