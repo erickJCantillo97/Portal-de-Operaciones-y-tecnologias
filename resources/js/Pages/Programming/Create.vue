@@ -41,12 +41,12 @@ const openConflict = ref(false)
 //#region Draggable
 const date = ref(new Date())
 const personal = ref()
-const tasks = ref([]);
+const projectData = ref([]);
 const loadingProgram = ref(true);
 const loadingPerson = ref(true);
 const personalHours = ref({});
 const conflicts = ref()
-const task = ref({})
+const task = ref([])
 
 // El código anterior define una función `onDrop` en Vue. Esta función se activa cuando un elemento se
 // coloca en una colección.
@@ -66,15 +66,21 @@ const getPersonalData = () => {
 // cuando el componente está montado.
 onMounted(() => {
     getPersonalData()
-    getTask('tomorrow')
+    // getTask('tomorrow')
 })
 
 // El código anterior es una función de Vue.js que recupera tareas según la opción seleccionada.
-const getTask = async (option) => {
+const getTask = async () => {
     loadingProgram.value = true
-    await axios.get(route('actividadesDeultimonivelPorProyectos')).then((res) => {
-        console.log(res.data[0])
-        tasks.value = res.data[0]
+    console.log(projectsSelected.value)
+    console.log(diasSemana.value[0].toISOString())
+    let date_start = diasSemana.value[0].toISOString()
+    let date_end = diasSemana.value[5].toISOString()
+    await axios.get(route('actividadesDeultimonivelPorProyectos', { idProject: projectsSelected.value[0].id, date_start, date_end })).then((res) => {
+        let project = projectsSelected.value[0]
+        project.tasks = res.data
+        projectData.value.push(project)
+        console.log(projectData.value)
         loadingProgram.value = false;
     })
 }
@@ -92,7 +98,7 @@ function obtenerFormatoSemana(fecha) {
     return `${año}-W${semana}`;
 }
 function obtenerFechasSemana(diaSeleccionado) {
-    const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    // const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
     const fechasSemana = [];
 
     // Asegurémonos de que el día seleccionado sea un objeto Date
@@ -110,8 +116,16 @@ function obtenerFechasSemana(diaSeleccionado) {
     return fechasSemana;
 }
 
+function fechaEnRango(fechaInicio, fechaFin, fechaSeleccionada) {
+    const inicio = new Date(fechaInicio);
+    const fin = new Date(fechaFin);
+    const seleccionada = new Date(fechaSeleccionada);
+
+    return seleccionada >= inicio && seleccionada <= fin;
+}
+
 const week = ref(obtenerFormatoSemana(date.value))
-const diasSemana = obtenerFechasSemana(date.value)
+const diasSemana = ref(obtenerFechasSemana(date.value))
 const projectsSelected = ref()
 </script>
 
@@ -130,7 +144,7 @@ const projectsSelected = ref()
                     </span>
                     <div class="flex items-center space-x-2">
                         <MultiSelect v-model="projectsSelected" display="chip" :options="projects" optionLabel="name"
-                            class="w-56" placeholder="Seleccione un proyecto" />
+                            class="w-56" placeholder="Seleccione un proyecto" @change="getTask()" />
                         <ButtonGroup>
                             <Button label="Mes" disabled />
                             <Button label="Semana" />
@@ -140,27 +154,51 @@ const projectsSelected = ref()
                     </div>
                 </div>
                 <!-- region calendario -->
-                <!-- region Cabezeras -->
-                <div
-                    class="grid-cols-7 divide-x divide-y divide-gray-100 border-r border-gray-100 text-sm leading-6 text-gray-500 grid">
-                    <div class="flex flex-col items-center">
-                        <p class="flex border-b w-full justify-center items-baseline font-bold">Proyecto</p>
-                    </div>
-                    <div v-for="dia, index in diasSemana" class="flex flex-col items-center"
-                        :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary font-bold' : '']">
-                        <p class="flex border-b w-full justify-center items-baseline">{{
+                <div class="h-[77vh]">
+                    <!-- region Cabezeras -->
+                    <div
+                        class="grid-cols-7 h-6 text-lg border-gray-100 leading-6 text-gray-500 grid mr-4 shadow-md">
+                        <div class="flex flex-col items-center">
+                            <p class="flex border-b w-full justify-center items-baseline font-bold">Proyecto</p>
+                        </div>
+                        <div v-for="dia, index in diasSemana" class="flex flex-col items-center"
+                            :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary font-bold' : '']">
+                            <p class="flex capitalize border-b w-full justify-center items-baseline">{{
                                 dia.toLocaleDateString('es-CO', {
                                     weekday: 'long', year: 'numeric', month: 'numeric', day:
                                         'numeric'
                                 }) }}
-                        </p>
+                            </p>
+                        </div>
+                        <!-- endregion -->
+                    </div>
+                    <!-- region Cabezeras -->
+                    <div v-for="data in projectData"
+                        class="grid-cols-7 h-full divide-x divide-y divide-gray-100 text-lg border-gray-100 leading-6 text-gray-500 grid overflow-y-scroll mr-1" >
+                        <div class="flex flex-col items-center px-2 h-full">
+                            <div class="flex h-full w-full items-center justify-center font-bold">
+                                <p>
+                                    {{ data.name }}
+                                </p>
+                            </div>
+                        </div>
+                        <div v-for="dia, index in diasSemana" class="flex flex-col items-center justify-center"
+                            :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary font-bold' : '']">
+                            <span v-for="task in data.tasks" class="w-full p-0.5">
+                                <div class="border h-32 rounded-md"
+                                    v-if="fechaEnRango(task.startDate, task.endDate, dia.toISOString().split('T')[0])">
+                                    <p class="border-b text-xs w-full text-center">
+                                        {{ task.name }}
+                                    </p>
+                                    <p class="text-xs font-thin text-center w-full">{{task.task}}</p>
+                                </div>
+                            </span>
+
+                        </div>
+                        <!-- endregion -->
                     </div>
                     <!-- endregion -->
                 </div>
-                <div class="w-12 px-1">
-                    <p class="w-full text-">Proyecto</p>
-                </div>
-                <!-- endregion -->
 
                 <!-- <Listbox :options="tasks" :filterFields="['task', 'name', 'project']" class="col-span-2" filter :pt="{
                                 list: '!h-[76vh] !px-1 !snap-y !snap-mandatory',
@@ -328,7 +366,6 @@ const projectsSelected = ref()
                     <!-- </span> -->
                 </Container>
             </div>
-
         </div>
     </AppLayout>
 
