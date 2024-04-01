@@ -60,6 +60,8 @@ class BudgetImport implements ToCollection, WithChunkReading, WithHeadingRow
                 $pep->labor =  $row['presupuesto_mdo'] ?? 0;
                 $pep->services =  $row['presupuesto_servicios'] ?? 0;
                 $pep->save();
+
+                // dd($pep);
             }
         }
     }

@@ -9,6 +9,11 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Employee extends Model
 {
+
+    protected $table = 'LISTADO_PERSONAL_CARGO_COSTO_DA_View';
+    protected $connection = 'sqlsrv_sap';
+    protected $guard = 'personal_sap';
+
     public $timestamps = false;
     protected $guarded = [];
     protected $appends = [
