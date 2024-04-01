@@ -3,7 +3,6 @@ const { confirmDelete } = useSweetalert()
 const { currencyFormat } = useCommonUtilities()
 const { eventListener } = useBroadcastNotifications()
 const { hasRole, hasPermission } = usePermissions();
-const { toast } = useSweetalert()
 import { useCommonUtilities } from '@/composable/useCommonUtilities';
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
@@ -16,6 +15,7 @@ import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
 
+const { toast } = useSweetalert()
 const loading = ref(false)
 
 //Props

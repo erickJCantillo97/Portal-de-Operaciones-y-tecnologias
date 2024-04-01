@@ -14,4 +14,9 @@ class MaterialRequirement extends Model implements Auditable
     use SoftDeletes;
 
     protected $guarded = [];
+
+    public function material()
+    {
+        return $this->belongsTo(Material::class);
+    }
 }

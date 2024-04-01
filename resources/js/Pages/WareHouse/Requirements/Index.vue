@@ -2,17 +2,58 @@
 import CustomInput from '@/Components/CustomInput.vue';
 import CustomModal from '@/Components/CustomModal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { router } from '@inertiajs/vue3';
 import Button from 'primevue/button';
 import { ref } from 'vue';
-
+import { useToast } from "primevue/usetoast";
+import CustomDataTable from '@/Components/CustomDataTable.vue';
+const toast = useToast()
 const props = defineProps({
-    projects: Array
+    projects: Array,
+    requirements: Array,
 })
 
 const open = ref(false)
 const formData = ref({
     requirement: {}
 })
+
+const addItem = () => {
+    // toast.add({ severity: 'success', group: 'customToast', text: 'Atividad Eliminada', life: 2000 });
+    formData.value.requirement = {}
+    open.value = true
+}
+
+const columns = [
+    { field: 'consecutive', header: 'Consecutivo', filter: "true" },
+    { field: 'project.name', header: 'Proyecto', filter: 'true', filterType: 'dropdown', filterLabel: 'name', filterValue: 'name', filterOptions: props.projects },
+    { field: 'bloque', header: 'Bloque' },
+    { field: 'sistema_grupo', header: 'Sistema/grupo' },
+    { field: 'user.name', header: 'Dibujante' },
+    { field: 'preeliminar_date', header: 'Fecha', type: 'date' },
+];
+
+const gestion = (event, data) => {
+    router.get(route('manage.requirements', { requirements: data.map((x) => x.id) }))
+}
+
+const submit = () => {
+    router.post(route('requirements.store'), formData.value.requirement, {
+        preserveScroll: true,
+        onSuccess: (res) => {
+            open.value = false
+            toast.add({ severity: 'success', group: 'customToast', text: 'Atividad Eliminada', life: 2000 });
+
+        },
+        onError: (errors) => {
+            toast.add({ severity: 'error', group: 'customToast', text: 'Ocurrio un Error', life: 2000 });
+            // toast('Hubo un error al crear el contrato', 'error')
+        },
+        onFinish: visit => {
+            loading.value = false
+        }
+    })
+}
 </script>
 
 <template>
@@ -24,10 +65,12 @@ const formData = ref({
                 </span>
                 <div class="flex items-center space-x-2">
                     <Button label="Importar Requerimientos" severity="success" icon="fa-solid fa-plus"
-                        :project="project" @click="open = !open" />
+                        @click="addItem" />
                 </div>
-
             </div>
+            <CustomDataTable :data="requirements" @selectionAction="gestion" :columnas="columns" :rowsDefault="10"
+                selectionMode="multiple">
+            </CustomDataTable>
         </div>
 
         <CustomModal v-model:visible="open" width="100vh">
@@ -43,11 +86,11 @@ const formData = ref({
                 <span class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <CustomInput type="dropdown" optionLabel="name" optionValue="id" :options="projects"
                         label="Proyecto" placeholder="Selecione un proyecto" id="bloque"
-                        v-model:input="formData.requirement.project" :invalid="$attrs.errors.supervisor != null"
-                        :errorMessage="$attrs.errors.bloque">
+                        v-model:input="formData.requirement.project_id" :invalid="$attrs.errors.project_id != null"
+                        :errorMessage="$attrs.errors.project_id">
                     </CustomInput>
-                    <CustomInput label="Bloque" placeholder="Escriba Bloque" id="bloque"
-                        v-model:input="formData.requirement.bloque" :invalid="$attrs.errors.supervisor != null"
+                    <CustomInput label="Bloque" placeholder="Escriba Bloque" id="bloque" type="number"
+                        v-model:input="formData.requirement.bloque" :invalid="$attrs.errors.bloque != null"
                         :errorMessage="$attrs.errors.bloque">
                     </CustomInput>
                     <CustomInput label="Grupo/Sistema" placeholder="Escriba El grupo o sistema" id="grupo"
@@ -58,8 +101,10 @@ const formData = ref({
                         id="document" v-model:input="formData.requirement.document"
                         :invalid="$attrs.errors.document != null" :errorMessage="$attrs.errors.document">
                     </CustomInput>
-                    <CustomInput label="Adjuntar PDF" type="file" acceptFile=".pdf" id="pdf"
-                        :invalid="$attrs.errors.pdf != null" :errorMessage="$attrs.errors.pdf">
+                    <CustomInput class="col-span-2" v-model:input="formData.requirement.data"
+                        label="Adjuntar Requerimientos" type="file"
+                        acceptFile="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                        id="data" :invalid="$attrs.errors.data != null" :errorMessage="$attrs.errors.data">
                     </CustomInput>
                     <CustomInput class="mt-2 col-span-3" label="Notas" placeholder="Escriba la Nota del requerimiento"
                         type="textarea" v-model:input="formData.requirement.note" :invalid="$attrs.errors.note != null"
