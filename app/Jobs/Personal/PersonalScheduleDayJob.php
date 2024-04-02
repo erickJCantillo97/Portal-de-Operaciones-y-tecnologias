@@ -16,6 +16,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class PersonalScheduleDayJob implements ShouldQueue
 {
@@ -43,11 +44,16 @@ class PersonalScheduleDayJob implements ShouldQueue
      */
     public function handle(): void
     {
+        // $ScheduleTime = ScheduleTime::create([
+        //     'schedule_id' => 275,
+        //     'hora_inicio' => '01:00',
+        //     'hora_fin' => '02:00'
+        // ]);
+        // $ScheduleTime->save();
         $collisions = DetailScheduleTime::where('fecha', $this->date)->where('idUsuario', $this->personal_id)->orderBy('horaInicio')->get();
         //validamos si solamente hay 1 colisión
         if (count($collisions) == 1) {
             $horario = $collisions->first();
-
             //si la unica colisión que hay es igual a la nueva actividad, entonces no se crea ningún schedule_time, sino que se acualiza
             //al  horario completo que se asignó al proyecto.
             if ($horario->idTask == $this->task->id) {
@@ -56,7 +62,7 @@ class PersonalScheduleDayJob implements ShouldQueue
                     'hora_fin' => $this->task->project->shiftObject->endShift,
                 ]);
             } else {
-                if (($horario->horaIncio > $this->task->project->shiftObject->startShift) && ($horario->horaFin < $this->task->project->shiftObject->endShift) ) {
+                if (( Carbon::parse($horario->horaIncio)->format('H:i') > Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i')) && (Carbon::parse($horario->horaFin)->format('H:i') <  Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i')) ) {
                     programming(Carbon::parse($this->date)->format('Y-m-d'), 
                     $this->personal_id, 
                     Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i'), 
@@ -70,14 +76,14 @@ class PersonalScheduleDayJob implements ShouldQueue
                     $this->task->id, 
                     $this->persona->Nombres_Apellidos);
                 }else 
-                if(($horario->horaInicio == $this->task->project->shiftObject->startShift) && ($this->task->project->shiftObject->endShift >$horario->horaFin )){
+                if((Carbon::parse($horario->horaIncio)->format('H:i')  == Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i')) && (Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i') >Carbon::parse($horario->horaFin)->format('H:i') )){
                     programming(Carbon::parse($this->date)->format('Y-m-d'), 
                     $this->personal_id, 
                     Carbon::parse($horario->horaFin)->addMinute()->format('H:i'), 
                     Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i'), 
                     $this->task->id, $this->persona->Nombres_Apellidos);
                 }else
-                if(($horario->horaInicio > $this->task->project->shiftObject->startShift) && ($this->task->project->shiftObject->endShift  == $horario->horaFin )){
+                if((Carbon::parse($horario->horaIncio)->format('H:i')  > Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i')) && (Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i')  == Carbon::parse($horario->horaFin)->format('H:i') )){
                     programming(Carbon::parse($this->date)->format('Y-m-d'), 
                     $this->personal_id, 
                     Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i'), 

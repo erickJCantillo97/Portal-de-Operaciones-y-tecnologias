@@ -92,6 +92,20 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
+
+        'sqlsrv_sap' => [
+            'driver' => 'sqlsrv',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_HOST_SAP', 'localhost'),
+            'port' => env('DB_PORT', '1433'),
+            'database' => env('DB_DATABASE_SAP', 'forge'),
+            'username' => env('DB_USERNAME_SAP', 'forge'),
+            'password' => env('DB_PASSWORD_SAP', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+        ],
+
         'sqlsrv_anterior' => [
             'driver' => 'sqlsrv',
             'url' => env('DATABASE_URL'),

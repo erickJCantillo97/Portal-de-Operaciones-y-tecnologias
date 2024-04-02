@@ -128,7 +128,7 @@ const props = defineProps({
     //tipo file
     maxFileSize: {
         type: Number,
-        default: 1000000
+        default: 100000000
     },
     multiple: {
         type: Boolean,

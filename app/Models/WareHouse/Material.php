@@ -14,4 +14,19 @@ class Material extends Model implements Auditable
     use SoftDeletes;
 
     protected $guarded = [];
+    public static $estado = [
+        'DISPONIBLE GECON' => 1,
+        'DISPONIBLE SAP' => 2,
+        'DISPONIBLE SAP CONSIGNACION' => 3,
+        'DISPONIBLE SAP INHOUSE' => 6,
+        'RETAL' => 4,
+        'PENDIENTE' => 0,
+    ];
+
+    public static $unidad = [
+        'UNIDAD' => 1,
+        'METROS' => 2,
+        'PIES' => 3,
+        'METRO' => 4,
+    ];
 }

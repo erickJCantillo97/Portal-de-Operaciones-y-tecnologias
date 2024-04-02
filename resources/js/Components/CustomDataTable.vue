@@ -73,6 +73,10 @@ const props = defineProps({
     showHeader: {
         type: Boolean,
         default: true
+    },
+    selectionMode: {
+        type: String,
+        default: 'single'
     }
 })
 
@@ -143,11 +147,13 @@ const formatDate = (date) => {
     }
 }
 //#endregion
+
+const selectedElement = ref([]);
 </script>
 
 <template>
-    <DataTable id="tabla" :value="data" :paginator="data.length > 0 && paginator" :rows="rows" selectionMode="single"
-        tableStyle="" sortMode="multiple" scrollable scrollHeight="flex" :loading="loading"
+    <DataTable id="tabla" :value="data" v-model:selection="selectedElement" :paginator="data.length > 0 && paginator"
+        :rows :selectionMode tableStyle="" sortMode="multiple" scrollable scrollHeight="flex" :loading="loading"
         currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort
         v-model:filters="filters" stripedRows filterDisplay="menu" class="p-datatable-sm text-xs p-1 rounded-md"
         stateStorage="session" :stateKey="cacheName ? 'dt-' + cacheName + '-state-session' : null"
@@ -193,6 +199,7 @@ const formatDate = (date) => {
                             </IconField>
                         </div>
                         <div class="w-full overflow-x-auto">
+
                             <ButtonGroup v-if="props.filterButtons && filterOK" class="flex">
                                 <Button v-for="button in props.filterButtons" class="font-bold truncate"
                                     :label="button.label + ': ' + getTotalStatus(button.field, button.data)"
@@ -202,7 +209,11 @@ const formatDate = (date) => {
                             </ButtonGroup>
                         </div>
                     </div>
-                    <div class="space-x-2 hidden sm:block">
+                    <div class="space-x-2 hidden sm:flex items-center">
+                        <Button v-if="selectionMode == 'multiple' && selectedElement.length > 0"
+                            v-tooltip.left="'Añadir'" @click="$emit('selectionAction', $event, selectedElement)"
+                            severity="primary" label="Gestionar" />
+
                         <Button v-if="exportRute != ''" text @click="exportar" icon="fa-solid fa-download" :pt="{
         root: '!border-0 !ring-0',
         trigger: '!hidden',
@@ -273,6 +284,7 @@ const formatDate = (date) => {
         <!-- #endregion -->
 
         <!-- #region Columnas -->
+        <Column :selectionMode v-if="selectionMode == 'multiple'" headerStyle="width: 3rem"></Column>
         <span v-for="col, index  in columnasSelect">
             <Column v-if="col.visible == null || col.visible == true" :field="col.field" :filterField="col.field"
                 :class="col.class" :sortable="col.sortable" :show-filter-match-modes="false"
@@ -300,6 +312,9 @@ const formatDate = (date) => {
                     <Dropdown v-else-if="col.type == 'tag' || col.type == 'customtag'" v-model="filterModel.value"
                         :options="col.severitys.map(option => option.text)" placeholder="Selecciona una opcion"
                         class="p-column-filter w-full md:w-14rem" showClear />
+                    <Dropdown v-else-if="col.filterType == 'dropdown'" :option-label="col.filterLabel"
+                        :option-value="col.filterValue" v-model="filterModel.value" :options="col.filterOptions"
+                        placeholder="Selecciona una opcion" class="p-column-filter w-full md:w-14rem" showClear />
                     <InputText v-else v-model="filterModel.value" type="text" class="p-column-filter"
                         placeholder="Escriba algo para buscar" />
                 </template>

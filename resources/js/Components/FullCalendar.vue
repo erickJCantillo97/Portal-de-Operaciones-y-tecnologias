@@ -41,7 +41,7 @@ const handleWeekendsToggle = () => {
   calendarOptions.value.weekends = !calendarOptions.value.weekends // update a property
 }
 
-const handleDateSelect = (selectInfo) =>  {
+const handleDateSelect = (selectInfo) => {
   // console.log(selectInfo)
   isOpen.value = true
   selectedEvent.value = selectInfo
