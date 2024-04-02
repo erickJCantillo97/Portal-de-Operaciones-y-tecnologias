@@ -649,6 +649,7 @@ class ProgrammingController extends Controller
                 $query->where('id', $request->idProject);
                 // $query->where('executor','LIKE', '%'.trim(auth()->user()->gerencia).'%');
             })->has('task')
+            ->where('percentDone', '<', 100)
             ->where(function ($query) use ($request) {
                 $query->whereBetween('startdate', [$request->date_start, $request->date_end])
                     ->orWhereBetween('enddate', [$request->date_start, $request->date_end])

@@ -6,7 +6,6 @@ import Loading from '@/Components/Loading.vue';
 import CustomInput from '@/Components/CustomInput.vue';
 import ModalColisions from './Components/ModalColisions.vue'
 import axios from 'axios';
-import { usePage } from '@inertiajs/vue3';
 import MultiSelect from 'primevue/multiselect';
 import ButtonGroup from 'primevue/buttongroup';
 import ProgressBar from 'primevue/progressbar';
@@ -14,6 +13,7 @@ import Avatar from 'primevue/avatar';
 import AvatarGroup from 'primevue/avatargroup';
 
 import OverlayPanel from 'primevue/overlaypanel';
+import NoContentToShow from '@/Components/NoContentToShow.vue';
 
 // const { hasRole, hasPermission } = usePermissions()
 
@@ -21,7 +21,7 @@ defineProps({
     projects: Array
 })
 
-const openConflict = ref(false)
+// #region funciones basicas
 function format24h(hora) {
     if (hora.length > 5) {
         return new Date(hora).toLocaleString('es-CO',
@@ -31,84 +31,6 @@ function format24h(hora) {
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
     }
 }
-
-//#region Draggable
-const date = ref(new Date())
-const personal = ref()
-const projectData = ref([]);
-const loadingProgram = ref(true);
-const loadingPerson = ref(true);
-const personalHours = ref({});
-const conflicts = ref()
-const task = ref([])
-
-// El código anterior define una función `onDrop` en Vue. Esta función se activa cuando un elemento se
-// coloca en una colección.
-
-
-const getPersonalData = () => {
-    loadingPerson.value = true
-    axios.get(route('get.personal.user')).then((res) => {
-        personal.value = Object.values(res.data.personal)
-        loadingPerson.value = false
-    })
-}
-
-//#endregion
-
-// El código anterior utiliza el gancho de ciclo de vida `onMounted` de Vue para ejecutar algún código
-// cuando el componente está montado.
-onMounted(() => {
-    getPersonalData()
-    // getTask('tomorrow')
-})
-
-// El código anterior es una función de Vue.js que recupera tareas según la opción seleccionada.
-const mode = ref('week')
-const getTask = async () => {
-    loadingProgram.value = true
-    if (mode.value == 'week') {
-        console.log(mode.value)
-        let date_start = diasSemana.value[0].toISOString()
-        let date_end = diasSemana.value[5].toISOString()
-        if (projectsSelected.value.length > 0) {
-            projectsSelected.value.forEach(async (element) => {
-                await axios.get(route('actividadesDeultimonivelPorProyectos', { idProject: element.id, date_start, date_end })).then((res) => {
-                    let project = element
-                    project.tasks = res.data
-                    projectData.value.push(project)
-                    console.log(projectData.value)
-                    loadingProgram.value = false;
-                })
-            })
-        }
-    } else if (mode.value == 'date') {
-        console.log(mode.value)
-        let date_start = dates.value
-        let date_end = dates.value
-        if (projectsSelected.value.length > 0) {
-            projectsSelected.value.forEach(async (element) => {
-                await axios.get(route('actividadesDeultimonivelPorProyectos', { idProject: element.id, date_start, date_end })).then((res) => {
-                    let project = element
-                    project.tasks = res.data
-                    projectData.value.push(project)
-                    console.log(projectData.value)
-                    loadingProgram.value = false;
-                })
-            })
-        }
-
-    } else if (mode.value == 'month') {
-
-    } else {
-
-    }
-};
-//#region
-
-//#endregion
-const filter = ref('');
-
 function obtenerFormatoSemana(fecha) {
     const fechaActual = fecha;
     const año = fechaActual.getFullYear();
@@ -143,21 +65,101 @@ function fechaEnRango(fechaInicio, fechaFin, fechaSeleccionada) {
 
     return seleccionada >= inicio && seleccionada <= fin;
 }
+//#endregion
 
-const dates = ref(obtenerFormatoSemana(date.value))
-const diasSemana = ref(obtenerFechasSemana(date.value))
-const projectsSelected = ref()
+//#region variables
+const openConflict = ref(false)
+const date = ref(new Date())
+const personal = ref()
+const projectData = ref([]);
+const loadingProgram = ref(true);
+const loadingPerson = ref(true);
+const personalHours = ref({});
+const conflicts = ref()
+const task = ref([])
+const mode = ref('date')
+const filter = ref('');
+const dates = ref(new Date(date.value.getFullYear(), date.value.getMonth(), date.value.getDate() + 1))
+const diasSemana = ref(obtenerFechasSemana(dates.value))
+const projectsSelected = ref([])
 const overlayPerson = ref()
+
+//#endregion
+
+//#region Consultas
+const getPersonalData = () => {
+    loadingPerson.value = true
+    axios.get(route('get.personal.user')).then((res) => {
+        personal.value = Object.values(res.data.personal)
+        loadingPerson.value = false
+    })
+}
+
+const getTask = async (option) => {
+    loadingProgram.value = true
+    if (option == null) {
+        option = mode.value
+    }
+    if (option == 'week') {
+        dates.value = obtenerFormatoSemana(new Date())
+        mode.value = option
+        let date_start = diasSemana.value[0].toISOString()
+        let date_end = diasSemana.value[5].toISOString()
+        if (projectsSelected.value.length > 0) {
+            projectsSelected.value.forEach(async (element) => {
+                await axios.get(route('actividadesDeultimonivelPorProyectos', { idProject: element.id, date_start, date_end })).then((res) => {
+                    let project = element
+                    project.tasks = res.data
+                    projectData.value.push(project)
+                    console.log(projectData.value)
+                    loadingProgram.value = false;
+                })
+            })
+        }
+    } else if (option == 'date') {
+        mode.value = 'date'
+        dates.value = new Date()
+        console.log(mode.value)
+        let date_start = dates.value
+        let date_end = dates.value
+        if (projectsSelected.value.length > 0) {
+            projectsSelected.value.forEach(async (element) => {
+                await axios.get(route('actividadesDeultimonivelPorProyectos', { idProject: element.id, date_start, date_end })).then((res) => {
+                    let project = element
+                    project.tasks = res.data
+                    projectData.value.push(project)
+                    console.log(projectData.value)
+                    loadingProgram.value = false;
+                })
+            })
+        }
+
+    } else if (mode.value == 'month') {
+
+    } else {
+
+    }
+};
+
+//#endregion
+
+//#region funciones
 const toggle = (event) => {
     overlayPerson.value.toggle(event);
 }
+
+onMounted(() => {
+    getPersonalData()
+})
+//#endregion
+
 </script>
 
 <template>
     <AppLayout>
         <div class="h-full w-full grid grid-cols-8">
             <div class="col-span-7 h-full space-y-1 pt-1 px-1 flex flex-col">
-                <div class="flex justify-between h-10 items-center">
+                <div class="flex justify-between h-10 items-center pr-1">
                     <span class="flex space-x-4">
                         <p class="text-xl font-bold text-primary h-full items-center flex">
                             Programación de actividades
@@ -170,13 +172,11 @@ const toggle = (event) => {
                         <MultiSelect v-model="projectsSelected" display="chip" :options="projects" optionLabel="name"
                             class="w-56" placeholder="Seleccione un proyecto" @change="getTask()" />
                         <ButtonGroup>
-                            <Button label="Mes"
-                                @click="mode = 'month'; dates = (new Date()).getFullYear() + '-' + ((new Date()).getMonth().toString().length < 2 ? '0' + (new Date()).getMonth() : (new Date()).getMonth()); getTask"
+                            <Button label="Mes" disabled
+                                @click="mode = 'month'; dates = (new Date()).getFullYear() + '-' + ((new Date()).getMonth().toString().length < 2 ? '0' + (new Date()).getMonth() : (new Date()).getMonth()); getTask()"
                                 :outlined="mode != 'month'" />
-                            <Button label="Semana" @click="mode = 'week'; dates = obtenerFormatoSemana(date); getTask"
-                                :outlined="mode != 'week'" />
-                            <Button label="dia" @click="mode = 'date'; dates = date; getTask"
-                                :outlined="mode != 'date'" />
+                            <Button label="Semana" @click="getTask('week')" :outlined="mode != 'week'" />
+                            <Button label="dia" @click="getTask('date')" :outlined="mode != 'date'" />
                         </ButtonGroup>
                         <div class="w-52 flex justify-end">
                             <CustomInput v-model:input="dates" :type="mode"></CustomInput>
@@ -184,172 +184,185 @@ const toggle = (event) => {
                     </div>
                 </div>
                 <!-- region calendario -->
-                <div v-if="mode == 'week'" class="h-[80vh] flex flex-col justify-between ">
-                    <!-- region Cabezeras -->
-                    <div class="grid-cols-7 h-6 text-lg leading-6 grid mr-4 shadow-md">
-                        <div class="flex flex-col items-center">
-                            <p class="flex border-b w-full justify-center items-baseline font-bold">Proyecto</p>
-                        </div>
-                        <div v-for="dia, index in diasSemana" class="flex flex-col items-center"
-                            :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary font-bold' : '']">
-                            <p class="flex capitalize border-b w-full justify-center items-baseline">{{
+                <span v-if="projectsSelected.length > 0">
+                    <div v-if="mode == 'week'" class="h-[80vh] flex flex-col justify-between ">
+                        <!-- region Cabezeras -->
+                        <div class="grid-cols-7 h-6 text-lg leading-6 grid mr-4 shadow-md">
+                            <div class="flex flex-col items-center">
+                                <p class="flex border-b w-full justify-center items-baseline font-bold">Proyecto</p>
+                            </div>
+                            <div v-for="dia, index in diasSemana" class="flex flex-col items-center"
+                                :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary rounded-t-md font-bold' : '']">
+                                <p class="flex capitalize border-b w-full justify-center items-baseline">{{
                                 dia.toLocaleDateString('es-CO', {
                                     weekday: 'long', year: 'numeric', month: 'numeric', day:
                                         'numeric'
                                 }) }}
-                            </p>
-                        </div>
-                        <!-- endregion -->
-                    </div>
-                    <!-- region Cabezeras -->
-                    <div v-for="data in projectData"
-                        class="grid-cols-7 h-full divide-x divide-y divide-gray-100 text-lg border-gray-100 leading-6  grid overflow-y-scroll mr-1">
-                        <div class="flex flex-col items-center px-2 h-full">
-                            <div class="flex h-full w-full items-center justify-center font-bold">
-                                <p>
-                                    {{ data.name }}
                                 </p>
-                                {{ data.percentDone }}
                             </div>
+                            <!-- endregion -->
                         </div>
-                        <div v-for="dia, index in diasSemana" class="flex flex-col items-center justify-center"
-                            :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
-                            <span v-for="task in data.tasks" class="w-full p-0.5">
-                                <div class="border border-primary h-32 rounded-md flex flex-col justify-between"
-                                    v-if="fechaEnRango(task.startDate, task.endDate, dia.toISOString().split('T')[0])">
-                                    <div class="flex flex-col justify-between h-full">
-                                        <p
-                                            class="border-b font-bold border-primary h-10 flex items-center justify-center text-xs px-0.5 w-full text-center">
-                                            {{ task.name }}
+                        <!-- region actividades -->
+                        <div class="h-full overflow-y-auto space-y-2">
+                            <div v-for="data in projectData"
+                                class="grid-cols-7 divide-x divide-y divide-gray-100 border border-indigo-200 rounded-md text-lg leading-6 grid mr-1">
+                                <div class="flex flex-col items-center px-2 h-full">
+                                    <div class="flex h-full w-full items-center justify-center font-bold">
+                                        <p>
+                                            {{ data.name }}
                                         </p>
-                                        <p class="text-xs px-1 text-center w-full">{{ task.task }}</p>
-                                        <div class="grid grid-cols-4 items-center px-1">
-                                            <div
-                                                class="px-1 flex cursor-default flex-col justify-center border rounded-md h-full">
-                                                <p v-tooltip.left="'Hora inicio'" class="text-sm text-center">
-                                                    {{ format24h(task.shift.startShift) }}
-                                                </p>
-                                                <p v-tooltip.left="'Hora Fin'" class="text-sm text-center">
-                                                    {{ format24h(task.shift.endShift) }}
-                                                </p>
-                                            </div>
-                                            <div class="col-span-3 flex justify-end">
-                                                <AvatarGroup @click="toggle">
-                                                    <Avatar v-tooltip.top="'Nombre Apellido'"
-                                                        v-for="person in [0, 1, 2, 3]"
-                                                        image="/images/person-default.png" shape="circle" />
-                                                    <Avatar v-tooltip.top="{
-                                escape: false,
-                                value:
-                                    `<div class='flex flex-col'>
-                                                            <p>Nombre Apellido</p>
-                                                            <p>Nombre Apellido</p>
-                                                            <p>Nombre Apellido</p>
-                                                            <p>Nombre Apellido</p>
-                                                            <p>Nombre Apellido</p>
-                                                            <p>Nombre Apellido</p>
-                                                        </div>`
-                            }" @click="toggle" label="+2" shape="circle" />
-                                                </AvatarGroup>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="p-1">
-                                        <!-- {{ task.percentDone }} -->
-                                        <ProgressBar :value="parseFloat(task.percentDone)" class="" v-tooltip="'Avance'"
-                                            :pt="{ label: 'text-xs font-thin' }"></ProgressBar>
+                                        {{ data.percentDone }}
                                     </div>
                                 </div>
-                            </span>
-
-                        </div>
-                        <!-- endregion -->
-                    </div>
-                    <!-- endregion -->
-                    <div class="grid-cols-7 p-1 h-min divide-x-2 text-sm leading-6 grid mr-4 shadow-md">
-                        <div>
-                            <p class="w-full text-center font-bold">
-                                Total personas
-                            </p>
-                        </div>
-                        <div class="grid cursor-default grid-cols-3 px-1 gap-2" v-for="item in [0, 1, 2, 3, 4, 5]">
-                            <p v-tooltip.top="'Programados'"
-                                class="w-full text-center bg-success text-white rounded-md">20</p>
-                            <p v-tooltip.top="'Sin programar'"
-                                class="w-full bg-danger rounded-md text-white text-center">1</p>
-                            <p v-tooltip.top="'No programables'"
-                                class="w-full text-center bg-warning text-white rounded-md ">4</p>
-                        </div>
-                    </div>
-                </div>
-                <div v-if="mode == 'date'" class="h-[80vh] border rounded-md flex flex-col justify-between">
-                    <p class="w-full text-center font-bold">Programacion del dia {{ dates.toLocaleDateString() }}</p>
-                    <div class="h-full p-1 overflow-y-auto">
-                        <div v-for="project in projectData" class="border w-full flex p-1 rounded-md">
-                            <div class="w-40 flex items-center justify-center">
-                                <p>
-                                    {{ project.name }}
-                                </p>
-                            </div>
-                            <div class="w-full overflow-x-auto grid grid-cols-5">
-                                <span v-for="task in project.tasks" class="w-full p-0.5">
-                                    <div class="border border-primary h-32 rounded-md flex flex-col justify-between"
-                                        v-if="fechaEnRango(task.startDate, task.endDate, new Date(dates).toISOString().split('T')[0])">
-                                        <div class="flex flex-col justify-between h-full">
-                                            <p
-                                                class="border-b font-bold border-primary h-10 flex justify-center text-xs px-0.5 w-full items-center text-center">
-                                                {{ task.name }}
-                                            </p>
-                                            <p class="text-xs px-1 text-center w-full">{{ task.task }}</p>
-                                            <div class="grid grid-cols-4 items-center px-1">
-                                                <div
-                                                    class="px-1 flex cursor-default flex-col justify-center border rounded-md h-full">
-                                                    <p v-tooltip.left="'Hora inicio'" class="text-sm text-center">
-                                                        {{ format24h(task.shift.startShift) }}
-                                                    </p>
-                                                    <p v-tooltip.left="'Hora Fin'" class="text-sm text-center">
-                                                        {{ format24h(task.shift.endShift) }}
-                                                    </p>
-                                                </div>
-                                                <div class="col-span-3 flex justify-end">
-                                                    <AvatarGroup @click="toggle">
-                                                        <Avatar v-tooltip.top="'Nombre Apellido'"
-                                                            v-for="person in [0, 1, 2, 3]"
-                                                            image="/images/person-default.png" shape="circle" />
-                                                        <Avatar v-tooltip.top="{
+                                <div v-for="dia, index in diasSemana" class="flex flex-col items-center"
+                                    :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
+                                    <span v-for="task in data.tasks" class="w-full p-0.5"
+                                        :class="fechaEnRango(task.startDate, task.endDate, dia.toISOString().split('T')[0]) ? '' : 'hidden'">
+                                        <div
+                                            class="border border-primary h-32 rounded-md flex flex-col justify-between">
+                                            <div class="flex flex-col justify-between h-full">
+                                                <p
+                                                    class="border-b font-bold border-primary h-10 flex items-center justify-center text-xs px-0.5 w-full text-center">
+                                                    {{ task.name }}
+                                                </p>
+                                                <p class="text-xs px-1 text-center w-full">{{ task.task }}</p>
+                                                <div class="grid grid-cols-4 items-center px-1">
+                                                    <div
+                                                        class="px-1 flex cursor-default flex-col justify-center border rounded-md h-full">
+                                                        <p v-tooltip.left="'Hora inicio'" class="text-sm text-center">
+                                                            {{ format24h(task.shift.startShift) }}
+                                                        </p>
+                                                        <p v-tooltip.left="'Hora Fin'" class="text-sm text-center">
+                                                            {{ format24h(task.shift.endShift) }}
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-span-3 flex justify-end">
+                                                        <AvatarGroup @click="toggle">
+                                                            <Avatar v-tooltip.top="'Nombre Apellido'"
+                                                                v-for="person in [0, 1, 2, 3]"
+                                                                image="/images/person-default.png" shape="circle" />
+                                                            <Avatar v-tooltip.top="{
                                 escape: false,
                                 value:
                                     `<div class='flex flex-col'>
-                                                                <p>Nombre Apellido</p>
-                                                                <p>Nombre Apellido</p>
-                                                                <p>Nombre Apellido</p>
-                                                                <p>Nombre Apellido</p>
-                                                                <p>Nombre Apellido</p>
-                                                                <p>Nombre Apellido</p>
-                                                            </div>`
+                                                                    <p>Nombre Apellido</p>
+                                                                    <p>Nombre Apellido</p>
+                                                                    <p>Nombre Apellido</p>
+                                                                    <p>Nombre Apellido</p>
+                                                                    <p>Nombre Apellido</p>
+                                                                    <p>Nombre Apellido</p>
+                                                                </div>`
                             }" @click="toggle" label="+2" shape="circle" />
-                                                    </AvatarGroup>
+                                                        </AvatarGroup>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <div class="p-1">
+                                                <!-- {{ task.percentDone }} -->
+                                                <ProgressBar :value="parseFloat(task.percentDone)" class=""
+                                                    v-tooltip="'Avance'" :pt="{ label: 'text-xs font-thin' }">
+                                                </ProgressBar>
+                                            </div>
                                         </div>
-                                        <div class="p-1">
-                                            <!-- {{ task.percentDone }} -->
-                                            <ProgressBar :value="parseFloat(task.percentDone)" class=""
-                                                v-tooltip="'Avance'" :pt="{ label: 'text-xs font-thin' }"></ProgressBar>
-                                        </div>
-                                    </div>
-                                </span>
+                                    </span>
+
+                                </div>
+                                <!-- endregion -->
                             </div>
                         </div>
+                        <!-- endregion -->
+                        <div class="grid-cols-7 h-8 text-sm grid mr-4 shadow-md">
+                            <div>
+                                <p class="w-full h-full flex items-center justify-center font-bold">
+                                    Total personas
+                                </p>
+                            </div>
+                            <div v-for="dia, index in diasSemana" class="flex h-full items-center space-x-3 px-2"
+                                :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary rounded-b-md font-bold' : '']">
+                                <p v-tooltip.top="'Programados'"
+                                    class="w-full text-center bg-success text-white rounded-md">20</p>
+                                <p v-tooltip.top="'Sin programar'"
+                                    class="w-full bg-danger rounded-md text-white text-center">1</p>
+                                <!-- <p v-tooltip.top="'No programables'"
+                                    class="w-full text-center bg-warning text-white rounded-md ">4</p> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="mode == 'date'" class="h-[80vh] border rounded-md flex flex-col justify-between">
+                        <p class="w-full text-center font-bold">Programacion del dia {{ dates.toLocaleDateString() }}
+                        </p>
+                        <div class="h-full p-1 overflow-y-auto space-y-1">
+                            <div v-for="project in projectData" class="border w-full flex p-1 rounded-md">
+                                <div class="w-40 flex items-center justify-center">
+                                    <p>
+                                        {{ project.name }}
+                                    </p>
+                                </div>
+                                <div class="w-full overflow-x-auto grid grid-cols-5">
+                                    <span v-for="task in project.tasks" class="w-full p-0.5"
+                                        :class="fechaEnRango(task.startDate, task.endDate, new Date(dates).toISOString().split('T')[0]) ? '' : 'hidden'">
+                                        <div
+                                            class="border border-primary h-32 rounded-md flex flex-col justify-between">
+                                            <div class="flex flex-col justify-between h-full">
+                                                <p
+                                                    class="border-b font-bold border-primary h-10 flex justify-center text-xs px-0.5 w-full items-center text-center">
+                                                    {{ task.name }}
+                                                </p>
+                                                <p class="text-xs px-1 text-center w-full">{{ task.task }}</p>
+                                                <div class="grid grid-cols-4 items-center px-1">
+                                                    <div
+                                                        class="px-1 flex cursor-default flex-col justify-center border rounded-md h-full">
+                                                        <p v-tooltip.left="'Hora inicio'" class="text-sm text-center">
+                                                            {{ format24h(task.shift.startShift) }}
+                                                        </p>
+                                                        <p v-tooltip.left="'Hora Fin'" class="text-sm text-center">
+                                                            {{ format24h(task.shift.endShift) }}
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-span-3 flex justify-end">
+                                                        <AvatarGroup @click="toggle">
+                                                            <Avatar v-tooltip.top="'Nombre Apellido'"
+                                                                v-for="person in [0, 1, 2, 3]"
+                                                                image="/images/person-default.png" shape="circle" />
+                                                            <Avatar v-tooltip.top="{
+                                escape: false,
+                                value:
+                                    `<div class='flex flex-col'>
+                                                                    <p>Nombre Apellido</p>
+                                                                    <p>Nombre Apellido</p>
+                                                                    <p>Nombre Apellido</p>
+                                                                    <p>Nombre Apellido</p>
+                                                                    <p>Nombre Apellido</p>
+                                                                    <p>Nombre Apellido</p>
+                                                                </div>`
+                            }" @click="toggle" label="+2" shape="circle" />
+                                                        </AvatarGroup>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="p-1">
+                                                <!-- {{ task.percentDone }} -->
+                                                <ProgressBar :value="parseFloat(task.percentDone)" class=""
+                                                    v-tooltip="'Avance'" :pt="{ label: 'text-xs font-thin' }">
+                                                </ProgressBar>
+                                            </div>
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
 
+                        </div>
+                        <div class="w-full justify-center flex gap-6">
+                            <p class="rounded bg-primary px-2 text-white">Programados: 20</p>
+                            <p class="rounded bg-danger px-2 text-white">No programados 2</p>
+                            <!-- <p class="rounded bg-warning px-2 text-white">No programables 3</p> -->
+                        </div>
                     </div>
-                    <div class="w-full justify-center flex gap-6">
-                        <p class="rounded bg-primary px-2 text-white">Programados: 20</p>
-                        <p class="rounded bg-danger px-2 text-white">No programados 2</p>
-                        <p class="rounded bg-warning px-2 text-white">No programables 3</p>
-                    </div>
+                    <div v-if="mode == 'month'" class="h-[80vh] flex flex-col justify-between"></div>
+                </span>
+                <div class="h-full" v-else>
+                    <NoContentToShow subject="Seleccione uno o mas proyectos" />
                 </div>
-                <div v-if="mode == 'month'" class="h-[80vh] flex flex-col justify-between"></div>
             </div>
             <!--#region LISTA PERSONAL-->
             <div class="row-span-2 rounded-lg border p-1">
