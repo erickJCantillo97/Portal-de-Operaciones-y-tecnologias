@@ -193,9 +193,9 @@ const toggle = (event, data, fecha) => {
       </div>
       <!-- Avance {{ parseFloat(task.percentDone).toFixed(2) }} % -->
       <div class="space-y-2 rounded-lg border border-gray-300 p-2 text-center">
-        <div class="bg-blue-500 p-1 rounded-lg">
+        <!-- <div class="bg-blue-500 p-1 rounded-lg">
           <span class="text-xs text-white uppercase">Avance</span>
-        </div>
+        </div> -->
         <ProgressBar :value="parseFloat(task.percentDone).toFixed(0)" :pt="{
         root: '!bg-slate-300 !text-center',
         value: '!bg-emerald-500'

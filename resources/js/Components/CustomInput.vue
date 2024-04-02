@@ -134,6 +134,10 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
+    selectionMode: {
+        type: String,
+        default: 'multiple'
+    },
     onLabel: {
         type: String,
         default: 'Si'
@@ -161,9 +165,9 @@ const props = defineProps({
     //calendar
     stepMinute: {
         type: Number,
-        default: null
+        default: 30
     },
-    disabledDays:{
+    disabledDays: {
         type: Array,
         default: null
     }
@@ -204,7 +208,7 @@ const input = defineModel('input', {
                     :aria-describedby="id + '-help'" :required :useGrouping="mode == 'currency' ? '' : useGrouping"
                     :currency="currency" :mode="mode" :suffix :prefix :pt="{ input: '!w-full' }" />
                 <Textarea v-else-if="type == 'textarea'" :id :disabled :rows="rowsTextarea" class="w-full" :required
-                    :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
+                    :placeholder :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
                 <Dropdown v-else-if="type == 'dropdown'" :optionValue :id :disabled :placeholder :options :optionLabel
                     :loading showClear :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''"
                     v-model="input" :aria-describedby="id + '-help'" class="w-full" :pt="{
@@ -269,9 +273,9 @@ const input = defineModel('input', {
         }" />
                 </span>
                 <span v-else-if="type == 'date'">
-                    <Calendar :id v-model="input" :minDate :maxDate :required showIcon :disabledDays
+                    <Calendar :id v-model="input" :minDate :maxDate :selectionMode :required showIcon :disabledDays
                         dateFormat="dd/mm/yy" :pt="{
-            root: '!w-44',
+            root: '!w-full',
             input: '!h-8 text-center'
         }" />
                 </span>

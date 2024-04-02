@@ -90,7 +90,7 @@ const submit = (idTask, schedule) => {
 
   if (title != null) {
     calendarApi.addEvent({
-      id: String(eventguid++),
+      id: String(eventguid.value++),
       title,
       start: schedule.startStr,
       end: schedule.endStr,

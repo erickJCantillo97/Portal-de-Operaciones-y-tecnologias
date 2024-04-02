@@ -1,5 +1,5 @@
 <script setup>
-const { byteSizeFormatter,currencyFormat } = useCommonUtilities()
+const { byteSizeFormatter, currencyFormat } = useCommonUtilities()
 import { useCommonUtilities } from '@/composable/useCommonUtilities';
 import { FilterMatchMode } from 'primevue/api'
 import { onMounted, ref } from 'vue';
