@@ -156,7 +156,7 @@ const getTask = async() => {
                 task.value = res.data
         })
     } catch (error) {
-        console.error('Error' + error)
+        console.error('Error ' + error)
     }
 }
 
@@ -168,7 +168,7 @@ const editTask = async(id) => {
                 console.log('Hace algo')
             })
     } catch (error) {
-        console.error('Error' + error)
+        console.error('Error ' + error)
     }
 }
 
@@ -177,10 +177,10 @@ const deleteTask = async(id) => {
         await axios.delete(route('task.delete.i', task.id))
             .then(res => {
                 //TODO request
-                console.log('Hace algo')
+                console.error('Hace algo')
             })
     } catch (error) {
-        console.error('Error' + error)
+        console.error('Error ' + error)
     }
 }
 //#endregion
@@ -255,7 +255,7 @@ const deleteTask = async(id) => {
                         </div>
 
                         <CustomInput label="Proyectos" type="dropdown" optionLabel="name" :options="projects"
-                            placeholder="Seleccione un proyecto" v-model:input="projectSelected">
+                            placeholder="Seleccione un proyecto" filterPlaceholder="Buscar proyecto" v-model:input="projectSelected">
                         </CustomInput>
 
                         <CustomInput label="Actividades" selectionMode optionLabel="name" type="multiselect"
@@ -281,16 +281,20 @@ const deleteTask = async(id) => {
                                 </h2>
                             </div>
                             <div class="h-[25rem] snap-y snap-mandatory overflow-y-auto p-2">
-                                <ul v-for="task in Options" :key="task.id">
+                                <ul v-for="task in Options">
                                     <div class="mb-2 snap-center gap-2 space-y-2 rounded-lg border border-gray-300 p-2">
                                         <li class="font-semibold text-primary">{{ task.project }}</li>
                                         <div class="block"> <!--TODO v-for tasks, edit tasks & -->
                                             <div class="flex justify-between items-center">
                                                 <li class="font-semibold">{{ task.name }}</li>
-                                                <Button v-tooltip.left="'Eliminar Tarea'" class="mb-2" icon="pi pi-trash"
-                                                    severity="danger" outlined @click="deleteTask(task.id)" />
-                                                <Button v-tooltip.left="'Editar Tarea'" class="mb-2" icon="pi pi-pencil"
-                                                    severity="warning" outlined @click="editTask(task.id)" />
+                                                <div class="flex space-x-3 w-20">
+                                                    <Button v-tooltip.top="'Editar Tarea'" class="mb-2"
+                                                        icon="pi pi-pencil" severity="warning" outlined small
+                                                        @click="editTask(task.id)" />
+                                                    <Button v-tooltip.top="'Eliminar Tarea'" class="mb-2"
+                                                        icon="pi pi-trash" severity="danger" outlined small
+                                                        @click="deleteTask(task.id)" />
+                                                </div>
                                             </div>
                                             <div class="flex justify-between">
                                                 <li class="italic">Lunes {{ task.date }}</li>

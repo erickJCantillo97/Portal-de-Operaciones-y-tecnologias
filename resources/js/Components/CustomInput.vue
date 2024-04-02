@@ -63,6 +63,10 @@ const props = defineProps({
         type: String,
         default: null
     },
+    filterPlaceholder: {
+        type: String,
+        default: null
+    },
     //tipo number
     useGrouping: {
         type: Boolean,
@@ -217,9 +221,10 @@ const input = defineModel('input', {
             item: '!py-1 !px-3 !text-sm !font-normal',
             filterInput: '!h-8'
         }" />
-                <Dropdown v-else-if="type == 'country'" :optionValue :id :disabled :placeholder filter resetFilterOnHide
-                    :options="countries" :loading :class="invalid ? 'p-invalid' : ''" v-model="input"
-                    optionLabel="translations.spa.common" :aria-describedby="id + '-help'" class="w-full" :pt="{
+                <Dropdown v-else-if="type == 'country'" :optionValue :id :disabled :placeholder :filterPlaceholder
+                    filter resetFilterOnHide :options="countries" :loading :class="invalid ? 'p-invalid' : ''"
+                    v-model="input" optionLabel="translations.spa.common" :aria-describedby="id + '-help'"
+                    class="w-full" :pt="{
             root: '!h-8 ',
             input: '!py-0 !flex !items-center !text-sm !font-normal',
             item: '!py-1 !px-3 !text-sm !font-normal',
