@@ -14,6 +14,7 @@ import AvatarGroup from 'primevue/avatargroup';
 
 import OverlayPanel from 'primevue/overlaypanel';
 import NoContentToShow from '@/Components/NoContentToShow.vue';
+import Calendar from 'primevue/calendar';
 
 // const { hasRole, hasPermission } = usePermissions()
 
@@ -57,13 +58,22 @@ function obtenerFechasSemana(diaSeleccionado) {
 
     return fechasSemana;
 }
-
 function fechaEnRango(fechaInicio, fechaFin, fechaSeleccionada) {
     const inicio = new Date(fechaInicio);
     const fin = new Date(fechaFin);
     const seleccionada = new Date(fechaSeleccionada);
 
     return seleccionada >= inicio && seleccionada <= fin;
+}
+function obtenerDiaSemana(dato) {
+    const partes = dato.split('-W');
+    const año = parseInt(partes[0]);
+    const semana = parseInt(partes[1]);
+
+    // Crear una fecha para el primer día de la semana
+    const fecha = new Date(año, 0, 1 + (semana - 1) * 7);
+
+    return fecha;
 }
 //#endregion
 
@@ -97,11 +107,13 @@ const getPersonalData = () => {
 
 const getTask = async (option) => {
     loadingProgram.value = true
+    projectData.value=[]
     if (option == null) {
         option = mode.value
     }
     if (option == 'week') {
-        dates.value = obtenerFormatoSemana(new Date())
+        // dates.value = obtenerFormatoSemana(new Date())
+        console.log(option)
         mode.value = option
         let date_start = diasSemana.value[0].toISOString()
         let date_end = diasSemana.value[5].toISOString()
@@ -111,7 +123,7 @@ const getTask = async (option) => {
                     let project = element
                     project.tasks = res.data
                     projectData.value.push(project)
-                    console.log(projectData.value)
+                    // console.log(projectData.value)
                     loadingProgram.value = false;
                 })
             })
@@ -128,7 +140,7 @@ const getTask = async (option) => {
                     let project = element
                     project.tasks = res.data
                     projectData.value.push(project)
-                    console.log(projectData.value)
+                    // console.log(projectData.value)
                     loadingProgram.value = false;
                 })
             })
@@ -175,12 +187,15 @@ onMounted(() => {
                             <Button label="Mes" disabled
                                 @click="mode = 'month'; dates = (new Date()).getFullYear() + '-' + ((new Date()).getMonth().toString().length < 2 ? '0' + (new Date()).getMonth() : (new Date()).getMonth()); getTask()"
                                 :outlined="mode != 'month'" />
-                            <Button label="Semana" @click="getTask('week')" :outlined="mode != 'week'" />
+                            <Button label="Semana" @click="dates = obtenerFormatoSemana(new Date()); getTask('week')"
+                                :outlined="mode != 'week'" />
                             <Button label="dia" @click="getTask('date')" :outlined="mode != 'date'" />
                         </ButtonGroup>
-                        <div class="w-52 flex justify-end">
-                            <CustomInput v-model:input="dates" :type="mode"></CustomInput>
+                        <div class="w-52">
+                            <CustomInput v-model:input="dates" :type="mode" :manualInput="false"
+                                @valueChange="mode == 'week' ? (diasSemana = obtenerFechasSemana(obtenerDiaSemana(dates))) : ''; getTask()" />
                         </div>
+
                     </div>
                 </div>
                 <!-- region calendario -->

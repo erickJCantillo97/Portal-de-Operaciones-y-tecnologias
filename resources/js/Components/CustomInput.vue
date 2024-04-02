@@ -184,6 +184,9 @@ if (props.type == 'country') {
 const input = defineModel('input', {
     required: true
 })
+
+defineEmits(['valueChange'])
+
 </script>
 <template>
     <div class="flex flex-col">
@@ -263,21 +266,21 @@ const input = defineModel('input', {
 
                 <span v-else-if="type == 'datetime'">
                     <Calendar :id v-model="input" :minDate :maxDate showTime :required hourFormat="24" showIcon
-                        :stepMinute dateFormat="dd/mm/yy" :disabledDays :pt="{
+                        :stepMinute dateFormat="dd/mm/yy" @date-select="$emit('valueChange', $event)" :disabledDays :pt="{
             root: '!w-full',
             input: '!h-8'
         }" />
                 </span>
                 <span v-else-if="type == 'date'">
                     <Calendar :id v-model="input" :minDate :maxDate :required showIcon :disabledDays
-                        dateFormat="dd/mm/yy" :pt="{
+                        @date-select="$emit('valueChange', $event)" dateFormat="dd/mm/yy" :pt="{
             root: '!w-44',
             input: '!h-8 text-center'
         }" />
                 </span>
                 <span v-else-if="type == 'time'">
                     <Calendar :id v-model="input" timeOnly hourFormat="24" :required showIcon dateFormat="dd/mm/yy"
-                        :stepMinute :pt="{
+                        :stepMinute @date-select="$emit('valueChange', $event)" :pt="{
             root: '!w-full',
             input: '!h-8'
         }" />
@@ -288,7 +291,7 @@ const input = defineModel('input', {
                         v-model="input" :type :required :aria-describedby="id + '-help'" class="w-full" />
                 </IconField>
                 <span v-else class="w-full">
-                    <InputText size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''"
+                    <InputText size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''" @change="$emit('valueChange',$event)"
                         v-model="input" :type :required :aria-describedby="id + '-help'" class="w-full" />
                 </span>
                 <label v-if="floatLabel && label" :for="id" class="">{{ label }}</label>
