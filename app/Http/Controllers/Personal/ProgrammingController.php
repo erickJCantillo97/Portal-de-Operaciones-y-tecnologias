@@ -550,33 +550,33 @@ class ProgrammingController extends Controller
 
     public function collisionsPerDay(Request $request){
         try {
-            //return $request->endSchedule;
-            // return DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->first()->idSchedule;
-            // return response()->json(['status' => false, 'mensaje'=> 'Mensaje desde el controlador']);
-            //DB::beginTransaction();
+            // $request->endSchedule = true;
+            // $request->actionType = 2;
+            // $request->scheduleTime = 333;
+            // $request->idTask = 18;
+            DB::beginTransaction();
             $DetailScheduleTime = DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->first();
             $mensaje = '';
-            $schedule = Schedule::find($DetailScheduleTime->idSchedule);
             switch ($request->actionType) {
             case 1:
-
+                $schedule = Schedule::find($DetailScheduleTime->idSchedule);
                 $schedule->task_id = $request->idTask;
                 $schedule->save();
                 if($request->endSchedule){   
-                    PersonalScheduleDayJob::dispatch($DetailScheduleTime->fecha,$DetailScheduleTime->idUsuario, $request->idTask);
+                    PersonalScheduleDayJob::dispatch($DetailScheduleTime->fecha,$DetailScheduleTime->idUsuario, $request->idTask)->onConnection('sync');
                     $mensaje = 'registro actualizado';               
                 }
                 break;
             case 2:
                 if($request->endSchedule){
-                    PersonalScheduleDayJob::dispatch($DetailScheduleTime->fecha,$DetailScheduleTime->idUsuario, $request->idTask);
-                    $mensaje = 'registro actualizado';                
+                    PersonalScheduleDayJob::dispatch($DetailScheduleTime->fecha,$DetailScheduleTime->idUsuario, $request->idTask)->onConnection('sync');
+                    $mensaje = 'registro actualizado';               
                 }
                 break;
             default:
                 break;
             }
-            // DB::commit();
+            DB::commit();
             return response()->json(['status' => true, 'mensaje'=> $mensaje]);
         }catch (Exception $e) {
             DB::rollBack();
@@ -640,6 +640,9 @@ class ProgrammingController extends Controller
 
     public function endNivelActivitiesByProject(Request $request)
     {
+        // $request->date_end ='2024-01-01';
+        // $request->date_start = '2024-05-05';
+        // $request->idProject = 1;
         $taskWithSubTasks = VirtualTask::has('project')->whereNotNull('task_id')->select('task_id')->get()->map(function ($task) {
             return $task['task_id'];
         })->toArray();

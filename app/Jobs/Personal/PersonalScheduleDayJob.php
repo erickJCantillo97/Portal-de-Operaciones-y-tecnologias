@@ -2,16 +2,12 @@
 
 namespace App\Jobs\Personal;
 
-use App\Models\Gantt\Task;
 use App\Models\Personal\Employee;
-use App\Models\Personal\Personal;
-use App\Models\Schedule;
 use App\Models\ScheduleTime;
 use App\Models\Views\DetailScheduleTime;
 use App\Models\VirtualTask;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -35,7 +31,8 @@ class PersonalScheduleDayJob implements ShouldQueue
     {
         $this->date = $date;
         $this->personal_id = $personal_id;
-        $this->persona = Employee::where('Num_SAP', $personal_id)->first();
+     //   $this->persona = Employee::where('Num_SAP','LIKE', '%'.$personal_id)->first();
+        $this->persona = '';
         $this->task =  VirtualTask::find($task_id);
     }
 
@@ -44,12 +41,6 @@ class PersonalScheduleDayJob implements ShouldQueue
      */
     public function handle(): void
     {
-        // $ScheduleTime = ScheduleTime::create([
-        //     'schedule_id' => 275,
-        //     'hora_inicio' => '01:00',
-        //     'hora_fin' => '02:00'
-        // ]);
-        // $ScheduleTime->save();
         $collisions = DetailScheduleTime::where('fecha', $this->date)->where('idUsuario', $this->personal_id)->orderBy('horaInicio')->get();
         //validamos si solamente hay 1 colisión
         if (count($collisions) == 1) {
@@ -62,53 +53,54 @@ class PersonalScheduleDayJob implements ShouldQueue
                     'hora_fin' => $this->task->project->shiftObject->endShift,
                 ]);
             } else {
-                if (( Carbon::parse($horario->horaIncio)->format('H:i') > Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i')) && (Carbon::parse($horario->horaFin)->format('H:i') <  Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i')) ) {
+                if (( Carbon::parse($horario->horaInicio)->format('H:i') > Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i')) && (Carbon::parse($horario->horaFin)->format('H:i') <  Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i')) ) {
                     programming(Carbon::parse($this->date)->format('Y-m-d'), 
                     $this->personal_id, 
                     Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i'), 
-                    Carbon::parse($horario->horaIncio)->subMinute()->format('H:i'), 
-                    $this->task->id, $this->persona->Nombres_Apellidos);
+                    Carbon::parse($horario->horaInicio)->subMinute()->format('H:i'), 
+                    $this->task->id, $horario->nombre);
 
                     programming(Carbon::parse($this->date)->format('Y-m-d'), 
                     $this->personal_id, 
                     Carbon::parse($horario->horaFin)->addMinute()->format('H:i'),
                     Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i'), 
                     $this->task->id, 
-                    $this->persona->Nombres_Apellidos);
+                    $horario->nombre);
                 }else 
-                if((Carbon::parse($horario->horaIncio)->format('H:i')  == Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i')) && (Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i') >Carbon::parse($horario->horaFin)->format('H:i') )){
+                if((Carbon::parse($horario->horaInicio)->format('H:i')  == Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i')) && (Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i') >Carbon::parse($horario->horaFin)->format('H:i') )){
                     programming(Carbon::parse($this->date)->format('Y-m-d'), 
                     $this->personal_id, 
                     Carbon::parse($horario->horaFin)->addMinute()->format('H:i'), 
                     Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i'), 
-                    $this->task->id, $this->persona->Nombres_Apellidos);
+                    $this->task->id, $horario->nombre);
                 }else
-                if((Carbon::parse($horario->horaIncio)->format('H:i')  > Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i')) && (Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i')  == Carbon::parse($horario->horaFin)->format('H:i') )){
+                if((Carbon::parse($horario->horaInicio)->format('H:i')  > Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i')) && (Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i')  == Carbon::parse($horario->horaFin)->format('H:i') )){
                     programming(Carbon::parse($this->date)->format('Y-m-d'), 
                     $this->personal_id, 
                     Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i'), 
-                    Carbon::parse($horario->horaInicio)->addMinute()->format('H:i'), 
-                    $this->task->id, $this->persona->Nombres_Apellidos);
+                    Carbon::parse($horario->horaInicio)->subMinute()->format('H:i'), 
+                    $this->task->id,$horario->nombre);
                 }
             }
         } else {
             $startHour = $this->task->project->shiftObject->startShift;
             for ($i = 0; $i < count($collisions); $i++) {
-                if(Carbon::parse($startHour)->format('H:i') < Carbon::parse($collisions[$i]->horaInicio)->format('H:i')){
-                    programming(Carbon::parse($this->date)->format('Y-m-d'), 
+                //si $startHour es menor que $collisions[$i]->horaInicio
+                if(Carbon::parse(Carbon::parse($startHour)->format('H:i'))->lt(Carbon::parse($collisions[$i]->horaInicio)->format('H:i'))){
+                    programming($this->date, 
                     $this->personal_id, 
                     Carbon::parse($startHour)->format('H:i'), 
-                    Carbon::parse($collisions[$i]->horaInicio)->subMinute()->format('H:i'), 
-                    $this->task->id, $this->persona->Nombres_Apellidos);
+                    Carbon::parse($collisions[$i]->horaInicio)->subMinute(), 
+                    $this->task->id, $collisions[$i]->nombre);
                 }
-                $startHour = Carbon::parse($collisions[$i]->horaFin)->addMinute()->format('H:i');
-                if ($i == count($collisions)) {
-                    if(Carbon::parse($collisions[$i]->horaFin)->format('H:i') < Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i')){
+                $startHour = Carbon::parse($collisions[$i]->horaFin)->addMinute();
+                if ($i == (count($collisions)-1)) {
+                    if(Carbon::parse($collisions[$i]->horaFin)->format('H:i') < Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i')){
                         programming(Carbon::parse($this->date)->format('Y-m-d'), 
                         $this->personal_id, 
                         Carbon::parse($collisions[$i]->horaFin)->addMinute()->format('H:i'), 
-                        Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i'), 
-                        $this->task->id, $this->persona->Nombres_Apellidos);
+                        Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i'), 
+                        $this->task->id, $collisions[$i]->nombre);
                     }
                 }
             }
