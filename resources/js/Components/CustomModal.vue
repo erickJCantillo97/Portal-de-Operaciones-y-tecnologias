@@ -67,7 +67,7 @@ const visible = defineModel('visible')
             </div>
         </template>
         <template #default>
-            <div class="h-full ">
+            <div class="h-full">
                 <slot name="body" />
             </div>
         </template>

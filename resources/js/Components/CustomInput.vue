@@ -63,6 +63,10 @@ const props = defineProps({
         type: String,
         default: null
     },
+    filterPlaceholder: {
+        type: String,
+        default: null
+    },
     //tipo number
     useGrouping: {
         type: Boolean,
@@ -134,6 +138,10 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
+    selectionMode: {
+        type: String,
+        default: 'multiple'
+    },
     onLabel: {
         type: String,
         default: 'Si'
@@ -161,7 +169,7 @@ const props = defineProps({
     //calendar
     stepMinute: {
         type: Number,
-        default: null
+        default: 30
     },
     disabledDays: {
         type: Array,
@@ -207,7 +215,7 @@ defineEmits(['valueChange'])
                     :aria-describedby="id + '-help'" :required :useGrouping="mode == 'currency' ? '' : useGrouping"
                     :currency="currency" :mode="mode" :suffix :prefix :pt="{ input: '!w-full' }" />
                 <Textarea v-else-if="type == 'textarea'" :id :disabled :rows="rowsTextarea" class="w-full" :required
-                    :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
+                    :placeholder :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
                 <Dropdown v-else-if="type == 'dropdown'" :optionValue :id :disabled :placeholder :options :optionLabel
                     :loading showClear :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''"
                     v-model="input" :aria-describedby="id + '-help'" class="w-full" :pt="{
@@ -216,9 +224,10 @@ defineEmits(['valueChange'])
             item: '!py-1 !px-3 !text-sm !font-normal',
             filterInput: '!h-8'
         }" />
-                <Dropdown v-else-if="type == 'country'" :optionValue :id :disabled :placeholder filter resetFilterOnHide
-                    :options="countries" :loading :class="invalid ? 'p-invalid' : ''" v-model="input"
-                    optionLabel="translations.spa.common" :aria-describedby="id + '-help'" class="w-full" :pt="{
+                <Dropdown v-else-if="type == 'country'" :optionValue :id :disabled :placeholder :filterPlaceholder
+                    filter resetFilterOnHide :options="countries" :loading :class="invalid ? 'p-invalid' : ''"
+                    v-model="input" optionLabel="translations.spa.common" :aria-describedby="id + '-help'"
+                    class="w-full" :pt="{
             root: '!h-8 ',
             input: '!py-0 !flex !items-center !text-sm !font-normal',
             item: '!py-1 !px-3 !text-sm !font-normal',
@@ -272,9 +281,15 @@ defineEmits(['valueChange'])
         }" />
                 </span>
                 <span v-else-if="type == 'date'">
+<<<<<<< HEAD
                     <Calendar :id v-model="input" :minDate :maxDate :required showIcon :disabledDays
                         @date-select="$emit('valueChange', $event)" dateFormat="dd/mm/yy" :pt="{
             root: '!w-44',
+=======
+                    <Calendar :id v-model="input" :minDate :maxDate :selectionMode :required showIcon :disabledDays
+                        dateFormat="dd/mm/yy" :pt="{
+            root: '!w-full',
+>>>>>>> 399231eb7fa6bb25aa72081ca29d2763e2b15da7
             input: '!h-8 text-center'
         }" />
                 </span>
