@@ -251,7 +251,7 @@ const urls = ref([
                 <div class="block md:flex space-x-2 space-y-4">
                     <div class="space-y-2">
                         <CustomInput type="date" label="Fecha de extendidos" v-model:input="formData.date"
-                            :multiple="true" />
+                            selectionMode="multiple" />
 
                         <div class="flex items-center">
                             <CustomInput type="time" label="Hora Inicio del Turno" v-model:input="formData.timeStart"
