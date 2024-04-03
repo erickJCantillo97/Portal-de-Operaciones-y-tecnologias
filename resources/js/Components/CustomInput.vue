@@ -140,7 +140,7 @@ const props = defineProps({
     },
     selectionMode: {
         type: String,
-        default: 'multiple'
+        default: 'single'
     },
     onLabel: {
         type: String,
@@ -281,7 +281,7 @@ defineEmits(['valueChange'])
         }" />
                 </span>
                 <span v-else-if="type == 'date'">
-                    <Calendar :id v-model="input" :minDate :maxDate :required showIcon :disabledDays
+                    <Calendar :id v-model="input" :minDate :maxDate :required showIcon :disabledDays :selectionMode
                         @date-select="$emit('valueChange', $event)" dateFormat="dd/mm/yy" :pt="{
             root: '!w-full',
             input: '!h-8 text-center'
