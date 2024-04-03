@@ -281,8 +281,8 @@ defineEmits(['valueChange'])
         }" />
                 </span>
                 <span v-else-if="type == 'date'">
-                    <Calendar :id v-model="input" :minDate :maxDate :selectionMode :required showIcon :disabledDays
-                        dateFormat="dd/mm/yy" :pt="{
+                    <Calendar :id v-model="input" :minDate :maxDate :required showIcon :disabledDays
+                        @date-select="$emit('valueChange', $event)" dateFormat="dd/mm/yy" :pt="{
             root: '!w-full',
             input: '!h-8 text-center'
         }" />
