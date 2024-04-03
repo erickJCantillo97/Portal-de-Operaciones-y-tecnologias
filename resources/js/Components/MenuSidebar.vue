@@ -311,7 +311,7 @@ const navigation = [
             },
 
             {
-                name: 'requerimentos',
+                name: 'Requerimentos',
                 dev: false,
                 show: true,
                 children: [
