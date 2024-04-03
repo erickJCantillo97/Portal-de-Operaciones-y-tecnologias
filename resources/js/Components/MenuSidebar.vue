@@ -77,8 +77,6 @@
                                                             {{ c.name }}
                                                         </li>
                                                         </Link>
-
-
                                                     </ul>
                                                 </vue-collapsible>
                                             </li>
