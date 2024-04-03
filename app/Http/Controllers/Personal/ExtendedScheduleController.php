@@ -29,7 +29,7 @@ class ExtendedScheduleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ExtendedSchedule $extendedSchedule)
+    public function update(Request $request)
     {
         return "Acción: update, Hace algo (Desde el controlador) ";
         $validateData = $request->validate([

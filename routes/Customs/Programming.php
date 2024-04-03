@@ -35,6 +35,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::post('/ExtendedSchedule/store', [ExtendedScheduleController::class, 'store'])->name('ExtendedSchedule.store');
 
+    Route::post('/ExtendedSchedule/update', [ExtendedScheduleController::class, 'update'])->name('ExtendedSchedule.update');
+
     Route::get('/ExtendedSchedule/getTask/{project}', [ExtendedScheduleController::class, 'getTask'])->name('ExtendedSchedule.getTask');
 
     Route::get('/ExtendedSchedule/all', [ExtendedScheduleController::class, 'all'])->name('ExtendedSchedule.all');
