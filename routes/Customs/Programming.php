@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Personal\ProgrammingController;
+use App\Http\Controllers\Personal\ExtendedScheduleController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
@@ -26,4 +27,19 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/gettaskdatedivision', [ProgrammingController::class, 'getTaskDateDivision'])->name('get.task.date.division');
 
     Route::get('actividadesDeultimonivelPorProyectos/{project}', [ProgrammingController::class, 'endNivelActivitiesByProject'])->name('actividadesDeultimonivelPorProyectos');
+
+
+    
+
+    /********************************  Rutas del controlador ExtendedScheduleController  ******************************/
+
+    Route::post('/ExtendedSchedule/store', [ExtendedScheduleController::class, 'store'])->name('ExtendedSchedule.store');
+
+    Route::get('/ExtendedSchedule/getTask/{project}', [ExtendedScheduleController::class, 'getTask'])->name('ExtendedSchedule.getTask');
+
+    Route::get('/ExtendedSchedule/all', [ExtendedScheduleController::class, 'all'])->name('ExtendedSchedule.all');
+
+    Route::delete('/ExtendedSchedule/destroy/{id}', [ExtendedScheduleController::class, 'destroy'])->name('ExtendedSchedule.destroy');
+
+
 });
