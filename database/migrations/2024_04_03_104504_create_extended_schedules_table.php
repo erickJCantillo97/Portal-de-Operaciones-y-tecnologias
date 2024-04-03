@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('extended_schedules', function (Blueprint $table) {
             $table->id();
-            $table->string('date');
-            $table->time('hora_inicio');
-            $table->time('hora_fin');
+            $table->dateTime('date');
+            $table->time('start_hour');
+            $table->time('end_hour');
             $table->string('description')->nullable();
             $table->bigInteger('project_id')->index()->unsigned();
             $table->bigInteger('task_id')->index()->unsigned();
