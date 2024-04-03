@@ -281,15 +281,9 @@ defineEmits(['valueChange'])
         }" />
                 </span>
                 <span v-else-if="type == 'date'">
-<<<<<<< HEAD
                     <Calendar :id v-model="input" :minDate :maxDate :required showIcon :disabledDays
                         @date-select="$emit('valueChange', $event)" dateFormat="dd/mm/yy" :pt="{
             root: '!w-44',
-=======
-                    <Calendar :id v-model="input" :minDate :maxDate :selectionMode :required showIcon :disabledDays
-                        dateFormat="dd/mm/yy" :pt="{
-            root: '!w-full',
->>>>>>> 399231eb7fa6bb25aa72081ca29d2763e2b15da7
             input: '!h-8 text-center'
         }" />
                 </span>
@@ -306,8 +300,9 @@ defineEmits(['valueChange'])
                         v-model="input" :type :required :aria-describedby="id + '-help'" class="w-full" />
                 </IconField>
                 <span v-else class="w-full">
-                    <InputText size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''" @change="$emit('valueChange',$event)"
-                        v-model="input" :type :required :aria-describedby="id + '-help'" class="w-full" />
+                    <InputText size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''"
+                        @change="$emit('valueChange', $event)" v-model="input" :type :required
+                        :aria-describedby="id + '-help'" class="w-full" />
                 </span>
                 <label v-if="floatLabel && label" :for="id" class="">{{ label }}</label>
             </span>
