@@ -66,11 +66,11 @@ class ProgrammingController extends Controller
             if ($hours < 9.5) {
                 $task = VirtualTask::find($validateData['task_id']);
                 $date = Carbon::parse($validateData['fecha']);
-                if($project->daysPerWeek == 5){
+                if ($project->daysPerWeek == 5) {
                     $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::FRIDAY);
-                }else if($project->daysPerWeek == 6){
+                } else if ($project->daysPerWeek == 6) {
                     $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::SATURDAY);
-                }else{
+                } else {
                     $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::SUNDAY);
                 }
                 // if($end_date < Carbon::parse($validateData['fecha'])){
@@ -548,39 +548,40 @@ class ProgrammingController extends Controller
         }
     }
 
-    public function collisionsPerDay(Request $request){
+    public function collisionsPerDay(Request $request)
+    {
         try {
             // $request->endSchedule = true;
             // $request->actionType = 2;
             // $request->scheduleTime = 333;
             // $request->idTask = 18;
             DB::beginTransaction();
-            $DetailScheduleTime = DetailScheduleTime::where('idScheduleTime',$request->scheduleTime)->first();
+            $DetailScheduleTime = DetailScheduleTime::where('idScheduleTime', $request->scheduleTime)->first();
             $mensaje = '';
             switch ($request->actionType) {
-            case 1:
-                $schedule = Schedule::find($DetailScheduleTime->idSchedule);
-                $schedule->task_id = $request->idTask;
-                $schedule->save();
-                if($request->endSchedule){   
-                    PersonalScheduleDayJob::dispatch($DetailScheduleTime->fecha,$DetailScheduleTime->idUsuario, $request->idTask)->onConnection('sync');
-                    $mensaje = 'registro actualizado';               
-                }
-                break;
-            case 2:
-                if($request->endSchedule){
-                    PersonalScheduleDayJob::dispatch($DetailScheduleTime->fecha,$DetailScheduleTime->idUsuario, $request->idTask)->onConnection('sync');
-                    $mensaje = 'registro actualizado';               
-                }
-                break;
-            default:
-                break;
+                case 1:
+                    $schedule = Schedule::find($DetailScheduleTime->idSchedule);
+                    $schedule->task_id = $request->idTask;
+                    $schedule->save();
+                    if ($request->endSchedule) {
+                        PersonalScheduleDayJob::dispatch($DetailScheduleTime->fecha, $DetailScheduleTime->idUsuario, $request->idTask)->onConnection('sync');
+                        $mensaje = 'registro actualizado';
+                    }
+                    break;
+                case 2:
+                    if ($request->endSchedule) {
+                        PersonalScheduleDayJob::dispatch($DetailScheduleTime->fecha, $DetailScheduleTime->idUsuario, $request->idTask)->onConnection('sync');
+                        $mensaje = 'registro actualizado';
+                    }
+                    break;
+                default:
+                    break;
             }
             DB::commit();
-            return response()->json(['status' => true, 'mensaje'=> $mensaje]);
-        }catch (Exception $e) {
+            return response()->json(['status' => true, 'mensaje' => $mensaje]);
+        } catch (Exception $e) {
             DB::rollBack();
-            return response()->json(['status' => true, 'mensaje'=> 'Se ha generado un error: '.$e->getMessage()]);
+            return response()->json(['status' => true, 'mensaje' => 'Se ha generado un error: ' . $e->getMessage()]);
         }
     }
 
@@ -638,7 +639,7 @@ class ProgrammingController extends Controller
         }
     }
 
-    public function endNivelActivitiesByProject(Request $request)
+    public function endNivelActivitiesByProject(Project $project, Request $request)
     {
         // $request->date_end ='2024-01-01';
         // $request->date_start = '2024-05-05';
@@ -646,32 +647,33 @@ class ProgrammingController extends Controller
         $taskWithSubTasks = VirtualTask::has('project')->whereNotNull('task_id')->select('task_id')->get()->map(function ($task) {
             return $task['task_id'];
         })->toArray();
-        
+
         return response()->json(
-            VirtualTask::whereHas('project', function ($query) use ($request){
-                $query->where('id', $request->idProject);
-                // $query->where('executor','LIKE', '%'.trim(auth()->user()->gerencia).'%');
-            })->has('task')
-            ->where('percentDone', '<', 100)
-            ->where(function ($query) use ($request) {
-                $query->whereBetween('startdate', [$request->date_start, $request->date_end])
-                    ->orWhereBetween('enddate', [$request->date_start, $request->date_end])
-                    ->orWhere(function ($query) use ($request) {
-                        $query->where('enddate', '>', $request->date_end)
-                            ->where('startdate', '<', $request->date_start);
-                    });
-            })->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) {
-                return [
-                    'name' => $task['name'],
-                    'id' => $task['id'],
-                    'task' => $task->task->name,
-                    'endDate' => $task['endDate'],
-                    'percentDone' => $task['percentDone'],
-                    'project' => $task->project->name,
-                    'shift' => $task->project->shift ? Shift::where('id', $task->project->shift)->first() : null,
-                    'startDate' => $task['startDate'],
-                ];
-            }),
+            VirtualTask::has('project')->has('task')
+                ->where('project_id', $project->id)
+                // ->where('executor','LIKE ,'%'.$request->executor.'%)
+                ->where('percentDone', '<', 100)
+                ->where('startDate', '<=', $request->date)
+                // ->where(function ($query) use ($request) {
+                //     $query->whereBetween('startdate', [$request->date_start, $request->date_end])
+                //         ->orWhereBetween('enddate', [$request->date_start, $request->date_end])
+                //         ->orWhere(function ($query) use ($request) {
+                //             $query->where('enddate', '>', $request->date_end)
+                //                 ->where('startdate', '<', $request->date_start);
+                //         });
+                ->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) use ($request) {
+                    return [
+                        'name' => $task['name'],
+                        'id' => $task['id'],
+                        'task' => $task->task->name,
+                        'taskdad' => $task->task->task->name ?? '',
+                        'endDate' => $task['endDate'],
+                        'startDate' => $task['startDate'],
+                        'percentDone' => $task['percentDone'],
+                        'shift' => $task->project->shift ? Shift::where('id', $task->project->shift)->first() : null,
+                        'employees' => Schedule::where('task_id', $task['id'])->where('fecha', $request->date)->get(),
+                    ];
+                }),
         );
     }
 }
