@@ -16,7 +16,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow, ShouldQueue
+class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow
 {
     private $project;
 
@@ -52,6 +52,7 @@ class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow, 
                 if (isset($pep)) {
                     $tipo = TypeAccount::where('account', 'LIKE', $row['clase_de_coste'])->first();
                     if (!isset($tipo)) {
+                        addNotification('Error al Subir el Costo de ' . $this->project->name, 'error', 'No hemos encontrado la clase: ' . $row['clase_de_coste']);
                         dd('La clase de Cuenta: ' . $row['clase_de_coste'] . ' No se encuentra en la base de datos');
                     }
                     if ($tipo->class == "MATERIALES") {
@@ -69,7 +70,7 @@ class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow, 
                     // dd('No hemos encontrado el grafo: ' . $row['objeto'] . ' En la Estructura');
                 }
             } catch (Exception $e) {
-                addNotification('Error al Subir elde ' . $this->project->name, 'error', 'Ha Ocurrido un Error Inesperado');
+                addNotification('Error al Subir el Costo de ' . $this->project->name, 'error', 'Ha Ocurrido un Error Inesperado');
                 dd($e);
             }
         }
