@@ -11,20 +11,30 @@
             <div class="fixed inset-0 bg-[black]/60 z-10" :class="{ hidden: !menu }" @click="menu = !menu"></div>
             <MenuSidebar class="lg:block " :class="{ hidden: !menu }"></MenuSidebar>
             <div
-                class="max-h-[6vh] z-10 flex items-center justify-between h-auto px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 md:ml-24">
+                class="max-h-[6vh] z-10 flex items-center justify-between h-auto px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 lg:ml-24">
                 <div class="w-full">
                     <button type="button" class="-ml-7 p-2.5 text-gray-700 lg:hidden" @click="menu = !menu">
                         <span class="sr-only">Open sidebar</span>
                         <Bars3CenterLeftIcon class="w-6 h-6" aria-hidden="true" />
                     </button>
-                    <div class="items-center justify-between hidden lg:flex">
-                        <h1 class="hidden text-xl font-extrabold lg:block text-primary">
-                            Portal de Operaciones Tecnológicas e Inteligencia Artificial
-                        </h1>
-                        <DolarTRM />
+                    <div class="flex">
+                        <Link :href="route('dashboard')" v-tooltip.top="'Dashboard'">
+                            <div class="flex space-x-2 items-center">
+                                <i class="fa-solid fa-home text-gray-500"></i>
+                                <h1 class="text-center font-semibold text-primary text-xl mt-1">
+                                    TOP
+                                </h1>
+                            </div>
+                        </Link>
+                            <div class="flex justify-between items-center">
+                                <Breadcrumb :home="home" :model="urls" :pt="{
+                                    root: '!h-2 !flex !justify-center !items-center'
+                                }" />
+                            </div>
                     </div>
                 </div>
                 <div class="flex items-center">
+                    <DolarTRM />
                     <FlyoutNotificationsMenu title="Notificaciones" />
                     <DropdownSetting title="Utilidades" />
                     <Menu as="div" class="relative inline-block text-left">
@@ -32,12 +42,13 @@
                             <MenuButton
                                 class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white rounded-md hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
                                 <span class="sr-only">Open user menu</span>
-                                <img class="custom-image" :src="$page.props.auth.user.photo" alt="" />
+                                <img class="size-8 object-[50%_30%] object-cover rounded-full"
+                                    :src="$page.props.auth.user.photo" alt="" />
                                 <span class="hidden lg:flex lg:items-center">
                                     <span class="ml-4 text-xs font-semibold text-gray-900" aria-hidden="true">{{
-        $page.props.auth.user.short_name }}</span>
+                                        $page.props.auth.user.short_name }}</span>
                                 </span>
-                                <ChevronDownIcon class="w-5 h-5 ml-2 -mr-1 text-violet-200 hover:text-violet-100"
+                                <ChevronDownIcon class="size-5 ml-2 -mr-1 text-violet-200 hover:text-violet-100"
                                     aria-hidden="true" />
                             </MenuButton>
                         </div>
@@ -161,11 +172,11 @@
                                                                     <span v-if="suggestion.type == 'Error'"
                                                                         class="flex justify-center px-2 text-xs font-medium rounded-md"
                                                                         :class="suggestion.status == 1 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-success'">{{
-        suggestion.status == 1 ? 'Pendiente' :
-            'Resuelto'
-    }}</span>
+                                                                        suggestion.status == 1 ? 'Pendiente' :
+                                                                        'Resuelto'
+                                                                        }}</span>
                                                                     <p class="w-full text-xs text-end">{{
-            formatDateTime24h(suggestion.created_at) }}</p>
+                                                                        formatDateTime24h(suggestion.created_at) }}</p>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -270,9 +281,10 @@ import "@/composable/push.min.js"
 import { useCommonUtilities } from '@/composable/useCommonUtilities'
 import { Menu, MenuButton, MenuItems, MenuItem, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { ref, onMounted } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+import { router, Link } from '@inertiajs/vue3'
 import { useBroadcastNotifications } from '@/composable/useBroadcastNotifications'
 import { useSweetalert } from '@/composable/sweetAlert'
+import Breadcrumb from 'primevue/breadcrumb';
 import Button from '@/Components/Button.vue'
 import ConfirmPopup from 'primevue/confirmpopup';
 import DolarTRM from "@/Components/DolarTRM.vue"
@@ -290,6 +302,14 @@ const sugerencia = ref('')
 const sugerenciaVisible = ref(false)
 const suggestions = ref([])
 const tipoReporte = ref('Sugerencia')
+
+const props = defineProps({
+    urls: {
+        type: Array,
+        default: [],
+        required: true
+    }
+})
 
 onMounted(() => {
     loadSuggestions()
@@ -338,13 +358,9 @@ const loadSuggestions = () => {
         suggestions.value = res.data[0]
     })
 }
+
+const home = ref({
+    route: '/dashboard',
+    // label: 'Dashboard'
+})
 </script>
-<style scoped>
-.custom-image {
-    width: 32px;
-    height: 32px;
-    object-position: 50% 30%;
-    border-radius: 99999px;
-    object-fit: cover;
-}
-</style>

@@ -5,15 +5,6 @@ import {
 } from '@heroicons/vue/20/solid'
 </script>
 <style scoped>
-.custom-image {
-    width: 60px;
-    height: 60px;
-    object-position: 50% 30%;
-    border-radius: 50% 50%;
-    object-fit: cover;
-    /* Opciones: 'cover', 'contain', 'fill', etc. */
-}
-
 @media screen and (max-width: 640px) {
     .custom-image2 {
         display: none;
@@ -27,10 +18,11 @@ import {
                 <div class="flex-1 min-w-0">
                     <!-- Profile -->
                     <div class="flex items-center">
-                        <img class="custom-image" :src="$page.props.auth.user.photo" alt="" />
+                        <img class="size-[4rem] object-[50%_30%] object-cover rounded-full"
+                            :src="$page.props.auth.user.photo" alt="" />
                         <div>
                             <div class="flex items-center">
-                                <img class="custom-image2 sm:hidden md:hidden lg:hidden xl:hidden"
+                                <img class="hidden sm:hidden md:hidden lg:hidden xl:hidden"
                                     :src="$page.props.auth.user.photo" alt="" />
                                 <h1 class="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:leading-9">
                                     Buen
