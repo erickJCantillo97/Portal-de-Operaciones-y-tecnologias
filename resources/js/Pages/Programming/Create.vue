@@ -228,14 +228,26 @@ onMounted(() => {
                                     <span v-for="task in data.tasks[dia.toISOString().split('T')[0]]"
                                         class="w-full p-0.5">
                                         <div
-                                            class="border border-primary h-32 rounded-md flex flex-col justify-between">
+                                            class="border border-primary h-40 rounded-md flex flex-col justify-between">
                                             <div class="flex flex-col justify-between h-full">
-                                                <p
-                                                    class="border-b font-bold border-primary h-10 flex items-center justify-center text-xs px-0.5 w-full text-center">
-                                                    {{ task.name }}
-                                                </p>
-                                                <p class="text-xs px-1 text-center w-full">{{ task.task }}</p>
-                                                <div class="grid grid-cols-4 items-center px-1">
+                                                <span>
+                                                    <p
+                                                        class="border-b font-bold border-primary h-10 flex items-center justify-center text-xs px-0.5 w-full text-center">
+                                                        {{ task.name }}
+                                                    </p>
+                                                    <p class="text-xs px-1 text-center w-full">{{ task.task }}</p>
+                                                    <div
+                                                        class="flex cursor-default space-x-2 justify-center rounded-md">
+                                                        <p v-tooltip.left="'Fecha inicio'" class=" px-1 text-xs text-center">
+                                                            {{ task.startDate }}
+                                                        </p>
+                                                        <p v-tooltip.left="'Fecha Fin'" class="text-xs text-center px-1"
+                                                            :class="new Date(task.endDate) < dia ? 'bg-red-500 rounded-md' : ''">
+                                                            {{ task.endDate }}
+                                                        </p>
+                                                    </div>
+                                                </span>
+                                                <div class="grid grid-cols-4 items-center px-1 h-full">
                                                     <div
                                                         class="px-1 flex cursor-default flex-col justify-center border rounded-md h-full">
                                                         <p v-tooltip.left="'Hora inicio'" class="text-sm text-center">
@@ -245,16 +257,18 @@ onMounted(() => {
                                                             {{ format24h(task.shift.endShift) }}
                                                         </p>
                                                     </div>
-                                                    <div class="col-span-3 flex justify-end">
+                                                    <div class="col-span-3 flex justify-center"
+                                                        v-tooltip.top="{ value: `<div>${task.employees.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false,pt:{text:'text-center w-52'} }">
                                                         <AvatarGroup
                                                             v-if="task.employees.length > 0 && task.employees.length <= 3"
-                                                            @click="toggle" >
+                                                            @click="toggle">
                                                             <Avatar v-for="person in task.employees"
                                                                 :image="person.employee.photo ?? '/images/person-default.png'"
-                                                                shape="circle" />
+                                                                shape="circle" size="large" />
                                                         </AvatarGroup>
                                                         <AvatarGroup v-else-if="task.employees.length > 3">
-                                                            <Avatar v-for="i in [0, 1, 2]" :image="task.employees[i].photo ?? '/images/person-default.png'"
+                                                            <Avatar v-for="i in [0, 1, 2]"
+                                                                :image="task.employees[i].photo ?? '/images/person-default.png'"
                                                                 shape="circle" />
                                                             <Avatar :label="task.employees.length - 3" shape="circle" />
                                                         </AvatarGroup>
@@ -262,7 +276,6 @@ onMounted(() => {
                                                 </div>
                                             </div>
                                             <div class="p-1">
-                                                <!-- {{ task.percentDone }} -->
                                                 <ProgressBar :value="parseFloat(task.percentDone)" class=""
                                                     v-tooltip="'Avance'" :pt="{ label: 'text-xs font-thin' }">
                                                 </ProgressBar>
@@ -306,17 +319,29 @@ onMounted(() => {
                                     </p>
                                 </div>
                                 <div class="w-full overflow-x-auto grid grid-cols-5">
-                                    <span v-for="task in project.tasks" class="w-full p-0.5"
-                                        :class="fechaEnRango(task.startDate, task.endDate, new Date(dates).toISOString().split('T')[0]) ? '' : 'hidden'">
+                                    <span v-for="task in project.tasks"
+                                        class="w-full p-0.5">
                                         <div
-                                            class="border border-primary h-32 rounded-md flex flex-col justify-between">
+                                            class="border border-primary h-40 rounded-md flex flex-col justify-between">
                                             <div class="flex flex-col justify-between h-full">
-                                                <p
-                                                    class="border-b font-bold border-primary h-10 flex justify-center text-xs px-0.5 w-full items-center text-center">
-                                                    {{ task.name }}
-                                                </p>
-                                                <p class="text-xs px-1 text-center w-full">{{ task.task }}</p>
-                                                <div class="grid grid-cols-4 items-center px-1">
+                                                <span>
+                                                    <p
+                                                        class="border-b font-bold border-primary h-10 flex items-center justify-center text-xs px-0.5 w-full text-center">
+                                                        {{ task.name }}
+                                                    </p>
+                                                    <p class="text-xs px-1 text-center w-full">{{ task.task }}</p>
+                                                    <div
+                                                        class="flex cursor-default space-x-2 justify-center rounded-md">
+                                                        <p v-tooltip.left="'Fecha inicio'" class=" px-1 text-xs text-center">
+                                                            {{ task.startDate }}
+                                                        </p>
+                                                        <p v-tooltip.left="'Fecha Fin'" class="text-xs text-center px-1"
+                                                            :class="new Date(task.endDate) < dia ? 'bg-red-500 rounded-md' : ''">
+                                                            {{ task.endDate }}
+                                                        </p>
+                                                    </div>
+                                                </span>
+                                                <div class="grid grid-cols-4 items-center px-1 h-full">
                                                     <div
                                                         class="px-1 flex cursor-default flex-col justify-center border rounded-md h-full">
                                                         <p v-tooltip.left="'Hora inicio'" class="text-sm text-center">
@@ -326,29 +351,25 @@ onMounted(() => {
                                                             {{ format24h(task.shift.endShift) }}
                                                         </p>
                                                     </div>
-                                                    <div class="col-span-3 flex justify-end">
-                                                        <AvatarGroup @click="toggle">
-                                                            <Avatar v-tooltip.top="'Nombre Apellido'"
-                                                                v-for="person in [0, 1, 2, 3]"
-                                                                image="/images/person-default.png" shape="circle" />
-                                                            <Avatar v-tooltip.top="{
-                                escape: false,
-                                value:
-                                    `<div class='flex flex-col'>
-                                                                    <p>Nombre Apellido</p>
-                                                                    <p>Nombre Apellido</p>
-                                                                    <p>Nombre Apellido</p>
-                                                                    <p>Nombre Apellido</p>
-                                                                    <p>Nombre Apellido</p>
-                                                                    <p>Nombre Apellido</p>
-                                                                </div>`
-                            }" @click="toggle" label="+2" shape="circle" />
+                                                    <div class="col-span-3 flex justify-center"
+                                                        v-tooltip.top="{ value: `<div>${task.employees.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false,pt:{text:'text-center w-52'} }">
+                                                        <AvatarGroup
+                                                            v-if="task.employees.length > 0 && task.employees.length <= 3"
+                                                            @click="toggle">
+                                                            <Avatar v-for="person in task.employees"
+                                                                :image="person.employee.photo ?? '/images/person-default.png'"
+                                                                shape="circle" size="large" />
+                                                        </AvatarGroup>
+                                                        <AvatarGroup v-else-if="task.employees.length > 3">
+                                                            <Avatar v-for="i in [0, 1, 2]"
+                                                                :image="task.employees[i].photo ?? '/images/person-default.png'"
+                                                                shape="circle" />
+                                                            <Avatar :label="task.employees.length - 3" shape="circle" />
                                                         </AvatarGroup>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="p-1">
-                                                <!-- {{ task.percentDone }} -->
                                                 <ProgressBar :value="parseFloat(task.percentDone)" class=""
                                                     v-tooltip="'Avance'" :pt="{ label: 'text-xs font-thin' }">
                                                 </ProgressBar>
