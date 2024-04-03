@@ -198,7 +198,7 @@ const getWeekTasks = async () => {
 
 const errors = ref({})
 const beforeChange = async () => {
-    if (formData.value.name != null) {
+    if (formData.value.name != null && formData.value.SAP_code != null) {
         let switchTabsStates = false
         loading.value = true
         try {
@@ -220,12 +220,11 @@ const beforeChange = async () => {
             return switchTabsStates
         } catch (error) {
             errors.value = error.response.data.errors
-            console.log(error)
             toast.add({ severity: 'error', group: 'customToast', text: errors.value.message, life: 2000 });
         }
     } else {
-        errors.value.name = 'El campo nombre es obligatorio'
-        toast.add({ severity: 'error', group: 'customToast', text: 'Se requiere un nombre', life: 2000 });
+        // errors.value.name = 'El campo nombre es obligatorio'
+        toast.add({ severity: 'error', group: 'customToast', text: 'Rellene todos los campos', life: 2000 });
     }
 }
 
@@ -378,7 +377,8 @@ const active = ref(0);
                         {{ project ? project.name : 'Nuevo proyecto' }}
                     </h2>
                 </span>
-                <div v-if="project" class="space-x-6 justify-end flex w-full">
+                <div v-if="project && $page.props.auth.user.gerencia == 'GECON'"
+                    class="space-x-6 justify-end flex w-full">
                     <Button icon="fa-solid fa-list-check" severity="help" v-tooltip.left="'Tareas de la semana'"
                         @click="modalWeekTask = true" />
                     <Button icon="fa-solid fa-gauge-high" severity="secondary" v-tooltip.left="'Avance del proyecto'"
@@ -421,8 +421,9 @@ const active = ref(0);
                     color="#2E3092" nextButtonText="Siguiente" backButtonText="Regresar"
                     finishButtonText="Guardar y salir" ref="wizard">
                     <!--INFORMACIÓN CONTRACTUAL-->
-                    <tab-content title="Información Contractual" class="h-[45vh] overflow-y-auto"
-                        icon="fa-solid fa-file-signature" :beforeChange="beforeChange">
+                    <tab-content
+                        :title="$page.props.auth.user.gerencia == 'GECON' ? 'Información Contractual' : 'INFORMACION DEL PROYECTO'"
+                        class="h-[45vh] overflow-y-auto" icon="fa-solid fa-file-signature" :beforeChange="beforeChange">
                         <div class="border gap-4 border-gray-200 rounded-lg p-4 md:grid md:grid-cols-2">
                             <!--CAMPO NOMBRE DEL PROYECTO (name)-->
                             <CustomInput label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
@@ -436,24 +437,29 @@ const active = ref(0);
                             <CustomInput label="Alcance del Proyecto" type="dropdown"
                                 placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.scope" showClear
                                 :options="scopeOptions" :errorMessage="$page.props.errors.scope"
-                                :invalid="$page.props.errors.scope ? true : false" />
+                                :invalid="$page.props.errors.scope ? true : false"
+                                v-if="$page.props.auth.user.gerencia == 'GECON'" />
                             <CustomInput label="Contrato" type="dropdown" placeholder="Seleccione Alcance del Proyecto"
                                 optionValue="id" optionLabel="contract_id" v-model:input="formData.contract_id"
-                                showClear :options="contractsOptions" />
+                                showClear :options="contractsOptions"
+                                v-if="$page.props.auth.user.gerencia == 'GECON'" />
                             <CustomInput label="Autorizaciones" type="dropdown" placeholder="Seleccione Autorización"
                                 optionLabel="name" v-model:input="authorizationSelect" showClear
                                 :options="authorizationsOptions" :errorMessage="$page.props.errors.authorization_id"
-                                :invalid="$page.props.errors.authorization_id ? true : false" />
+                                :invalid="$page.props.errors.authorization_id ? true : false"
+                                v-if="$page.props.auth.user.gerencia == 'GECON'" />
 
                             <CustomInput label="Estimaciones" type="dropdown" placeholder="Seleccione Estimación"
                                 optionLabel="consecutive" v-model:input="formData.quote_id" optionValue="id" showClear
                                 :options="Object.values(quotesOptions)" :errorMessage="$page.props.errors.quote_id"
-                                :invalid="$page.props.errors.quote_id ? true : false" />
+                                :invalid="$page.props.errors.quote_id ? true : false"
+                                v-if="$page.props.auth.user.gerencia == 'GECON'" />
                         </div>
                     </tab-content>
                     <!--DATOS DEL PROYECTO-->
                     <tab-content title="Datos del Proyecto" icon="fa-solid fa-diagram-project"
-                        class="h-[45vh] overflow-y-auto" :before-change="beforeChange">
+                        v-if="$page.props.auth.user.gerencia == 'GECON'" class="h-[45vh] overflow-y-auto"
+                        :before-change="beforeChange">
                         <!--CAMPO SUPERVISOR (supervisor)-->
                         <div class="sm:grid sm:grid-cols-2 border gap-4 rounded-lg p-4">
 
@@ -483,8 +489,9 @@ const active = ref(0);
                         </div>
                     </tab-content>
                     <!--PLANEACIÓN DEL PROYECTO-->
-                    <tab-content title="Planeación del Proyecto" icon="fa-solid fa-calendar-check"
-                        :before-change="beforeChange" class="h-[45vh] overflow-y-auto">
+                    <tab-content title="Planeación del Proyecto" v-if="$page.props.auth.user.gerencia == 'GECON'"
+                        icon="fa-solid fa-calendar-check" :before-change="beforeChange"
+                        class="h-[45vh] overflow-y-auto">
                         <div class="sm:grid sm:grid-cols-2 gap-6 w-full border p-4 rounded-lg ">
                             <div class="flex flex-col gap-4">
                                 <!--CAMPO FECHA INICIO-->
@@ -560,8 +567,8 @@ const active = ref(0);
                         </div>
                     </tab-content>
                     <!--BUQUES-->
-                    <tab-content title="Buques" icon="fa-solid fa-ship" :before-change="beforeChange"
-                        class="h-[45vh] flex gap-2">
+                    <tab-content title="Buques" icon="fa-solid fa-ship" v-if="$page.props.auth.user.gerencia == 'GECON'"
+                        :before-change="beforeChange" class="h-[45vh] flex gap-2">
                         <span class="h-ful flex flex-col w-1/2">
                             <p class="font-bold text-lg">Buques agregados</p>
                             <Listbox :options="projectShipsOptions" optionValue="id"
@@ -632,8 +639,8 @@ const active = ref(0);
                             </Listbox>
                         </span>
                     </tab-content>
-                    <tab-content title="Hitos" icon="fa-solid fa-list-check"
-                        class=" h-[45vh] w-full border rounded-lg p-1 overflow-y-auto">
+                    <tab-content title="Hitos" v-if="$page.props.auth.user.gerencia == 'GECON'"
+                        icon="fa-solid fa-list-check" class=" h-[45vh] w-full border rounded-lg p-1 overflow-y-auto">
                         <CustomDataTable :rowsDefault="5" :data="milestonesOptions" :columnas="columnas"
                             :actions="actions" @edit="showModal" :filter="false" :showHeader="false" :showAdd="true"
                             @addClick="showModal" @delete="delMilestone" />
@@ -652,6 +659,7 @@ const active = ref(0);
                         <Button label="Guardar y salir" :loading="loading" raised icon="fa-solid fa-floppy-disk" />
                     </template>
                 </form-wizard>
+
             </div>
         </div>
     </AppLayout>
