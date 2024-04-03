@@ -311,12 +311,12 @@ const navigation = [
             },
 
             {
-                name: 'requirementos',
+                name: 'requerimentos',
                 dev: false,
                 show: true,
                 children: [
                     {
-                        name: 'Requimientos Preeliminares',
+                        name: 'Requemientos Preeliminares',
                         href: 'requirements.index',
                         dev: true,
                         show: true,

@@ -22,7 +22,7 @@ const props = defineProps({
 
 <template>
     <AppLayout>
-        <div class="w-full h-full overflow-y-scroll">
+        <div class="size-full overflow-y-scroll">
             <div class="grid grid-cols-1 md:grid-cols-2 max-w-full">
                 <UserHeader class="col-span-1" />
                 <QuotesCard class="col-span-1" :showIndicators="false"
