@@ -34,10 +34,12 @@ use Illuminate\Support\Facades\Route;
 use App\Mail\AssignmentToolsMail;
 use App\Models\NotificationUser;
 use App\Models\Personal\Employee;
+use App\Models\Project\Operation;
 use App\Models\Project\ProgressProjectWeek;
 use App\Models\Projects\Contract;
 use App\Models\Projects\ProjectsShip;
 use App\Models\Projects\Ship;
+use App\Models\Views\Cost;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
@@ -210,11 +212,43 @@ Route::get('/mailable', function () {
     return new App\Mail\CreateProjectMail($project, $customer);
 });
 Route::get('/prueba', function (Request $request) {
-    setEmpleadosAPI();
-    return Employee::get();
+    // setEmpleadosAPI();
+    $operacion = Operation::where('project_id', 136)->first();
+    $op = explode(' ', $operacion->grafo_id);
+    $week = '2413';
+
+    $projects = ProgressProjectWeek::with('project')->where('week', $week)->where('CPI', '<>', 0)->get()->pluck('project.SAP_code');
+
+
+    // return $projects;
+    $codes =  DB::table('peps_view')->whereIn('code', $projects)
+        // ->join('costs_view as costo', 'costo.project', '=', 'peps_view.code_project')
+        ->get();
+    // return $codes;
+    // return $projects->pluck('SAP_code')->toArray();
+    // return $codes;
+    $costos =  Cost::whereIn('project', $codes->pluck('code_project'))->select(DB::raw('SUM(value) as total'), 'project')->groupBy('project')->get();
+    $ejecutado_total = 0;
+    $ejecutado_acumulado = 0;
+    foreach ($costos as $c) {
+        $ejecutado_total += $c->total;
+        // return $c->total;
+
+        $code_sap =  DB::table('peps_view')->where('code_project', $c->project)->first()->code;
+
+        $project = Project::where('SAP_code', $code_sap)->first()->id;
+        // return $project;
+        $ejecutado_acumulado += ProgressProjectWeek::where('project_id', $project)->with('project')->where('week', $week)->first()->CPI * $c->total;
+        return $ejecutado_acumulado;
+        // return $code_sap;
+    }
+
+    return $ejecutado_acumulado / $ejecutado_total;
+    $code =  DB::table('operations_view')->where('grafo', 'LIKE', '%' . $op[0])->where('operacion', 'LIKE', end($op))->get()->first()->costo_cod;
+    return $op;
     // return back()->withErrors(['errors' => ['messaje', 'default1', 'messaje1', 'default2', 'messaje4', 'default4', 'messaje', 'default',]]);
 
-    // return Excel::download(new ProjectsDetailsExport, 'invoices.xlsx');
+    // return Excegl::download(new ProjectsDetailsExport, 'invoices.xlsx');
 })->name('prueba');
 
 
