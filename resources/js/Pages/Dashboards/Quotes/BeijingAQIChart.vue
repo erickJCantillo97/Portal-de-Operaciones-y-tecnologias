@@ -72,14 +72,6 @@ export default {
               saveAsImage: {}
             }
           },
-          dataZoom: [
-            {
-              startValue: this.projects[0]
-            },
-            {
-              type: 'inside'
-            }
-          ],
           visualMap: {
             top: 50,
             right: 10,
@@ -109,10 +101,16 @@ export default {
               color: '#00ab55'
             }
           },
-          series: {
+          series: [{
+            label: {
+              show: true,
+              position: 'top',
+              formatter: '{b}'
+            },
             name: 'Gráfica de Control',
             type: 'line',
             data: this.variations,
+
             markLine: {
               silent: true,
               lineStyle: {
@@ -136,7 +134,7 @@ export default {
                 }
               ]
             }
-          }
+          }]
         })
       )
     },
