@@ -644,6 +644,7 @@ class ProgrammingController extends Controller
         // $request->date_end ='2024-01-01';
         // $request->date_start = '2024-05-05';
         // $request->idProject = 1;
+        // dd($request->all());
         $taskWithSubTasks = VirtualTask::has('project')->whereNotNull('task_id')->select('task_id')->get()->map(function ($task) {
             return $task['task_id'];
         })->toArray();

@@ -11,10 +11,8 @@ import ButtonGroup from 'primevue/buttongroup';
 import ProgressBar from 'primevue/progressbar';
 import Avatar from 'primevue/avatar';
 import AvatarGroup from 'primevue/avatargroup';
-
 import OverlayPanel from 'primevue/overlaypanel';
 import NoContentToShow from '@/Components/NoContentToShow.vue';
-import Calendar from 'primevue/calendar';
 
 // const { hasRole, hasPermission } = usePermissions()
 
@@ -84,7 +82,6 @@ const personal = ref()
 const projectData = ref([]);
 const loadingProgram = ref(true);
 const loadingPerson = ref(true);
-const personalHours = ref({});
 const conflicts = ref()
 const task = ref([])
 const mode = ref('date')
@@ -107,36 +104,32 @@ const getPersonalData = () => {
 
 const getTask = async (option) => {
     loadingProgram.value = true
-    projectData.value=[]
+    projectData.value = []
     if (option == null) {
         option = mode.value
     }
     if (option == 'week') {
-        // dates.value = obtenerFormatoSemana(new Date())
         console.log(option)
         mode.value = option
-        let date_start = diasSemana.value[0].toISOString()
-        let date_end = diasSemana.value[5].toISOString()
         if (projectsSelected.value.length > 0) {
-            projectsSelected.value.forEach(async (element) => {
-                await axios.get(route('actividadesDeultimonivelPorProyectos', { idProject: element.id, date_start, date_end })).then((res) => {
-                    let project = element
-                    project.tasks = res.data
-                    projectData.value.push(project)
-                    // console.log(projectData.value)
-                    loadingProgram.value = false;
+            projectData.value = projectsSelected.value
+            projectData.value.forEach(async (project) => {
+                project.tasks = {}
+                await diasSemana.value.forEach(async (dia) => {
+                    await axios.post(route('actividadesDeultimonivelPorProyectos', project.id), { date: dia }).then((res) => {
+                        project.tasks[dia.toISOString().split('T')[0]] = res.data
+                    })
                 })
+                loadingProgram.value = false;
             })
         }
     } else if (option == 'date') {
         mode.value = 'date'
-        dates.value = new Date()
-        console.log(mode.value)
-        let date_start = dates.value
-        let date_end = dates.value
+        // dates.value = new Date()
+        let date = dates.value
         if (projectsSelected.value.length > 0) {
             projectsSelected.value.forEach(async (element) => {
-                await axios.get(route('actividadesDeultimonivelPorProyectos', { idProject: element.id, date_start, date_end })).then((res) => {
+                await axios.post(route('actividadesDeultimonivelPorProyectos', element.id), { date }).then((res) => {
                     let project = element
                     project.tasks = res.data
                     projectData.value.push(project)
@@ -189,7 +182,8 @@ onMounted(() => {
                                 :outlined="mode != 'month'" />
                             <Button label="Semana" @click="dates = obtenerFormatoSemana(new Date()); getTask('week')"
                                 :outlined="mode != 'week'" />
-                            <Button label="dia" @click="getTask('date')" :outlined="mode != 'date'" />
+                            <Button label="dia" @click="dates = new Date(); getTask('date')"
+                                :outlined="mode != 'date'" />
                         </ButtonGroup>
                         <div class="w-52">
                             <CustomInput v-model:input="dates" :type="mode" :manualInput="false"
@@ -218,7 +212,7 @@ onMounted(() => {
                             <!-- endregion -->
                         </div>
                         <!-- region actividades -->
-                        <div class="h-full overflow-y-auto space-y-2">
+                        <div v-if="!loadingProgram" class="h-full overflow-y-auto space-y-2">
                             <div v-for="data in projectData"
                                 class="grid-cols-7 divide-x divide-y divide-gray-100 border border-indigo-200 rounded-md text-lg leading-6 grid mr-1">
                                 <div class="flex flex-col items-center px-2 h-full">
@@ -231,8 +225,8 @@ onMounted(() => {
                                 </div>
                                 <div v-for="dia, index in diasSemana" class="flex flex-col items-center"
                                     :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
-                                    <span v-for="task in data.tasks" class="w-full p-0.5"
-                                        :class="fechaEnRango(task.startDate, task.endDate, dia.toISOString().split('T')[0]) ? '' : 'hidden'">
+                                    <span v-for="task in data.tasks[dia.toISOString().split('T')[0]]"
+                                        class="w-full p-0.5">
                                         <div
                                             class="border border-primary h-32 rounded-md flex flex-col justify-between">
                                             <div class="flex flex-col justify-between h-full">
@@ -252,22 +246,17 @@ onMounted(() => {
                                                         </p>
                                                     </div>
                                                     <div class="col-span-3 flex justify-end">
-                                                        <AvatarGroup @click="toggle">
-                                                            <Avatar v-tooltip.top="'Nombre Apellido'"
-                                                                v-for="person in [0, 1, 2, 3]"
-                                                                image="/images/person-default.png" shape="circle" />
-                                                            <Avatar v-tooltip.top="{
-                                escape: false,
-                                value:
-                                    `<div class='flex flex-col'>
-                                                                    <p>Nombre Apellido</p>
-                                                                    <p>Nombre Apellido</p>
-                                                                    <p>Nombre Apellido</p>
-                                                                    <p>Nombre Apellido</p>
-                                                                    <p>Nombre Apellido</p>
-                                                                    <p>Nombre Apellido</p>
-                                                                </div>`
-                            }" @click="toggle" label="+2" shape="circle" />
+                                                        <AvatarGroup
+                                                            v-if="task.employees.length > 0 && task.employees.length <= 3"
+                                                            @click="toggle" >
+                                                            <Avatar v-for="person in task.employees"
+                                                                :image="person.employee.photo ?? '/images/person-default.png'"
+                                                                shape="circle" />
+                                                        </AvatarGroup>
+                                                        <AvatarGroup v-else-if="task.employees.length > 3">
+                                                            <Avatar v-for="i in [0, 1, 2]" :image="task.employees[i].photo ?? '/images/person-default.png'"
+                                                                shape="circle" />
+                                                            <Avatar :label="task.employees.length - 3" shape="circle" />
                                                         </AvatarGroup>
                                                     </div>
                                                 </div>
@@ -286,7 +275,7 @@ onMounted(() => {
                             </div>
                         </div>
                         <!-- endregion -->
-                        <div class="grid-cols-7 h-8 text-sm grid mr-4 shadow-md">
+                        <div v-if="!loadingProgram" class="grid-cols-7 h-8 text-sm grid mr-4 shadow-md">
                             <div>
                                 <p class="w-full h-full flex items-center justify-center font-bold">
                                     Total personas
@@ -302,11 +291,14 @@ onMounted(() => {
                                     class="w-full text-center bg-warning text-white rounded-md ">4</p> -->
                             </div>
                         </div>
+                        <div v-if="loadingProgram" class="h-full flex flex-col justify-center">
+                            <Loading />
+                        </div>
                     </div>
                     <div v-if="mode == 'date'" class="h-[80vh] border rounded-md flex flex-col justify-between">
                         <p class="w-full text-center font-bold">Programacion del dia {{ dates.toLocaleDateString() }}
                         </p>
-                        <div class="h-full p-1 overflow-y-auto space-y-1">
+                        <div v-if="!loadingProgram" class="h-full p-1 overflow-y-auto space-y-1">
                             <div v-for="project in projectData" class="border w-full flex p-1 rounded-md">
                                 <div class="w-40 flex items-center justify-center">
                                     <p>
@@ -367,10 +359,13 @@ onMounted(() => {
                             </div>
 
                         </div>
-                        <div class="w-full justify-center flex gap-6">
+                        <div v-if="!loadingProgram" class="w-full justify-center flex gap-6">
                             <p class="rounded bg-primary px-2 text-white">Programados: 20</p>
                             <p class="rounded bg-danger px-2 text-white">No programados 2</p>
                             <!-- <p class="rounded bg-warning px-2 text-white">No programables 3</p> -->
+                        </div>
+                        <div v-if="loadingProgram" class="h-full flex flex-col justify-center">
+                            <Loading />
                         </div>
                     </div>
                     <div v-if="mode == 'month'" class="h-[80vh] flex flex-col justify-between"></div>
@@ -385,11 +380,10 @@ onMounted(() => {
                 <Loading v-if="loadingPerson" class="mt-10" message="Cargando personas" />
                 <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy" group-name="1"
                     class="h-[74vh] flex flex-col space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
-                    <!-- <span v-for="item in personal"> -->
-                    <Draggable v-for="item in personal"
+                    <Draggable v-for="item in personal" :key="item.id"
                         v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
                         :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"
-                        :drag-not-allowed="personalHours[item.Num_SAP] < 9.5 ? false : true"
+                        :drag-not-allowed="false"
                         class="snap-start rounded-xl shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
                         <div class="flex flex-col gap-x-1 p-1">
                             <span class=" flex flex-col justify-center">
