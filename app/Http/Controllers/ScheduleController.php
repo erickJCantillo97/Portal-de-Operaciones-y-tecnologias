@@ -115,7 +115,8 @@ class ScheduleController extends Controller
     public function sync(Project $project, Request $request)
     {
         $rows = [];
-        $removed = [];
+        $rowsDependecy = [];
+        $removedDependecy = [];
         $assgimentRows = [];
 
         if (isset($request->tasks['added'])) {
@@ -184,15 +185,28 @@ class ScheduleController extends Controller
 
                     $dependency['to'] =  $collections->where('$PhantomId', $dependency['to'])->first()['id'];
                 }
-                Dependecy::create([
+                $dependency = Dependecy::create([
                     'from' => $dependency['from'],
                     'to' => $dependency['to'],
                     'type' => $dependency['type'],
                     'lag' => $dependency['lag'],
                     'lagUnit' => $dependency['lagUnit'],
                 ]);
+                array_push($rowsDependecy, [
+                    '$PhantomId' => $dependency['$PhantomId'],
+                    'id' => $dependency->id,
+                    'added_dt' => $dependency->created_at,
+                ]);
             }
         }
+
+        if (isset($request->dependencies['removed'])) {
+            foreach ($request->dependencies['removed'] as $dependency) {
+                $taskUpdate = Dependecy::where('id', $dependency['id'])->delete();
+                array_push($removedDependecy, ['id' => $dependency['id']]);
+            }
+        }
+
         if (isset($request->assignments['added'])) {
             foreach ($request->assignments['added'] as $assignment) {
                 if (!is_numeric($assignment['resource'])) {
@@ -226,6 +240,10 @@ class ScheduleController extends Controller
             ],
             'assignments' => [
                 'rows' => $assgimentRows,
+            ],
+            'dependencies' => [
+                'rows' => $rowsDependecy,
+                'removed' => $removedDependecy,
             ],
         ]);
     }

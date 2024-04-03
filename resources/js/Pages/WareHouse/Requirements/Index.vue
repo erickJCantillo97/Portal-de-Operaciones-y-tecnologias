@@ -24,13 +24,52 @@ const addItem = () => {
     open.value = true
 }
 
+const options = [
+    {
+        name: 'GRUPO 100',
+        value: 100
+    },
+    {
+        name: 'GRUPO 200',
+        value: 200
+    },
+    {
+        name: 'GRUPO 300',
+        value: 300
+    },
+    {
+        name: 'GRUPO 400',
+        value: 400
+    },
+    {
+        name: 'GRUPO 500',
+        value: 500
+    },
+    {
+        name: 'GRUPO 600',
+        value: 600
+    },
+    {
+        name: 'GRUPO 700',
+        value: 700
+    },
+    {
+        name: 'GRUPO 800',
+        value: 700
+    },
+    {
+        name: 'GRUPO 900',
+        value: 900
+    },
+]
+
 const columns = [
     { field: 'consecutive', header: 'Consecutivo', filter: "true" },
     { field: 'project.name', header: 'Proyecto', filter: 'true', filterType: 'dropdown', filterLabel: 'name', filterValue: 'name', filterOptions: props.projects },
-    { field: 'bloque', header: 'Bloque' },
-    { field: 'sistema_grupo', header: 'Sistema/grupo' },
-    { field: 'user.name', header: 'Dibujante' },
-    { field: 'preeliminar_date', header: 'Fecha', type: 'date' },
+    { field: 'bloque', header: 'Bloque', filter: true },
+    { field: 'sistema_grupo', header: 'Sistema/grupo', filter: true, filterOptions: options, filterLabel: 'name', filterValue: 'value', filterType: 'dropdown' },
+    { field: 'user.short_name', header: 'Dibujante', filter: true },
+    { field: 'preeliminar_date', header: 'Fecha', type: 'date', filter: true, },
 ];
 
 const gestion = (event, data) => {
@@ -59,17 +98,20 @@ const submit = () => {
 <template>
     <AppLayout>
         <div class="h-full w-full">
-            <div class="flex justify-between items-center px-4 h-min">
-                <span class="text-xl font-bold text-primary h-full items-center flex">
+            <!-- <div class="flex justify-between items-center px-4">
+                <span class="text-xl font-bold text-primary  items-center flex">
                     <p> Requerimientos de Materiales </p>
                 </span>
                 <div class="flex items-center space-x-2">
+                    
+                </div>
+            </div> -->
+            <CustomDataTable :data="requirements" title="Requerimeinto de Materiales" @selectionAction="gestion"
+                :columnas="columns" :rowsDefault="10" selectionMode="multiple">
+                <template #buttonHeader>
                     <Button label="Importar Requerimientos" severity="success" icon="fa-solid fa-plus"
                         @click="addItem" />
-                </div>
-            </div>
-            <CustomDataTable :data="requirements" @selectionAction="gestion" :columnas="columns" :rowsDefault="10"
-                selectionMode="multiple">
+                </template>
             </CustomDataTable>
         </div>
 

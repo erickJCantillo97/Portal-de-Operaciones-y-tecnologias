@@ -281,33 +281,42 @@ const navigation = [
         show: true
     },
     {
-        name: 'Almacén',
+        name: 'Materiales y Equipos',
         show: hasPermission(['category read']),
+        icon: WrenchScrewdriverIcon,
+        current: false,
         children: [
             {
-                name: 'Categorías',
-                href: 'categories.index',
-                show: hasPermission(['category read']),
+                name: 'Almacen',
+                show: true,
+                children: [
+                    {
+                        name: 'Categorías',
+                        href: 'categories.index',
+                        show: hasPermission(['category read']),
+                    },
+                    {
+                        name: 'Equipos y Herramientas',
+                        href: 'tools.index',
+                        dev: false,
+                        show: hasPermission('tool read'),
+                    },
+                    {
+                        name: 'Asignaciones',
+                        href: 'assignmentTool.index',
+                        dev: false,
+                        show: hasPermission('assignmentTool read'),
+                    },
+                ]
             },
+
             {
-                name: 'Equipos y Herramientas',
-                href: 'tools.index',
-                dev: false,
-                show: hasPermission('tool read'),
-            },
-            {
-                name: 'Asignaciones',
-                href: 'assignmentTool.index',
-                dev: false,
-                show: hasPermission('assignmentTool read'),
-            },
-            {
-                name: 'requirementos',
+                name: 'requerimentos',
                 dev: false,
                 show: true,
                 children: [
                     {
-                        name: 'Requimientos Preeliminares',
+                        name: 'Requemientos Preeliminares',
                         href: 'requirements.index',
                         dev: true,
                         show: true,
@@ -315,8 +324,7 @@ const navigation = [
                 ]
             },
         ],
-        icon: WrenchScrewdriverIcon,
-        current: false
+
     },
     // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon, current: false },
     // { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },

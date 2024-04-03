@@ -19,4 +19,9 @@ class MaterialRequirement extends Model implements Auditable
     {
         return $this->belongsTo(Material::class);
     }
+
+    public function requirement()
+    {
+        return $this->belongsTo(Requirement::class);
+    }
 }

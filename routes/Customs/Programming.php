@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
     Route::get('/programming', [ProgrammingController::class, 'index'])->name('programming');
-    
+
     Route::get('/programming/create', [ProgrammingController::class, 'create'])->name('programming.create');
 
     Route::post('/programming/store', [ProgrammingController::class, 'store'])->name('programming.store');
@@ -25,6 +25,5 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('/gettaskdatedivision', [ProgrammingController::class, 'getTaskDateDivision'])->name('get.task.date.division');
 
-    Route::get('actividadesDeultimonivelPorProyectos', [ProgrammingController::class, 'endNivelActivitiesByProject'])->name('actividadesDeultimonivelPorProyectos');
-
+    Route::get('actividadesDeultimonivelPorProyectos/{project}', [ProgrammingController::class, 'endNivelActivitiesByProject'])->name('actividadesDeultimonivelPorProyectos');
 });

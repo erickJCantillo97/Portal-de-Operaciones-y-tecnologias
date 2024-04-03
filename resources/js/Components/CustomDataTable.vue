@@ -176,7 +176,7 @@ const selectedElement = ref([]);
         <template #header>
             <div class="space-y-1">
                 <span class="flex justify-between ">
-                    <p class="text-lg h-ful flex items-center font-semibold leading-6 capitalize text-primary">
+                    <p class="text-xl h-ful flex items-center font-bold leading-6 mb-2 capitalize text-primary">
                         {{ title }}
                     </p>
                     <span class="space-x-1">
