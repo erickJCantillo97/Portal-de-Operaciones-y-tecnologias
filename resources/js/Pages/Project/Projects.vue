@@ -185,10 +185,17 @@ const goToProjectOverview = (event, data) => {
     }
 }
 //#endregion
+
+const urls = ref([
+    {
+        url: '/projects',
+        label: 'Proyectos'
+    },
+])
 </script>
 
 <template>
-    <AppLayout>
+    <AppLayout :urls>
         <div class="w-full h-full overflow-y-auto">
             <CustomDataTable title="Proyectos" :filterButtons="filterButtons" :data="projects" :rows-default="100"
                 :columnas="columnas" :actions="buttons" @addDoc="addDoc" @addAct="addAct" @editClic="editClic"

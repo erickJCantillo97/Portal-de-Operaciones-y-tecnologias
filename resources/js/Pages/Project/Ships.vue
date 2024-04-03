@@ -114,10 +114,16 @@ const buttons = ref([
     { event: 'confirmDelete', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false, show: hasPermission('ship delete') },
 ])
 
+const urls = ref([
+    {
+        url: '/ships',
+        label: 'Unidades'
+    },
+])
 </script>
 
 <template>
-    <AppLayout>
+    <AppLayout :urls>
         <div class="w-full h-full overflow-y-auto">
             <CustomDataTable :data="ships" exportRute="export.ships" :columnas="columnas" :actions="buttons"
                 :rowsDefault=20 :title="customer ? 'Unidades del cliente:' + customer.name : 'Todas las unidades'"

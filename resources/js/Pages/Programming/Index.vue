@@ -184,10 +184,17 @@ const deleteTask = async(id) => {
     }
 }
 //#endregion
+
+const urls = ref([
+    {
+        url: '/programming',
+        label: 'Programación'
+    },
+])
 </script>
 <template>
-    <AppLayout>
-        <div class="h-full w-full">
+    <AppLayout :urls>
+        <div class="size-full">
             <div class="flex justify-between items-center px-4 h-min">
                 <span class="text-xl font-bold text-primary h-full items-center flex">
                     <p> Programación de Actividades </p>
