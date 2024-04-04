@@ -1,5 +1,5 @@
 <script setup>
-import { Link } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import Dropdown from 'primevue/dropdown';
@@ -41,7 +41,7 @@ const formData = ref({
  * @param {*} hora
  */
 function format24h(hora) {
-    return new Date("1970-01-01T" + hora).toLocaleString('es-CO',
+    return new Date(hora).toLocaleString('es-CO',
         { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 }
 
@@ -62,13 +62,13 @@ const divisionsOptions = [
 //#region Requests
 const submit = async () => {
     try {
-        formData.value.start_hour = String(formatUTCOffset(formData.value.start_hour))
-        formData.value.end_hour = String(formatUTCOffset(formData.value.end_hour))
+        // formData.value.start_hour = String(formatUTCOffset(formData.value.start_hour))
+        // formData.value.end_hour = String(formatUTCOffset(formData.value.end_hour))
 
-        await axios.post(route('extended.schedule.store'), formData.value)
+        await router.post(route('extended.schedule.store'), formData.value)
             .then(res => {
                 //TODO request
-                toast.add({ severity: 'success', group: 'customToast', text: 'Tareas Guardadas guardado', life: 2000 });
+                toast.add({ severity: 'success', group: 'customToast', text: 'Tareas Guardadas', life: 2000 });
                 formData.value = {
                     dates: [],
                     start_hour: '',
@@ -228,7 +228,7 @@ const urls = ref([
                                 <ul v-for="project in projects">
                                     <div class="mb-2 snap-center gap-2 space-y-2 rounded-lg border border-gray-300 p-2">
                                         <li class="font-semibold text-primary">{{ project.name }}</li>
-                                        <div class="block" v-for="task in project.tasks">
+                                        <div class="block border-b-2 p-1 mb-2" v-for="task in project.tasks">
                                             <div class="flex justify-between items-center">
                                                 <li class="font-semibold">{{ task.task.name }}</li>
                                                 <li class="font-semibold">{{ task.task.percentDone }} %</li>

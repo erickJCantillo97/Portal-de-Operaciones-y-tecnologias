@@ -29,8 +29,8 @@ class ExtendedScheduleController extends Controller
                 foreach ($request->tasks as $t) {
                     ExtendedSchedule::create([
                         'date' => $d,
-                        'start_hour' => Carbon::parse($request->start_hour)->format('H:m'),
-                        'end_hour' => Carbon::parse($request->end_hour)->format('H:m'),
+                        'start_hour' => $request->start_hour,
+                        'end_hour' => $request->end_hour,
                         'project_id' => VirtualTask::findOrFail($t)->project_id,
                         'task_id' => $t,
                         'description' => $request->description,
@@ -39,11 +39,11 @@ class ExtendedScheduleController extends Controller
             }
             DB::commit();
 
-            return response()->json(['status' => true, 'message' => 'Registro guardado']);
+            // return response()->json(['status' => true, 'message' => 'Registro guardado']);
         } catch (Exception $e) {
             DB::rollBack();
 
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
     }
 
@@ -61,7 +61,7 @@ class ExtendedScheduleController extends Controller
 
             return response()->json(['status' => true, 'mensaje' => 'Registro actualizado']);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -76,7 +76,7 @@ class ExtendedScheduleController extends Controller
 
             return response()->json(['status' => true, 'mensaje' => 'Registro eliminado']);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 

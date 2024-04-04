@@ -36,7 +36,7 @@ class ProgrammingController extends Controller
         }
 
         foreach ($projects as $key => $project) {
-            $extendedTask = ExtendedSchedule::with('task')->where('project_id', $project->id)->whereBetween('date', [Carbon::now(), $nextMonday])->get();
+            $extendedTask = ExtendedSchedule::with('task')->where('project_id', $project->id)->whereBetween('date', [Carbon::yesterday(), $nextMonday])->get();
 
             $project->tasks = $extendedTask;
         }
@@ -668,6 +668,17 @@ class ProgrammingController extends Controller
         $taskWithSubTasks = VirtualTask::has('project')->whereNotNull('task_id')->select('task_id')->get()->map(function ($task) {
             return $task['task_id'];
         })->toArray();
+
+        $date = Carbon::parse($request->date);
+
+        if ($date->isSaturday() || $date->isSunday()) {
+            ExtendedSchedule::has('project')->has('task')->where('project_id', $project->id)
+                // ->where('executor','LIKE ,'%'.$request->executor.'%)
+                ->where('percentDone', '<', 100)
+                ->where('data', $request->date)
+                ->get()->map(function ($task) {
+                });
+        }
 
         return response()->json(
             VirtualTask::has('project')->has('task')
