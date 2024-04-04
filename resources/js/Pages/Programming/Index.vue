@@ -1,13 +1,16 @@
 <script setup>
 import { Link } from '@inertiajs/vue3'
-import { ref, onMounted } from 'vue'
-import { useForm } from '@inertiajs/vue3'
+import { ref } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import Dropdown from 'primevue/dropdown';
 import NoContentToShow from '@/Components/NoContentToShow.vue'
 import WeekTable from '@/Pages/Programming/WeekTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
+
+import { useCommonUtilities } from "@/composable/useCommonUtilities"
+const { formatUTCOffset, formatDateTime24h } = useCommonUtilities()
+
 import { useToast } from "primevue/usetoast";
 const toast = useToast()
 
@@ -15,44 +18,16 @@ const props = defineProps({
     projects: Array,
 })
 
-onMounted(() => {
-    // getTask()
-})
-
 const loading = ref(false)
 const project = ref()
-
-const divisionsOptions = ref(
-    [
-        'GEMAM',
-        'GEBOC',
-        'DEEST',
-        'DEGPM',
-        'DEPRO',
-        'DVPCP',
-        'DVARD',
-        'DVSOL',
-        'DVMEC',
-        'DVPIN',
-        'DVELC',
-        'DVHAB',
-        'DVAIR',
-        'DVEAT',
-        'DVMOT',
-        'DVADQ',
-        'DEINE',
-        'DEMTO',
-        'CLIENTE'
-    ])
-
 
 //#region UseForm
 const projectSelected = ref()
 const formData = ref({
-    date: [],
-    timeStart: '',
-    timeEnd: '',
-    task: [],
+    dates: [],
+    start_hour: '',
+    end_hour: '',
+    tasks: [],
     description: '',
 })
 //#endregion
@@ -78,14 +53,29 @@ const openDialog = () => {
     openModal.value = true
 }
 
+const divisionsOptions = [
+    'GEMAM',
+    'GECON',
+    'GEDIN',
+]
+
 //#region Requests
 const submit = async () => {
     try {
+        formData.value.start_hour = String(formatUTCOffset(formData.value.start_hour))
+        formData.value.end_hour = String(formatUTCOffset(formData.value.end_hour))
+
         await axios.post(route('extended.schedule.store'), formData.value)
             .then(res => {
                 //TODO request
                 toast.add({ severity: 'success', group: 'customToast', text: 'Tareas Guardadas guardado', life: 2000 });
-                console.log('Hace algo')
+                formData.value = {
+                    dates: [],
+                    start_hour: '',
+                    end_hour: '',
+                    tasks: [],
+                    description: '',
+                }
             })
     } catch (error) {
         console.error('Error' + error)
@@ -99,14 +89,11 @@ const getTaskByProjects = async (id_project) => {
             .then(res => {
                 //TODO request
                 taskOptions.value = res.data
-                console.log(taskOptions.value)
             })
     } catch (error) {
         console.error('Error ' + error)
     }
 }
-
-
 
 const editTask = async (id_project) => {
     try {
@@ -198,14 +185,14 @@ const urls = ref([
             <template #body>
                 <div class="block md:flex space-x-2 space-y-4">
                     <div class="space-y-2">
-                        <CustomInput type="date" label="Fecha de extendidos" v-model:input="formData.date"
+                        <CustomInput type="date" label="Fecha de extendidos" v-model:input="formData.dates"
                             selectionMode="multiple" />
 
                         <div class="flex items-center">
-                            <CustomInput type="time" label="Hora Inicio del Turno" v-model:input="formData.timeStart"
+                            <CustomInput type="time" label="Hora Inicio del Turno" v-model:input="formData.start_hour"
                                 :multiple="true" />
                             <i class="fa-solid fa-minus mx-2 mt-[1.60rem]"></i>
-                            <CustomInput type="time" label="Hora Fin del Turno" v-model:input="formData.timeEnd"
+                            <CustomInput type="time" label="Hora Fin del Turno" v-model:input="formData.end_hour"
                                 :multiple="true" />
                         </div>
 
@@ -216,7 +203,7 @@ const urls = ref([
 
                         <CustomInput label="Actividades" selectionMode optionLabel="name" option-value="id"
                             type="multiselect" :options="taskOptions" placeholder="Seleccione actividad(es)"
-                            v-model:input="formData.task">
+                            v-model:input="formData.tasks">
                         </CustomInput>
 
                         <CustomInput class="mt-2" label="Observaciones" placeholder="Observaciones" type="textarea"
@@ -258,7 +245,7 @@ const urls = ref([
                                                 <li class="italic">Lunes {{ task.date }}</li>
                                                 <li v-tooltip.left="'Turno Ordinario'"
                                                     class="italic rounded-lg bg-success p-2 text-white text-xs">
-                                                    {{ task.start_hour }} - {{ task.end_hour }}
+                                                    {{ format24h(task.start_hour) }} - {{ format24h(task.end_hour) }}
                                                 </li>
                                             </div>
                                         </div>
