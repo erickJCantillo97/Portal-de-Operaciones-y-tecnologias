@@ -13,6 +13,13 @@ import Avatar from 'primevue/avatar';
 import AvatarGroup from 'primevue/avatargroup';
 import OverlayPanel from 'primevue/overlaypanel';
 import NoContentToShow from '@/Components/NoContentToShow.vue';
+import CustomModal from '@/Components/CustomModal.vue';
+import Calendar from 'primevue/calendar';
+import RadioButton from 'primevue/radiobutton';
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
+import InputSwitch from 'primevue/inputswitch';
+import CustomShiftSelector from '@/Components/CustomShiftSelector.vue';
 
 // const { hasRole, hasPermission } = usePermissions()
 
@@ -90,6 +97,8 @@ const dates = ref(new Date(date.value.getFullYear(), date.value.getMonth(), date
 const diasSemana = ref(obtenerFechasSemana(dates.value))
 const projectsSelected = ref([])
 const overlayPerson = ref()
+const dragStart = ref()
+const personsEdit = ref()
 
 //#endregion
 
@@ -149,15 +158,368 @@ const getTask = async (option) => {
 //#endregion
 
 //#region funciones
-const toggle = (event) => {
-    overlayPerson.value.toggle(event);
-}
 
 onMounted(() => {
     getPersonalData()
 })
+
+
 //#endregion
 
+//#region drag
+
+const getChildPayload = (index) => {
+    return personal.value[index];
+}
+
+async function onDrop(collection, dropResult, date) {
+    const { addedIndex, payload } = dropResult;
+    if (addedIndex !== null) {
+        collection.loading = true
+        await axios.post(route('programming.store'), { task_id: collection.id, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: date.toISOString().split("T")[0] }).then((res) => {
+            if (Object.values(res.data.conflict).length > 0) {
+                conflicts.value = Object.values(res.data.conflict)
+                openConflict.value = true;
+                task.value = collection
+            } else {
+                console.log(payload)
+                collection.employees = res.data.task
+                collection.loading = false
+            }
+        })
+    }
+}
+
+//#endregion
+
+
+//#region edicion de horarios
+
+const formEditHour = ref({
+    userName: null, //nombre de la persona
+    timeName: null, // nombre del horario personalizado
+    startShift: '07:00',// hora inicio
+    endShift: '16:30',// hora fin
+    timeBreak: null,
+    schedule_time: null,
+    schedule: null, // id del schedule/cronograma (TABLA SCHEDULES)
+    idUser: null, // Id de la persona seleccionada (COLUMNA EMPLOYEE_ID DE LA TABLA SCHEDULES)
+    date: date, // fecha seleccionada en el calendario
+    personalized: true, // Seleccionar turno => false, Seleccionar Horario Personalizado => false, Nuevo horario personalizado =>true
+    type: 1,// Solo el => 1; Resto de la actividad => 2; Rango de fechas => 3; Fechas específicos => 4
+    details: [],
+    loading: false,
+    /* la propiedad details depende de la propiedad type, es decir:
+        si la opción type es 1, en details se debe enviar la fecha (Solo el =>) ej: ['2024-03-07']
+        si la opcion type es 2, en details se debe enviar el id de la actividad seleccionada (EN BASE DE DATOS ES LA TABLA TASK) ej: [7683]
+        si la opcion type es 3, en details se debe enviar la fecha inicial y la fecha final (EN LA PRIMERA POSICION SIEMPRE SE DEBE MANDAR LA FECHA INICIAL), ej: ['2024-03-01','2024-03-10']
+        si la opcion type es 4, en details se debe enviar las fechas seleccionadas en el calendario, no importa el orden ej: ['2024-03-01', '2024-03-10', '2024-01-01','2024-02-10']
+    */
+});
+const editHorario = ref()
+const nuevoHorario = ref({})
+const optionSelectHours = ref('select')
+const modhours = ref(false)
+
+const togglePerson = (event, persons,task) => {
+    editHorario.value.data = task
+    personsEdit.value = persons
+    overlayPerson.value.toggle(event);
+}
+
+const editHour = (horario, data, option) => {
+    editHorario.value = horario
+    // editHorario.value.data = data
+    editHorario.value.option = option
+    formEditHour.value.idUser = data.employee_id
+    formEditHour.value.schedule = data.id
+    formEditHour.value.schedule_time = horario.id
+    formEditHour.value.userName = data.name
+    nuevoHorario.value = {}
+    modhours.value = true
+}
+const save = async () => {
+    task.value = tasks.value.find((task) => task.id = editHorario.value.data.task_id)
+    formEditHour.value.loading = true
+    if (tabActive.value != 2) {
+        formEditHour.value.personalized = false
+        formEditHour.value.startShift = new Date(nuevoHorario.value.startShift).toLocaleString('es-CO',
+            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+        formEditHour.value.endShift = new Date(nuevoHorario.value.endShift).toLocaleString('es-CO',
+            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+        formEditHour.value.timeBreak = parseFloat(nuevoHorario.value.timeBreak)
+    } else {
+        formEditHour.value.startShift = new Date(formEditHour.value.startShift).toLocaleString('es-CO',
+            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+        formEditHour.value.endShift = new Date(formEditHour.value.endShift).toLocaleString('es-CO',
+            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+        formEditHour.value.timeBreak = parseFloat(formEditHour.value.timeBreak)
+    }
+
+    if (formEditHour.value.type == 1) {
+        formEditHour.value.details[0] = date.value.toISOString().split("T")[0]
+    } else if (formEditHour.value.type == 2) {
+        formEditHour.value.details[0] = formEditHour.value.schedule
+    }
+    else {
+        selectDays.value.forEach((day, index) => {
+            formEditHour.value.details[index] = new Date(day).toISOString().split("T")[0]
+        })
+    }
+    //aplicar validaciones de campos requeridos (TODOS LOS CAMPOS SON REQUERIDOS)
+    /*
+    NOTA:
+    Se debe cambiar el campo de hora inicio y hora fin a un formato de 24 horas.
+    */
+    await axios.post(route(editHorario.value.option != 'delete' ? 'programming.saveCustomizedSchedule' : 'programming.removeSchedule'), formEditHour.value)
+        .then((res) => {
+            if (res.data.status) {
+                modhours.value = false
+                listaDatos.value[formEditHour.value.schedule] = res.data.task
+                editHorario.value.data.hora_inicio = formEditHour.value.startShift
+                editHorario.value.data.hora_fin = formEditHour.value.endShift
+                getAssignmentHoursForEmployee((formEditHour.value.idUser))
+                toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
+            }
+            else {
+                conflicts.value = Object.values(res.data.conflict)
+                if (conflicts.value.length > 0) {
+                    openConflict.value = true;
+                    // task.value.id = schedule
+                }
+                // toast.add({ severity: 'danger', group: "customToast", text: res.data.mensaje, life: 2000 })
+            }
+            formEditHour.value.loading = false
+        }).catch((error) => {
+            console.log(error)
+            toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 2000 })
+        });
+}
+//#endregion
+
+//#region popup confirmacion coliciones
+const formColision = ref({
+    actionType: null, // accion a realizar: 1: Reemplazar , 2: Omitir
+    idTask: null,// idTask de la Nueva tarea
+    scheduleTime: null, // id del schedule time
+    endSchedule: null, // se manda true si es la ultima colisión
+    startShift: null, // hora de inicio de la nueva tarea
+    endShift: null, // hora final de la nueva tarea
+});
+
+async function confirm1(event, scheduleTime, option, data) {
+    formColision.value.idTask = task.value.id
+    formColision.value.startShift = format24h(task.value.shift.startShift)
+    formColision.value.endShift = format24h(task.value.shift.endShift)
+    if (option == 'omit') {
+        scheduleTime.status = option
+        formColision.value.actionType = 1
+        formColision.value.endSchedule = data.find((a) => { a.status == null }) == undefined
+        scheduleTime.status = undefined
+        if (formColision.value.endSchedule) {
+            confirm.require({
+                target: event.currentTarget,
+                message: '¿Está totalmente seguro? No se puede deshacer',
+                icon: 'pi pi-exclamation-triangle text-danger',
+                rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+                acceptClass: 'p-button-sm p-button-success',
+                rejectLabel: 'No',
+                acceptLabel: 'Sí',
+                accept: async () => {
+                    scheduleTime.status = option
+                    let status = resolveCollision(formColision)
+                    if (!status) {
+                        scheduleTime.status = undefined
+                        toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+                    } else {
+                        conflicts.value.splice(conflicts.value.indexOf(data), 1);
+                        openConflict.value = conflicts.value.length > 0
+                        toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
+                    }
+                }, reject: () => {
+                    scheduleTime.status = undefined
+                    formColision.value.endSchedule = false
+                }
+            })
+        } else {
+            let status = resolveCollision(formColision)
+            if (!status) {
+                scheduleTime.status = undefined
+                toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+            } else {
+                toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
+            }
+        }
+    } else if (option == 'remplace') {
+        scheduleTime.status = option
+        formColision.value.actionType = 2
+        formColision.value.endSchedule = data.find((a) => { a.status == null }) == undefined
+        scheduleTime.status = undefined
+        if (formColision.value.endSchedule) {
+            confirm.require({
+                target: event.currentTarget,
+                message: '¿Está totalmente seguro? No se puede deshacer',
+                icon: 'pi pi-exclamation-triangle text-danger',
+                rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+                acceptClass: 'p-button-sm p-button-success',
+                rejectLabel: 'No',
+                acceptLabel: 'Sí',
+                accept: async () => {
+                    scheduleTime.status = option
+                    let status = resolveCollision(formColision)
+                    if (!status) {
+                        scheduleTime.status = undefined
+                        toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+                    } else {
+                        conflicts.value.splice(conflicts.value.indexOf(data), 1);
+                        openConflict.value = conflicts.value.length > 0
+                        toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
+                    }
+                }, reject: () => {
+                    scheduleTime.status = undefined
+                    formColision.value.endSchedule = false
+                }
+            })
+        } else {
+            let status = resolveCollision(formColision)
+            if (!status) {
+                scheduleTime.status = undefined
+                toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
+            } else {
+                toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
+            }
+        }
+    } else {
+        confirm.require({
+            target: event.currentTarget,
+            message: '¿Está totalmente seguro? No se puede deshacer',
+            icon: 'pi pi-exclamation-triangle text-danger',
+            rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+            acceptClass: 'p-button-sm p-button-success',
+            rejectLabel: 'No',
+            acceptLabel: 'Sí',
+            accept: async () => {
+                if (option == 'omitAll') {
+                    let error
+                    data.forEach((scheduleD) => {
+                        const endIndex = scheduleD.findLastIndex((element) => element.status == null)
+                        scheduleD.forEach((scheduleT, index) => {
+                            if (scheduleT.status == null) {
+                                formColision.value.endSchedule = endIndex == index ? true : false
+                                formColision.value.actionType = 2
+                                formColision.value.scheduleTime = scheduleT.idScheduleTime
+                                let status = resolveCollision(formColision)
+                                if (!status) {
+                                    error = scheduleT
+                                    toast.add({ severity: 'error', group: "error", text: 'Hubo un error inesperado', life: 3000 });
+                                } else {
+                                    scheduleT.status = 'remplace'
+                                }
+                            }
+                        })
+                    })
+                    if (error) {
+                        toast.add({ severity: 'warn', group: "customToast", text: 'Se remplazaron todas con errores', life: 3000 });
+                    } else {
+                        conflicts.value = []
+                        openConflict.value = conflicts.value.length > 0
+                        toast.add({ severity: 'success', group: "customToast", text: 'Se remplazaron todas', life: 3000 });
+                    }
+                } else if (option == 'remplaceAll') {
+                    let error
+                    data.forEach((scheduleD) => {
+                        const endIndex = scheduleD.findLastIndex((element) => element.status == null)
+                        scheduleD.forEach((scheduleT, index) => {
+                            if (scheduleT.status == null) {
+                                formColision.value.endSchedule = endIndex == index ? true : false
+                                formColision.value.actionType = 1
+                                formColision.value.scheduleTime = scheduleT.idScheduleTime
+                                let status = resolveCollision(formColision)
+                                if (!status) {
+                                    error = scheduleT
+                                    toast.add({ severity: 'error', group: "error", text: 'Hubo un error inesperado', life: 3000 });
+                                } else {
+                                    scheduleT.status = 'remplace'
+                                }
+                            }
+                        })
+                    })
+                    if (error) {
+                        toast.add({ severity: 'warn', group: "customToast", text: 'Se remplazaron todas con errores', life: 3000 });
+                    } else {
+                        conflicts.value = []
+                        openConflict.value = conflicts.value.length > 0
+                        toast.add({ severity: 'success', group: "customToast", text: 'Se remplazaron todas', life: 3000 });
+                    }
+                } else if (option == 'omitAllDay') {
+                    let error
+                    const endIndex = data.findLastIndex((element) => element.status == null)
+                    await data.forEach((scheduleT, index) => {
+                        if (scheduleT.status == null) {
+                            formColision.value.endSchedule = endIndex == index ? true : false
+                            formColision.value.actionType = 2
+                            formColision.value.scheduleTime = scheduleT.idScheduleTime
+                            let status = resolveCollision(formColision)
+                            if (!status) {
+                                error = scheduleT
+                                toast.add({ severity: 'error', group: "error", text: 'Hubo un error inesperado', life: 3000 });
+                            } else {
+                                scheduleT.status = 'omit'
+                            }
+                        }
+                    })
+                    if (error) {
+                        toast.add({ severity: 'warn', group: "customToast", text: 'Se omitieron todas las del dia con errores', life: 3000 });
+                    } else {
+                        conflicts.value.splice(conflicts.value.indexOf(data), 1);
+                        openConflict.value = conflicts.value.length > 0
+                        toast.add({ severity: 'success', group: "customToast", text: 'Se omitieron todas las del dia', life: 3000 });
+                    }
+                } else if (option == 'remplaceAllDay') {
+                    let error
+                    const endIndex = data.findLastIndex((element) => element.status == null)
+                    await data.forEach((scheduleT, index) => {
+                        if (scheduleT.status == null) {
+                            formColision.value.endSchedule = endIndex == index ? true : false
+                            formColision.value.actionType = 1
+                            formColision.value.scheduleTime = scheduleT.idScheduleTime
+                            let status = resolveCollision(formColision)
+                            if (!status) {
+                                error = scheduleT
+                                toast.add({ severity: 'error', group: "error", text: 'Hubo un error inesperado', life: 3000 });
+                            } else {
+                                scheduleT.status = 'remplace'
+                            }
+                        }
+                    })
+                    if (error) {
+                        toast.add({ severity: 'warn', group: "customToast", text: 'Se remplazaron todas las del dia con errores', life: 3000 });
+                    } else {
+                        conflicts.value.splice(conflicts.value.indexOf(data), 1);
+                        openConflict.value = conflicts.value.length > 0
+                        toast.add({ severity: 'success', group: "customToast", text: 'Se remplazaron todas las del dia', life: 3000 });
+                    }
+                }
+            },
+            reject: () => {
+
+                // toast.add({ severity: 'error', group: "customToast", text: 'You have rejected', life: 3000 });
+            }
+        });
+    }
+};
+
+async function resolveCollision(form) {
+    await axios.post(route('programming.collisionsPerDay', form)).then((r) => {
+        return true
+    }).catch((e) => {
+        console.log(e)
+        return false
+    })
+    return true
+}
+
+//#endregion
 </script>
 
 <template>
@@ -238,7 +600,8 @@ onMounted(() => {
                                                     <p class="text-xs px-1 text-center w-full">{{ task.task }}</p>
                                                     <div
                                                         class="flex cursor-default space-x-2 justify-center rounded-md">
-                                                        <p v-tooltip.left="'Fecha inicio'" class=" px-1 text-xs text-center">
+                                                        <p v-tooltip.left="'Fecha inicio'"
+                                                            class=" px-1 text-xs text-center">
                                                             {{ task.startDate }}
                                                         </p>
                                                         <p v-tooltip.left="'Fecha Fin'" class="text-xs text-center px-1"
@@ -258,10 +621,10 @@ onMounted(() => {
                                                         </p>
                                                     </div>
                                                     <div class="col-span-3 flex justify-center"
-                                                        v-tooltip.top="{ value: `<div>${task.employees.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false,pt:{text:'text-center w-52'} }">
+                                                        v-tooltip.top="{ value: `<div>${task.employees.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
                                                         <AvatarGroup
                                                             v-if="task.employees.length > 0 && task.employees.length <= 3"
-                                                            @click="toggle">
+                                                            @click="togglePerson($event, task.employee)">
                                                             <Avatar v-for="person in task.employees"
                                                                 :image="person.employee.photo ?? '/images/person-default.png'"
                                                                 shape="circle" size="large" />
@@ -319,8 +682,7 @@ onMounted(() => {
                                     </p>
                                 </div>
                                 <div class="w-full overflow-x-auto grid grid-cols-5">
-                                    <span v-for="task in project.tasks"
-                                        class="w-full p-0.5">
+                                    <span v-for="task in project.tasks" class="w-full p-0.5">
                                         <div
                                             class="border border-primary h-40 rounded-md flex flex-col justify-between">
                                             <div class="flex flex-col justify-between h-full">
@@ -332,11 +694,12 @@ onMounted(() => {
                                                     <p class="text-xs px-1 text-center w-full">{{ task.task }}</p>
                                                     <div
                                                         class="flex cursor-default space-x-2 justify-center rounded-md">
-                                                        <p v-tooltip.left="'Fecha inicio'" class=" px-1 text-xs text-center">
+                                                        <p v-tooltip.left="'Fecha inicio'"
+                                                            class=" px-1 text-xs text-center">
                                                             {{ task.startDate }}
                                                         </p>
                                                         <p v-tooltip.left="'Fecha Fin'" class="text-xs text-center px-1"
-                                                            :class="new Date(task.endDate) < dia ? 'bg-red-500 rounded-md' : ''">
+                                                            :class="new Date(task.endDate) < date ? 'bg-red-500 rounded-md' : ''">
                                                             {{ task.endDate }}
                                                         </p>
                                                     </div>
@@ -351,22 +714,34 @@ onMounted(() => {
                                                             {{ format24h(task.shift.endShift) }}
                                                         </p>
                                                     </div>
-                                                    <div class="col-span-3 flex justify-center"
-                                                        v-tooltip.top="{ value: `<div>${task.employees.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false,pt:{text:'text-center w-52'} }">
-                                                        <AvatarGroup
-                                                            v-if="task.employees.length > 0 && task.employees.length <= 3"
-                                                            @click="toggle">
-                                                            <Avatar v-for="person in task.employees"
-                                                                :image="person.employee.photo ?? '/images/person-default.png'"
-                                                                shape="circle" size="large" />
-                                                        </AvatarGroup>
-                                                        <AvatarGroup v-else-if="task.employees.length > 3">
-                                                            <Avatar v-for="i in [0, 1, 2]"
-                                                                :image="task.employees[i].photo ?? '/images/person-default.png'"
-                                                                shape="circle" />
-                                                            <Avatar :label="task.employees.length - 3" shape="circle" />
-                                                        </AvatarGroup>
-                                                    </div>
+                                                    <Container class="col-span-3 flex flex-col justify-center h-14"
+                                                        @drop="onDrop(task, $event, dates)" group-name="1"
+                                                        @click="togglePerson($event, task.employees)"
+                                                        v-tooltip.top="{ value: task.employees.length > 0 ? `<div>${task.employees.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
+                                                        <div v-if="!dragStart" class="flex justify-center">
+                                                            <AvatarGroup
+                                                                v-if="task.employees.length > 0 && task.employees.length <= 3">
+                                                                <Avatar v-for="person in task.employees"
+                                                                    :image="person.employee.photo ?? '/images/person-default.png'"
+                                                                    shape="circle" size="large" />
+                                                            </AvatarGroup>
+                                                            <AvatarGroup v-else-if="task.employees.length > 3">
+                                                                <Avatar v-for="i in [0, 1, 2]"
+                                                                    :image="task.employees[i].photo ?? '/images/person-default.png'"
+                                                                    shape="circle" />
+                                                                <Avatar :label="'+' + String(task.employees.length - 3)"
+                                                                    shape="circle" />
+                                                            </AvatarGroup>
+                                                        </div>
+                                                        <div v-else class="flex items-center p-1">
+                                                            <p
+                                                                class="border p-1 text-center rounded-md border-dashed bg-primary-light animate-pulse">
+                                                                Arrastra aqui para programar
+                                                            </p>
+                                                        </div>
+                                                        <ProgressBar v-if="task.loading" mode="indeterminate"
+                                                            style="height: 4px" />
+                                                    </Container>
                                                 </div>
                                             </div>
                                             <div class="p-1">
@@ -400,6 +775,7 @@ onMounted(() => {
                 <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
                 <Loading v-if="loadingPerson" class="mt-10" message="Cargando personas" />
                 <Container v-else oncontextmenu="return false" onkeydown="return false" behaviour="copy" group-name="1"
+                    @drag-start="dragStart = true" @drag-end="dragStart = false" :get-child-payload="getChildPayload"
                     class="h-[74vh] flex flex-col space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
                     <Draggable v-for="item in personal" :key="item.id"
                         v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
@@ -427,18 +803,120 @@ onMounted(() => {
     </AppLayout>
 
     <OverlayPanel ref="overlayPerson">
-        <div class="flex flex-col space-y-1 w-72">
-            <div v-for="person in [0, 1, 2, 3, 4, 5]" class="flex justify-between space-x-1 items-center">
-                <p class="font-bold">Persona con apellido</p>
-                <span class="space-x-1">
-                    <Button severity="warning" text raised icon="fa-solid fa-pencil" />
-                    <Button severity="danger" text raised icon="fa-solid fa-trash-can" />
-                </span>
+        <div class="flex flex-col space-y-1 w-96">
+            <!-- {{ personsEdit }} -->
+            <div v-for="person in personsEdit" class="flex flex-col border p-1 rounded-md justify-between">
+                <p class="text-sm font-bold">{{ person.name }}</p>
+                <div class="grid grid-cols-3 gap-2">
+                    <span
+                        class="text-xs flex bg-success-light justify-center hover:justify-between rounded-md p-1 hover:space-x-1 group">
+                        <button
+                            class="rounded shadow-2xl px-1 hover:ring-1 ring-warning  hover:bg-warning-light hidden group-hover:block"
+                            @click="editHour('horario', 'item', 'modify')">
+                            <i class="fa-solid fa-pencil text-warning"></i>
+                        </button>
+                        <span class="grid grid-cols-2">
+                            <p>7:00</p>
+                            <p>16:30</p>
+                        </span>
+                        <button @click="editHour('slotProps.option', 'item', 'delete')"
+                            class="rounded shadow-2xl px-1 hover:ring-1 ring-danger  hover:bg-danger-light hidden group-hover:block">
+                            <i class="fa-solid fa-trash-can text-danger"></i>
+                        </button>
+                    </span>
+                </div>
             </div>
         </div>
     </OverlayPanel>
 
     <!--#region MODALES -->
+
+    <CustomModal v-model:visible="modhours" :footer="false" icon="fa-regular fa-clock" width="60vw"
+        :closeOnEscape="false"
+        :titulo="editHorario?.option != 'delete' ? 'Modificar horario de ' + editHorario?.data.name : 'Eliminando a ' + editHorario?.data.name + 'de la actividad ' + editHorario?.task">
+        <template #body>
+            <form @submit.prevent="save" class="pb-2">
+                <div v-if="editHorario?.option != 'delete'" class="flex flex-col gap-1">
+                    <div class="flex items-center justify-between col-span-3 ">
+
+                        <p class="font-bold">Horario actual:</p>
+                        <p class="px-1 py-1 text-green-900 bg-green-200 rounded-md">
+                            {{ format24h(editHorario.hora_inicio.slice(0,
+                                editHorario.hora_inicio.lastIndexOf(':'))) }}
+                            {{ format24h(editHorario.hora_fin.slice(0,
+                                editHorario.hora_fin.lastIndexOf(':'))) }}
+                        </p>
+                    </div>
+                    <TabView v-model:activeIndex="tabActive" class="border rounded-md p-1" :pt="{
+                                nav: '!flex !justify-between',
+                                panelContainer: '!p-1'
+                            }">
+                        <TabPanel header="Seleccionar Turno" :pt="{
+                                root: 'w-full',
+                                headerTitle: '!w-full !flex !justify-center',
+                            }">
+                            <CustomShiftSelector v-model:shift="nuevoHorario" />
+                        </TabPanel>
+                        <TabPanel header="Seleccionar Horario Personalizado" :pt="{
+                                root: 'w-full',
+                                headerTitle: '!w-full !flex !justify-center',
+                            }">
+                            <CustomShiftSelector :shiftUser="parseInt($page.props.auth.user.id)"
+                                v-model:shift="nuevoHorario" />
+                        </TabPanel>
+                        <TabPanel header="Personalizado" :pt="{
+                                root: 'w-full',
+                                headerTitle: '!w-full !flex !justify-center',
+                            }">
+                            <div class="h-52 space-y-2 m-1 mt-3">
+                                <span class="flex gap-2 items-center">
+                                    <label class="-mb-0.5" for="switch1">Guardar en personalizados?</label>
+                                    <InputSwitch inputId="switch1" v-model="formEditHour.personalized" />
+                                </span>
+                                <CustomInput v-if="formEditHour.personalized" v-model:input="formEditHour.timeName"
+                                    label="Nombre" type="text" id="name" placeholder="Nombre del horario"
+                                    :required="tabActive == 2" />
+                                <span class="grid grid-cols-3 gap-x-1">
+                                    <CustomInput v-model:input="formEditHour.startShift" label="Hora inicio" type="time"
+                                        :stepMinute="30" id="start" placeholder="Hora de inicio"
+                                        :required="tabActive === 2" />
+                                    <CustomInput v-model:input="formEditHour.endShift" label="Hora fin" type="time"
+                                        id="end" :stepMinute="30" placeholder="Hora de fin"
+                                        :required="tabActive === 2" />
+                                    <CustomInput v-model:input="formEditHour.timeBreak" label="Descanso" type="number"
+                                        suffix=" Hora" id="break" placeholder="Descanso en horas"
+                                        :required="tabActive === 2" />
+                                </span>
+                            </div>
+                        </TabPanel>
+                    </TabView>
+                </div>
+                <p class="font-bold text-xl">Aplicar por:</p>
+                <span class="flex items-center p-2 gap-4">
+                    <div v-for="category in [{ name: 'Solo el ' + date.toISOString().split('T')[0], key: 1 }, { name: 'Resto de la actividad', key: 2 }, { name: 'Rango de fechas', key: 3 }, { name: 'Fechas específicos', key: 4 }]"
+                        :key="category.key" class="flex items-center">
+                        <RadioButton v-model="formEditHour.type" :inputId="category.key + category.name" name="dynamic"
+                            :value="category.key" @click="formEditHour.details = []" />
+                        <label :for="category.key" class="ml-1 mb-0">{{ category.name }}</label>
+                    </div>
+                </span>
+                <!-- {{editHorario?.option != 'delete'?tabActive != 2? nuevoHorario?.startShift!=null?false:true:false:false }} -->
+                <span class="w-full grid grid-cols-4 justify-end gap-5 items-center">
+                    <Calendar v-if="formEditHour.type == 3 || formEditHour.type == 4" show-icon v-model="selectDays"
+                        class="col-span-3" :selectionMode="formEditHour.type == 3 ? 'range' : 'multiple'"
+                        :manualInput="false" :pt="{
+                                root: '!w-full',
+                                input: '!h-8'
+                            }" />
+                    <Button type="submit" class="col-start-4" :loading="formEditHour.loading"
+                        :disabled="(editHorario?.option !== 'delete') && (tabActive !== 2) && (nuevoHorario?.startShift !== null)"
+                        :severity="editHorario?.option != 'delete' ? 'success' : 'danger'"
+                        :icon="editHorario?.option != 'delete' ? 'fa-solid fa-floppy-disk' : 'fa-solid fa-trash-can'"
+                        :label="editHorario?.option != 'delete' ? 'Guardar' : 'Eliminar'" />
+                </span>
+            </form>
+        </template>
+    </CustomModal>
 
     <ModalColisions v-model:visible="openConflict" v-model:conflicts="conflicts" v-model:task="task">
     </ModalColisions>

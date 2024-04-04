@@ -26,7 +26,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('/gettaskdatedivision', [ProgrammingController::class, 'getTaskDateDivision'])->name('get.task.date.division');
 
-    Route::get('actividadesDeultimonivelPorProyectos/{project}', [ProgrammingController::class, 'endNivelActivitiesByProject'])->name('actividadesDeultimonivelPorProyectos');
+    Route::post('actividadesDeultimonivelPorProyectos/{project}', [ProgrammingController::class, 'endNivelActivitiesByProject'])->name('actividadesDeultimonivelPorProyectos');
 
 
     

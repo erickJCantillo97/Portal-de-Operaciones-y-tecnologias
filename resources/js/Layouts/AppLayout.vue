@@ -307,7 +307,7 @@ const props = defineProps({
     urls: {
         type: Array,
         default: [],
-        required: true
+        required: false
     }
 })
 
