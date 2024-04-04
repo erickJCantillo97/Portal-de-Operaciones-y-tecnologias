@@ -106,7 +106,7 @@ const submit = () => {
                     
                 </div>
             </div> -->
-            <CustomDataTable :data="requirements" title="Requerimeinto de Materiales" @selectionAction="gestion"
+            <CustomDataTable :data="requirements" title="Requerimiento de Materiales" @selectionAction="gestion"
                 :columnas="columns" :rowsDefault="10" selectionMode="multiple">
                 <template #buttonHeader>
                     <Button label="Importar Requerimientos" severity="success" icon="fa-solid fa-plus"

@@ -36,8 +36,9 @@ class ProgrammingController extends Controller
         }
 
         foreach ($projects as $key => $project) {
-            $extendedTask = ExtendedSchedule::where('project_id', $project->id)->whereBetween('date', [$currentDate, $nextMonday])->get();
-            $project['tasks'] = $extendedTask;
+            $extendedTask = ExtendedSchedule::with('task')->where('project_id', $project->id)->whereBetween('date', [Carbon::now(), $nextMonday])->get();
+
+            $project->tasks = $extendedTask;
         }
 
         return Inertia::render('Programming/Index', [

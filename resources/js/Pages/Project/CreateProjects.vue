@@ -1,12 +1,10 @@
 <script setup>
 const { confirmDelete } = useSweetalert()
-const toast = useToast()
 import 'vue3-form-wizard/dist/style.css'
 import { FormWizard, TabContent } from 'vue3-form-wizard'
 import { ref, onMounted } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
 import { useSweetalert } from '@/composable/sweetAlert'
-import { useToast } from "primevue/usetoast";
 import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
@@ -16,6 +14,8 @@ import CustomUpload from '@/Components/CustomUpload.vue';
 import Empty from '@/Components/Empty.vue'
 import Listbox from 'primevue/listbox'
 import ToggleButton from 'primevue/togglebutton'
+import { useToast } from "primevue/usetoast";
+const toast = useToast()
 
 const props = defineProps({
     project: Object,

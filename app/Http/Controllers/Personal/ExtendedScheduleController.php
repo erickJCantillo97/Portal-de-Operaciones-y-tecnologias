@@ -7,6 +7,7 @@ use App\Models\VirtualTask;
 use Exception;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Projects\Project;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -25,14 +26,14 @@ class ExtendedScheduleController extends Controller
     {
         try {
             DB::beginTransaction();
-            foreach ($request->dates as $date) {
-                foreach ($request->task_id as $taks) {
+            foreach ($request->date as $d) {
+                foreach ($request->task as $t) {
                     ExtendedSchedule::create([
-                        'date' => $date,
-                        'start_hour' => $request->start_hour,
-                        'end_hour' => $request->end_hour,
-                        'project_id' => $request->project_id,
-                        'task_id' => $taks,
+                        'date' => $d,
+                        'start_hour' => Carbon::parse($request->timeStart)->format('H:m'),
+                        'end_hour' => Carbon::parse($request->timeEnd)->format('H:m'),
+                        'project_id' => VirtualTask::findOrFail($t)->project_id,
+                        'task_id' => $t,
                         'description' =>  $request->description
                     ]);
                 }
@@ -40,6 +41,7 @@ class ExtendedScheduleController extends Controller
             DB::commit();
             return response()->json(['status' => true, 'message' => 'Registro guardado']);
         } catch (Exception $e) {
+            DB::rollBack();
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
     }

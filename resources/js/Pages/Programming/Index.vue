@@ -8,6 +8,8 @@ import NoContentToShow from '@/Components/NoContentToShow.vue'
 import WeekTable from '@/Pages/Programming/WeekTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
+import { useToast } from "primevue/usetoast";
+const toast = useToast()
 
 const props = defineProps({
     projects: Array,
@@ -43,64 +45,6 @@ const divisionsOptions = ref(
         'CLIENTE'
     ])
 
-const Options = ref([
-    {
-        id: 1,
-        name: 'GEMAM',
-        project: 'TOP',
-        date: '12-04-2024',
-        shift: '7:00 - 16:30'
-    },
-    {
-        id: 2,
-        name: 'GEBOC',
-        project: 'PUNTA BORINQUEN',
-        date: '12-04-2024',
-        shift: '7:00 - 16:30'
-    },
-    {
-        id: 3,
-        name: 'GEMAM',
-        project: 'TOP',
-        date: '12-04-2024',
-        shift: '7:00 - 16:30'
-    },
-    {
-        id: 4,
-        name: 'GEBOC',
-        project: 'PUNTA BORINQUEN',
-        date: '12-04-2024',
-        shift: '7:00 - 16:30'
-    },
-    {
-        id: 5,
-        name: 'GEMAM',
-        project: 'TOP',
-        date: '12-04-2024',
-        shift: '7:00 - 16:30'
-    },
-    {
-        id: 6,
-        name: 'GEBOC',
-        project: 'PUNTA BORINQUEN',
-        date: '12-04-2024',
-        shift: '7:00 - 16:30'
-    },
-    {
-        id: 7,
-        name: 'GEBOC',
-        project: 'PUNTA BORINQUEN',
-        date: '12-04-2024',
-        shift: '7:00 - 16:30'
-    },
-    {
-        id: 8,
-        name: 'GEBOC',
-        project: 'PUNTA BORINQUEN',
-        date: '12-04-2024',
-        shift: '7:00 - 16:30'
-    },
-])
 
 //#region UseForm
 const projectSelected = ref()
@@ -137,9 +81,10 @@ const openDialog = () => {
 //#region Requests
 const submit = async () => {
     try {
-        await axios.post(route('task.store.id'), formData)
+        await axios.post(route('extended.schedule.store'), formData.value)
             .then(res => {
                 //TODO request
+                toast.add({ severity: 'success', group: 'customToast', text: 'Tareas Guardadas guardado', life: 2000 });
                 console.log('Hace algo')
             })
     } catch (error) {
@@ -161,18 +106,7 @@ const getTaskByProjects = async (id_project) => {
     }
 }
 
-const getAllTask = async () => {
-    try {
-        await axios.get(route('extended.schedule.all'))
-            .then(res => {
-                //TODO request
-                taskOptions.value = res.data
-                console.log(taskOptions.value)
-            })
-    } catch (error) {
-        console.error('Error ' + error)
-    }
-}
+
 
 const editTask = async (id_project) => {
     try {
@@ -280,8 +214,9 @@ const urls = ref([
                             filterPlaceholder="Buscar proyecto" v-model:input="projectSelected">
                         </CustomInput>
 
-                        <CustomInput label="Actividades" selectionMode optionLabel="name" type="multiselect"
-                            :options="taskOptions" placeholder="Seleccione actividad(es)" v-model:input="formData.task">
+                        <CustomInput label="Actividades" selectionMode optionLabel="name" option-value="id"
+                            type="multiselect" :options="taskOptions" placeholder="Seleccione actividad(es)"
+                            v-model:input="formData.task">
                         </CustomInput>
 
                         <CustomInput class="mt-2" label="Observaciones" placeholder="Observaciones" type="textarea"
@@ -306,9 +241,10 @@ const urls = ref([
                                 <ul v-for="project in projects">
                                     <div class="mb-2 snap-center gap-2 space-y-2 rounded-lg border border-gray-300 p-2">
                                         <li class="font-semibold text-primary">{{ project.name }}</li>
-                                        <div class="block" v-for="task in projects.tasks"> <!--TODO v-for tasks, edit tasks & -->
+                                        <div class="block" v-for="task in project.tasks">
                                             <div class="flex justify-between items-center">
-                                                <li class="font-semibold">{{ project.name }}</li>
+                                                <li class="font-semibold">{{ task.task.name }}</li>
+                                                <li class="font-semibold">{{ task.task.percentDone }} %</li>
                                                 <div class="flex space-x-3 w-20">
                                                     <Button v-tooltip.top="'Editar Tarea'" class="mb-2"
                                                         icon="pi pi-pencil" severity="warning" outlined small
@@ -319,10 +255,10 @@ const urls = ref([
                                                 </div>
                                             </div>
                                             <div class="flex justify-between">
-                                                <li class="italic">Lunes {{ project.date }}</li>
+                                                <li class="italic">Lunes {{ task.date }}</li>
                                                 <li v-tooltip.left="'Turno Ordinario'"
                                                     class="italic rounded-lg bg-success p-2 text-white text-xs">
-                                                    {{ project.shift }}
+                                                    {{ task.start_hour }} - {{ task.end_hour }}
                                                 </li>
                                             </div>
                                         </div>

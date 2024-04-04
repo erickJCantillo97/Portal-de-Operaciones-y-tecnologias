@@ -87,15 +87,11 @@ const deleteEstado = (index) => {
     form.materiales.splice(index, 1);
 };
 
-const addItem = () => {
 
-    formData.value.requirement = {}
-    open.value = true
-}
 
 
 const submit = () => {
-    router.post(route('requirements.store'), formData.value.requirement, {
+    router.post(route('store.requirement.oficial'), form, {
         preserveScroll: true,
         onSuccess: (res) => {
             open.value = false
@@ -179,7 +175,7 @@ const submit = () => {
                 </Link>
                 <div class="flex space-x-2">
                     <Button label="Guardar" icon="fa-solid fa-floppy-disk" raised severity="primary"></Button>
-                    <Button label="Enviar a Oficiales" icon="fa-solid fa-paper-plane" raised
+                    <Button label="Enviar a Oficiales" @click="submit" icon="fa-solid fa-paper-plane" raised
                         severity="success"></Button>
                 </div>
             </div>

@@ -108,4 +108,13 @@ class RequirementController extends Controller
             'materials' => $materials
         ]);
     }
+
+    public function storeRequirementOficials(Request $request)
+    {
+        foreach ($request->all() as $requirement) {
+            return $requirement[0]['nivel'];
+        }
+
+        // return $request->all();
+    }
 }
