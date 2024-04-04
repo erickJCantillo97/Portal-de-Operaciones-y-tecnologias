@@ -38,7 +38,7 @@ class ExtendedScheduleController extends Controller
                 }
             }
             DB::commit();
-            return response()->json(['status' => true, 'mensaje' => 'Registro guardado']);
+            return response()->json(['status' => true, 'message' => 'Registro guardado']);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }

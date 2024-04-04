@@ -217,8 +217,9 @@ defineEmits(['valueChange'])
                 <Textarea v-else-if="type == 'textarea'" :id :disabled :rows="rowsTextarea" class="w-full" :required
                     :placeholder :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
                 <Dropdown v-else-if="type == 'dropdown'" :optionValue :id :disabled :placeholder :options :optionLabel
-                    :loading showClear :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''"
-                    v-model="input" :aria-describedby="id + '-help'" class="w-full" :pt="{
+                    :loading @change="$emit('change', $event)" showClear :filter="optionLabel ? true : false"
+                    :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" class="w-full"
+                    :pt="{
             root: '!h-8',
             input: '!py-0 !flex !items-center !text-sm !font-normal',
             item: '!py-1 !px-3 !text-sm !font-normal',
