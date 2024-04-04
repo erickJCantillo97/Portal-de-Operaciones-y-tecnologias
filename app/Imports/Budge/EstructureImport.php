@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class EstructureImport implements ToCollection, WithChunkReading, WithHeadingRow
+class EstructureImport implements ToCollection,  WithHeadingRow
 {
     public $proyecto;
 
@@ -95,16 +95,14 @@ class EstructureImport implements ToCollection, WithChunkReading, WithHeadingRow
                         'project_id' => $this->proyecto,
                         'grafo_id' => $row['id'],
                     ]);
+                    if ($padre == null) {
+                        dd($row[$key - 1]);
+                    }
                     $operacion->identification = $row['identificacion'];
                     $operacion->grafo = $padre;
                     $operacion->save();
                 }
             }
         }
-    }
-
-    public function chunkSize(): int
-    {
-        return 300;
     }
 }

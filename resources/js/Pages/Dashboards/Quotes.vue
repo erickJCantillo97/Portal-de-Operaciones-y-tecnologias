@@ -5,6 +5,7 @@ import GraphicMadurityTime from './Quotes/GraphicMadurityTime.vue';
 import GraphicQuoteCountry from './Quotes/GraphicQuoteCountry.vue';
 import GraphicStatus from '@/Pages/Dashboards/Quotes/GraphicStatus.vue';
 import TableQuotes from '@/Pages/Dashboards/Quotes/TableQuotes.vue';
+import BeijingAQIChart from './Quotes/BeijingAQIChart.vue';
 </script>
 
 <template>
@@ -18,6 +19,6 @@ import TableQuotes from '@/Pages/Dashboards/Quotes/TableQuotes.vue';
         <!-- <TableQuotes class="shadow-md col-span-1 md:col-span-2 mt-4" /> -->
         <DataEstimatorCard class="shadow-md rounded-b-md" />
         <TableQuotes class="shadow-md col-span-1 md:col-span-2 mt-4" />
-        <!-- <BeijingAQIChart class="shadow-md col-span-1 md:col-span-2 mt-4" /> -->
+       
     </div>
 </template>

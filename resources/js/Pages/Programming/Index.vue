@@ -104,12 +104,12 @@ const Options = ref([
 
 //#region UseForm
 const projectSelected = ref()
-const formData = useForm({
+const formData = ref({
     date: [],
     timeStart: '',
     timeEnd: '',
     task: [],
-    observations: '',
+    description: '',
 })
 //#endregion
 
@@ -129,15 +129,15 @@ function format24h(hora) {
 const openModal = ref(false)
 
 const openDialog = () => {
-    formData.reset()
+    // formData.reset()
     projectSelected.value = ''
     openModal.value = true
 }
 
 //#region Requests
-const submit = async() => {
-    try{
-        await axios.post(route('task.store.i'), formData)
+const submit = async () => {
+    try {
+        await axios.post(route('task.store.id'), formData)
             .then(res => {
                 //TODO request
                 console.log('Hace algo')
@@ -147,22 +147,36 @@ const submit = async() => {
     }
 }
 
-const task = ref()
-const getTask = async() => {
-    try{
-        await axios.get(route('get.task'))
+const taskOptions = ref()
+const getTaskByProjects = async (id_project) => {
+    try {
+        await axios.get(route('extended.schedule.getTask', id_project))
             .then(res => {
                 //TODO request
-                task.value = res.data
-        })
+                taskOptions.value = res.data
+                console.log(taskOptions.value)
+            })
     } catch (error) {
         console.error('Error ' + error)
     }
 }
 
-const editTask = async(id) => {
-    try{
-        await axios.put(route('task.store.i', task.id))
+const getAllTask = async () => {
+    try {
+        await axios.get(route('extended.schedule.all'))
+            .then(res => {
+                //TODO request
+                taskOptions.value = res.data
+                console.log(taskOptions.value)
+            })
+    } catch (error) {
+        console.error('Error ' + error)
+    }
+}
+
+const editTask = async (id_project) => {
+    try {
+        await axios.put(route('task.store.i', id_project))
             .then(res => {
                 //TODO request
                 console.log('Hace algo')
@@ -172,8 +186,8 @@ const editTask = async(id) => {
     }
 }
 
-const deleteTask = async(id) => {
-    try{
+const deleteTask = async (id) => {
+    try {
         await axios.delete(route('task.delete.i', task.id))
             .then(res => {
                 //TODO request
@@ -261,16 +275,17 @@ const urls = ref([
                                 :multiple="true" />
                         </div>
 
-                        <CustomInput label="Proyectos" type="dropdown" optionLabel="name" :options="projects"
-                            placeholder="Seleccione un proyecto" filterPlaceholder="Buscar proyecto" v-model:input="projectSelected">
+                        <CustomInput @change="getTaskByProjects(projects[0].id)" label="Proyectos" type="dropdown"
+                            optionLabel="name" :options="projects" placeholder="Seleccione un proyecto"
+                            filterPlaceholder="Buscar proyecto" v-model:input="projectSelected">
                         </CustomInput>
 
                         <CustomInput label="Actividades" selectionMode optionLabel="name" type="multiselect"
-                            :options="Options" placeholder="Seleccione actividad(es)" v-model:input="formData.task">
+                            :options="taskOptions" placeholder="Seleccione actividad(es)" v-model:input="formData.task">
                         </CustomInput>
 
                         <CustomInput class="mt-2" label="Observaciones" placeholder="Observaciones" type="textarea"
-                            v-model:input="formData.observations">
+                            v-model:input="formData.description">
                         </CustomInput>
 
                         <div class="flex justify-end space-x-2">
@@ -288,26 +303,26 @@ const urls = ref([
                                 </h2>
                             </div>
                             <div class="h-[25rem] snap-y snap-mandatory overflow-y-auto p-2">
-                                <ul v-for="task in Options">
+                                <ul v-for="project in projects">
                                     <div class="mb-2 snap-center gap-2 space-y-2 rounded-lg border border-gray-300 p-2">
-                                        <li class="font-semibold text-primary">{{ task.project }}</li>
-                                        <div class="block"> <!--TODO v-for tasks, edit tasks & -->
+                                        <li class="font-semibold text-primary">{{ project.name }}</li>
+                                        <div class="block" v-for="task in projects.tasks"> <!--TODO v-for tasks, edit tasks & -->
                                             <div class="flex justify-between items-center">
-                                                <li class="font-semibold">{{ task.name }}</li>
+                                                <li class="font-semibold">{{ project.name }}</li>
                                                 <div class="flex space-x-3 w-20">
                                                     <Button v-tooltip.top="'Editar Tarea'" class="mb-2"
                                                         icon="pi pi-pencil" severity="warning" outlined small
-                                                        @click="editTask(task.id)" />
+                                                        @click="editTask(project.id)" />
                                                     <Button v-tooltip.top="'Eliminar Tarea'" class="mb-2"
                                                         icon="pi pi-trash" severity="danger" outlined small
-                                                        @click="deleteTask(task.id)" />
+                                                        @click="deleteTask(project.id)" />
                                                 </div>
                                             </div>
                                             <div class="flex justify-between">
-                                                <li class="italic">Lunes {{ task.date }}</li>
+                                                <li class="italic">Lunes {{ project.date }}</li>
                                                 <li v-tooltip.left="'Turno Ordinario'"
                                                     class="italic rounded-lg bg-success p-2 text-white text-xs">
-                                                    {{ task.shift }}
+                                                    {{ project.shift }}
                                                 </li>
                                             </div>
                                         </div>

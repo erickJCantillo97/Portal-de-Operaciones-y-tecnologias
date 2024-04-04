@@ -57,7 +57,7 @@ export default {
             data: this.projects,
           },
           yAxis: {
-            label:{
+            label: {
 
             },
             formatter: '{b}: {c}%',
@@ -72,47 +72,45 @@ export default {
               saveAsImage: {}
             }
           },
-          dataZoom: [
-            {
-              startValue: this.projects[0]
-            },
-            {
-              type: 'inside'
-            }
-          ],
           visualMap: {
             top: 50,
             right: 10,
             pieces: [
               {
                 gt: 0,
-                lte: 15,
-                color: '#4CFF33' //light green
+                lte: 5,
+                color: '#00ab55' //light green
               },
               {
                 gt: 15,
                 lte: 100,
-                color: '#FF0104' //red
+                color: '#DC2626' //red
               },
               {
                 gt: -15,
-                lte: 0,
+                lte: -1,
                 color: '#FFB32D' //orange
               },
               {
-                gt: -100,
-                lte: -15,
-                color: '#FF0104' //red
+                gt: 5,
+                lte: 15,
+                color: '#FFB32D' //orange
               },
             ],
             outOfRange: {
-              color: '#999'
+              color: '#00ab55'
             }
           },
-          series: {
+          series: [{
+            label: {
+              show: true,
+              position: 'top',
+              formatter: '{b}'
+            },
             name: 'Gráfica de Control',
             type: 'line',
             data: this.variations,
+
             markLine: {
               silent: true,
               lineStyle: {
@@ -136,7 +134,7 @@ export default {
                 }
               ]
             }
-          }
+          }]
         })
       )
     },
@@ -164,7 +162,7 @@ export default {
         'BCFBC FONSECON II',
         'FONSECON LANCHA POLICÍA'
       ],
-      variations: [ 19, 13, 13, 13, 2, 16, 4, 0, 0, 1, 8, 1, 0, -4, 4, 2, 23, 13, 5 ]
+      variations: [19, 13, 13, 13, 2, 16, 4, 0, 0, 1, 8, 1, 0, -4, 4, 2, 23, 13, 5]
     }
   }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Personal;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\Personal\PersonalScheduleDayJob;
+use App\Models\Personal\ExtendedSchedule;
 use App\Models\Projects\Project;
 use App\Models\Schedule;
 use App\Models\ScheduleTime;
@@ -22,6 +23,22 @@ class ProgrammingController extends Controller
     public function index()
     {
         $projects = Project::active()->get();
+
+        // Obtener la fecha actual
+        $currentDate = Carbon::now();
+
+        // Obtener el inicio de la próxima semana (lunes)
+        $nextMonday = $currentDate->next()->startOfWeek();
+
+        // Si hoy es lunes, obtenemos el siguiente lunes
+        if ($currentDate->isMonday()) {
+            $nextMonday = $nextMonday->addWeek();
+        }
+
+        foreach ($projects as $key => $project) {
+            $extendedTask = ExtendedSchedule::where('project_id', $project->id)->whereBetween('date', [$currentDate, $nextMonday])->get();
+            $project['tasks'] = $extendedTask;
+        }
 
         return Inertia::render('Programming/Index', [
             'projects' => $projects,
@@ -68,7 +85,7 @@ class ProgrammingController extends Controller
                 $date = Carbon::parse($validateData['fecha']);
                 if ($project->daysPerWeek == 5) {
                     $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::FRIDAY);
-                } else if ($project->daysPerWeek == 6) {
+                } elseif ($project->daysPerWeek == 6) {
                     $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::SATURDAY);
                 } else {
                     $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::SUNDAY);
@@ -333,7 +350,7 @@ class ProgrammingController extends Controller
                                     ->whereTime('horaFin', '>=', $request->startShift);
                             })->orWhere(function ($subquery) use ($request) {
                                 $subquery->whereTime('horaInicio', '<=', $request->endShift)
-                                    ->whereTime('horaFin', '>=',  $request->endShift);
+                                    ->whereTime('horaFin', '>=', $request->endShift);
                             })->orWhere(function ($subquery) use ($request) {
                                 $subquery->whereBetween('horaInicio', [$request->startShift, $request->endShift])
                                     ->whereBetween('horaFin', [$request->startShift, $request->endShift]);
@@ -578,9 +595,11 @@ class ProgrammingController extends Controller
                     break;
             }
             DB::commit();
+
             return response()->json(['status' => true, 'mensaje' => $mensaje]);
         } catch (Exception $e) {
             DB::rollBack();
+
             return response()->json(['status' => true, 'mensaje' => 'Se ha generado un error: ' . $e->getMessage()]);
         }
     }
@@ -672,7 +691,7 @@ class ProgrammingController extends Controller
                         'startDate' => $task['startDate'],
                         'percentDone' => $task['percentDone'],
                         'shift' => $task->project->shift ? Shift::where('id', $task->project->shift)->first() : null,
-                        'employees' => Schedule::where('task_id', $task['id'])->where('fecha', $request->date)->get(),
+                        'employees' => Schedule::with('scheduleTimes')->where('task_id', $task['id'])->where('fecha', $request->date)->get(),
                     ];
                 }),
         );

@@ -52,11 +52,12 @@
                                                 </Link>
                                             </li>
                                             <li class="w-full nav-link group" v-if="children.children">
-                                                <button type="button"
-                                                    class="w-full hover:bg-gray-100 dark:hover:bg-gray-900"
+                                                <button type="button" class="w-full nav-link group"
                                                     @click="subActive === children.name ? (subActive = null) : (subActive = children.name)">
-                                                    {{ children.name }}
-                                                    <div class="ltr:ml-auto rtl:mr-auto rtl:rotate-180"
+                                                    <span>
+                                                        {{ children.name }}
+                                                    </span>
+                                                    <div class=""
                                                         :class="{ '!rotate-90': subActive === children.name }">
                                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                                             xmlns="http://www.w3.org/2000/svg">
@@ -77,8 +78,6 @@
                                                             {{ c.name }}
                                                         </li>
                                                         </Link>
-
-
                                                     </ul>
                                                 </vue-collapsible>
                                             </li>

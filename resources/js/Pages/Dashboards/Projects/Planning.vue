@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import AdvancedBarChart from '@/Pages/Dashboards/Projects/AdvancedBarChart.vue'
 import GaugeGradeChart from '@/Pages/Dashboards/Projects/GaugeGradeChart.vue'
 import SimpleScatterChart from '@/Pages/Dashboards/Projects/SimpleScatterChart.vue'
+import BeijingAQIChart from '../Quotes/BeijingAQIChart.vue';
 
 onMounted(() => {
   getData()
@@ -79,7 +80,9 @@ const series = ref([])
       <div class="col-span-1">
         <!-- <AdvancedBar :key="showLineChart" title="Avance Proyectos en Ejecución" :series="series" /> -->
         <SimpleScatterChart :key="showLineChart" title="Proyectos" :series="scatterSeries" />
+
       </div>
+      <BeijingAQIChart class="shadow-md col-span-1 md:col-span-3 mt-4" />
     </div>
   </main>
 </template>
