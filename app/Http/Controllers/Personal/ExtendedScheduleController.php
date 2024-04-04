@@ -19,14 +19,16 @@ class ExtendedScheduleController extends Controller
         try{
             DB::beginTransaction();
             foreach($request->dates as $date){
-                ExtendedSchedule::create([
-                    'date' => $date,
-                    'start_hour' => $request->start_hour,
-                    'end_hour' => $request->end_hour,
-                    'project_id' => $request->project_id,
-                    'task_id' => $request->task_id,
-                    'description'=>  $request->description
-                ]);
+                foreach($request->task_id as $taks){
+                    ExtendedSchedule::create([
+                        'date' => $date,
+                        'start_hour' => $request->start_hour,
+                        'end_hour' => $request->end_hour,
+                        'project_id' => $request->project_id,
+                        'task_id' => $taks,
+                        'description'=>  $request->description
+                    ]);
+                }
             }
             DB::commit();
             return response()->json(['status'=>true, 'mensaje'=>'Registro guardado']);
