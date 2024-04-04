@@ -20,6 +20,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::resource('requirements', RequirementController::class);
     Route::get('manageRequeriments', [RequirementController::class, 'manageRequirements'])->name('manage.requirements');
+    Route::post('storeRequirementOficials', [RequirementController::class, 'storeRequirementOficials'])->name('store.requirement.oficial');
     // Route::get('categorias_anteriores', [CategoryController::class, 'getDataAnterior']);
     // Route::get('equipos_anteriores', [ToolController::class, 'getDataAnterior']);
     // Route::get('prestamos_anteriores', [AssignmentToolController::class, 'getDataAnterior']);

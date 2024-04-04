@@ -143,6 +143,17 @@ export function useCommonUtilities() {
         });
     }
 
+    // Este código es una función llamada `formatUTCOffset` que toma una `dateString` como entrada.
+    // Crea un nuevo objeto `Date` usando `dateString`. Luego resta 5 horas de las horas de la fecha usando
+    // `date.setHours(date.getHours() - 5)`. Finalmente, convierte la fecha de modificación a un formato de
+    // cadena ISO usando `date.toISOString()` y devuelve la fecha formateada.
+    const formatUTCOffset = (dateString) => {
+        const date = new Date(dateString);
+        date.setHours(date.getHours() - 5);
+        const formattedDate = date.toISOString();
+        return formattedDate;
+    };
+
     /**
      * The `getDays` function calculates the number of days between two given dates.
      * @param startDate - The `startDate` parameter in the `getDays` function represents the starting
@@ -222,6 +233,7 @@ export function useCommonUtilities() {
         formatDate,
         formatDateTime24h,
         getDays,
+        formatUTCOffset,
         html2canvasDownload,
         truncateString,
     };

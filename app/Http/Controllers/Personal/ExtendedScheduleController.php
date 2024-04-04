@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers\Personal;
 
+use App\Http\Controllers\Controller;
 use App\Models\Personal\ExtendedSchedule;
 use App\Models\VirtualTask;
 use Exception;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class ExtendedScheduleController extends Controller
 {
-
     public function index()
     {
         $extendsEschedule = ExtendedSchedule::where('date', '>=', Carbon::now()->format('Y-m-d'))->get();
+
         return response()->json([
             'data' => [],
         ]);
@@ -25,21 +25,24 @@ class ExtendedScheduleController extends Controller
     {
         try {
             DB::beginTransaction();
-            foreach ($request->dates as $date) {
-                foreach ($request->task_id as $taks) {
+            foreach ($request->dates as $d) {
+                foreach ($request->tasks as $t) {
                     ExtendedSchedule::create([
-                        'date' => $date,
+                        'date' => $d,
                         'start_hour' => $request->start_hour,
                         'end_hour' => $request->end_hour,
-                        'project_id' => $request->project_id,
-                        'task_id' => $taks,
-                        'description' =>  $request->description
+                        'project_id' => VirtualTask::findOrFail($t)->project_id,
+                        'task_id' => $t,
+                        'description' => $request->description,
                     ]);
                 }
             }
             DB::commit();
-            return response()->json(['status' => true, 'message' => 'Registro guardado']);
+
+            // return response()->json(['status' => true, 'message' => 'Registro guardado']);
         } catch (Exception $e) {
+            DB::rollBack();
+
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
     }
@@ -55,6 +58,7 @@ class ExtendedScheduleController extends Controller
             $extendedSchedule->start_hour = $request->start_hour;
             $extendedSchedule->end_hour = $request->end_hour;
             $extendedSchedule->save();
+
             return response()->json(['status' => true, 'mensaje' => 'Registro actualizado']);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
@@ -69,19 +73,19 @@ class ExtendedScheduleController extends Controller
         try {
             $extendedSchedule = ExtendedSchedule::find($id);
             $extendedSchedule->delete();
+
             return response()->json(['status' => true, 'mensaje' => 'Registro eliminado']);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 
-
-
     public function getTask($project)
     {
         $taskWithSubTasks = VirtualTask::has('project')->whereNotNull('task_id')->select('task_id')->distinct()->get()->map(function ($task) {
             return $task['task_id'];
         })->toArray();
+
         return response()->json(
             VirtualTask::where('percentDone', '<', 100)->where('project_id', $project)
                 ->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) {
