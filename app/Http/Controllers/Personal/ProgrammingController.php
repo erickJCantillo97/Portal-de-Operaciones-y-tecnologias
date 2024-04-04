@@ -290,12 +290,14 @@ class ProgrammingController extends Controller
     /*
      * Esta función obtiene el numero de horas asignadas a una persona en una fecha especifica
      */
-    public function getAssignmentHour($fecha, $userId)
+    public function getAssignmentHour(Request $request)
     {
-        $schedule = Schedule::where([
-            'fecha' => $fecha,
-            'employee_id' => $userId,
-        ])->pluck('id')->toArray();
+        $personalUserIds = getPersonalUser()->map(function ($p) {
+            return $p->Num_SAP;
+        });
+        $schedule = Schedule::whereIn('idUsuario',  $personalUserIds)->where('fecha', $request->date)->pluck('id')->toArray();
+
+        DetailScheduleTime::whereIn('idUsuario',  $personalUserIds)->where('fecha', $request->date);
 
         $horas_acumulados = ScheduleTime::whereIn('schedule_id', $schedule)->selectRaw('SUM(datediff(mi,hora_inicio, hora_fin)) as diferencia_acumulada')->get();
 
@@ -703,7 +705,7 @@ class ProgrammingController extends Controller
                         'startDate' => $task['startDate'],
                         'percentDone' => $task['percentDone'],
                         'shift' => $task->project->shift ? Shift::where('id', $task->project->shift)->first() : null,
-                        'employees' => Schedule::with('scheduleTimes')->where('task_id', $task['id'])->where('fecha', $request->date)->get(),
+                        'employees' => [],
                     ];
                 }),
         );
