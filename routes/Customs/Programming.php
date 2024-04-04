@@ -29,9 +29,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('actividadesDeultimonivelPorProyectos/{project}', [ProgrammingController::class, 'endNivelActivitiesByProject'])->name('actividadesDeultimonivelPorProyectos');
 
 
-    
+
 
     /********************************  Rutas del controlador ExtendedScheduleController  ******************************/
+
+    Route::resource();
 
     Route::post('/ExtendedSchedule/store', [ExtendedScheduleController::class, 'store'])->name('ExtendedSchedule.store');
 
@@ -42,6 +44,4 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/ExtendedSchedule/all', [ExtendedScheduleController::class, 'all'])->name('ExtendedSchedule.all');
 
     Route::delete('/ExtendedSchedule/destroy/{id}', [ExtendedScheduleController::class, 'destroy'])->name('ExtendedSchedule.destroy');
-
-
 });
