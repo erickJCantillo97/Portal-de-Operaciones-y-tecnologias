@@ -253,7 +253,7 @@ defineEmits(['valueChange'])
                     </template>
                 </Dropdown>
                 <MultiSelect v-else-if="type == 'multiselect'" :optionValue :id display="chip" v-model="input" :options
-                    :optionLabel :loading :maxSelectedLabels :placeholder :filter="optionLabel ? true : false"
+                    :optionLabel :loading :maxSelectedLabels :placeholder :disabled :filter="optionLabel ? true : false"
                     :class="invalid ? 'p-invalid' : ''" class="w-full" :aria-describedby="id + '-help'" :pt="{
             root: '!h-8',
             label: '!py-0.5 !flex !h-full !items-center !text-sm !font-normal',
