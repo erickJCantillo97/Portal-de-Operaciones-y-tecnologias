@@ -120,10 +120,10 @@ const getTask = async (option) => {
                 // project.loading = true
                 project.tasks = {}
                 await diasSemana.value.forEach(async (dia) => {
-                    project.tasks[dia.toISOString().split('T')[0]]={loading:true,data:[]}
+                    project.tasks[dia.toISOString().split('T')[0]] = { loading: true, data: [] }
                     await axios.post(route('actividadesDeultimonivelPorProyectos', project.id), { date: dia }).then((res) => {
                         project.tasks[dia.toISOString().split('T')[0]].data = res.data
-                        project.tasks[dia.toISOString().split('T')[0]].loading=false
+                        project.tasks[dia.toISOString().split('T')[0]].loading = false
                     })
                 })
                 // project.loading = false
@@ -377,8 +377,9 @@ const save = async () => {
                                 <span class="grid grid-cols-7 col-span-9 overflow-y-auto overflow-x-hidden">
                                     <div v-for="dia, index in diasSemana" class="flex flex-col h-full items-center"
                                         :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
-                                        <div v-if="project.tasks[dia.toISOString().split('T')[0]].loading" class="flex h-full items-center" >
-                                            <Loading/>
+                                        <div v-if="project.tasks[dia.toISOString().split('T')[0]].loading"
+                                            class="flex h-full items-center">
+                                            <Loading />
                                         </div>
                                         <span v-else v-for="task in project.tasks[dia.toISOString().split('T')[0]].data"
                                             class="w-full p-0.5">
@@ -424,7 +425,7 @@ const save = async () => {
                                                                 <AvatarGroup
                                                                     v-if="(task.employees ? true : false) && task.employees.length > 0 && task.employees.length <= 3">
                                                                     <Avatar v-for="person in task.employees"
-                                                                        :image="person.employee.photo ?? '/images/person-default.png'"
+                                                                        :image="'/images/person-default.png'"
                                                                         shape="circle" size="large" />
                                                                 </AvatarGroup>
                                                                 <AvatarGroup
@@ -455,8 +456,9 @@ const save = async () => {
                                                     </div>
                                                 </div>
                                                 <div class="p-1">
-                                                    <ProgressBar :value="parseFloat(task.percentDone)" style="height: 12px"
-                                                        v-tooltip="'Avance'" :pt="{ label: 'text-xs font-thin' }">
+                                                    <ProgressBar :value="parseFloat(task.percentDone)"
+                                                        style="height: 12px" v-tooltip="'Avance'"
+                                                        :pt="{ label: 'text-xs font-thin' }">
                                                     </ProgressBar>
                                                 </div>
                                             </div>
@@ -549,8 +551,8 @@ const save = async () => {
                                                             <AvatarGroup
                                                                 v-if="(task.employees ? true : false) && task.employees.length > 0 && task.employees.length <= 3">
                                                                 <Avatar v-for="person in task.employees"
-                                                                    :image="person.employee.photo ?? '/images/person-default.png'"
-                                                                    shape="circle" size="large" />
+                                                                    :image="'/images/person-default.png'" shape="circle"
+                                                                    size="large" />
                                                             </AvatarGroup>
                                                             <AvatarGroup
                                                                 v-else-if="(task.employees ? true : false) && task.employees.length > 3">

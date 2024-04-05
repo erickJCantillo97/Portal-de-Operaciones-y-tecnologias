@@ -110,19 +110,21 @@ function getPersonalUser()
             str_pad(($p), 8, '0', STR_PAD_LEFT);
     })->toArray();
 
-    $miPersonal = Employee::where('JI_Num_SAP', auth()->user()->num_sap)->orWhereIn('Num_SAP', $NumSAPPersonal)->get()->map(function ($person) {
-        return [
-            'Num_SAP' => (int) $person['Num_SAP'],
-            'Fecha_Final' => Carbon::createFromFormat('Ymd', $person['Fecha_Final']),
-            'Costo_Hora' => $person['Costo_Hora'],
-            'Costo_Mes' => $person['Costo_Mes'],
-            'Oficina' => $person['Oficina'],
-            'canDelete' => $person['JI_Num_SAP'] != auth()->user()->num_sap,
-            'Nombres_Apellidos' => $person['Nombres_Apellidos'],
-            'Cargo' => $person['Cargo'],
-            'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
-        ];
-    });
+    $miPersonal = Employee::where('JI_Num_SAP', auth()->user()->num_sap)->orWhereIn('Num_SAP', $NumSAPPersonal)
+        ->orWhere('Oficina', auth()->user()->oficina)
+        ->get()->map(function ($person) {
+            return [
+                'Num_SAP' => (int) $person['Num_SAP'],
+                'Fecha_Final' => Carbon::createFromFormat('Ymd', $person['Fecha_Final']),
+                'Costo_Hora' => $person['Costo_Hora'],
+                'Costo_Mes' => $person['Costo_Mes'],
+                'Oficina' => $person['Oficina'],
+                'canDelete' => $person['JI_Num_SAP'] != auth()->user()->num_sap,
+                'Nombres_Apellidos' => $person['Nombres_Apellidos'],
+                'Cargo' => $person['Cargo'],
+                'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
+            ];
+        });
     return $miPersonal;
 }
 

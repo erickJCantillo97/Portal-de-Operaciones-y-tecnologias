@@ -731,7 +731,10 @@ class ProgrammingController extends Controller
                         'startDate' => $task['startDate'],
                         'percentDone' => $task['percentDone'],
                         'shift' => $task->project->shift ? Shift::where('id', $task->project->shift)->first() : null,
-                        'employees' => [],
+                        'employees' => DetailScheduleTime::groupBy('idUsuario')->where('idTask', $task['id'])->where('fecha', $request->date)->select(
+                            Db::raw('MIN(nombre) as name'),
+                            Db::raw('MIN(idUsuario) as id'),
+                        )->get(),
                     ];
                 }),
         );
