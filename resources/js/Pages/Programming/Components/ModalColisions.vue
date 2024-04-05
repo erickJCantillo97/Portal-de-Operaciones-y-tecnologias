@@ -57,7 +57,7 @@ async function confirm1(event, scheduleTime, option, data) {
                         toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 3000 });
                     } else {
                         conflicts.value.splice(conflicts.value.indexOf(data), 1);
-                        visible.value=conflicts.value.length>0
+                        openConflict.value=conflicts.value.length>0
                         toast.add({ severity: 'info', group: "customToast", text: 'Omitida', life: 3000 });
                     }
                 }, reject: () => {
