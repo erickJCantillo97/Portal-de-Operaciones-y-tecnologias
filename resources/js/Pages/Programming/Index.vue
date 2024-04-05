@@ -1,17 +1,18 @@
 <script setup>
 import { Link, router } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import Dropdown from 'primevue/dropdown';
+import Dropdown from 'primevue/dropdown'
 import NoContentToShow from '@/Components/NoContentToShow.vue'
 import WeekTable from '@/Pages/Programming/WeekTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
+import Knob from 'primevue/knob'
 
 import { useCommonUtilities } from "@/composable/useCommonUtilities"
-const { formatUTCOffset, formatDateTime24h } = useCommonUtilities()
+const { format_ES_Date, formatDateTime24h } = useCommonUtilities()
 
-import { useToast } from "primevue/usetoast";
+import { useToast } from "primevue/usetoast"
 const toast = useToast()
 
 const props = defineProps({
@@ -20,6 +21,9 @@ const props = defineProps({
 
 const loading = ref(false)
 const project = ref()
+const selectedTaskId = ref(null)
+const editMode = ref(false)
+const disabled = computed(() => selectedTaskId.value !== null && editMode.value)
 
 //#region UseForm
 const projectSelected = ref()
@@ -121,8 +125,6 @@ const getTaskByProjects = async () => {
     }
 }
 
-const selectedTaskId = ref(null)
-const editMode = ref(false)
 const editTask = async (task) => {
     try {
         // console.log(task)
@@ -267,15 +269,14 @@ const urls = ref([
 
                         <CustomInput @change="getTaskByProjects()" label="Proyectos" type="dropdown" optionLabel="name"
                             option-value="id" :options="projects" placeholder="Seleccione un proyecto"
-                            :disabled="selectedTaskId != null && editMode == true"
-                            :class="[selectedTaskId != null && editMode == true ? 'cursor-not-allowed' : '']"
+                            :disabled="disabled" :class="[disabled ? 'cursor-not-allowed' : '']"
                             filterPlaceholder="Buscar proyecto" v-model:input="projectSelected">
                         </CustomInput>
 
                         <CustomInput label="Actividades" selectionMode optionLabel="name" option-value="id"
                             type="multiselect" :options="taskOptions" placeholder="Seleccione actividad(es)"
-                            :disabled="selectedTaskId != null && editMode == true" v-model:input="formData.tasks"
-                            :class="[selectedTaskId != null && editMode == true ? 'cursor-not-allowed' : '']">
+                            :disabled="disabled" v-model:input="formData.tasks"
+                            :class="[disabled ? 'cursor-not-allowed' : '']">
                         </CustomInput>
 
                         <CustomInput class="mt-2" label="Observaciones" placeholder="Observaciones" type="textarea"
@@ -286,7 +287,6 @@ const urls = ref([
                             <Button severity="success" :loading="false" @click="submit()">
                                 {{ selectedTaskId != null ? 'Actualizar' : 'Guardar' }}
                             </Button>
-                            <!-- {{ selectedTaskId }} -->
                         </div>
                     </div>
 
@@ -294,7 +294,7 @@ const urls = ref([
                         <div class="border border-gray-300 rounded-lg">
                             <div class="flex justify-center items-center bg-blue-900 rounded-t-lg p-2">
                                 <h2 class="text-center text-white">
-                                    Listado de Actividades Extendidos
+                                    Listado de Actividades Extendidas
                                 </h2>
                             </div>
                             <div class="h-[25rem] snap-y snap-mandatory overflow-y-auto p-2">
@@ -306,7 +306,9 @@ const urls = ref([
                                             :class="[task.task.id == selectedTaskId ? 'bg-gray-200 p-1 rounded-lg' : '']">
                                             <div class="flex justify-between items-center">
                                                 <li class="font-semibold">{{ task.task.name }}</li>
-                                                <li class="font-semibold">{{ task.task.percentDone }} %</li>
+                                                <Knob v-tooltip.top="`Avance: ${parseInt(task.task.percentDone)}%`"
+                                                    :model-value="parseInt(task.task.percentDone)" readonly :size="40"
+                                                    valueTemplate="{value}%" />
                                                 <div class="flex space-x-3 ">
                                                     <Button v-tooltip.top="'Editar Tarea'" class="mb-2"
                                                         icon="pi pi-pencil" severity="warning" outlined small
@@ -320,7 +322,8 @@ const urls = ref([
                                                 </div>
                                             </div>
                                             <div class="flex justify-between">
-                                                <li class="italic">{{ task.date }}</li>
+                                                <li class="italic">
+                                                    {{ format_ES_Date(task.date) }}</li>
                                                 <li v-tooltip.left="'Turno Ordinario'"
                                                     class="italic rounded-lg bg-success p-2 text-white text-xs">
                                                     {{ format24h(task.start_hour) }} - {{ format24h(task.end_hour) }}
