@@ -37,5 +37,5 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('getTimesEmployee', [ProgrammingController::class, 'getTimesSchedulesEmployee'])->name('get.times.employees');
     
-    Route::get('getSchedulePersonalStatus', [PersonalController::class, 'getSchedulePersonalStatus'])->name('get.personal.status.programming');
+    Route::post('getSchedulePersonalStatus', [PersonalController::class, 'getSchedulePersonalStatus'])->name('get.personal.status.programming');
 });
