@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { Container, Draggable } from "vue-dndrop";
 import Loading from '@/Components/Loading.vue';
 import CustomInput from '@/Components/CustomInput.vue';
@@ -106,6 +106,14 @@ const getPersonalData = () => {
         loadingPerson.value = false
     })
 }
+getPersonalData()
+
+
+// async function getTaskDay(days,projectId){
+
+
+    
+// }
 
 const getTask = async (option) => {
     projectData.value = []
@@ -117,7 +125,6 @@ const getTask = async (option) => {
         if (projectsSelected.value.length > 0) {
             projectData.value = projectsSelected.value
             projectData.value.forEach(async (project) => {
-                // project.loading = true
                 project.tasks = {}
                 await diasSemana.value.forEach(async (dia) => {
                     project.tasks[dia.toISOString().split('T')[0]] = { loading: true, data: [] }
@@ -126,7 +133,6 @@ const getTask = async (option) => {
                         project.tasks[dia.toISOString().split('T')[0]].loading = false
                     })
                 })
-                // project.loading = false
             })
         }
     } else if (option == 'date') {
@@ -136,10 +142,11 @@ const getTask = async (option) => {
         projectData.value = projectsSelected.value
         if (projectData.value.length > 0) {
             projectData.value.forEach(async (project) => {
-                project.loading = true
+                project.tasks = {}
+                project.tasks[date.toISOString().split('T')[0]] = { loading: true, data: [] }
                 await axios.post(route('actividadesDeultimonivelPorProyectos', project.id), { date }).then((res) => {
-                    project.tasks = res.data
-                    project.loading = false
+                    project.tasks[date.toISOString().split('T')[0]].data = res.data
+                    project.tasks[date.toISOString().split('T')[0]].loading = false
                     // console.log(projectData.value)
                 })
             })
@@ -155,11 +162,6 @@ const getTask = async (option) => {
 //#endregion
 
 //#region funciones
-
-onMounted(() => {
-    getPersonalData()
-})
-
 
 //#endregion
 
@@ -357,9 +359,9 @@ const save = async () => {
                             <!-- endregion -->
                         </div>
                         <!-- region actividades -->
-                        <div class="h-full space-y-2 overflow-y-auto pl-1 ">
+                        <div class="h-full space-y-2 overflow-y-clip pl-1 ">
                             <div v-for="project in projectData"
-                                class="grid-cols-10 divide-x divide-y cursor-default h-full divide-gray-100 border border-indigo-200 rounded-md text-lg leading-6 grid mr-1">
+                                class="grid-cols-10 divide-x divide-y cursor-default h-full divide-gray-100 border border-indigo-200 rounded-l-md text-lg leading-6 grid">
                                 <div class="flex flex-col items-center px-2">
                                     <div class="flex h-full w-full items-center justify-center flex-col font-bold">
                                         <p>
@@ -378,7 +380,7 @@ const save = async () => {
                                     <div v-for="dia, index in diasSemana" class="flex flex-col h-full items-center"
                                         :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
                                         <div v-if="project.tasks[dia.toISOString().split('T')[0]].loading"
-                                            class="flex h-full items-center">
+                                            class="flex justify-center h-full items-center">
                                             <Loading />
                                         </div>
                                         <span v-else v-for="task in project.tasks[dia.toISOString().split('T')[0]].data"
@@ -507,10 +509,12 @@ const save = async () => {
                                     </div>
                                 </div>
                                 <div class="w-full overflow-x-auto grid grid-cols-5">
-                                    <div v-if="project.loading" class="col-span-5 h-56 flex items-center">
+                                    <div v-if="project.tasks[dates.toISOString().split('T')[0]].loading"
+                                        class="flex col-span-5 justify-center h-full items-center">
                                         <Loading />
                                     </div>
-                                    <span v-else v-for="task in project.tasks" class="w-full p-0.5 cursor-default">
+                                    <span v-else v-for="task in project.tasks[dates.toISOString().split('T')[0]].data"
+                                        class="w-full p-0.5 cursor-default">
                                         <div
                                             class="border border-primary h-40 rounded-md flex flex-col justify-between">
                                             <div class="flex flex-col justify-between h-full">
