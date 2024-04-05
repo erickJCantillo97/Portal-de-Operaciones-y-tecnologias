@@ -57,10 +57,10 @@ const visible = defineModel('visible')
             footer: { class: '!p-2 !h-min !items-end !flex !justify-end' }
         }">
         <template #header>
-            <div class="flex items-center space-x-2 text-white">
+            <div class="flex items-center space-x-2 text-white w-[95%]">
                 <i v-if="icon" :class="icon" />
                 <slot v-else name="icon" />
-                <span v-if="titulo" class="text-xl font-bold">
+                <span v-if="titulo" class="text-xl font-bold truncate">
                     {{ titulo }}
                 </span>
                 <slot v-else name="titulo" />
