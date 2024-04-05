@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Container, Draggable } from "vue-dndrop";
 import Loading from '@/Components/Loading.vue';
 import CustomInput from '@/Components/CustomInput.vue';
@@ -164,7 +164,10 @@ const getPersonalStatus = async (days) => {
         })
     })
 }
+
+
 getPersonalStatus([dates.value])
+
 
 //
 
@@ -191,6 +194,7 @@ async function onDrop(collection, dropResult, date) {
                 task.value = collection
             } else {
                 console.log(payload)
+                getPersonalStatus([date])
                 collection.employees = res.data.task
                 collection.loading = false
                 toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
@@ -492,23 +496,26 @@ const save = async () => {
                                 </p>
                             </div>
                             <span class="col-span-9 grid grid-cols-7 z-10">
-                                <div v-for="dia, index in diasSemana" class="flex h-full items-center space-x-3 px-2" :key="index+dia"
+                                <div v-for="dia, index in diasSemana" class="flex h-full items-center space-x-3 px-2"
+                                    :key="index + dia"
                                     :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary rounded-b-md font-bold' : '']">
 
                                     <div class="rounded bg-primary px-2 w-full text-center text-white"
-                                    v-tooltip.top="{ value: statusPersonal[dia.toISOString().split('T')[0]].data.programados?.length > 0 ? `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }" 
-                                    >
-                                        <i v-if="statusPersonal[dia.toISOString().split('T')[0]].loading" class="fa-solid fa-spinner animate-spin" />
+                                        v-tooltip.top="{ value: statusPersonal[dia.toISOString().split('T')[0]].data.programados?.length > 0 ? `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
+                                        <i v-if="statusPersonal[dia.toISOString().split('T')[0]].loading"
+                                            class="fa-solid fa-spinner animate-spin" />
                                         <p v-else>
-                                            {{ statusPersonal[dia.toISOString().split('T')[0]].data.programados.length }}
+                                            {{ statusPersonal[dia.toISOString().split('T')[0]].data.programados.length
+                                            }}
                                         </p>
                                     </div>
                                     <div class="rounded bg-danger px-2 w-full text-center text-white"
-                                    v-tooltip.top="{ value: statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados?.length > 0 ? `<div><p class='w-full text-center font-bold'>No programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }" 
-                                    >
-                                        <i v-if="statusPersonal[dia.toISOString().split('T')[0]].loading" class="fa-solid fa-spinner animate-spin" />
+                                        v-tooltip.top="{ value: statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados?.length > 0 ? `<div><p class='w-full text-center font-bold'>No programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
+                                        <i v-if="statusPersonal[dia.toISOString().split('T')[0]].loading"
+                                            class="fa-solid fa-spinner animate-spin" />
                                         <p v-else>
-                                            {{ statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados.length }}
+                                            {{ statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados.length
+                                            }}
                                         </p>
                                     </div>
                                 </div>
@@ -624,9 +631,8 @@ const save = async () => {
                         </div>
                         <div class="w-full justify-center flex space-x-2 p-1 z-10">
                             <p class="rounded bg-primary px-2 text-white"
-                            v-tooltip="{ value: statusPersonal[dates.toISOString().split('T')[0]].data.programados?.length > 0 ? `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }" 
-                            >
-                            Programados:
+                                v-tooltip="{ value: statusPersonal[dates.toISOString().split('T')[0]].data.programados?.length > 0 ? `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
+                                Programados:
                                 <i v-if="statusPersonal[dates.toISOString().split('T')[0]].loading"
                                     class="fa-solid fa-spinner animate-spin" />
                                 <span v-else>{{
@@ -634,9 +640,8 @@ const save = async () => {
                                 </span>
                             </p>
                             <span class="rounded bg-danger px-2 text-white" title="dasdads"
-                            v-tooltip.click.top="{ value: statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados?.length > 0 ? `<div><p class='w-full text-center font-bold'>No programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }" 
-                            >
-                            No programados:
+                                v-tooltip.click.top="{ value: statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados?.length > 0 ? `<div><p class='w-full text-center font-bold'>No programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
+                                No programados:
                                 <i v-if="statusPersonal[dates.toISOString().split('T')[0]].loading"
                                     class="fa-solid fa-spinner animate-spin" />
                                 <span v-else>{{
@@ -658,7 +663,8 @@ const save = async () => {
                 <Loading v-if="loadingPerson" class="mt-10" message="Cargando personas" />
                 <div v-else class="overflow-y-auto h-[81vh]">
                     <Container oncontextmenu="return false" onkeydown="return false" behaviour="copy" group-name="1"
-                        @drag-start="dragStart = true" @drag-end="dragStart = false" :get-child-payload="getChildPayload"
+                        @drag-start="dragStart = true" @drag-end="dragStart = false"
+                        :get-child-payload="getChildPayload"
                         class="flex flex-col space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
                         <Draggable v-for="item in personal" :key="item.id"
                             v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"

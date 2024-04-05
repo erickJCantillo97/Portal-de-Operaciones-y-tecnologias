@@ -102,6 +102,25 @@ export function useCommonUtilities() {
     };
 
     /**
+     * The `format_ES_Date` function formats a given date into a string with Spanish (Colombian) locale
+     * including day, month, year, and weekday.
+     * @param date - The `date` parameter in the `format_ES_Date` function is the date that you want to
+     * format. It should be a valid date string or a Date object that you want to convert into a
+     * formatted date string in Spanish (Colombia) locale.
+     * @returns The `format_ES_Date` function returns a formatted date string in Spanish (Colombia)
+     * locale with the day in 2-digit format, the month in long format, the year in numeric format, and
+     * the weekday in long format.
+     */
+    const format_ES_Date = (date) => {
+        return new Date(date).toLocaleString("es-CO", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+            weekday: "long",
+        });
+    };
+
+    /**
      * The function `formatDate` takes a date string in the format "yyyymmdd" and returns it in the
      * format "dd/mm/yyyy", unless the day is "00" in which case it returns "Indefinido".
      * @param date - The `formatDate` function takes a date string in the format "YYYYMMDD" and returns
@@ -230,6 +249,7 @@ export function useCommonUtilities() {
         calculatePercentage,
         currencyFormat,
         excelExport,
+        format_ES_Date,
         formatDate,
         formatDateTime24h,
         getDays,

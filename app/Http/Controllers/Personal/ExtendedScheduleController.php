@@ -27,6 +27,7 @@ class ExtendedScheduleController extends Controller
             DB::beginTransaction();
             foreach ($request->dates as $d) {
                 foreach ($request->tasks as $t) {
+                    // dd($t);
                     ExtendedSchedule::create([
                         'date' => $d,
                         'start_hour' => $request->start_hour,
@@ -42,41 +43,43 @@ class ExtendedScheduleController extends Controller
             // return response()->json(['status' => true, 'message' => 'Registro guardado']);
         } catch (Exception $e) {
             DB::rollBack();
+            // dd($e);
 
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    public function update(Request $request, ExtendedSchedule $extendedSchedule)
     {
+        // return $request->dates;
         try {
-            $extendedSchedule = ExtendedSchedule::find($request->id);
-            $extendedSchedule->date = $request->date;
+           
+
+            dd($extendedSchedule);
+            $extendedSchedule->date = Carbon::parse($request->dates)->format('Y-m-d');
             $extendedSchedule->start_hour = $request->start_hour;
             $extendedSchedule->end_hour = $request->end_hour;
+            $extendedSchedule->description = $request->description;
             $extendedSchedule->save();
 
             return response()->json(['status' => true, 'mensaje' => 'Registro actualizado']);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(ExtendedSchedule $extendedSchedule)
     {
         try {
-            $extendedSchedule = ExtendedSchedule::find($id);
             $extendedSchedule->delete();
-
-            return response()->json(['status' => true, 'mensaje' => 'Registro eliminado']);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }
 
