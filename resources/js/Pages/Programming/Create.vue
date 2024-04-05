@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Container, Draggable } from "vue-dndrop";
 import Loading from '@/Components/Loading.vue';
 import CustomInput from '@/Components/CustomInput.vue';
@@ -133,9 +133,8 @@ const getTask = async (option) => {
             projectData.value.forEach(async (project) => {
                 await getTaskDay(diasSemana.value, project)
             })
-
         }
-        getPersonalStatus(diasSemana.value)
+        // getPersonalStatus(diasSemana.value)
     } else if (option == 'date') {
         mode.value = 'date'
         // dates.value = new Date()
@@ -147,7 +146,7 @@ const getTask = async (option) => {
                 await getTaskDay(date, project)
             })
         }
-        getPersonalStatus(date)
+        // getPersonalStatus(date)
 
     } else if (mode.value == 'month') {
 
@@ -165,7 +164,10 @@ const getPersonalStatus = async (days) => {
         })
     })
 }
+
+
 getPersonalStatus([dates.value])
+
 
 //
 
@@ -192,9 +194,10 @@ async function onDrop(collection, dropResult, date) {
                 task.value = collection
             } else {
                 console.log(payload)
+                getPersonalStatus([date])
                 collection.employees = res.data.task
                 collection.loading = false
-                toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
+                toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
             }
         })
     }
@@ -304,6 +307,7 @@ const save = async () => {
             }
             formEditHour.value.loading = false
         }).catch((error) => {
+            formEditHour.value.loading = false
             console.log(error)
             toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 2000 })
         });
@@ -329,17 +333,20 @@ const save = async () => {
                         <MultiSelect v-model="projectsSelected" display="chip" :options="projects" optionLabel="name"
                             class="w-56" placeholder="Seleccione un proyecto" @change="getTask()" />
                         <ButtonGroup>
-                            <Button label="Mes" disabled
-                                @click="mode = 'month'; dates = (new Date()).getFullYear() + '-' + ((new Date()).getMonth().toString().length < 2 ? '0' + (new Date()).getMonth() : (new Date()).getMonth()); getTask()"
-                                :outlined="mode != 'month'" />
-                            <Button label="Semana" @click="dates = obtenerFormatoSemana(new Date()); getTask('week')"
-                                :outlined="mode != 'week'" />
-                            <Button label="dia" @click="dates = new Date(); getTask('date')"
+                            <Button label="Mes" disabled @click="
+                                mode = 'month';
+                            dates = (new Date()).getFullYear() + '-' + ((new Date()).getMonth().toString().length < 2 ? '0' + (new Date()).getMonth() : (new Date()).getMonth());
+                            getTask()" :outlined="mode != 'month'" />
+                            <Button label="Semana" @click="
+                                dates = obtenerFormatoSemana(new Date());
+                            getPersonalStatus(obtenerFechasSemana(obtenerDiaSemana(dates)));
+                            getTask('week')" :outlined="mode != 'week'" />
+                            <Button label="dia" @click="dates = new Date(); getPersonalStatus([dates]); getTask('date')"
                                 :outlined="mode != 'date'" />
                         </ButtonGroup>
                         <div class="w-52">
                             <CustomInput v-model:input="dates" :type="mode" :manualInput="false"
-                                @valueChange="mode == 'week' ? (diasSemana = obtenerFechasSemana(obtenerDiaSemana(dates))) : ''; getTask()" />
+                                @valueChange="mode == 'week' ? (diasSemana = obtenerFechasSemana(obtenerDiaSemana(dates)), getPersonalStatus(diasSemana)) : getPersonalStatus([dates]); getTask()" />
                         </div>
 
                     </div>
@@ -429,21 +436,21 @@ const save = async () => {
                                                             @drop="onDrop(task, $event, dia)" group-name="1"
                                                             @click="togglePerson($event, task.employees, task, dia)"
                                                             v-tooltip.top="{ value: task.employees?.length > 0 ? `<div>${task.employees.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
-                                                            <div v-if="!dragStart" class="flex justify-center">
+                                                            <div v-if="!dragStart && !(task.loading==null?false:task.loading)" class="flex justify-center">
                                                                 <AvatarGroup
-                                                                    v-if="(task.employees ? true : false) && task.employees.length > 0 && task.employees.length <= 3">
+                                                                    v-if="(task.employees ? true : false) && task.employees.length > 0 && task.employees.length <= 2">
                                                                     <Avatar v-for="person in task.employees"
                                                                         :image="person.photo ?? '/images/person-default.png'"
                                                                         shape="circle" size="large" />
                                                                 </AvatarGroup>
                                                                 <AvatarGroup
-                                                                    v-else-if="(task.employees ? true : false) && task.employees.length > 3">
-                                                                    <Avatar v-for="i in [0, 1, 2]"
+                                                                    v-else-if="(task.employees ? true : false) && task.employees.length > 2">
+                                                                    <Avatar v-for="i in [0, 1]"
                                                                         :image="task.employees[i].photo ?? '/images/person-default.png'"
-                                                                        shape="circle" />
+                                                                        shape="circle" size="large" />
                                                                     <Avatar
-                                                                        :label="'+' + String(task.employees.length - 3)"
-                                                                        shape="circle" />
+                                                                        :label="'+' + String(task.employees.length - 2)"
+                                                                        shape="circle" size="large" />
                                                                 </AvatarGroup>
                                                                 <div v-else class="flex items-center p-1">
                                                                     <p
@@ -452,9 +459,10 @@ const save = async () => {
                                                                     </p>
                                                                 </div>
                                                             </div>
-                                                            <div v-else class="flex items-center p-1">
+                                                            <div v-else-if="!task.loading"
+                                                                class="flex items-center p-1">
                                                                 <p
-                                                                    class="border p-1 text-center text-sm  rounded-md border-dashed bg-primary-light animate-pulse">
+                                                                    class="border p-1 text-center rounded-md border-dashed text-sm bg-primary-light animate-pulse">
                                                                     Arrastra aqui para programar
                                                                 </p>
                                                             </div>
@@ -487,23 +495,26 @@ const save = async () => {
                                 </p>
                             </div>
                             <span class="col-span-9 grid grid-cols-7 z-10">
-                                <div v-for="dia, index in diasSemana" class="flex h-full items-center space-x-3 px-2" :key="index+dia"
+                                <div v-for="dia, index in diasSemana" class="flex h-full items-center space-x-3 px-2"
+                                    :key="index + dia"
                                     :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary rounded-b-md font-bold' : '']">
 
                                     <div class="rounded bg-primary px-2 w-full text-center text-white"
-                                    v-tooltip.top="{ value: statusPersonal[dia.toISOString().split('T')[0]].data.programados?.length > 0 ? `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }" 
-                                    >
-                                        <i v-if="statusPersonal[dia.toISOString().split('T')[0]].loading" class="fa-solid fa-spinner animate-spin" />
+                                        v-tooltip.top="{ value: statusPersonal[dia.toISOString().split('T')[0]].data.programados?.length > 0 ? `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
+                                        <i v-if="statusPersonal[dia.toISOString().split('T')[0]].loading"
+                                            class="fa-solid fa-spinner animate-spin" />
                                         <p v-else>
-                                            {{ statusPersonal[dia.toISOString().split('T')[0]].data.programados.length }}
+                                            {{ statusPersonal[dia.toISOString().split('T')[0]].data.programados.length
+                                            }}
                                         </p>
                                     </div>
                                     <div class="rounded bg-danger px-2 w-full text-center text-white"
-                                    v-tooltip.top="{ value: statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados?.length > 0 ? `<div><p class='w-full text-center font-bold'>No programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }" 
-                                    >
-                                        <i v-if="statusPersonal[dia.toISOString().split('T')[0]].loading" class="fa-solid fa-spinner animate-spin" />
+                                        v-tooltip.top="{ value: statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados?.length > 0 ? `<div><p class='w-full text-center font-bold'>No programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
+                                        <i v-if="statusPersonal[dia.toISOString().split('T')[0]].loading"
+                                            class="fa-solid fa-spinner animate-spin" />
                                         <p v-else>
-                                            {{ statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados.length }}
+                                            {{ statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados.length
+                                            }}
                                         </p>
                                     </div>
                                 </div>
@@ -571,20 +582,20 @@ const save = async () => {
                                                         @drop="onDrop(task, $event, dates)" group-name="1"
                                                         @click="togglePerson($event, task.employees, task, dates)"
                                                         v-tooltip.top="{ value: task.employees?.length > 0 ? `<div>${task.employees.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
-                                                        <div v-if="!dragStart" class="flex justify-center">
+                                                        <div v-if="!dragStart && !(task.loading==null?false:task.loading)" class="flex justify-center">
                                                             <AvatarGroup
-                                                                v-if="(task.employees ? true : false) && task.employees.length > 0 && task.employees.length <= 3">
+                                                                v-if="(task.employees ? true : false) && task.employees.length > 0 && task.employees.length <= 2">
                                                                 <Avatar v-for="person in task.employees"
                                                                     :image="person.photo ?? '/images/person-default.png'"
                                                                     shape="circle" size="large" />
                                                             </AvatarGroup>
                                                             <AvatarGroup
-                                                                v-else-if="(task.employees ? true : false) && task.employees.length > 3">
-                                                                <Avatar v-for="i in [0, 1, 2]"
+                                                                v-else-if="(task.employees ? true : false) && task.employees.length > 2">
+                                                                <Avatar v-for="i in [0, 1]"
                                                                     :image="task.employees[i].photo ?? '/images/person-default.png'"
-                                                                    shape="circle" />
-                                                                <Avatar :label="'+' + String(task.employees.length - 3)"
-                                                                    shape="circle" />
+                                                                    shape="circle" size="large" />
+                                                                <Avatar :label="'+' + String(task.employees.length - 2)"
+                                                                    shape="circle" size="large" />
                                                             </AvatarGroup>
                                                             <div v-else class="flex items-center p-1">
                                                                 <p
@@ -593,7 +604,7 @@ const save = async () => {
                                                                 </p>
                                                             </div>
                                                         </div>
-                                                        <div v-else class="flex items-center p-1">
+                                                        <div v-else-if="!task.loading" class="flex items-center p-1">
                                                             <p
                                                                 class="border p-1 text-center rounded-md border-dashed bg-primary-light animate-pulse">
                                                                 Arrastra aqui para programar
@@ -601,6 +612,7 @@ const save = async () => {
                                                         </div>
                                                         <ProgressBar v-if="task.loading" mode="indeterminate"
                                                             style="height: 4px" />
+                                                            <!-- {{ task.loading }} -->
                                                     </Container>
                                                 </div>
                                             </div>
@@ -619,9 +631,8 @@ const save = async () => {
                         </div>
                         <div class="w-full justify-center flex space-x-2 p-1 z-10">
                             <p class="rounded bg-primary px-2 text-white"
-                            v-tooltip="{ value: statusPersonal[dates.toISOString().split('T')[0]].data.programados?.length > 0 ? `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }" 
-                            >
-                            Programados:
+                                v-tooltip="{ value: statusPersonal[dates.toISOString().split('T')[0]].data.programados?.length > 0 ? `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
+                                Programados:
                                 <i v-if="statusPersonal[dates.toISOString().split('T')[0]].loading"
                                     class="fa-solid fa-spinner animate-spin" />
                                 <span v-else>{{
@@ -629,9 +640,8 @@ const save = async () => {
                                 </span>
                             </p>
                             <span class="rounded bg-danger px-2 text-white" title="dasdads"
-                            v-tooltip.click.top="{ value: statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados?.length > 0 ? `<div><p class='w-full text-center font-bold'>No programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }" 
-                            >
-                            No programados:
+                                v-tooltip.click.top="{ value: statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados?.length > 0 ? `<div><p class='w-full text-center font-bold'>No programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
+                                No programados:
                                 <i v-if="statusPersonal[dates.toISOString().split('T')[0]].loading"
                                     class="fa-solid fa-spinner animate-spin" />
                                 <span v-else>{{
@@ -651,15 +661,16 @@ const save = async () => {
             <div class="row-span-2 rounded-lg border h-full p-1">
                 <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
                 <Loading v-if="loadingPerson" class="mt-10" message="Cargando personas" />
-                <div v-else class="overflow-y-auto flex flex-col h-[81vh]">
+                <div v-else class="overflow-y-auto h-[81vh]">
                     <Container oncontextmenu="return false" onkeydown="return false" behaviour="copy" group-name="1"
-                        @drag-start="dragStart = true" @drag-end="dragStart = false" :get-child-payload="getChildPayload"
+                        @drag-start="dragStart = true" @drag-end="dragStart = false"
+                        :get-child-payload="getChildPayload"
                         class="flex flex-col space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
                         <Draggable v-for="item in personal" :key="item.id"
                             v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
                             :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"
                             :drag-not-allowed="false"
-                            class="snap-start rounded-xl shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
+                            class="snap-start rounded-xl h-full shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
                             <div class="flex flex-col gap-x-1 p-1">
                                 <span class=" flex flex-col justify-center">
                                     <p class="text-sm font-semibold truncate  text-gray-900">
@@ -715,7 +726,7 @@ const save = async () => {
 
     <CustomModal v-if="modhours" v-model:visible="modhours" :footer="false" icon="fa-regular fa-clock" width="60vw"
         :closeOnEscape="false"
-        :titulo="editHorario?.option != 'delete' ? 'Modificar horario de ' + editHorario?.data.name : 'Eliminando a ' + editHorario?.data.name + 'de la actividad ' + editHorario?.task">
+        :titulo="editHorario?.option != 'delete' ? 'Modificar horario de ' + editHorario?.nombre : 'Eliminando a ' + editHorario?.nombre + ' de la actividad ' + editHorario?.nombreTask">
         <template #body>
             <!-- {{ console.log(editHorario) }} -->
             <form @submit.prevent="save" class="pb-2">
@@ -724,10 +735,10 @@ const save = async () => {
 
                         <p class="font-bold">Horario actual:</p>
                         <p class="px-1 py-1 text-green-900 bg-green-200 rounded-md">
-                            {{ format24h(editHorario.hora_inicio.slice(0,
-                                editHorario.hora_inicio.lastIndexOf(':'))) }}
-                            {{ format24h(editHorario.hora_fin.slice(0,
-                                editHorario.hora_fin.lastIndexOf(':'))) }}
+                            {{ format24h(editHorario.horaInicio.slice(0,
+                                editHorario.horaInicio.lastIndexOf(':'))) }}
+                            {{ format24h(editHorario.horaFin.slice(0,
+                                editHorario.horaFin.lastIndexOf(':'))) }}
                         </p>
                     </div>
                     <TabView v-model:activeIndex="tabActive" class="border rounded-md p-1" :pt="{

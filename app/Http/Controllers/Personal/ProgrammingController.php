@@ -91,7 +91,6 @@ class ProgrammingController extends Controller
             ]);
 
             $status = false;
-            $codigo = 1001; //Codigo para el caso en se trate de programar alguien con mas de 9.5 horas
             $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
             $conflict = [];
             $end_date = '';
@@ -147,14 +146,13 @@ class ProgrammingController extends Controller
                     }
                     $date = $date->addDays(1);
                 } while ($end_date->gte($date));
-                $codigo = 0;
+
                 $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
             }
             DB::commit();
 
             return response()->json([
                 'status' => $status,
-                'codigo' => $codigo,
                 'task' => $this->getSchedule($validateData['fecha'], $validateData['task_id']),
                 'hours' => $hours,
                 'conflict' => $conflict,
@@ -297,22 +295,41 @@ class ProgrammingController extends Controller
 
     private function getSchedule($fecha, $taskId)
     {
-        return Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get()->sortBy([
-            ['is_my_personal', 'desc'],
-        ]);
+
+        return DetailScheduleTime::groupBy('idUsuario')->where('idTask', $taskId)->where('fecha', $fecha)->select(
+            Db::raw('MIN(nombre) as name'),
+            Db::raw('MIN(idUsuario) as id'),
+        )->get()->map(function ($d) use ($taskId, $fecha) {
+            return [
+                'name' => $d->name,
+                'user_id' => $d->id,
+                'times' => DetailScheduleTime::where([
+                    ['fecha', '=', $fecha],
+                    ['idTask', '=', $taskId],
+                    ['idUsuario', '=', $d->id],
+                ])->get(),
+                'photo' =>  User::where('employeenumber',  str_pad(
+                    $d->id,
+                    8,
+                    '0',
+                    STR_PAD_LEFT
+                ))->first()->photo(),
+            ];
+        });
+        // return Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get()->sortBy([
+        //     ['is_my_personal', 'desc'],
+        // ]);
     }
 
     /*
      * Esta función obtiene el numero de horas asignadas a una persona en una fecha especifica
      */
-    public function getAssignmentHour(Request $request)
+    public function getAssignmentHour($fecha, $userId)
     {
-        $personalUserIds = getPersonalUser()->map(function ($p) {
-            return $p->Num_SAP;
-        });
-        $schedule = Schedule::whereIn('idUsuario',  $personalUserIds)->where('fecha', $request->date)->pluck('id')->toArray();
-
-        DetailScheduleTime::whereIn('idUsuario',  $personalUserIds)->where('fecha', $request->date);
+        $schedule = Schedule::where([
+            'fecha' => $fecha,
+            'employee_id' => $userId,
+        ])->pluck('id')->toArray();
 
         $horas_acumulados = ScheduleTime::whereIn('schedule_id', $schedule)->selectRaw('SUM(datediff(mi,hora_inicio, hora_fin)) as diferencia_acumulada')->get();
 
