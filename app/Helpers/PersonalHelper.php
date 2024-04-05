@@ -110,8 +110,10 @@ function getPersonalUser()
             str_pad(($p), 8, '0', STR_PAD_LEFT);
     })->toArray();
 
-    $miPersonal = Employee::where('JI_Num_SAP', auth()->user()->num_sap)->orWhereIn('Num_SAP', $NumSAPPersonal)
-        ->orWhere('Oficina', auth()->user()->oficina)
+    $miPersonal = Employee::where('Gerencia', auth()->user()->gerencia)
+        ->where('Oficina', auth()->user()->oficina)
+        ->orWhereIn('Num_SAP', $NumSAPPersonal)
+        ->orWhere('JI_Num_SAP', auth()->user()->num_sap)
         ->get()->map(function ($person) {
             return [
                 'Num_SAP' => (int) $person['Num_SAP'],
