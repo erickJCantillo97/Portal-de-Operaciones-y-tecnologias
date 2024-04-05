@@ -33,15 +33,13 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     /********************************  Rutas del controlador ExtendedScheduleController  ******************************/
 
-    Route::post('/ExtendedSchedule/store', [ExtendedScheduleController::class, 'store'])->name('extended.schedule.store');
-
-    Route::post('/ExtendedSchedule/update', [ExtendedScheduleController::class, 'update'])->name('extended.schedule.update');
+    Route::get('/ExtendedSchedule/all', [ExtendedScheduleController::class, 'all'])->name('extended.schedule.all');
 
     Route::get('/ExtendedSchedule/getTask/{project}', [ExtendedScheduleController::class, 'getTask'])->name('extended.schedule.getTask');
 
-    Route::get('/ExtendedSchedule/all', [ExtendedScheduleController::class, 'all'])->name('extended.schedule.all');
+    Route::post('/ExtendedSchedule/store', [ExtendedScheduleController::class, 'store'])->name('extended.schedule.store');
 
-    Route::delete('/ExtendedSchedule/destroy/{id}', [ExtendedScheduleController::class, 'destroy'])->name('extended.schedule.destroy');
+    Route::put('/ExtendedSchedule/update/{extendedSchedule}', [ExtendedScheduleController::class, 'update'])->name('extended.schedule.update');
 
-
+    Route::delete('/ExtendedSchedule/destroy/{extendedSchedule}', [ExtendedScheduleController::class, 'destroy'])->name('extended.schedule.destroy');
 });

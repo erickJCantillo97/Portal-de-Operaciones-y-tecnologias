@@ -48,8 +48,7 @@ function format24h(hora) {
 const openModal = ref(false)
 
 const openDialog = () => {
-    // formData.reset()
-    projectSelected.value = ''
+    resetFormData()
     openModal.value = true
 }
 
@@ -60,34 +59,61 @@ const divisionsOptions = [
 ]
 
 //#region Requests
-const submit = async () => {
-    try {
-        // formData.value.start_hour = String(formatUTCOffset(formData.value.start_hour))
-        // formData.value.end_hour = String(formatUTCOffset(formData.value.end_hour))
-
-        await router.post(route('extended.schedule.store'), formData.value)
-            .then(res => {
-                //TODO request
-                toast.add({ severity: 'success', group: 'customToast', text: 'Tareas Guardadas', life: 2000 });
-                formData.value = {
-                    dates: [],
-                    start_hour: '',
-                    end_hour: '',
-                    tasks: [],
-                    description: '',
-                }
-            })
-    } catch (error) {
-        console.error('Error' + error)
+const submit = () => {
+    if (!selectedTaskId.value) {
+        router.post(route('extended.schedule.store'), formData.value, {
+            onSuccess: () => {
+                toast.add({
+                    severity: 'success',
+                    group: 'customToast',
+                    text: 'Tarea extendida creada con éxito',
+                    life: 2000
+                })
+                openModal.value = false
+                resetFormData()
+            },
+            onError: (errors) => {
+                toast.add({
+                    severity: 'danger',
+                    group: 'customToast',
+                    text: 'No se ha podido guardar la tarea ' + errors,
+                    life: 2000
+                })
+                openModal.value = false
+                resetFormData()
+            }
+        })
+    } else {
+        router.put(route('extended.schedule.update', selectedTaskId.value), formData.value, {
+            onSuccess: (data) => {
+                toast.add({
+                    severity: 'success',
+                    group: 'customToast',
+                    text: 'Tarea extendida actualizada con éxito',
+                    life: 2000
+                })
+                openModal.value = false
+                resetFormData()
+            },
+            onError: (errors) => {
+                toast.add({
+                    severity: 'danger',
+                    group: 'customToast',
+                    text: 'No se ha podido actualizar la tarea ' + errors,
+                    life: 2000
+                })
+                openModal.value = false
+                resetFormData()
+            }
+        })
     }
 }
 
 const taskOptions = ref()
-const getTaskByProjects = async (id_project) => {
+const getTaskByProjects = async () => {
     try {
-        await axios.get(route('extended.schedule.getTask', id_project))
+        await axios.get(route('extended.schedule.getTask', projectSelected.value))
             .then(res => {
-                //TODO request
                 taskOptions.value = res.data
             })
     } catch (error) {
@@ -95,30 +121,73 @@ const getTaskByProjects = async (id_project) => {
     }
 }
 
-const editTask = async (id_project) => {
+const selectedTaskId = ref(null)
+const editMode = ref(false)
+const editTask = async (task) => {
     try {
-        await axios.put(route('task.store.i', id_project))
-            .then(res => {
-                //TODO request
-                console.log('Hace algo')
-            })
+        // console.log(task)
+        editMode.value = true
+        selectedTaskId.value = task.task_id
+        projectSelected.value = parseInt(task.project_id)
+        await getTaskByProjects()
+        formData.value.dates = formatDateTime24h(task.date).split(", ")[0]
+        formData.value.start_hour = format24h(task.start_hour)
+        formData.value.end_hour = format24h(task.end_hour)
+        formData.value.tasks = [parseInt(task.task_id)]
+        formData.value.description = task.description
     } catch (error) {
         console.error('Error ' + error)
     }
 }
 
-const deleteTask = async (id) => {
+const cloneTask = async (task) => {
     try {
-        await axios.delete(route('task.delete.i', task.id))
-            .then(res => {
-                //TODO request
-                console.error('Hace algo')
-            })
+        // console.log(task)
+        selectedTaskId.value = null
+        projectSelected.value = parseInt(task.project_id)
+        await getTaskByProjects()
+        formData.value.dates = formatDateTime24h(task.date).split(", ")[0]
+        formData.value.start_hour = format24h(task.start_hour)
+        formData.value.end_hour = format24h(task.end_hour)
+        formData.value.tasks = []
+        formData.value.description = task.description
     } catch (error) {
         console.error('Error ' + error)
     }
 }
+
+const deleteTask = (id_task) => {
+    router.delete(route('extended.schedule.destroy', id_task), {
+        onSuccess: () => {
+            toast.add({
+                severity: 'success',
+                group: 'customToast',
+                text: 'Tarea Elimnada',
+                life: 2000
+            })
+        },
+        onError: (errors) => {
+            toast.add({
+                severity: 'danger',
+                group: 'customToast',
+                text: 'No se ha podido eliminar la tarea ' + errors,
+                life: 2000
+            })
+        }
+    })
+}
 //#endregion
+
+const resetFormData = () => {
+    formData.value = {
+        dates: [],
+        start_hour: '',
+        end_hour: '',
+        tasks: []
+    }
+    selectedTaskId.value = null
+    projectSelected.value = ''
+}
 
 const urls = ref([
     {
@@ -140,20 +209,20 @@ const urls = ref([
                         <Dropdown :options="projects" placeholder="Seleccione un proyecto" optionLabel="name"
                             optionValue="id" showClear :filter="true" filterPlaceholder="Buscar proyecto"
                             v-model="project" :pt="{
-                            root: '!h-8',
-                            input: '!py-0 !flex !items-center !text-sm !font-normal',
-                            item: '!py-1 !px-3 !text-sm !font-normal',
-                            filterInput: '!h-8'
-                        }" />
+                                root: '!h-8',
+                                input: '!py-0 !flex !items-center !text-sm !font-normal',
+                                item: '!py-1 !px-3 !text-sm !font-normal',
+                                filterInput: '!h-8'
+                            }" />
                     </span>
                     <span class="flex flex-col sm:flex-row items-center sm:space-x-2">
                         <Dropdown :options="divisionsOptions" placeholder="Seleccione una división" showClear
                             :filter="true" filterPlaceholder="Buscar proyecto" v-model="project" :pt="{
-                            root: '!h-8',
-                            input: '!py-0 !flex !items-center !text-sm !font-normal',
-                            item: '!py-1 !px-3 !text-sm !font-normal',
-                            filterInput: '!h-8'
-                        }" />
+                                root: '!h-8',
+                                input: '!py-0 !flex !items-center !text-sm !font-normal',
+                                item: '!py-1 !px-3 !text-sm !font-normal',
+                                filterInput: '!h-8'
+                            }" />
                     </span>
                     <!-- <CustomInput type="week" placeholder="Seleccione una semana"></CustomInput> -->
                     <Link :href="route('programming.create')">
@@ -196,14 +265,17 @@ const urls = ref([
                                 :multiple="true" />
                         </div>
 
-                        <CustomInput @change="getTaskByProjects(projects[0].id)" label="Proyectos" type="dropdown"
-                            optionLabel="name" :options="projects" placeholder="Seleccione un proyecto"
+                        <CustomInput @change="getTaskByProjects()" label="Proyectos" type="dropdown" optionLabel="name"
+                            option-value="id" :options="projects" placeholder="Seleccione un proyecto"
+                            :disabled="selectedTaskId != null && editMode == true"
+                            :class="[selectedTaskId != null && editMode == true ? 'cursor-not-allowed' : '']"
                             filterPlaceholder="Buscar proyecto" v-model:input="projectSelected">
                         </CustomInput>
 
                         <CustomInput label="Actividades" selectionMode optionLabel="name" option-value="id"
                             type="multiselect" :options="taskOptions" placeholder="Seleccione actividad(es)"
-                            v-model:input="formData.tasks">
+                            :disabled="selectedTaskId != null && editMode == true" v-model:input="formData.tasks"
+                            :class="[selectedTaskId != null && editMode == true ? 'cursor-not-allowed' : '']">
                         </CustomInput>
 
                         <CustomInput class="mt-2" label="Observaciones" placeholder="Observaciones" type="textarea"
@@ -212,8 +284,9 @@ const urls = ref([
 
                         <div class="flex justify-end space-x-2">
                             <Button severity="success" :loading="false" @click="submit()">
-                                Guardar
+                                {{ selectedTaskId != null ? 'Actualizar' : 'Guardar' }}
                             </Button>
+                            <!-- {{ selectedTaskId }} -->
                         </div>
                     </div>
 
@@ -228,17 +301,22 @@ const urls = ref([
                                 <ul v-for="project in projects">
                                     <div class="mb-2 snap-center gap-2 space-y-2 rounded-lg border border-gray-300 p-2">
                                         <li class="font-semibold text-primary">{{ project.name }}</li>
-                                        <div class="block border-b-2 p-1 mb-2" v-for="task in project.tasks">
+                                        <div v-for="task in project.tasks"
+                                            class="block border-b-2 p-2 mb-2 rounded-lg hover:bg-gray-50"
+                                            :class="[task.task.id == selectedTaskId ? 'bg-gray-200 p-1 rounded-lg' : '']">
                                             <div class="flex justify-between items-center">
                                                 <li class="font-semibold">{{ task.task.name }}</li>
                                                 <li class="font-semibold">{{ task.task.percentDone }} %</li>
-                                                <div class="flex space-x-3 w-20">
+                                                <div class="flex space-x-3 ">
                                                     <Button v-tooltip.top="'Editar Tarea'" class="mb-2"
                                                         icon="pi pi-pencil" severity="warning" outlined small
-                                                        @click="editTask(project.id)" />
+                                                        @click="editTask(task)" />
+                                                    <Button v-tooltip.top="'Clonar Tarea'" class="mb-2"
+                                                        icon="pi pi-clone" severity="info" outlined small
+                                                        @click="cloneTask(task)" />
                                                     <Button v-tooltip.top="'Eliminar Tarea'" class="mb-2"
                                                         icon="pi pi-trash" severity="danger" outlined small
-                                                        @click="deleteTask(project.id)" />
+                                                        @click="deleteTask(task.id)" />
                                                 </div>
                                             </div>
                                             <div class="flex justify-between">
