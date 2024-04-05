@@ -39,10 +39,10 @@ class RequirementImport implements ToCollection, WithHeadingRow
         ])->validate();
         foreach ($collections as $key => $collection) {
             $material = Material::firstOrNew([
+                'description' => $collection['descripcion'],
                 'code' => $collection['codigo_material'],
             ]);
             $material->code_proveedor = $collection['codigo_proveedor'];
-            $material->description = $collection['descripcion'];
             $material->unit = Material::$unidad[$collection['unidad']] ?? 0;
             $material->save();
 
@@ -51,7 +51,7 @@ class RequirementImport implements ToCollection, WithHeadingRow
                 'project_id' => $this->data['project_id'],
                 'user_id' => auth()->user()->id,
                 'document' => $this->data['document'],
-                'note' => $this->data['note'],
+                'note' => $this->data['note'] ?? '',
                 'sistema_grupo' => $this->data['sistema_grupo'],
                 'bloque' => $this->data['bloque'],
                 'preeliminar_date' => Carbon::now(),
