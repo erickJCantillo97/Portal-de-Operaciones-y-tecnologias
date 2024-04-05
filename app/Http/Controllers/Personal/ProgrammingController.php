@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Personal;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\Personal\PersonalScheduleDayJob;
+use App\Ldap\User;
 use App\Models\Personal\ExtendedSchedule;
 use App\Models\Projects\Project;
 use App\Models\Schedule;
@@ -734,7 +735,23 @@ class ProgrammingController extends Controller
                         'employees' => DetailScheduleTime::groupBy('idUsuario')->where('idTask', $task['id'])->where('fecha', $request->date)->select(
                             Db::raw('MIN(nombre) as name'),
                             Db::raw('MIN(idUsuario) as id'),
-                        )->get(),
+                        )->get()->map(function ($d) use ($task, $request) {
+                            return [
+                                'name' => $d->name,
+                                'user_id' => $d->id,
+                                'times' => DetailScheduleTime::where([
+                                    ['fecha', '=', $request->date],
+                                    ['idTask', '=', $task['id']],
+                                    ['idUsuario', '=', $d->id],
+                                ])->get(),
+                                'photo' =>  User::where('employeenumber',  str_pad(
+                                    $d->id,
+                                    8,
+                                    '0',
+                                    STR_PAD_LEFT
+                                ))->first()->photo(),
+                            ];
+                        }),
                     ];
                 }),
         );
