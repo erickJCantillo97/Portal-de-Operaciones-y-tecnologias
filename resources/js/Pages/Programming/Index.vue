@@ -242,7 +242,7 @@ const urls = ref([
                                                 </div>
                                             </div>
                                             <div class="flex justify-between">
-                                                <li class="italic">Lunes {{ task.date }}</li>
+                                                <li class="italic">{{ task.date }}</li>
                                                 <li v-tooltip.left="'Turno Ordinario'"
                                                     class="italic rounded-lg bg-success p-2 text-white text-xs">
                                                     {{ format24h(task.start_hour) }} - {{ format24h(task.end_hour) }}

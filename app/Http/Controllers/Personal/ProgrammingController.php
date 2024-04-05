@@ -48,21 +48,7 @@ class ProgrammingController extends Controller
 
     public function create()
     {
-        $projects = VirtualTask::has('project')->whereNull('task_id')->get()->map(function ($item) {
-            return [
-                'task_id' => $item->id,
-                'task_name' => $item['name'],
-                'id' => $item->project->id,
-                // 'project' => $item->project,
-                'avance' => $item['percentDone'],
-                'name' => $item->project->name,
-                // 'file' => $item->project->contract->ship->file,
-                'duracion' => $item->duration,
-                'fechaI' => $item->startDate,
-                'fechaF' => $item->endDate,
-                'unidadDuracion' => $item->durationUnit,
-            ];
-        });
+        $projects = Project::active()->get();
 
         return Inertia::render('Programming/Create', [
             'projects' => $projects,
@@ -290,7 +276,7 @@ class ProgrammingController extends Controller
         ]);
 
         return response()->json([
-            'schedule' => $schedule,
+            'schedule' => $schedule, 
         ], 200);
     }
 
@@ -688,12 +674,24 @@ class ProgrammingController extends Controller
         $date = Carbon::parse($request->date);
 
         if ($date->isSaturday() || $date->isSunday()) {
-            ExtendedSchedule::has('project')->has('task')->where('project_id', $project->id)
-                // ->where('executor','LIKE ,'%'.$request->executor.'%)
-                ->where('percentDone', '<', 100)
-                ->where('data', $request->date)
-                ->get()->map(function ($task) {
-                });
+            return response()->json(
+                ExtendedSchedule::has('project')->has('task')->where('project_id', $project->id)
+                    // ->where('executor','LIKE ,'%'.$request->executor.'%)
+                    ->where('date', $request->date)
+                    ->get()->map(function ($task) {
+                        return [
+                            'name' => $task['task']['name'],
+                            'id' => $task['id'],
+                            'task' => $task->task->task->name,
+                            'taskdad' => $task->task->task->name ?? '',
+                            'endDate' => $task['task']['endDate'],
+                            'startDate' => $task['task']['startDate'],
+                            'percentDone' => $task['task']['percentDone'],
+                            'shift' => $task->project->shift ? Shift::where('id', $task->project->shift)->first() : null,
+                            'employees' => [],
+                        ];
+                    })
+            );
         }
 
         return response()->json(
