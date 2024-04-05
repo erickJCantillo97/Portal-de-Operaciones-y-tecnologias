@@ -427,7 +427,7 @@ const save = async () => {
                                                                 <AvatarGroup
                                                                     v-if="(task.employees ? true : false) && task.employees.length > 0 && task.employees.length <= 3">
                                                                     <Avatar v-for="person in task.employees"
-                                                                        :image="person.employee.photo ?? '/images/person-default.png'"
+                                                                        :image="'/images/person-default.png'"
                                                                         shape="circle" size="large" />
                                                                 </AvatarGroup>
                                                                 <AvatarGroup
@@ -555,8 +555,8 @@ const save = async () => {
                                                             <AvatarGroup
                                                                 v-if="(task.employees ? true : false) && task.employees.length > 0 && task.employees.length <= 3">
                                                                 <Avatar v-for="person in task.employees"
-                                                                    :image="person.employee.photo ?? '/images/person-default.png'"
-                                                                    shape="circle" size="large" />
+                                                                    :image="'/images/person-default.png'" shape="circle"
+                                                                    size="large" />
                                                             </AvatarGroup>
                                                             <AvatarGroup
                                                                 v-else-if="(task.employees ? true : false) && task.employees.length > 3">
