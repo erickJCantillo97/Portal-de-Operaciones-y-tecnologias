@@ -31,13 +31,19 @@ defineProps({
 
 // #region funciones basicas
 function format24h(hora) {
-    if (hora.length > 5) {
+    try {
+        if (hora.length > 5) {
         return new Date(hora).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
     } else {
         return new Date("1970-01-01T" + hora).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
     }
+    } catch (error) {
+        console.log(error)
+        return 'error'
+    }
+    
 }
 function obtenerFormatoSemana(fecha) {
     const fechaActual = fecha;
@@ -96,7 +102,7 @@ const dragStart = ref()
 const personsEdit = ref()
 const tabActive = ref()
 const statusPersonal = ref({})
-const selectDays =ref([])
+const selectDays = ref([])
 
 //#endregion
 
@@ -184,23 +190,33 @@ const getChildPayload = (index) => {
     return personal.value[index];
 }
 
-async function onDrop(collection, dropResult, date) {
+async function onDrop(collection, dropResult, fecha) {
     const { addedIndex, payload } = dropResult;
     if (addedIndex !== null) {
-        collection.loading = true
-        await axios.post(route('programming.store'), { task_id: collection.id, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: date.toISOString().split("T")[0] }).then((res) => {
-            if (Object.values(res.data.conflict).length > 0) {
-                conflicts.value = Object.values(res.data.conflict)
-                openConflict.value = true;
-                task.value = collection
-            } else {
-                console.log(payload)
-                getPersonalStatus([date])
-                collection.employees = res.data.task
-                collection.loading = false
-                toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
-            }
-        })
+        if (new Date(fecha.toISOString().split("T")[0]) >= new Date(date.value.toISOString().split("T")[0])) {
+            collection.loading = true
+            await axios.post(route('programming.store'), { task_id: collection.id, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: fecha.toISOString().split("T")[0] }).then((res) => {
+                if (Object.values(res.data.conflict).length > 0) {
+                    conflicts.value = Object.values(res.data.conflict)
+                    openConflict.value = true;
+                    collection.loading = false
+                    task.value = collection
+                    collection.employees = res.data.task
+                } else if (res.data.status == false) {
+                    collection.loading = false
+                    collection.employees = res.data.task
+                    toast.add({ severity: 'error', group: "customToast", text: 'Hubo un error al programar', life: 2000 })
+                } else {
+                    console.log(payload)
+                    getPersonalStatus([fecha])
+                    collection.employees = res.data.task
+                    collection.loading = false
+                    toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
+                }
+            })
+        } else {
+            toast.add({ severity: 'error', group: "customToast", text: 'No se puede programar en dias anteriores', life: 2000 })
+        }
     }
 }
 
@@ -314,21 +330,21 @@ const save = async () => {
 
 <template>
     <AppLayout>
-        <div class="h-full w-full grid grid-cols-8">
-            <div class="col-span-7 h-full space-y-1 pt-1 px-1 flex flex-col">
-                <div class="flex justify-between h-10 items-center pr-1">
-                    <span class="flex space-x-4">
+        <div class="h-full w-full sm:grid sm:grid-cols-8 flex-col">
+            <div class="sm:col-span-7 sm:h-full space-y-1 pt-1 px-1 flex flex-col">
+                <div class="sm:flex grid grid-cols-1 gap-1 justify-between sm:h-10 items-center sm:pr-1">
+                    <div class="flex w-full justify-between sm:w-fit space-x-4">
                         <p class="text-xl font-bold text-primary h-full items-center flex">
                             Programación de actividades
                         </p>
                         <p class="border px-2 bg-primary rounded-lg text-white flex items-center">
                             {{ $page.props.auth.user.oficina }}
                         </p>
-                    </span>
-                    <div class="flex items-center space-x-2">
+                    </div>
+                    <div class="sm:flex grid grid-cols-2 items-center gap-2 sm:space-x-2">
                         <MultiSelect v-model="projectsSelected" display="chip" :options="projects" optionLabel="name"
-                            class="w-56" placeholder="Seleccione un proyecto" @change="getTask()" />
-                        <ButtonGroup>
+                            class="sm:w-56 w-full" placeholder="Seleccione un proyecto" @change="getTask()" />
+                        <ButtonGroup class="hidden sm:block">
                             <Button label="Mes" disabled @click="
                                 mode = 'month';
                             dates = (new Date()).getFullYear() + '-' + ((new Date()).getMonth().toString().length < 2 ? '0' + (new Date()).getMonth() : (new Date()).getMonth());
@@ -340,7 +356,7 @@ const save = async () => {
                             <Button label="dia" @click="dates = new Date(); getPersonalStatus([dates]); getTask('date')"
                                 :outlined="mode != 'date'" />
                         </ButtonGroup>
-                        <div class="w-52">
+                        <div class="sm:w-52 w-full">
                             <CustomInput v-model:input="dates" :type="mode" :manualInput="false"
                                 @valueChange="mode == 'week' ? (diasSemana = obtenerFechasSemana(obtenerDiaSemana(dates)), getPersonalStatus(diasSemana)) : getPersonalStatus([dates]); getTask()" />
                         </div>
@@ -453,16 +469,28 @@ const save = async () => {
                                                                     <p
                                                                         class="border p-1 text-center text-sm font-bold text-danger rounded-md border-dashed bg-danger-light animate-pulse">
                                                                         Sin personal asignado
+
                                                                     </p>
                                                                 </div>
                                                             </div>
-                                                            <div v-else-if="!task.loading"
+                                                            <div v-else-if="!task.loading && ((new Date(new Date().toISOString().split('T')[0])) <= new Date(dia.toISOString().split('T')[0]))"
                                                                 class="flex items-center p-1">
                                                                 <p
-                                                                    class="border p-1 text-center rounded-md border-dashed text-sm bg-primary-light animate-pulse">
+                                                                    class="border w-full h-full p-1 text-center rounded-md border-dashed text-sm bg-primary-light animate-pulse">
                                                                     Arrastra aqui para programar
                                                                 </p>
                                                             </div>
+                                                            <div v-else-if="dragStart && !((new Date(new Date().toISOString().split('T')[0])) <= new Date(dia.toISOString().split('T')[0]))"
+                                                                class="flex items-center p-1">
+                                                                <p
+                                                                    class="border w-full h-full p-1 text-center rounded-md border-dashed text-sm bg-primary-light animate-pulse">
+                                                                    No se puede programar
+                                                                </p>
+                                                            </div>
+                                                            <!-- {{ ((new Date(new Date().toISOString().split('T')[0])) <= new Date(dia.toISOString().split('T')[0])) }} -->
+                                                            <!-- {{ (new Date(dia.toISOString().split('T')[0])) }} -->
+                                                            <!-- {{ (new Date()) }} -->
+                                                            <!-- {{ (new Date(dia).toISOString().split('T')[0] >= (new Date().toISOString().split('T')[0])) }} -->
                                                             <ProgressBar v-if="task.loading" mode="indeterminate"
                                                                 style="height: 4px" />
                                                         </Container>
@@ -518,14 +546,15 @@ const save = async () => {
                             </span>
                         </div>
                     </div>
-                    <div v-if="mode == 'date'" class="h-[80vh] border rounded-md flex flex-col justify-between">
-                        <p class="w-full text-center bg-primary-light font-bold">
+                    <div v-if="mode == 'date'"
+                        class=" h-[70vh] sm:h-[80vh] border rounded-md flex flex-col justify-between">
+                        <p class="w-full h-6 text-center bg-primary-light font-bold">
                             Programacion del dia {{ dates.toLocaleDateString() }}
                         </p>
-                        <div class="h-full p-1 overflow-y-auto space-y-1">
+                        <div class="h-full p-1 sm:overflow-y-auto space-y-1">
                             <div v-if="projectData.length > 0" v-for="project in projectData"
-                                class="border w-full flex p-1 rounded-md">
-                                <div class="w-40 flex items-center flex-col justify-center">
+                                class="border w-full sm:flex p-1 rounded-md">
+                                <div class="sm:w-40 flex items-center flex-col justify-center">
                                     <p class="font-bold">
                                         {{ project.name }}
                                     </p>
@@ -536,7 +565,7 @@ const save = async () => {
                                         <p v-tooltip="'Fecha de fin'" class="px-2">{{ project.fechaF }}</p>
                                     </div>
                                 </div>
-                                <div class="w-full overflow-x-auto grid grid-cols-5">
+                                <div class="w-full h-[55vh] sm:h-full overflow-y-auto sm:overflow-x-auto grid grid-cols-2 sm:grid-cols-5">
                                     <div v-if="project.tasks[dates.toISOString().split('T')[0]].loading"
                                         class="flex col-span-5 justify-center h-full items-center">
                                         <Loading />
@@ -550,6 +579,7 @@ const save = async () => {
                                                     <p
                                                         class="border-b font-bold border-primary h-10 flex items-center justify-center text-xs px-0.5 w-full text-center">
                                                         {{ task.name }}
+                                                        <!-- {{ console.log(task) }} -->
                                                     </p>
                                                     <p class="text-xs px-1 text-center w-full">{{ task.task }}</p>
                                                     <div
@@ -568,10 +598,10 @@ const save = async () => {
                                                     <div
                                                         class="flex cursor-default flex-col justify-center rounded-md h-full">
                                                         <p v-tooltip.left="'Hora inicio'" class="text-sm text-center">
-                                                            {{ format24h(task.shift.startShift) }}
+                                                            {{ format24h(task.shift?.startShift??null) }}
                                                         </p>
                                                         <p v-tooltip.left="'Hora Fin'" class="text-sm text-center">
-                                                            {{ format24h(task.shift.endShift) }}
+                                                            {{ format24h(task.shift?.endShift??null) }}
                                                         </p>
                                                     </div>
                                                     <Container
@@ -602,15 +632,22 @@ const save = async () => {
                                                                 </p>
                                                             </div>
                                                         </div>
-                                                        <div v-else-if="!task.loading" class="flex items-center p-1">
+                                                        <div v-else-if="!task.loading && (new Date(dates.toISOString().split('T')[0]) >= (new Date()))"
+                                                            class="flex items-center p-1">
                                                             <p
-                                                                class="border p-1 text-center rounded-md border-dashed bg-primary-light animate-pulse">
+                                                                class="border w-full h-full p-1 text-center rounded-md border-dashed text-sm bg-primary-light animate-pulse">
                                                                 Arrastra aqui para programar
+                                                            </p>
+                                                        </div>
+                                                        <div v-else-if="dragStart && !(new Date(dates.toISOString().split('T')[0]) >= (new Date()))"
+                                                            class="flex items-center p-1">
+                                                            <p
+                                                                class="border w-full h-full p-1 text-center rounded-md border-dashed text-sm bg-primary-light animate-pulse">
+                                                                No se puede programar
                                                             </p>
                                                         </div>
                                                         <ProgressBar v-if="task.loading" mode="indeterminate"
                                                             style="height: 4px" />
-                                                        <!-- {{ task.loading }} -->
                                                     </Container>
                                                 </div>
                                             </div>
@@ -656,14 +693,13 @@ const save = async () => {
                 </div> -->
             </div>
             <!--#region LISTA PERSONAL-->
-            <div class="row-span-2 rounded-lg border h-full p-1">
+            <div class="row-span-2 sm:block rounded-lg border h-full p-1">
                 <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
                 <Loading v-if="loadingPerson" class="mt-10" message="Cargando personas" />
-                <div v-else class="overflow-y-auto h-[81vh]">
+                <div v-else class="sm:overflow-y-auto sm:h-[81vh] p-1">
                     <Container oncontextmenu="return false" onkeydown="return false" behaviour="copy" group-name="1"
                         @drag-start="dragStart = true" @drag-end="dragStart = false"
-                        :get-child-payload="getChildPayload"
-                        class="flex flex-col space-y-1 mt-1 p-1 snap-y snap-mandatory overflow-y-auto">
+                        :get-child-payload="getChildPayload" class="sm:space-y- ">
                         <Draggable v-for="item in personal" :key="item.id"
                             v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
                             :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"
@@ -685,7 +721,6 @@ const save = async () => {
                         </Draggable>
                     </Container>
                 </div>
-
             </div>
         </div>
     </AppLayout>
@@ -795,8 +830,7 @@ const save = async () => {
                         <label :for="category.key" class="ml-1 mb-0">{{ category.name }}</label>
                     </div>
                     <Calendar v-if="formEditHour.type == 3 || formEditHour.type == 4" show-icon v-model="selectDays"
-                        class="col-span-3" :selectionMode="'multiple'"
-                        :manualInput="false" :pt="{
+                        class="col-span-3" :selectionMode="'multiple'" :min-date="date" :manualInput="false" :pt="{
                                 input: '!h-8'
                             }" />
                 </div>
