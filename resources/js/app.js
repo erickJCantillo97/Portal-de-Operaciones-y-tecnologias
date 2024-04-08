@@ -52,13 +52,19 @@ createInertiaApp({
                     },
                     multiselect: {
                         root: '!h-8',
-            label: '!py-0.5 !flex !h-full !items-center !text-sm !font-normal',
-            token: '!py-0 !px-1',
-            tokenLabel: '!text-sm',
-            item: '!py-1 !px-3 !text-sm !font-normal',
-            filterInput: '!h-8',
-            header: '!h-min !py-0.5'
+                        label: '!py-0.5 !flex !h-full !items-center !text-sm !font-normal',
+                        token: '!py-0 !px-1',
+                        tokenLabel: '!text-sm',
+                        item: '!py-1 !px-3 !text-sm !font-normal',
+                        filterInput: '!h-8',
+                        header: '!h-min !py-0.5'
                     }
+                },
+                zIndex: {
+                    modal: 1100,        //dialog, sidebar
+                    overlay: 1000,      //dropdown, overlaypanel
+                    menu: 1000,         //overlay menus
+                    tooltip: 1100       //tooltip
                 }
             })
             .component('Button', Button)
