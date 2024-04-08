@@ -96,6 +96,7 @@ const dragStart = ref()
 const personsEdit = ref()
 const tabActive = ref()
 const statusPersonal = ref({})
+const selectDays =ref([])
 
 //#endregion
 
@@ -233,7 +234,6 @@ const editHorario = ref({
     name: null
 })
 const nuevoHorario = ref({})
-const optionSelectHours = ref('select')
 const modhours = ref(false)
 const dateSelect = ref()
 
@@ -246,12 +246,12 @@ const togglePerson = (event, persons, task, date) => {
 
 const editHour = (horario, option) => {
     Object.assign(editHorario.value, horario)
-    // editHorario.value.data = data
+    console.log(editHorario.value)
     editHorario.value.option = option
     formEditHour.value.idUser = editHorario.value.data.employee_id
-    formEditHour.value.schedule = editHorario.value.data.id
-    formEditHour.value.schedule_time = horario.id
-    formEditHour.value.userName = editHorario.value.data.name
+    formEditHour.value.schedule = horario.idSchedule
+    formEditHour.value.schedule_time = horario.idScheduleTime
+    // formEditHour.value.userName = editHorario.value.data.name
     nuevoHorario.value = {}
     modhours.value = true
 }
@@ -283,11 +283,7 @@ const save = async () => {
             formEditHour.value.details[index] = new Date(day).toISOString().split("T")[0]
         })
     }
-    //aplicar validaciones de campos requeridos (TODOS LOS CAMPOS SON REQUERIDOS)
-    /*
-    NOTA:
-    Se debe cambiar el campo de hora inicio y hora fin a un formato de 24 horas.
-    */
+
     await axios.post(route(editHorario.value.option != 'delete' ? 'programming.saveCustomizedSchedule' : 'programming.removeSchedule'), formEditHour.value)
         .then((res) => {
             if (res.data.status) {
@@ -436,7 +432,8 @@ const save = async () => {
                                                             @drop="onDrop(task, $event, dia)" group-name="1"
                                                             @click="togglePerson($event, task.employees, task, dia)"
                                                             v-tooltip.top="{ value: task.employees?.length > 0 ? `<div>${task.employees.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
-                                                            <div v-if="!dragStart && !(task.loading==null?false:task.loading)" class="flex justify-center">
+                                                            <div v-if="!dragStart && !(task.loading == null ? false : task.loading)"
+                                                                class="flex justify-center">
                                                                 <AvatarGroup
                                                                     v-if="(task.employees ? true : false) && task.employees.length > 0 && task.employees.length <= 2">
                                                                     <Avatar v-for="person in task.employees"
@@ -582,7 +579,8 @@ const save = async () => {
                                                         @drop="onDrop(task, $event, dates)" group-name="1"
                                                         @click="togglePerson($event, task.employees, task, dates)"
                                                         v-tooltip.top="{ value: task.employees?.length > 0 ? `<div>${task.employees.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
-                                                        <div v-if="!dragStart && !(task.loading==null?false:task.loading)" class="flex justify-center">
+                                                        <div v-if="!dragStart && !(task.loading == null ? false : task.loading)"
+                                                            class="flex justify-center">
                                                             <AvatarGroup
                                                                 v-if="(task.employees ? true : false) && task.employees.length > 0 && task.employees.length <= 2">
                                                                 <Avatar v-for="person in task.employees"
@@ -612,7 +610,7 @@ const save = async () => {
                                                         </div>
                                                         <ProgressBar v-if="task.loading" mode="indeterminate"
                                                             style="height: 4px" />
-                                                            <!-- {{ task.loading }} -->
+                                                        <!-- {{ task.loading }} -->
                                                     </Container>
                                                 </div>
                                             </div>
@@ -732,7 +730,6 @@ const save = async () => {
             <form @submit.prevent="save" class="pb-2">
                 <div v-if="editHorario?.option != 'delete'" class="flex flex-col gap-1">
                     <div class="flex items-center justify-between col-span-3 ">
-
                         <p class="font-bold">Horario actual:</p>
                         <p class="px-1 py-1 text-green-900 bg-green-200 rounded-md">
                             {{ format24h(editHorario.horaInicio.slice(0,
@@ -786,22 +783,25 @@ const save = async () => {
                     </TabView>
                 </div>
                 <p class="font-bold text-xl">Aplicar por:</p>
-                <span class="flex items-center p-2 gap-4">
-                    <div v-for="category in [{ name: 'Solo el ' + dateSelect.toISOString().split('T')[0], key: 1 }, { name: 'Resto de la actividad', key: 2 }, { name: 'Rango de fechas', key: 3 }, { name: 'Fechas específicos', key: 4 }]"
-                        :key="category.key" class="flex items-center">
+                <div class="flex items-center p-2 gap-4">
+                    <div v-for="category in [
+                                { name: 'Solo el ' + dateSelect.toISOString().split('T')[0], key: 1 },
+                                { name: 'Resto de la actividad', key: 2 },
+                                // { name: 'Rango de fechas', key: 3 },
+                                { name: 'Fechas específicas', key: 4 }
+                            ]" :key="category.key" class="flex items-center">
                         <RadioButton v-model="formEditHour.type" :inputId="category.key + category.name" name="dynamic"
                             :value="category.key" @click="formEditHour.details = []" />
                         <label :for="category.key" class="ml-1 mb-0">{{ category.name }}</label>
                     </div>
-                </span>
-                <!-- {{editHorario?.option != 'delete'?tabActive != 2? nuevoHorario?.startShift!=null?false:true:false:false }} -->
-                <span class="w-full grid grid-cols-4 justify-end gap-5 items-center">
                     <Calendar v-if="formEditHour.type == 3 || formEditHour.type == 4" show-icon v-model="selectDays"
-                        class="col-span-3" :selectionMode="formEditHour.type == 3 ? 'range' : 'multiple'"
+                        class="col-span-3" :selectionMode="'multiple'"
                         :manualInput="false" :pt="{
-                                root: '!w-full',
                                 input: '!h-8'
                             }" />
+                </div>
+                <!-- {{editHorario?.option != 'delete'?tabActive != 2? nuevoHorario?.startShift!=null?false:true:false:false }} -->
+                <span class="w-full grid grid-cols-4 justify-end gap-5 items-center">
                     <Button type="submit" class="col-start-4" :loading="formEditHour.loading"
                         :disabled="(editHorario?.option !== 'delete') && (tabActive !== 2) && (nuevoHorario?.startShift !== null)"
                         :severity="editHorario?.option != 'delete' ? 'success' : 'danger'"

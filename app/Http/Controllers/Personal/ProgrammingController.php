@@ -643,8 +643,8 @@ class ProgrammingController extends Controller
     {
         try {
             DB::beginTransaction();
-            $schedule = Schedule::find(33);
-            dd($schedule);
+            $schedule = Schedule::find($request->schedule);
+            // dd($schedule);
             switch ($request->type) {
                     //SOLO EL $request->date
                 case 1:
