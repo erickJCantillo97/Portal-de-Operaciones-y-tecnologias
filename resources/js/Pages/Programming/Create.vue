@@ -104,6 +104,8 @@ const personsEdit = ref()
 const tabActive = ref()
 const statusPersonal = ref({})
 const selectDays = ref([])
+const filterProgram=ref(false)
+const arrayFilter=ref()
 
 //#endregion
 
@@ -370,7 +372,7 @@ const save = async () => {
                 <div class="cursor-default flex flex-col h-full">
                     <div v-if="mode == 'week'" class="h-[80vh] flex flex-col justify-between border rounded-md">
                         <!-- region Cabezeras -->
-                        <div class="grid-cols-10 h-6 text-lg leading-6 grid pr-3 border-b shadow-md mb-1 ">
+                        <div class="grid-cols-10 h-6 text-lg leading-6 grid pr-3 pl-2 border-b shadow-md mb-1 ">
                             <div class="flex flex-col items-center">
                                 <p class="flex w-full justify-center items-baseline font-bold">Proyecto</p>
                             </div>
@@ -388,9 +390,9 @@ const save = async () => {
                             <!-- endregion -->
                         </div>
                         <!-- region actividades -->
-                        <div class="h-full space-y-2 overflow-y-clip pl-1 ">
+                        <div class="h-full space-y-2 overflow-y-auto pl-1 ">
                             <div v-if="projectData.length > 0" v-for="project in projectData"
-                                class="grid-cols-10 divide-x divide-y cursor-default h-full divide-gray-100 border border-indigo-200 rounded-l-md text-lg leading-6 grid">
+                                class="grid-cols-10 ml-0.5 divide-x divide-y cursor-default h-full divide-gray-100 border border-indigo-200 rounded-l-md text-lg leading-6 grid">
                                 <div class="flex flex-col items-center px-2">
                                     <div class="flex h-full w-full items-center justify-center flex-col font-bold">
                                         <p>
@@ -516,31 +518,30 @@ const save = async () => {
                             </div>
                         </div>
                         <!-- endregion -->
-                        <div class="grid-cols-10 h-8 text-sm grid pr-3 border-t shadow-lg mt-1 ">
+                        <div class="grid-cols-10 h-8 text-sm grid pr-3 pl-2 border-t shadow-lg mt-1 ">
                             <div>
                                 <p class="w-full h-full flex items-center justify-center font-bold">
                                     Total personas
                                 </p>
                             </div>
                             <span class="col-span-9 grid grid-cols-7 z-10">
-                                <div v-for="dia, index in diasSemana" class="flex h-full items-center space-x-3 px-2"
-                                    :key="index + dia"
+                                <div v-for="dia, index in diasSemana" class="flex h-full justify-center items-center space-x-3 px-2"
+                                    :key="index + dia" @click="filterProgram?(filterProgram=false,arrayFilter=[]):(filterProgram=true,arrayFilter=statusPersonal[dia.toISOString().split('T')[0]].data.programados)"
                                     :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary rounded-b-md font-bold' : '']">
-
-                                    <div class="rounded bg-primary px-2 w-full text-center text-white"
-                                        v-tooltip.top="{ value: statusPersonal[dia.toISOString().split('T')[0]].data.programados?.length > 0 ? `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
-                                        <i v-if="statusPersonal[dia.toISOString().split('T')[0]].loading"
-                                            class="fa-solid fa-spinner animate-spin" />
-                                        <p v-else>
+                                    <div class="w-full flex items-center justify-center" v-if="statusPersonal[dia.toISOString().split('T')[0]].loading">
+                                        <i class="fa-solid fa-spinner animate-spin" />
+                                    </div>
+                                    <div class="rounded bg-primary px-2 w-1/2 text-center text-white" v-if="statusPersonal[dia.toISOString().split('T')[0]].data.programados?.length > 0"
+                                        v-tooltip.top="{ value:`<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
+                                        <p>
                                             {{ statusPersonal[dia.toISOString().split('T')[0]].data.programados.length
                                             }}
                                         </p>
                                     </div>
-                                    <div class="rounded bg-danger px-2 w-full text-center text-white"
-                                        v-tooltip.top="{ value: statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados?.length > 0 ? `<div><p class='w-full text-center font-bold'>No programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
-                                        <i v-if="statusPersonal[dia.toISOString().split('T')[0]].loading"
-                                            class="fa-solid fa-spinner animate-spin" />
-                                        <p v-else>
+                                    <i v-if="arrayFilter==statusPersonal[dia.toISOString().split('T')[0]].data.programados" class="fa-solid fa-filter p-1 bg-success-light rounded-md"></i>
+                                    <div class="rounded bg-danger px-2 w-1/2 text-center text-white" v-if="statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados?.length > 0"
+                                        v-tooltip.top="{ value: `<div><p class='w-full text-center font-bold'>No programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
+                                        <p>
                                             {{ statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados.length
                                             }}
                                         </p>
@@ -554,10 +555,10 @@ const save = async () => {
                         <p class="sm:block hidden w-full h-6 text-center bg-primary-light font-bold">
                             Programacion del dia {{ dates.toLocaleDateString() }}
                         </p>
-                        <div class="h-full p-1 sm:overflow-y-auto space-y-1">
+                        <div class="h-full sm:p-1 sm:overflow-y-auto space-y-1">
                             <div v-if="projectData.length > 0" v-for="project in projectData"
-                                class="border w-full sm:flex p-1 rounded-md">
-                                <div class="sm:w-40 flex items-center flex-col justify-center">
+                                class="border w-full sm:flex p-1 divide-y-2 sm:divide-y-0 rounded-md shadow-xl ">
+                                <div class="sm:w-40 shadow-md sm:shadow-none flex items-center flex-col justify-center">
                                     <p class="font-bold">
                                         {{ project.name }}
                                     </p>
@@ -673,9 +674,10 @@ const save = async () => {
                                 <NoContentToShow subject="Seleccione uno o mas proyectos" />
                             </div>
                         </div>
-                        <div class="w-full justify-center flex space-x-2 p-1 z-10">
-                            <p class="rounded bg-primary px-2 text-white"
-                                v-tooltip="{ value: statusPersonal[dates.toISOString().split('T')[0]].data.programados?.length > 0 ? `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
+                        <div class="w-full justify-center flex space-x-2 p-1 z-10"
+                          @click="filterProgram?filterProgram=false:filterProgram=true;arrayFilter=statusPersonal[dates.toISOString().split('T')[0]].data.programados" >
+                            <p class="rounded bg-primary px-2 text-white" v-if="statusPersonal[dates.toISOString().split('T')[0]].data.programados?.length > 0"
+                                v-tooltip="{ value: `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
                                 Programados:
                                 <i v-if="statusPersonal[dates.toISOString().split('T')[0]].loading"
                                     class="fa-solid fa-spinner animate-spin" />
@@ -683,15 +685,15 @@ const save = async () => {
                                 statusPersonal[dates.toISOString().split('T')[0]].data.programados.length }}
                                 </span>
                             </p>
-                            <span class="rounded bg-danger px-2 text-white" title="dasdads"
-                                v-tooltip.click.top="{ value: statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados?.length > 0 ? `<div><p class='w-full text-center font-bold'>No programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
+                            <p class="rounded bg-danger px-2 text-white" v-if="statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados?.length > 0"
+                                v-tooltip.click.top="{ value: `<div><p class='w-full text-center font-bold'>No programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
                                 No programados:
                                 <i v-if="statusPersonal[dates.toISOString().split('T')[0]].loading"
                                     class="fa-solid fa-spinner animate-spin" />
                                 <span v-else>{{
                                 statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados.length }}
                                 </span>
-                            </span>
+                            </p>
                             <!-- <p class="rounded bg-warning px-2 text-white">No programables 3</p> -->
                         </div>
                     </div>
@@ -711,7 +713,7 @@ const save = async () => {
                     class="sm:overflow-y-auto overflow-x-visible flex sm:block overflow-y-hidden sm:h-[81vh] p-1 space-x-1 space-y-0 sm:space-y-1 sm:space-x-0 sm:w-full">
                     <Draggable v-for="item in personal" :key="item.id"
                         v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
-                        :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"
+                        :class="[(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden',filterProgram?(arrayFilter.find(objeto => objeto.name === item.Nombres_Apellidos)!==undefined?'bg-green-200':'bg-red-200'):'']"
                         :drag-not-allowed="false"
                         class=" min-w-[25vw] sm:min-w-full rounded-xl border border-primary h-full sm:h-20 shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
                         <div class="flex sm:w-full flex-col gap-x-1 p-1">
