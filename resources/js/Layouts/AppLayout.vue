@@ -12,7 +12,7 @@
             <MenuSidebar class="lg:block " :class="{ hidden: !menu }"></MenuSidebar>
             <div
                 class="max-h-[6vh] z-10 flex items-center justify-between h-auto px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 lg:ml-24">
-                <div class="w-full">
+                <div class="w-full flex items-center">
                     <button type="button" class="-ml-7 p-2.5 text-gray-700 lg:hidden" @click="menu = !menu">
                         <span class="sr-only">Open sidebar</span>
                         <Bars3CenterLeftIcon class="w-6 h-6" aria-hidden="true" />
