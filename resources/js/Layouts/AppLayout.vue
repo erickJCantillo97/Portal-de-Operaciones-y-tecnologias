@@ -12,25 +12,26 @@
             <MenuSidebar class="lg:block " :class="{ hidden: !menu }"></MenuSidebar>
             <div
                 class="max-h-[6vh] z-10 flex items-center justify-between h-auto px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 lg:ml-24">
-                <div class="w-full">
+                <div class="w-full flex items-center">
                     <button type="button" class="-ml-7 p-2.5 text-gray-700 lg:hidden" @click="menu = !menu">
                         <span class="sr-only">Open sidebar</span>
                         <Bars3CenterLeftIcon class="w-6 h-6" aria-hidden="true" />
                     </button>
                     <div class="flex">
                         <Link :href="route('dashboard')" v-tooltip.top="'Dashboard'">
-                            <div class="flex space-x-2 items-center">
-                                <i class="fa-solid fa-home text-gray-500"></i>
-                                <h1 class="text-center font-semibold text-primary text-xl mt-1">
-                                    TOP
-                                </h1>
-                            </div>
+                        <div class="flex space-x-2 items-center">
+                            <i class="fa-solid fa-home text-gray-500"></i>
+                            <h1 class="text-center font-semibold text-primary text-xl mt-1">
+                                TOP
+                            </h1>
+                        </div>
                         </Link>
-                            <div class="flex justify-between items-center">
-                                <Breadcrumb :home="home" :model="urls" :pt="{
-                                    root: '!h-2 !flex !justify-center !items-center'
-                                }" />
-                            </div>
+                        <div class="flex justify-between items-center">
+                            <Breadcrumb :home="home" :model="urls" :pt="{
+                                root: '!h-2 !flex !justify-center !items-center',
+                                label: '!text-blue-800'
+                            }" />
+                        </div>
                     </div>
                 </div>
                 <div class="flex items-center">
@@ -63,8 +64,8 @@
                                 <div class="px-1 py-1">
                                     <MenuItem v-slot="{ active }">
                                     <button @click="logout" :class="[
-        active ? 'bg-primary text-white' : 'text-gray-900',
-        'group flex w-full items-center rounded-md px-2 py-2 text-sm',]">
+                                        active ? 'bg-primary text-white' : 'text-gray-900',
+                                        'group flex w-full items-center rounded-md px-2 py-2 text-sm',]">
                                         <ArrowLeftCircleIcon :active="active" class="w-5 h-5 mr-2 text-violet-400"
                                             aria-hidden="true" />
                                         Salir
@@ -172,8 +173,8 @@
                                                                     <span v-if="suggestion.type == 'Error'"
                                                                         class="flex justify-center px-2 text-xs font-medium rounded-md"
                                                                         :class="suggestion.status == 1 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-success'">{{
-                                                                        suggestion.status == 1 ? 'Pendiente' :
-                                                                        'Resuelto'
+                                                                            suggestion.status == 1 ? 'Pendiente' :
+                                                                                'Resuelto'
                                                                         }}</span>
                                                                     <p class="w-full text-xs text-end">{{
                                                                         formatDateTime24h(suggestion.created_at) }}</p>
@@ -329,34 +330,36 @@ const createSuggestion = () => {
     if (sugerencia.value.length < 20) {
         toast('La sugerencia debe tener mínimo 20 caracteres', 'error')
     } else {
-        html2canvas(document.body).then(canvas => {
-            router.post(route('suggestion.store'),
-                {
-                    details: sugerencia.value,
-                    type: tipoReporte.value,
-                    capture: canvas.toDataURL(),
-                    urlAddress: document.location.href
-                }, {
-                onSuccess: res => {
-                    toast('¡Se ha enviado con éxito, muchas gracias por su reporte!', 'success')
-                    sugerenciaVisible.value = false
-                    sugerencia.value = null
-                    loadSuggestions()
-                },
-                onError: (e) => {
-                    console.log(e)
-                    toast('Ha ocurrido un error', 'error')
+        html2canvas(document.body)
+            .then(canvas => {
+                router.post(route('suggestion.store'),
+                    {
+                        details: sugerencia.value,
+                        type: tipoReporte.value,
+                        capture: canvas.toDataURL(),
+                        urlAddress: document.location.href
+                    }, {
+                    onSuccess: res => {
+                        toast('¡Se ha enviado con éxito, muchas gracias por su reporte!', 'success')
+                        sugerenciaVisible.value = false
+                        sugerencia.value = null
+                        loadSuggestions()
+                    },
+                    onError: (e) => {
+                        console.log(e)
+                        toast('Ha ocurrido un error', 'error')
+                    }
                 }
-            }
-            )
-        })
+                )
+            })
     }
 }
 
 const loadSuggestions = () => {
-    axios.get(route('suggestion.create')).then((res) => {
-        suggestions.value = res.data[0]
-    })
+    axios.get(route('suggestion.create'))
+        .then((res) => {
+            suggestions.value = res.data[0]
+        })
 }
 
 const home = ref({

@@ -8,6 +8,9 @@ use App\Models\Labor;
 use App\Models\Personal\Personal;
 use App\Models\Personal\Team;
 use App\Models\Personal\WorkingTeams;
+use App\Models\Schedule;
+use App\Models\ScheduleTime;
+use App\Models\Views\DetailScheduleTime;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -224,6 +227,38 @@ class PersonalController extends Controller
                     'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),
                 ];
             }),
+        ]);
+    }
+
+    public function getSchedulePersonalStatus(Request $request)
+    {
+        $personal = getPersonalUser();
+        $scheduleComplete = [];
+        $scheduleNotComplete = [];
+        foreach ($personal as $person) {
+            // $schedule = Schedule::where('employee_id',  $person['Num_SAP'])->where('fecha', $request->date)->pluck('id')->toArray();
+
+            $horas_acumulados = DetailScheduleTime::where('idUsuario', $person['Num_SAP'])->where('fecha', $request->date)->selectRaw('SUM(datediff(mi,horaInicio, horaFin)) as diferencia_acumulada')->get();
+            $hours = $horas_acumulados[0]->diferencia_acumulada / 60;
+            if ($hours > 8.5) {
+                array_push($scheduleComplete, [
+                    'name' => $person['Nombres_Apellidos'],
+                    'hours' => $hours,
+                    'cargo' => $person['Cargo'],
+                    'photo' => $person['photo']
+                ]);
+            } else {
+                array_push($scheduleNotComplete, [
+                    'name' => $person['Nombres_Apellidos'],
+                    'hours' => $hours,
+                    'cargo' => $person['Cargo'],
+                    'photo' => $person['photo']
+                ]);
+            }
+        }
+        return response()->json([
+            'programados' => $scheduleComplete,
+            'noProgramados' => $scheduleNotComplete
         ]);
     }
 }

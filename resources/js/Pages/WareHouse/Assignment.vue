@@ -90,7 +90,12 @@ const deleteAssignment = (event, data) => {
 const submit = () => {
   try {
     if (form.tools == null) {
-      toast.add({ severity: 'error', group: 'customToast', text: 'Seleccione los Equipos a Asignar', life: 2000 });
+      toast.add({
+        severity: 'error',
+        group: 'customToast',
+        text: 'Seleccione los Equipos a Asignar',
+        life: 2000
+      })
     } else {
       router.post(route('assignmentTool.store'),
         {
@@ -99,11 +104,16 @@ const submit = () => {
           supervisor_id: selectedSupervisor.value.Num_SAP,
           project_id: selectedProject.value?.id ?? 0,
           email: selectedEmployee.value.Correo,
-          tools: form.tools
+          tools: form.tools.map(value => value.id)
         },
         {
           onSuccess: () => {
-            toast.add({ severity: 'success', group: 'customToast', text: 'Asignación Exitosa, Enviaremos un Mensaje a: ' + selectedEmployee.value.Correo, life: 10000 });
+            toast.add({
+              severity: 'success',
+              group: 'customToast',
+              text: 'Asignación Exitosa, Enviaremos un Mensaje a: ' + selectedEmployee.value.Correo,
+              life: 10000
+            })
             // toast(`¡Asignación creada exitosamente!`, 'success')
             clearModal()
           },
@@ -124,10 +134,10 @@ const submitDownload = () => {
     observation: descriptionValue.value
   }, {
     onSuccess: () => {
-      toast.add({ summary: 'Asignación Descargada', life: 2000 });
+      toast.add({ summary: 'Asignación Descargada', life: 2000 })
       clearModal2()
     }
-  });
+  })
 }
 
 const clearModal = () => {
@@ -142,9 +152,16 @@ const clearModal2 = () => {
   openDialog2.value = false
   form.reset()
 }
+
+const urls = ref([
+  {
+    url: '/assignmentTool',
+    label: 'Asignación Herramientas'
+  },
+])
 </script>
 <template>
-  <AppLayout>
+  <AppLayout :urls="urls">
     <div class="w-full h-[89vh] overflow-y-auto">
       <CustomDataTable :data="assignmentsTool" title="Asignaciones" :rows-default="15" :columnas="columnas"
         :actions="actions" @download="downloadAssignment" @delete="deleteAssignment">
@@ -190,11 +207,22 @@ const clearModal2 = () => {
         <!--CAMPO SELECCIÓN DE EQUIPOS (tools)-->
         <div class="col-span-2">
           <label class="text-md font-semibold">Seleccionar Equipos</label>
+          <div class="flex flex-nowrap gap-2 mb-2 w-full overflow-x-auto">
+            <div v-for="tool in form.tools"
+              class="bg-emerald-100 border border-l-8 border-l-emerald-400 rounded-lg shadow-lg shadow-emerald-200">
+              <ul class="flex flex-col">
+                <li class="p-2 text-xs text-emerald-500 font-semibold">
+                  {{ tool.name }}
+                  <span class="block text-xs">{{ tool.serial }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
           <Listbox v-model="form.tools" :options="tools" multiple filter :filterFields="['name', 'serial']"
-            optionLabel="name" optionValue="id" filterPlaceholder="Seleccione el/los equipo(s) para asignar."
-            class="w-full md:w-14rem" :virtualScrollerOptions="{ itemSize: 38 }" listStyle="height:15rem" :pt="{
-        filterInput: '!text-sm'
-      }">
+            optionLabel="name" filterPlaceholder="Seleccione el/los equipo(s) para asignar." class="w-full md:w-14rem"
+            :virtualScrollerOptions="{ itemSize: 38 }" listStyle="height:15rem" :pt="{
+              filterInput: '!text-sm'
+            }">
             <template #option="slotProps">
               <div class="items-center flex justify-between">
                 <div> {{ slotProps.option.name }}</div>
@@ -231,15 +259,15 @@ const clearModal2 = () => {
           <label>Estado de la herramienta <span class="text-red-700 italic mt-2 font-serif">*</span></label>
           <RadioGroups v-model="toolStatus" />
           <span class="text-red-700 text-xs italic mt-2 font-serif" v-if="!toolStatus">{{
-        $page.props.errors.status
-      }}</span>
+            $page.props.errors.status
+          }}</span>
         </div>
         <div class="col-span-4">
           <label>Descripción de Estado de la herramienta</label>
           <Textarea v-model="descriptionValue" rows="5" col="10" placeholder="Agregue una descripción al grupo"
             autoResize :pt="{
-        root: '!w-full !text-sm'
-      }" />
+              root: '!w-full !text-sm'
+            }" />
         </div>
       </section>
     </template>
@@ -251,13 +279,13 @@ const clearModal2 = () => {
   </CustomModal>
 
   <Toast position="bottom-center" :pt="{
-        root: '!h-10 !w-64',
-        container: {
-          class: form.error ? '!bg-danger !h-10 !rounded-lg' : '!bg-primary !h-10 !rounded-lg'
-        },
-        content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
-        buttonContainer: '!hidden',
-        icon: '!hidden',
-        detail: '!hidden'
-      }" />
+    root: '!h-10 !w-64',
+    container: {
+      class: form.error ? '!bg-danger !h-10 !rounded-lg' : '!bg-primary !h-10 !rounded-lg'
+    },
+    content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
+    buttonContainer: '!hidden',
+    icon: '!hidden',
+    detail: '!hidden'
+  }" />
 </template>

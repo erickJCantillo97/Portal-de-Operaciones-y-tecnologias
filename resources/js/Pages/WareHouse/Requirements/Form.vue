@@ -87,7 +87,7 @@ const deleteEstado = (index) => {
     form.materiales.splice(index, 1);
 };
 
-
+const search = ref();
 
 
 const submit = () => {
@@ -107,21 +107,34 @@ const submit = () => {
         }
     })
 }
+
+const searching = () => {
+    form.materiales = form.materiales.map(objeto => {
+        console.log(objeto.material.material);
+        if (objeto.material.material.description.toUpperCase().includes(search.value.toUpperCase()) || objeto.material.material.toUpperCase().includes(search.value.toUpperCase())) {
+            console.log(objeto.material.material.description)
+            return { ...objeto, ver: 1 };
+        } else {
+            return { ...objeto, ver: 0 };
+        }
+    });
+}
 </script>
 
 <template>
     <AppLayout>
         <div class="h-full w-full overflow-y-auto">
             <div class="flex justify-between items-center px-4 h-min">
-                <span class="text-2xl font-extrabold text-primary h-full items-center flex">
+                <span class="text-2xl font-extrabold text-primary h-full w-full items-center block">
                     <p> Gestion de Requerimientos </p>
+                    <input type="text" v-model="search" @keyup="searching" placeholder="Buscar..."
+                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-center focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                 </span>
-
             </div>
             <div class="block space-y-2 p-2 overflow-y-auto">
 
                 <div class="block items-center space-x-2 rounded-md px-4" v-for="(material, index) in form.materiales"
-                    :class="material.nivel > 1 ? 'bg-white border border-gray-800 px-8' : 'bg-secondary'">
+                    :class="[material.nivel > 1 ? 'bg-white border border-gray-800 px-8' : 'bg-secondary', material.ver == 1 ? '' : 'hidden']">
                     <div class="flex justify-between my-2">
                         <span class="text-primary font-bold">
                             <span class="text-primary cursor-default" v-tooltip="'Cantidad Material Requerido'">

@@ -1,17 +1,18 @@
 <script setup>
 import { Link, router } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import Dropdown from 'primevue/dropdown';
+import Dropdown from 'primevue/dropdown'
 import NoContentToShow from '@/Components/NoContentToShow.vue'
 import WeekTable from '@/Pages/Programming/WeekTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
+import Knob from 'primevue/knob'
 
 import { useCommonUtilities } from "@/composable/useCommonUtilities"
-const { formatUTCOffset, formatDateTime24h } = useCommonUtilities()
+const { format_ES_Date, formatDateTime24h } = useCommonUtilities()
 
-import { useToast } from "primevue/usetoast";
+import { useToast } from "primevue/usetoast"
 const toast = useToast()
 
 const props = defineProps({
@@ -20,6 +21,9 @@ const props = defineProps({
 
 const loading = ref(false)
 const project = ref()
+const selectedTaskId = ref(null)
+const editMode = ref(false)
+const disabled = computed(() => selectedTaskId.value !== null && editMode.value)
 
 //#region UseForm
 const projectSelected = ref()
@@ -48,8 +52,7 @@ function format24h(hora) {
 const openModal = ref(false)
 
 const openDialog = () => {
-    // formData.reset()
-    projectSelected.value = ''
+    resetFormData()
     openModal.value = true
 }
 
@@ -60,34 +63,57 @@ const divisionsOptions = [
 ]
 
 //#region Requests
-const submit = async () => {
-    try {
-        // formData.value.start_hour = String(formatUTCOffset(formData.value.start_hour))
-        // formData.value.end_hour = String(formatUTCOffset(formData.value.end_hour))
-
-        await router.post(route('extended.schedule.store'), formData.value)
-            .then(res => {
-                //TODO request
-                toast.add({ severity: 'success', group: 'customToast', text: 'Tareas Guardadas', life: 2000 });
-                formData.value = {
-                    dates: [],
-                    start_hour: '',
-                    end_hour: '',
-                    tasks: [],
-                    description: '',
-                }
-            })
-    } catch (error) {
-        console.error('Error' + error)
+const submit = () => {
+    if (!selectedTaskId.value) {
+        router.post(route('extended.schedule.store'), formData.value, {
+            onSuccess: () => {
+                toast.add({
+                    severity: 'success',
+                    group: 'customToast',
+                    text: 'Tarea extendida creada con éxito',
+                    life: 2000
+                })
+                resetFormData()
+            },
+            onError: (errors) => {
+                toast.add({
+                    severity: 'danger',
+                    group: 'customToast',
+                    text: 'No se ha podido guardar la tarea ' + errors,
+                    life: 2000
+                })
+                resetFormData()
+            }
+        })
+    } else {
+        router.put(route('extended.schedule.update', selectedTaskId.value), formData.value, {
+            onSuccess: () => {
+                toast.add({
+                    severity: 'success',
+                    group: 'customToast',
+                    text: 'Tarea extendida actualizada con éxito',
+                    life: 2000
+                })
+                resetFormData()
+            },
+            onError: (errors) => {
+                toast.add({
+                    severity: 'danger',
+                    group: 'customToast',
+                    text: 'No se ha podido actualizar la tarea ' + errors,
+                    life: 2000
+                })
+                resetFormData()
+            }
+        })
     }
 }
 
 const taskOptions = ref()
-const getTaskByProjects = async (id_project) => {
+const getTaskByProjects = async () => {
     try {
-        await axios.get(route('extended.schedule.getTask', id_project))
+        await axios.get(route('extended.schedule.getTask', projectSelected.value))
             .then(res => {
-                //TODO request
                 taskOptions.value = res.data
             })
     } catch (error) {
@@ -95,30 +121,73 @@ const getTaskByProjects = async (id_project) => {
     }
 }
 
-const editTask = async (id_project) => {
+const editTask = async (task) => {
     try {
-        await axios.put(route('task.store.i', id_project))
-            .then(res => {
-                //TODO request
-                console.log('Hace algo')
-            })
+        // console.log(task)
+        editMode.value = true
+        selectedTaskId.value = task.task_id
+        projectSelected.value = parseInt(task.project_id)
+        await getTaskByProjects()
+        formData.value.dates = formatDateTime24h(task.date).split(", ")[0]
+        formData.value.start_hour = format24h(task.start_hour)
+        formData.value.end_hour = format24h(task.end_hour)
+        formData.value.tasks = [parseInt(task.task_id)]
+        formData.value.description = task.description
     } catch (error) {
         console.error('Error ' + error)
     }
 }
 
-const deleteTask = async (id) => {
+const cloneTask = async (task) => {
     try {
-        await axios.delete(route('task.delete.i', task.id))
-            .then(res => {
-                //TODO request
-                console.error('Hace algo')
-            })
+        // console.log(task)
+        selectedTaskId.value = null
+        projectSelected.value = parseInt(task.project_id)
+        await getTaskByProjects()
+        formData.value.dates = formatDateTime24h(task.date).split(", ")[0]
+        formData.value.start_hour = format24h(task.start_hour)
+        formData.value.end_hour = format24h(task.end_hour)
+        formData.value.tasks = []
+        formData.value.description = task.description
     } catch (error) {
         console.error('Error ' + error)
     }
 }
+
+const deleteTask = (id_task) => {
+    router.delete(route('extended.schedule.destroy', id_task), {
+        onSuccess: () => {
+            toast.add({
+                severity: 'success',
+                group: 'customToast',
+                text: 'Tarea Elimnada',
+                life: 2000
+            })
+        },
+        onError: (errors) => {
+            toast.add({
+                severity: 'danger',
+                group: 'customToast',
+                text: 'No se ha podido eliminar la tarea ' + errors,
+                life: 2000
+            })
+        }
+    })
+}
 //#endregion
+
+const resetFormData = () => {
+    openModal.value = false
+
+    formData.value = {
+        dates: [],
+        start_hour: '',
+        end_hour: '',
+        tasks: []
+    }
+    selectedTaskId.value = null
+    projectSelected.value = ''
+}
 
 const urls = ref([
     {
@@ -140,20 +209,20 @@ const urls = ref([
                         <Dropdown :options="projects" placeholder="Seleccione un proyecto" optionLabel="name"
                             optionValue="id" showClear :filter="true" filterPlaceholder="Buscar proyecto"
                             v-model="project" :pt="{
-                            root: '!h-8',
-                            input: '!py-0 !flex !items-center !text-sm !font-normal',
-                            item: '!py-1 !px-3 !text-sm !font-normal',
-                            filterInput: '!h-8'
-                        }" />
+                                root: '!h-8',
+                                input: '!py-0 !flex !items-center !text-sm !font-normal',
+                                item: '!py-1 !px-3 !text-sm !font-normal',
+                                filterInput: '!h-8'
+                            }" />
                     </span>
                     <span class="flex flex-col sm:flex-row items-center sm:space-x-2">
                         <Dropdown :options="divisionsOptions" placeholder="Seleccione una división" showClear
                             :filter="true" filterPlaceholder="Buscar proyecto" v-model="project" :pt="{
-                            root: '!h-8',
-                            input: '!py-0 !flex !items-center !text-sm !font-normal',
-                            item: '!py-1 !px-3 !text-sm !font-normal',
-                            filterInput: '!h-8'
-                        }" />
+                                root: '!h-8',
+                                input: '!py-0 !flex !items-center !text-sm !font-normal',
+                                item: '!py-1 !px-3 !text-sm !font-normal',
+                                filterInput: '!h-8'
+                            }" />
                     </span>
                     <!-- <CustomInput type="week" placeholder="Seleccione una semana"></CustomInput> -->
                     <Link :href="route('programming.create')">
@@ -196,14 +265,16 @@ const urls = ref([
                                 :multiple="true" />
                         </div>
 
-                        <CustomInput @change="getTaskByProjects(projects[0].id)" label="Proyectos" type="dropdown"
-                            optionLabel="name" :options="projects" placeholder="Seleccione un proyecto"
+                        <CustomInput @change="getTaskByProjects()" label="Proyectos" type="dropdown" optionLabel="name"
+                            option-value="id" :options="projects" placeholder="Seleccione un proyecto"
+                            :disabled="disabled" :class="[disabled ? 'cursor-not-allowed' : '']"
                             filterPlaceholder="Buscar proyecto" v-model:input="projectSelected">
                         </CustomInput>
 
                         <CustomInput label="Actividades" selectionMode optionLabel="name" option-value="id"
                             type="multiselect" :options="taskOptions" placeholder="Seleccione actividad(es)"
-                            v-model:input="formData.tasks">
+                            :disabled="disabled" v-model:input="formData.tasks"
+                            :class="[disabled ? 'cursor-not-allowed' : '']">
                         </CustomInput>
 
                         <CustomInput class="mt-2" label="Observaciones" placeholder="Observaciones" type="textarea"
@@ -212,7 +283,7 @@ const urls = ref([
 
                         <div class="flex justify-end space-x-2">
                             <Button severity="success" :loading="false" @click="submit()">
-                                Guardar
+                                {{ selectedTaskId != null ? 'Actualizar' : 'Guardar' }}
                             </Button>
                         </div>
                     </div>
@@ -221,28 +292,36 @@ const urls = ref([
                         <div class="border border-gray-300 rounded-lg">
                             <div class="flex justify-center items-center bg-blue-900 rounded-t-lg p-2">
                                 <h2 class="text-center text-white">
-                                    Listado de Actividades Extendidos
+                                    Listado de Actividades Extendidas
                                 </h2>
                             </div>
                             <div class="h-[25rem] snap-y snap-mandatory overflow-y-auto p-2">
                                 <ul v-for="project in projects">
                                     <div class="mb-2 snap-center gap-2 space-y-2 rounded-lg border border-gray-300 p-2">
                                         <li class="font-semibold text-primary">{{ project.name }}</li>
-                                        <div class="block border-b-2 p-1 mb-2" v-for="task in project.tasks">
+                                        <div v-for="task in project.tasks"
+                                            class="block border-b-2 p-2 mb-2 rounded-lg hover:bg-gray-50"
+                                            :class="[task.task.id == selectedTaskId ? 'bg-gray-200 p-1 rounded-lg' : '']">
                                             <div class="flex justify-between items-center">
                                                 <li class="font-semibold">{{ task.task.name }}</li>
-                                                <li class="font-semibold">{{ task.task.percentDone }} %</li>
-                                                <div class="flex space-x-3 w-20">
+                                                <Knob v-tooltip.top="`Avance: ${parseInt(task.task.percentDone)}%`"
+                                                    :model-value="parseInt(task.task.percentDone)" readonly :size="40"
+                                                    valueTemplate="{value}%" />
+                                                <div class="flex space-x-3 ">
                                                     <Button v-tooltip.top="'Editar Tarea'" class="mb-2"
                                                         icon="pi pi-pencil" severity="warning" outlined small
-                                                        @click="editTask(project.id)" />
+                                                        @click="editTask(task)" />
+                                                    <Button v-tooltip.top="'Clonar Tarea'" class="mb-2"
+                                                        icon="pi pi-clone" severity="info" outlined small
+                                                        @click="cloneTask(task)" />
                                                     <Button v-tooltip.top="'Eliminar Tarea'" class="mb-2"
                                                         icon="pi pi-trash" severity="danger" outlined small
-                                                        @click="deleteTask(project.id)" />
+                                                        @click="deleteTask(task.id)" />
                                                 </div>
                                             </div>
                                             <div class="flex justify-between">
-                                                <li class="italic">Lunes {{ task.date }}</li>
+                                                <li class="italic">
+                                                    {{ format_ES_Date(task.date) }}</li>
                                                 <li v-tooltip.left="'Turno Ordinario'"
                                                     class="italic rounded-lg bg-success p-2 text-white text-xs">
                                                     {{ format24h(task.start_hour) }} - {{ format24h(task.end_hour) }}

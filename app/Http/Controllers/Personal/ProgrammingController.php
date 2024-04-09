@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Personal;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\Personal\PersonalScheduleDayJob;
+use App\Ldap\User;
 use App\Models\Personal\ExtendedSchedule;
 use App\Models\Projects\Project;
 use App\Models\Schedule;
@@ -90,7 +91,6 @@ class ProgrammingController extends Controller
             ]);
 
             $status = false;
-            $codigo = 1001; //Codigo para el caso en se trate de programar alguien con mas de 9.5 horas
             $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
             $conflict = [];
             $end_date = '';
@@ -146,14 +146,13 @@ class ProgrammingController extends Controller
                     }
                     $date = $date->addDays(1);
                 } while ($end_date->gte($date));
-                $codigo = 0;
+
                 $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
             }
             DB::commit();
 
             return response()->json([
                 'status' => $status,
-                'codigo' => $codigo,
                 'task' => $this->getSchedule($validateData['fecha'], $validateData['task_id']),
                 'hours' => $hours,
                 'conflict' => $conflict,
@@ -294,11 +293,32 @@ class ProgrammingController extends Controller
         ], 200);
     }
 
-    private function getSchedule($fecha, $taskId)
+    public function getSchedule($fecha, $task)
     {
-        return Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get()->sortBy([
-            ['is_my_personal', 'desc'],
-        ]);
+
+        return DetailScheduleTime::groupBy('idUsuario')->where('idTask', $task)->where('fecha', $fecha)->select(
+            Db::raw('MIN(nombre) as name'),
+            Db::raw('MIN(idUsuario) as id'),
+        )->get()->map(function ($d) use ($task, $fecha) {
+            return [
+                'name' => $d->name,
+                'user_id' => $d->id,
+                'times' => DetailScheduleTime::where([
+                    ['fecha', '=', $fecha],
+                    ['idTask', '=', $task],
+                    ['idUsuario', '=', $d->id],
+                ])->get(),
+                'photo' =>  User::where('employeenumber',  str_pad(
+                    $d->id,
+                    8,
+                    '0',
+                    STR_PAD_LEFT
+                ))->first()->photo(),
+            ];
+        });
+        // return Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get()->sortBy([
+        //     ['is_my_personal', 'desc'],
+        // ]);
     }
 
     /*
@@ -311,7 +331,7 @@ class ProgrammingController extends Controller
             'employee_id' => $userId,
         ])->pluck('id')->toArray();
 
-        $horas_acumulados = ScheduleTime::whereIn('schedule_id', $schedule)->selectRaw('SUM(datediff(mi,hora_inicio, hora_fin)) as diferencia_acumulada')->get();
+        $horas_acumulados = DetailScheduleTime::whereIn('idSchedule', $schedule)->selectRaw('SUM(datediff(mi,horaInicio, horaFin)) as diferencia_acumulada')->get();
 
         // dd($horas_acumulados);
         return $horas_acumulados[0]->diferencia_acumulada / 60;
@@ -623,49 +643,50 @@ class ProgrammingController extends Controller
     {
         try {
             DB::beginTransaction();
+            $schedule = Schedule::find($request->schedule);
+            // dd($schedule);
             switch ($request->type) {
                     //SOLO EL $request->date
                 case 1:
-                    $schedule = Schedule::find($request->schedule);
-                    $schedule->delete();
                     ScheduleTime::where('schedule_id', $schedule->id)->delete();
+                    $schedule->delete();
                     break;
                 case 2:
                     //RESTO DE LA ACTIVIDAD
-                    $schedule = Schedule::where('fecha', '>=', $request->date)
-                        ->where('employee_id', $request->idUser);
-                    $itemsToRemove = $schedule->get()->map(function ($item) {
-                        return $item->id;
-                    });
-                    ScheduleTime::whereIn('schedule_id', $itemsToRemove)->delete();
-                    $schedule->delete();
+                    $schedules = Schedule::where('fecha', '>=', $schedule->fecha)
+                        ->where('task_id', $schedule->task_id)
+                        ->where('employee_id', $schedule->employee_id)->pluck('id')->toArray();
+                    Schedule::whereIn('id', $schedules)->delete();
+                    ScheduleTime::whereIn('schedule_id', $schedules)->delete();
                     break;
-                case 3:
-                    //RANGO DE FECHAS
-                    $schedule = Schedule::where('employee_id', $request->idUser)
-                        ->whereBetween('fecha', [$request->details[0], $request->details[1]])->get();
-                    $itemsToRemove = $schedule->map(function ($item) {
-                        return $item->id;
-                    });
-                    ScheduleTime::whereIn('schedule_id', $itemsToRemove)->delete();
-                    Schedule::whereBetween('fecha', [$request->details[0], $request->details[1]])->delete();
-                    break;
+                    // case 3:
+                    //     //RANGO DE FECHAS
+                    //     $schedule = Schedule::where('employee_id', $request->idUser)
+                    //         ->whereBetween('fecha', [$request->details[0], $request->details[1]])->get();
+                    //     $itemsToRemove = $schedule->map(function ($item) {
+                    //         return $item->id;
+                    //     });
+                    //     ScheduleTime::whereIn('schedule_id', $itemsToRemove)->delete();
+                    //     Schedule::whereBetween('fecha', [$request->details[0], $request->details[1]])->delete();
+                    //     break;
                 case 4:
                     //FECHAS ESPECIFICAS
-                    foreach ($request->details as $date) {
-                        $schedule = Schedule::where('fecha', '=', $date)
-                            ->where('employee_id', '=', $request->idUser)->get()->first();
-                        ScheduleTime::where('schedule_id', $schedule->id)->delete();
-                        Schedule::where('fecha', $date)
-                            ->where('employee_id', $request->idUser)->delete();
-                    }
+                    $schedules = Schedule::whereIn('fecha', $request->details)
+                        ->where('task_id', $schedule->task_id)
+                        ->where('employee_id', $schedule->employee_id)->pluck('id')->toArray();
+                    Schedule::whereIn('id', $schedules)->delete();
+                    ScheduleTime::whereIn('schedule_id', $schedules)->delete();
                     break;
                 default:
                     break;
             }
             DB::commit();
 
-            return response()->json(['status' => true, 'mensaje' => 'Horario eliminado']);
+            return response()->json([
+                'status' => true,
+                'mensaje' => 'Horario eliminado',
+                'task' => $this->getSchedule($schedule->fecha, $schedule->task_id),
+            ]);
         } catch (Exception $e) {
             DB::rollBack();
 
@@ -686,12 +707,43 @@ class ProgrammingController extends Controller
         $date = Carbon::parse($request->date);
 
         if ($date->isSaturday() || $date->isSunday()) {
-            ExtendedSchedule::has('project')->has('task')->where('project_id', $project->id)
-                // ->where('executor','LIKE ,'%'.$request->executor.'%)
-                ->where('percentDone', '<', 100)
-                ->where('data', $request->date)
-                ->get()->map(function ($task) {
-                });
+            return response()->json(
+                ExtendedSchedule::has('project')->has('task')->where('project_id', $project->id)
+                    // ->where('executor','LIKE ,'%'.$request->executor.'%)
+                    ->where('date', $date)
+                    ->get()->map(function ($task) use ($date) {
+                        return [
+                            'name' => $task['task']['name'],
+                            'id' => $task['id'],
+                            'task' => $task->task->task->name,
+                            'taskdad' => $task->task->task->name ?? '',
+                            'endDate' => $task['task']['endDate'],
+                            'startDate' => $task['task']['startDate'],
+                            'percentDone' => $task['task']['percentDone'],
+                            'shift' => $task->project->shift ? Shift::where('id', $task->project->shift)->first() : null,
+                            'employees' => DetailScheduleTime::groupBy('idUsuario')->where('idTask', $task['task']['id'])->where('fecha', $date)->select(
+                                Db::raw('MIN(nombre) as name'),
+                                Db::raw('MIN(idUsuario) as id'),
+                            )->get()->map(function ($d) use ($task, $date) {
+                                return [
+                                    'name' => $d->name,
+                                    'user_id' => $d->id,
+                                    'times' => DetailScheduleTime::where([
+                                        ['fecha', '=', $date],
+                                        ['idTask', '=', $task['id']],
+                                        ['idUsuario', '=', $d->id],
+                                    ])->get(),
+                                    'photo' =>  User::where('employeenumber',  str_pad(
+                                        $d->id,
+                                        8,
+                                        '0',
+                                        STR_PAD_LEFT
+                                    ))->first()->photo(),
+                                ];
+                            }),
+                        ];
+                    })
+            );
         }
 
         return response()->json(
@@ -699,7 +751,7 @@ class ProgrammingController extends Controller
                 ->where('project_id', $project->id)
                 // ->where('executor','LIKE ,'%'.$request->executor.'%)
                 ->where('percentDone', '<', 100)
-                ->where('startDate', '<=', $request->date)
+                ->where('startDate', '<=', $date)
                 // ->where(function ($query) use ($request) {
                 //     $query->whereBetween('startdate', [$request->date_start, $request->date_end])
                 //         ->orWhereBetween('enddate', [$request->date_start, $request->date_end])
@@ -707,7 +759,7 @@ class ProgrammingController extends Controller
                 //             $query->where('enddate', '>', $request->date_end)
                 //                 ->where('startdate', '<', $request->date_start);
                 //         });
-                ->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) use ($request) {
+                ->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) use ($date) {
                     return [
                         'name' => $task['name'],
                         'id' => $task['id'],
@@ -717,7 +769,26 @@ class ProgrammingController extends Controller
                         'startDate' => $task['startDate'],
                         'percentDone' => $task['percentDone'],
                         'shift' => $task->project->shift ? Shift::where('id', $task->project->shift)->first() : null,
-                        'employees' => Schedule::with('scheduleTimes')->where('task_id', $task['id'])->where('fecha', $request->date)->get(),
+                        'employees' => DetailScheduleTime::groupBy('idUsuario')->where('idTask', $task['id'])->where('fecha', $date)->select(
+                            Db::raw('MIN(nombre) as name'),
+                            Db::raw('MIN(idUsuario) as id'),
+                        )->get()->map(function ($d) use ($task, $date) {
+                            return [
+                                'name' => $d->name,
+                                'user_id' => $d->id,
+                                'times' => DetailScheduleTime::where([
+                                    ['fecha', '=', $date],
+                                    ['idTask', '=', $task['id']],
+                                    ['idUsuario', '=', $d->id],
+                                ])->get(),
+                                'photo' =>  User::where('employeenumber',  str_pad(
+                                    $d->id,
+                                    8,
+                                    '0',
+                                    STR_PAD_LEFT
+                                ))->first()->photo(),
+                            ];
+                        }),
                     ];
                 }),
         );

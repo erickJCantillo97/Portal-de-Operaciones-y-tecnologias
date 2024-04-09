@@ -129,8 +129,8 @@ const copy = () => {
 </script>
 <template>
     <div v-if="rate > 0" :key="rate" @click="toggle" id="trmdolar"
-        :class="[change > 0 ? 'bg-green-100 text-primary' : 'bg-red-100 text-red-800', 'cursor-pointer inline-flex items-center rounded-full']">
-        <div class="flex flex-col items-center justify-center pl-3">
+        :class="[change > 0 ? 'bg-green-100 text-primary' : 'bg-red-100 text-red-800', ' py-0.5 cursor-pointer inline-flex items-center w-28 justify-between rounded-full']">
+        <div class="flex w-full flex-col items-center justify-center pl-3">
             <p class="text-xs leading-4 text-gray-900">TRM Hoy</p>
             <p class="text-sm font-semibold leading-4 text-primary">${{ rateT }} </p>
         </div>

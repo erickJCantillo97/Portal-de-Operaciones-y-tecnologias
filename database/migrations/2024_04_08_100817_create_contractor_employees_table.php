@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('materials', function (Blueprint $table) {
+        Schema::create('contractor_employees', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->nullable();
-            $table->string('code_proveedor')->nullable();
-            $table->string('description', 4000);
-            $table->string('description_SAP', 4000)->nullable();
-            $table->integer('unit')->nullable();
-            $table->string('observation')->nullable();
+            $table->string('contractor');
+            $table->string('name');
+            $table->string('labor')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -29,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('materials');
+        Schema::dropIfExists('contractor_employees');
     }
 };
