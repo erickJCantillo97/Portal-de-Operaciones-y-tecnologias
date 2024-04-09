@@ -21,14 +21,14 @@ const props = defineProps({
 })
 
 const openDialog = ref(false)
-const selectedContractor = ref()
 
 const items = ref([]);
 
 const search = (event) => {
-  let _items = [...Array(10).keys()];
-
-  items.value = event.query ? [...Array(10).keys()].map((item) => event.query + '-' + item) : _items;
+  console.log(event.query.toLowerCase());
+  let lista = props.employees.map(x => x.contractor)
+  console.log(lista);
+  items.value = lista.filter(x => x.toLowerCase().startsWith(event.query.toLowerCase()))
 }
 
 //#region CustomDataTable
@@ -44,9 +44,10 @@ const actions = [
   // { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
 ]
 //#endregion
-
+const employee = ref('')
 //#region CRUD
 const formData = useForm({
+  id: null,
   contractor: null,
   name: null,
   labor: null,
@@ -54,7 +55,7 @@ const formData = useForm({
 
 const submit = () => {
   try {
-    if (formData) {
+    if (formData.id == null) {
       formData.post(route('contractorEmployees.store'), {
         preserveScroll: true,
         onSuccess: () => {
@@ -109,7 +110,8 @@ const submit = () => {
 
 const editContractor = (event, contractor) => {
   try {
-    openModal()
+    openDialog.value = true
+    formData.id = contractor.id
     formData.contractor = contractor.contractor
     formData.name = contractor.name
     formData.labor = contractor.labor
@@ -143,6 +145,7 @@ const deleteContractor = (event, contractor) => {
 
 const openModal = () => {
   openDialog.value = true
+  formData.id = null
 }
 
 const clearModal = () => {
@@ -196,10 +199,10 @@ const urls = ref([
       </section>
     </template>
     <template #footer>
+
       <Button label="Cancelar" icon="fa-regular fa-circle-xmark" severity="danger" outlined @click="clearModal()" />
-      <Button icon="fa-solid fa-floppy-disk" severity="success" outlined @click="submit()">
-        {{ formData != null ? 'Actualizar ' : 'Guardar' }}
-      </Button>
+      <Button icon="fa-solid fa-floppy-disk" severity="success" :label="formData.id != null ? 'Actualizar ' : 'Guardar'"
+        outlined @click="submit()" />
     </template>
   </CustomModal>
 </template>

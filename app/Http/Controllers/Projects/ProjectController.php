@@ -84,6 +84,7 @@ class ProjectController extends Controller
 
         try {
             $validateData['gerencia'] = auth()->user()->gerencia;
+            $validateData['shift'] = 1;
             $project = Project::create($validateData);
             foreach ($request->ships as $ship) {
                 ProjectsShip::create([
@@ -194,6 +195,7 @@ class ProjectController extends Controller
         ]);
 
         try {
+            $validateData['shift'] = 1;
             $project->update($validateData);
             foreach ($request->ships as $ship) {
                 ProjectsShip::create([

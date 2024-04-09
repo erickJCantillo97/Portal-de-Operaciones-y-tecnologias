@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('materials', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->nullable()->unique();
+            $table->string('code')->nullable();
             $table->string('code_proveedor')->nullable();
             $table->string('description', 4000);
             $table->string('description_SAP', 4000)->nullable();

@@ -29,7 +29,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('actividadesDeultimonivelPorProyectos/{project}', [ProgrammingController::class, 'endNivelActivitiesByProject'])->name('actividadesDeultimonivelPorProyectos');
 
 
-    Route::get('getScheduleTaskDate/{fecha}/{task}', [ProgrammingController::class, 'getSchedule'])->name('get.schedule.task.date');
+    Route::get('getScheduleTaskDate/{fecha}/{task}', [ProgrammingController::class, 'getSchedule'])->name('get.task.schedule.date');
 
     /********************************  Rutas del controlador ExtendedScheduleController  ******************************/
 

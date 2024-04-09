@@ -10,6 +10,7 @@ use App\Models\Personal\Team;
 use App\Models\Personal\WorkingTeams;
 use App\Models\Schedule;
 use App\Models\ScheduleTime;
+use App\Models\Views\DetailScheduleTime;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -235,33 +236,24 @@ class PersonalController extends Controller
         $scheduleComplete = [];
         $scheduleNotComplete = [];
         foreach ($personal as $person) {
-            $schedule = Schedule::where('employee_id',  $person['Num_SAP'])->where('fecha', $request->date)->pluck('id')->toArray();
-            if ($schedule) {
-                $horas_acumulados = ScheduleTime::whereIn('schedule_id', $schedule)->selectRaw('SUM(datediff(mi,hora_inicio, hora_fin)) as diferencia_acumulada')->get();
-                $hours = $horas_acumulados[0]->diferencia_acumulada / 60;
-                if ($hours > 8.5) {
-                    array_push($scheduleComplete, [
-                        'name' => $person['Nombres_Apellidos'],
-                        'hours' => $hours,
-                        'cargo' => $person['Cargo'],
-                        'photo' => $person['photo']
-                    ]);
-                } else {
-                    array_push($scheduleNotComplete, [
-                        'name' => $person['Nombres_Apellidos'],
-                        'hours' => $hours,
-                        'cargo' => $person['Cargo'],
-                        'photo' => $person['photo']
-                    ]);
-                }
-            } else {
-                array_push($scheduleNotComplete, [
+            // $schedule = Schedule::where('employee_id',  $person['Num_SAP'])->where('fecha', $request->date)->pluck('id')->toArray();
+
+            $horas_acumulados = DetailScheduleTime::where('idUsuario', $person['Num_SAP'])->where('fecha', $request->date)->selectRaw('SUM(datediff(mi,horaInicio, horaFin)) as diferencia_acumulada')->get();
+            $hours = $horas_acumulados[0]->diferencia_acumulada / 60;
+            if ($hours > 8.5) {
+                array_push($scheduleComplete, [
                     'name' => $person['Nombres_Apellidos'],
-                    'hours' => 0,
+                    'hours' => $hours,
                     'cargo' => $person['Cargo'],
                     'photo' => $person['photo']
                 ]);
-                // $scheduleNotComplete[] = $schedule;
+            } else {
+                array_push($scheduleNotComplete, [
+                    'name' => $person['Nombres_Apellidos'],
+                    'hours' => $hours,
+                    'cargo' => $person['Cargo'],
+                    'photo' => $person['photo']
+                ]);
             }
         }
         return response()->json([

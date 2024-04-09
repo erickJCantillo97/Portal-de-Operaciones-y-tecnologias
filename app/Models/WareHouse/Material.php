@@ -22,7 +22,7 @@ class Material extends Model implements Auditable
         'RETAL' => 4,
         'PENDIENTE' => 0,
     ];
-
+    
     public static $unidad = [
         'UNIDAD' => 1,
         'METROS' => 2,

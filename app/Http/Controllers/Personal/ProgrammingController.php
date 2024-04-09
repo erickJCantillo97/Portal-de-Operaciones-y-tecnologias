@@ -331,7 +331,7 @@ class ProgrammingController extends Controller
             'employee_id' => $userId,
         ])->pluck('id')->toArray();
 
-        $horas_acumulados = ScheduleTime::whereIn('schedule_id', $schedule)->selectRaw('SUM(datediff(mi,hora_inicio, hora_fin)) as diferencia_acumulada')->get();
+        $horas_acumulados = DetailScheduleTime::whereIn('idSchedule', $schedule)->selectRaw('SUM(datediff(mi,horaInicio, horaFin)) as diferencia_acumulada')->get();
 
         // dd($horas_acumulados);
         return $horas_acumulados[0]->diferencia_acumulada / 60;
