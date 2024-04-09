@@ -162,6 +162,12 @@ const navigation = [
                 dev: false,
                 show: true
             },
+            {
+                name: 'Contratistas',
+                href: 'contractorEmployees.index',
+                dev: false,
+                show: true
+            },
             // { name: 'Programación', href: '#' },
             // { name: 'Parte Diario', href: '#' },
             // { name: 'Informes', href: '#' },

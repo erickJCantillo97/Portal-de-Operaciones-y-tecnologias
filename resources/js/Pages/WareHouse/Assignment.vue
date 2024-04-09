@@ -90,7 +90,12 @@ const deleteAssignment = (event, data) => {
 const submit = () => {
   try {
     if (form.tools == null) {
-      toast.add({ severity: 'error', group: 'customToast', text: 'Seleccione los Equipos a Asignar', life: 2000 });
+      toast.add({
+        severity: 'error',
+        group: 'customToast',
+        text: 'Seleccione los Equipos a Asignar',
+        life: 2000
+      })
     } else {
       router.post(route('assignmentTool.store'),
         {
@@ -99,11 +104,16 @@ const submit = () => {
           supervisor_id: selectedSupervisor.value.Num_SAP,
           project_id: selectedProject.value?.id ?? 0,
           email: selectedEmployee.value.Correo,
-          tools: form.tools
+          tools: form.tools.map(value => value.id)
         },
         {
           onSuccess: () => {
-            toast.add({ severity: 'success', group: 'customToast', text: 'Asignación Exitosa, Enviaremos un Mensaje a: ' + selectedEmployee.value.Correo, life: 10000 });
+            toast.add({
+              severity: 'success',
+              group: 'customToast',
+              text: 'Asignación Exitosa, Enviaremos un Mensaje a: ' + selectedEmployee.value.Correo,
+              life: 10000
+            })
             // toast(`¡Asignación creada exitosamente!`, 'success')
             clearModal()
           },
@@ -124,10 +134,10 @@ const submitDownload = () => {
     observation: descriptionValue.value
   }, {
     onSuccess: () => {
-      toast.add({ summary: 'Asignación Descargada', life: 2000 });
+      toast.add({ summary: 'Asignación Descargada', life: 2000 })
       clearModal2()
     }
-  });
+  })
 }
 
 const clearModal = () => {
@@ -142,9 +152,16 @@ const clearModal2 = () => {
   openDialog2.value = false
   form.reset()
 }
+
+const urls = ref([
+  {
+    url: '/assignmentTool',
+    label: 'Asignación Herramientas'
+  },
+])
 </script>
 <template>
-  <AppLayout>
+  <AppLayout :urls="urls">
     <div class="w-full h-[89vh] overflow-y-auto">
       <CustomDataTable :data="assignmentsTool" title="Asignaciones" :rows-default="15" :columnas="columnas"
         :actions="actions" @download="downloadAssignment" @delete="deleteAssignment">
@@ -191,43 +208,12 @@ const clearModal2 = () => {
         <div class="col-span-2">
           <label class="text-md font-semibold">Seleccionar Equipos</label>
           <div class="flex flex-nowrap gap-2 mb-2 w-full overflow-x-auto">
-            <div v-for="tool in form.tools" class="bg-emerald-100 rounded-lg">
-              <ul class="flex">
-                <li class="p-2 text-sm text-emerald-500 font-semibold">
+            <div v-for="tool in form.tools"
+              class="bg-emerald-100 border border-l-8 border-l-emerald-400 rounded-lg shadow-lg shadow-emerald-200">
+              <ul class="flex flex-col">
+                <li class="p-2 text-xs text-emerald-500 font-semibold">
                   {{ tool.name }}
-                  <span class="text-xs">{{ tool.serial }}</span>
-                </li>
-              </ul>
-            </div>
-            <div v-for="tool in form.tools" class="bg-emerald-100 rounded-lg">
-              <ul class="flex">
-                <li class="p-2 text-sm text-emerald-500 font-semibold">
-                  {{ tool.name }}
-                  <span class="text-xs">{{ tool.serial }}</span>
-                </li>
-              </ul>
-            </div>
-            <div v-for="tool in form.tools" class="bg-emerald-100 rounded-lg">
-              <ul class="flex">
-                <li class="p-2 text-sm text-emerald-500 font-semibold">
-                  {{ tool.name }}
-                  <span class="text-xs">{{ tool.serial }}</span>
-                </li>
-              </ul>
-            </div>
-            <div v-for="tool in form.tools" class="bg-emerald-100 rounded-lg">
-              <ul class="flex">
-                <li class="p-2 text-sm text-emerald-500 font-semibold">
-                  {{ tool.name }}
-                  <span class="text-xs">{{ tool.serial }}</span>
-                </li>
-              </ul>
-            </div>
-            <div v-for="tool in form.tools" class="bg-emerald-100 rounded-lg">
-              <ul class="flex">
-                <li class="p-2 text-sm text-emerald-500 font-semibold">
-                  {{ tool.name }}
-                  <span class="text-xs">{{ tool.serial }}</span>
+                  <span class="block text-xs">{{ tool.serial }}</span>
                 </li>
               </ul>
             </div>
