@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Personal\ContractorEmployeeController;
 use App\Http\Controllers\Personal\PersonalController;
 use App\Http\Controllers\Personal\ProgrammingController;
 use App\Http\Controllers\Personal\TeamController;
@@ -36,6 +37,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('getAssignmentHour/', [ProgrammingController::class, 'getAssignmentHour'])->name('get.assignment.hours');
 
     Route::get('getTimesEmployee', [ProgrammingController::class, 'getTimesSchedulesEmployee'])->name('get.times.employees');
-    
+
     Route::post('getSchedulePersonalStatus', [PersonalController::class, 'getSchedulePersonalStatus'])->name('get.personal.status.programming');
+
+    //Proveedores/Contratistas
+    Route::resource('contractorEmployees', ContractorEmployeeController::class);
 });

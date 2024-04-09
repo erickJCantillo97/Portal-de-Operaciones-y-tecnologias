@@ -73,7 +73,6 @@ const submit = () => {
                     text: 'Tarea extendida creada con éxito',
                     life: 2000
                 })
-                openModal.value = false
                 resetFormData()
             },
             onError: (errors) => {
@@ -83,20 +82,18 @@ const submit = () => {
                     text: 'No se ha podido guardar la tarea ' + errors,
                     life: 2000
                 })
-                openModal.value = false
                 resetFormData()
             }
         })
     } else {
         router.put(route('extended.schedule.update', selectedTaskId.value), formData.value, {
-            onSuccess: (data) => {
+            onSuccess: () => {
                 toast.add({
                     severity: 'success',
                     group: 'customToast',
                     text: 'Tarea extendida actualizada con éxito',
                     life: 2000
                 })
-                openModal.value = false
                 resetFormData()
             },
             onError: (errors) => {
@@ -106,7 +103,6 @@ const submit = () => {
                     text: 'No se ha podido actualizar la tarea ' + errors,
                     life: 2000
                 })
-                openModal.value = false
                 resetFormData()
             }
         })
@@ -181,6 +177,8 @@ const deleteTask = (id_task) => {
 //#endregion
 
 const resetFormData = () => {
+    openModal.value = false
+
     formData.value = {
         dates: [],
         start_hour: '',
