@@ -345,9 +345,8 @@ const save = async () => {
                     <div class="sm:flex grid grid-cols-2 items-center gap-2 sm:space-x-2">
                         <MultiSelect v-model="projectsSelected" display="chip" :options="projects" optionLabel="name"
                             class="w-56 hidden sm:flex" placeholder="Seleccione un proyecto" @change="getTask()" />
-                        <Dropdown v-model="projectsSelected[0]" placeholder="Seleccione un proyecto" :options="projects" optionLabel="name"  @change="getTask()"
-                        class="sm:hidden flex"
-                        />
+                        <Dropdown v-model="projectsSelected[0]" placeholder="Seleccione un proyecto" :options="projects"
+                            optionLabel="name" @change="getTask()" class="sm:hidden flex" />
                         <ButtonGroup class="hidden sm:block">
                             <Button label="Mes" disabled @click="
                                 mode = 'month';
@@ -552,7 +551,7 @@ const save = async () => {
                     </div>
                     <div v-if="mode == 'date'"
                         class=" h-full sm:h-[80vh] border rounded-md flex flex-col justify-between">
-                        <p class="w-full h-6 text-center bg-primary-light font-bold">
+                        <p class="sm:block hidden w-full h-6 text-center bg-primary-light font-bold">
                             Programacion del dia {{ dates.toLocaleDateString() }}
                         </p>
                         <div class="h-full p-1 sm:overflow-y-auto space-y-1">
@@ -562,15 +561,20 @@ const save = async () => {
                                     <p class="font-bold">
                                         {{ project.name }}
                                     </p>
-                                    <Knob v-tooltip="'Avance'" :model-value="parseInt(project.avance)" readonly
-                                        :size="40" valueTemplate="{value}%" />
-                                    <div class="text-xs">
+                                    <div class="text-xs sm:block flex">
                                         <p v-tooltip="'Fecha de inicio'" class="px-2">{{ project.fechaI }}</p>
                                         <p v-tooltip="'Fecha de fin'" class="px-2">{{ project.fechaF }}</p>
                                     </div>
+                                    <Knob v-tooltip="'Avance'" :model-value="parseInt(project.avance)" readonly
+                                    :size="40" valueTemplate="{value}%" class="sm:flex hidden" />
+                                    <div class="h-6 w-1/2 sm:hidden">
+                                        <ProgressBar :value="parseFloat(project.avance).toFixed(2)" class="" v-tooltip="'Avance'"
+                                            :pt="{ label: 'text-xs font-thin' }">
+                                        </ProgressBar>
+                                    </div>
                                 </div>
                                 <div
-                                    class="w-full h-[55vh] sm:h-full overflow-y-auto sm:overflow-x-auto grid grid-cols-2 sm:grid-cols-5">
+                                    class="w-full h-[60vh] sm:h-full overflow-y-auto sm:overflow-x-auto grid grid-cols-2 sm:grid-cols-5">
                                     <div v-if="project.tasks[dates.toISOString().split('T')[0]].loading"
                                         class="flex col-span-5 justify-center h-full items-center">
                                         <Loading />
