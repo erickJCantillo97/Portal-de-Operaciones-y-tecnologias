@@ -330,8 +330,8 @@ const save = async () => {
 
 <template>
     <AppLayout>
-        <div class="h-full w-full sm:grid sm:grid-cols-8 flex-col">
-            <div class="sm:col-span-7 sm:h-full space-y-1 pt-1 px-1 flex flex-col">
+        <div class="h-full w-full sm:grid sm:grid-cols-8 flex-col overflow-hidden">
+            <div class="sm:col-span-7 h-[88%] sm:h-full space-y-1 pt-1 px-1 flex flex-col">
                 <div class="sm:flex grid grid-cols-1 gap-1 justify-between sm:h-10 items-center sm:pr-1">
                     <div class="flex w-full justify-between sm:w-fit space-x-4">
                         <p class="text-xl font-bold text-primary h-full items-center flex">
@@ -364,7 +364,7 @@ const save = async () => {
                     </div>
                 </div>
                 <!-- region calendario -->
-                <span class="cursor-default">
+                <div class="cursor-default flex flex-col h-full">
                     <div v-if="mode == 'week'" class="h-[80vh] flex flex-col justify-between border rounded-md">
                         <!-- region Cabezeras -->
                         <div class="grid-cols-10 h-6 text-lg leading-6 grid pr-3 border-b shadow-md mb-1 ">
@@ -547,7 +547,7 @@ const save = async () => {
                         </div>
                     </div>
                     <div v-if="mode == 'date'"
-                        class=" h-[70vh] sm:h-[80vh] border rounded-md flex flex-col justify-between">
+                        class=" h-full sm:h-[80vh] border rounded-md flex flex-col justify-between">
                         <p class="w-full h-6 text-center bg-primary-light font-bold">
                             Programacion del dia {{ dates.toLocaleDateString() }}
                         </p>
@@ -687,24 +687,21 @@ const save = async () => {
                         </div>
                     </div>
                     <div v-if="mode == 'month'" class="h-[80vh] flex flex-col justify-between"></div>
-                </span>
-                <!-- <div class="h-full" v-else>
-                    <NoContentToShow subject="Seleccione uno o mas proyectos" />
-                </div> -->
+                </div>
             </div>
             <!--#region LISTA PERSONAL-->
-            <div class="row-span-2 sm:block rounded-lg border h-full p-1">
+            <div class="sm:row-span-2 block sm:rounded-lg border sm:h-full p-1">
                 <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
                 <Loading v-if="loadingPerson" class="mt-10" message="Cargando personas" />
                 <div v-else class="sm:overflow-y-auto sm:h-[81vh] p-1">
                     <Container oncontextmenu="return false" onkeydown="return false" behaviour="copy" group-name="1"
                         @drag-start="dragStart = true" @drag-end="dragStart = false"
-                        :get-child-payload="getChildPayload" class="sm:space-y- ">
+                        :get-child-payload="getChildPayload" class="sm:space-y-1 flex sm:flex-col space-x-1 overflow-y-auto">
                         <Draggable v-for="item in personal" :key="item.id"
                             v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
                             :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"
                             :drag-not-allowed="false"
-                            class="snap-start rounded-xl h-full shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
+                            class="snap-start rounded-xl border border-primary h-full shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
                             <div class="flex flex-col gap-x-1 p-1">
                                 <span class=" flex flex-col justify-center">
                                     <p class="text-sm font-semibold truncate  text-gray-900">
