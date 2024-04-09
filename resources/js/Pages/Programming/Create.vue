@@ -104,8 +104,8 @@ const personsEdit = ref()
 const tabActive = ref()
 const statusPersonal = ref({})
 const selectDays = ref([])
-const filterProgram=ref(false)
-const arrayFilter=ref()
+const filterProgram = ref(false)
+const arrayFilter = ref()
 
 //#endregion
 
@@ -525,21 +525,26 @@ const save = async () => {
                                 </p>
                             </div>
                             <span class="col-span-9 grid grid-cols-7 z-10">
-                                <div v-for="dia, index in diasSemana" class="flex h-full justify-center items-center space-x-3 px-2"
-                                    :key="index + dia" @click="filterProgram?(filterProgram=false,arrayFilter=[]):(filterProgram=true,arrayFilter=statusPersonal[dia.toISOString().split('T')[0]].data.programados)"
+                                <div v-for="dia, index in diasSemana"
+                                    class="flex h-full justify-center items-center space-x-3 px-2" :key="index + dia"
+                                    @click="filterProgram ? (filterProgram = false, arrayFilter = []) : (filterProgram = true, arrayFilter = statusPersonal[dia.toISOString().split('T')[0]].data.programados)"
                                     :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary rounded-b-md font-bold' : '']">
-                                    <div class="w-full flex items-center justify-center" v-if="statusPersonal[dia.toISOString().split('T')[0]].loading">
+                                    <div class="w-full flex items-center justify-center"
+                                        v-if="statusPersonal[dia.toISOString().split('T')[0]].loading">
                                         <i class="fa-solid fa-spinner animate-spin" />
                                     </div>
-                                    <div class="rounded bg-primary px-2 w-1/2 text-center text-white" v-if="statusPersonal[dia.toISOString().split('T')[0]].data.programados?.length > 0"
-                                        v-tooltip.top="{ value:`<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
+                                    <div class="rounded bg-primary px-2 w-1/2 text-center text-white"
+                                        v-if="statusPersonal[dia.toISOString().split('T')[0]].data.programados?.length > 0"
+                                        v-tooltip.top="{ value: `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
                                         <p>
                                             {{ statusPersonal[dia.toISOString().split('T')[0]].data.programados.length
                                             }}
                                         </p>
                                     </div>
-                                    <i v-if="arrayFilter==statusPersonal[dia.toISOString().split('T')[0]].data.programados" class="fa-solid fa-filter p-1 bg-success-light rounded-md"></i>
-                                    <div class="rounded bg-danger px-2 w-1/2 text-center text-white" v-if="statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados?.length > 0"
+                                    <i v-if="arrayFilter == statusPersonal[dia.toISOString().split('T')[0]].data.programados"
+                                        class="fa-solid fa-filter p-1 bg-success-light rounded-md"></i>
+                                    <div class="rounded bg-danger px-2 w-1/2 text-center text-white"
+                                        v-if="statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados?.length > 0"
                                         v-tooltip.top="{ value: `<div><p class='w-full text-center font-bold'>No programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
                                         <p>
                                             {{ statusPersonal[dia.toISOString().split('T')[0]].data.noProgramados.length
@@ -567,10 +572,10 @@ const save = async () => {
                                         <p v-tooltip="'Fecha de fin'" class="px-2">{{ project.fechaF }}</p>
                                     </div>
                                     <Knob v-tooltip="'Avance'" :model-value="parseInt(project.avance)" readonly
-                                    :size="40" valueTemplate="{value}%" class="sm:flex hidden" />
+                                        :size="40" valueTemplate="{value}%" class="sm:flex hidden" />
                                     <div class="h-6 w-1/2 sm:hidden">
-                                        <ProgressBar :value="parseFloat(project.avance).toFixed(2)" class="" v-tooltip="'Avance'"
-                                            :pt="{ label: 'text-xs font-thin' }">
+                                        <ProgressBar :value="parseFloat(project.avance).toFixed(2)" class=""
+                                            v-tooltip="'Avance'" :pt="{ label: 'text-xs font-thin' }">
                                         </ProgressBar>
                                     </div>
                                 </div>
@@ -586,12 +591,13 @@ const save = async () => {
                                             class="border border-primary h-40 rounded-md flex flex-col justify-between">
                                             <div class="flex flex-col justify-between h-full">
                                                 <span>
-                                                    <p
-                                                        class="border-b font-bold border-primary h-10 flex items-center justify-center text-xs px-0.5 w-full text-center">
+                                                    <p v-tooltip="task.name"
+                                                        class="border-b font-bold trun border-primary h-10 flex items-center justify-center text-xs px-0.5 w-full text-center">
                                                         {{ task.name }}
-                                                        <!-- {{ console.log(task) }} -->
                                                     </p>
-                                                    <p class="text-xs px-1 text-center w-full">{{ task.task }}</p>
+                                                    <p v-tooltip="task.task"
+                                                        class="text-xs px-1 text-center w-full truncate">{{ task.task }}
+                                                    </p>
                                                     <div
                                                         class="flex cursor-default space-x-2 justify-center rounded-md">
                                                         <p v-tooltip.left="'Fecha inicio'"
@@ -608,10 +614,10 @@ const save = async () => {
                                                     <div
                                                         class="flex cursor-default flex-col justify-center rounded-md h-full">
                                                         <p v-tooltip.left="'Hora inicio'" class="text-sm text-center">
-                                                            {{ format24h(task.shift?.startShift ?? null) }}
+                                                            {{ format24h(task.shift?.startShift ?? '') }}
                                                         </p>
                                                         <p v-tooltip.left="'Hora Fin'" class="text-sm text-center">
-                                                            {{ format24h(task.shift?.endShift ?? null) }}
+                                                            {{ format24h(task.shift?.endShift ?? '') }}
                                                         </p>
                                                     </div>
                                                     <Container
@@ -675,8 +681,9 @@ const save = async () => {
                             </div>
                         </div>
                         <div class="w-full justify-center flex space-x-2 p-1 z-10"
-                          @click="filterProgram?filterProgram=false:filterProgram=true;arrayFilter=statusPersonal[dates.toISOString().split('T')[0]].data.programados" >
-                            <p class="rounded bg-primary px-2 text-white" v-if="statusPersonal[dates.toISOString().split('T')[0]].data.programados?.length > 0"
+                            @click="filterProgram ? filterProgram = false : filterProgram = true; arrayFilter = statusPersonal[dates.toISOString().split('T')[0]].data.programados">
+                            <p class="rounded bg-primary px-2 text-white"
+                                v-if="statusPersonal[dates.toISOString().split('T')[0]].data.programados?.length > 0"
                                 v-tooltip="{ value: `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
                                 Programados:
                                 <i v-if="statusPersonal[dates.toISOString().split('T')[0]].loading"
@@ -685,7 +692,8 @@ const save = async () => {
                                 statusPersonal[dates.toISOString().split('T')[0]].data.programados.length }}
                                 </span>
                             </p>
-                            <p class="rounded bg-danger px-2 text-white" v-if="statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados?.length > 0"
+                            <p class="rounded bg-danger px-2 text-white"
+                                v-if="statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados?.length > 0"
                                 v-tooltip.click.top="{ value: `<div><p class='w-full text-center font-bold'>No programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
                                 No programados:
                                 <i v-if="statusPersonal[dates.toISOString().split('T')[0]].loading"
@@ -694,6 +702,7 @@ const save = async () => {
                                 statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados.length }}
                                 </span>
                             </p>
+                            <i v-if="filterProgram" class="fa-solid fa-filter"></i>
                             <!-- <p class="rounded bg-warning px-2 text-white">No programables 3</p> -->
                         </div>
                     </div>
@@ -701,7 +710,7 @@ const save = async () => {
                 </div>
             </div>
             <!--#region LISTA PERSONAL-->
-            <div class="sm:row-span-2 block sm:rounded-lg border  sm:h-full h-24 p-1">
+            <div class="sm:row-span-2 block sm:rounded-lg border divide-y space-y-1 sm:h-full h-24 p-1 gap-1">
                 <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
                 <div v-if="loadingPerson" class="w-full h-full flex flex-col justify-center">
                     <Loading class="mt-10 hidden sm:flex" message="Cargando personas" />
@@ -713,18 +722,18 @@ const save = async () => {
                     class="sm:overflow-y-auto overflow-x-visible flex sm:block overflow-y-hidden sm:h-[81vh] p-1 space-x-1 space-y-0 sm:space-y-1 sm:space-x-0 sm:w-full">
                     <Draggable v-for="item in personal" :key="item.id"
                         v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
-                        :class="[(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden',filterProgram?(arrayFilter.find(objeto => objeto.name === item.Nombres_Apellidos)!==undefined?'bg-green-200':'bg-red-200'):'']"
+                        :class="[(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden', filterProgram ? (arrayFilter.find(objeto => objeto.name === item.Nombres_Apellidos) !== undefined ? 'bg-green-200' : 'bg-red-200') : '']"
                         :drag-not-allowed="false"
-                        class=" min-w-[25vw] sm:min-w-full rounded-xl border border-primary h-full sm:h-20 shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
-                        <div class="flex sm:w-full flex-col gap-x-1 p-1">
+                        class="min-w-[25vw] sm:min-w-32 rounded-xl border border-primary h-full sm:h-16 shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
+                        <div class="flex flex-col h-full justify-center gap-x-1 p-1">
                             <div class="flex flex-col justify-center">
                                 <p class="text-sm font-semibold truncate text-gray-900">
                                     {{ item.Nombres_Apellidos }}
                                 </p>
-                                <p class="flex mt-1 text-xs truncate  text-gray-500">
+                                <p class="text-xs truncate  text-gray-500">
                                     {{ item.Cargo }}
                                 </p>
-                                <p class="flex mt-1 text-xs truncate  text-gray-500">
+                                <p class="text-xs truncate  text-gray-500">
                                     {{ item.Oficina }}
                                 </p>
                             </div>
