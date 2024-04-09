@@ -22,6 +22,7 @@ import InputSwitch from 'primevue/inputswitch';
 import CustomShiftSelector from '@/Components/CustomShiftSelector.vue';
 import { useToast } from "primevue/usetoast";
 import Knob from 'primevue/knob';
+import Dropdown from 'primevue/dropdown';
 const toast = useToast();
 // const { hasRole, hasPermission } = usePermissions()
 
@@ -33,17 +34,17 @@ defineProps({
 function format24h(hora) {
     try {
         if (hora.length > 5) {
-        return new Date(hora).toLocaleString('es-CO',
-            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-    } else {
-        return new Date("1970-01-01T" + hora).toLocaleString('es-CO',
-            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-    }
+            return new Date(hora).toLocaleString('es-CO',
+                { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+        } else {
+            return new Date("1970-01-01T" + hora).toLocaleString('es-CO',
+                { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+        }
     } catch (error) {
         console.log(error)
         return 'error'
     }
-    
+
 }
 function obtenerFormatoSemana(fecha) {
     const fechaActual = fecha;
@@ -343,7 +344,10 @@ const save = async () => {
                     </div>
                     <div class="sm:flex grid grid-cols-2 items-center gap-2 sm:space-x-2">
                         <MultiSelect v-model="projectsSelected" display="chip" :options="projects" optionLabel="name"
-                            class="sm:w-56 w-full" placeholder="Seleccione un proyecto" @change="getTask()" />
+                            class="w-56 hidden sm:flex" placeholder="Seleccione un proyecto" @change="getTask()" />
+                        <Dropdown v-model="projectsSelected[0]" placeholder="Seleccione un proyecto" :options="projects" optionLabel="name"  @change="getTask()"
+                        class="sm:hidden flex"
+                        />
                         <ButtonGroup class="hidden sm:block">
                             <Button label="Mes" disabled @click="
                                 mode = 'month';
@@ -565,7 +569,8 @@ const save = async () => {
                                         <p v-tooltip="'Fecha de fin'" class="px-2">{{ project.fechaF }}</p>
                                     </div>
                                 </div>
-                                <div class="w-full h-[55vh] sm:h-full overflow-y-auto sm:overflow-x-auto grid grid-cols-2 sm:grid-cols-5">
+                                <div
+                                    class="w-full h-[55vh] sm:h-full overflow-y-auto sm:overflow-x-auto grid grid-cols-2 sm:grid-cols-5">
                                     <div v-if="project.tasks[dates.toISOString().split('T')[0]].loading"
                                         class="flex col-span-5 justify-center h-full items-center">
                                         <Loading />
@@ -598,10 +603,10 @@ const save = async () => {
                                                     <div
                                                         class="flex cursor-default flex-col justify-center rounded-md h-full">
                                                         <p v-tooltip.left="'Hora inicio'" class="text-sm text-center">
-                                                            {{ format24h(task.shift?.startShift??null) }}
+                                                            {{ format24h(task.shift?.startShift ?? null) }}
                                                         </p>
                                                         <p v-tooltip.left="'Hora Fin'" class="text-sm text-center">
-                                                            {{ format24h(task.shift?.endShift??null) }}
+                                                            {{ format24h(task.shift?.endShift ?? null) }}
                                                         </p>
                                                     </div>
                                                     <Container
@@ -690,34 +695,36 @@ const save = async () => {
                 </div>
             </div>
             <!--#region LISTA PERSONAL-->
-            <div class="sm:row-span-2 block sm:rounded-lg border sm:h-full p-1">
+            <div class="sm:row-span-2 block sm:rounded-lg border  sm:h-full h-24 p-1">
                 <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
-                <Loading v-if="loadingPerson" class="mt-10" message="Cargando personas" />
-                <div v-else class="sm:overflow-y-auto sm:h-[81vh] p-1">
-                    <Container oncontextmenu="return false" onkeydown="return false" behaviour="copy" group-name="1"
-                        @drag-start="dragStart = true" @drag-end="dragStart = false"
-                        :get-child-payload="getChildPayload" class="sm:space-y-1 flex sm:flex-col space-x-1 overflow-y-auto">
-                        <Draggable v-for="item in personal" :key="item.id"
-                            v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
-                            :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"
-                            :drag-not-allowed="false"
-                            class="snap-start rounded-xl border border-primary h-full shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
-                            <div class="flex flex-col gap-x-1 p-1">
-                                <span class=" flex flex-col justify-center">
-                                    <p class="text-sm font-semibold truncate  text-gray-900">
-                                        {{ item.Nombres_Apellidos }}
-                                    </p>
-                                    <p class="flex mt-1 text-xs truncate  text-gray-500">
-                                        {{ item.Cargo }}
-                                    </p>
-                                    <p class="flex mt-1 text-xs truncate  text-gray-500">
-                                        {{ item.Oficina }}
-                                    </p>
-                                </span>
-                            </div>
-                        </Draggable>
-                    </Container>
+                <div v-if="loadingPerson" class="w-full h-full flex flex-col justify-center">
+                    <Loading class="mt-10 hidden sm:flex" message="Cargando personas" />
+                    <ProgressBar mode="indeterminate" class="flex sm:hidden" style="height: 4px" />
                 </div>
+                <Container v-else-if="personal.length > 0" oncontextmenu="return false" onkeydown="return false"
+                    behaviour="copy" group-name="1" @drag-start="dragStart = true" @drag-end="dragStart = false"
+                    :key="String(personal.length) + loadingPerson" :get-child-payload="getChildPayload"
+                    class="sm:overflow-y-auto overflow-x-visible flex sm:block overflow-y-hidden sm:h-[81vh] p-1 space-x-1 space-y-0 sm:space-y-1 sm:space-x-0 sm:w-full">
+                    <Draggable v-for="item in personal" :key="item.id"
+                        v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
+                        :class="(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden'"
+                        :drag-not-allowed="false"
+                        class=" min-w-[25vw] sm:min-w-full rounded-xl border border-primary h-full sm:h-20 shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
+                        <div class="flex sm:w-full flex-col gap-x-1 p-1">
+                            <div class="flex flex-col justify-center">
+                                <p class="text-sm font-semibold truncate text-gray-900">
+                                    {{ item.Nombres_Apellidos }}
+                                </p>
+                                <p class="flex mt-1 text-xs truncate  text-gray-500">
+                                    {{ item.Cargo }}
+                                </p>
+                                <p class="flex mt-1 text-xs truncate  text-gray-500">
+                                    {{ item.Oficina }}
+                                </p>
+                            </div>
+                        </div>
+                    </Draggable>
+                </Container>
             </div>
         </div>
     </AppLayout>
