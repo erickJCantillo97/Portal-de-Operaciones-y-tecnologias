@@ -54,4 +54,18 @@ class DashboardWareHouseController extends Controller
             'status' => true
         ], 200);
     }
+
+    public function getTotalStatusCategories($category)
+    {
+
+        $warehouse = Warehouse::where('department', Auth::user()->oficina)->first()->id ?? 4;
+        $tools = Tool::where('warehouse_id', $warehouse)->where('category_id', $category)
+            ->select(DB::raw('count(id) as value'), DB::raw('UPPER(estado) as estado'))
+            ->groupBy('estado')->get();
+
+        return response()->json([
+            'tools' => $tools,
+            'status' => true
+        ], 200);
+    }
 }
