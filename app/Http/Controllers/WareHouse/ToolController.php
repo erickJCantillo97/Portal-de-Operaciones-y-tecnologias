@@ -183,4 +183,10 @@ class ToolController extends Controller
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
+
+    public function reports()
+    {
+
+        return Inertia::render('WareHouse/Dashboards/Index');
+    }
 }

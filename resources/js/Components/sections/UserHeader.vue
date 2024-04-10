@@ -25,8 +25,7 @@ import {
                                 <img class="hidden sm:hidden md:hidden lg:hidden xl:hidden"
                                     :src="$page.props.auth.user.photo" alt="" />
                                 <h1 class="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:leading-9">
-                                    Buen
-                                    Dia, {{ $page.props.auth.user.name }}</h1>
+                                    Saludos, {{ $page.props.auth.user.name }}</h1>
                             </div>
                             <dl class="flex flex-col mt-6 sm:ml-3 sm:mt-1 sm:flex-row sm:flex-wrap">
                                 <dt class="sr-only">Company</dt>

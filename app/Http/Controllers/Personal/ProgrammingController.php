@@ -152,7 +152,7 @@ class ProgrammingController extends Controller
             DB::commit();
 
             return response()->json([
-                'status' => $status,
+                'status' => true,
                 'task' => $this->getSchedule($validateData['fecha'], $validateData['task_id']),
                 'hours' => $hours,
                 'conflict' => $conflict,

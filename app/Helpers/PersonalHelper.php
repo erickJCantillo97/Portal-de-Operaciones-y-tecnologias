@@ -84,9 +84,7 @@ function setEmpleadosAPI(): mixed
 
 function searchEmpleados(string $clave, string $valor)
 {
-    return getEmpleadosAPI()->filter(function ($employee) use ($clave, $valor) {
-        return strpos($employee[$clave], $valor) !== false;
-    });
+    return Employee::where($clave, $valor)->get();
 }
 // ->map(function ($person) {
 //     return [
@@ -121,7 +119,7 @@ function getPersonalUser()
                 'Costo_Hora' => $person['Costo_Hora'],
                 'Costo_Mes' => $person['Costo_Mes'],
                 'Oficina' => $person['Oficina'],
-                'canDelete' => $person['JI_Num_SAP'] != auth()->user()->num_sap,
+                'canDelete' =>  $person['Oficina'] != auth()->user()->oficina,
                 'Nombres_Apellidos' => $person['Nombres_Apellidos'],
                 'Cargo' => $person['Cargo'],
                 'photo' => User::where('userprincipalname', $person['Correo'])->first()->photo(),

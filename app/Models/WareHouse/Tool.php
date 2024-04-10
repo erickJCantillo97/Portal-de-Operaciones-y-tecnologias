@@ -45,7 +45,7 @@ class Tool extends Model implements Auditable
 
     public function getNameAttribute()
     {
-        return $this->category->name;
+        return $this->category->name ?? '';
     }
 
     public function getAssignmentNameAttribute()

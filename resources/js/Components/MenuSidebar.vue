@@ -296,6 +296,11 @@ const navigation = [
                 show: true,
                 children: [
                     {
+                        name: 'Reportes',
+                        href: 'tools.reports',
+                        show: hasPermission(['tool read']),
+                    },
+                    {
                         name: 'Categorías',
                         href: 'categories.index',
                         show: hasPermission(['category read']),

@@ -51,7 +51,7 @@ const series = ref([])
 
 </script>
 <template>
-  <main class="h-screen">
+  <main>
     <div class="grid grid-cols-4 gap-2 mb-8">
       <div class="col-span-2 border border-gray-200 rounded-lg shadow-sm">
         <div class="flex justify-center items-center p-1 rounded-t-lg bg-blue-800 text-white">
@@ -80,9 +80,10 @@ const series = ref([])
       <div class="col-span-1">
         <!-- <AdvancedBar :key="showLineChart" title="Avance Proyectos en Ejecución" :series="series" /> -->
         <SimpleScatterChart :key="showLineChart" title="Proyectos" :series="scatterSeries" />
-
       </div>
-      <BeijingAQIChart class="shadow-md col-span-1 md:col-span-3 mt-4" />
+      <div class="shadow-md col-span-1 md:col-span-2 m-4">
+        <BeijingAQIChart />
+      </div>
     </div>
   </main>
 </template>
