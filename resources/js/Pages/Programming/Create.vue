@@ -263,7 +263,7 @@ async function onDrop(evt, task, fecha) {
                 task.employees = res.data.task
                 toast.add({ severity: 'error', group: "customToast", text: 'Hubo un error al programar', life: 2000 })
             } else {
-                console.log(payload)
+                // console.log(payload)
                 getPersonalStatus([fecha])
                 task.employees = res.data.task
                 task.loading = false
