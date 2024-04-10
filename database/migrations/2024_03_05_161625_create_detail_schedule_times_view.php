@@ -13,17 +13,18 @@ return new class extends Migration
     public function up(): void
     {
         DB::statement("
-        SELECT 
-        employee_id 'idUsuario',schedules.name 'nombre', fecha, hora_inicio 'horaInicio',hora_fin 'horaFin', tasks.id 'idTask',
-        tasks.name 'nombreTask',a.name 'nombrePadreTask', projects.name 'NombreProyecto'
-        from 
-        schedule_times   
-        inner join schedules  on schedule_times.schedule_id = schedules.id and schedules.deleted_at is null
-        inner join tasks on schedules.task_id = tasks.id and tasks.deleted_at is null
-        inner join tasks a on tasks.task_id = a.id and a.deleted_at is null        
-        inner join projects on tasks.project_id = projects.id and projects.deleted_at is null
-        WHERE schedule_times.deleted_at is null 
+        CREATE or alter VIEW [dbo].[detail_schedule_times]
+        AS
+        SELECT dbo.schedule_times.id AS idScheduleTime, dbo.schedules.id AS idSchedule, dbo.schedules.employee_id AS idUsuario, dbo.schedules.name AS nombre, dbo.schedules.fecha, dbo.schedule_times.hora_inicio AS horaInicio, dbo.schedule_times.hora_fin AS horaFin, 
+                     dbo.tasks.id AS idTask, dbo.tasks.name AS nombreTask, a.name AS nombrePadreTask, dbo.projects.name AS NombreProyecto, dbo.schedules.deleted_at, dbo.tasks.percentDone
+        FROM   dbo.schedule_times INNER JOIN
+                     dbo.schedules ON dbo.schedule_times.schedule_id = dbo.schedules.id AND dbo.schedules.deleted_at IS NULL INNER JOIN
+                     dbo.tasks ON dbo.schedules.task_id = dbo.tasks.id AND dbo.tasks.deleted_at IS NULL INNER JOIN
+                     dbo.tasks AS a ON dbo.tasks.task_id = a.id AND a.deleted_at IS NULL INNER JOIN
+                     dbo.projects ON dbo.tasks.project_id = dbo.projects.id AND dbo.projects.deleted_at IS NULL
+        WHERE (dbo.schedule_times.deleted_at IS NULL) AND (dbo.schedules.deleted_at IS NULL) AND (dbo.tasks.percentDone < 100) AND (dbo.tasks.deleted_at IS NULL)
         
+          go
         ");
     }
 
