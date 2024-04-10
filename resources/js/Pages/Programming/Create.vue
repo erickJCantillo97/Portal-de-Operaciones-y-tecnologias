@@ -190,6 +190,7 @@ getPersonalStatus([dates.value])
 //#region drag
 
 const getChildPayload = (index) => {
+    console.log(index)
     return personal.value[index];
 }
 
@@ -333,8 +334,8 @@ const save = async () => {
 
 <template>
     <AppLayout>
-        <div class="h-full w-full sm:grid sm:grid-cols-8 flex-col overflow-hidden">
-            <div class="sm:col-span-7 h-[88%] sm:h-full space-y-1 pt-1 px-1 flex flex-col">
+        <div class="h-full w-full sm:grid sm:grid-cols-8 flex-col justify-between flex overflow-hidden">
+            <div class="sm:col-span-7 border space-y-1 pt-1 px-1 flex flex-col">
                 <div class="sm:flex grid grid-cols-1 gap-1 justify-between sm:h-10 items-center sm:pr-1">
                     <div class="flex w-full justify-between sm:w-fit space-x-4">
                         <p class="text-xl font-bold text-primary h-full items-center flex">
@@ -492,10 +493,6 @@ const save = async () => {
                                                                     No se puede programar
                                                                 </p>
                                                             </div>
-                                                            <!-- {{ ((new Date(new Date().toISOString().split('T')[0])) <= new Date(dia.toISOString().split('T')[0])) }} -->
-                                                            <!-- {{ (new Date(dia.toISOString().split('T')[0])) }} -->
-                                                            <!-- {{ (new Date()) }} -->
-                                                            <!-- {{ (new Date(dia).toISOString().split('T')[0] >= (new Date().toISOString().split('T')[0])) }} -->
                                                             <ProgressBar v-if="task.loading" mode="indeterminate"
                                                                 style="height: 4px" />
                                                         </Container>
@@ -536,9 +533,9 @@ const save = async () => {
                                     <div class="rounded bg-primary px-2 w-1/2 text-center text-white"
                                         v-if="statusPersonal[dia.toISOString().split('T')[0]].data.programados?.length > 0"
                                         v-tooltip.top="{ value: `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
-                                        <p>
-                                            {{ statusPersonal[dia.toISOString().split('T')[0]].data.programados.length
-                                            }}
+                                        <p> {{
+                                statusPersonal[dia.toISOString().split('T')[0]].data.programados.length
+                            }}
                                         </p>
                                     </div>
                                     <i v-if="arrayFilter == statusPersonal[dia.toISOString().split('T')[0]].data.programados"
@@ -710,7 +707,7 @@ const save = async () => {
                 </div>
             </div>
             <!--#region LISTA PERSONAL-->
-            <div class="sm:row-span-2 block sm:rounded-lg border divide-y space-y-1 sm:h-full h-24 p-1 gap-1">
+            <div class="sm:row-span-2 block h-min sm:rounded-lg border divide-y space-y-1 sm:h-full p-1 gap-1">
                 <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
                 <div v-if="loadingPerson" class="w-full h-full flex flex-col justify-center">
                     <Loading class="mt-10 hidden sm:flex" message="Cargando personas" />
@@ -718,12 +715,11 @@ const save = async () => {
                 </div>
                 <Container v-else-if="personal.length > 0" oncontextmenu="return false" onkeydown="return false"
                     behaviour="copy" group-name="1" @drag-start="dragStart = true" @drag-end="dragStart = false"
-                    :key="String(personal.length) + loadingPerson" :get-child-payload="getChildPayload"
+                    :key="personal.length" :get-child-payload="getChildPayload"
                     class="sm:overflow-y-auto overflow-x-visible flex sm:block overflow-y-hidden sm:h-[81vh] p-1 space-x-1 space-y-0 sm:space-y-1 sm:space-x-0 sm:w-full">
-                    <Draggable v-for="item in personal" :key="item.id"
+                    <Draggable v-for="item in personal" :key="item"
                         v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
                         :class="[(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden', filterProgram ? (arrayFilter.find(objeto => objeto.name === item.Nombres_Apellidos) !== undefined ? 'bg-green-200' : 'bg-red-200') : '']"
-                        :drag-not-allowed="false"
                         class="min-w-[25vw] sm:min-w-32 rounded-xl border border-primary h-full sm:h-16 shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
                         <div class="flex flex-col h-full justify-center gap-x-1 p-1">
                             <div class="flex flex-col justify-center">
