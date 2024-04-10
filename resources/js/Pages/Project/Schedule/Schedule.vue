@@ -535,7 +535,7 @@ const taskTooltip = ref({
                     <div class="">
                         <p class="font-bold text-center w-full text-md" >${StringHelper.encodeHtml(taskRecord.name)}: ${StringHelper.encodeHtml(taskRecord.percentDone.toFixed(0))}% </p>
                     </div>
-                    <div class="flex gap-2 justify-between"> 
+                    <div class="flex gap-2 justify-between">
                         <div class="">
                             <p class="font-bold">Inicio:</p>
                             <p>${DateHelper.format(taskRecord.startDate, 'DD MMM YYYY')}</p>
@@ -987,12 +987,22 @@ const showCritical = () => {
     let gantt = ganttref.value.instance.value
     gantt.features.criticalPaths.disabled = critical.value
 }
-
 //#endregion
 
+const url = [
+    {
+        ruta: 'projects.index',
+        label: 'Proyectos',
+    },
+    {
+        ruta: 'createSchedule.create',
+        label: 'Cronograma',
+        active: true
+    }
+]
 </script>
 <template>
-    <AppLayout>
+    <AppLayout :href="url">
         <div id="ganttContainer" :class="full ? 'fixed bg-white z-50 top-0 left-0 h-screen w-screen' : 'h-full w-full'"
             class="flex flex-col overflow-y-auto gap-y-1">
             <div class="rounded-t-lg h-8 flex justify-between cursor-default">

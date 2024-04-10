@@ -363,11 +363,23 @@ const deleteweekTask = (id) => {
     })
 }
 
-const active = ref(0);
+const active = ref(0)
+
+const url = [
+    {
+        ruta: 'projects.index',
+        label: 'Proyectos'
+    },
+    {
+        ruta: 'projects.create',
+        label: props.project ? 'Editar' : 'Crear' + ' Proyecto',
+        active: true
+    }
+]
 </script>
 
 <template>
-    <AppLayout>
+    <AppLayout :href="url">
         <div class="h-full w-full overflow-y-auto flex flex-col ">
             <div class="flex justify-between items-center px-2 h-[8vh]">
                 <span class="w-full flex space-x-1">
@@ -574,11 +586,11 @@ const active = ref(0);
                             <Listbox :options="projectShipsOptions" optionValue="id"
                                 :filterFields="['ship.name', 'ship.idHull']"
                                 filterPlaceholder="Filtrar Buques agregados" multiple filter optionLabel="name" :pt="{
-                        list: projectShipsOptions.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
-                        header: '!p-1',
-                        filterInput: '!h-8',
-                        item: '!h-min !rounded-lg'
-                    }">
+                                    list: projectShipsOptions.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
+                                    header: '!p-1',
+                                    filterInput: '!h-8',
+                                    item: '!h-min !rounded-lg'
+                                }">
 
                                 <template #option="slotProps">
                                     <div class="flex items-center justify-between">
@@ -610,11 +622,11 @@ const active = ref(0);
                             <Listbox :options="shipsOptions" v-model="formData.ships" optionValue="id"
                                 :filterFields="['name', 'idHull']" filterPlaceholder="Filtrar Buques sin agregar"
                                 multiple filter optionLabel="name" :pt="{
-                        list: shipsOptions.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
-                        header: '!p-1',
-                        filterInput: '!h-8',
-                        item: '!h-min !rounded-lg'
-                    }">
+                                    list: shipsOptions.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
+                                    header: '!p-1',
+                                    filterInput: '!h-8',
+                                    item: '!h-min !rounded-lg'
+                                }">
 
                                 <template #option="slotProps">
                                     <div class="flex">

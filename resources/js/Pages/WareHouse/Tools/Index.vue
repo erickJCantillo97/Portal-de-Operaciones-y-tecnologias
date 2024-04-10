@@ -143,9 +143,17 @@ const save = () => {
         form.value.loading = false
     }
 }
+
+const url = [
+    {
+        ruta: 'tools.index',
+        label: 'Herramientas y Equipos (Almacén)',
+        active: true
+    }
+]
 </script>
 <template>
-    <AppLayout>
+    <AppLayout :href="url">
         <div class="w-full h-full overflow-y-auto">
             <CustomDataTable :rowsDefault="100" title="Herramientas y equipos" :data="tools" :columnas="columnas"
                 :actions="actions" @edit="showModal" @goToToolOverview="goToToolOverview" @cloneItem="showModalClone"

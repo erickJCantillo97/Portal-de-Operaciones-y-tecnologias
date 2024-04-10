@@ -98,10 +98,18 @@ const buttons = [
     { event: 'editItem', severity: 'warning', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false, show: hasPermission('customer edit') },
     { event: 'deleteItem', severity: 'danger', icon: 'fa-solid fa-trash', text: true, outlined: false, rounded: false, show: hasPermission('customer delete') },
 ]
+
+const url = [
+    {
+        ruta: 'customers.index',
+        label: 'Clientes',
+        active: true
+    }
+]
 </script>
 
 <template>
-    <AppLayout>
+    <AppLayout :href="url">
         <div class="h-full w-full overflow-y-auto">
             <CustomDataTable :data="customers" :rows-default="100" title="Clientes" cacheName="customers"
                 :columnas="columnas" :actions="buttons" @showShips="showShips" @deleteItem="deleteItem"

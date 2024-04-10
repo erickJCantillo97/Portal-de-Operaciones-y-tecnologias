@@ -139,9 +139,17 @@ const save = () => {
         toast.add({ summary: 'Error al guardar', life: 1500 });
     }
 }
+
+const url = [
+    {
+        ruta: 'categories.index',
+        label: 'Categorías (Almacén)',
+        active: true
+    }
+]
 </script>
 <template>
-    <AppLayout>
+    <AppLayout :href="url">
         <div class="h-full w-full">
             <TabView class="tabview-custom" :scrollable="true" :pt="{
                 nav: '!flex !justify-between'

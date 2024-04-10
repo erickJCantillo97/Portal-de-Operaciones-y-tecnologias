@@ -189,15 +189,16 @@ const resetFormData = () => {
     projectSelected.value = ''
 }
 
-const urls = ref([
+const url = [
     {
-        url: '/programming',
-        label: 'Programación'
-    },
-])
+        ruta: 'programming',
+        label: 'Programación',
+        active: true
+    }
+]
 </script>
 <template>
-    <AppLayout :urls>
+    <AppLayout :href="url">
         <div class="size-full">
             <div class="flex justify-between items-center px-4 h-min">
                 <span class="text-xl font-bold text-primary h-full items-center flex">
