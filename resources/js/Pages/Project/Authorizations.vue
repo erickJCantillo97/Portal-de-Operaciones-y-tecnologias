@@ -153,11 +153,19 @@ const getContractStatusSeverity = (authorization) => {
         default:
             return null;
     }
-};
+}
+
+const url = [
+    {
+        ruta: 'authorizations.index',
+        label: 'Autorizaciones',
+        active: true
+    }
+]
 </script>
 
 <template>
-    <AppLayout>
+    <AppLayout :href="url">
         <div class="w-full h-full overflow-y-auto">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">

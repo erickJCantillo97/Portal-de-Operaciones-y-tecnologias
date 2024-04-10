@@ -19,9 +19,17 @@ const props = defineProps({
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
+
+const url = [
+    {
+        ruta: 'personal.activos',
+        label: 'Personal Activos',
+        active: true
+    }
+]
 </script>
 <template>
-    <AppLayout>
+    <AppLayout :href="url">
         <div class="w-full h-full overflow-y-auto p-2">
             <div class="flex items-center mx-2 mb-2">
                 <div class="flex-auto">

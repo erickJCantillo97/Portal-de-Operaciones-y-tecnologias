@@ -83,6 +83,7 @@ function obtenerDiaSemana(dato) {
 
     return fecha;
 }
+
 //#endregion
 
 //#region variables
@@ -189,39 +190,93 @@ getPersonalStatus([dates.value])
 
 //#region drag
 
-const getChildPayload = (index) => {
-    return personal.value[index];
+// const getChildPayload = (index) => {
+//     console.log(index)
+//     return personal.value[index];
+// }
+
+// async function onDrop(collection, dropResult, fecha) {
+//     const { addedIndex, payload } = dropResult;
+//     if (addedIndex !== null) {
+//         if (new Date(fecha.toISOString().split("T")[0]) >= new Date(date.value.toISOString().split("T")[0])) {
+//             collection.loading = true
+//             await axios.post(route('programming.store'), { task_id: collection.id, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: fecha.toISOString().split("T")[0] }).then((res) => {
+//                 if (Object.values(res.data.conflict).length > 0) {
+//                     conflicts.value = Object.values(res.data.conflict)
+//                     openConflict.value = true;
+//                     collection.loading = false
+//                     task.value = collection
+//                     collection.employees = res.data.task
+//                 } else if (res.data.status == false) {
+//                     collection.loading = false
+//                     collection.employees = res.data.task
+//                     toast.add({ severity: 'error', group: "customToast", text: 'Hubo un error al programar', life: 2000 })
+//                 } else {
+//                     console.log(payload)
+//                     getPersonalStatus([fecha])
+//                     collection.employees = res.data.task
+//                     collection.loading = false
+//                     toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
+//                 }
+//             })
+//         } else {
+//             toast.add({ severity: 'error', group: "customToast", text: 'No se puede programar en dias anteriores', life: 2000 })
+//         }
+//     }
+// }
+
+function startDrag(evt, item, type) {
+    dragStart.value = true
+    if (type == null) {
+        evt.dataTransfer.setData('employee_id', item.Num_SAP)
+        evt.dataTransfer.setData('name', item.Nombres_Apellidos)
+    } else {
+        // console.log(item)
+        evt.dataTransfer.setData('name', item.name)
+        evt.dataTransfer.setData('employee_id', item.user_id)
+        evt.dataTransfer.setData('type', type)
+    }
+    evt.dataTransfer.effectAllowed = 'move'
+    evt.dataTransfer.dropEffect = 'move'
+    // console.log(item)
+}
+async function onDrop(evt, task, fecha) {
+    // console.log(list)
+    const employee_id = evt.dataTransfer.getData('employee_id')
+    const name = evt.dataTransfer.getData('name')
+    const type = evt.dataTransfer.getData('type')
+    // console.log(employee)
+    if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
+        task.loading = true
+        // if(type=='move'){
+
+        // }
+        await axios.post(route('programming.store'), { task_id: task.id, employee_id, name, fecha }).then((res) => {
+            if (Object.values(res.data.conflict).length > 0) {
+                conflicts.value = Object.values(res.data.conflict)
+                openConflict.value = true;
+                task.loading = false
+                task.value = task
+                task.employees = res.data.task
+            } else if (res.data.status == false) {
+                task.loading = false
+                task.employees = res.data.task
+                toast.add({ severity: 'error', group: "customToast", text: 'Hubo un error al programar', life: 2000 })
+            } else {
+                console.log(payload)
+                getPersonalStatus([fecha])
+                task.employees = res.data.task
+                task.loading = false
+                toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
+            }
+        })
+    } else {
+        toast.add({ severity: 'error', group: "customToast", text: 'No se puede programar en dias anteriores', life: 2000 })
+    }
+    // const item = this.items.find((item) => item.id == itemID)
+    // item.list = list
 }
 
-async function onDrop(collection, dropResult, fecha) {
-    const { addedIndex, payload } = dropResult;
-    if (addedIndex !== null) {
-        if (new Date(fecha.toISOString().split("T")[0]) >= new Date(date.value.toISOString().split("T")[0])) {
-            collection.loading = true
-            await axios.post(route('programming.store'), { task_id: collection.id, employee_id: payload.Num_SAP, name: payload.Nombres_Apellidos, fecha: fecha.toISOString().split("T")[0] }).then((res) => {
-                if (Object.values(res.data.conflict).length > 0) {
-                    conflicts.value = Object.values(res.data.conflict)
-                    openConflict.value = true;
-                    collection.loading = false
-                    task.value = collection
-                    collection.employees = res.data.task
-                } else if (res.data.status == false) {
-                    collection.loading = false
-                    collection.employees = res.data.task
-                    toast.add({ severity: 'error', group: "customToast", text: 'Hubo un error al programar', life: 2000 })
-                } else {
-                    console.log(payload)
-                    getPersonalStatus([fecha])
-                    collection.employees = res.data.task
-                    collection.loading = false
-                    toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
-                }
-            })
-        } else {
-            toast.add({ severity: 'error', group: "customToast", text: 'No se puede programar en dias anteriores', life: 2000 })
-        }
-    }
-}
 
 //#endregion
 
@@ -333,8 +388,8 @@ const save = async () => {
 
 <template>
     <AppLayout>
-        <div class="h-full w-full sm:grid sm:grid-cols-8 flex-col overflow-hidden">
-            <div class="sm:col-span-7 h-[88%] sm:h-full space-y-1 pt-1 px-1 flex flex-col">
+        <div class="h-full w-full sm:grid sm:grid-cols-8 flex-col justify-between flex overflow-hidden">
+            <div class="sm:col-span-7 space-y-1 pt-1 px-1 flex flex-col">
                 <div class="sm:flex grid grid-cols-1 gap-1 justify-between sm:h-10 items-center sm:pr-1">
                     <div class="flex w-full justify-between sm:w-fit space-x-4">
                         <p class="text-xl font-bold text-primary h-full items-center flex">
@@ -492,10 +547,6 @@ const save = async () => {
                                                                     No se puede programar
                                                                 </p>
                                                             </div>
-                                                            <!-- {{ ((new Date(new Date().toISOString().split('T')[0])) <= new Date(dia.toISOString().split('T')[0])) }} -->
-                                                            <!-- {{ (new Date(dia.toISOString().split('T')[0])) }} -->
-                                                            <!-- {{ (new Date()) }} -->
-                                                            <!-- {{ (new Date(dia).toISOString().split('T')[0] >= (new Date().toISOString().split('T')[0])) }} -->
                                                             <ProgressBar v-if="task.loading" mode="indeterminate"
                                                                 style="height: 4px" />
                                                         </Container>
@@ -536,9 +587,9 @@ const save = async () => {
                                     <div class="rounded bg-primary px-2 w-1/2 text-center text-white"
                                         v-if="statusPersonal[dia.toISOString().split('T')[0]].data.programados?.length > 0"
                                         v-tooltip.top="{ value: `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dia.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
-                                        <p>
-                                            {{ statusPersonal[dia.toISOString().split('T')[0]].data.programados.length
-                                            }}
+                                        <p> {{
+                                statusPersonal[dia.toISOString().split('T')[0]].data.programados.length
+                            }}
                                         </p>
                                     </div>
                                     <i v-if="arrayFilter == statusPersonal[dia.toISOString().split('T')[0]].data.programados"
@@ -556,7 +607,7 @@ const save = async () => {
                         </div>
                     </div>
                     <div v-if="mode == 'date'"
-                        class=" h-full sm:h-[80vh] border rounded-md flex flex-col justify-between">
+                        class="h-full sm:h-[80vh] border rounded-md flex flex-col justify-between">
                         <p class="sm:block hidden w-full h-6 text-center bg-primary-light font-bold">
                             Programacion del dia {{ dates.toLocaleDateString() }}
                         </p>
@@ -574,106 +625,120 @@ const save = async () => {
                                     <Knob v-tooltip="'Avance'" :model-value="parseInt(project.avance)" readonly
                                         :size="40" valueTemplate="{value}%" class="sm:flex hidden" />
                                     <div class="h-6 w-1/2 sm:hidden">
-                                        <ProgressBar :value="parseFloat(project.avance).toFixed(2)" class=""
-                                            v-tooltip="'Avance'" :pt="{ label: 'text-xs font-thin' }">
+                                        <ProgressBar :value="parseInt(project.avance)" class="" v-tooltip="'Avance'"
+                                            :pt="{ label: 'text-xs font-thin' }">
                                         </ProgressBar>
                                     </div>
                                 </div>
                                 <div
-                                    class="w-full h-[60vh] sm:h-full overflow-y-auto sm:overflow-x-auto grid grid-cols-2 sm:grid-cols-5">
+                                    class="w-full h-[60vh] sm:h-full overflow-y-visible sm:overflow-x-auto grid grid-cols-2 sm:grid-cols-5">
                                     <div v-if="project.tasks[dates.toISOString().split('T')[0]].loading"
                                         class="flex col-span-5 justify-center h-full items-center">
                                         <Loading />
                                     </div>
-                                    <span v-else v-for="task in project.tasks[dates.toISOString().split('T')[0]].data"
-                                        class="w-full p-0.5 cursor-default">
+                                    <div v-else v-for="task in project.tasks[dates.toISOString().split('T')[0]].data"
+                                        @drop="onDrop($event, task, dates.toISOString().split('T')[0])"
+                                        @dragover.prevent @dragenter.prevent class="w-full p-0.5 cursor-default"
+                                        @mouseenter="task.visible = false" @mouseleave="task.visible = true"
+                                        :key="task.name + dates.toDateString()">
                                         <div
                                             class="border border-primary h-40 rounded-md flex flex-col justify-between">
                                             <div class="flex flex-col justify-between h-full">
-                                                <span>
+                                                <div class="h-min">
                                                     <p v-tooltip="task.name"
                                                         class="border-b font-bold trun border-primary h-10 flex items-center justify-center text-xs px-0.5 w-full text-center">
                                                         {{ task.name }}
                                                     </p>
-                                                    <p v-tooltip="task.task"
-                                                        class="text-xs px-1 text-center w-full truncate">{{ task.task }}
-                                                    </p>
-                                                    <div
-                                                        class="flex cursor-default space-x-2 justify-center rounded-md">
-                                                        <p v-tooltip.left="'Fecha inicio'"
-                                                            class=" px-1 text-xs text-center">
-                                                            {{ task.startDate }}
+                                                </div>
+                                                <div class="h-full">
+                                                    <div :class="(task.visible == undefined ? true : task.visible) ? '' : 'hidden'"
+                                                        :key="task.name + new Date().toISOString()">
+                                                        <p v-tooltip="task.task"
+                                                            class="text-xs px-1 text-center w-full truncate">
+                                                            {{ task.task }}
                                                         </p>
-                                                        <p v-tooltip.left="'Fecha Fin'" class="text-xs text-center px-1"
-                                                            :class="new Date(task.endDate) < date ? 'bg-red-500 rounded-md' : ''">
-                                                            {{ task.endDate }}
-                                                        </p>
-                                                    </div>
-                                                </span>
-                                                <div class="grid grid-cols-4 items-center px-1 h-full">
-                                                    <div
-                                                        class="flex cursor-default flex-col justify-center rounded-md h-full">
-                                                        <p v-tooltip.left="'Hora inicio'" class="text-sm text-center">
-                                                            {{ format24h(task.shift?.startShift ?? '') }}
-                                                        </p>
-                                                        <p v-tooltip.left="'Hora Fin'" class="text-sm text-center">
-                                                            {{ format24h(task.shift?.endShift ?? '') }}
-                                                        </p>
-                                                    </div>
-                                                    <Container
-                                                        class="col-span-3 flex flex-col justify-center h-14 cursor-default"
-                                                        @drop="onDrop(task, $event, dates)" group-name="1"
-                                                        @click="togglePerson($event, task.employees, task, dates)"
-                                                        v-tooltip.top="{ value: task.employees?.length > 0 ? `<div>${task.employees.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
-                                                        <div v-if="!dragStart && !(task.loading == null ? false : task.loading)"
-                                                            class="flex justify-center">
-                                                            <AvatarGroup
-                                                                v-if="(task.employees ? true : false) && task.employees.length > 0 && task.employees.length <= 2">
-                                                                <Avatar v-for="person in task.employees"
-                                                                    :image="person.photo ?? '/images/person-default.png'"
-                                                                    shape="circle" size="large" />
-                                                            </AvatarGroup>
-                                                            <AvatarGroup
-                                                                v-else-if="(task.employees ? true : false) && task.employees.length > 2">
-                                                                <Avatar v-for="i in [0, 1]"
-                                                                    :image="task.employees[i].photo ?? '/images/person-default.png'"
-                                                                    shape="circle" size="large" />
-                                                                <Avatar :label="'+' + String(task.employees.length - 2)"
-                                                                    shape="circle" size="large" />
-                                                            </AvatarGroup>
-                                                            <div v-else class="flex items-center p-1">
-                                                                <p
-                                                                    class="border p-1 text-center text-danger rounded-md border-dashed bg-danger-light animate-pulse">
-                                                                    Sin personal asignado
+                                                        <div class="flex h-min cursor-default space-x-1 justify-center">
+                                                            <p v-tooltip.left="'Fecha inicio'"
+                                                                class=" px-1 text-xs text-center">
+                                                                {{ task.startDate }}
+                                                            </p>
+                                                            <p v-tooltip.left="'Fecha Fin'"
+                                                                class="text-xs text-center px-1"
+                                                                :class="new Date(task.endDate) < date ? 'bg-red-500 rounded-md' : ''">
+                                                                {{ task.endDate }}
+                                                            </p>
+                                                        </div>
+                                                        <div class="grid grid-cols-4 items-center px-1 h-min">
+                                                            <div
+                                                                class="flex cursor-default flex-col justify-center rounded-md h-full">
+                                                                <p v-tooltip.left="'Hora inicio'"
+                                                                    class="text-sm text-center">
+                                                                    {{ format24h(task.shift?.startShift ?? '') }}
+                                                                </p>
+                                                                <p v-tooltip.left="'Hora Fin'"
+                                                                    class="text-sm text-center">
+                                                                    {{ format24h(task.shift?.endShift ?? '') }}
                                                                 </p>
                                                             </div>
+                                                            <!-- zona de drop -->
+                                                            <div class="col-span-3 flex flex-col justify-center h-14 cursor-default"
+                                                                @click="togglePerson($event, task.employees, task, dates)"
+                                                                v-tooltip.top="{ value: task.employees?.length > 0 ? `<div>${task.employees.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
+                                                                <div v-if="!(task.loading == null ? false : task.loading)"
+                                                                    class="flex justify-center">
+                                                                    <AvatarGroup
+                                                                        v-if="(task.employees ? true : false) && task.employees.length > 0 && task.employees.length <= 2">
+                                                                        <Avatar v-for="person in task.employees"
+                                                                            :image="person.photo ?? '/images/person-default.png'"
+                                                                            shape="circle" size="large" />
+                                                                    </AvatarGroup>
+                                                                    <AvatarGroup
+                                                                        v-else-if="(task.employees ? true : false) && task.employees.length > 2">
+                                                                        <Avatar v-for="i in [0, 1]"
+                                                                            :image="task.employees[i].photo ?? '/images/person-default.png'"
+                                                                            shape="circle" size="large" />
+                                                                        <Avatar
+                                                                            :label="'+' + String(task.employees.length - 2)"
+                                                                            shape="circle" size="large" />
+                                                                    </AvatarGroup>
+                                                                    <div v-else class="flex items-center p-1">
+                                                                        <p
+                                                                            class="border p-1 text-center text-danger rounded-md border-dashed bg-danger-light animate-pulse">
+                                                                            Sin personal asignado
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                                <ProgressBar v-if="task.loading" mode="indeterminate"
+                                                                    style="height: 4px" />
+                                                            </div>
                                                         </div>
-                                                        <div v-else-if="!task.loading && (new Date(dates.toISOString().split('T')[0]) >= (new Date()))"
-                                                            class="flex items-center p-1">
+                                                        <div class="p-1">
+                                                            <ProgressBar :value="parseFloat(task.percentDone)" class=""
+                                                                v-tooltip="'Avance'"
+                                                                :pt="{ label: 'text-xs font-thin' }">
+                                                            </ProgressBar>
+                                                        </div>
+                                                    </div>
+                                                    <div :class="(task.visible == undefined ? true : task.visible) ? 'hidden' : ''"
+                                                        class="h-28 p-1 overflow-y-auto gap-1 flex flex-wrap justify-center items-center">
+                                                        <!-- @click="togglePerson($event, person, task, dates)" -->
+                                                        <img v-tooltip.top="{ value: person.name }" @click="togglePerson($event, person, task, dates)"
+                                                            v-if="task.employees?.length > 0"
+                                                            v-for="person in task.employees" :dragable="true"
+                                                            @dragstart="startDrag($event, person, 'edit')"
+                                                            :src="person.photo ?? '/images/person-default.png'"
+                                                            class="rounded-full h-12 w-12 object-cover ring-1 ring-primary-light shadow-md" />
+                                                        <div v-else>
                                                             <p
-                                                                class="border w-full h-full p-1 text-center rounded-md border-dashed text-sm bg-primary-light animate-pulse">
-                                                                Arrastra aqui para programar
+                                                                class="border p-1 text-center text-danger rounded-md border-dashed bg-danger-light animate-pulse">
+                                                                Sin personal asignado
                                                             </p>
                                                         </div>
-                                                        <div v-else-if="dragStart && !(new Date(dates.toISOString().split('T')[0]) >= (new Date()))"
-                                                            class="flex items-center p-1">
-                                                            <p
-                                                                class="border w-full h-full p-1 text-center rounded-md border-dashed text-sm bg-primary-light animate-pulse">
-                                                                No se puede programar
-                                                            </p>
-                                                        </div>
-                                                        <ProgressBar v-if="task.loading" mode="indeterminate"
-                                                            style="height: 4px" />
-                                                    </Container>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="p-1">
-                                                <ProgressBar :value="parseFloat(task.percentDone)" class=""
-                                                    v-tooltip="'Avance'" :pt="{ label: 'text-xs font-thin' }">
-                                                </ProgressBar>
-                                            </div>
                                         </div>
-                                    </span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="" v-else>
@@ -710,20 +775,21 @@ const save = async () => {
                 </div>
             </div>
             <!--#region LISTA PERSONAL-->
-            <div class="sm:row-span-2 block sm:rounded-lg border divide-y space-y-1 sm:h-full h-24 p-1 gap-1">
+            <div class="sm:row-span-2 block h-min sm:rounded-lg border divide-y space-y-1 sm:h-full p-1 gap-1">
                 <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
                 <div v-if="loadingPerson" class="w-full h-full flex flex-col justify-center">
                     <Loading class="mt-10 hidden sm:flex" message="Cargando personas" />
                     <ProgressBar mode="indeterminate" class="flex sm:hidden" style="height: 4px" />
                 </div>
-                <Container v-else-if="personal.length > 0" oncontextmenu="return false" onkeydown="return false"
-                    behaviour="copy" group-name="1" @drag-start="dragStart = true" @drag-end="dragStart = false"
-                    :key="String(personal.length) + loadingPerson" :get-child-payload="getChildPayload"
+                <!-- zona de drop -->
+                <div v-else-if="personal.length > 0" oncontextmenu="return false" onkeydown="return false"
+                    :key="personal.length"
                     class="sm:overflow-y-auto overflow-x-visible flex sm:block overflow-y-hidden sm:h-[81vh] p-1 space-x-1 space-y-0 sm:space-y-1 sm:space-x-0 sm:w-full">
-                    <Draggable v-for="item in personal" :key="item.id"
+                    <!-- item a arrastrar -->
+                    <div v-for="item in personal" :key="item.Nombres_Apellidos" :draggable="true"
+                        @dragstart="startDrag($event, item)"
                         v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
                         :class="[(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden', filterProgram ? (arrayFilter.find(objeto => objeto.name === item.Nombres_Apellidos) !== undefined ? 'bg-green-200' : 'bg-red-200') : '']"
-                        :drag-not-allowed="false"
                         class="min-w-[25vw] sm:min-w-32 rounded-xl border border-primary h-full sm:h-16 shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
                         <div class="flex flex-col h-full justify-center gap-x-1 p-1">
                             <div class="flex flex-col justify-center">
@@ -738,20 +804,20 @@ const save = async () => {
                                 </p>
                             </div>
                         </div>
-                    </Draggable>
-                </Container>
+                    </div>
+                </div>
             </div>
         </div>
     </AppLayout>
 
     <OverlayPanel ref="overlayPerson">
-        <div class="flex flex-col space-y-1 w-96">
+        <div class="flex flex-col space-y-1">
             <!-- {{ personsEdit }} -->
-            <div v-for="person in personsEdit" class="flex flex-col border p-1 rounded-md justify-between">
-                <p class="text-sm font-bold">{{ person.name }}</p>
-                <div class="grid grid-cols-3 gap-2">
+            <div class="flex flex-col border p-1 rounded-md justify-between">
+                <p class="text-sm font-bold">{{ personsEdit.name }}</p>
+                <div class="grid gap-2">
                     <!-- {{ console.log(person) }} -->
-                    <span v-for="schedule_time in person.times"
+                    <span v-for="schedule_time in personsEdit.times"
                         class="text-xs flex bg-success-light justify-center hover:justify-between rounded-md p-1 hover:space-x-1 group">
                         <button
                             class="rounded shadow-2xl px-1 hover:ring-1 ring-warning  hover:bg-warning-light hidden group-hover:block"

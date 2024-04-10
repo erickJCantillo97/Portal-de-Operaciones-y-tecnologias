@@ -84,7 +84,9 @@ function setEmpleadosAPI(): mixed
 
 function searchEmpleados(string $clave, string $valor)
 {
-    return Employee::where($clave, $valor)->get();
+    return getEmpleadosAPI()->filter(function ($employee) use ($clave, $valor) {
+        return strpos(ltrim($employee[$clave], '0'), $valor) !== false;
+    });
 }
 // ->map(function ($person) {
 //     return [
