@@ -124,10 +124,18 @@ const showClic = (event) => {
 //#region broadcast
 // eventListener('contracts', '.ContractsEvent')
 //#endregion
+
+const url = [
+    {
+        ruta: 'contracts.index',
+        label: 'Contratos',
+        active: true
+    }
+]
 </script>
 
 <template>
-    <AppLayout>
+    <AppLayout :href="url">
         <div class="h-full w-full overflow-y-auto">
             <CustomDataTable :data="contracts" :rowsDefault="20" title="Contratos" :columnas="columnas"
                 :actions="buttons" @edit="editItem" @delete="del" @rowClic="showClic">

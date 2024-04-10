@@ -7,7 +7,9 @@ import Button from 'primevue/button';
 import { onMounted, ref } from 'vue';
 import { useToast } from "primevue/usetoast";
 import CustomDataTable from '@/Components/CustomDataTable.vue';
+
 const toast = useToast()
+
 const props = defineProps({
     materials: Array
 
@@ -119,10 +121,22 @@ const searching = () => {
         }
     });
 }
+
+const url = [
+    {
+        ruta: 'requirements.index',
+        label: 'Requerimientos'
+    },
+    {
+        ruta: 'requirements.create',
+        label: props.materials ? 'Editar Requerimiento' : 'Crear Requerimiento',
+        active: true
+    }
+]
 </script>
 
 <template>
-    <AppLayout>
+    <AppLayout :href="url">
         <div class="h-full w-full overflow-y-auto">
             <div class="flex justify-between items-center px-4 h-min">
                 <span class="text-2xl font-extrabold text-primary h-full w-full items-center block">

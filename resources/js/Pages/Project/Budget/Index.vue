@@ -120,16 +120,17 @@ const projectSelect = async () => {
 
 const option = ref('total')
 
-const urls = ref([
+const url = [
     {
-        url: '/budget',
-        label: 'Presupuesto'
+        ruta: 'budget.index',
+        label: 'Presupuesto',
+        active: true
     },
-])
+]
 </script>
 
 <template>
-    <AppLayout :urls>
+    <AppLayout :href="url">
         <div class="h-full w-full overflow-y-auto px-3">
             <div class="sm:max-h-[20vh] py-1">
                 <span class="sm:flex justify-between mb-2">

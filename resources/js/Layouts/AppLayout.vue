@@ -18,19 +18,35 @@
                         <Bars3CenterLeftIcon class="w-6 h-6" aria-hidden="true" />
                     </button>
                     <div class="flex">
-                        <Link :href="route('dashboard')" v-tooltip.top="'Dashboard'">
+                        <Link :href="route('dashboard')" v-tooltip.bottom="'Dashboard'">
                         <div class="flex space-x-2 items-center">
                             <i class="fa-solid fa-home text-gray-500"></i>
-                            <h1 class="text-center font-semibold text-primary text-xl mt-1">
+                            <h1 class="text-center font-bold text-primary text-xl mt-1">
                                 TOP
                             </h1>
                         </div>
                         </Link>
                         <div class="flex justify-between items-center">
-                            <Breadcrumb :home="home" :model="urls" :pt="{
+                            <Breadcrumb :home="home" :model="href" :pt="{
                                 root: '!h-2 !flex !justify-center !items-center',
                                 label: '!text-blue-800'
-                            }" />
+                            }">
+                                <template #item="{ item, props }">
+
+                                    <div v-if="item.active" class="flex space-x-2 items-center">
+                                        <h1 class="text-center text-primary font-semibold text-md">
+                                            {{ item.label }}
+                                        </h1>
+                                    </div>
+                                    <Link v-else :href="route(item.ruta)">
+                                    <div class="flex space-x-2 items-center">
+                                        <h1 class="text-center text-primary text-md">
+                                            {{ item.label }}
+                                        </h1>
+                                    </div>
+                                    </Link>
+                                </template>
+                            </Breadcrumb>
                         </div>
                     </div>
                 </div>
@@ -305,10 +321,9 @@ const suggestions = ref([])
 const tipoReporte = ref('Sugerencia')
 
 const props = defineProps({
-    urls: {
+    href: {
         type: Array,
-        default: [],
-        required: false
+        default: []
     }
 })
 
@@ -363,7 +378,8 @@ const loadSuggestions = () => {
 }
 
 const home = ref({
-    route: '/dashboard',
-    // label: 'Dashboard'
+    ruta: 'dashboard',
+    // label: 'Dashboard',
+    //active: true
 })
 </script>

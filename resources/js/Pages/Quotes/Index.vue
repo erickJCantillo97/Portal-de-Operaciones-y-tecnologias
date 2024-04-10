@@ -64,9 +64,17 @@ const showClic = (event) => {
     quote.value = event.data;
     openSlideOver.value = true
 }
+
+const url = [
+    {
+        ruta: 'quotes.index',
+        label: 'Estimaciones',
+        active: true
+    }
+]
 </script>
 <template>
-    <AppLayout>
+    <AppLayout :href="url">
         <div class="h-full w-full overflow-y-auto">
             <CustomDataTable :rowsDefault="100" :data="quotes" :columnas="columnas" :filterButtons="filterButtons"
                 title="Estimaciones" @rowClic="showClic">

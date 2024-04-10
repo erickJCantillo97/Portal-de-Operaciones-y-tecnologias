@@ -159,9 +159,17 @@ const showHull = (event, data) => {
         op.value.toggle(event);
     }
 }
+
+const url = [
+    {
+        ruta: 'typeShips.index',
+        label: 'Clases',
+        active: true
+    }
+]
 </script>
 <template>
-    <AppLayout>
+    <AppLayout :href="url">
         <div class="h-full w-full overflow-y-auto">
             <CustomDataTable :rows-default="100" :data="typeShips" :columnas="columns" :actions="buttons"
                 @showHull="showHull" @rowClic="rowClick" @showEdit="showEdit" title="Clases de buque"
