@@ -153,7 +153,13 @@ const downloadFiles = async () => {
 }
 //#endregion
 
-
+const url = [
+  {
+    ruta: 'get.projectsGD',
+    label: 'Documentos',
+    active: true
+  }
+]
 </script>
 
 <style scoped>
@@ -173,7 +179,7 @@ const downloadFiles = async () => {
 </style>
 
 <template>
-  <AppLayout>
+  <AppLayout :href="url">
     <!-- <ProjectsCard /> -->
     <main class="h-[89vh] overflow-y-auto">
       <section class="grid grid-cols-2 size-full max-w-full gap-4 p-2">

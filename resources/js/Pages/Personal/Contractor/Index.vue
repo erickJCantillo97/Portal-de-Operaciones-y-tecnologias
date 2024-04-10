@@ -26,9 +26,9 @@ const items = ref([]);
 
 const search = (event) => {
   console.log(event.query.toLowerCase());
-  let lista = props.employees.map(x => x.contractor)
-  console.log(lista);
-  items.value = lista.filter(x => x.toLowerCase().startsWith(event.query.toLowerCase()))
+  let list = props.employees.map(value => value.contractor)
+  console.log(list);
+  items.value = list.filter(value => value.toLowerCase().startsWith(event.query.toLowerCase()))
 }
 
 //#region CustomDataTable
@@ -62,7 +62,7 @@ const submit = () => {
           toast.add({
             severity: 'success',
             group: 'customToast',
-            text: 'Se ha creado un contratista satisfactoriamente',
+            text: 'Se ha creado un empleado contratista satisfactoriamente',
             life: 10000
           })
           clearModal()
@@ -79,10 +79,11 @@ const submit = () => {
     } else {
       formData.put(route('contractorEmployees.update', formData.id), {
         onSuccess: () => {
+          preserveScroll: true,
           toast.add({
             severity: 'success',
             group: 'customToast',
-            text: 'Se ha editado el contratista satisfactoriamente',
+            text: 'Se ha editado el empleado contratista satisfactoriamente',
             life: 10000
           })
           clearModal()
@@ -120,27 +121,8 @@ const editContractor = (event, contractor) => {
   }
 }
 
-const deleteContractor = (event, contractor) => {
-  formData.delete(route('contractorEmployees.destroy', contractor), {
-    preserveScroll: true,
-    onSuccess: () => {
-      toast.add({
-        severity: 'success',
-        group: 'customToast',
-        text: 'Se ha eliminado un contratista satisfactoriamente',
-        life: 10000
-      })
-      clearModal()
-    },
-    onError: (error) => {
-      toast.add({
-        severity: 'danger',
-        group: 'customToast',
-        text: 'No se ha podido eliminar el personal contratista: ' + error,
-        life: 10000
-      })
-    }
-  })
+const deleteContractor = (event, data) => {
+  confirmDelete(data.id, 'Empleado', 'contractorEmployees')
 }
 
 const openModal = () => {
@@ -154,15 +136,16 @@ const clearModal = () => {
 }
 //#endregion
 
-const urls = ref([
+const url = [
   {
-    url: '/contractor-employees',
-    label: 'Contratistas'
+    ruta: 'contractorEmployees.index',
+    label: 'Contratistas',
+    active: true
   }
-])
+]
 </script>
 <template>
-  <AppLayout :urls="urls">
+  <AppLayout :href="url">
     <div class="w-full h-[89vh] overflow-y-auto">
       <CustomDataTable :data="employees" title="Contratistas" :rows-default="15" :columnas="columnas" :actions="actions"
         @edit="editContractor" @delete="deleteContractor">
@@ -184,25 +167,26 @@ const urls = ref([
       <p>Crear Empleado</p>
     </template>
     <template #body>
-      <span class="text-md mb-0.5 font-bold text-gray-900">
+      <span class="text-md font-bold text-gray-900">
         Nombre de la Empresa
       </span>
-      <section class="flex flex-col gap-4">
+      <section @keyup.enter="submit()" class="flex flex-col gap-4">
         <AutoComplete v-model="formData.contractor" placeholder="Escriba nombre de la empresa" dropdown
-          :suggestions="items" @complete="search" />
+          :suggestions="items" @complete="search" :pt="{
+            root: '!h-8 !mt-1'
+          }" />
 
         <CustomInput type="text" v-model:input="formData.name" label="Nombre Empleado"
-          placeholder="Escriba nombre del empleado" showClear />
+          placeholder="Escriba nombre del empleado" showClear :errorMessage="$attrs.errors.name" />
 
-        <CustomInput type="text" v-model:input="formData.labor" label="Cargo" placeholder="Escriba el cargo"
-          showClear />
+        <CustomInput type="text" v-model:input="formData.labor" label="Cargo" placeholder="Escriba el cargo" showClear
+          :errorMessage="$attrs.errors.labor" />
       </section>
     </template>
     <template #footer>
-
-      <Button label="Cancelar" icon="fa-regular fa-circle-xmark" severity="danger" outlined @click="clearModal()" />
       <Button icon="fa-solid fa-floppy-disk" severity="success" :label="formData.id != null ? 'Actualizar ' : 'Guardar'"
         outlined @click="submit()" />
+      <Button label="Cancelar" icon="fa-regular fa-circle-xmark" severity="danger" outlined @click="clearModal()" />
     </template>
   </CustomModal>
 </template>

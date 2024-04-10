@@ -93,17 +93,25 @@ const submit = () => {
         }
     })
 }
+
+const url = [
+    {
+        ruta: 'requirements.index',
+        label: 'Requerimientos Preliminares',
+        active: true
+    }
+]
 </script>
 
 <template>
-    <AppLayout>
+    <AppLayout :href="url">
         <div class="h-full w-full">
             <!-- <div class="flex justify-between items-center px-4">
                 <span class="text-xl font-bold text-primary  items-center flex">
                     <p> Requerimientos de Materiales </p>
                 </span>
                 <div class="flex items-center space-x-2">
-                    
+
                 </div>
             </div> -->
             <CustomDataTable :data="requirements" title="Requerimiento de Materiales" @selectionAction="gestion"

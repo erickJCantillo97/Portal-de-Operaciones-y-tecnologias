@@ -153,15 +153,16 @@ const clearModal2 = () => {
   form.reset()
 }
 
-const urls = ref([
+const url = [
   {
-    url: '/assignmentTool',
-    label: 'Asignación Herramientas'
-  },
-])
+    ruta: 'assignmentTool.index',
+    label: 'Asignación Herramientas (Almacén)',
+    active: true
+  }
+]
 </script>
 <template>
-  <AppLayout :urls="urls">
+  <AppLayout :href="url">
     <div class="w-full h-[89vh] overflow-y-auto">
       <CustomDataTable :data="assignmentsTool" title="Asignaciones" :rows-default="15" :columnas="columnas"
         :actions="actions" @download="downloadAssignment" @delete="deleteAssignment">

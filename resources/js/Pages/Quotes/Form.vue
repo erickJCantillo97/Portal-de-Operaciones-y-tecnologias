@@ -166,19 +166,19 @@ const quoteUpdate = () => {
         denyButtonText: 'Cancelar'
     }).then(async (result) => {
         if (result.isConfirmed) {
-        await axios.put(route('quotesversion.update', props.quote.id), dataQuoteNew.value).then((res) => {
-            quoteShips.value = res.data.quote.quote_type_ships
-            toast('Estimacion actualizada correctamente', 'success')
-            modEdit.value = false
-        }).catch((e) => {
-            console.log(e)
-            errors.value = e.response.data.errors
-            toast('Hay errores en los datos a guardar', 'error')
-        })
-        loadingButton.value = false
-    }else{
-        loadingButton.value = false
-    }
+            await axios.put(route('quotesversion.update', props.quote.id), dataQuoteNew.value).then((res) => {
+                quoteShips.value = res.data.quote.quote_type_ships
+                toast('Estimacion actualizada correctamente', 'success')
+                modEdit.value = false
+            }).catch((e) => {
+                console.log(e)
+                errors.value = e.response.data.errors
+                toast('Hay errores en los datos a guardar', 'error')
+            })
+            loadingButton.value = false
+        } else {
+            loadingButton.value = false
+        }
     })
 }
 
@@ -214,17 +214,29 @@ const op = ref();
 const toggle = (event) => {
     op.value.toggle(event);
 }
+
+const url = [
+    {
+        ruta: 'quotes.index',
+        label: 'Estimaciones'
+    },
+    {
+        ruta: 'quotes.create',
+        label: props.quote ? 'Editar Estimación' : 'Crear Estimación',
+        active: true
+    }
+]
 </script>
 <template>
-    <AppLayout>
+    <AppLayout :href="url">
         <div class=" h-full w-full overflow-y-scroll space-y-2">
             <span>
                 <span class="flex justify-between p-1">
                     <p class="text-primary font-bold text-xl">
                         {{
                             newQuote ? action == 2 ? 'Creando nueva version para estimacion #' + props.quote.consecutive :
-                            'Crear solicitud de estimacion' : 'Editar estimacion #' +
-                        props.quote.consecutive
+                                'Crear solicitud de estimacion' : 'Editar estimacion #' +
+                            props.quote.consecutive
                         }}
                     </p>
                     <Button v-if="!newQuote" label="Ver sugerencia" icon="fa-solid fa-file-circle-question" class="!h-8"
@@ -263,8 +275,8 @@ const toggle = (event) => {
                             <p>Estimador</p>
                             <Dropdown v-model="dataQuoteNew.estimador_id" :options="Object.values(estimadores)" filter
                                 optionLabel="name" optionValue="user_id" placeholder="Selecciona un estimador"
-                                :class="errors.estimador_id ? 'p-invalid' : ''" class="w-full md:w-14rem !h-8 " showClear
-                                :pt="{
+                                :class="errors.estimador_id ? 'p-invalid' : ''" class="w-full md:w-14rem !h-8 "
+                                showClear :pt="{
                                     input: '!p-0 !pt-1 !px-1 '
                                 }" />
                             <small v-if="errors.estimador_id" class="p-error" id="text-error">
@@ -336,7 +348,7 @@ const toggle = (event) => {
             <div class="" v-if="quoteShips && !modEdit && action != 2">
                 <div class=" border rounded-md p-1">
                     <TabView class="tabview-custom" :scrollable="true">
-                        <TabPanel v-for=" buque, index  in  quoteShips ">
+                        <TabPanel v-for=" buque, index in quoteShips ">
                             <template #header>
                                 <div class="flex items-center space-x-1">
                                     <Avatar :image="buque.render ? buque.render : '/images/generic-boat.png'"
@@ -350,8 +362,9 @@ const toggle = (event) => {
                             <div class="grid grid-cols-4 gap-2 ">
                                 <span class="">
                                     <p for="username">Alcance</p>
-                                    <Dropdown v-model="buque.scope" :options="alcance" placeholder="Selecciona el alcance"
-                                        class="w-full md:w-14rem !h-8" showClear :pt="{
+                                    <Dropdown v-model="buque.scope" :options="alcance"
+                                        placeholder="Selecciona el alcance" class="w-full md:w-14rem !h-8" showClear
+                                        :pt="{
                                             input: '!p-0 !pt-1 !px-1 '
                                         }
                                             " />
@@ -359,7 +372,8 @@ const toggle = (event) => {
                                 <span class="">
                                     <p for="username">Madurez</p>
                                     <Dropdown v-model="buque.maturity" :options="madurez"
-                                        placeholder="Selecciona la madurez" class="w-full md:w-14rem !h-8" showClear :pt="{
+                                        placeholder="Selecciona la madurez" class="w-full md:w-14rem !h-8" showClear
+                                        :pt="{
                                             input: '!p-0 !pt-1 !px-1 '
                                         }
                                             " />
@@ -378,7 +392,8 @@ const toggle = (event) => {
                                 <span class="">
                                     <p for="username">Precio de compra EUR</p>
                                     <InputText v-model="buque.rate_buy_eur" filter optionLabel="name"
-                                        placeholder="Precio de compra en Euros" class="w-full md:w-14rem !h-8" showClear />
+                                        placeholder="Precio de compra en Euros" class="w-full md:w-14rem !h-8"
+                                        showClear />
                                 </span>
                                 <span class="">
                                     <p for="username">Precio antes de IVA</p>
@@ -401,7 +416,8 @@ const toggle = (event) => {
                                 <span class="">
                                     <p for="username">Tipo de documento tecnico</p>
                                     <Dropdown v-model="buque.white_paper" :options="docTecnico"
-                                        placeholder="Selecciona el tipo de DT" class="w-full md:w-14rem !h-8" showClear :pt="{
+                                        placeholder="Selecciona el tipo de DT" class="w-full md:w-14rem !h-8" showClear
+                                        :pt="{
                                             input: '!p-0 !pt-1 !px-1 '
                                         }
                                             " />
@@ -432,8 +448,9 @@ const toggle = (event) => {
                     <span class="flex items-end gap-2" v-if="!modEdit">
                         <Button severity="success" @click="quoteShipsSave(false)" icon="fa-solid fa-floppy-disk"
                             :loading="loadingButton" label="Guardar" class="!h-8"></Button>
-                        <Button severity="primary" @click="quoteShipsSave(true)" :disabled="quoteShips.length==0" icon="fa-solid fa-paper-plane"
-                            :loading="loadingButton" label="Enviar a revision" class="!h-8"></Button>
+                        <Button severity="primary" @click="quoteShipsSave(true)" :disabled="quoteShips.length == 0"
+                            icon="fa-solid fa-paper-plane" :loading="loadingButton" label="Enviar a revision"
+                            class="!h-8"></Button>
                     </span>
                 </span>
                 <!-- {{ quoteShips.length }} -->
