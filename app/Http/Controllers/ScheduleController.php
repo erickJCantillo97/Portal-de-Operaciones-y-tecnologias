@@ -103,7 +103,7 @@ class ScheduleController extends Controller
         return response()->json([
             'success' => true,
             'proyect' => ['rows' => [
-                'calendar' => $defaultCalendar->id, // calendario por defecto
+                'calendar' => $defaultCalendar == null ? '': $defaultCalendar->id, // calendario por defecto
                 'startDate'=> $project->startDate,
                 'hoursPerDay'=> $project->hoursPerDay,
                 'daysPerWeek'=> $project->daysPerWeek,
