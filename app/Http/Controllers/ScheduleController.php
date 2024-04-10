@@ -83,7 +83,7 @@ class ScheduleController extends Controller
                 'costo_hora' => '$ ' . number_format($cargo->costo_hora, 0),
             ];
         })->toArray();
-        $defaultCalendar = Calendar::first();
+        $defaultCalendar = Calendar::find($project->calendar_id);
         $recursos = array_merge_recursive($cargos, $personal);
         $projectCalendars = DetailProjectWithCalendar::where('project_id',$project->id);
         if($projectCalendars->count() > 0){    
@@ -254,7 +254,6 @@ class ScheduleController extends Controller
                 ]);
             }
         }
-
         if(isset($request->calendars['added'])){
             //return dd($request->calendars['added']);
             DB::beginTransaction();
@@ -298,6 +297,15 @@ class ScheduleController extends Controller
             }
             // return dd($calendars);
             DB::commit();
+        }
+        if(isset($request->project['added'])){
+            $project->calendar_id = $request->project['added']['calendar'];
+            $project->daysPerMonth = $request->project['added']['daysPerMonth'];
+            $project->direction = $request->project['added']['direction'];
+            $project->daysPerWeek = $request->project['added']['daysPerWeek'];
+            $project->hoursPerDay = $request->project['added']['hoursPerDay'];
+            $project->startDate = $request->project['added']['startDate'];
+            $project->update();
         }
         return response()->json([
             'success' => true,
