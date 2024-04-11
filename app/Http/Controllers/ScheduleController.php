@@ -10,7 +10,10 @@ use App\Models\Projects\Calendar;
 use App\Models\Projects\CalendarInterval;
 use App\Models\Projects\Project;
 use App\Models\Projects\ProjectWithCalendar;
+use App\Models\Schedule;
+use App\Models\ScheduleTime;
 use App\Models\Views\DetailProjectWithCalendar;
+use App\Models\Views\DetailScheduleTime;
 use App\Models\VirtualTask;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -92,9 +95,16 @@ class ScheduleController extends Controller
                 'id' => $calendar->calendarId,
                 'name' => $calendar->name,
                 'intervals'=>CalendarInterval::where('calendar_id',$calendar->calendarId)->get()->map(function ($interval){
+                    if  ($interval->recurrentStartDate){
+                        return[
+                            'recurrentStartDate' => $interval->recurrentStartDate,
+                            'recurrentEndDate'   => $interval->recurrentEndDate,
+                            'isWorking'          => $interval->isWorking == "1" ? true: false
+                        ];
+                    }
                     return[
-                        'recurrentStartDate' => $interval->recurrentStartDate,
-                        'recurrentEndDate'   => $interval->recurrentEndDate,
+                        'startDate' => $interval->startDate,
+                        'endDate'   => $interval->endDate,
                         'isWorking'          => $interval->isWorking == "1" ? true: false
                     ];
                 })->toArray()
@@ -102,14 +112,14 @@ class ScheduleController extends Controller
         })->toArray();
         return response()->json([
             'success' => true,
-            'proyect' => ['rows' => [
+            'project' =>  [
                 'calendar' => $defaultCalendar == null ? '': $defaultCalendar->id, // calendario por defecto
                 'startDate'=> $project->startDate,
                 'hoursPerDay'=> $project->hoursPerDay,
                 'daysPerWeek'=> $project->daysPerWeek,
                 'daysPerMonth'=> $project->daysPerMonth
 
-            ]],
+            ],
             'calendars' => [
                 "rows" => $calendarInterval
             ],
@@ -232,6 +242,7 @@ class ScheduleController extends Controller
             }
         }
         if (isset($request->assignments['added'])) {
+            DB::beginTransaction();
             foreach ($request->assignments['added'] as $assignment) {
                 if (!is_numeric($assignment['resource'])) {
                     $idResource = str_replace('CA', '', $assignment['resource']);
@@ -239,6 +250,31 @@ class ScheduleController extends Controller
                 } else {
                     $labor = searchEmpleados('Num_SAP', $assignment['resource'])->first();
                     $labor->name = $labor->Nombres_Apellidos;
+                    $task = VirtualTask::find($assignment['event']);
+                    $now = Carbon::now();
+                    if($task->endDate < $now->format('Y-m-d')){
+                        return response()->json(['status'=> false, 
+                        'mensaje'=>'No se pudo programar a: '.$labor->Nombres_Apellidos.' porque la tarea: '.$task->name
+                        .' finalizó.']);
+                    }else{  
+                        if(count(VirtualTask::where('task_id',$assignment['event'])->get())>0){
+                            return response()->json(['status'=> false, 
+                            'mensaje'=>'No se puede programar en esta actividad porque no es de ultimo nivel','conflict'=>[]]);
+                        }
+                            foreach($request->assignments['added'] as $employe){
+                                do{
+                                    if(getWorkingDays($now)){
+                                        programming($now ,$employe['resource'],
+                                        $task->project->shiftObject->startShift,
+                                        $task->project->shiftObject->endShift,
+                                        $employe['event'],
+                                        $labor->Nombres_Apellidos);
+                                    }
+                                    $now = $now->addDays(1);
+                            }while($now->format('Y-m-d') <= $task->endDate);
+                            $now = Carbon::now();
+                  }
+                }
                 }
                 $assigmmentCreate = Assignment::create([
                     'event' => $assignment['event'],
@@ -253,6 +289,18 @@ class ScheduleController extends Controller
                     'added_dt' => $assigmmentCreate->created_at,
                 ]);
             }
+            DB::commit();
+        }
+        if(isset($request->assignments['removed'])){
+            DB::beginTransaction();
+            foreach($request->assignments['removed'] as $id ){
+                $assignment = Assignment::find($id)->first();
+                Schedule::where('employee_id',$assignment->resource)
+                ->where('task_id',$assignment->event)
+                ->delete();
+                $assignment->delete();
+            }
+            DB::commit();
         }
         if(isset($request->calendars['added'])){
             //return dd($request->calendars['added']);
