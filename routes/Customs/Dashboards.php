@@ -18,7 +18,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     /*  Projects */
     Route::get('projectActive', [DashboardProjectsController::class, 'projectActive'])->name('project.active');
-    Route::get('getCPISPIPromedio', [DashboardProjectsController::class, 'getCPISPIPromedio'])->name('get.cpispi.romedio');
+    Route::get('getCPISPIPromedio', [DashboardProjectsController::class, 'getCPISPIPromedio'])->name('get.cpispi.promedio');
     /* Almacen */
     Route::get('getToolsStatus', [DashboardWareHouseController::class, 'getToolsStatus'])->name('get.tool.status');
     Route::get('getToolsStatusAssigment', [DashboardWareHouseController::class, 'getAssigmentTool'])->name('get.tool.assigment.status');
