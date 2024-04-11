@@ -237,15 +237,15 @@ class ScheduleController extends Controller
                     $idResource = str_replace('CA', '', $assignment['resource']);
                     $labor = Labor::find($idResource);
                 } else {
-                    $labor = searchEmpleados('Num_SAP', $assignment['resource']);
-                    $labor->name = $labor['Nombres_Apellidos'];
+                    $labor = searchEmpleados('Num_SAP', $assignment['resource'])->first();
+                    $labor->name = $labor->Nombres_Apellidos;
                 }
                 $assigmmentCreate = Assignment::create([
                     'event' => $assignment['event'],
                     'resource' => $assignment['resource'],
                     'units' => $assignment['units'],
                     'name' => $labor->name,
-                    'costo_hora' => $labor->costo_hora,
+                    'costo_hora' => $labor->Costo_Hora,
                 ]);
                 array_push($assgimentRows, [
                     '$PhantomId' => end($assignment),

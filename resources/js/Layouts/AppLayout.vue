@@ -28,9 +28,9 @@
                         </Link>
                         <div class="flex items-center justify-between">
                             <Breadcrumb :home="home" :model="href" :pt="{
-                                root: '!h-2 !flex !justify-center !items-center',
-                                label: '!text-blue-800'
-                            }">
+        root: '!h-2 !flex !justify-center !items-center',
+        label: '!text-blue-800'
+    }">
                                 <template #item="{ item, props }">
 
                                     <div v-if="item.active" class="flex space-x-2 items-center">
@@ -50,9 +50,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <FlyoutNotificationsMenu title="Notificaciones" type="buttonBadge" badge="120" severity="warning"
-                        v-if="$page.props.auth.user.oficina == 'OFTIC'" />
+                <div class="flex items-center">
                     <DolarTRM />
                     <FlyoutNotificationsMenu title="Notificaciones" icon="bellIcon" />
                     <DropdownSetting title="Utilidades" />
@@ -65,7 +63,7 @@
                                     :src="$page.props.auth.user.photo" alt="" />
                                 <span class="hidden lg:flex lg:items-center">
                                     <span class="ml-4 text-xs font-semibold text-gray-900" aria-hidden="true">{{
-                                        $page.props.auth.user.short_name }}</span>
+        $page.props.auth.user.short_name }}</span>
                                 </span>
                                 <ChevronDownIcon class="size-5 ml-2 -mr-1 text-violet-200 hover:text-violet-100"
                                     aria-hidden="true" />
@@ -82,8 +80,8 @@
                                 <div class="px-1 py-1">
                                     <MenuItem v-slot="{ active }">
                                     <button @click="logout" :class="[
-                                        active ? 'bg-primary text-white' : 'text-gray-900',
-                                        'group flex w-full items-center rounded-md px-2 py-2 text-sm',]">
+        active ? 'bg-primary text-white' : 'text-gray-900',
+        'group flex w-full items-center rounded-md px-2 py-2 text-sm',]">
                                         <ArrowLeftCircleIcon :active="active" class="w-5 h-5 mr-2 text-violet-400"
                                             aria-hidden="true" />
                                         Salir
@@ -95,8 +93,20 @@
                     </Menu>
                 </div>
             </div>
-            <div
-                class="h-[87vh] items-center flex p-1 gap-1 border border-gray-200 bg-white rounded-lg shadow-2xl g-white sm:ml-24 sm:mr-1">
+            <!--
+                sm:h-[80vh]  sm:border-red-500
+                md:h-[80vh]  md:border-fuchsia-600
+                lg:h-[87vh]  lg:border-green-500
+                xl:h-[88vh]  xl:border-blue-500
+                2xl:h-[90vh]  2xl:border-yellow-500
+             -->
+            <div class="h-[91vh]
+                sm:h-[83vh]
+                md:h-[85vh]
+                lg:h-[87vh]
+                xl:h-[88vh]
+                2xl:h-[90vh]
+                items-center flex p-1 gap-1 border-gray-200 bg-white rounded-lg shadow-2xl g-white sm:ml-24 sm:mr-1">
                 <slot />
             </div>
             <div class="fixed right-[-5px] z-50 w-10 top-1/4 animate-pulse" data-html2canvas-ignore>
@@ -191,11 +201,11 @@
                                                                     <span v-if="suggestion.type == 'Error'"
                                                                         class="flex justify-center px-2 text-xs font-medium rounded-md"
                                                                         :class="suggestion.status == 1 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-success'">{{
-                                                                        suggestion.status == 1 ? 'Pendiente' :
-                                                                        'Resuelto'
+                                                                            suggestion.status == 1 ? 'Pendiente' :
+                                                                                'Resuelto'
                                                                         }}</span>
                                                                     <p class="w-full text-xs text-end">{{
-                                                                        formatDateTime24h(suggestion.created_at) }}</p>
+            formatDateTime24h(suggestion.created_at) }}</p>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -308,6 +318,7 @@ import Button from '@/Components/Button.vue'
 import ConfirmPopup from 'primevue/confirmpopup';
 import DolarTRM from "@/Components/DolarTRM.vue"
 import DropdownSetting from '@/Components/DropdownSetting.vue'
+import UserStatusProgramming from '@/Components/sections/UserStatusProgramming.vue'
 import FlyoutNotificationsMenu from '@/Components/FlyoutNotificationsMenu.vue'
 import Footer from "@/Components/Footer.vue"
 import html2canvas from 'html2canvas'

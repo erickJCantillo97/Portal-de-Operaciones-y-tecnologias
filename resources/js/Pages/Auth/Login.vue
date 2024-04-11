@@ -43,14 +43,14 @@ const parallaxBackgroundFX = () => {
 }
 </script>
 <template>
-    <div class="flex min-h-screen min-w-full items-center justify-center bg-primary text-white">
+    <div class="flex min-h-screen min-w-full items-center justify-center bg-white md:bg-primary text-white">
         <div class="max-w-sm md:min-w-max px-2">
             <!-- <video autoplay="autoplay" class="video hidden md:block" loop="loop" muted="muted" preload="">
                 <source src="/images/video_margen_completa_home.mp4" type="video/mp4">
             </video> -->
-            <div class="flex h-screen w-full items-center justify-center overflow-hidden bg-indigo-800">
+            <div class="flex h-screen w-full items-center justify-center overflow-hidden bg-white md:bg-primary">
                 <img id="parallax" src="images/fondo.webp"
-                    class="absolute bottom-0 right-0 translate-x-[2.5px] translate-y-[2.5px] bg-cover bg-center bg-repeat-x blur-[0.6px]"
+                    class="absolute bottom-0 hidden md:block right-0 translate-x-[2.5px] translate-y-[2.5px] bg-cover bg-center bg-repeat-x blur-[0.6px]"
                     alt="login-background">
                 <AuthenticationCard>
                     <template #logo>
