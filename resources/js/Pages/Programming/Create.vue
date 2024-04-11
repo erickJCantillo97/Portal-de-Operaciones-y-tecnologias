@@ -100,7 +100,7 @@ const dates = ref(new Date(date.value.getFullYear(), date.value.getMonth(), date
 const diasSemana = ref(obtenerFechasSemana(dates.value))
 const projectsSelected = ref([])
 const overlayPerson = ref()
-const dragStart = ref()
+// const dragStart = ref()
 const personsEdit = ref()
 const tabActive = ref()
 const statusPersonal = ref({})
@@ -191,19 +191,21 @@ getPersonalStatus([dates.value])
 //#region drag
 
 function startDrag(evt, item, type) {
-    dragStart.value = true
-    if (type == null) {
-        evt.dataTransfer.setData('employee_id', item.Num_SAP)
-        evt.dataTransfer.setData('name', item.Nombres_Apellidos)
-        evt.dataTransfer.setData('type', 'add')
-    } else {
-        evt.dataTransfer.setData('name', item.name)
-        evt.dataTransfer.setData('employee_id', item.user_id)
-        evt.dataTransfer.setData('type', type)
-    }
-    evt.dataTransfer.effectAllowed = 'move'
-    evt.dataTransfer.dropEffect = 'move'
+    // dragStart.value = true
+    console.log(evt)
+    // if (type == null) {
+    //     evt.dataTransfer.setData('employee_id', item.Num_SAP)
+    //     evt.dataTransfer.setData('name', item.Nombres_Apellidos)
+    //     evt.dataTransfer.setData('type', 'add')
+    // } else {
+    //     evt.dataTransfer.setData('name', item.name)
+    //     evt.dataTransfer.setData('employee_id', item.user_id)
+    //     evt.dataTransfer.setData('type', type)
+    // }
+    // evt.dataTransfer.effectAllowed = 'move'
+    // evt.dataTransfer.dropEffect = 'move'
 }
+
 async function onDrop(evt, task, fecha) {
     const employee_id = evt.dataTransfer.getData('employee_id')
     const name = evt.dataTransfer.getData('name')
@@ -350,7 +352,7 @@ const save = async () => {
 <template>
     <AppLayout>
         <div class="h-full w-full flex flex-col sm:flex-row ">
-            <div class="sm:w-full h-[90%] sm:h-full pt-1 px-1 flex flex-col">
+            <div class="sm:w-full h-full pt-1 px-1 flex flex-col">
                 <div class="sm:flex gap-1 sm:justify-between h-20 sm:h-10 items-center sm:pr-1">
                     <div class="flex w-full justify-between sm:w-fit space-x-4">
                         <p class="text-xl font-bold text-primary h-full items-center flex">
@@ -385,7 +387,7 @@ const save = async () => {
                     </div>
                 </div>
                 <!-- region calendario -->
-                <div class="cursor-default h-full overflow-y-auto">
+                <div class="sm:cursor-default h-full overflow-y-auto">
                     <div v-if="mode == 'week'" class="h-full flex flex-col justify-between border rounded-md">
                         <!-- region Cabezeras -->
                         <div class="grid-cols-10 h-6 text-lg leading-6 grid pr-3 pl-2 border-b shadow-md mb-1 ">
@@ -598,7 +600,7 @@ const save = async () => {
                                     </div>
                                     <div v-else v-for="task in project.tasks[dates.toISOString().split('T')[0]].data"
                                         @drop="onDrop($event, task, dates.toISOString().split('T')[0])"
-                                        @dragover.prevent @dragenter.prevent class="max-w-60 h-full w-full  max-h-40 p-0.5 float-left"
+                                        @dragover.prevent @dragenter.prevent class="sm:max-w-60 sm:h-full w-1/2 sm:w-full sm:max-h-40 p-0.5 float-left"
                                         :key="task.name + dates.toDateString()">
                                         <div
                                             class="flex border pb-1 rounded-md border-primary hover:bg-primary-light flex-col justify-between h-full">
@@ -635,7 +637,7 @@ const save = async () => {
                                                     </div>
                                                     <div class="h-16 flex items-center w-full">
                                                         <div
-                                                            class="px-2 flex h-full w-full justify-center overflow-hidden">
+                                                            class="px-2 flex h-full w-full justify-between sm:justify-center items-center overflow-hidden">
                                                             <div
                                                                 class="overflow-x-hidden hover:overflow-x-auto gap-x-1 flex items-center h-full px-2 py-1 max-w-full flex-nowrap">
                                                                 <img v-tooltip.top="{ value: person.name }"
@@ -645,15 +647,18 @@ const save = async () => {
                                                                     @dragstart="startDrag($event, person, 'edit')"
                                                                     :src="person.photo ?? '/images/person-default.png'"
                                                                     class="rounded-full min-h-10 h-10 hover:ring-1 hover:ring-primary w-10 min-w-10 object-cover ring-primary-light shadow-md" />
-                                                                <i v-if="task.loading"
+                                                                    <i v-if="task.loading"
                                                                     class="fa-solid fa-circle-notch font-bold text-3xl animate-spin"></i>
                                                                 <div v-if="(task.employees?.length == 0) && !task.loading"
                                                                     class="flex items-center p-1">
                                                                     <p
-                                                                        class="border p-1 text-center text-danger rounded-md border-dashed bg-danger-light animate-pulse">
+                                                                        class="text-center text-danger rounded-md border-dashed bg-danger-light animate-pulse">
                                                                         Sin personal asignado
                                                                     </p>
                                                                 </div>
+                                                            </div>
+                                                            <div class="min-w-9 sm:hidden h-full items-center flex justify-end">
+                                                                <Button text rounded raised class="!w-8" severity="success" icon="fa-solid fa-plus"></Button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -700,7 +705,7 @@ const save = async () => {
                 </div>
             </div>
             <!--#region LISTA PERSONAL-->
-            <div class="sm:flex sm:flex-col h-36 w-full sm:w-52 sm:rounded-lg  divide-y space-y-1 sm:h-full p-1 gap-1">
+            <div class="sm:flex hidden sm:flex-col h-36 w-full sm:w-52 sm:rounded-lg  divide-y space-y-1 sm:h-full p-1 gap-1">
                 <div class="h-8">
                     <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
                 </div>
@@ -717,7 +722,7 @@ const save = async () => {
                         @dragstart="startDrag($event, item)"
                         v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
                         :class="[(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden', filterProgram ? (arrayFilter.find(objeto => objeto.name === item.Nombres_Apellidos) !== undefined ? 'bg-green-200' : 'bg-red-200') : '']"
-                        class="min-w-[25vw] sm:min-w-32 rounded-xl border border-primary h-full sm:h-16 shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
+                        class="min-w-[25vw] sm:min-w-32 z-10 rounded-xl border border-primary h-full sm:h-16 shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
                         <div class="flex flex-col h-full justify-center gap-x-1 p-1">
                             <div class="flex flex-col justify-center">
                                 <p class="text-sm font-semibold truncate text-gray-900">
