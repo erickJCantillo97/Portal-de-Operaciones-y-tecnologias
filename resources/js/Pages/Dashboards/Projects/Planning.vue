@@ -48,7 +48,6 @@ const getData = () => {
 
 const showLineChart = ref(0)
 const series = ref([])
-
 </script>
 <template>
   <main>
