@@ -17,7 +17,7 @@
                         <span class="sr-only">Open sidebar</span>
                         <Bars3CenterLeftIcon class="w-6 h-6" aria-hidden="true" />
                     </button>
-                    <div class="flex">
+                    <div class="hidden md:flex">
                         <Link :href="route('dashboard')" v-tooltip.bottom="'Dashboard'">
                         <div class="flex space-x-2 items-center">
                             <i class="fa-solid fa-home text-gray-500"></i>
@@ -26,7 +26,7 @@
                             </h1>
                         </div>
                         </Link>
-                        <div class="flex justify-between items-center">
+                        <div class="flex items-center justify-between">
                             <Breadcrumb :home="home" :model="href" :pt="{
         root: '!h-2 !flex !justify-center !items-center',
         label: '!text-blue-800'
@@ -51,9 +51,8 @@
                     </div>
                 </div>
                 <div class="flex items-center">
-                    <UserStatusProgramming></UserStatusProgramming>
                     <DolarTRM />
-                    <FlyoutNotificationsMenu title="Notificaciones" />
+                    <FlyoutNotificationsMenu title="Notificaciones" icon="bellIcon" />
                     <DropdownSetting title="Utilidades" />
                     <Menu as="div" class="relative inline-block text-left">
                         <div title="Perfil">
@@ -94,7 +93,7 @@
                     </Menu>
                 </div>
             </div>
-            <!-- 
+            <!--
                 sm:h-[80vh]  sm:border-red-500
                 md:h-[80vh]  md:border-fuchsia-600
                 lg:h-[87vh]  lg:border-green-500
@@ -202,9 +201,9 @@
                                                                     <span v-if="suggestion.type == 'Error'"
                                                                         class="flex justify-center px-2 text-xs font-medium rounded-md"
                                                                         :class="suggestion.status == 1 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-success'">{{
-        suggestion.status == 1 ? 'Pendiente' :
-            'Resuelto'
-    }}</span>
+                                                                            suggestion.status == 1 ? 'Pendiente' :
+                                                                                'Resuelto'
+                                                                        }}</span>
                                                                     <p class="w-full text-xs text-end">{{
             formatDateTime24h(suggestion.created_at) }}</p>
                                                                 </div>

@@ -25,9 +25,9 @@ const openDialog = ref(false)
 const items = ref([]);
 
 const search = (event) => {
-  console.log(event.query.toLowerCase());
-  let list = props.employees.map(value => value.contractor)
-  console.log(list);
+  // console.log(event.query.toLowerCase());
+  let list = props.employees.map(employee => employee.contractor)
+  // console.log(list);
   items.value = list.filter(value => value.toLowerCase().startsWith(event.query.toLowerCase()))
 }
 
@@ -44,7 +44,7 @@ const actions = [
   // { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
 ]
 //#endregion
-const employee = ref('')
+
 //#region CRUD
 const formData = useForm({
   id: null,

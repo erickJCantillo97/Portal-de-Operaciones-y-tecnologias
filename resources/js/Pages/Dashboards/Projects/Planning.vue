@@ -7,9 +7,14 @@ import BeijingAQIChart from '../Quotes/BeijingAQIChart.vue';
 
 onMounted(() => {
   getData()
+  getPromedio()
 })
 
 const projects = ref([])
+const promedios = ref({
+  cpi: 0,
+  spi: 0
+})
 const scatterSeries = ref([])
 
 const getData = () => {
@@ -49,6 +54,13 @@ const getData = () => {
 const showLineChart = ref(0)
 const series = ref([])
 
+const getPromedio = () => {
+  axios.get(route('get.cpispi.promedio')).then((res) => {
+    promedios.value.cpi = res.data.cpi
+    promedios.value.spi = res.data.spi
+    showLineChart.value++
+  })
+}
 </script>
 <template>
   <main>
@@ -58,8 +70,8 @@ const series = ref([])
           <h2 class="text-md font-semibold">PROMEDIO</h2>
         </div>
         <div class="flex justify-center size-full">
-          <GaugeGradeChart :key="showLineChart" title="CPI" :value="1.005" />
-          <GaugeGradeChart :key="showLineChart" title="SPI" :value="0.985" />
+          <GaugeGradeChart :key="showLineChart" title="CPI" :value="promedios.cpi" />
+          <GaugeGradeChart :key="showLineChart" title="SPI" :value="promedios.spi" />
         </div>
       </div>
       <div class="col-span-2 border border-gray-200 rounded-lg shadow-sm">
@@ -68,7 +80,7 @@ const series = ref([])
         </div>
         <div class="flex justify-center size-full">
           <GaugeGradeChart :key="showLineChart" title="CPI" :value="1.019" />
-          <GaugeGradeChart :key="showLineChart" title="SPI" :value="0.994" />
+          <GaugeGradeChart :key="showLineChart" title="SPI" :value="0.981" />
         </div>
       </div>
     </div>
