@@ -22,6 +22,10 @@ const props = defineProps({
         type: Array,
         required: true
     },
+    changeRows: {
+        type: Boolean,
+        default: true
+    },
     cacheName: {
         type: String,
         default: null
@@ -211,7 +215,7 @@ const selectedElement = ref([]);
                     </div>
                     <div class="space-x-2 hidden sm:flex items-center">
                         <Button v-if="selectionMode == 'multiple' && selectedElement.length > 0"
-                            v-tooltip.left="'Añadir'" @click="$emit('selectionAction', $event, selectedElement)"
+                            v-tooltip.left="''" @click="$emit('selectionAction', $event, selectedElement)"
                             severity="primary" label="Gestionar" />
 
                         <Button v-if="exportRute != ''" text @click="exportar" icon="fa-solid fa-download" :pt="{
@@ -257,7 +261,7 @@ const selectedElement = ref([]);
             </div>
         </template>
         <template #paginatorstart>
-            <div class="flex items-center">
+            <div class="flex items-center" v-if="changeRows">
                 <Dropdown v-model="rows" :options="[1, 5, 10, 20, 50, 100]" :pt="{
         root: '!h-8 !border-0 !ring-0',
         input: '!py-0 !flex !items-center',

@@ -27,6 +27,7 @@ const disabled = computed(() => selectedTaskId.value !== null && editMode.value)
 
 //#region UseForm
 const projectSelected = ref()
+
 const formData = ref({
     dates: [],
     start_hour: '',
@@ -55,12 +56,6 @@ const openDialog = () => {
     resetFormData()
     openModal.value = true
 }
-
-const divisionsOptions = [
-    'GEMAM',
-    'GECON',
-    'GEDIN',
-]
 
 //#region Requests
 const submit = () => {

@@ -40,10 +40,7 @@ export default {
 
       myChart.setOption(
         ({
-          title: {
-            text: 'Gráfica de Control (%)',
-            left: '1%'
-          },
+
           tooltip: {
             trigger: 'axis',
             formatter: '{b}: {c}%',
@@ -53,14 +50,37 @@ export default {
             right: '15%',
             bottom: '10%'
           },
-          xAxis: {
-            data: this.projects,
-          },
-          yAxis: {
-            label: {
-
+          xAxis: [
+            {
+              show: false,
+              data: this.projects,
             },
+            {
+              type: 'category',
+              axisTick: {
+                alignWithLabel: true
+              },
+              axisPointer: {
+                label: {
+                  formatter: function (params) {
+                    return (
+                      'Precipitation  ' +
+                      params.value +
+                      (params.seriesData.length ? '：' + params.seriesData[0].data : '')
+                    );
+                  }
+                }
+              },
+              // prettier-ignore
+              data: this.years
+            }
+
+          ],
+          yAxis: {
             formatter: '{b}: {c}%',
+            axisLabel: {
+              formatter: '{value} %'
+            },
           },
           toolbox: {
             right: 10,
@@ -72,6 +92,17 @@ export default {
               saveAsImage: {}
             }
           },
+          // dataZoom: [
+          //   {
+          //     start: '2015-04-01',
+          //     end: '2015-04-01',
+          //     startValue: '2015-04-01',
+          //     endValue: '2022-04-01',
+          //   },
+          //   {
+          //     type: 'inside'
+          //   }
+          // ],
           visualMap: {
             top: 50,
             right: 10,
@@ -105,7 +136,8 @@ export default {
             label: {
               show: true,
               position: 'top',
-              formatter: '{b}'
+              formatter: '{b}',
+              fontSize: 10,
             },
             name: 'Gráfica de Control',
             type: 'line',
@@ -138,6 +170,38 @@ export default {
         })
       )
     },
+    projectWithYears() {
+      return this.projects.map(project => {
+        if (project.includes('DISEÑO Y CONST EMPUJADOR DE RÍO COTECMAR')) {
+          return `${project} \n2015`;
+        } else if (
+          project.includes('CTO 128/18 PART BARCAZA TANQUERA 1') ||
+          project.includes('CTO 129/18 PART BARCAZA TANQUERA 2') ||
+          project.includes('CTO 130/18 PART BARCAZA TANQUERA 3')
+        ) {
+          return `${project} \n2018`;
+        } else if (project.includes('CTO 0064-ARC-CBN6-219 BOTES SAFE') ||
+          project.includes('CTO 290-SUBAFIN-2019 BB')) {
+          return `${project} \n2019`;
+        } else if (project.includes('CTO 007-ARC-JOLA-2020 BDA URR') ||
+          project.includes('CTO 0084-ARC-CBN6-2020 EMBAR. ARAUCA') ||
+          project.includes('CTO INT 171-GINRED-2020 BOYAS DIMAR') ||
+          project.includes('CTO INT 0158-ARC-CBN6-2020 BOTES SAFE') ||
+          project.includes('CTO 004-ARC-JOLA-2020 BOTES BRF')) {
+          return `${project} \n2020`;
+        } else if (project.includes('CTO 003/21 JOLA BOTE APOSTLE 41') ||
+          project.includes('CTO 9677/21 FNGRD BOTE APOSTLE 41') ||
+          project.includes('CTO 003/21 JOLA BOTE ARCÁNGEL') ||
+          project.includes('CTO 369/21 FONDO PAZ BOTE TIPO C')) {
+          return `${project} \n2021`;
+        } else if (project.includes('CTO 1104/22 BCFBC FONSECON') ||
+          project.includes('BCFBC FONSECON II')) {
+          return `${project} \n2022`;
+        } else {
+          return project;
+        }
+      });
+    }
   },
   data() {
     return {
@@ -162,7 +226,15 @@ export default {
         'BCFBC FONSECON II',
         'FONSECON LANCHA POLICÍA'
       ],
-      variations: [19, 13, 13, 13, 2, 16, 4, 0, 0, 1, 8, 1, 0, -4, 4, 2, 23, 13, 5]
+      variations: [19, 13, 13, 13, 2, 16, 4, 0, 0, 1, 8, 1, 0, -4, 4, 2, 23, 13, 5],
+      years: [
+        '2015',
+        '2018',
+        '2019',
+        '2020',
+        '2021',
+        '2022'
+      ]
     }
   }
 }

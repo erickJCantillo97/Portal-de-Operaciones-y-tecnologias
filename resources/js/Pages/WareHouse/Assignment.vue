@@ -64,7 +64,7 @@ const columnas = [
 
 const actions = [
   { event: 'download', severity: 'warning', icon: 'fa-regular fa-circle-xmark', text: true, outlined: false, rounded: false, show: hasPermission('assignmentTool delete') },
-  { event: 'delete', severity: 'danger', icon: 'fa-regular fa-trash-can', text: true, outlined: false, rounded: false, show: hasPermission('assignmentTool delete') },
+  // { event: 'delete', severity: 'danger', icon: 'fa-regular fa-trash-can', text: true, outlined: false, rounded: false, show: hasPermission('assignmentTool delete') },
   // { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
 ]
 
@@ -85,6 +85,10 @@ const downloadAssignment = (event, data) => {
 
 const deleteAssignment = (event, data) => {
   confirmDelete(data.id, 'Asignación', 'assignmentTool')
+}
+
+const removeElement = (element) => {
+  form.tools = form.tools.filter(value => value.id !== element.id)
 }
 
 const submit = () => {
@@ -175,7 +179,7 @@ const url = [
   </AppLayout>
 
   <!--Modal Asignación de Equipos-->
-  <CustomModal v-model:visible="openDialog" :closable="false">
+  <CustomModal v-model:visible="openDialog" :closable="true" >
     <template #icon>
       <span class="material-symbols-outlined font-semibold text-3xl">
         construction
@@ -208,22 +212,25 @@ const url = [
         <!--CAMPO SELECCIÓN DE EQUIPOS (tools)-->
         <div class="col-span-2">
           <label class="text-md font-semibold">Seleccionar Equipos</label>
-          <div class="flex flex-nowrap gap-2 mb-2 w-full overflow-x-auto">
+          <div class="flex gap-2 mb-2 w-full overflow-x-auto">
             <div v-for="tool in form.tools"
-              class="bg-emerald-100 border border-l-8 border-l-emerald-400 rounded-lg shadow-lg shadow-emerald-200">
-              <ul class="flex flex-col">
-                <li class="p-2 text-xs text-emerald-500 font-semibold">
-                  {{ tool.name }}
-                  <span class="block text-xs">{{ tool.serial }}</span>
-                </li>
-              </ul>
+              class="bg-emerald-100 w-32 border border-l-8 border-l-emerald-400 rounded-lg shadow-lg shadow-emerald-200">
+
+              <div class="p-2 text-sm font-semibold">
+                {{ tool.name }}
+                <div class="flex w-full justify-between items-center">
+                  <div class="block text-xs text-black font-light italic ">{{ tool.serial }}</div>
+                  <div class="block text-xs text-danger font-light italic fa-regular fa-trash-can cursor-pointer"
+                    @click="removeElement(tool)" v-tooltip="'Quitar'"></div>
+                </div>
+              </div>
             </div>
           </div>
           <Listbox v-model="form.tools" :options="tools" multiple filter :filterFields="['name', 'serial']"
             optionLabel="name" filterPlaceholder="Seleccione el/los equipo(s) para asignar." class="w-full md:w-14rem"
             :virtualScrollerOptions="{ itemSize: 38 }" listStyle="height:15rem" :pt="{
-              filterInput: '!text-sm'
-            }">
+    filterInput: '!text-sm'
+  }">
             <template #option="slotProps">
               <div class="items-center flex justify-between">
                 <div> {{ slotProps.option.name }}</div>
@@ -260,15 +267,15 @@ const url = [
           <label>Estado de la herramienta <span class="text-red-700 italic mt-2 font-serif">*</span></label>
           <RadioGroups v-model="toolStatus" />
           <span class="text-red-700 text-xs italic mt-2 font-serif" v-if="!toolStatus">{{
-            $page.props.errors.status
-          }}</span>
+    $page.props.errors.status
+  }}</span>
         </div>
         <div class="col-span-4">
           <label>Descripción de Estado de la herramienta</label>
           <Textarea v-model="descriptionValue" rows="5" col="10" placeholder="Agregue una descripción al grupo"
             autoResize :pt="{
-              root: '!w-full !text-sm'
-            }" />
+    root: '!w-full !text-sm'
+  }" />
         </div>
       </section>
     </template>

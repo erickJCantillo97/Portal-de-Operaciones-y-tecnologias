@@ -22,6 +22,7 @@ use Spatie\Holidays\Countries\Colombia;
 use Spatie\Holidays\Holidays;
 use Illuminate\Support\Facades\Log;
 use DB;
+use Illuminate\Support\Facades\DB as FacadesDB;
 
 class ScheduleController extends Controller
 {
@@ -302,51 +303,51 @@ class ScheduleController extends Controller
             }
             DB::commit();
         }
-        if(isset($request->calendars['added'])){
+        if (isset($request->calendars['added'])) {
             //return dd($request->calendars['added']);
-            DB::beginTransaction();
-            foreach ($request->calendars['added'] as $calendar){
+            FacadesDB::beginTransaction();
+            foreach ($request->calendars['added'] as $calendar) {
                 $calendarsDetails = [];
                 $calendarSave = Calendar::firstOrCreate([
-                    'expanded'=>$calendar['expanded'],
-                    'version'=>$calendar['version'],
-                    'name'=>$calendar['name'],
-                    'unspecifiedTimeIsWorking'=>$calendar['unspecifiedTimeIsWorking'],
+                    'expanded' => $calendar['expanded'],
+                    'version' => $calendar['version'],
+                    'name' => $calendar['name'],
+                    'unspecifiedTimeIsWorking' => $calendar['unspecifiedTimeIsWorking'],
                 ]);
                 $calendarSave->save();
-                if(isset($calendar['intervals']['added'])){
-                foreach ($calendar['intervals']['added'] as $intervals) {
-                    CalendarInterval::firstOrCreate([
-                        'calendar_id'=>$calendarSave->id,
-                        'isWorking'=>$intervals['isWorking'],
-                        'priority'=>$intervals['priority'],
-                        'recurrentStartDate'=>isset($intervals['recurrentStartDate'])== true ?  $intervals['recurrentStartDate'] : '',
-                        'recurrentEndDate'=>isset($intervals['recurrentEndDate'])  == true ? $intervals['recurrentEndDate'] : '',
-                        'startDate'=>isset($intervals['startDate'])== true ? Carbon::parse($intervals['startDate'])->format('Y-m-d H:i') : null,
-                        'endDate'=>isset($intervals['endDate'])== true ? Carbon::parse($intervals['endDate'])->format('Y-m-d H:i') : null
-                    ]);
-                    array_push($calendarsDetails, [
-                                        'id'=>$intervals['$PhantomId'],
-                                        'recurrentStartDate'=>isset($intervals['recurrentStartDate']) == true ? $intervals['recurrentStartDate'] : '',
-                                        'recurrentEndDate'=>isset($intervals['recurrentEndDate'])  == true ? $intervals['recurrentEndDate'] : '',
-                                        'isWorking'=>$intervals['isWorking']
-                                ]);
+                if (isset($calendar['intervals']['added'])) {
+                    foreach ($calendar['intervals']['added'] as $intervals) {
+                        CalendarInterval::firstOrCreate([
+                            'calendar_id' => $calendarSave->id,
+                            'isWorking' => $intervals['isWorking'],
+                            'priority' => $intervals['priority'],
+                            'recurrentStartDate' => isset($intervals['recurrentStartDate']) == true ?  $intervals['recurrentStartDate'] : '',
+                            'recurrentEndDate' => isset($intervals['recurrentEndDate'])  == true ? $intervals['recurrentEndDate'] : '',
+                            'startDate' => isset($intervals['startDate']) == true ? Carbon::parse($intervals['startDate'])->format('Y-m-d H:i') : null,
+                            'endDate' => isset($intervals['endDate']) == true ? Carbon::parse($intervals['endDate'])->format('Y-m-d H:i') : null
+                        ]);
+                        array_push($calendarsDetails, [
+                            'id' => $intervals['$PhantomId'],
+                            'recurrentStartDate' => isset($intervals['recurrentStartDate']) == true ? $intervals['recurrentStartDate'] : '',
+                            'recurrentEndDate' => isset($intervals['recurrentEndDate'])  == true ? $intervals['recurrentEndDate'] : '',
+                            'isWorking' => $intervals['isWorking']
+                        ]);
+                    }
                 }
-            }
                 array_push($calendars, [
                     'id' => $calendar['$PhantomId'],
                     'name' => $calendar['name'],
-                    'intervals'=>$calendarsDetails
+                    'intervals' => $calendarsDetails
                 ]);
                 ProjectWithCalendar::firstOrCreate([
-                    'project_id'=>$project->id,
-                    'calendar_id'=>$calendarSave->id
+                    'project_id' => $project->id,
+                    'calendar_id' => $calendarSave->id
                 ]);
             }
             // return dd($calendars);
             DB::commit();
         }
-        if(isset($request->project['added'])){
+        if (isset($request->project['added'])) {
             $project->calendar_id = $request->project['added']['calendar'];
             $project->daysPerMonth = $request->project['added']['daysPerMonth'];
             $project->direction = $request->project['added']['direction'];
@@ -369,12 +370,12 @@ class ScheduleController extends Controller
                 'rows' => $rowsDependecy,
                 'removed' => $removedDependecy,
             ],
-            'project'=>[
-                'calendar'=> $project->id,
-                'startDate'=> $project->startDate,
-                'hoursPerDay'=> $project->hoursPerDay,
-                'daysPerWeek'=> $project->daysPerWeek,
-                'daysPerMonth'=> $project->daysPerMonth
+            'project' => [
+                'calendar' => $project->id,
+                'startDate' => $project->startDate,
+                'hoursPerDay' => 9,
+                'daysPerWeek' => 6,
+                'daysPerMonth' => 24
             ],
             'calendars' => [
                 'rows' => $calendars

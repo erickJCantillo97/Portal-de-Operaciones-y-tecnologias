@@ -19,7 +19,7 @@ class RequirementController extends Controller
     public function index()
     {
         $projects = Project::active()->get();
-        $requirements = Requirement::with('project', 'user')->get();
+        $requirements = Requirement::has('project')->with('project', 'user')->get();
         return Inertia::render('WareHouse/Requirements/Index', [
             'projects' => $projects,
             'requirements' => $requirements

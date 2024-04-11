@@ -331,35 +331,6 @@ td {
                 <div v-else class="flex justify-center mt-10">
                   <ApplicationLogo height="350" width="350" />
                 </div>
-                <!-- <article class="flex col-span-1 md:flex md:col-span-2 md:justify-center md:items-center">
-                <Galleria :value="selectedImage" :responsiveOptions="responsiveOptions" indicatorsPosition="left"
-                  :transitionInterval="2000" :showThumbnails="true" :changeItemOnIndicatorHover="true"
-                  :showIndicatorsOnItem="true" containerStyle="max-width: 600px" :pt="{
-                    itemContainer: '!border !border-gray-200 !rounded-lg',
-                    indicatorButton: '!bg-blue-800'
-                  }">
-                  <template #item="slotProps">
-                    {{ selectedImage }}
-                    <img :src="selectedImage" />
-                  </template>
-
-<template #thumbnail="slotProps">
-                    <img :src="selectedImage" style="width: 100%;" />
-                  </template>
-
-<template #caption="slotProps">
-                    <div class="text-xl mb-2 font-bold">
-                      {{ props.ships[0].name }}
-                    </div>
-                    <p class="text-white">
-                      No. Casco: {{ props.ships[0].idHull }}
-                    </p>
-                  </template>
-</Galleria>
-<div v-if="selectedImage == null" class="flex justify-center mt-10">
-  <ApplicationLogo height="350" width="350" />
-</div>
-</article> -->
               </div>
             </div>
             <TabView :scrollable="true" :pt="{
