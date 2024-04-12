@@ -1,5 +1,5 @@
 <script setup>
-import Index from "@/Pages/WareHouse/Dashboards/Index.vue"
+// import Index from "@/Pages/WareHouse/Dashboards/Index.vue"
 import GraphicStatus from "../WareHouse/Dashboards/GraphicStatus.vue";
 </script>
 <template>
