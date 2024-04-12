@@ -123,7 +123,7 @@
                 xl:h-[88vh]  xl:border-blue-500
                 2xl:h-[90vh]  2xl:border-yellow-500
              -->
-            <div class="h-[87vh] 
+            <div class="h-[85vh] 
                 sm:h-[83vh]  
                 md:h-[85vh]  
                 lg:h-[87vh]  

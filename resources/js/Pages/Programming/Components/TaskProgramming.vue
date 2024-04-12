@@ -8,7 +8,7 @@ const tasks = ref({})
 const props = defineProps({
     day: {
         type: Date,
-        default: []
+        default:null
     },
     project: {
         type: Number
@@ -40,7 +40,16 @@ async function getTaskDay() {
 }
 getTaskDay()
 
-defineEmits(['drop'])
+const itemDrag = defineModel('itemDrag', {
+    required: false,
+    set(value){
+        let x={}
+        x.Num_SAP=value.user_id
+        x.Nombres_Apellidos=value.name
+        return x
+    }
+})
+defineEmits(['drop','togglePerson'])
 
 </script>
 <template>
@@ -48,7 +57,7 @@ defineEmits(['drop'])
         <Loading />
     </div>
     <div v-else v-for="task in tasks.data" @drop="$emit('drop', task, day)"
-        @dragover.prevent @dragenter.prevent class="sm:h-full w-1/2 sm:w-1/3 sm:max-h-44 p-0.5 float-left"
+        @dragover.prevent @dragenter.prevent class="sm:h-full w-full sm:w-1/3 sm:max-h-44 p-0.5 float-left"
         :key="task.name + date.toDateString()">
         <div class="flex border pb-1 rounded-md border-primary hover:bg-primary-light flex-col justify-between h-full">
             <div class="h-min w-full">
@@ -87,9 +96,9 @@ defineEmits(['drop'])
                                 <i v-if="task.loading"
                                     class="fa-solid fa-circle-notch font-bold text-3xl animate-spin"></i>
                                 <img v-tooltip.top="{ value: person.name }"
-                                    @click="togglePerson($event, person, task, dates)" v-if="task.employees?.length > 0"
+                                    @click="$emit('togglePerson',$event, person, task, day)" v-if="task.employees?.length > 0"
                                     v-for="person in task.employees" :dragable="true"
-                                    @dragstart="startDrag($event, person, 'edit')"
+                                    @dragstart="itemDrag== person"
                                     :src="person.photo ?? '/images/person-default.png'"
                                     class="rounded-full min-h-10 h-10 hover:ring-1 hover:ring-primary w-10 min-w-10 object-cover ring-primary-light shadow-md" />
                                 <div v-if="(task.employees?.length == 0) && !task.loading"
