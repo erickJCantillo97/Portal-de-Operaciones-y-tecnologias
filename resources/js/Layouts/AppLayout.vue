@@ -50,7 +50,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center">
+                <div class="flex items-center space-x-2">
+                    <FlyoutNotificationsMenu title="Requerimiento de Materiales" type="buttonBadge" badge="120"
+                        severity="warning" />
                     <DolarTRM />
                     <FlyoutNotificationsMenu title="Notificaciones" icon="bellIcon" />
                     <DropdownSetting title="Utilidades" />
@@ -100,12 +102,12 @@
                 xl:h-[88vh]  xl:border-blue-500
                 2xl:h-[90vh]  2xl:border-yellow-500
              -->
-            <div class="h-[91vh]
-                sm:h-[83vh]
-                md:h-[85vh]
-                lg:h-[87vh]
-                xl:h-[88vh]
-                2xl:h-[90vh]
+            <div class="h-[87vh] 
+                sm:h-[83vh]  
+                md:h-[85vh]  
+                lg:h-[87vh]  
+                xl:h-[88vh] 
+                2xl:h-[90vh]  
                 items-center flex p-1 gap-1 border-gray-200 bg-white rounded-lg shadow-2xl g-white sm:ml-24 sm:mr-1">
                 <slot />
             </div>
@@ -201,9 +203,9 @@
                                                                     <span v-if="suggestion.type == 'Error'"
                                                                         class="flex justify-center px-2 text-xs font-medium rounded-md"
                                                                         :class="suggestion.status == 1 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-success'">{{
-                                                                            suggestion.status == 1 ? 'Pendiente' :
-                                                                                'Resuelto'
-                                                                        }}</span>
+        suggestion.status == 1 ? 'Pendiente' :
+            'Resuelto'
+    }}</span>
                                                                     <p class="w-full text-xs text-end">{{
             formatDateTime24h(suggestion.created_at) }}</p>
                                                                 </div>

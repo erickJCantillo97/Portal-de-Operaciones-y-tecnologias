@@ -23,12 +23,27 @@ const props = defineProps({
 
 <template>
     <AppLayout>
-        <div class="size-full overflow-y-scroll">
+        <div class="size-full overflow-y-scroll space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 max-w-full">
                 <UserHeader class="col-span-1" />
                 <QuotesCard class="col-span-1" :showIndicators="false"
                     v-if="$page.props.auth.user.oficina == 'DEPPC'" />
             </div>
+            <!-- <div class="grid grid-cols-1 md:grid-cols-2 max-w-full">
+                <div class="p-2">
+                    <h2 class="text-primary font-extrabold text-lg py-2 border-b mb-2">Reqeurimientos Pendientes</h2>
+                    <div class="flex justify-between w-full rounded-md shadow-md">
+                        <div class="block"> 
+                            <div class="text-primary font-bold text-md">RI-223-500-2001</div>
+                            <div>TOP - Erick J cantillo</div>
+                        </div>
+                        <div class="flex space-x-2">
+                            Informacion -
+                            aprobar - rechazar
+                        </div>
+                    </div>
+                </div>
+            </div> -->
             <Quotes v-if="$page.props.auth.user.oficina !== 'DEPPC'" />
             <Planning v-if="$page.props.auth.user.oficina != 'DEPPC'" :projects="props.projects" />
             <!-- <Tools v-if="hasPermission('tool edit')" :projects="props.projects" /> -->

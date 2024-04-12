@@ -64,7 +64,7 @@ const options = [
 ]
 
 const columns = [
-    { field: 'consecutive', header: 'Consecutivo', filter: "true" },
+    { field: 'consecutive', header: 'Consecutivo', filter: "true", rowClass: "underline !text-left !text-sm", filter: true, sortable: true, type: 'button', event: 'showStatus', severity: 'info', text: true, },
     { field: 'project.name', header: 'Proyecto', filter: 'true', filterType: 'dropdown', filterLabel: 'name', filterValue: 'name', filterOptions: props.projects },
     { field: 'bloque', header: 'Bloque', filter: true },
     { field: 'sistema_grupo', header: 'Sistema/grupo', filter: true, filterOptions: options, filterLabel: 'name', filterValue: 'value', filterType: 'dropdown' },
@@ -115,7 +115,7 @@ const url = [
                 </div>
             </div> -->
             <CustomDataTable :data="requirements" title="Requerimiento de Materiales" @selectionAction="gestion"
-                :columnas="columns" :rowsDefault="10" selectionMode="multiple">
+                :columnas="columns" :rowsDefault="10" selectionMode="multiple" @showStatus="gestion">
                 <template #buttonHeader>
                     <Button label="Importar Requerimientos" severity="success" icon="fa-solid fa-plus"
                         @click="addItem" />

@@ -76,8 +76,8 @@ const url = [
 <template>
     <AppLayout :href="url">
         <div class="h-full w-full overflow-y-auto">
-            <CustomDataTable :rowsDefault="100" :data="quotes" :columnas="columnas" :filterButtons="filterButtons"
-                title="Estimaciones" @rowClic="showClic">
+            <CustomDataTable :rowsDefault="100" :data="quotes" selectionMode="multiple" :columnas="columnas"
+                :filterButtons="filterButtons" title="Estimaciones" @rowClic="showClic">
                 <template #buttonHeader>
                     <Link :href="route('quotes.create')">
                     <Button title="Agregar Estimación" severity="success" label="Agregar" outlined

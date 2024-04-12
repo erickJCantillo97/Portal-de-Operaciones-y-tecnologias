@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Models\Project\Operation;
+use App\Models\Project\ProgressProjectWeek;
 use App\Models\Projects\Project;
 use App\Models\VirtualTask;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DashboardProjectsController extends Controller
 {
@@ -32,5 +35,46 @@ class DashboardProjectsController extends Controller
         return response()->json([
             'projects' => $tasks
         ], 200);
+    }
+
+    public function getCPISPIPromedio()
+    {
+        $projects = Project::active();
+        $projects_id = $projects->pluck('id')->toArray();
+        $semanas = ProgressProjectWeek::where('real_progress', '<>', 0)->whereIn('project_id', $projects_id)->groupBy('project_id')->select('project_id', DB::raw("MAX(week) as week"))->get();
+        $cpi = 0;
+        $spi = 0;
+
+        foreach ($semanas as $semana) {
+            $progre =  ProgressProjectWeek::where('project_id', $semana->project_id)->where('week', $semana->week)->first();
+            $materials_ejecutados = Operation::where('project_id', $semana->project_id)->get()->sum('materials_ejecutados');
+
+            $labor_ejecutados = Operation::where('project_id', $semana->project_id)->get()->sum('labor_ejecutados');
+
+            $services_ejecutados = Operation::where('project_id', $semana->project_id)->get()->sum('services_ejecutados');
+            $cpi += $progre->CPI;
+            $spi += $progre->SPI;
+        }
+        return response()->json([
+            'cpi' => $cpi / count($semanas),
+            'spi' => $spi / count($semanas),
+        ]);
+    }
+    public function getDataCPISPIPonderado()
+    {
+        $projects = Project::active();
+        $projects_id = $projects->pluck('id')->toArray();
+        $semanas = ProgressProjectWeek::where('real_progress', '<>', 0)->whereIn('project_id', $projects_id)->groupBy('project_id')->select('project_id', DB::raw("MAX(week) as week"))->get();
+        $cpi = 0;
+        $spi = 0;
+        foreach ($semanas as $semana) {
+            $progre =  ProgressProjectWeek::where('project_id', $semana->project_id)->where('week', $semana->week)->first();
+            $cpi += $progre->CPI;
+            $spi += $progre->SPI;
+        }
+        return response()->json([
+            'cpi' => $cpi / count($semanas),
+            'spi' => $spi / count($semanas),
+        ]);
     }
 }

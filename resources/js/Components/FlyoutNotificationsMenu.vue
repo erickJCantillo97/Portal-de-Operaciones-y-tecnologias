@@ -20,11 +20,11 @@ const props = defineProps({
   },
   label: {
     type: String,
-    default: ''
+    default: ' '
   },
   severity: {
     type: String,
-    default: 'info'
+    default: 'success'
   },
   badge: {
     type: String,
@@ -40,7 +40,7 @@ const props = defineProps({
   },
   icon: {
     type: String,
-    default: null
+    default: 'fa-solid fa-dolly'
   }
 })
 
@@ -100,65 +100,53 @@ const toggle = (event) => {
       </div>
     </PopoverButton>
 
-    <PopoverButton v-else-if="icon == 'dollyIcon'"
-      class="focus:outline-none inline-flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900">
-      <div class="relative mt-2 hover:bg-gray-100 p-1 rounded-full">
-        <i class="fa-solid fa-dolly text-lg text-gray-400" aria-hidden="true"></i>
-        <div
-          :class="notifications != 0 ? 'absolute inline-flex size-4 z-[1] bg-red-500 rounded-full -mt-2 -ml-2 animate-[ping_3s_ease-in-out_infinite]' : 'hidden'">
-        </div>
-        <div :class="notifications != 0 ? 'absolute inline-flex size-4 bg-red-500 rounded-full -mt-2 -ml-2' : 'hidden'">
-          <span class="text-white text-xs z-[2] ml-[0.3rem]">
-            {{ notifications.length }}
-          </span>
-        </div>
-      </div>
-    </PopoverButton>
+
 
     <Button v-if="type == 'buttonBadge'" v-tooltip.bottom="'Requerimientos Pendientes'" :label :severity :badge
       :badgeSeverity :outlined @click="toggle" :pt="{
-        root: '!p-1',
-        label: '!w-4',
-      }">
+      root: '!p-1.5',
+    }">
       <template #icon>
-        <i class="fa-solid fa-dolly"></i>
+        <i :class="icon"></i>
       </template>
     </Button>
 
-    <OverlayPanel ref="op" class="h-96 space-y-2 overflow-y-auto border-b px-1" :pt="{
-      content: '!p-0'
+    <OverlayPanel ref="op" class="h-96 space-y-2" :pt="{
+      content: '!p-0',
+      root: '!p-0 !bg-primary'
     }">
-      <div class="flex w-full flex-nowrap place-content-between rounded-t-lg bg-primary p-2 align-middle">
+      <div class="flex w-full flex-nowrap place-content-between rounded-t-lg bg-primary px-4 pb-2 align-middle">
         <div>
           <h2 class="text-lg font-extrabold text-white">
             {{ props.title }}
           </h2>
         </div>
       </div>
-
-      <div v-if="notifications.length > 0" v-for="item in notifications" :key="item.name"
-        class="rounded-lg hover:bg-slate-100">
-        <Link :href="route('requirements.index')">
-        <div class="flex items-center justify-center space-x-6 rounded-lg border-b p-1">
-          <i class="fa-solid fa-screwdriver-wrench text-2xl w-4" aria-hidden="true"
-            :class="item.type == 'error' ? 'text-danger' : 'text-gray-600'">
-          </i>
-          <div class="col-span-2 mx-4 w-full">
-            <a :href="item.href" class="font-semibold text-gray-900">
-              <!-- Requerimientos Pendientes -->
-              {{ item.title }}
-            </a>
-            <p class="text-gray-600 text-sm">{{ item.message }}</p>
-            <span class="text-xs italic text-gray-500 flex">{{ item.ago }}</span>
+      <slot />
+      <div v-if="notifications.length > 0" class="h-80 px-2 overflow-y-auto bg-white ">
+        <div v-for="item in notifications" :key="item.name" class="rounded-lg hover:bg-slate-100">
+          <Link :href="route('requirements.index')">
+          <div class="flex items-center justify-center space-x-6 rounded-lg border-b p-1">
+            <i class="fa-solid fa-screwdriver-wrench text-2xl w-4" aria-hidden="true"
+              :class="item.type == 'error' ? 'text-danger' : 'text-gray-600'">
+            </i>
+            <div class="col-span-2 mx-4 w-full">
+              <a :href="item.href" class="font-semibold text-gray-900">
+                <!-- Requerimientos Pendientes -->
+                {{ item.title }}
+              </a>
+              <p class="text-gray-600 text-sm">{{ item.message }}</p>
+              <span class="text-xs italic text-gray-500 flex">{{ item.ago }}</span>
+            </div>
+            <div
+              class="col-span-1 flex size-8 cursor-pointer items-center justify-center rounded-2xl text-end hover:bg-gray-200">
+              <!-- <i class="text-danger fa-solid fa-trash text-sm" aria-hidden="true" /> -->
+              <Button v-tooltip.bottom="'Eliminar Notificación'" icon="pi pi-trash" severity="danger" text rounded
+                @click="deleteNotification(item.id)" aria-label="Delete" />
+            </div>
           </div>
-          <div
-            class="col-span-1 flex size-8 cursor-pointer items-center justify-center rounded-2xl text-end hover:bg-gray-200">
-            <!-- <i class="text-danger fa-solid fa-trash text-sm" aria-hidden="true" /> -->
-            <Button v-tooltip.bottom="'Eliminar Notificación'" icon="pi pi-trash" severity="danger" text rounded
-              @click="deleteNotification(item.id)" aria-label="Delete" />
-          </div>
+          </Link>
         </div>
-        </Link>
       </div>
       <div v-else class="flex h-[10rem] w-full flex-col items-center justify-center">
         <div class="flex size-20 items-center justify-center rounded-full bg-slate-100">
@@ -166,7 +154,18 @@ const toggle = (event) => {
         </div>
         <p class="mt-4 text-lg font-semibold">No hay notificaciones para mostrar</p>
       </div>
+      <a>
+        <div v-if="notifications.length > 0"
+          class="grid grid-cols-1 rounded-b-lg divide-x divide-gray-900/5 bg-primary">
+          <div
+            class="flex items-center justify-center gap-x-2.5 p-1 font-semibold cursor-pointer text-white hover:bg-blue-800">
+            <component :is="CursorArrowRaysIcon" class="size-5 flex-none text-gray-400" aria-hidden="true" />
+            Ver Todas
+          </div>
+        </div>
+      </a>
     </OverlayPanel>
+
 
     <transition enter-active-class="transition ease-out duration-200" enter-from-class="opacity-0 translate-y-0"
       enter-to-class="opacity-100 translate-y-0" leave-active-class="transition ease-in duration-150"
