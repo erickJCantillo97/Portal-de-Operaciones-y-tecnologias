@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\WareHouse\Material;
 use App\Models\WareHouse\MaterialRequirement;
+use App\Models\WareHouse\Requirement;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -11,9 +13,21 @@ class MaterialRequirementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Requirement $requirement)
     {
-        //
+        $materials = MaterialRequirement::with('material', 'requirement')->where('requirement_id', $requirement->id)->orderBy('material_id')->get()->map(function ($m) {
+            return [
+                'id' => $m['id'],
+                'material' => $m['material']['description'],
+                'codigo' => $m['material']['code'],
+                'cantidad' => $m['count'],
+                'unidad' => array_search($m['unit'] + 1, Material::$unidad),
+                'Estado' => array_search($m['status'], Material::$estado),
+            ];
+        });
+        return response()->json([
+            'material' => $materials,
+        ], 200);
     }
 
     /**
@@ -33,10 +47,10 @@ class MaterialRequirementController extends Controller
             //
         ]);
 
-        try{
+        try {
             MaterialRequirement::create($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
     }
 
@@ -65,10 +79,10 @@ class MaterialRequirementController extends Controller
             //
         ]);
 
-        try{
+        try {
             $materialRequirement->update($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -77,10 +91,10 @@ class MaterialRequirementController extends Controller
      */
     public function destroy(MaterialRequirement $materialRequirement)
     {
-        try{
+        try {
             $materialRequirement->delete();
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }

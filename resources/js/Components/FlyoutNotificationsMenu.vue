@@ -27,8 +27,8 @@ const props = defineProps({
     default: 'success'
   },
   badge: {
-    type: String,
-    default: '2'
+    type: Number,
+    default: 0
   },
   outlined: {
     type: Boolean,

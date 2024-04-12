@@ -2,6 +2,8 @@
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
 import DescriptionItem from '@/Components/DescriptionItem.vue'
+import axios from 'axios';
+import { ref } from 'vue';
 
 const emit = defineEmits(['closeSlideOver'])
 
@@ -12,8 +14,16 @@ const props = defineProps({
   requirement: {
     type: Object,
     required: true
+  },
+  materials: {
+    type: Array,
+    required: false,
+    default: []
   }
 })
+
+
+
 </script>
 <template>
   <TransitionRoot as="template" :show="show">
@@ -50,7 +60,17 @@ const props = defineProps({
                   </div>
                   <article class="w-full mt-20">
                     <div class="border border-solid rounded-lg p-2 mb-2">
-                      <DescriptionItem :data="requirement"/>
+                      <DescriptionItem :data="requirement" />
+                    </div>
+                    <div class="border border-solid rounded-lg mb-2">
+                      <div class="mb-4">
+                        <h3 class="font-semibold p-1 rounded-t-xl text-center bg-primary text-white">Lista de Materiales
+                        </h3>
+                        <div class="shadow-md my-4 px-2" v-for="m in materials">
+                          <h3 class="font-semibold text-gray-900 text-center">{{ m.material }}</h3>
+                          <DescriptionItem :data="m" />
+                        </div>
+                      </div>
                     </div>
                   </article>
                 </div>

@@ -7,7 +7,8 @@ import Button from 'primevue/button';
 import { ref } from 'vue';
 import { useToast } from "primevue/usetoast";
 import CustomDataTable from '@/Components/CustomDataTable.vue';
-import RequirementSlideOver from '@/Components/RequirementSlideOver.vue'
+import RequirementSlideOver from './RequirementSlideOver.vue'
+
 
 const toast = useToast()
 
@@ -24,6 +25,14 @@ const formData = ref({
     requirement: {}
 })
 
+
+const materials = ref([])
+
+const getMaterial = (requirement) => {
+    axios.get(route('materials.index', requirement)).then((res) => {
+        materials.value = res.data.material
+    })
+}
 const addItem = () => {
     // toast.add({ severity: 'success', group: 'customToast', text: 'Atividad Eliminada', life: 2000 });
     formData.value.requirement = {}
@@ -75,7 +84,7 @@ const columns = [
     { field: 'bloque', header: 'Bloque', filter: true },
     { field: 'grupo', header: 'Sistema/grupo', filter: true, filterOptions: options, filterLabel: 'name', filterValue: 'value', filterType: 'dropdown' },
     { field: 'dibujante', header: 'Dibujante', filter: true },
-    { field: 'fecha', header: 'Fecha', type: 'date', filter: true, },
+    { field: 'fecha', header: 'Fecha', filter: true, },
 ];
 
 const gestion = (event, data) => {
@@ -104,6 +113,7 @@ const showClick = (event, data) => {
     // console.log(data)
     requirement.value = data;
     openSlideOver.value = true
+    getMaterial(data.id)
 }
 
 const url = [
@@ -113,6 +123,8 @@ const url = [
         active: true
     }
 ]
+
+
 </script>
 
 <template>
@@ -183,7 +195,7 @@ const url = [
             </template>
         </CustomModal>
 
-        <RequirementSlideOver :requirement="requirement" :key="requirement.id" :show="openSlideOver"
+        <RequirementSlideOver :requirement="requirement" :materials :key="requirement.id" :show="openSlideOver"
             @closeSlideOver="openSlideOver = false" />
     </AppLayout>
 </template>
