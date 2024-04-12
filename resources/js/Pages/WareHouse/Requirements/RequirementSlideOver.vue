@@ -1,11 +1,15 @@
 <script setup>
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
+import { ref } from 'vue'
+import Accordion from 'primevue/accordion';
+import AccordionTab from 'primevue/accordiontab';
 import DescriptionItem from '@/Components/DescriptionItem.vue'
-import axios from 'axios';
-import { ref } from 'vue';
+import ListBox from 'primevue/listbox';
 
 const emit = defineEmits(['closeSlideOver'])
+
+const selectedMaterial = ref()
 
 const props = defineProps({
   show: {
@@ -21,8 +25,6 @@ const props = defineProps({
     default: []
   }
 })
-
-
 
 </script>
 <template>
@@ -58,17 +60,23 @@ const props = defineProps({
                       Requerimientos
                     </h2>
                   </div>
-                  <article class="w-full mt-20">
+                  <article class="w-full mt-18">
                     <div class="border border-solid rounded-lg p-2 mb-2">
                       <DescriptionItem :data="requirement" />
                     </div>
                     <div class="border border-solid rounded-lg mb-2">
                       <div class="mb-4">
-                        <h3 class="font-semibold p-1 rounded-t-xl text-center bg-primary text-white">Lista de Materiales
+                        <h3 class="font-semibold p-1 rounded-t-xl text-center bg-primary text-white">
+                          Lista de Materiales
                         </h3>
-                        <div class="shadow-md my-4 px-2" v-for="m in materials">
-                          <h3 class="font-semibold text-gray-900 text-center">{{ m.material }}</h3>
-                          <DescriptionItem :data="m" />
+                        <div class="shadow-md my-4 px-2 h-full" v-for="material in materials">
+                            <Accordion expandIcon="pi pi-plus" collapseIcon="pi pi-minus" :pt="{
+                              content: '!h-[80vh] !p-2 !overflow-y-auto'
+                            }">
+                              <AccordionTab :activeIndex="0" :header="`${material.material}`">
+                                <DescriptionItem :data="material" />
+                              </AccordionTab>
+                            </Accordion>
                         </div>
                       </div>
                     </div>

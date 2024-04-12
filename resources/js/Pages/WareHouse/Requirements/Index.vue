@@ -119,12 +119,10 @@ const showClick = (event, data) => {
 const url = [
     {
         ruta: 'requirements.index',
-        label: 'Requerimientos Preliminares',
+        label: 'Requerimientos',
         active: true
     }
 ]
-
-
 </script>
 
 <template>

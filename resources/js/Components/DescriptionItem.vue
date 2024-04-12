@@ -67,7 +67,7 @@ const getFieldValue = (field) => {
           {{ item[0] }}:
         </dt>
         <dd
-          :class="item[0] == 'state' || item[0] == 'status' || item[0] == 'estado' ? 'p-2 bg-emerald-400 rounded-lg text-white text-xs animate-pulse' : 'text-gray-500 uppercase'">
+          :class="item[0] == 'state' || item[0] == 'status' || item[0] == 'estado' || item[0] == 'Estado' ? 'p-2 bg-emerald-400 rounded-lg text-white text-xs animate-pulse' : 'text-gray-500 uppercase'">
           {{ getFieldValue(item[0]) || 'SIN DEFINIR' }}
         </dd>
       </div>
