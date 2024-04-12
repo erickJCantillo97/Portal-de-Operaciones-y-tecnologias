@@ -33,7 +33,8 @@ const props = defineProps({
             <Planning v-if="$page.props.auth.user.oficina != 'DEPPC'" :projects="props.projects" />
             <!-- <Tools v-if="hasPermission('tool edit')" :projects="props.projects" /> -->
             <Planning v-if="$page.props.auth.user.oficina == 'DEPPC'" :projects="props.projects" />
-            <WareHouse /> <!-- <Tools v-if="hasPermission('tool edit')" :projects="props.projects" /> -->
+
+            <!-- <Tools v-if="hasPermission('tool edit')" :projects="props.projects" /> -->
             <!-- <Projects v-else /> -->
             <!-- <CustomUpload mode="advanced" :multiple="true" accept=".xlsx,.xls" url="prueba"/> -->
         </div>
