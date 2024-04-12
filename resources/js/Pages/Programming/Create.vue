@@ -113,15 +113,6 @@ const arrayPersonFilter = ref([])
 //#endregion
 
 //#region Consultas
-const getPersonalData = () => {
-    loadingPerson.value = true
-    axios.get(route('get.personal.user')).then((res) => {
-        personal.value = Object.values(res.data.personal)
-        loadingPerson.value = false
-    })
-}
-getPersonalData()
-
 
 async function getTaskDay(days, project) {
     project.tasks = {}
@@ -199,9 +190,6 @@ getPersonalStatus([dates.value])
 async function onDrop(task, fecha) {
     if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
         task.loading = true
-        // if (type != undefined) {
-        //     task.loading = false
-        // } else {
         await axios.post(route('programming.store'), { task_id: task.id, employee_id: personDrag.value.Num_SAP, name: personDrag.value.Nombres_Apellidos, fecha }).then((res) => {
             if (Object.values(res.data.conflict).length > 0) {
                 conflicts.value = Object.values(res.data.conflict)
@@ -220,7 +208,6 @@ async function onDrop(task, fecha) {
                 toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
             }
         })
-        // }
     } else {
         toast.add({ severity: 'error', group: "customToast", text: 'No se puede programar en dias anteriores', life: 2000 })
     }
@@ -579,14 +566,15 @@ const save = async () => {
                                     </div>
                                 </div>
                                 <div class="h-full sm:h-full p-1 w-full overflow-y-auto">
-                                    <TaskProgramming :project="project.id" :day="dates" :key="dates" @drop="onDrop"  />
+                                    <TaskProgramming :project="project.id" :day="dates" :key="dates + project.id" 
+                                    @drop="onDrop" v-model:itemDrag="personDrag" @togglePerson="togglePerson"/>
                                 </div>
                             </div>
-                            <div class="" v-else>
+                            <div  v-else>
                                 <NoContentToShow subject="Seleccione uno o mas proyectos" />
                             </div>
                         </div>
-                        <div class="w-full h-8 justify-center flex space-x-2 p-1 z-10">
+                        <div class="w-full h-8 justify-center flex space-x-2 p-1 z-10" oncontextmenu="return false">
                             <p class="rounded bg-primary px-2 text-white"
                                 v-if="statusPersonal[dates.toISOString().split('T')[0]].data.programados?.length > 0"
                                 v-tooltip="{ value: `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
@@ -607,7 +595,6 @@ const save = async () => {
                                 statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados.length }}
                                 </span>
                             </p>
-                            <i v-if="filterProgram" class="fa-solid fa-filter"></i>
                             <!-- <p class="rounded bg-warning px-2 text-white">No programables 3</p> -->
                         </div>
                     </div>
