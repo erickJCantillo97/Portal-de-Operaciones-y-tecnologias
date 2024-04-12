@@ -51,10 +51,31 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <FlyoutNotificationsMenu title="Requerimiento de Materiales" type="buttonBadge" badge="120"
-                        severity="warning" />
+                    <FlyoutNotificationsMenu title="Requerimiento de Materiales" type="buttonBadge"
+                        :badge="requirements.length" severity="warning" icon="fa-solid fa-boxes-packing"
+                        :badge-severity="'contrast'">
+                        <div v-if="requirements.length > 0" class="h-80 px-2 overflow-y-auto bg-white ">
+                            <div v-for="item in requirements" :key="item.name" class="rounded-lg hover:bg-slate-100">
+                                <NotificationItem :item></NotificationItem>
+                            </div>
+                        </div>
+                        <div v-else class="flex w-full h-80 flex-col items-center justify-center bg-white">
+                            <NoContentToShow subject="Requerimientos" description="No hay elementos por aprobar" />
+                        </div>
+                    </FlyoutNotificationsMenu>
+                    <FlyoutNotificationsMenu title="Notificaciones" icon="bellIcon">
+                        <div v-if="notifications.length > 0" class="h-80 px-2 overflow-y-auto bg-white ">
+                            <div v-for="item in notifications" :key="item.name" class="rounded-lg hover:bg-slate-100">
+                                <NotificationItem :item></NotificationItem>
+                            </div>
+                        </div>
+                        <div v-else class="flex w-full h-80 flex-col items-center justify-center bg-white">
+                            <NoContentToShow subject="No hay Notificaciones por Mostrar" />
+                        </div>
+                    </FlyoutNotificationsMenu>
                     <DolarTRM />
-                    <FlyoutNotificationsMenu title="Notificaciones" icon="bellIcon" />
+
+
                     <DropdownSetting title="Utilidades" />
                     <Menu as="div" class="relative inline-block text-left">
                         <div title="Perfil">
@@ -327,6 +348,8 @@ import html2canvas from 'html2canvas'
 import MenuSidebar from '@/Components/MenuSidebar.vue'
 import RadioButton from 'primevue/radiobutton'
 import Toast from 'primevue/toast'
+import NotificationItem from '@/Components/NotificationItem.vue'
+import NoContentToShow from '@/Components/NoContentToShow.vue';
 
 const debug = import.meta.env.VITE_APP_DEBUG
 const menu = ref(false)
@@ -344,6 +367,8 @@ const props = defineProps({
 
 onMounted(() => {
     loadSuggestions()
+    getNotifications()
+    getRequiments()
     // testBroadcast()
 })
 
@@ -390,6 +415,29 @@ const loadSuggestions = () => {
         .then((res) => {
             suggestions.value = res.data[0]
         })
+}
+
+const notifications = ref([])
+const getNotifications = () => {
+    try {
+        axios.get(route('getNotifications.index'))
+            .then((res) => {
+                notifications.value = res.data.notifications
+            })
+    } catch (error) {
+        console.log(error)
+    }
+}
+const requirements = ref([])
+const getRequiments = () => {
+    try {
+        axios.get(route('get.requirements.role'))
+            .then((res) => {
+                requirements.value = res.data.requirements
+            })
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 const home = ref({

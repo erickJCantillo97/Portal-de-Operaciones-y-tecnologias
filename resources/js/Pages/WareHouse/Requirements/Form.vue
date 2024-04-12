@@ -112,9 +112,7 @@ const submit = () => {
 
 const searching = () => {
     form.materiales = form.materiales.map(objeto => {
-        console.log(objeto.material.material);
-        if (objeto.material.material.description.toUpperCase().includes(search.value.toUpperCase()) || objeto.material.material.toUpperCase().includes(search.value.toUpperCase())) {
-            console.log(objeto.material.material.description)
+        if (objeto.material.material.description.toUpperCase().includes(search.value.toUpperCase()) || objeto.material.material.description.toUpperCase().includes(search.value.toUpperCase())) {
             return { ...objeto, ver: 1 };
         } else {
             return { ...objeto, ver: 0 };
@@ -145,11 +143,10 @@ const url = [
                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-center focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                 </span>
             </div>
-            <div class="block space-y-2 p-2 overflow-y-auto">
-
+            <div class="block space-y-2 px-2 overflow-y-auto h-[80vh] mt-1">
                 <div class="block items-center space-x-2 rounded-md px-4" v-for="(material, index) in form.materiales"
                     :class="[material.nivel > 1 ? 'bg-white border border-gray-800 px-8' : 'bg-secondary', material.ver == 1 ? '' : 'hidden']">
-                    <div class="flex justify-between my-2">
+                    <div class="flex justify-between my-2 items-center">
                         <span class="text-primary font-bold">
                             <span class="text-primary cursor-default" v-tooltip="'Cantidad Material Requerido'">
                                 {{ material.material.count }}
@@ -158,6 +155,12 @@ const url = [
                                 {{ material.material.requirement.consecutive }}
                             </div>
                         </span>
+                        <div class=" space-x-4 text-center">
+                            <Button class="size-10" icon="fa-solid fa-plus" v-if="material.nivel == 1"
+                                @click="addEstado(material)" severity="success"></Button>
+                            <Button class="size-10" icon="fa-solid fa-minus" v-else @click="deleteEstado(index)"
+                                severity="danger"></Button>
+                        </div>
                     </div>
                     <div class="flex space-x-4">
                         <div class="w-1/6">
@@ -184,13 +187,6 @@ const url = [
                             <span for="code text-sm ">Observaciones</span>
                             <CustomInput :rowsTextarea="2" type="textarea" v-model:input="material.observacion">
                             </CustomInput>
-                        </div>
-                        <div class=" space-x-4 text-center">
-                            <div for="code text-sm">Acciones</div>
-                            <Button class="size-10" icon="fa-solid fa-plus" v-if="material.nivel == 1"
-                                @click="addEstado(material)" severity="success"></Button>
-                            <Button class="size-10" icon="fa-solid fa-minus" v-else @click="deleteEstado(index)"
-                                severity="danger"></Button>
                         </div>
                     </div>
 
