@@ -187,7 +187,26 @@ getPersonalStatus([dates.value])
 
 //#region drag
 
-async function onDrop(task, fecha) {
+function startDrag(evt, item, type) {
+    //dragStart.value = true
+    console.log(evt)
+    if (type == null) {
+        evt.dataTransfer.setData('employee_id', item.Num_SAP)
+        evt.dataTransfer.setData('name', item.Nombres_Apellidos)
+        evt.dataTransfer.setData('type', 'add')
+    } else {
+        evt.dataTransfer.setData('name', item.name)
+        evt.dataTransfer.setData('employee_id', item.user_id)
+        evt.dataTransfer.setData('type', type)
+    }
+    evt.dataTransfer.effectAllowed = 'move'
+    evt.dataTransfer.dropEffect = 'move'
+}
+
+async function onDrop(evt, task, fecha) {
+    const employee_id = evt.dataTransfer.getData('employee_id')
+    const name = evt.dataTransfer.getData('name')
+    const type = evt.dataTransfer.getData('type')
     if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
         task.loading = true
         await axios.post(route('programming.store'), { task_id: task.id, employee_id: personDrag.value.Num_SAP, name: personDrag.value.Nombres_Apellidos, fecha }).then((res) => {
