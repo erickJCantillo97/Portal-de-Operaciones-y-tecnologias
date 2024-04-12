@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Personal;
 use App\Http\Controllers\Controller;
 use App\Jobs\Personal\PersonalScheduleDayJob;
 use App\Ldap\User;
+use App\Models\Gantt\Assignment;
 use App\Models\Personal\ExtendedSchedule;
 use App\Models\Projects\Project;
 use App\Models\Schedule;
@@ -105,10 +106,8 @@ class ProgrammingController extends Controller
                 } else {
                     $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::SUNDAY);
                 }
-                // if($end_date < Carbon::parse($validateData['fecha'])){
-                //     return $end_date." es menor";
-                // }
-                // return $end_date." es mayor";
+                
+                $employee = searchEmpleados('Num_SAP', $validateData['employee_id'])->first();
                 do {
                     if (getWorkingDays($date->format('Y-m-d'), intval($project->daysPerWeek))) {
                         $exist = DetailScheduleTime::where('idUsuario', $validateData['employee_id'])
@@ -141,6 +140,15 @@ class ProgrammingController extends Controller
                                 'schedule_id' => $schedule->id,
                                 'hora_inicio' => Carbon::parse($task->project->shiftObject->startShift)->format('H:i'),
                                 'hora_fin' => Carbon::parse($task->project->shiftObject->endShift)->format('H:i'),
+                            ]);
+                            /* adicional de guardar en schedule y scheduleTime, se guarda en la tabla Assignment para 
+                            que pueda aparecer en los recursos del gantt */
+                            Assignment::firstOrCreate([
+                                'event' => $validateData['task_id'],
+                                'resource' => $validateData['employee_id'],
+                                'units' => 100,
+                                'name' => $validateData['name'],
+                                'costo_hora' => $employee->Costo_Hora,
                             ]);
                         }
                     }
@@ -644,6 +652,9 @@ class ProgrammingController extends Controller
         try {
             DB::beginTransaction();
             $schedule = Schedule::find($request->schedule);
+            //se eliminan el recurso en el gantt
+            Assignment::where('event',$schedule->task_id)
+            ->where('resource', $schedule->employee_id)->delete();
             // dd($schedule);
             switch ($request->type) {
                     //SOLO EL $request->date
