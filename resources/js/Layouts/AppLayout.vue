@@ -50,7 +50,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center">
+                <div class="flex items-center space-x-2">
+                    <FlyoutNotificationsMenu title="Requerimiento de Materiales" type="buttonBadge" badge="120"
+                        severity="warning" />
                     <DolarTRM />
                     <FlyoutNotificationsMenu title="Notificaciones" icon="bellIcon" />
                     <DropdownSetting title="Utilidades" />
@@ -201,9 +203,9 @@
                                                                     <span v-if="suggestion.type == 'Error'"
                                                                         class="flex justify-center px-2 text-xs font-medium rounded-md"
                                                                         :class="suggestion.status == 1 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-success'">{{
-                                                                            suggestion.status == 1 ? 'Pendiente' :
-                                                                                'Resuelto'
-                                                                        }}</span>
+        suggestion.status == 1 ? 'Pendiente' :
+            'Resuelto'
+    }}</span>
                                                                     <p class="w-full text-xs text-end">{{
             formatDateTime24h(suggestion.created_at) }}</p>
                                                                 </div>
