@@ -62,7 +62,7 @@ class RequirementImport implements ToCollection, WithHeadingRow
                 'material_id' => $material->id,
                 'count' => $collection['cantidad'],
                 'status' => 0,
-                'unit' =>  Material::$unidad[$collection['unidad']] ?? 0,
+                'unit' =>  Material::$unidad[strtoupper($collection['unidad'])] ?? 0,
             ]);
         }
     }

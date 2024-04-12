@@ -326,7 +326,7 @@ const navigation = [
                 show: true,
                 children: [
                     {
-                        name: 'Requemientos Preeliminares',
+                        name: 'Requemientos',
                         href: 'requirements.index',
                         dev: true,
                         show: true,

@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from 'vue'
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 
 const props = defineProps({
@@ -30,7 +29,7 @@ const props = defineProps({
         <h3 class="text-xl font-semibold italic text-gray-500 text-center">
             {{ props.subject }}
         </h3>
-        <span v-if="props.showDescription" class="text-sm italic text-gray-500 text-center">
+        <span v-if="props.description" class="text-sm italic text-gray-500 text-center">
             {{ props.description }}
         </span>
     </section>

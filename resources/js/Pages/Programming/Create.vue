@@ -1,10 +1,11 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref, onMounted } from 'vue';
-import { Container, Draggable } from "vue-dndrop";
+import { ref } from 'vue';
+import { Container } from "vue-dndrop";
 import Loading from '@/Components/Loading.vue';
 import CustomInput from '@/Components/CustomInput.vue';
 import ModalColisions from './Components/ModalColisions.vue'
+import ListPersonDrag from './Components/ListPersonDrag.vue'
 import axios from 'axios';
 import MultiSelect from 'primevue/multiselect';
 import ButtonGroup from 'primevue/buttongroup';
@@ -21,6 +22,7 @@ import TabPanel from 'primevue/tabpanel';
 import InputSwitch from 'primevue/inputswitch';
 import CustomShiftSelector from '@/Components/CustomShiftSelector.vue';
 import { useToast } from "primevue/usetoast";
+import TaskProgramming from './Components/TaskProgramming.vue';
 import Knob from 'primevue/knob';
 import Dropdown from 'primevue/dropdown';
 const toast = useToast();
@@ -95,18 +97,18 @@ const loadingPerson = ref(true);
 const conflicts = ref()
 const task = ref([])
 const mode = ref('date')
-const filter = ref('');
 const dates = ref(new Date(date.value.getFullYear(), date.value.getMonth(), date.value.getDate() + 1))
 const diasSemana = ref(obtenerFechasSemana(dates.value))
 const projectsSelected = ref([])
 const overlayPerson = ref()
-// const dragStart = ref()
 const personsEdit = ref()
 const tabActive = ref()
 const statusPersonal = ref({})
 const selectDays = ref([])
 const filterProgram = ref(false)
 const arrayFilter = ref()
+const personDrag = ref()
+const arrayPersonFilter = ref([])
 
 //#endregion
 
@@ -145,7 +147,7 @@ const getTask = async (option) => {
                 await getTaskDay(diasSemana.value, project)
             })
         }
-        // getPersonalStatus(diasSemana.value)
+        getPersonalStatus(diasSemana.value)
     } else if (option == 'date') {
         mode.value = 'date'
         // dates.value = new Date()
@@ -157,7 +159,7 @@ const getTask = async (option) => {
                 await getTaskDay(date, project)
             })
         }
-        // getPersonalStatus(date)
+        getPersonalStatus(date)
 
     } else if (mode.value == 'month') {
 
@@ -167,16 +169,20 @@ const getTask = async (option) => {
 };
 
 const getPersonalStatus = async (dias) => {
+    if (dias.length == 1) arrayPersonFilter.value = []
     await dias.forEach(async (dia) => {
         statusPersonal.value[new Date(dia).toISOString().split('T')[0]] = { loading: true, data: [] }
         await axios.post(route('get.personal.status.programming'), { date: dia }).then((res) => {
             statusPersonal.value[new Date(dia).toISOString().split('T')[0]].data = res.data
             statusPersonal.value[new Date(dia).toISOString().split('T')[0]].loading = false
         })
+        if (dias.length == 1) {
+            arrayPersonFilter.value = statusPersonal.value[new Date(dias[0]).toISOString().split('T')[0]].data.programados
+            // console.log(statusPersonal.value[new Date(dias[0]).toISOString().split('T')[0]].data)
+        }
     })
+
 }
-
-
 getPersonalStatus([dates.value])
 
 
@@ -212,33 +218,31 @@ async function onDrop(evt, task, fecha) {
     const type = evt.dataTransfer.getData('type')
     if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
         task.loading = true
-        if (type == 'edit') {
-            task.loading = false
-        } else {
-            await axios.post(route('programming.store'), { task_id: task.id, employee_id, name, fecha }).then((res) => {
-                if (Object.values(res.data.conflict).length > 0) {
-                    conflicts.value = Object.values(res.data.conflict)
-                    openConflict.value = true;
-                    task.loading = false
-                    task.value = task
-                    task.employees = res.data.task
-                } else if (res.data.status == false) {
-                    task.loading = false
-                    task.employees = res.data.task
-                    toast.add({ severity: 'error', group: "customToast", text: 'Hubo un error al programar', life: 2000 })
-                } else {
-                    getPersonalStatus([fecha])
-                    task.employees = res.data.task
-                    task.loading = false
-                    toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
-                }
-            })
-        }
+        // if (type != undefined) {
+        //     task.loading = false
+        // } else {
+        await axios.post(route('programming.store'), { task_id: task.id, employee_id: personDrag.value.Num_SAP, name: personDrag.value.Nombres_Apellidos, fecha }).then((res) => {
+            if (Object.values(res.data.conflict).length > 0) {
+                conflicts.value = Object.values(res.data.conflict)
+                openConflict.value = true;
+                task.loading = false
+                task.value = task
+                task.employees = res.data.task
+            } else if (res.data.status == false) {
+                task.loading = false
+                task.employees = res.data.task
+                toast.add({ severity: 'error', group: "customToast", text: 'Hubo un error al programar', life: 2000 })
+            } else {
+                getPersonalStatus([fecha])
+                task.employees = res.data.task
+                task.loading = false
+                toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
+            }
+        })
+        // }
     } else {
         toast.add({ severity: 'error', group: "customToast", text: 'No se puede programar en dias anteriores', life: 2000 })
     }
-    // const item = this.items.find((item) => item.id == itemID)
-    // item.list = list
 }
 
 
@@ -594,89 +598,14 @@ const save = async () => {
                                     </div>
                                 </div>
                                 <div class="h-full sm:h-full p-1 w-full overflow-y-auto">
-                                    <div v-if="project.tasks[dates.toISOString().split('T')[0]].loading"
-                                        class="flex col-span-5 justify-center h-full items-center">
-                                        <Loading />
-                                    </div>
-                                    <div v-else v-for="task in project.tasks[dates.toISOString().split('T')[0]].data"
-                                        @drop="onDrop($event, task, dates.toISOString().split('T')[0])"
-                                        @dragover.prevent @dragenter.prevent class="sm:max-w-60 sm:h-full w-1/2 sm:w-full sm:max-h-40 p-0.5 float-left"
-                                        :key="task.name + dates.toDateString()">
-                                        <div
-                                            class="flex border pb-1 rounded-md border-primary hover:bg-primary-light flex-col justify-between h-full">
-                                            <div class="h-min w-full">
-                                                <p v-tooltip="task.name"
-                                                    class="border-b font-bold trun border-primary h-10 flex items-center justify-center text-xs px-0.5 w-full text-center">
-                                                    {{ task.name }}
-                                                </p>
-                                            </div>
-                                            <div class="h-full">
-                                                <div :key="task.name + new Date().toISOString()"
-                                                    class="flex flex-col justify-between h-full py-1">
-                                                    <p v-tooltip="task.task"
-                                                        class="text-xs px-1 text-center h-min w-full truncate">
-                                                        {{ task.task }}
-                                                    </p>
-                                                    <div class="flex text-xs h-min justify-between px-1 items-center">
-                                                        <div
-                                                            class="flex h-min cursor-default space-x-1  justify-center">
-                                                            <p v-tooltip.left="'Fecha Fin'" class="text-xs text-center"
-                                                                :class="new Date(task.endDate) < date ? 'bg-red-500 rounded-md px-1' : ''">
-                                                                {{ task.endDate }}
-                                                            </p>
-                                                        </div>
-                                                        <div
-                                                            class="flex cursor-default bg-success-light px-1 space-x-1 justify-center items-center rounded-md">
-                                                            <p v-tooltip.left="'Hora inicio'" class=" text-center">
-                                                                {{ format24h(task.shift?.startShift ?? '') }}
-                                                            </p>
-                                                            <p v-tooltip.left="'Hora Fin'" class="text-center">
-                                                                {{ format24h(task.shift?.endShift ?? '') }}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="h-16 flex items-center w-full">
-                                                        <div
-                                                            class="px-2 flex h-full w-full justify-between sm:justify-center items-center overflow-hidden">
-                                                            <div
-                                                                class="overflow-x-hidden hover:overflow-x-auto gap-x-1 flex items-center h-full px-2 py-1 max-w-full flex-nowrap">
-                                                                <img v-tooltip.top="{ value: person.name }"
-                                                                    @click="togglePerson($event, person, task, dates)"
-                                                                    v-if="task.employees?.length > 0"
-                                                                    v-for="person in task.employees" :dragable="true"
-                                                                    @dragstart="startDrag($event, person, 'edit')"
-                                                                    :src="person.photo ?? '/images/person-default.png'"
-                                                                    class="rounded-full min-h-10 h-10 hover:ring-1 hover:ring-primary w-10 min-w-10 object-cover ring-primary-light shadow-md" />
-                                                                    <i v-if="task.loading"
-                                                                    class="fa-solid fa-circle-notch font-bold text-3xl animate-spin"></i>
-                                                                <div v-if="(task.employees?.length == 0) && !task.loading"
-                                                                    class="flex items-center p-1">
-                                                                    <p
-                                                                        class="text-center text-danger rounded-md border-dashed bg-danger-light animate-pulse">
-                                                                        Sin personal asignado
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                            <div class="min-w-9 sm:hidden h-full items-center flex justify-end">
-                                                                <Button text rounded raised class="!w-8" severity="success" icon="fa-solid fa-plus"></Button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <ProgressBar :value="parseFloat(task.percentDone)" class="h-3 mx-1"
-                                                        v-tooltip="'Avance'" :pt="{ label: 'text-xs font-thin' }">
-                                                    </ProgressBar>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <TaskProgramming :project="project.id" :day="dates" :key="dates" @drop="onDrop"  />
                                 </div>
                             </div>
                             <div class="" v-else>
                                 <NoContentToShow subject="Seleccione uno o mas proyectos" />
                             </div>
                         </div>
-                        <div class="w-full h-8 justify-center flex space-x-2 p-1 z-10"
-                            @click="filterProgram ? filterProgram = false : filterProgram = true; arrayFilter = statusPersonal[dates.toISOString().split('T')[0]].data.programados">
+                        <div class="w-full h-8 justify-center flex space-x-2 p-1 z-10">
                             <p class="rounded bg-primary px-2 text-white"
                                 v-if="statusPersonal[dates.toISOString().split('T')[0]].data.programados?.length > 0"
                                 v-tooltip="{ value: `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
@@ -705,40 +634,7 @@ const save = async () => {
                 </div>
             </div>
             <!--#region LISTA PERSONAL-->
-            <div class="sm:flex hidden sm:flex-col h-36 w-full sm:w-52 sm:rounded-lg  divide-y space-y-1 sm:h-full p-1 gap-1">
-                <div class="h-8">
-                    <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
-                </div>
-                <div v-if="loadingPerson" class="w-full h-full flex flex-col justify-center">
-                    <Loading class="mt-10 hidden sm:flex" message="Cargando personas" />
-                    <ProgressBar mode="indeterminate" class="flex sm:hidden" style="height: 4px" />
-                </div>
-                <!-- zona de drop -->
-                <div v-else-if="personal.length > 0" oncontextmenu="return false" onkeydown="return false"
-                    :key="personal.length"
-                    class="sm:overflow-y-auto overflow-x-visible flex sm:block overflow-y-hidden p-1 space-x-1 space-y-0 sm:space-y-1 sm:space-x-0 sm:w-full">
-                    <!-- item a arrastrar -->
-                    <div v-for="item in personal" :key="item.Nombres_Apellidos" :draggable="true"
-                        @dragstart="startDrag($event, item)"
-                        v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
-                        :class="[(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden', filterProgram ? (arrayFilter.find(objeto => objeto.name === item.Nombres_Apellidos) !== undefined ? 'bg-green-200' : 'bg-red-200') : '']"
-                        class="min-w-[25vw] sm:min-w-32 z-10 rounded-xl border border-primary h-full sm:h-16 shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
-                        <div class="flex flex-col h-full justify-center gap-x-1 p-1">
-                            <div class="flex flex-col justify-center">
-                                <p class="text-sm font-semibold truncate text-gray-900">
-                                    {{ item.Nombres_Apellidos }}
-                                </p>
-                                <p class="text-xs truncate  text-gray-500">
-                                    {{ item.Cargo }}
-                                </p>
-                                <p class="text-xs truncate  text-gray-500">
-                                    {{ item.Oficina }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <ListPersonDrag v-model:itemDrag="personDrag" :arrayPersonFilter="arrayPersonFilter" />
         </div>
     </AppLayout>
 

@@ -6,6 +6,7 @@ use App\Imports\RequirementImport;
 use App\Models\Projects\Project;
 use App\Models\WareHouse\MaterialRequirement;
 use App\Models\WareHouse\Requirement;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,17 +17,48 @@ class RequirementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        //  dd($request->all());
         $projects = Project::active()->get();
-        $requirements = Requirement::has('project')->with('project', 'user')->get();
+        $requirements = Requirement::has('project')->with('project', 'user')->get()->map(function ($requirement) {
+            return [
+                'id' => $requirement->id,
+                'consecutivo' => $requirement->consecutive,
+                'proyecto' => $requirement->project->name,
+                'bloque' => $requirement->bloque,
+                'grupo' => $requirement->sistema_grupo,
+                'dibujante' => $requirement->user->short_name,
+                'fecha' => Carbon::parse($requirement->preeliminar_date)->format('d-m-Y'),
+            ];
+        });
+
         return Inertia::render('WareHouse/Requirements/Index', [
             'projects' => $projects,
-            'requirements' => $requirements
-
+            'requirements' => $requirements,
+            'requirement_id' => $request->requirement
         ]);
     }
 
+    public function getRequirementByRole()
+    {
+        $requirements = [];
+        if (auth()->user()->hasRole('ADMIN' . '%TOP%' . auth()->user()->gerencia)) {
+            // return Requirement::has('project')->with('project', 'user')->get();
+            $requirements = Requirement::has('project')->with('project', 'user')->get()->map(function ($r) {
+                return [
+                    'id' => $r->id,
+                    'title' => 'Requerimiento ' . $r->consecutive,
+                    'user' => $r->user->short_name,
+                    'message' => 'Requerimiento en espera de Aprobación',
+                    'ago' => Carbon::parse($r->created_at)->diffForHumans(),
+                ];
+            });
+        }
+        return response()->json([
+            'requirements' => $requirements
+        ]);
+    }
     /**
      * Show the form for creating a new resource.
      */
@@ -105,7 +137,7 @@ class RequirementController extends Controller
         $materials = MaterialRequirement::with('material', 'requirement')->whereIn('requirement_id', $request->requirements)->orderBy('material_id')->get();
 
         return Inertia::render('WareHouse/Requirements/Form', [
-            'materials' => $materials
+            'materials' => $materials,
         ]);
     }
 
