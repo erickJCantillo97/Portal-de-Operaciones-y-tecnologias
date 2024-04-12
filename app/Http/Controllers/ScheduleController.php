@@ -153,6 +153,7 @@ class ScheduleController extends Controller
         $rowsDependecy = [];
         $removedDependecy = [];
         $assgimentRows = [];
+       // $removedAssignments = [];
         $calendars = [];
         $calendarsDetails = [];
         //return dd($request->calendars['added']);
@@ -296,10 +297,15 @@ class ScheduleController extends Controller
             DB::beginTransaction();
             foreach($request->assignments['removed'] as $id ){
                 $assignment = Assignment::find($id)->first();
+                $deleteIds = Schedule::where('employee_id',$assignment->resource)
+                ->where('task_id',$assignment->event)
+                ->pluck('id')->toArray();
+                ScheduleTime::whereIn('schedule_id',$deleteIds)->delete();
                 Schedule::where('employee_id',$assignment->resource)
                 ->where('task_id',$assignment->event)
                 ->delete();
                 $assignment->delete();
+            //    array_push($removedAssignments, ['id' => $id]);
             }
             DB::commit();
         }
@@ -365,6 +371,7 @@ class ScheduleController extends Controller
             ],
             'assignments' => [
                 'rows' => $assgimentRows,
+                //'removed' => $removedAssignments,
             ],
             'dependencies' => [
                 'rows' => $rowsDependecy,
