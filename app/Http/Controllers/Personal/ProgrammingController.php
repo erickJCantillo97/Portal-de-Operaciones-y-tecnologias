@@ -82,85 +82,125 @@ class ProgrammingController extends Controller
      */
     public function store(Request $request)
     {
+        DB::beginTransaction();
+        $status = false;
+        $conflict = [];
         try {
-            DB::beginTransaction();
             $validateData = $request->validate([
                 'task_id' => 'required',
                 'employee_id' => 'required',
                 'name' => 'required',
                 'fecha' => 'required|date', //fecha seleccionada del calendario
             ]);
-
-            $status = false;
-            $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
-            $conflict = [];
-            $end_date = '';
-            $project = Project::find(VirtualTask::find($request->task_id)->project_id);
-            if ($hours < 9.5) {
-                $task = VirtualTask::find($validateData['task_id']);
-                $date = Carbon::parse($validateData['fecha']);
-                if ($project->daysPerWeek == 5) {
-                    $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::FRIDAY);
-                } elseif ($project->daysPerWeek == 6) {
-                    $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::SATURDAY);
-                } else {
-                    $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::SUNDAY);
-                }
-                
+            $date = Carbon::parse($validateData['fecha']);
+            $task = VirtualTask::find($validateData['task_id']);
+            $exist = DetailScheduleTime::where('idUsuario', $validateData['employee_id'])
+            ->where('fecha', $date->format('Y-m-d'))
+            ->where('idTask','!=',$validateData['task_id'])
+            ->get();
+            if ($exist->count() > 0) {               
+                // se agrega el task a las actividades que generan conflictos.
+                $exist = collect($exist)->each(function ($DetailScheduleTime) {
+                    $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
+                });
+                $conflict[$date->format('Y-m-d')] = $exist;
+                $status = false;
+            } else {
+                $schedule = Schedule::firstOrNew([
+                    'task_id' => $validateData['task_id'],
+                    'employee_id' => $validateData['employee_id'],
+                    'name' => $validateData['name'],
+                    'fecha' => $date->format('Y-m-d'),
+                ]);
+                $schedule->save();
+                ScheduleTime::firstOrCreate([
+                    'schedule_id' => $schedule->id,
+                    'hora_inicio' => Carbon::parse($task->project->shiftObject->startShift)->format('H:i'),
+                    'hora_fin' => Carbon::parse($task->project->shiftObject->endShift)->format('H:i'),
+                ]);
                 $employee = searchEmpleados('Num_SAP', $validateData['employee_id'])->first();
-                do {
-                    if (getWorkingDays($date->format('Y-m-d'), intval($project->daysPerWeek))) {
-                        $exist = DetailScheduleTime::where('idUsuario', $validateData['employee_id'])
-                            ->where('fecha', $date)
-                            ->get();
-                        if ($exist->count() > 0) {
-                            //obtengo las actividades diferentes a la actual
-                            $exist = $exist->filter(function ($item) use ($validateData) {
-                                return $item->idTask != $validateData['task_id'];
-                            })->values()->all();
-
-                            // se agrega el task a las actividades que generan conflictos.
-                            $exist = collect($exist)->each(function ($DetailScheduleTime) {
-                                $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
-                            });
-                            // se guardan las actividades que generan conflictos
-                            if ($exist->count() > 0) {
-                                $conflict[$date->format('Y-m-d')] = $exist;
-                                $status = false;
-                            }
-                        } else {
-                            $schedule = Schedule::firstOrNew([
-                                'task_id' => $validateData['task_id'],
-                                'employee_id' => $validateData['employee_id'],
-                                'name' => $validateData['name'],
-                                'fecha' => $date->format('Y-m-d'),
-                            ]);
-                            $schedule->save();
-                            ScheduleTime::create([
-                                'schedule_id' => $schedule->id,
-                                'hora_inicio' => Carbon::parse($task->project->shiftObject->startShift)->format('H:i'),
-                                'hora_fin' => Carbon::parse($task->project->shiftObject->endShift)->format('H:i'),
-                            ]);
-                            /* adicional de guardar en schedule y scheduleTime, se guarda en la tabla Assignment para 
-                            que pueda aparecer en los recursos del gantt */
-                            Assignment::firstOrCreate([
-                                'event' => $validateData['task_id'],
-                                'resource' => $validateData['employee_id'],
-                                'units' => 100,
-                                'name' => $validateData['name'],
-                                'costo_hora' => $employee->Costo_Hora,
-                            ]);
-                        }
-                    }
-                    $date = $date->addDays(1);
-                } while ($end_date->gte($date));
-
-                $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
+                /* adicional de guardar en schedule y scheduleTime, se guarda en la tabla Assignment para 
+                que pueda aparecer en los recursos del gantt */
+                Assignment::firstOrCreate([
+                    'event' => $validateData['task_id'],
+                    'resource' => $validateData['employee_id'],
+                    'units' => 100,
+                    'name' => $validateData['name'],
+                    'costo_hora' => $employee->Costo_Hora,
+                ]);
+                $status = true;
             }
+
+            // $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
+            // $conflict = [];
+            // $end_date = '';
+            // $project = Project::find(VirtualTask::find($request->task_id)->project_id);
+            // if ($hours < 9.5) {
+            //     $task = VirtualTask::find($validateData['task_id']);
+            //     $date = Carbon::parse($validateData['fecha']);
+            //     if ($project->daysPerWeek == 5) {
+            //         $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::FRIDAY);
+            //     } elseif ($project->daysPerWeek == 6) {
+            //         $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::SATURDAY);
+            //     } else {
+            //         $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::SUNDAY);
+            //     }
+                
+            //     $employee = searchEmpleados('Num_SAP', $validateData['employee_id'])->first();
+            //     do {
+            //         if (getWorkingDays($date->format('Y-m-d'), intval($project->daysPerWeek))) {
+            //             $exist = DetailScheduleTime::where('idUsuario', $validateData['employee_id'])
+            //                 ->where('fecha', $date)
+            //                 ->get();
+            //             if ($exist->count() > 0) {
+            //                 //obtengo las actividades diferentes a la actual
+            //                 $exist = $exist->filter(function ($item) use ($validateData) {
+            //                     return $item->idTask != $validateData['task_id'];
+            //                 })->values()->all();
+
+            //                 // se agrega el task a las actividades que generan conflictos.
+            //                 $exist = collect($exist)->each(function ($DetailScheduleTime) {
+            //                     $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
+            //                 });
+            //                 // se guardan las actividades que generan conflictos
+            //                 if ($exist->count() > 0) {
+            //                     $conflict[$date->format('Y-m-d')] = $exist;
+            //                     $status = false;
+            //                 }
+            //             } else {
+            //                 $schedule = Schedule::firstOrNew([
+            //                     'task_id' => $validateData['task_id'],
+            //                     'employee_id' => $validateData['employee_id'],
+            //                     'name' => $validateData['name'],
+            //                     'fecha' => $date->format('Y-m-d'),
+            //                 ]);
+            //                 $schedule->save();
+            //                 ScheduleTime::create([
+            //                     'schedule_id' => $schedule->id,
+            //                     'hora_inicio' => Carbon::parse($task->project->shiftObject->startShift)->format('H:i'),
+            //                     'hora_fin' => Carbon::parse($task->project->shiftObject->endShift)->format('H:i'),
+            //                 ]);
+            //                 /* adicional de guardar en schedule y scheduleTime, se guarda en la tabla Assignment para 
+            //                 que pueda aparecer en los recursos del gantt */
+            //                 Assignment::firstOrCreate([
+            //                     'event' => $validateData['task_id'],
+            //                     'resource' => $validateData['employee_id'],
+            //                     'units' => 100,
+            //                     'name' => $validateData['name'],
+            //                     'costo_hora' => $employee->Costo_Hora,
+            //                 ]);
+            //             }
+            //         }
+            //         $date = $date->addDays(1);
+            //     } while ($end_date->gte($date));
+
+            //     $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
+            // }
+            $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
             DB::commit();
 
             return response()->json([
-                'status' => true,
+                'status' => $status,
                 'task' => $this->getSchedule($validateData['fecha'], $validateData['task_id']),
                 'hours' => $hours,
                 'conflict' => $conflict,

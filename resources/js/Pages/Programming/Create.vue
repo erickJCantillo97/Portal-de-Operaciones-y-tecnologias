@@ -191,19 +191,19 @@ getPersonalStatus([dates.value])
 //#region drag
 
 function startDrag(evt, item, type) {
-    // dragStart.value = true
+    //dragStart.value = true
     console.log(evt)
-    // if (type == null) {
-    //     evt.dataTransfer.setData('employee_id', item.Num_SAP)
-    //     evt.dataTransfer.setData('name', item.Nombres_Apellidos)
-    //     evt.dataTransfer.setData('type', 'add')
-    // } else {
-    //     evt.dataTransfer.setData('name', item.name)
-    //     evt.dataTransfer.setData('employee_id', item.user_id)
-    //     evt.dataTransfer.setData('type', type)
-    // }
-    // evt.dataTransfer.effectAllowed = 'move'
-    // evt.dataTransfer.dropEffect = 'move'
+    if (type == null) {
+        evt.dataTransfer.setData('employee_id', item.Num_SAP)
+        evt.dataTransfer.setData('name', item.Nombres_Apellidos)
+        evt.dataTransfer.setData('type', 'add')
+    } else {
+        evt.dataTransfer.setData('name', item.name)
+        evt.dataTransfer.setData('employee_id', item.user_id)
+        evt.dataTransfer.setData('type', type)
+    }
+    evt.dataTransfer.effectAllowed = 'move'
+    evt.dataTransfer.dropEffect = 'move'
 }
 
 async function onDrop(evt, task, fecha) {
