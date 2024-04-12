@@ -1,12 +1,12 @@
 <script setup>
+import { ref, onMounted } from 'vue';
+import { router } from '@inertiajs/vue3';
+import { useToast } from "primevue/usetoast";
+import AppLayout from '@/Layouts/AppLayout.vue';
+import Button from 'primevue/button';
+import CustomDataTable from '@/Components/CustomDataTable.vue';
 import CustomInput from '@/Components/CustomInput.vue';
 import CustomModal from '@/Components/CustomModal.vue';
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { router } from '@inertiajs/vue3';
-import Button from 'primevue/button';
-import { ref, onMounted } from 'vue';
-import { useToast } from "primevue/usetoast";
-import CustomDataTable from '@/Components/CustomDataTable.vue';
 import RequirementSlideOver from './RequirementSlideOver.vue'
 
 
@@ -26,7 +26,6 @@ const formData = ref({
     requirement: {}
 })
 
-
 const materials = ref([])
 
 const getMaterial = (requirement) => {
@@ -34,6 +33,8 @@ const getMaterial = (requirement) => {
         materials.value = res.data.material
     })
 }
+
+
 const addItem = () => {
     // toast.add({ severity: 'success', group: 'customToast', text: 'Atividad Eliminada', life: 2000 });
     formData.value.requirement = {}
