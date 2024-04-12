@@ -61,7 +61,7 @@ const filterButtons = [
 //#endregion
 
 const showClic = (event) => {
-    quote.value = event.data;
+    quote.value = event.data
     openSlideOver.value = true
 }
 
