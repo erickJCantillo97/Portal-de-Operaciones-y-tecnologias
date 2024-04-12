@@ -4,7 +4,7 @@ import CustomModal from '@/Components/CustomModal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { router } from '@inertiajs/vue3';
 import Button from 'primevue/button';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useToast } from "primevue/usetoast";
 import CustomDataTable from '@/Components/CustomDataTable.vue';
 import RequirementSlideOver from './RequirementSlideOver.vue'
@@ -15,6 +15,7 @@ const toast = useToast()
 const props = defineProps({
     projects: Array,
     requirements: Array,
+    requirement_id: Object
 })
 
 const open = ref(false)
@@ -123,6 +124,18 @@ const url = [
         active: true
     }
 ]
+
+onMounted(() => {
+
+    if (props.requirement_id) {
+        requirement.value = props.requirements.filter(requirement => requirement.id == props.requirement_id)[0]
+
+        openSlideOver.value = true
+        getMaterial(props.requirement_id)
+    }
+});
+
+
 </script>
 
 <template>

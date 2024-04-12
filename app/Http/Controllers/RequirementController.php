@@ -17,8 +17,9 @@ class RequirementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        //  dd($request->all());
         $projects = Project::active()->get();
         $requirements = Requirement::has('project')->with('project', 'user')->get()->map(function ($requirement) {
             return [
@@ -35,7 +36,7 @@ class RequirementController extends Controller
         return Inertia::render('WareHouse/Requirements/Index', [
             'projects' => $projects,
             'requirements' => $requirements,
-
+            'requirement_id' => $request->requirement
         ]);
     }
 
