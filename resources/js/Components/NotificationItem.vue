@@ -1,5 +1,5 @@
 <template>
-    <Link :href="route('requirements.index')">
+    <Link :href="route('requirements.index', { 'requirement': item.id })">
     <div class="flex items-center justify-center space-x-6 rounded-lg border-b p-1">
 
         <div class="col-span-2 mx-4 w-full">
