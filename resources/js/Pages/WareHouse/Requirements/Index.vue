@@ -7,13 +7,19 @@ import Button from 'primevue/button';
 import { ref } from 'vue';
 import { useToast } from "primevue/usetoast";
 import CustomDataTable from '@/Components/CustomDataTable.vue';
+import RequirementSlideOver from '@/Components/RequirementSlideOver.vue'
+
 const toast = useToast()
+
 const props = defineProps({
     projects: Array,
     requirements: Array,
 })
 
 const open = ref(false)
+const openSlideOver = ref(false)
+const requirement = ref({})
+
 const formData = ref({
     requirement: {}
 })
@@ -64,12 +70,12 @@ const options = [
 ]
 
 const columns = [
-    { field: 'consecutive', header: 'Consecutivo', filter: "true", rowClass: "underline !text-left !text-sm", filter: true, sortable: true, type: 'button', event: 'showStatus', severity: 'info', text: true, },
-    { field: 'project.name', header: 'Proyecto', filter: 'true', filterType: 'dropdown', filterLabel: 'name', filterValue: 'name', filterOptions: props.projects },
+    { field: 'consecutivo', header: 'Consecutivo', filter: "true", rowClass: "underline !text-left !text-sm", filter: true, sortable: true, type: 'button', event: 'showSlide', severity: 'info', text: true, },
+    { field: 'proyecto', header: 'Proyecto', filter: 'true', filterType: 'dropdown', filterLabel: 'name', filterValue: 'name', filterOptions: props.projects },
     { field: 'bloque', header: 'Bloque', filter: true },
-    { field: 'sistema_grupo', header: 'Sistema/grupo', filter: true, filterOptions: options, filterLabel: 'name', filterValue: 'value', filterType: 'dropdown' },
-    { field: 'user.short_name', header: 'Dibujante', filter: true },
-    { field: 'preeliminar_date', header: 'Fecha', type: 'date', filter: true, },
+    { field: 'grupo', header: 'Sistema/grupo', filter: true, filterOptions: options, filterLabel: 'name', filterValue: 'value', filterType: 'dropdown' },
+    { field: 'dibujante', header: 'Dibujante', filter: true },
+    { field: 'fecha', header: 'Fecha', type: 'date', filter: true, },
 ];
 
 const gestion = (event, data) => {
@@ -94,6 +100,12 @@ const submit = () => {
     })
 }
 
+const showClick = (event, data) => {
+    // console.log(data)
+    requirement.value = data;
+    openSlideOver.value = true
+}
+
 const url = [
     {
         ruta: 'requirements.index',
@@ -105,7 +117,7 @@ const url = [
 
 <template>
     <AppLayout :href="url">
-        <div class="h-full w-full">
+        <div class="size-full">
             <!-- <div class="flex justify-between items-center px-4">
                 <span class="text-xl font-bold text-primary  items-center flex">
                     <p> Requerimientos de Materiales </p>
@@ -115,7 +127,7 @@ const url = [
                 </div>
             </div> -->
             <CustomDataTable :data="requirements" title="Requerimiento de Materiales" @selectionAction="gestion"
-                :columnas="columns" :rowsDefault="10" selectionMode="multiple" @showStatus="gestion">
+                :columnas="columns" :rowsDefault="10" selectionMode="multiple" @showSlide="showClick">
                 <template #buttonHeader>
                     <Button label="Importar Requerimientos" severity="success" icon="fa-solid fa-plus"
                         @click="addItem" />
@@ -161,7 +173,6 @@ const url = [
                         :errorMessage="$attrs.errors.note">
                     </CustomInput>
                 </span>
-
             </template>
 
             <template #footer>
@@ -171,5 +182,8 @@ const url = [
                 </Button>
             </template>
         </CustomModal>
+
+        <RequirementSlideOver :requirement="requirement" :key="requirement.id" :show="openSlideOver"
+            @closeSlideOver="openSlideOver = false" />
     </AppLayout>
 </template>

@@ -6,6 +6,7 @@ use App\Imports\RequirementImport;
 use App\Models\Projects\Project;
 use App\Models\WareHouse\MaterialRequirement;
 use App\Models\WareHouse\Requirement;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -19,10 +20,21 @@ class RequirementController extends Controller
     public function index()
     {
         $projects = Project::active()->get();
-        $requirements = Requirement::has('project')->with('project', 'user')->get();
+        $requirements = Requirement::has('project')->with('project', 'user')->get()->map(function ($requirement) {
+            return [
+                'id' => $requirement->id,
+                'consecutivo' => $requirement->consecutive,
+                'proyecto' => $requirement->project->name,
+                'bloque' => $requirement->bloque,
+                'grupo' => $requirement->sistema_grupo,
+                'dibujante' => $requirement->user->short_name,
+                'fecha' => Carbon::parse($requirement->preeliminar_date)->format('d-m-Y'),
+            ];
+        });
+
         return Inertia::render('WareHouse/Requirements/Index', [
             'projects' => $projects,
-            'requirements' => $requirements
+            'requirements' => $requirements,
 
         ]);
     }
@@ -51,7 +63,7 @@ class RequirementController extends Controller
             Excel::import(new RequirementImport($validateData), $request->data);
             // Requirement::create($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
     }
 
@@ -83,7 +95,7 @@ class RequirementController extends Controller
         try {
             $requirement->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
 
@@ -95,7 +107,7 @@ class RequirementController extends Controller
         try {
             $requirement->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }
 
@@ -105,7 +117,7 @@ class RequirementController extends Controller
         $materials = MaterialRequirement::with('material', 'requirement')->whereIn('requirement_id', $request->requirements)->orderBy('material_id')->get();
 
         return Inertia::render('WareHouse/Requirements/Form', [
-            'materials' => $materials
+            'materials' => $materials,
         ]);
     }
 
