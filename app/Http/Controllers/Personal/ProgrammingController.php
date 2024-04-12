@@ -91,7 +91,7 @@ class ProgrammingController extends Controller
                 'fecha' => 'required|date', //fecha seleccionada del calendario
             ]);
 
-            $status = false;
+            
             $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
             $conflict = [];
             $end_date = '';

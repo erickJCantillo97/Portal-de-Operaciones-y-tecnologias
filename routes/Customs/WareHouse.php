@@ -20,6 +20,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::resource('warehouse', WarehouseController::class);
 
 
+    Route::get('requirements/getRequirementByRole', [RequirementController::class, 'getRequirementByRole'])->name('get.requirements.role');
     Route::resource('requirements', RequirementController::class);
     Route::get('manageRequeriments', [RequirementController::class, 'manageRequirements'])->name('manage.requirements');
     Route::post('storeRequirementOficials', [RequirementController::class, 'storeRequirementOficials'])->name('store.requirement.oficial');

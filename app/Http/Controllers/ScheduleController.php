@@ -89,61 +89,61 @@ class ScheduleController extends Controller
         })->toArray();
         $defaultCalendar = Calendar::find($project->calendar_id);
         $recursos = array_merge_recursive($cargos, $personal);
-        $projectCalendars = DetailProjectWithCalendar::where('project_id',$project->id);
-        if($projectCalendars->count() > 0){    
-        $calendarInterval = $projectCalendars->select('calendarId','name')->distinct()->get()->map(function ($calendar){
-            return [
-                'id' => $calendar->calendarId,
-                'name' => $calendar->name,
-                'intervals'=>CalendarInterval::where('calendar_id',$calendar->calendarId)->get()->map(function ($interval){
-                    if  ($interval->recurrentStartDate){
-                        return[
-                            'recurrentStartDate' => $interval->recurrentStartDate,
-                            'recurrentEndDate'   => $interval->recurrentEndDate,
-                            'isWorking'          => $interval->isWorking == "1" ? true: false
+        $projectCalendars = DetailProjectWithCalendar::where('project_id', $project->id);
+        if ($projectCalendars->count() > 0) {
+            $calendarInterval = $projectCalendars->select('calendarId', 'name')->distinct()->get()->map(function ($calendar) {
+                return [
+                    'id' => $calendar->calendarId,
+                    'name' => $calendar->name,
+                    'intervals' => CalendarInterval::where('calendar_id', $calendar->calendarId)->get()->map(function ($interval) {
+                        if ($interval->recurrentStartDate) {
+                            return [
+                                'recurrentStartDate' => $interval->recurrentStartDate,
+                                'recurrentEndDate'   => $interval->recurrentEndDate,
+                                'isWorking'          => $interval->isWorking == "1" ? true : false
+                            ];
+                        }
+                        return [
+                            'startDate' => $interval->startDate,
+                            'endDate'   => $interval->endDate,
+                            'isWorking'          => $interval->isWorking == "1" ? true : false
                         ];
-                    }
-                    return[
-                        'startDate' => $interval->startDate,
-                        'endDate'   => $interval->endDate,
-                        'isWorking'          => $interval->isWorking == "1" ? true: false
-                    ];
-                })->toArray()
-            ];
-        })->toArray();
-        return response()->json([
-            'success' => true,
-            'project' =>  [
-                'calendar' => $defaultCalendar == null ? '': $defaultCalendar->id, // calendario por defecto
-                'startDate'=> $project->startDate,
-                'hoursPerDay'=> $project->hoursPerDay,
-                'daysPerWeek'=> $project->daysPerWeek,
-                'daysPerMonth'=> $project->daysPerMonth
+                    })->toArray()
+                ];
+            })->toArray();
+            return response()->json([
+                'success' => true,
+                'project' =>  [
+                    'calendar' => $defaultCalendar == null ? '' : $defaultCalendar->id, // calendario por defecto
+                    'startDate' => $project->startDate,
+                    'hoursPerDay' => $project->hoursPerDay,
+                    'daysPerWeek' => $project->daysPerWeek,
+                    'daysPerMonth' => $project->daysPerMonth
 
-            ],
-            'calendars' => [
-                "rows" => $calendarInterval
-            ],
-            'tasks' => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
-            'dependencies' => ['rows' => Dependecy::get()],
-            'resources' => ['rows' => $recursos],
-            'assignments' => ['rows' => Assignment::get()],
-            'timeRanges' => ['rows' => []],
-        ]);
-    }else{
-        return response()->json([
-            'success' => true,
-            'proyect' => [],
-            'calendars' => [
-                "rows" => []
-            ],
-            'tasks' => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
-            'dependencies' => ['rows' => Dependecy::get()],
-            'resources' => ['rows' => $recursos],
-            'assignments' => ['rows' => Assignment::get()],
-            'timeRanges' => ['rows' => []],
-        ]);
-    }
+                ],
+                'calendars' => [
+                    "rows" => $calendarInterval
+                ],
+                'tasks' => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
+                'dependencies' => ['rows' => Dependecy::get()],
+                'resources' => ['rows' => $recursos],
+                'assignments' => ['rows' => Assignment::get()],
+                'timeRanges' => ['rows' => []],
+            ]);
+        } else {
+            return response()->json([
+                'success' => true,
+                'proyect' => [],
+                'calendars' => [
+                    "rows" => []
+                ],
+                'tasks' => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
+                'dependencies' => ['rows' => Dependecy::get()],
+                'resources' => ['rows' => $recursos],
+                'assignments' => ['rows' => Assignment::get()],
+                'timeRanges' => ['rows' => []],
+            ]);
+        }
     }
 
     public function sync(Project $project, Request $request)
@@ -153,7 +153,7 @@ class ScheduleController extends Controller
         $rowsDependecy = [];
         $removedDependecy = [];
         $assgimentRows = [];
-       // $removedAssignments = [];
+        // $removedAssignments = [];
         $calendars = [];
         $calendarsDetails = [];
         //return dd($request->calendars['added']);
@@ -254,29 +254,36 @@ class ScheduleController extends Controller
                     $labor->name = $labor->Nombres_Apellidos;
                     $task = VirtualTask::find($assignment['event']);
                     $now = Carbon::now();
-                    if($task->endDate < $now->format('Y-m-d')){
-                        return response()->json(['status'=> false, 
-                        'mensaje'=>'No se pudo programar a: '.$labor->Nombres_Apellidos.' porque la tarea: '.$task->name
-                        .' finalizó.']);
-                    }else{  
-                        if(count(VirtualTask::where('task_id',$assignment['event'])->get())>0){
-                            return response()->json(['status'=> false, 
-                            'mensaje'=>'No se puede programar en esta actividad porque no es de ultimo nivel','conflict'=>[]]);
+                    if ($task->endDate < $now->format('Y-m-d')) {
+                        return response()->json([
+                            'status' => false,
+                            'mensaje' => 'No se pudo programar a: ' . $labor->Nombres_Apellidos . ' porque la tarea: ' . $task->name
+                                . ' finalizó.'
+                        ]);
+                    } else {
+                        if (count(VirtualTask::where('task_id', $assignment['event'])->get()) > 0) {
+                            return response()->json([
+                                'status' => false,
+                                'mensaje' => 'No se puede programar en esta actividad porque no es de ultimo nivel', 'conflict' => []
+                            ]);
                         }
-                            foreach($request->assignments['added'] as $employe){
-                                do{
-                                    if(getWorkingDays($now)){
-                                        programming($now ,$employe['resource'],
+                        foreach ($request->assignments['added'] as $employe) {
+                            do {
+                                if (getWorkingDays($now)) {
+                                    programming(
+                                        $now,
+                                        $employe['resource'],
                                         $task->project->shiftObject->startShift,
                                         $task->project->shiftObject->endShift,
                                         $employe['event'],
-                                        $labor->Nombres_Apellidos);
-                                    }
-                                    $now = $now->addDays(1);
-                            }while($now->format('Y-m-d') <= $task->endDate);
+                                        $labor->Nombres_Apellidos
+                                    );
+                                }
+                                $now = $now->addDays(1);
+                            } while ($now->format('Y-m-d') <= $task->endDate);
                             $now = Carbon::now();
-                  }
-                }
+                        }
+                    }
                 }
                 $assigmmentCreate = Assignment::create([
                     'event' => $assignment['event'],
@@ -293,19 +300,19 @@ class ScheduleController extends Controller
             }
             DB::commit();
         }
-        if(isset($request->assignments['removed'])){
+        if (isset($request->assignments['removed'])) {
             DB::beginTransaction();
-            foreach($request->assignments['removed'] as $id ){
+            foreach ($request->assignments['removed'] as $id) {
                 $assignment = Assignment::find($id)->first();
-                $deleteIds = Schedule::where('employee_id',$assignment->resource)
-                ->where('task_id',$assignment->event)
-                ->pluck('id')->toArray();
-                ScheduleTime::whereIn('schedule_id',$deleteIds)->delete();
-                Schedule::where('employee_id',$assignment->resource)
-                ->where('task_id',$assignment->event)
-                ->delete();
+                $deleteIds = Schedule::where('employee_id', $assignment->resource)
+                    ->where('task_id', $assignment->event)
+                    ->pluck('id')->toArray();
+                ScheduleTime::whereIn('schedule_id', $deleteIds)->delete();
+                Schedule::where('employee_id', $assignment->resource)
+                    ->where('task_id', $assignment->event)
+                    ->delete();
                 $assignment->delete();
-            //    array_push($removedAssignments, ['id' => $id]);
+                //    array_push($removedAssignments, ['id' => $id]);
             }
             DB::commit();
         }

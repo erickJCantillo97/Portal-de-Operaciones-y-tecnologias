@@ -6,6 +6,7 @@ use App\Imports\RequirementImport;
 use App\Models\Projects\Project;
 use App\Models\WareHouse\MaterialRequirement;
 use App\Models\WareHouse\Requirement;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -27,6 +28,25 @@ class RequirementController extends Controller
         ]);
     }
 
+    public function getRequirementByRole()
+    {
+        $requirements = [];
+        if (auth()->user()->hasRole('ADMIN' . '%TOP%' . auth()->user()->gerencia)) {
+            // return Requirement::has('project')->with('project', 'user')->get();
+            $requirements = Requirement::has('project')->with('project', 'user')->get()->map(function ($r) {
+                return [
+                    'id' => $r->id,
+                    'title' => 'Requerimiento ' . $r->consecutive,
+                    'user' => $r->user->short_name,
+                    'message' => 'Requerimiento en espera de Aprobación',
+                    'ago' => Carbon::parse($r->created_at)->diffForHumans(),
+                ];
+            });
+        }
+        return response()->json([
+            'requirements' => $requirements
+        ]);
+    }
     /**
      * Show the form for creating a new resource.
      */
