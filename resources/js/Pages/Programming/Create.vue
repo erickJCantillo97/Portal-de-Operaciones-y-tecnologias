@@ -103,9 +103,7 @@ const personsEdit = ref()
 const tabActive = ref()
 const statusPersonal = ref({})
 const selectDays = ref([])
-const filterProgram = ref(false)
-const arrayFilter = ref()
-const personDrag = ref()
+const personDrag = ref({})
 const arrayPersonFilter = ref([])
 
 //#endregion
@@ -179,39 +177,38 @@ getPersonalStatus([dates.value])
 
 //#endregion
 
-//#region funciones
-
-//#endregion
-
 //#region drag
 
-async function onDrop(task, fecha) {
-
+async function onDrop(task, fecha, option) {
     if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
         task.loading = true
-        await axios.post(route('programming.store'), { task_id: task.id, employee_id: personDrag.value.Num_SAP, name: personDrag.value.Nombres_Apellidos, fecha }).then((res) => {
-            if (Object.values(res.data.conflict).length > 0) {
-                conflicts.value = Object.values(res.data.conflict)
-                openConflict.value = true;
-                task.loading = false
-                task.value = task
-                task.employees = res.data.task
-            } else if (res.data.status == false) {
-                task.loading = false
-                task.employees = res.data.task
-                toast.add({ severity: 'error', group: "customToast", text: 'Hubo un error al programar', life: 2000 })
-            } else {
-                getPersonalStatus([fecha])
-                task.employees = res.data.task
-                task.loading = false
-                toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
-            }
-        })
+        if (option == 'move') {
+            console.log(personDrag.value)
+            task.loading = false
+        } else {
+            await axios.post(route('programming.store'), { task_id: task.id, employee_id: personDrag.value.Num_SAP, name: personDrag.value.Nombres_Apellidos, fecha }).then((res) => {
+                if (Object.values(res.data.conflict).length > 0) {
+                    conflicts.value = Object.values(res.data.conflict)
+                    openConflict.value = true;
+                    task.loading = false
+                    task.value = task
+                    task.employees = res.data.task
+                } else if (res.data.status == false) {
+                    task.loading = false
+                    task.employees = res.data.task
+                    toast.add({ severity: 'error', group: "customToast", text: 'Hubo un error al programar', life: 2000 })
+                } else {
+                    getPersonalStatus([fecha])
+                    task.employees = res.data.task
+                    task.loading = false
+                    toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
+                }
+            })
+        }
     } else {
         toast.add({ severity: 'error', group: "customToast", text: 'No se puede programar en dias anteriores', life: 2000 })
     }
 }
-
 
 //#endregion
 
@@ -358,7 +355,7 @@ const save = async () => {
                     </div>
                 </div>
                 <!-- region calendario -->
-                
+
                 <div class="sm:cursor-default h-full overflow-y-auto">
                     <div v-if="mode == 'week'" class="h-full flex flex-col justify-between border rounded-md">
                         en desarrollo

@@ -8,7 +8,7 @@ const tasks = ref({})
 const props = defineProps({
     day: {
         type: Date,
-        default:null
+        default: null
     },
     project: {
         type: Number
@@ -39,19 +39,19 @@ async function getTaskDay() {
     })
 }
 getTaskDay()
-
+const option = ref()
 const itemDrag = defineModel('itemDrag', {
     required: false,
 })
-defineEmits(['drop','togglePerson'])
+defineEmits(['drop', 'togglePerson'])
 
 </script>
 <template>
     <div v-if="tasks.loading" class="flex col-span-5 justify-center h-full items-center">
         <Loading />
     </div>
-    <div v-else v-for="task in tasks.data" @drop="$emit('drop', task, day)"
-        @dragover.prevent @dragenter.prevent class="sm:h-full w-full sm:w-1/3 sm:max-h-44 p-0.5 float-left"
+    <div v-else v-for="task in tasks.data" @drop="$emit('drop', task, day, option); option = null" @dragover.prevent
+        @dragenter.prevent class="sm:h-full w-full sm:w-1/3 sm:max-h-44 p-0.5 float-left"
         :key="task.name + date.toDateString()">
         <div class="flex border pb-1 rounded-md border-primary hover:bg-primary-light flex-col justify-between h-full">
             <div class="h-min w-full">
@@ -89,12 +89,13 @@ defineEmits(['drop','togglePerson'])
                                 class="overflow-x-hidden hover:overflow-x-auto gap-x-1 flex items-center h-full px-2 py-1 max-w-full flex-nowrap">
                                 <i v-if="task.loading"
                                     class="fa-solid fa-circle-notch font-bold text-3xl animate-spin"></i>
-                                <img v-tooltip.top="{ value: person.Nombres_Apellidos, pt:{text:'text-center'}}"
-                                    @click="$emit('togglePerson',$event, person, task, day)" v-if="task.employees?.length > 0"
-                                    v-for="person in task.employees" :dragable="true"
-                                    @dragstart="itemDrag== person"
-                                    :src="person.photo ?? '/images/person-default.png'"
-                                    class="rounded-full min-h-10 h-10 hover:ring-1 hover:ring-primary w-10 min-w-10 object-cover ring-primary-light shadow-md" />
+                                <span v-if="task.employees?.length > 0" v-for="person in task.employees">
+                                    <img v-tooltip.top="{ value: person.Nombres_Apellidos, pt: { text: 'text-center' } }"
+                                        @click="$emit('togglePerson', $event, person, task, day)" :dragable="true"
+                                        @dragstart="itemDrag = person; option = 'move'"
+                                        :src="person.photo ?? '/images/person-default.png'"
+                                        class="rounded-full min-h-10 h-10 hover:ring-1 hover:ring-primary w-10 min-w-10 object-cover ring-primary-light shadow-md" />
+                                </span>
                                 <div v-if="(task.employees?.length == 0) && !task.loading"
                                     class="flex items-center p-1">
                                     <p
