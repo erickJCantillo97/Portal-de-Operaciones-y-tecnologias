@@ -95,10 +95,10 @@ class ProgrammingController extends Controller
             $date = Carbon::parse($validateData['fecha']);
             $task = VirtualTask::find($validateData['task_id']);
             $exist = DetailScheduleTime::where('idUsuario', $validateData['employee_id'])
-            ->where('fecha', $date->format('Y-m-d'))
-            ->where('idTask','!=',$validateData['task_id'])
-            ->get();
-            if ($exist->count() > 0) {               
+                ->where('fecha', $date->format('Y-m-d'))
+                ->where('idTask', '!=', $validateData['task_id'])
+                ->get();
+            if ($exist->count() > 0) {
                 // se agrega el task a las actividades que generan conflictos.
                 $exist = collect($exist)->each(function ($DetailScheduleTime) {
                     $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
@@ -145,7 +145,7 @@ class ProgrammingController extends Controller
             //     } else {
             //         $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::SUNDAY);
             //     }
-                
+
             //     $employee = searchEmpleados('Num_SAP', $validateData['employee_id'])->first();
             //     do {
             //         if (getWorkingDays($date->format('Y-m-d'), intval($project->daysPerWeek))) {
@@ -349,8 +349,8 @@ class ProgrammingController extends Controller
             Db::raw('MIN(idUsuario) as id'),
         )->get()->map(function ($d) use ($task, $fecha) {
             return [
-                'name' => $d->name,
-                'user_id' => $d->id,
+                'Nombres_Apellidos' => $d->name,
+                'Num_SAP' => $d->id,
                 'times' => DetailScheduleTime::where([
                     ['fecha', '=', $fecha],
                     ['idTask', '=', $task],
@@ -693,8 +693,8 @@ class ProgrammingController extends Controller
             DB::beginTransaction();
             $schedule = Schedule::find($request->schedule);
             //se eliminan el recurso en el gantt
-            Assignment::where('event',$schedule->task_id)
-            ->where('resource', $schedule->employee_id)->delete();
+            Assignment::where('event', $schedule->task_id)
+                ->where('resource', $schedule->employee_id)->delete();
             // dd($schedule);
             switch ($request->type) {
                     //SOLO EL $request->date
@@ -825,8 +825,8 @@ class ProgrammingController extends Controller
                             Db::raw('MIN(idUsuario) as id'),
                         )->get()->map(function ($d) use ($task, $date) {
                             return [
-                                'name' => $d->name,
-                                'user_id' => $d->id,
+                                'Nombres_Apellidos' => $d->name,
+                                'Num_SAP' => $d->id,
                                 'times' => DetailScheduleTime::where([
                                     ['fecha', '=', $date],
                                     ['idTask', '=', $task['id']],
