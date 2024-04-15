@@ -129,14 +129,14 @@ const getTask = async (option) => {
         option = mode.value
     }
     if (option == 'week') {
-        mode.value = option
-        if (projectsSelected.value.length > 0) {
-            projectData.value = projectsSelected.value
-            projectData.value.forEach(async (project) => {
-                await getTaskDay(diasSemana.value, project)
-            })
-        }
-        getPersonalStatus(diasSemana.value)
+        // mode.value = option
+        // if (projectsSelected.value.length > 0) {
+        //     projectData.value = projectsSelected.value
+        //     projectData.value.forEach(async (project) => {
+        //         await getTaskDay(diasSemana.value, project)
+        //     })
+        // }
+        // getPersonalStatus(diasSemana.value)
     } else if (option == 'date') {
         mode.value = 'date'
         // dates.value = new Date()
@@ -186,6 +186,7 @@ getPersonalStatus([dates.value])
 //#region drag
 
 async function onDrop(task, fecha) {
+
     if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
         task.loading = true
         await axios.post(route('programming.store'), { task_id: task.id, employee_id: personDrag.value.Num_SAP, name: personDrag.value.Nombres_Apellidos, fecha }).then((res) => {
@@ -342,7 +343,7 @@ const save = async () => {
                                 mode = 'month';
                             dates = (new Date()).getFullYear() + '-' + ((new Date()).getMonth().toString().length < 2 ? '0' + (new Date()).getMonth() : (new Date()).getMonth());
                             getTask()" :outlined="mode != 'month'" /> -->
-                            <Button label="Semana" @click="
+                            <Button label="Semana" disabled @click="
                                 dates = obtenerFormatoSemana(new Date());
                             getPersonalStatus(obtenerFechasSemana(obtenerDiaSemana(dates)));
                             getTask('week')" :outlined="mode != 'week'" />
@@ -357,10 +358,11 @@ const save = async () => {
                     </div>
                 </div>
                 <!-- region calendario -->
+                
                 <div class="sm:cursor-default h-full overflow-y-auto">
                     <div v-if="mode == 'week'" class="h-full flex flex-col justify-between border rounded-md">
-                        <!-- region Cabezeras -->
-                        <div class="grid-cols-10 h-6 text-lg leading-6 grid pr-3 pl-2 border-b shadow-md mb-1 ">
+                        en desarrollo
+                        <!-- <div class="grid-cols-10 h-6 text-lg leading-6 grid pr-3 pl-2 border-b shadow-md mb-1 ">
                             <div class="flex flex-col items-center">
                                 <p class="flex w-full justify-center items-baseline font-bold">Proyecto</p>
                             </div>
@@ -375,9 +377,7 @@ const save = async () => {
                                     </p>
                                 </div>
                             </span>
-                            <!-- endregion -->
                         </div>
-                        <!-- region actividades -->
                         <div class="h-full space-y-2 overflow-y-auto pl-1 ">
                             <div v-if="projectData.length > 0" v-for="project in projectData"
                                 class="grid-cols-10 ml-0.5 divide-x divide-y cursor-default h-full divide-gray-100 border border-indigo-200 rounded-l-md text-lg leading-6 grid">
@@ -495,13 +495,13 @@ const save = async () => {
                                         </span>
                                     </div>
                                 </span>
-                                <!-- endregion -->
+                                
                             </div>
                             <div class="h-full" v-else>
                                 <NoContentToShow subject="Seleccione uno o mas proyectos" />
                             </div>
                         </div>
-                        <!-- endregion -->
+                        
                         <div class="grid-cols-10 h-8 text-sm grid pr-3 pl-2 border-t shadow-lg mt-1 ">
                             <div>
                                 <p class="w-full h-full flex items-center justify-center font-bold">
@@ -537,7 +537,7 @@ const save = async () => {
                                     </div>
                                 </div>
                             </span>
-                        </div>
+                        </div> -->
                     </div>
                     <div v-if="mode == 'date'" class="h-full border rounded-md flex flex-col justify-between">
                         <p class="sm:block hidden w-full h-6 text-center bg-primary-light font-bold">
@@ -613,7 +613,7 @@ const save = async () => {
         <div class="flex flex-col space-y-1">
             <!-- {{ personsEdit }} -->
             <div class="flex flex-col border p-1 rounded-md justify-between">
-                <p class="text-sm font-bold">{{ personsEdit.name }}</p>
+                <p class="text-sm font-bold">{{ personsEdit.Nombres_Apellidos }}</p>
                 <div class="grid gap-2">
                     <span v-for="schedule_time in personsEdit.times"
                         class="text-xs flex bg-success-light justify-center hover:justify-between rounded-md p-1 hover:space-x-1 group">

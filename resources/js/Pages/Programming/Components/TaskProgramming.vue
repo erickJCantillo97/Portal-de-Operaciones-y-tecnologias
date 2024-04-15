@@ -42,12 +42,6 @@ getTaskDay()
 
 const itemDrag = defineModel('itemDrag', {
     required: false,
-    set(value){
-        let x={}
-        x.Num_SAP=value.user_id
-        x.Nombres_Apellidos=value.name
-        return x
-    }
 })
 defineEmits(['drop','togglePerson'])
 
@@ -95,7 +89,7 @@ defineEmits(['drop','togglePerson'])
                                 class="overflow-x-hidden hover:overflow-x-auto gap-x-1 flex items-center h-full px-2 py-1 max-w-full flex-nowrap">
                                 <i v-if="task.loading"
                                     class="fa-solid fa-circle-notch font-bold text-3xl animate-spin"></i>
-                                <img v-tooltip.top="{ value: person.name }"
+                                <img v-tooltip.top="{ value: person.Nombres_Apellidos, pt:{text:'text-center'}}"
                                     @click="$emit('togglePerson',$event, person, task, day)" v-if="task.employees?.length > 0"
                                     v-for="person in task.employees" :dragable="true"
                                     @dragstart="itemDrag== person"
