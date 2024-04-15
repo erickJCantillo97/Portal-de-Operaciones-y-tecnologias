@@ -63,15 +63,19 @@ const optionStatus = {
                     </button>
                   </div>
                 </TransitionChild>
-                <div class="h-full overflow-y-auto bg-white p-2">
-                  <div class="absolute w-96 -m-2 z-50 py-4 bg-blue-900 text-white uppercase p-2">
+                <div class="h-full overflow-y-auto bg-white ">
+                  <div class="w-full bg-blue-900 text-white uppercase p-2">
                     <h2 class="text-lg text-center font-bold text-white">
-                      Requerimientos
+                      Requerimiento
                     </h2>
                   </div>
-                  <article class="w-full mt-18">
-                    <div class="border border-solid rounded-lg p-2 mb-2">
+                  <article class="w-full p-2">
+                    <div class=" border border-solid rounded-lg p-2 mb-2">
+                      <!-- {{ requirement }} -->
                       <DescriptionItem :data="requirement" />
+                    </div>
+                    <div class="border border-solid rounded-lg mb-2">
+
                     </div>
                     <div class="border border-solid rounded-lg mb-2">
                       <div class="mb-4">
@@ -83,8 +87,8 @@ const optionStatus = {
                         </div> -->
                         <div class="shadow-md my-4 px-2 h-full" v-for="material in materials">
                           <Accordion expandIcon="pi pi-plus" collapseIcon="pi pi-minus" :pt="{
-                            content: '!h-[80vh] !p-2 !overflow-y-auto'
-                          }">
+    content: '!h-[80vh] !p-2 !overflow-y-auto'
+  }">
                             <AccordionTab :activeIndex="0" :header="`${material.material}`">
                               <DescriptionItem :data="material" :optionStatus />
                             </AccordionTab>

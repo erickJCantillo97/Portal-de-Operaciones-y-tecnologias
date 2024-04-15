@@ -24,7 +24,7 @@ class RequirementController extends Controller
         $requirements = Requirement::has('project')->with('project', 'user')->get()->map(function ($requirement) {
             return [
                 'id' => $requirement->id,
-                'consecutivo' => $requirement->consecutive,
+                'consecutivo' => $requirement->consecutive, 
                 'proyecto' => $requirement->project->name,
                 'bloque' => $requirement->bloque,
                 'grupo' => $requirement->sistema_grupo,

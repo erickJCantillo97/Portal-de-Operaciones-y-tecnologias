@@ -21,7 +21,8 @@ const props = defineProps({
     project: Object,
     contracts: Array,
     gerentes: Array,
-    weekTasks: Array
+    weekTasks: Array,
+    milestones: Array
 })
 
 //#region Referencias (v-model)
@@ -586,11 +587,11 @@ const url = [
                             <Listbox :options="projectShipsOptions" optionValue="id"
                                 :filterFields="['ship.name', 'ship.idHull']"
                                 filterPlaceholder="Filtrar Buques agregados" multiple filter optionLabel="name" :pt="{
-                                    list: projectShipsOptions.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
-                                    header: '!p-1',
-                                    filterInput: '!h-8',
-                                    item: '!h-min !rounded-lg'
-                                }">
+        list: projectShipsOptions.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
+        header: '!p-1',
+        filterInput: '!h-8',
+        item: '!h-min !rounded-lg'
+    }">
 
                                 <template #option="slotProps">
                                     <div class="flex items-center justify-between">
@@ -622,11 +623,11 @@ const url = [
                             <Listbox :options="shipsOptions" v-model="formData.ships" optionValue="id"
                                 :filterFields="['name', 'idHull']" filterPlaceholder="Filtrar Buques sin agregar"
                                 multiple filter optionLabel="name" :pt="{
-                                    list: shipsOptions.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
-                                    header: '!p-1',
-                                    filterInput: '!h-8',
-                                    item: '!h-min !rounded-lg'
-                                }">
+        list: shipsOptions.length > 0 ? 'sm:!grid sm:!grid-cols-2 !gap-1 !p-1 !max-h-[34vh] h-[34vh]' : '!max-h-[34vh] h-[34vh]',
+        header: '!p-1',
+        filterInput: '!h-8',
+        item: '!h-min !rounded-lg'
+    }">
 
                                 <template #option="slotProps">
                                     <div class="flex">
@@ -653,9 +654,9 @@ const url = [
                     </tab-content>
                     <tab-content title="Hitos" v-if="$page.props.auth.user.gerencia == 'GECON'"
                         icon="fa-solid fa-list-check" class=" h-[45vh] w-full border rounded-lg p-1 overflow-y-auto">
-                        <CustomDataTable :rowsDefault="5" :data="milestonesOptions" :columnas="columnas"
-                            :actions="actions" @edit="showModal" :filter="false" :showHeader="false" :showAdd="true"
-                            @addClick="showModal" @delete="delMilestone" />
+                        <CustomDataTable :rowsDefault="5" :data="milestones" :columnas="columnas" :actions="actions"
+                            @edit="showModal" :filter="false" :showHeader="false" :showAdd="true" @addClick="showModal"
+                            @delete="delMilestone" />
                     </tab-content>
 
                     <template #prev>
@@ -694,14 +695,14 @@ const url = [
                 <div class="flex space-x-4 items-center">
                     <label for="" class="mb-0.5 font-bold">Avance del HITO: </label>
                     <ToggleButton v-model="formMilestone.advance" onLabel="100%" offLabel="0%" :pt="{
-                        root: ({ props }) => ({
-                            class:
-                                [
-                                    '!p-1 !text-sm',
-                                    props.modelValue ? '!bg-teal-700 !text-white' : '!bg-danger !text-white'
-                                ]
-                        })
-                    }" />
+        root: ({ props }) => ({
+            class:
+                [
+                    '!p-1 !text-sm',
+                    props.modelValue ? '!bg-teal-700 !text-white' : '!bg-danger !text-white'
+                ]
+        })
+    }" />
                 </div>
             </section>
         </template>
