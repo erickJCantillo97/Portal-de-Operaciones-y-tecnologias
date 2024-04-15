@@ -91,9 +91,7 @@ function obtenerDiaSemana(dato) {
 //#region variables
 const openConflict = ref(false)
 const date = ref(new Date())
-const personal = ref()
 const projectData = ref([]);
-const loadingPerson = ref(true);
 const conflicts = ref()
 const task = ref([])
 const mode = ref('date')
@@ -160,7 +158,7 @@ const getTask = async (option) => {
 };
 
 const getPersonalStatus = async (dias) => {
-    if (dias.length == 1) arrayPersonFilter.value = []
+    if (dias.length == 1) arrayPersonFilter.value = { loading: true, data: [] }
     await dias.forEach(async (dia) => {
         statusPersonal.value[new Date(dia).toISOString().split('T')[0]] = { loading: true, data: [] }
         await axios.post(route('get.personal.status.programming'), { date: dia }).then((res) => {
@@ -168,7 +166,7 @@ const getPersonalStatus = async (dias) => {
             statusPersonal.value[new Date(dia).toISOString().split('T')[0]].loading = false
         })
         if (dias.length == 1) {
-            arrayPersonFilter.value = statusPersonal.value[new Date(dias[0]).toISOString().split('T')[0]].data.programados
+            arrayPersonFilter.value = statusPersonal.value[new Date(dias[0]).toISOString().split('T')[0]]
             // console.log(statusPersonal.value[new Date(dias[0]).toISOString().split('T')[0]].data)
         }
     })
@@ -187,26 +185,7 @@ getPersonalStatus([dates.value])
 
 //#region drag
 
-function startDrag(evt, item, type) {
-    //dragStart.value = true
-    console.log(evt)
-    if (type == null) {
-        evt.dataTransfer.setData('employee_id', item.Num_SAP)
-        evt.dataTransfer.setData('name', item.Nombres_Apellidos)
-        evt.dataTransfer.setData('type', 'add')
-    } else {
-        evt.dataTransfer.setData('name', item.name)
-        evt.dataTransfer.setData('employee_id', item.user_id)
-        evt.dataTransfer.setData('type', type)
-    }
-    evt.dataTransfer.effectAllowed = 'move'
-    evt.dataTransfer.dropEffect = 'move'
-}
-
-async function onDrop(evt, task, fecha) {
-    const employee_id = evt.dataTransfer.getData('employee_id')
-    const name = evt.dataTransfer.getData('name')
-    const type = evt.dataTransfer.getData('type')
+async function onDrop(task, fecha) {
     if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
         task.loading = true
         await axios.post(route('programming.store'), { task_id: task.id, employee_id: personDrag.value.Num_SAP, name: personDrag.value.Nombres_Apellidos, fecha }).then((res) => {
@@ -585,35 +564,40 @@ const save = async () => {
                                     </div>
                                 </div>
                                 <div class="h-full sm:h-full p-1 w-full overflow-y-auto">
-                                    <TaskProgramming :project="project.id" :day="dates" :key="dates + project.id" 
-                                    @drop="onDrop" v-model:itemDrag="personDrag" @togglePerson="togglePerson"/>
+                                    <TaskProgramming :project="project.id" :day="dates" :key="dates + project.id"
+                                        @drop="onDrop" v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
                                 </div>
                             </div>
-                            <div  v-else>
+                            <div v-else>
                                 <NoContentToShow subject="Seleccione uno o mas proyectos" />
                             </div>
                         </div>
                         <div class="w-full h-8 justify-center flex space-x-2 p-1 z-10" oncontextmenu="return false">
-                            <p class="rounded bg-primary px-2 text-white"
-                                v-if="statusPersonal[dates.toISOString().split('T')[0]].data.programados?.length > 0"
-                                v-tooltip="{ value: `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
-                                Programados:
-                                <i v-if="statusPersonal[dates.toISOString().split('T')[0]].loading"
-                                    class="fa-solid fa-spinner animate-spin" />
-                                <span v-else>{{
+                            <span class="" v-if="statusPersonal[dates.toISOString().split('T')[0]].loading">
+                                <i class="fa-solid fa-spinner animate-spin" />
+                            </span>
+                            <span v-else class="flex space-x-2">
+                                <p class="rounded bg-primary px-2 text-white"
+                                    v-if="statusPersonal[dates.toISOString().split('T')[0]].data.programados?.length > 0"
+                                    v-tooltip="{ value: `<div><p class='w-full text-center font-bold'>Programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
+                                    Programados:
+                                    <i v-if="statusPersonal[dates.toISOString().split('T')[0]].loading"
+                                        class="fa-solid fa-spinner animate-spin" />
+                                    <span v-else>{{
                                 statusPersonal[dates.toISOString().split('T')[0]].data.programados.length }}
-                                </span>
-                            </p>
-                            <p class="rounded bg-danger px-2 text-white"
-                                v-if="statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados?.length > 0"
-                                v-tooltip.click.top="{ value: `<div><p class='w-full text-center font-bold'>No programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
-                                No programados:
-                                <i v-if="statusPersonal[dates.toISOString().split('T')[0]].loading"
-                                    class="fa-solid fa-spinner animate-spin" />
-                                <span v-else>{{
+                                    </span>
+                                </p>
+                                <p class="rounded bg-danger px-2 text-white"
+                                    v-if="statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados?.length > 0"
+                                    v-tooltip.click.top="{ value: `<div><p class='w-full text-center font-bold'>No programados</p>${statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>`, escape: false, pt: { text: 'text-center w-52' } }">
+                                    No programados:
+                                    <i v-if="statusPersonal[dates.toISOString().split('T')[0]].loading"
+                                        class="fa-solid fa-spinner animate-spin" />
+                                    <span v-else>{{
                                 statusPersonal[dates.toISOString().split('T')[0]].data.noProgramados.length }}
-                                </span>
-                            </p>
+                                    </span>
+                                </p>
+                            </span>
                             <!-- <p class="rounded bg-warning px-2 text-white">No programables 3</p> -->
                         </div>
                     </div>
