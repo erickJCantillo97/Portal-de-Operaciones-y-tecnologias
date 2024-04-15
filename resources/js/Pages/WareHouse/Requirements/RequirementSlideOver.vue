@@ -1,14 +1,18 @@
 <script setup>
+const { hasRole, hasPermission } = usePermissions()
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import { Link } from '@inertiajs/vue3'
+import { ref, watch } from 'vue'
+import { usePermissions } from '@/composable/permission'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
-import { ref } from 'vue'
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
+import Badge from 'primevue/badge'
 import DescriptionItem from '@/Components/DescriptionItem.vue'
+import ListBox from 'primevue/listbox'
 import Loading from '@/Components/Loading.vue'
-import ListBox from 'primevue/listbox';
 
-const emit = defineEmits(['closeSlideOver'])
+const { emit } = defineEmits(['closeSlideOver'])
 
 const selectedMaterial = ref()
 const loadingMaterials = ref(true)
@@ -25,6 +29,13 @@ const props = defineProps({
     type: Array,
     required: false,
     default: []
+  },
+  materialsLoaded: Boolean
+})
+
+watch(() => props.materialsLoaded, (newValue, oldValue) => {
+  if (newValue) {
+    loadingMaterials.value = false
   }
 })
 
@@ -33,8 +44,19 @@ const optionStatus = {
     icon: 'fa-solid fa-user-clock',
     color: 'bg-orange-600 text-white'
   },
+  'APROBADO': {
+    icon: 'fa-solid fa-check',
+    color: 'bg-emerald-600 text-white'
+  },
+  'RECHAZADO': {
+    icon: 'fa-solid fa-xmark',
+    color: 'bg-red-600 text-white'
+  },
+  'ELIMINADO': {
+    icon: 'fa-solid fa-trash',
+    color: 'bg-yellow-600 text-gray-800'
+  }
 }
-
 </script>
 <template>
   <TransitionRoot as="template" :show="show">
@@ -69,7 +91,38 @@ const optionStatus = {
                       Requerimientos
                     </h2>
                   </div>
-                  <article class="w-full mt-18">
+                  <div class="flex gap-2 mt-14 h-12 items-center justify-center p-4">
+                    <!--Botón Aprobar-->
+                    <Link :href="'#'">
+                    <Button v-tooltip.top="'Aprobar'" size="small" icon="pi pi-check-circle" outlined severity="success"
+                      v-if="hasPermission('quote create')" />
+                    </Link>
+
+                    <!--Botón Rechazar-->
+                    <Link :href="'#'">
+                    <Button v-tooltip.top="'Rechazar'" size="small" icon="pi pi-times-circle" outlined
+                      severity="warning" v-if="hasPermission('quote create')" />
+                    </Link>
+
+                    <!--Botón Gestionar-->
+                    <Link :href="''">
+                    <Button v-tooltip.top="'Gestionar'" size="small" icon="pi pi-cog" outlined severity="info"
+                      v-if="hasPermission('quote create')" />
+                    </Link>
+
+                    <!--Botón Editar-->
+                    <Link :href="''">
+                    <Button v-tooltip.top="'Editar'" size="small" icon="pi pi-pencil" outlined severity="warning"
+                      v-if="hasPermission('quote create')" />
+                    </Link>
+
+                    <!--Botón Eliminar-->
+                    <Link :href="''">
+                    <Button v-tooltip.top="'Eliminar'" size="small" icon="pi pi-trash" outlined severity="danger"
+                      v-if="hasPermission('quote delete')" />
+                    </Link>
+                  </div>
+                  <article class="w-full">
                     <div class="border border-solid rounded-lg p-2 mb-2">
                       <DescriptionItem :data="requirement" />
                     </div>
@@ -78,14 +131,23 @@ const optionStatus = {
                         <h3 class="font-semibold p-1 rounded-t-xl text-center bg-primary text-white">
                           Lista de Materiales
                         </h3>
-                        <!-- <div v-if="loadingMaterials">
+                        <div v-if="loadingMaterials" class="mt-4">
                           <Loading message="Cargando Lista de Materiales" />
-                        </div> -->
+                        </div>
                         <div class="shadow-md my-4 px-2 h-full" v-for="material in materials">
-                          <Accordion expandIcon="pi pi-plus" collapseIcon="pi pi-minus" :pt="{
+                          <Accordion :pt="{
                             content: '!h-[80vh] !p-2 !overflow-y-auto'
                           }">
-                            <AccordionTab :activeIndex="0" :header="`${material.material}`">
+                            <AccordionTab :activeIndex="0">
+                              <template #header>
+                                <span class="flex align-items-center gap-2 w-full">
+                                  <span class="font-bold white-space-nowrap">
+                                    {{ material.material }}
+                                  </span>
+                                  <Badge :value="`${parseInt(material.cantidad)} ${material.unidad}`"
+                                    class="ml-auto mr-2 bg-emerald-600" />
+                                </span>
+                              </template>
                               <DescriptionItem :data="material" :optionStatus />
                             </AccordionTab>
                           </Accordion>

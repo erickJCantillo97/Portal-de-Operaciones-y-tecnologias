@@ -148,17 +148,18 @@ const deleteQuoteVersion = () => {
 <template>
     <TransitionRoot as="template" :show="show">
         <Dialog as="div" class="relative z-10" @close="$emit('closeSlideOver')">
-            <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0" enter-to="opacity-100"
-                leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
+            <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0"
+                enter-to="opacity-100" leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
                 <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
             </TransitionChild>
             <div class="fixed inset-0 overflow-hidden">
                 <div class="absolute inset-0 overflow-hidden">
                     <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
-                        <TransitionChild as="template" enter="transform transition ease-in-out duration-500 sm:duration-700"
+                        <TransitionChild as="template"
+                            enter="transform transition ease-in-out duration-500 sm:duration-700"
                             enter-from="translate-x-full" enter-to="translate-x-0"
-                            leave="transform transition ease-in-out duration-500 sm:duration-700" leave-from="translate-x-0"
-                            leave-to="translate-x-full">
+                            leave="transform transition ease-in-out duration-500 sm:duration-700"
+                            leave-from="translate-x-0" leave-to="translate-x-full">
                             <DialogPanel class="pointer-events-auto relative w-96">
                                 <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0"
                                     enter-to="opacity-100" leave="ease-in-out duration-500" leave-from="opacity-100"
@@ -210,8 +211,9 @@ const deleteQuoteVersion = () => {
                                                 </div>
                                                 <div class="flex justify-between py-3 text-sm font-medium">
                                                     <dt class="text-gray-500">Fecha de Solicitud:</dt>
-                                                    <dd class="text-gray-900">{{ Moment(quote.created_at).format('DD/MM/YY')
-                                                    }}</dd>
+                                                    <dd class="text-gray-900">{{
+                                                        Moment(quote.created_at).format('DD/MM/YY')
+                                                        }}</dd>
                                                 </div>
                                                 <div class="flex justify-between py-3 text-sm font-medium">
                                                     <dt class="text-gray-500">Fecha Respuesta Esperada:</dt>
@@ -221,13 +223,15 @@ const deleteQuoteVersion = () => {
                                                 <div v-if="showDateResponse"
                                                     class="flex justify-between py-3 text-sm font-medium">
                                                     <dt class="text-gray-500">Fecha de Respuesta:</dt>
-                                                    <dd class="text-gray-900">{{ Moment().add(6, 'days').format('DD/MM/YY')
-                                                    }}</dd>
+                                                    <dd class="text-gray-900">{{ Moment().add(6,
+                                                        'days').format('DD/MM/YY')
+                                                        }}</dd>
                                                 </div>
                                                 <div v-if="showDateResponse"
                                                     class="flex justify-between py-3 text-sm font-medium">
                                                     <dt class="text-gray-500">Precio antes de Iva:</dt>
-                                                    <dd class="text-gray-900">{{ currencyFormat(quote.total_cost) }}</dd>
+                                                    <dd class="text-gray-900">{{ currencyFormat(quote.total_cost) }}
+                                                    </dd>
                                                 </div>
                                                 <div class="flex justify-between py-3 text-sm font-medium">
                                                     <dt class="text-gray-500">Estado:</dt>
@@ -254,7 +258,7 @@ const deleteQuoteVersion = () => {
                                                     <p class="white-space-nowrap font-semibold">{{ product.name }}</p>
                                                     <p class=" white-space-nowrap text-xs">{{
                                                         currencyFormat(product.price_before_iva_original)
-                                                    }}</p>
+                                                        }}</p>
 
                                                 </div>
                                             </template>
@@ -274,7 +278,8 @@ const deleteQuoteVersion = () => {
                                                         </div>
                                                         <div class="flex justify-between py-3 text-sm font-medium">
                                                             <dt class="text-gray-500">Madurez:</dt>
-                                                            <dd class="text-gray-900">{{ product.maturity == null ? 'N/A' :
+                                                            <dd class="text-gray-900">{{ product.maturity == null ?
+                                                                'N/A' :
                                                                 product.maturity }}</dd>
                                                         </div>
                                                         <div class="flex justify-between py-3 text-sm font-medium">
@@ -295,7 +300,8 @@ const deleteQuoteVersion = () => {
                                                         <div class="flex justify-between py-3 text-sm font-medium">
                                                             <dt class="text-gray-500">Precio Original:</dt>
                                                             <dd class="text-gray-900">{{
-                                                                currencyFormat(product.price_before_iva_original) }}</dd>
+                                                                currencyFormat(product.price_before_iva_original) }}
+                                                            </dd>
                                                         </div>
                                                         <div class="flex justify-between py-3 text-sm font-medium">
                                                             <dt class="text-gray-500">Tasa de Venta:</dt>
@@ -346,11 +352,12 @@ const deleteQuoteVersion = () => {
                                                 </Link>
 
                                                 <!--Botón Eliminar-->
-                                                <Button @click="(deleteQuoteVersion())" size="small" label="Eliminar" :pt="{
-                                                    root: '!w-full !bg-danger !hover:bg-red-500',
-                                                    label: '!text-center',
-                                                }
-                                                    " v-if="hasPermission('quote delete')" />
+                                                <Button @click="(deleteQuoteVersion())" size="small" label="Eliminar"
+                                                    :pt="{
+                                                        root: '!w-full !bg-danger !hover:bg-red-500',
+                                                        label: '!text-center',
+                                                    }
+                                                        " v-if="hasPermission('quote delete')" />
                                             </div>
                                         </section>
                                     </section>
