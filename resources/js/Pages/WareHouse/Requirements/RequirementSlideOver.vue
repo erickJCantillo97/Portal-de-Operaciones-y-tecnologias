@@ -5,11 +5,13 @@ import { ref } from 'vue'
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import DescriptionItem from '@/Components/DescriptionItem.vue'
+import Loading from '@/Components/Loading.vue'
 import ListBox from 'primevue/listbox';
 
 const emit = defineEmits(['closeSlideOver'])
 
 const selectedMaterial = ref()
+const loadingMaterials = ref(true)
 
 const props = defineProps({
   show: {
@@ -25,6 +27,13 @@ const props = defineProps({
     default: []
   }
 })
+
+const optionStatus = {
+  'PENDIENTE': {
+    icon: 'fa-solid fa-user-clock',
+    color: 'bg-orange-600 text-white'
+  },
+}
 
 </script>
 <template>
@@ -69,14 +78,17 @@ const props = defineProps({
                         <h3 class="font-semibold p-1 rounded-t-xl text-center bg-primary text-white">
                           Lista de Materiales
                         </h3>
+                        <!-- <div v-if="loadingMaterials">
+                          <Loading message="Cargando Lista de Materiales" />
+                        </div> -->
                         <div class="shadow-md my-4 px-2 h-full" v-for="material in materials">
-                            <Accordion expandIcon="pi pi-plus" collapseIcon="pi pi-minus" :pt="{
-                              content: '!h-[80vh] !p-2 !overflow-y-auto'
-                            }">
-                              <AccordionTab :activeIndex="0" :header="`${material.material}`">
-                                <DescriptionItem :data="material" />
-                              </AccordionTab>
-                            </Accordion>
+                          <Accordion expandIcon="pi pi-plus" collapseIcon="pi pi-minus" :pt="{
+                            content: '!h-[80vh] !p-2 !overflow-y-auto'
+                          }">
+                            <AccordionTab :activeIndex="0" :header="`${material.material}`">
+                              <DescriptionItem :data="material" :optionStatus />
+                            </AccordionTab>
+                          </Accordion>
                         </div>
                       </div>
                     </div>
