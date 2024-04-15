@@ -85,13 +85,13 @@ const optionStatus = {
                     </button>
                   </div>
                 </TransitionChild>
-                <div class="h-full overflow-y-auto bg-white p-2">
-                  <div class="absolute w-96 -m-2 z-50 py-4 bg-blue-900 text-white uppercase p-2">
+                <div class="h-full overflow-y-auto bg-white ">
+                  <div class="w-full bg-blue-900 text-white uppercase p-2">
                     <h2 class="text-lg text-center font-bold text-white">
-                      Requerimientos
+                      Requerimiento
                     </h2>
                   </div>
-                  <div class="flex gap-2 mt-14 h-12 items-center justify-center p-4">
+                  <div class="flex gap-2 items-center justify-center p-4">
                     <!--Botón Aprobar-->
                     <Link :href="'#'">
                     <Button v-tooltip.top="'Aprobar'" size="small" icon="pi pi-check-circle" outlined severity="success"
@@ -122,9 +122,13 @@ const optionStatus = {
                       v-if="hasPermission('quote delete')" />
                     </Link>
                   </div>
-                  <article class="w-full">
-                    <div class="border border-solid rounded-lg p-2 mb-2">
+                  <article class="w-full p-2">
+                    <div class=" border border-solid rounded-lg p-2 mb-2">
+                      <!-- {{ requirement }} -->
                       <DescriptionItem :data="requirement" />
+                    </div>
+                    <div class="border border-solid rounded-lg mb-2">
+
                     </div>
                     <div class="border border-solid rounded-lg mb-2">
                       <div class="mb-4">

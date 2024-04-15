@@ -130,10 +130,8 @@ const url = [
 ]
 
 onMounted(() => {
-
     if (props.requirement_id) {
         requirement.value = props.requirements.filter(requirement => requirement.id == props.requirement_id)[0]
-
         openSlideOver.value = true
         getMaterial(props.requirement_id)
     }
