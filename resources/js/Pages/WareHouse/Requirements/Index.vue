@@ -30,14 +30,6 @@ const formData = ref({
 
 const materials = ref([])
 
-const getMaterial = (requirement) => {
-    materialsLoaded.value = true
-    axios.get(route('materials.index', requirement)).then((res) => {
-        materials.value = res.data.material
-        materialsLoaded.value = false
-    })
-}
-
 const addItem = () => {
     // toast.add({ severity: 'success', group: 'customToast', text: 'Atividad Eliminada', life: 2000 });
     formData.value.requirement = {}
@@ -118,7 +110,6 @@ const showClick = (event, data) => {
     // console.log(data)
     requirement.value = data;
     openSlideOver.value = true
-    getMaterial(data.id)
 }
 
 const url = [
@@ -208,7 +199,7 @@ onMounted(() => {
             </template>
         </CustomModal>
 
-        <RequirementSlideOver :requirement="requirement" :materials :key="requirement.id + materialsLoaded" :show="openSlideOver"
-            @closeSlideOver="openSlideOver = false" :materialsLoaded />
+        <RequirementSlideOver :requirement="requirement" :materials :key="requirement.id" :show="openSlideOver"
+            @closeSlideOver="openSlideOver = false" />
     </AppLayout>
 </template>

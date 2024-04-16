@@ -14,7 +14,7 @@ import Loading from '@/Components/Loading.vue'
 
 const { emit } = defineEmits(['closeSlideOver'])
 
-const selectedMaterial = ref()
+const materialsLoaded = ref()
 
 const props = defineProps({
   show: {
@@ -24,15 +24,21 @@ const props = defineProps({
     type: Object,
     required: true
   },
-  materials: {
-    type: Array,
-    required: false,
-    default: []
-  },
-  materialsLoaded: Boolean
+
 })
 
+const materials = ref([])
 
+const getMaterial = async () => {
+  materialsLoaded.value = true
+  await axios.get(route('materials.index', props.requirement.id)).then((res) => {
+    materials.value = res.data.material
+    materialsLoaded.value = false
+  })
+  return materials.value
+}
+
+getMaterial()
 
 
 const optionStatusRequirement = {
@@ -45,6 +51,14 @@ const optionStatusRequirement = {
     color: 'bg-primary text-white'
   }
 }
+
+watch(() => props.materialsLoaded, (newValue, oldValue) => {
+  if (newValue) {
+    loadingMaterials.value = false
+  } else {
+    loadingMaterials.value = true
+  }
+})
 
 const optionStatus = {
   'PENDIENTE': {
@@ -59,9 +73,9 @@ const optionStatus = {
     icon: 'fa-solid fa-xmark',
     color: 'bg-red-600 text-white'
   },
-  'ELIMINADO': {
-    icon: 'fa-solid fa-trash',
-    color: 'bg-yellow-600 text-gray-800'
+  'DISPONIBLE GECON': {
+    icon: '',
+    color: 'bg-success text-white'
   }
 }
 </script>
@@ -98,7 +112,7 @@ const optionStatus = {
                       Requerimiento
                     </h2>
                   </div>
-                  <div class="flex gap-2 items-center justify-center p-4">
+                  <div class="flex gap-2 items-center justify-center p-2">
                     <!--Botón Aprobar-->
                     <Link :href="'#'">
                     <Button v-tooltip.top="'Aprobar'" size="small" icon="pi pi-check-circle" severity="success"
@@ -107,25 +121,29 @@ const optionStatus = {
 
                     <!--Botón Rechazar-->
                     <Link :href="'#'">
-                    <Button v-tooltip.top="'Rechazar'" size="small" icon="pi pi-times-circle" severity="warning"
+                    <Button v-tooltip.top="'Rechazar'" size="small" icon="pi pi-times-circle" raised severity="warning"
                       v-if="hasPermission('quote create')" />
                     </Link>
 
                     <!--Botón Gestionar-->
-                    <Link :href="''">
-                    <Button v-tooltip.top="'Gestionar'" size="small" icon="pi pi-cog" severity="info"
-                      v-if="hasPermission('quote create')" />
+                    <Link :href="'#'">
+                    <Button v-tooltip.top="'Gestionar'" size="small" raised severity="info"
+                      v-if="hasPermission('quote create')">
+                      <template #icon>
+                        <i class="fa-solid fa-list-check"></i>
+                      </template>
+                    </Button>
                     </Link>
 
                     <!--Botón Editar-->
-                    <Link :href="''">
-                    <Button v-tooltip.top="'Editar'" size="small" icon="pi pi-pencil" severity="warning"
+                    <Link :href="'#'">
+                    <Button v-tooltip.top="'Editar'" size="small" icon="pi pi-pencil" raised severity="warning"
                       v-if="hasPermission('quote create')" />
                     </Link>
 
                     <!--Botón Eliminar-->
-                    <Link :href="''">
-                    <Button v-tooltip.top="'Eliminar'" size="small" icon="pi pi-trash" severity="danger"
+                    <Link :href="'#'">
+                    <Button v-tooltip.top="'Eliminar'" size="small" icon="pi pi-trash" raised severity="danger"
                       v-if="hasPermission('quote delete')" />
                     </Link>
                   </div>
