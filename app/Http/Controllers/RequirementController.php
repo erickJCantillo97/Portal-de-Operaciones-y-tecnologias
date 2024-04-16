@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Imports\RequirementImport;
 use App\Models\Projects\Project;
+use App\Models\WareHouse\Material;
 use App\Models\WareHouse\MaterialRequirement;
 use App\Models\WareHouse\Requirement;
 use Carbon\Carbon;
@@ -24,11 +25,12 @@ class RequirementController extends Controller
         $requirements = Requirement::has('project')->with('project', 'user')->get()->map(function ($requirement) {
             return [
                 'id' => $requirement->id,
-                'consecutivo' => $requirement->consecutive, 
+                'consecutivo' => $requirement->consecutive,
                 'proyecto' => $requirement->project->name,
                 'bloque' => $requirement->bloque,
                 'grupo' => $requirement->sistema_grupo,
                 'dibujante' => $requirement->user->short_name,
+                'estado' => $requirement->oficial_date != null ? 'Oficial' : 'Aprobado DIPR',
                 'fecha' => Carbon::parse($requirement->preeliminar_date)->format('d-m-Y'),
             ];
         });
@@ -143,10 +145,42 @@ class RequirementController extends Controller
 
     public function storeRequirementOficials(Request $request)
     {
-        foreach ($request->all() as $requirement) {
-            return $requirement[0]['nivel'];
-        }
+        // return $request->materiales[0];
+        $validateData = $request->validate([
+            'materiales' => 'array|required',
+            'materiales.*.nivel' => 'required',
+            'materiales.*' => 'required|array',
+            'materiales.*.unidad' => 'required',
+            'materiales.*.cantidad' => 'required|numeric',
+            'materiales.*.estado' => 'required|numeric',
+            'materiales.*.codigo_material' => 'required|string',
+            'materiales.*.observacion' => 'nullable|string',
+        ]);
 
+        foreach ($request['materiales'] as $material) {
+            // return $material['codigo_material'];
+            if ($material['nivel'] == 1) {
+                MaterialRequirement::find($material['material']['id'])->update(
+                    [
+                        'count' => $material['cantidad'],
+                        'status' => $material['estado'],
+                        'unit' => $material['unidad'],
+                        'observation' => $material['observacion'],
+                    ]
+                );
+
+                // dd($material['material']['material']['id']);
+                Material::find($material['material']['material']['id'])->update([
+                    'code' => $material['codigo_material'],
+                ]);
+            } else {
+            }
+        }
+        Requirement::find($request['materiales'][0]['material']['requirement_id'])->update([
+            'intendente_id' => auth()->user()->id,
+            'oficial_date' => Carbon::now(),
+        ]);
+        return back();
         // return $request->all();
     }
 }

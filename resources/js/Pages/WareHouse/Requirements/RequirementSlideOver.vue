@@ -15,7 +15,6 @@ import Loading from '@/Components/Loading.vue'
 const { emit } = defineEmits(['closeSlideOver'])
 
 const selectedMaterial = ref()
-const loadingMaterials = ref(true)
 
 const props = defineProps({
   show: {
@@ -33,11 +32,19 @@ const props = defineProps({
   materialsLoaded: Boolean
 })
 
-watch(() => props.materialsLoaded, (newValue, oldValue) => {
-  if (newValue) {
-    loadingMaterials.value = false
+
+
+
+const optionStatusRequirement = {
+  'Oficial': {
+    icon: 'fa-solid fa-check',
+    color: 'bg-success text-white'
+  },
+  'Aprobado DIPR': {
+    icon: 'fa-solid fa-user-clock',
+    color: 'bg-primary text-white'
   }
-})
+}
 
 const optionStatus = {
   'PENDIENTE': {
@@ -94,38 +101,38 @@ const optionStatus = {
                   <div class="flex gap-2 items-center justify-center p-4">
                     <!--Botón Aprobar-->
                     <Link :href="'#'">
-                    <Button v-tooltip.top="'Aprobar'" size="small" icon="pi pi-check-circle" outlined severity="success"
+                    <Button v-tooltip.top="'Aprobar'" size="small" icon="pi pi-check-circle" severity="success"
                       v-if="hasPermission('quote create')" />
                     </Link>
 
                     <!--Botón Rechazar-->
                     <Link :href="'#'">
-                    <Button v-tooltip.top="'Rechazar'" size="small" icon="pi pi-times-circle" outlined
-                      severity="warning" v-if="hasPermission('quote create')" />
+                    <Button v-tooltip.top="'Rechazar'" size="small" icon="pi pi-times-circle" severity="warning"
+                      v-if="hasPermission('quote create')" />
                     </Link>
 
                     <!--Botón Gestionar-->
                     <Link :href="''">
-                    <Button v-tooltip.top="'Gestionar'" size="small" icon="pi pi-cog" outlined severity="info"
+                    <Button v-tooltip.top="'Gestionar'" size="small" icon="pi pi-cog" severity="info"
                       v-if="hasPermission('quote create')" />
                     </Link>
 
                     <!--Botón Editar-->
                     <Link :href="''">
-                    <Button v-tooltip.top="'Editar'" size="small" icon="pi pi-pencil" outlined severity="warning"
+                    <Button v-tooltip.top="'Editar'" size="small" icon="pi pi-pencil" severity="warning"
                       v-if="hasPermission('quote create')" />
                     </Link>
 
                     <!--Botón Eliminar-->
                     <Link :href="''">
-                    <Button v-tooltip.top="'Eliminar'" size="small" icon="pi pi-trash" outlined severity="danger"
+                    <Button v-tooltip.top="'Eliminar'" size="small" icon="pi pi-trash" severity="danger"
                       v-if="hasPermission('quote delete')" />
                     </Link>
                   </div>
                   <article class="w-full p-2">
                     <div class=" border border-solid rounded-lg p-2 mb-2">
                       <!-- {{ requirement }} -->
-                      <DescriptionItem :data="requirement" />
+                      <DescriptionItem :data="requirement" :option-status="optionStatusRequirement" />
                     </div>
                     <div class="border border-solid rounded-lg mb-2">
 
@@ -135,13 +142,13 @@ const optionStatus = {
                         <h3 class="font-semibold p-1 rounded-t-xl text-center bg-primary text-white">
                           Lista de Materiales
                         </h3>
-                        <div v-if="loadingMaterials" class="mt-4">
+                        <div v-if="materialsLoaded" class="mt-4">
                           <Loading message="Cargando Lista de Materiales" />
                         </div>
                         <div class="shadow-md my-4 px-2 h-full" v-for="material in materials">
                           <Accordion :pt="{
-                            content: '!h-[80vh] !p-2 !overflow-y-auto'
-                          }">
+    content: '!h-[80vh] !p-2 !overflow-y-auto'
+  }">
                             <AccordionTab :activeIndex="0">
                               <template #header>
                                 <span class="flex align-items-center gap-2 w-full">

@@ -196,13 +196,12 @@ class ProgrammingController extends Controller
 
             //     $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
             // }
-            $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
+            
             DB::commit();
 
             return response()->json([
                 'status' => $status,
                 'task' => $this->getSchedule($validateData['fecha'], $validateData['task_id']),
-                'hours' => $hours,
                 'conflict' => $conflict,
             ], 200);
         } catch (Exception $e) {
