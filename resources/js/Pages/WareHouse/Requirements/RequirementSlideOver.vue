@@ -36,6 +36,8 @@ const props = defineProps({
 watch(() => props.materialsLoaded, (newValue, oldValue) => {
   if (newValue) {
     loadingMaterials.value = false
+  } else {
+    loadingMaterials.value = true 
   }
 })
 
@@ -91,34 +93,38 @@ const optionStatus = {
                       Requerimiento
                     </h2>
                   </div>
-                  <div class="flex gap-2 items-center justify-center p-4">
+                  <div class="flex gap-2 items-center justify-center p-2">
                     <!--Botón Aprobar-->
                     <Link :href="'#'">
-                    <Button v-tooltip.top="'Aprobar'" size="small" icon="pi pi-check-circle" outlined severity="success"
-                      v-if="hasPermission('quote create')" />
+                    <Button v-tooltip.top="'Aprobar'" size="small" icon="pi pi-check-circle" outlined raised
+                      severity="success" v-if="hasPermission('quote create')" />
                     </Link>
 
                     <!--Botón Rechazar-->
                     <Link :href="'#'">
-                    <Button v-tooltip.top="'Rechazar'" size="small" icon="pi pi-times-circle" outlined
+                    <Button v-tooltip.top="'Rechazar'" size="small" icon="pi pi-times-circle" outlined raised
                       severity="warning" v-if="hasPermission('quote create')" />
                     </Link>
 
                     <!--Botón Gestionar-->
-                    <Link :href="''">
-                    <Button v-tooltip.top="'Gestionar'" size="small" icon="pi pi-cog" outlined severity="info"
-                      v-if="hasPermission('quote create')" />
+                    <Link :href="'#'">
+                    <Button v-tooltip.top="'Gestionar'" size="small" outlined raised severity="info"
+                      v-if="hasPermission('quote create')">
+                      <template #icon>
+                        <i class="fa-solid fa-list-check"></i>
+                      </template>
+                    </Button>
                     </Link>
 
                     <!--Botón Editar-->
-                    <Link :href="''">
-                    <Button v-tooltip.top="'Editar'" size="small" icon="pi pi-pencil" outlined severity="warning"
+                    <Link :href="'#'">
+                    <Button v-tooltip.top="'Editar'" size="small" icon="pi pi-pencil" outlined raised severity="warning"
                       v-if="hasPermission('quote create')" />
                     </Link>
 
                     <!--Botón Eliminar-->
-                    <Link :href="''">
-                    <Button v-tooltip.top="'Eliminar'" size="small" icon="pi pi-trash" outlined severity="danger"
+                    <Link :href="'#'">
+                    <Button v-tooltip.top="'Eliminar'" size="small" icon="pi pi-trash" outlined raised severity="danger"
                       v-if="hasPermission('quote delete')" />
                     </Link>
                   </div>
