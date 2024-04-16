@@ -36,7 +36,7 @@ const statusSelect = defineModel('statusSelect', {
 </script>
 
 <template>
-    <div class="w-full max-w-[30vw] justify-center flex space-x-2 p-1 z-10 cursor-pointer"
+    <div class="w-full sm:max-w-[30vw] justify-center flex space-x-2 p-1 z-10 cursor-pointer"
     :class="[(date.toDateString()==new Date().toDateString())?'bg-secondary rounded-b-md':'',(statusSelect == status)?'border-success border rounded-md bg-success-light':'']" 
     @click="!(statusSelect == status) ? statusSelect = status : (statusSelect = {
         loading: false,
@@ -50,13 +50,13 @@ const statusSelect = defineModel('statusSelect', {
             :class="status.data.programados.length !== 0 ? 'bg-primary' : 'bg-success'"
             v-if="status.data.programados.length !== 0"
             v-tooltip="{ value: status.data.programados?.length > 0 ? `<div><p class='w-full text-center font-bold'>Programados</p>${status.data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
-            <span v-if="letters">Programados:</span>
+            <span v-if="letters">Programados: </span>
             <span>{{ status.data.programados.length }}
             </span>
         </p>
         <p class="rounded w-full text-center px-2 text-white bg-danger" v-if="status.data.noProgramados.length !== 0"
             v-tooltip="{ value: status.data.noProgramados?.length > 0 ? `<div><p class='w-full text-center font-bold'>No programados</p>${status.data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
-            <span v-if="letters">No Programados:</span>
+            <span v-if="letters">No Programados: </span>
             <span>{{ status.data.noProgramados.length }}
             </span>
         </p>

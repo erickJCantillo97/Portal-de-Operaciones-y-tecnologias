@@ -3,13 +3,9 @@ import { ref } from 'vue';
 import ProgressBar from 'primevue/progressbar';
 import Loading from '@/Components/Loading.vue';
 import Empty from '@/Components/Empty.vue';
-import OverlayPanel from 'primevue/overlaypanel';
-import ListPersonDrag from './ListPersonDrag.vue';
 
 const date = ref(new Date())
 const tasks = ref({})
-
-const overlayPerson=ref()
 
 const props = defineProps({
     day: {
@@ -18,9 +14,16 @@ const props = defineProps({
     },
     project: {
         type: Number,
-        required:true
+        required: true
     },
-    type:{type:String, default:'day'}
+    type: {
+        type: String,
+        default: 'day'
+    },
+    movil: {
+        type: Boolean,
+        default: false
+    }
 })
 
 function format24h(hora) {
@@ -51,11 +54,7 @@ const option = ref()
 const itemDrag = defineModel('itemDrag', {
     required: false,
 })
-defineEmits(['drop', 'togglePerson'])
-
-function tooglePerson(event){
-    overlayPerson.value.toggle(event);
-}
+defineEmits(['drop', 'togglePerson', 'addPerson'])
 
 const arrayPersonFilter = ref({
     loading: false,
@@ -72,8 +71,9 @@ const arrayPersonFilter = ref({
     <div v-if="tasks.loading" class="flex justify-center h-full items-center">
         <Loading />
     </div>
-    <div v-else-if="tasks.data.length>0" v-for="task in tasks.data" @drop="$emit('drop', task, day, option); option = null" @dragover.prevent
-        @dragenter.prevent class="sm:h-full w-full sm:max-h-44 p-0.5" :class="[type=='day'?'sm:w-1/3 float-left':'']"
+    <div v-else-if="tasks.data.length > 0" v-for="task in tasks.data"
+        @drop="!movil?$emit('drop', task, day, option):null; option = null" @dragover.prevent @dragenter.prevent
+        class="sm:h-full w-full sm:max-h-44 p-0.5" :class="[type == 'day' ? 'sm:w-1/3 float-left' : '']"
         :key="task.name + date.toDateString()">
         <div class="flex border pb-1 rounded-md border-primary hover:bg-primary-light flex-col justify-between h-full">
             <div class="h-min w-full">
@@ -126,9 +126,9 @@ const arrayPersonFilter = ref({
                                     </p>
                                 </div>
                             </div>
-                            <div class="min-w-9  h-full items-center flex justify-end">
-                                <Button text rounded raised class="!w-8" severity="success"
-                                    icon="fa-solid fa-plus" @click="tooglePerson($event)" />
+                            <div v-if="movil" class="min-w-9  h-full items-center flex justify-end">
+                                <Button text rounded raised class="!w-8" severity="success" icon="fa-solid fa-plus"
+                                    @click="movil?$emit('addPerson',$event,task,day):null" />
                             </div>
                         </div>
                     </div>
@@ -140,9 +140,6 @@ const arrayPersonFilter = ref({
         </div>
     </div>
     <div v-else class="flex flex-col h-full justify-center">
-        <Empty message="Sin actidades"/>
+        <Empty message="Sin actidades" />
     </div>
-    <OverlayPanel ref="overlayPerson" :pt="{root: 'h-96', content:'h-full overflow-y-auto'}">
-        <ListPersonDrag :arrayPersonFilter="arrayPersonFilter" />
-    </OverlayPanel>
 </template>

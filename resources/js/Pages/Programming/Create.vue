@@ -21,6 +21,7 @@ import { useToast } from "primevue/usetoast";
 import TaskProgramming from './Components/TaskProgramming.vue';
 import Knob from 'primevue/knob';
 import Dropdown from 'primevue/dropdown';
+import Listbox from 'primevue/listbox';
 import UserStatusProgramming from '@/Components/sections/UserStatusProgramming.vue';
 const toast = useToast();
 // const { hasRole, hasPermission } = usePermissions()
@@ -83,6 +84,22 @@ function obtenerDiaSemana(dato) {
     return fecha;
 }
 
+function esMovil() {
+    const dispositivos = [
+        /Android/i,
+        /webOS/i,
+        /iPhone/i,
+        /iPad/i,
+        /iPod/i,
+        /BlackBerry/i,
+        /Windows Phone/i
+    ];
+
+    return dispositivos.some((dispositivo) => {
+        return navigator.userAgent.match(dispositivo);
+    });
+}
+
 //#endregion
 
 //#region variables
@@ -95,8 +112,10 @@ const dates = ref(new Date(date.value.getFullYear(), date.value.getMonth(), date
 const diasSemana = ref(obtenerFechasSemana(dates.value))
 const projectsSelected = ref([])
 const overlayPerson = ref()
+const overlayAddPerson = ref()
 const personsEdit = ref()
 const tabActive = ref()
+const personal = ref()
 const selectDays = ref([])
 const personDrag = ref({})
 const arrayPersonFilter = ref({
@@ -106,6 +125,7 @@ const arrayPersonFilter = ref({
         noProgramados: []
     }
 })
+const personsSelect = ref()
 
 //#endregion
 
@@ -117,10 +137,10 @@ const getTask = async (option) => {
     }
     if (option == 'week') {
         mode.value = option
-        !(dates.value instanceof Array)??(dates.value = obtenerFormatoSemana(new Date()))
+        !(dates.value instanceof Array) ?? (dates.value = obtenerFormatoSemana(new Date()))
     } else if (option == 'date') {
         mode.value = option
-        !(dates.value instanceof Date)??(dates.value = new Date())
+        !(dates.value instanceof Date) ?? (dates.value = new Date())
     } else if (mode.value == 'month') {
 
     } else {
@@ -128,6 +148,14 @@ const getTask = async (option) => {
     }
 };
 
+const getPersonalData = () => {
+    axios.get(route('get.personal.user')).then((res) => {
+        personal.value = Object.values(res.data.personal)
+    })
+}
+if (esMovil()) {
+    getPersonalData()
+}
 //#endregion
 
 //#region drag
@@ -153,7 +181,6 @@ async function onDrop(task, fecha, option) {
                     task.employees = res.data.task
                     toast.add({ severity: 'error', group: "customToast", text: 'Hubo un error al programar', life: 2000 })
                 } else {
-                    getPersonalStatus([fecha])
                     task.employees = res.data.task
                     task.loading = false
                     toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
@@ -197,6 +224,11 @@ const editHorario = ref({
 const nuevoHorario = ref({})
 const modhours = ref(false)
 const dateSelect = ref()
+
+function addPerson(event) {
+    // console.log(event)
+    overlayAddPerson.value.toggle(event)
+}
 
 const togglePerson = (event, persons, task, date) => {
     dateSelect.value = date
@@ -270,27 +302,6 @@ const save = async () => {
 }
 //#endregion
 
-function esMovil() {
-    const dispositivos = [
-        /Android/i,
-        /webOS/i,
-        /iPhone/i,
-        /iPad/i,
-        /iPod/i,
-        /BlackBerry/i,
-        /Windows Phone/i
-    ];
-
-    return dispositivos.some((dispositivo) => {
-        return navigator.userAgent.match(dispositivo);
-    });
-}
-
-if (esMovil()) {
-    console.log("El usuario está en un dispositivo móvil.");
-} else {
-    console.log("El usuario no está en un dispositivo móvil.");
-}
 
 
 </script>
@@ -315,8 +326,7 @@ if (esMovil()) {
                             optionLabel="name" @change="getTask()" class="sm:hidden flex" />
                         <ButtonGroup class="hidden sm:block">
                             <Button label="Semana" @click="getTask('week')" :outlined="mode != 'week'" />
-                            <Button label="dia" @click="getTask('date')"
-                                :outlined="mode != 'date'" />
+                            <Button label="dia" @click="getTask('date')" :outlined="mode != 'date'" />
                         </ButtonGroup>
                         <div class="sm:w-52 w-full">
                             <CustomInput v-model:input="dates" :type="mode" :manualInput="false"
@@ -362,9 +372,9 @@ if (esMovil()) {
                                 <span class="grid grid-cols-7 col-span-9 overflow-y-auto overflow-x-hidden">
                                     <div v-for="dia, index in diasSemana" class="flex flex-col h-full items-center"
                                         :class="[index > 4 ? 'bg-warning-light' : '', dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
-                                        <TaskProgramming :project="project.id" :day="dia" :key="dates.toDateString() + project.id"
-                                            type="week" @drop="onDrop" v-model:itemDrag="personDrag"
-                                            @togglePerson="togglePerson" />
+                                        <TaskProgramming :project="project.id" :day="dia"
+                                            :key="dates.toDateString() + project.id" type="week" @drop="onDrop"
+                                            v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
                                     </div>
                                 </span>
 
@@ -413,8 +423,9 @@ if (esMovil()) {
                                     </div>
                                 </div>
                                 <div class="h-full sm:h-full p-1 w-full overflow-y-auto">
-                                    <TaskProgramming :project="project.id" :day="dates" :key="dates.toDateString() + project.id"
-                                        @drop="onDrop" v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
+                                    <TaskProgramming @addPerson="addPerson" :movil="esMovil()" :project="project.id"
+                                        :day="dates" :key="dates.toDateString() + project.id" @drop="onDrop"
+                                        v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
                                 </div>
                             </div>
                             <div v-else>
@@ -431,14 +442,13 @@ if (esMovil()) {
             </div>
             <!--#region LISTA PERSONAL-->
             <span v-if="!esMovil()">
-                <ListPersonDrag  v-model:itemDrag="personDrag" :arrayPersonFilter="arrayPersonFilter" />
+                <ListPersonDrag v-model:itemDrag="personDrag" :arrayPersonFilter="arrayPersonFilter" />
             </span>
         </div>
     </AppLayout>
 
     <OverlayPanel ref="overlayPerson">
         <div class="flex flex-col space-y-1">
-            <!-- {{ personsEdit }} -->
             <div class="flex flex-col border p-1 rounded-md justify-between">
                 <p class="text-sm font-bold">{{ personsEdit.Nombres_Apellidos }}</p>
                 <div class="grid gap-2">
@@ -466,6 +476,21 @@ if (esMovil()) {
     </OverlayPanel>
 
     <!--#region MODALES -->
+
+    <OverlayPanel ref="overlayAddPerson" :pt="{root:'w-96'}">
+        <Listbox v-model="personsSelect" multiple filter :options="personal" optionLabel="Nombres_Apellidos" class="w-full"
+            listStyle="max-height:250px">
+            <template #option="slotProps">
+                <div class="flex">
+                    <div>{{ slotProps.option.Nombres_Apellidos }}</div>
+                </div>
+            </template>
+        </Listbox>
+        <div class="flex w-full pt-2 px-4 space-x-2 justify-center">
+            <!-- <Button label="Cancelar" severity="danger"/> -->
+            <Button label="Programar" severity="success"/>
+        </div>
+    </OverlayPanel>
 
     <CustomModal v-if="modhours" v-model:visible="modhours" :footer="false" icon="fa-regular fa-clock" width="60vw"
         :closeOnEscape="false"
@@ -560,20 +585,3 @@ if (esMovil()) {
 
     <!--#endregion-->
 </template>
-
-<style scoped>
-.custom-image {
-    width: 200px;
-    height: 50px;
-    /* object-position: 50% 30%; */
-    border-radius: 5px 10px;
-    object-fit: cover;
-    /* Opciones: 'cover', 'contain', 'fill', etc. */
-}
-
-.info-resto {
-    font-size: 15px;
-    text-wrap: balance;
-    opacity: .5;
-}
-</style>
