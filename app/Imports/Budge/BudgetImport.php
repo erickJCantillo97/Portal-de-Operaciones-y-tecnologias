@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class BudgetImport implements ToCollection, WithChunkReading, WithHeadingRow
+class BudgetImport implements ToCollection,  WithHeadingRow
 {
     public $proyecto;
 
@@ -41,10 +41,10 @@ class BudgetImport implements ToCollection, WithChunkReading, WithHeadingRow
         //     $tool->save();
         // }
         Validator::make($rows->toArray(), [
-            '*.estructura_sap' => 'required',
             '*.presupuesto_materiales' => 'nullable|numeric',
             '*.presupuesto_mdo' => 'nullable|numeric',
             '*.presupuesto_servicios' => 'nullable|numeric',
+            '*.estructura_sap' => 'required',
         ])->validate();
 
         foreach ($rows as $row) {
@@ -64,10 +64,5 @@ class BudgetImport implements ToCollection, WithChunkReading, WithHeadingRow
                 // dd($pep);
             }
         }
-    }
-
-    public function chunkSize(): int
-    {
-        return 100;
     }
 }

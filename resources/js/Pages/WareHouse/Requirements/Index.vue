@@ -9,6 +9,7 @@ import CustomInput from '@/Components/CustomInput.vue';
 import CustomModal from '@/Components/CustomModal.vue';
 import RequirementSlideOver from './RequirementSlideOver.vue'
 
+// const emit = defineEmits(['materialsLoaded'])
 
 const toast = useToast()
 
@@ -20,6 +21,7 @@ const props = defineProps({
 
 const open = ref(false)
 const openSlideOver = ref(false)
+const materialsLoaded = ref(false)
 const requirement = ref({})
 
 const formData = ref({
@@ -27,13 +29,6 @@ const formData = ref({
 })
 
 const materials = ref([])
-
-const getMaterial = (requirement) => {
-    axios.get(route('materials.index', requirement)).then((res) => {
-        materials.value = res.data.material
-    })
-}
-
 
 const addItem = () => {
     // toast.add({ severity: 'success', group: 'customToast', text: 'Atividad Eliminada', life: 2000 });
@@ -115,7 +110,6 @@ const showClick = (event, data) => {
     // console.log(data)
     requirement.value = data;
     openSlideOver.value = true
-    getMaterial(data.id)
 }
 
 const url = [

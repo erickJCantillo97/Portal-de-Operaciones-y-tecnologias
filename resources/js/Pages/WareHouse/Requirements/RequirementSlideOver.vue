@@ -1,17 +1,20 @@
 <script setup>
+const { hasRole, hasPermission } = usePermissions()
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import { Link } from '@inertiajs/vue3'
+import { ref, watch } from 'vue'
+import { usePermissions } from '@/composable/permission'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
-import { ref } from 'vue'
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
+import Badge from 'primevue/badge'
 import DescriptionItem from '@/Components/DescriptionItem.vue'
+import ListBox from 'primevue/listbox'
 import Loading from '@/Components/Loading.vue'
-import ListBox from 'primevue/listbox';
 
-const emit = defineEmits(['closeSlideOver'])
+const { emit } = defineEmits(['closeSlideOver'])
 
-const selectedMaterial = ref()
-const loadingMaterials = ref(true)
+const materialsLoaded = ref()
 
 const props = defineProps({
   show: {
@@ -21,10 +24,39 @@ const props = defineProps({
     type: Object,
     required: true
   },
-  materials: {
-    type: Array,
-    required: false,
-    default: []
+
+})
+
+const materials = ref([])
+
+const getMaterial = async () => {
+  materialsLoaded.value = true
+  await axios.get(route('materials.index', props.requirement.id)).then((res) => {
+    materials.value = res.data.material
+    materialsLoaded.value = false
+  })
+  return materials.value
+}
+
+getMaterial()
+
+
+const optionStatusRequirement = {
+  'Oficial': {
+    icon: 'fa-solid fa-check',
+    color: 'bg-success text-white'
+  },
+  'Aprobado DIPR': {
+    icon: 'fa-solid fa-user-clock',
+    color: 'bg-primary text-white'
+  }
+}
+
+watch(() => props.materialsLoaded, (newValue, oldValue) => {
+  if (newValue) {
+    loadingMaterials.value = false
+  } else {
+    loadingMaterials.value = true
   }
 })
 
@@ -33,8 +65,19 @@ const optionStatus = {
     icon: 'fa-solid fa-user-clock',
     color: 'bg-orange-600 text-white'
   },
+  'APROBADO': {
+    icon: 'fa-solid fa-check',
+    color: 'bg-emerald-600 text-white'
+  },
+  'RECHAZADO': {
+    icon: 'fa-solid fa-xmark',
+    color: 'bg-red-600 text-white'
+  },
+  'DISPONIBLE GECON': {
+    icon: '',
+    color: 'bg-success text-white'
+  }
 }
-
 </script>
 <template>
   <TransitionRoot as="template" :show="show">
@@ -69,10 +112,45 @@ const optionStatus = {
                       Requerimiento
                     </h2>
                   </div>
+                  <div class="flex gap-2 items-center justify-center p-2">
+                    <!--Botón Aprobar-->
+                    <Link :href="'#'">
+                    <Button v-tooltip.top="'Aprobar'" size="small" icon="pi pi-check-circle" severity="success"
+                      v-if="hasPermission('quote create')" />
+                    </Link>
+
+                    <!--Botón Rechazar-->
+                    <Link :href="'#'">
+                    <Button v-tooltip.top="'Rechazar'" size="small" icon="pi pi-times-circle" raised severity="warning"
+                      v-if="hasPermission('quote create')" />
+                    </Link>
+
+                    <!--Botón Gestionar-->
+                    <Link :href="'#'">
+                    <Button v-tooltip.top="'Gestionar'" size="small" raised severity="info"
+                      v-if="hasPermission('quote create')">
+                      <template #icon>
+                        <i class="fa-solid fa-list-check"></i>
+                      </template>
+                    </Button>
+                    </Link>
+
+                    <!--Botón Editar-->
+                    <Link :href="'#'">
+                    <Button v-tooltip.top="'Editar'" size="small" icon="pi pi-pencil" raised severity="warning"
+                      v-if="hasPermission('quote create')" />
+                    </Link>
+
+                    <!--Botón Eliminar-->
+                    <Link :href="'#'">
+                    <Button v-tooltip.top="'Eliminar'" size="small" icon="pi pi-trash" raised severity="danger"
+                      v-if="hasPermission('quote delete')" />
+                    </Link>
+                  </div>
                   <article class="w-full p-2">
                     <div class=" border border-solid rounded-lg p-2 mb-2">
                       <!-- {{ requirement }} -->
-                      <DescriptionItem :data="requirement" />
+                      <DescriptionItem :data="requirement" :option-status="optionStatusRequirement" />
                     </div>
                     <div class="border border-solid rounded-lg mb-2">
 
@@ -82,14 +160,23 @@ const optionStatus = {
                         <h3 class="font-semibold p-1 rounded-t-xl text-center bg-primary text-white">
                           Lista de Materiales
                         </h3>
-                        <!-- <div v-if="loadingMaterials">
+                        <div v-if="materialsLoaded" class="mt-4">
                           <Loading message="Cargando Lista de Materiales" />
-                        </div> -->
+                        </div>
                         <div class="shadow-md my-4 px-2 h-full" v-for="material in materials">
-                          <Accordion expandIcon="pi pi-plus" collapseIcon="pi pi-minus" :pt="{
+                          <Accordion :pt="{
     content: '!h-[80vh] !p-2 !overflow-y-auto'
   }">
-                            <AccordionTab :activeIndex="0" :header="`${material.material}`">
+                            <AccordionTab :activeIndex="0">
+                              <template #header>
+                                <span class="flex align-items-center gap-2 w-full">
+                                  <span class="font-bold white-space-nowrap">
+                                    {{ material.material }}
+                                  </span>
+                                  <Badge :value="`${parseInt(material.cantidad)} ${material.unidad}`"
+                                    class="ml-auto mr-2 bg-emerald-600" />
+                                </span>
+                              </template>
                               <DescriptionItem :data="material" :optionStatus />
                             </AccordionTab>
                           </Accordion>

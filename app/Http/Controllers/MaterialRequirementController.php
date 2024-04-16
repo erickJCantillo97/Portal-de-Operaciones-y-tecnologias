@@ -21,7 +21,7 @@ class MaterialRequirementController extends Controller
                 'material' => $m['material']['description'],
                 'codigo' => $m['material']['code'],
                 'cantidad' => $m['count'],
-                'unidad' => array_search($m['unit'] + 1, Material::$unidad),
+                'unidad' => array_search($m['unit'], Material::$unidad),
                 'Estado' => array_search($m['status'], Material::$estado),
             ];
         });
