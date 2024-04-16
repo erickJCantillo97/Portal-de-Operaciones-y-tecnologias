@@ -31,11 +31,12 @@ const materials = ref([])
 
 const getMaterial = async () => {
   materialsLoaded.value = true
-  await axios.get(route('materials.index', props.requirement.id)).then((res) => {
-    materials.value = res.data.material
-    materialsLoaded.value = false
-  })
-  return materials.value
+  if (props.requirement.id != null) {
+    await axios.get(route('materials.index', props.requirement.id)).then((res) => {
+      materials.value = res.data.material
+      materialsLoaded.value = false
+    })
+  }
 }
 
 getMaterial()
@@ -63,7 +64,7 @@ watch(() => props.materialsLoaded, (newValue, oldValue) => {
 const optionStatus = {
   'PENDIENTE': {
     icon: 'fa-solid fa-user-clock',
-    color: 'bg-orange-600 text-white'
+    color: 'bg-danger text-white'
   },
   'APROBADO': {
     icon: 'fa-solid fa-check',
@@ -76,7 +77,11 @@ const optionStatus = {
   'DISPONIBLE GECON': {
     icon: '',
     color: 'bg-success text-white'
-  }
+  },
+  'DISPONIBLE SAP INHOUSE': {
+    icon: '',
+    color: 'bg-success text-white'
+  },
 }
 </script>
 <template>
@@ -119,6 +124,11 @@ const optionStatus = {
                       v-if="hasPermission('quote create')" />
                     </Link>
 
+                    <Link :href="'#'" v-if="requirement.estado == 'Oficial'">
+                    <Button v-tooltip.top="'Generar'" size="small" icon="pi pi-file-pdf" raised severity="danger"
+                      v-if="hasPermission('quote delete')" />
+                    </Link>
+
                     <!--Botón Rechazar-->
                     <Link :href="'#'">
                     <Button v-tooltip.top="'Rechazar'" size="small" icon="pi pi-times-circle" raised severity="warning"
@@ -146,6 +156,7 @@ const optionStatus = {
                     <Button v-tooltip.top="'Eliminar'" size="small" icon="pi pi-trash" raised severity="danger"
                       v-if="hasPermission('quote delete')" />
                     </Link>
+
                   </div>
                   <article class="w-full p-2">
                     <div class=" border border-solid rounded-lg p-2 mb-2">
