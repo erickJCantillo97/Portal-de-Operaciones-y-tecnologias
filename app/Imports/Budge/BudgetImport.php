@@ -40,6 +40,7 @@ class BudgetImport implements ToCollection,  WithHeadingRow
         //     $tool->estado_operativo = $row['estado_operativo'];
         //     $tool->save();
         // }
+        // dd($rows[0]);
         Validator::make($rows->toArray(), [
             '*.presupuesto_materiales' => 'nullable|numeric',
             '*.presupuesto_mdo' => 'nullable|numeric',

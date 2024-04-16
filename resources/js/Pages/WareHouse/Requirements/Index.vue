@@ -8,6 +8,8 @@ import CustomDataTable from '@/Components/CustomDataTable.vue';
 import CustomInput from '@/Components/CustomInput.vue';
 import CustomModal from '@/Components/CustomModal.vue';
 import RequirementSlideOver from './RequirementSlideOver.vue'
+import { usePermissions } from '@/composable/permission'
+const { hasRole, hasPermission } = usePermissions()
 
 // const emit = defineEmits(['materialsLoaded'])
 
@@ -82,6 +84,14 @@ const columns = [
     { field: 'grupo', header: 'Sistema/grupo', filter: true, filterOptions: options, filterLabel: 'name', filterValue: 'value', filterType: 'dropdown' },
     { field: 'dibujante', header: 'Dibujante', filter: true },
     { field: 'fecha', header: 'Fecha', filter: true, },
+    {
+        field: 'estado', header: 'Estado', filter: true, type: 'tag', filtertype: 'EQUALS',
+        severitys: [
+            { text: 'Por Aprobar', severity: 'danger', class: 'text-red-800' },
+            { text: 'Aprobado DIPR', severity: 'primary', class: '' },
+            { text: 'Oficial', severity: 'success', class: '' },
+        ]
+    },
 ];
 
 const gestion = (event, data) => {
@@ -107,10 +117,19 @@ const submit = () => {
 }
 
 const showClick = (event, data) => {
-    // console.log(data)
-    requirement.value = data;
-    openSlideOver.value = true
+    if (data !== undefined) {
+        {
+            requirement.value = data;
+            openSlideOver.value = true
+        }
+    }
+    else if (!hasPermission('gestionar materiales')) {
+        // console.log(event);
+        requirement.value = event.data;
+        openSlideOver.value = true
+    }
 }
+
 
 const url = [
     {
@@ -143,7 +162,9 @@ onMounted(() => {
                 </div>
             </div> -->
             <CustomDataTable :data="requirements" title="Requerimiento de Materiales" @selectionAction="gestion"
-                :columnas="columns" :rowsDefault="10" selectionMode="multiple" @showSlide="showClick">
+                :columnas="columns" :rowsDefault="10"
+                :selectionMode="hasPermission('gestionar materiales') ? 'multiple' : 'single'" @rowClic="showClick"
+                @showSlide="showClick">
                 <template #buttonHeader>
                     <Button label="Importar Requerimientos" severity="success" icon="fa-solid fa-plus"
                         @click="addItem" />
