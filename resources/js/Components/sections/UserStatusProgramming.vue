@@ -1,54 +1,54 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { Link, router } from '@inertiajs/vue3'
+import { ref } from 'vue'
 const props = defineProps({
     date: {
-        type: String,
-        default: new Date().toISOString().split('T')[0]
+        type: Date,
+        default: new Date()
     },
     letters: {
         type: Boolean,
         default: false
     }
-
 })
-const statusProgram = ref([])
-const statusNoProgram = ref([])
-const loading = ref(false)
+const status = ref({
+    loading : false,
+    data:{
+        programados : [],
+        noProgramados : []}
+    }
+)
 
 const getPersonalStatus = () => {
-    loading.value = true
+    status.value.loading = true
     axios.post(route('get.personal.status.programming'), { date: props.date }).then((res) => {
-        statusProgram.value = res.data.programados
-        statusNoProgram.value = res.data.noProgramados
-        loading.value = false
+        status.value.data.programados = res.data.programados
+        status.value.data.noProgramados = res.data.noProgramados
+        status.value.loading = false
     })
 }
-
-
 getPersonalStatus()
+
+const statusSelect = defineModel('statusSelect', {
+    required: false,
+})
 
 </script>
 
 <template>
-    <Link :href="route('programming.create')">
-    <div class="w-full justify-center flex space-x-2 p-1 z-10 cursor-pointer">
-
-        <p class="rounded  px-2 text-white" :class="statusNoProgram.length !== 0 ? 'bg-primary' : 'bg-success'"
-            v-if="statusProgram.length !== 0"
-            v-tooltip="{ value: statusProgram?.length > 0 ? `<div><p class='w-full text-center font-bold'>Personal Programado</p>${statusProgram.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
+    <div class="w-full max-w-[30vw] justify-center flex space-x-2 p-1 z-10 cursor-pointer" @click="statusSelect = status">
+        <i v-if="status.loading" class="fa-solid fa-spinner animate-spin" />
+        <p class="rounded w-full text-center px-2 text-white"
+            :class="status.data.programados.length !== 0 ? 'bg-primary' : 'bg-success'" v-if="status.data.programados.length !== 0"
+            v-tooltip="{ value: status.data.programados?.length > 0 ? `<div><p class='w-full text-center font-bold'>Programados</p>${status.data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
             <span v-if="letters">Programados:</span>
-            <i v-if="loading" class="fa-solid fa-spinner animate-spin" />
-            <span v-else>{{ statusProgram.length }}
+            <span>{{ status.data.programados.length }}
             </span>
         </p>
-        <p class="rounded  px-2 text-white bg-danger" v-if="statusNoProgram.length !== 0"
-            v-tooltip="{ value: statusNoProgram?.length > 0 ? `<div><p class='w-full text-center font-bold'>Personal NO Programados</p>${statusNoProgram.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
+        <p class="rounded w-full text-center px-2 text-white bg-danger" v-if="status.data.noProgramados.length !== 0"
+            v-tooltip="{ value: status.data.noProgramados?.length > 0 ? `<div><p class='w-full text-center font-bold'>No programados</p>${status.data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
             <span v-if="letters">No Programados:</span>
-            <i v-if="loading" class="fa-solid fa-spinner animate-spin" />
-            <span v-else>{{ statusNoProgram.length }}
+            <span>{{ status.data.noProgramados.length }}
             </span>
         </p>
     </div>
-    </Link>
 </template>
