@@ -42,6 +42,7 @@ class PersonalScheduleDayJob implements ShouldQueue
     public function handle(): void
     {
         $collisions = DetailScheduleTime::where('fecha', $this->date)->where('idUsuario', $this->personal_id)->orderBy('horaInicio')->get();
+        $employee = searchEmpleados('Num_SAP', $this->personal_id)->firstOrNew();
         //validamos si solamente hay 1 colisión
         if (count($collisions) == 1) {
             $horario = $collisions->first();
@@ -58,28 +59,32 @@ class PersonalScheduleDayJob implements ShouldQueue
                     $this->personal_id, 
                     Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i'), 
                     Carbon::parse($horario->horaInicio)->subMinute()->format('H:i'), 
-                    $this->task->id, $horario->nombre);
+                    $this->task->id, $horario->nombre,
+                    $employee->Costo_Hora);
 
                     programming(Carbon::parse($this->date)->format('Y-m-d'), 
                     $this->personal_id, 
                     Carbon::parse($horario->horaFin)->addMinute()->format('H:i'),
                     Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i'), 
                     $this->task->id, 
-                    $horario->nombre);
+                    $horario->nombre,
+                    $employee->Costo_Hora);
                 }else 
                 if((Carbon::parse($horario->horaInicio)->format('H:i')  == Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i')) && (Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i') >Carbon::parse($horario->horaFin)->format('H:i') )){
                     programming(Carbon::parse($this->date)->format('Y-m-d'), 
                     $this->personal_id, 
                     Carbon::parse($horario->horaFin)->addMinute()->format('H:i'), 
                     Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i'), 
-                    $this->task->id, $horario->nombre);
+                    $this->task->id, $horario->nombre,
+                    $employee->Costo_Hora);
                 }else
                 if((Carbon::parse($horario->horaInicio)->format('H:i')  > Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i')) && (Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i')  == Carbon::parse($horario->horaFin)->format('H:i') )){
                     programming(Carbon::parse($this->date)->format('Y-m-d'), 
                     $this->personal_id, 
                     Carbon::parse($this->task->project->shiftObject->startShift)->format('H:i'), 
                     Carbon::parse($horario->horaInicio)->subMinute()->format('H:i'), 
-                    $this->task->id,$horario->nombre);
+                    $this->task->id,$horario->nombre,
+                    $employee->Costo_Hora);
                 }
             }
         } else {
@@ -91,7 +96,8 @@ class PersonalScheduleDayJob implements ShouldQueue
                     $this->personal_id, 
                     Carbon::parse($startHour)->format('H:i'), 
                     Carbon::parse($collisions[$i]->horaInicio)->subMinute(), 
-                    $this->task->id, $collisions[$i]->nombre);
+                    $this->task->id, $collisions[$i]->nombre,
+                    $employee->Costo_Hora);
                 }
                 $startHour = Carbon::parse($collisions[$i]->horaFin)->addMinute();
                 if ($i == (count($collisions)-1)) {
@@ -100,7 +106,8 @@ class PersonalScheduleDayJob implements ShouldQueue
                         $this->personal_id, 
                         Carbon::parse($collisions[$i]->horaFin)->addMinute()->format('H:i'), 
                         Carbon::parse($this->task->project->shiftObject->endShift)->format('H:i'), 
-                        $this->task->id, $collisions[$i]->nombre);
+                        $this->task->id, $collisions[$i]->nombre,
+                        $employee->Costo_Hora);
                     }
                 }
             }

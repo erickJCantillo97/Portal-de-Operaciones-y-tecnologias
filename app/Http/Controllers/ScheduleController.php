@@ -245,52 +245,57 @@ class ScheduleController extends Controller
         }
         if (isset($request->assignments['added'])) {
             DB::beginTransaction();
+            $now = Carbon::now();
+            $task = VirtualTask::find( $request->assignments['added'][0]['event']);
+            if ($task->endDate < $now->format('Y-m-d')) {
+                return response()->json([
+                    'status' => false,
+                    'mensaje' => 'No se pudo programar al personal seleccionado porque la tarea: ' . $task->name
+                        . ' finalizó.',
+                        'conflict' => []
+                ]);
+            } 
+            if (count(VirtualTask::where('task_id',$request->assignments['added'][0]['event'])->get()) > 0) {
+                    return response()->json([
+                        'status' => false,
+                        'mensaje' => 'No se puede programar en esta actividad porque no es de ultimo nivel', 'conflict' => []
+                    ]);
+            }
             foreach ($request->assignments['added'] as $assignment) {
                 if (!is_numeric($assignment['resource'])) {
                     $idResource = str_replace('CA', '', $assignment['resource']);
                     $labor = Labor::find($idResource);
                 } else {
-                    $labor = searchEmpleados('Num_SAP', $assignment['resource'])->first();
-                    $labor->name = $labor->Nombres_Apellidos;
-                    $task = VirtualTask::find($assignment['event']);
-                    $now = Carbon::now();
-                    if ($task->endDate < $now->format('Y-m-d')) {
-                        return response()->json([
-                            'status' => false,
-                            'mensaje' => 'No se pudo programar a: ' . $labor->Nombres_Apellidos . ' porque la tarea: ' . $task->name
-                                . ' finalizó.'
-                        ]);
-                    } else {
-                        if (count(VirtualTask::where('task_id', $assignment['event'])->get()) > 0) {
-                            return response()->json([
-                                'status' => false,
-                                'mensaje' => 'No se puede programar en esta actividad porque no es de ultimo nivel', 'conflict' => []
-                            ]);
-                        }
-                        foreach ($request->assignments['added'] as $employe) {
-                            do {
-                                if (getWorkingDays($now)) {
-                                    programming(
-                                        $now,
-                                        $employe['resource'],
-                                        $task->project->shiftObject->startShift,
-                                        $task->project->shiftObject->endShift,
-                                        $employe['event'],
-                                        $labor->Nombres_Apellidos
-                                    );
+                    $employee = searchEmpleados('Num_SAP', $assignment['resource'])->first();
+                    do {
+                        if (getWorkingDays($now)) {
+                            $exist = DetailScheduleTime::where('idUsuario',$assignment['resource'])
+                            ->where('fecha',$now)->get();
+                            if(count($exist)>0){ 
+                                foreach($exist as $details){
+                                    disprogramming($details->idTask,$assignment['resource'],$now);
                                 }
-                                $now = $now->addDays(1);
-                            } while ($now->format('Y-m-d') <= $task->endDate);
-                            $now = Carbon::now();
+                            }
+                            programming(
+                                $now,
+                                $assignment['resource'],
+                                $task->project->shiftObject->startShift,
+                                $task->project->shiftObject->endShift,
+                                $assignment['event'],
+                                $employee->Nombres_Apellidos,
+                                $employee->Costo_Hora
+                            );
                         }
-                    }
-                }
-                $assigmmentCreate = Assignment::create([
+                        $now = $now->addDays(1);
+                    } while ($now->format('Y-m-d') <= $task->endDate);
+                    $now = Carbon::now();
+                
+                $assigmmentCreate = Assignment::firstOrCreate([
                     'event' => $assignment['event'],
                     'resource' => $assignment['resource'],
                     'units' => $assignment['units'],
-                    'name' => $labor->name,
-                    'costo_hora' => $labor->Costo_Hora,
+                    'name' => $employee->Nombres_Apellidos,
+                    'costo_hora' => $employee->Costo_Hora,
                 ]);
                 array_push($assgimentRows, [
                     '$PhantomId' => end($assignment),
@@ -298,7 +303,9 @@ class ScheduleController extends Controller
                     'added_dt' => $assigmmentCreate->created_at,
                 ]);
             }
+            }
             DB::commit();
+            
         }
         if (isset($request->assignments['removed'])) {
             DB::beginTransaction();
