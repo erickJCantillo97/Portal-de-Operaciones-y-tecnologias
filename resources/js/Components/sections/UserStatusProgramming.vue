@@ -11,11 +11,12 @@ const props = defineProps({
     }
 })
 const status = ref({
-    loading : false,
-    data:{
-        programados : [],
-        noProgramados : []}
+    loading: false,
+    data: {
+        programados: [],
+        noProgramados: []
     }
+}
 )
 
 const getPersonalStatus = () => {
@@ -35,10 +36,19 @@ const statusSelect = defineModel('statusSelect', {
 </script>
 
 <template>
-    <div class="w-full max-w-[30vw] justify-center flex space-x-2 p-1 z-10 cursor-pointer" @click="statusSelect = status">
+    <div class="w-full max-w-[30vw] justify-center flex space-x-2 p-1 z-10 cursor-pointer"
+    :class="[(date.toDateString()==new Date().toDateString())?'bg-secondary rounded-b-md':'',(statusSelect == status)?'border-success border rounded-md bg-success-light':'']" 
+    @click="!(statusSelect == status) ? statusSelect = status : (statusSelect = {
+        loading: false,
+        data: {
+            programados: [],
+            noProgramados: []
+        }
+    })">
         <i v-if="status.loading" class="fa-solid fa-spinner animate-spin" />
         <p class="rounded w-full text-center px-2 text-white"
-            :class="status.data.programados.length !== 0 ? 'bg-primary' : 'bg-success'" v-if="status.data.programados.length !== 0"
+            :class="status.data.programados.length !== 0 ? 'bg-primary' : 'bg-success'"
+            v-if="status.data.programados.length !== 0"
             v-tooltip="{ value: status.data.programados?.length > 0 ? `<div><p class='w-full text-center font-bold'>Programados</p>${status.data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
             <span v-if="letters">Programados:</span>
             <span>{{ status.data.programados.length }}

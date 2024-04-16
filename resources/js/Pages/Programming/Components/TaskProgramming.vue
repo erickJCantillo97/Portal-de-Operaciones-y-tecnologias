@@ -3,8 +3,13 @@ import { ref } from 'vue';
 import ProgressBar from 'primevue/progressbar';
 import Loading from '@/Components/Loading.vue';
 import Empty from '@/Components/Empty.vue';
+import OverlayPanel from 'primevue/overlaypanel';
+import ListPersonDrag from './ListPersonDrag.vue';
+
 const date = ref(new Date())
 const tasks = ref({})
+
+const overlayPerson=ref()
 
 const props = defineProps({
     day: {
@@ -47,6 +52,20 @@ const itemDrag = defineModel('itemDrag', {
     required: false,
 })
 defineEmits(['drop', 'togglePerson'])
+
+function tooglePerson(event){
+    overlayPerson.value.toggle(event);
+}
+
+const arrayPersonFilter = ref({
+    loading: false,
+    data: {
+        programados: [],
+        noProgramados: []
+    }
+})
+
+
 
 </script>
 <template>
@@ -107,9 +126,9 @@ defineEmits(['drop', 'togglePerson'])
                                     </p>
                                 </div>
                             </div>
-                            <div class="min-w-9 sm:hidden h-full items-center flex justify-end">
+                            <div class="min-w-9  h-full items-center flex justify-end">
                                 <Button text rounded raised class="!w-8" severity="success"
-                                    icon="fa-solid fa-plus"></Button>
+                                    icon="fa-solid fa-plus" @click="tooglePerson($event)" />
                             </div>
                         </div>
                     </div>
@@ -123,4 +142,7 @@ defineEmits(['drop', 'togglePerson'])
     <div v-else class="flex flex-col h-full justify-center">
         <Empty message="Sin actidades"/>
     </div>
+    <OverlayPanel ref="overlayPerson" :pt="{root: 'h-96', content:'h-full overflow-y-auto'}">
+        <ListPersonDrag :arrayPersonFilter="arrayPersonFilter" />
+    </OverlayPanel>
 </template>

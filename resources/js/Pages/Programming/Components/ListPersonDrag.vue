@@ -30,7 +30,7 @@ const itemDrag = defineModel('itemDrag', {
 </script>
 <template>
     <div
-        class="sm:flex hidden border sm:flex-col h-36 w-full sm:w-52 sm:rounded-lg  divide-y space-y-1 sm:h-full p-1 gap-1">
+        class="sm:flex border sm:flex-col h-36 w-full sm:w-52 sm:rounded-lg  divide-y space-y-1 sm:h-full p-1 gap-1">
         <div class="h-8">
             <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
         </div>

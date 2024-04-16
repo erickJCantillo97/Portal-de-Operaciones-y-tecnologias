@@ -1,8 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref } from 'vue';
-import { Container } from "vue-dndrop";
-import Loading from '@/Components/Loading.vue';
 import CustomInput from '@/Components/CustomInput.vue';
 import ModalColisions from './Components/ModalColisions.vue'
 import ListPersonDrag from './Components/ListPersonDrag.vue'
@@ -10,8 +8,6 @@ import axios from 'axios';
 import MultiSelect from 'primevue/multiselect';
 import ButtonGroup from 'primevue/buttongroup';
 import ProgressBar from 'primevue/progressbar';
-import Avatar from 'primevue/avatar';
-import AvatarGroup from 'primevue/avatargroup';
 import OverlayPanel from 'primevue/overlaypanel';
 import NoContentToShow from '@/Components/NoContentToShow.vue';
 import CustomModal from '@/Components/CustomModal.vue';
@@ -92,7 +88,6 @@ function obtenerDiaSemana(dato) {
 //#region variables
 const openConflict = ref(false)
 const date = ref(new Date())
-const projectData = ref([]);
 const conflicts = ref()
 const task = ref([])
 const mode = ref('date')
@@ -102,7 +97,6 @@ const projectsSelected = ref([])
 const overlayPerson = ref()
 const personsEdit = ref()
 const tabActive = ref()
-const statusPersonal = ref({})
 const selectDays = ref([])
 const personDrag = ref({})
 const arrayPersonFilter = ref({
@@ -118,20 +112,15 @@ const arrayPersonFilter = ref({
 //#region Consultas
 
 const getTask = async (option) => {
-    projectData.value = []
     if (option == null) {
         option = mode.value
     }
     if (option == 'week') {
         mode.value = option
-        dates = obtenerFormatoSemana(new Date())
-        projectData.value = projectsSelected.value
-        // getPersonalStatus(diasSemana.value)
+        !(dates.value instanceof Array)??(dates.value = obtenerFormatoSemana(new Date()))
     } else if (option == 'date') {
         mode.value = option
-        dates = new Date();
-        projectData.value = projectsSelected.value
-        // getPersonalStatus([dates.value])
+        !(dates.value instanceof Date)??(dates.value = new Date())
     } else if (mode.value == 'month') {
 
     } else {
@@ -281,6 +270,29 @@ const save = async () => {
 }
 //#endregion
 
+function esMovil() {
+    const dispositivos = [
+        /Android/i,
+        /webOS/i,
+        /iPhone/i,
+        /iPad/i,
+        /iPod/i,
+        /BlackBerry/i,
+        /Windows Phone/i
+    ];
+
+    return dispositivos.some((dispositivo) => {
+        return navigator.userAgent.match(dispositivo);
+    });
+}
+
+if (esMovil()) {
+    console.log("El usuario está en un dispositivo móvil.");
+} else {
+    console.log("El usuario no está en un dispositivo móvil.");
+}
+
+
 </script>
 
 <template>
@@ -332,7 +344,7 @@ const save = async () => {
                             </span>
                         </div>
                         <div class="h-full space-y-2 overflow-y-auto pl-1 ">
-                            <div v-if="projectData.length > 0" v-for="project in projectData"
+                            <div v-if="projectsSelected.length > 0" v-for="project in projectsSelected"
                                 class="grid-cols-10 ml-0.5 divide-x divide-y cursor-default h-full divide-gray-100 border border-indigo-200 rounded-l-md text-lg leading-6 grid">
                                 <div class="flex flex-col items-center px-2">
                                     <div class="flex h-full w-full items-center justify-center flex-col font-bold">
@@ -350,7 +362,7 @@ const save = async () => {
                                 <span class="grid grid-cols-7 col-span-9 overflow-y-auto overflow-x-hidden">
                                     <div v-for="dia, index in diasSemana" class="flex flex-col h-full items-center"
                                         :class="[index > 4 ? 'bg-warning-light' : '', dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
-                                        <TaskProgramming :project="project.id" :day="dia" :key="dates + project.id"
+                                        <TaskProgramming :project="project.id" :day="dia" :key="dates.toDateString() + project.id"
                                             type="week" @drop="onDrop" v-model:itemDrag="personDrag"
                                             @togglePerson="togglePerson" />
                                     </div>
@@ -381,7 +393,7 @@ const save = async () => {
                             Programacion del dia {{ dates.toLocaleDateString() }}
                         </p>
                         <div class="h-full sm:p-1 overflow-hidden sm:overflow-y-auto space-y-1">
-                            <div v-if="projectData.length > 0" v-for="project in projectData"
+                            <div v-if="projectsSelected.length > 0" v-for="project in projectsSelected"
                                 class="border h-full w-full flex flex-col sm:flex-row sm:flex sm:p-1 divide-y-2 sm:divide-y-0 rounded-md hover:shadow-md ">
                                 <div
                                     class="sm:w-80 h-16 sm:h-full sm:max-h-full sm:shadow-none flex items-center flex-col justify-center">
@@ -401,7 +413,7 @@ const save = async () => {
                                     </div>
                                 </div>
                                 <div class="h-full sm:h-full p-1 w-full overflow-y-auto">
-                                    <TaskProgramming :project="project.id" :day="dates" :key="dates + project.id"
+                                    <TaskProgramming :project="project.id" :day="dates" :key="dates.toDateString() + project.id"
                                         @drop="onDrop" v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
                                 </div>
                             </div>
@@ -418,7 +430,9 @@ const save = async () => {
                 </div>
             </div>
             <!--#region LISTA PERSONAL-->
-            <ListPersonDrag v-model:itemDrag="personDrag" :arrayPersonFilter="arrayPersonFilter" />
+            <span v-if="!esMovil()">
+                <ListPersonDrag  v-model:itemDrag="personDrag" :arrayPersonFilter="arrayPersonFilter" />
+            </span>
         </div>
     </AppLayout>
 
