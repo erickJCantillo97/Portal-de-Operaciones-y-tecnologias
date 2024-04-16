@@ -50,9 +50,9 @@ class Requirement extends Model implements Auditable
     public function getEstadoAttribute()
     {
         $estado = 'Por Aprobar';
-        
+
         if ($this->approved_dipr_date != null) {
-            $estado = 'Aprobado DIPR';
+            $estado = 'Aprobado DEIPR';
         }
         if ($this->oficial_date != null) {
             $estado = 'Oficial';
