@@ -1,6 +1,7 @@
 <?php
 
 use App\Ldap\User;
+use App\Models\Gantt\Assignment;
 use App\Models\Labor;
 use App\Models\Personal\Employee;
 use App\Models\Personal\Personal;
@@ -176,7 +177,7 @@ function getWorkingDays(string $date, int $Workingdays = 5)
     }
 }
 
-function programming($date, $user, $star, $end, $task, $name)
+function programming($date, $user, $star, $end, $task, $name, $constoHora)
 {
 
     $schedule = Schedule::firstOrNew([
@@ -191,4 +192,19 @@ function programming($date, $user, $star, $end, $task, $name)
         'hora_inicio' => $star,
         'hora_fin' => $end,
     ]);
+    Assignment::firstOrCreate([
+        'event' => $task,
+        'resource' => $user,
+        'units' => 100,
+        'name' => $name,
+        'costo_hora' => $constoHora,
+    ]);
+}
+
+function disprogramming($task, $user, $date){
+    Assignment::where('resource',$user)->where('event','=',$task)->delete();
+    $deleteIds = Schedule::where('employee_id', $user)
+    ->where('fecha',$date)->pluck('id')->toArray();
+    ScheduleTime::whereIn('schedule_id', $deleteIds)->delete();
+    Schedule::where('employee_id', $user)->where('fecha',$date)->delete();
 }

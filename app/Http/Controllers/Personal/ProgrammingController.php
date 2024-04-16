@@ -843,4 +843,62 @@ class ProgrammingController extends Controller
                 }),
         );
     }
+
+    public function moveEmployee(Request $request){
+        // $request->fecha = '2024-04-19';
+        // $request->task = 4613;
+        // $request->schedule = '1427';
+        try {
+        DB::beginTransaction();
+            $schedule = Schedule::where('id',$request->schedule)->first();
+            $newTask = VirtualTask::find($request->task);
+            if($newTask->endDate < Carbon::now()->format('Y-m-d')){
+                return response()->json([
+                    'status' => false,
+                    'mensaje' => 'No se puede mover a:'.$schedule->name.' porque la tarea ya finalizó.'
+                   // 'task' => $this->getSchedule($schedule->fecha, $schedule->task_id)
+                ]);
+            }
+            $newSchedule = Schedule::firstOrCreate([
+                'employee_id' => $schedule->employee_id,
+                'name' => $schedule->name,
+                'task_id' => $request->task,
+                'fecha' => $schedule->fecha
+            ]);
+            $scheduleTimes = ScheduleTime::where('schedule_id',$request->schedule)->get();
+            foreach($scheduleTimes as $scheduleTime){
+                ScheduleTime::firstOrCreate([
+                    'schedule_id' => $newSchedule->id,
+                    'hora_inicio' => $scheduleTime->hora_inicio,
+                    'hora_fin' => $scheduleTime->hora_fin,
+                ]);
+            }
+            Assignment::where('resource',$schedule->employee_id)->where('event','=',$schedule->task_id)->delete();
+            ScheduleTime::where('schedule_id',$schedule->id)->delete();
+            $schedule->delete();
+            DB::commit();
+            return response()->json([
+                'status' => true,
+                'mensaje' => 'Se ha movido de tarea a: '.$schedule->name.'.'
+               // 'task' => $this->getSchedule($schedule->fecha, $schedule->task_id)
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => false,'mensaje' => $e->getMessage()]);
+        }
+    }
+
+    public function copyPaste (Request $request){
+        try {
+            DB::beginTransaction();
+            
+                return response()->json([
+                    'status' => true,
+                    'mensaje' => 'Mensaje desde el controlador'
+                ]);
+            } catch (Exception $e) {
+                DB::rollBack();
+                return response()->json(['status' => false,'mensaje' => $e->getMessage()]);
+            }
+    }
 }

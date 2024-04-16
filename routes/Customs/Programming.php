@@ -28,6 +28,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::post('actividadesDeultimonivelPorProyectos/{project}', [ProgrammingController::class, 'endNivelActivitiesByProject'])->name('actividadesDeultimonivelPorProyectos');
 
+    Route::post('/programming/move', [ProgrammingController::class, 'moveEmployee'])->name('programming.move');
+
+    Route::post('/programming/copy', [ProgrammingController::class, 'copyPaste'])->name('programming.copy');
 
     Route::get('getScheduleTaskDate/{fecha}/{task}', [ProgrammingController::class, 'getSchedule'])->name('get.task.schedule.date');
 
