@@ -123,12 +123,12 @@
                 xl:h-[88vh]  xl:border-blue-500
                 2xl:h-[90vh]  2xl:border-yellow-500
              -->
-            <div class="h-[87vh] 
-                sm:h-[83vh]  
-                md:h-[85vh]  
-                lg:h-[87vh]  
-                xl:h-[88vh] 
-                2xl:h-[90vh]  
+            <div class="h-[85vh]
+                sm:h-[83vh]
+                md:h-[85vh]
+                lg:h-[87vh]
+                xl:h-[88vh]
+                2xl:h-[90vh]
                 items-center flex p-1 gap-1 border-gray-200 bg-white rounded-lg shadow-2xl g-white sm:ml-24 sm:mr-1">
                 <slot />
             </div>

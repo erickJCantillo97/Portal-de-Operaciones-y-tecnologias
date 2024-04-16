@@ -26,17 +26,19 @@ const form = useForm({
 });
 
 const estados = [
-    { value: "0", text: "Pendiente" },
+    { value: "0", text: "PENDIENTE" },
     { value: "1", text: "Disponible GECON" },
-    { value: "2", text: "Disponible SAP" },
-    { value: "6", text: "Disponible INHOUSE" },
-    { value: "3", text: "Retal" },
+    { value: "2", text: "DISPONIBLE SAP" },
+    { value: "3", text: "DISPONIBLE SAP CONSIGNACION" },
+    { value: "4", text: "RETAL" },
+    { value: "6", text: "DISPONIBLE SAP INHOUSE" },
 ];
 
 const unidades = [
-    { value: "0", text: "UNIDAD" },
-    { value: "1", text: "METROS" },
-    { value: "2", text: "PIES" },
+    { value: "1", text: "UNIDAD" },
+    { value: "2", text: "METROS" },
+    { value: "3", text: "PIES" },
+    { value: "4", text: "METROS" },
 ];
 
 onMounted(() => {
@@ -93,10 +95,9 @@ const search = ref();
 
 
 const submit = () => {
-    router.post(route('store.requirement.oficial'), form, {
+    form.post(route('store.requirement.oficial'), { materiales: form.materiales }, {
         preserveScroll: true,
         onSuccess: (res) => {
-            open.value = false
             toast.add({ severity: 'success', group: 'customToast', text: 'Atividad Eliminada', life: 2000 });
 
         },
@@ -165,7 +166,9 @@ const url = [
                     <div class="flex space-x-4">
                         <div class="w-1/6">
                             <span for="code text-sm ">Codigo de material</span>
-                            <CustomInput v-model:input="material.codigo_material"></CustomInput>
+                            <CustomInput v-model:input="material.codigo_material"
+                                :invalid="form.errors[`materiales.${index}.codigo_material`]"
+                                error-message="Este campo es Obligatorio" </CustomInput>
                         </div>
                         <div class="w-1/6">
                             <span for="code text-sm ">Cantidad</span>
@@ -194,12 +197,14 @@ const url = [
             </div>
             <div class="justify-between w-full flex mt-2 px-4">
                 <Link :href="route('requirements.index')">
-                <Button icon="fa-solid fa-arrow-left" raised label="Cancelar" severity="danger"></Button>
+                <Button icon="fa-solid fa-arrow-left" raised label="Cancelar" :loading="form.processing"
+                    severity="danger"></Button>
                 </Link>
                 <div class="flex space-x-2">
-                    <Button label="Guardar" icon="fa-solid fa-floppy-disk" raised severity="primary"></Button>
-                    <Button label="Enviar a Oficiales" @click="submit" icon="fa-solid fa-paper-plane" raised
-                        severity="success"></Button>
+                    <Button label="Guardar" icon="fa-solid fa-floppy-disk" raised :loading="form.processing"
+                        severity="primary"></Button>
+                    <Button label="Enviar a Oficiales" @click="submit" :loading="form.processing"
+                        icon="fa-solid fa-paper-plane" raised severity="success"></Button>
                 </div>
             </div>
         </div>

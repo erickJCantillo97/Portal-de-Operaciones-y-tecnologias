@@ -1,14 +1,15 @@
 <script setup>
+import { ref, onMounted } from 'vue';
+import { router } from '@inertiajs/vue3';
+import { useToast } from "primevue/usetoast";
+import AppLayout from '@/Layouts/AppLayout.vue';
+import Button from 'primevue/button';
+import CustomDataTable from '@/Components/CustomDataTable.vue';
 import CustomInput from '@/Components/CustomInput.vue';
 import CustomModal from '@/Components/CustomModal.vue';
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { router } from '@inertiajs/vue3';
-import Button from 'primevue/button';
-import { ref, onMounted } from 'vue';
-import { useToast } from "primevue/usetoast";
-import CustomDataTable from '@/Components/CustomDataTable.vue';
 import RequirementSlideOver from './RequirementSlideOver.vue'
 
+// const emit = defineEmits(['materialsLoaded'])
 
 const toast = useToast()
 
@@ -20,20 +21,15 @@ const props = defineProps({
 
 const open = ref(false)
 const openSlideOver = ref(false)
+const materialsLoaded = ref(false)
 const requirement = ref({})
 
 const formData = ref({
     requirement: {}
 })
 
-
 const materials = ref([])
 
-const getMaterial = (requirement) => {
-    axios.get(route('materials.index', requirement)).then((res) => {
-        materials.value = res.data.material
-    })
-}
 const addItem = () => {
     // toast.add({ severity: 'success', group: 'customToast', text: 'Atividad Eliminada', life: 2000 });
     formData.value.requirement = {}
@@ -114,7 +110,6 @@ const showClick = (event, data) => {
     // console.log(data)
     requirement.value = data;
     openSlideOver.value = true
-    getMaterial(data.id)
 }
 
 const url = [
@@ -126,10 +121,8 @@ const url = [
 ]
 
 onMounted(() => {
-
     if (props.requirement_id) {
         requirement.value = props.requirements.filter(requirement => requirement.id == props.requirement_id)[0]
-
         openSlideOver.value = true
         getMaterial(props.requirement_id)
     }
