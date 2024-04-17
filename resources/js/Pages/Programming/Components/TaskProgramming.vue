@@ -54,7 +54,7 @@ const option = ref()
 const itemDrag = defineModel('itemDrag', {
     required: false,
 })
-defineEmits(['drop', 'togglePerson', 'addPerson'])
+defineEmits(['drop', 'togglePerson', 'addPerson','menu'])
 
 
 
@@ -63,8 +63,8 @@ defineEmits(['drop', 'togglePerson', 'addPerson'])
     <div v-if="tasks.loading" class="flex justify-center h-full items-center">
         <Loading />
     </div>
-    <div v-else-if="tasks.data.length > 0" v-for="task in tasks.data"
-        @drop="!movil ? $emit('drop', task, day, option) : null; option = null" @dragover.prevent @dragenter.prevent
+    <div v-else-if="tasks.data.length > 0" v-for="task in tasks.data" @contextmenu="$emit('menu', $event, task, day)"
+        @drop="!movil ? $emit('drop', task, day) : null; option = null" @dragover.prevent @dragenter.prevent
         class="sm:h-full w-full sm:max-h-44 p-0.5" :class="[type == 'day' ? 'sm:w-1/3 float-left' : '']"
         :key="task.name + date.toDateString()">
         <div class="flex border pb-1 rounded-md border-primary hover:bg-primary-light flex-col justify-between h-full"
@@ -87,12 +87,14 @@ defineEmits(['drop', 'togglePerson', 'addPerson'])
                                 {{ task.endDate }}
                             </p>
                         </div>
-                        <p v-if="(new Date(task.endDate) < date) && movil"
-                            class="border truncate px-2 rounded-md bg-danger text-white"> {{ ((new Date() - new
+                        <div>
+                            <p v-if="(new Date(task.endDate) < date) && type === 'day'"
+                                class="border truncate px-2 rounded-md bg-danger text-white"> {{ ((new Date() - new
         Date(task.endDate)) / 86400000).toFixed(0) + ' dias de retraso' }}</p>
-                        <i v-else-if="(new Date(task.endDate) < date)" v-tooltip="((new Date() - new
+                            <i v-else-if="(new Date(task.endDate) < date)" v-tooltip="((new Date() - new
         Date(task.endDate)) / 86400000).toFixed(0) + ' dias de retraso'"
-                            class="fa-solid fa-circle-exclamation text-danger animate-pulse"></i>
+                                class="fa-solid fa-circle-exclamation text-danger animate-pulse"></i>
+                        </div>
                         <div
                             class="flex cursor-default bg-success-light px-1 space-x-1 justify-center items-center rounded-md">
                             <p v-tooltip.left="'Hora inicio'" class=" text-center">
@@ -113,7 +115,7 @@ defineEmits(['drop', 'togglePerson', 'addPerson'])
                                 <span v-if="task.employees?.length > 0" v-for="person in task.employees">
                                     <img v-tooltip.top="{ value: person.Nombres_Apellidos, pt: { text: 'text-center' } }"
                                         @click="$emit('togglePerson', $event, person, task, day)" :dragable="true"
-                                        @dragstart="itemDrag = person; itemDrag.task = task; option = 'move'"
+                                        @dragstart="itemDrag = person; itemDrag.task = task; itemDrag.option = 'move'"
                                         :src="person.photo ?? '/images/person-default.png'"
                                         class="rounded-full min-h-10 h-10 hover:ring-1 hover:ring-primary w-10 min-w-10 object-cover ring-primary-light shadow-md" />
                                 </span>

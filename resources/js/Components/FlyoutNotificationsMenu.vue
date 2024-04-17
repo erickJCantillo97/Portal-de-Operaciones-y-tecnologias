@@ -86,7 +86,7 @@ const toggle = (event) => {
 
 
   <div class="" v-if="type == 'buttonBadge'">
-    <Button v-tooltip.bottom="title" :label :severity :badge :badgeSeverity :outlined @click="toggle" outlined :pt="{
+    <Button v-tooltip.bottom="title" :label :severity :badge="String(badge)" :badgeSeverity :outlined @click="toggle" outlined :pt="{
     root: 'px-1',
   }">
       <template #icon>

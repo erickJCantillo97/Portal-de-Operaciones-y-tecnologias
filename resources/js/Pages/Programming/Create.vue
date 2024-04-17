@@ -23,6 +23,7 @@ import Knob from 'primevue/knob';
 import Dropdown from 'primevue/dropdown';
 import Listbox from 'primevue/listbox';
 import UserStatusProgramming from '@/Components/sections/UserStatusProgramming.vue';
+import ContextMenu from 'primevue/contextmenu';
 const toast = useToast();
 // const { hasRole, hasPermission } = usePermissions()
 
@@ -126,6 +127,44 @@ const arrayPersonFilter = ref({
     }
 })
 const personsSelect = ref()
+const menu = ref();
+const items = ref([
+    {
+        label: 'Copiar',
+        icon: 'fa-regular fa-copy',
+        command: () => {
+            console.log('Hace algo');
+        }
+    },
+    {
+        label: 'Copiar al dia siguiente', 
+        icon: 'fa-regular fa-copy', 
+        command: () => {
+            console.log('Hace algo');
+        }
+    },
+    {
+        label: 'Cortar', 
+        icon: 'fa-solid fa-scissors', 
+        command: () => {
+            console.log('Hace algo');
+        }
+    },
+    {
+        label: 'Pegar', 
+        icon: 'fa-regular fa-paste', 
+        command: () => {
+            console.log('Hace algo');
+        }
+    },
+    {
+        label: 'Quitar todos', 
+        icon: 'fa-solid fa-trash', 
+        command: () => {
+            console.log('Hace algo');
+        }
+    },
+]);
 
 //#endregion
 
@@ -160,26 +199,26 @@ if (esMovil()) {
 
 //#region drag
 
-async function onDrop(task, fecha, option) {
+async function onDrop(task, fecha) {
     if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
         task.loading = true
-        if (option == 'move') {
-            personDrag.value.task.loading=true
+        // console.log(personDrag.value)
+        if (personDrag.value.option == 'move') {
+            personDrag.value.task.loading = true
             await axios.post(route('programming.move'), { task: task.id, date: fecha, schedule: personDrag.value.times[0].idSchedule }).then((res) => {
                 // console.log(res.data)
                 if (res.data.status == false) {
                     task.loading = false
-                    task.employees = res.data.task
+                    personDrag.value.task.loading = false
                     toast.add({ severity: 'error', group: "customToast", text: res.data.mensaje, life: 2000 })
                 } else {
                     personDrag.value.task.employees = personDrag.value.task.employees.filter(person => person.NumSAP !== personDrag.value.NumSAP);
                     task.employees = res.data.task
                     task.loading = false
-                    personDrag.value.task.loading=false
-                    toast.add({ severity: 'success', group: "customToast", text:res.data.mensaje, life: 2000 })
+                    personDrag.value.task.loading = false
+                    toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
                 }
             })
-
             task.loading = false
         } else {
             await axios.post(route('programming.store'), { task_id: task.id, employee_id: personDrag.value.Num_SAP, name: personDrag.value.Nombres_Apellidos, fecha }).then((res) => {
@@ -315,11 +354,16 @@ const save = async () => {
 //#endregion
 
 
+const onImageRightClick = (event, task, day) => {
+    console.log(task)
+    console.log(day)
+    menu.value.show(event);
+};
 
 </script>
 
 <template>
-    <AppLayout>T
+    <AppLayout>
         <div class="h-full w-full flex flex-col sm:flex-row ">
             <div class="sm:w-full h-full pt-1 px-1 flex flex-col">
                 <div class="sm:flex gap-1 sm:justify-between h-20 sm:h-10 items-center sm:pr-1">
@@ -395,7 +439,6 @@ const save = async () => {
                                 <NoContentToShow subject="Seleccione uno o mas proyectos" />
                             </div>
                         </div>
-
                         <div class="grid-cols-10 h-8 text-sm grid pr-3 items-center pl-2 border-t shadow-lg mt-1 ">
                             <div>
                                 <p class="w-full h-full truncate font-bold">
@@ -437,8 +480,9 @@ const save = async () => {
                                 </div>
                                 <div class="h-full sm:h-full p-1 w-full overflow-y-auto">
                                     <TaskProgramming type="day" @addPerson="addPerson" :movil="esMovil()"
-                                        :project="project.id" :day="dates" :key="dates.toDateString() + project.id"
-                                        @drop="onDrop" v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
+                                        @menu="onImageRightClick" :project="project.id" :day="dates"
+                                        :key="dates.toDateString() + project.id" @drop="onDrop"
+                                        v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
                                 </div>
                             </div>
                             <div v-else>
@@ -598,4 +642,5 @@ const save = async () => {
     </ModalColisions>
 
     <!--#endregion-->
+    <ContextMenu ref="menu" :model="items" />
 </template>
