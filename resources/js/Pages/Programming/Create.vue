@@ -164,8 +164,21 @@ async function onDrop(task, fecha, option) {
     if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
         task.loading = true
         if (option == 'move') {
-            console.log(personDrag.value)
-
+            personDrag.value.task.loading=true
+            await axios.post(route('programming.move'), { task: task.id, date: fecha, schedule: personDrag.value.times[0].idSchedule }).then((res) => {
+                // console.log(res.data)
+                if (res.data.status == false) {
+                    task.loading = false
+                    task.employees = res.data.task
+                    toast.add({ severity: 'error', group: "customToast", text: res.data.mensaje, life: 2000 })
+                } else {
+                    personDrag.value.task.employees = personDrag.value.task.employees.filter(person => person.NumSAP !== personDrag.value.NumSAP);
+                    task.employees = res.data.task
+                    task.loading = false
+                    personDrag.value.task.loading=false
+                    toast.add({ severity: 'success', group: "customToast", text:res.data.mensaje, life: 2000 })
+                }
+            })
 
             task.loading = false
         } else {
@@ -226,7 +239,6 @@ const modhours = ref(false)
 const dateSelect = ref()
 
 function addPerson(event) {
-    // console.log(event)
     overlayAddPerson.value.toggle(event)
 }
 
@@ -307,15 +319,15 @@ const save = async () => {
 </script>
 
 <template>
-    <AppLayout>
+    <AppLayout>T
         <div class="h-full w-full flex flex-col sm:flex-row ">
             <div class="sm:w-full h-full pt-1 px-1 flex flex-col">
                 <div class="sm:flex gap-1 sm:justify-between h-20 sm:h-10 items-center sm:pr-1">
-                    <div class="flex w-full justify-between sm:w-fit space-x-4">
-                        <p class="text-xl font-bold text-primary h-full items-center flex">
+                    <div class="flex w-full justify-between items-center sm:w-fit space-x-4">
+                        <p class="text-xl font-bold text-primary truncate">
                             Programación de actividades
                         </p>
-                        <p class="border px-2 bg-primary rounded-lg text-white flex items-center">
+                        <p class="border h-min px-2 bg-primary rounded-lg text-white flex items-center">
                             {{ $page.props.auth.user.oficina }}
                         </p>
                     </div>
@@ -342,9 +354,9 @@ const save = async () => {
                                 <p class="flex w-full justify-center items-baseline font-bold">Proyecto</p>
                             </div>
                             <span class="grid grid-cols-7 col-span-9">
-                                <div v-for="dia, index in diasSemana" class="flex flex-col items-center"
+                                <div v-for="dia, index in diasSemana" class="flex w-full flex-col items-center"
                                     :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary rounded-t-md font-bold' : '']">
-                                    <p class="flex capitalize border-b w-full justify-center items-baseline">{{
+                                    <p class="capitalize border-b w-full truncate text-center">{{
                                 dia.toLocaleDateString('es-CO', {
                                     weekday: 'long', year: 'numeric', month: 'numeric', day:
                                         'numeric'
@@ -384,21 +396,22 @@ const save = async () => {
                             </div>
                         </div>
 
-                        <div class="grid-cols-10 h-8 text-sm grid pr-3 pl-2 border-t shadow-lg mt-1 ">
+                        <div class="grid-cols-10 h-8 text-sm grid pr-3 items-center pl-2 border-t shadow-lg mt-1 ">
                             <div>
-                                <p class="w-full h-full flex items-center justify-center font-bold">
+                                <p class="w-full h-full truncate font-bold">
                                     Total personas
                                 </p>
                             </div>
-                            <span class="col-span-9 grid grid-cols-7 z-10">
-                                <div v-for="dia, index in diasSemana">
+                            <div class="col-span-9 grid grid-cols-7 z-10">
+                                <span v-for="dia in diasSemana">
                                     <UserStatusProgramming :date="dia" :key="dia"
                                         v-model:statusSelect="arrayPersonFilter" />
-                                </div>
-                            </span>
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <div v-if="mode == 'date'" class="h-full border rounded-md flex flex-col justify-between">
+                    <div v-if="mode == 'date'"
+                        class="h-full border overflow-hidden rounded-md flex flex-col justify-between">
                         <p class="sm:block hidden w-full h-6 text-center bg-primary-light font-bold">
                             Programacion del dia {{ dates.toLocaleDateString() }}
                         </p>
@@ -423,16 +436,16 @@ const save = async () => {
                                     </div>
                                 </div>
                                 <div class="h-full sm:h-full p-1 w-full overflow-y-auto">
-                                    <TaskProgramming @addPerson="addPerson" :movil="esMovil()" :project="project.id"
-                                        :day="dates" :key="dates.toDateString() + project.id" @drop="onDrop"
-                                        v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
+                                    <TaskProgramming type="day" @addPerson="addPerson" :movil="esMovil()"
+                                        :project="project.id" :day="dates" :key="dates.toDateString() + project.id"
+                                        @drop="onDrop" v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
                                 </div>
                             </div>
                             <div v-else>
                                 <NoContentToShow subject="Seleccione uno o mas proyectos" />
                             </div>
                         </div>
-                        <div class="w-full flex justify-center z-10" oncontextmenu="return false">
+                        <div class="w-full flex justify-center h-min z-10" oncontextmenu="return false">
                             <UserStatusProgramming :letters="true" :date="dates" :key="dates.toISOString()"
                                 v-model:statusSelect="arrayPersonFilter" />
                         </div>
@@ -442,7 +455,8 @@ const save = async () => {
             </div>
             <!--#region LISTA PERSONAL-->
             <span v-if="!esMovil()">
-                <ListPersonDrag v-model:itemDrag="personDrag" :arrayPersonFilter="arrayPersonFilter" />
+                <ListPersonDrag class="sm:block hidden" v-model:itemDrag="personDrag"
+                    :arrayPersonFilter="arrayPersonFilter" />
             </span>
         </div>
     </AppLayout>
@@ -477,9 +491,9 @@ const save = async () => {
 
     <!--#region MODALES -->
 
-    <OverlayPanel ref="overlayAddPerson" :pt="{root:'w-96'}">
-        <Listbox v-model="personsSelect" multiple filter :options="personal" optionLabel="Nombres_Apellidos" class="w-full"
-            listStyle="max-height:250px">
+    <OverlayPanel ref="overlayAddPerson" :pt="{ root: 'w-96' }">
+        <Listbox v-model="personsSelect" multiple filter :options="personal" optionLabel="Nombres_Apellidos"
+            class="w-full" listStyle="max-height:250px">
             <template #option="slotProps">
                 <div class="flex">
                     <div>{{ slotProps.option.Nombres_Apellidos }}</div>
@@ -488,7 +502,7 @@ const save = async () => {
         </Listbox>
         <div class="flex w-full pt-2 px-4 space-x-2 justify-center">
             <!-- <Button label="Cancelar" severity="danger"/> -->
-            <Button label="Programar" severity="success"/>
+            <Button label="Programar" severity="success" />
         </div>
     </OverlayPanel>
 

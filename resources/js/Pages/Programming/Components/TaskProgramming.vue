@@ -56,14 +56,6 @@ const itemDrag = defineModel('itemDrag', {
 })
 defineEmits(['drop', 'togglePerson', 'addPerson'])
 
-const arrayPersonFilter = ref({
-    loading: false,
-    data: {
-        programados: [],
-        noProgramados: []
-    }
-})
-
 
 
 </script>
@@ -72,28 +64,35 @@ const arrayPersonFilter = ref({
         <Loading />
     </div>
     <div v-else-if="tasks.data.length > 0" v-for="task in tasks.data"
-        @drop="!movil?$emit('drop', task, day, option):null; option = null" @dragover.prevent @dragenter.prevent
+        @drop="!movil ? $emit('drop', task, day, option) : null; option = null" @dragover.prevent @dragenter.prevent
         class="sm:h-full w-full sm:max-h-44 p-0.5" :class="[type == 'day' ? 'sm:w-1/3 float-left' : '']"
         :key="task.name + date.toDateString()">
-        <div class="flex border pb-1 rounded-md border-primary hover:bg-primary-light flex-col justify-between h-full">
+        <div class="flex border pb-1 rounded-md border-primary hover:bg-primary-light flex-col justify-between h-full"
+            :class="type === 'day' ? 'text-sm' : 'text-xs'">
             <div class="h-min w-full">
                 <p v-tooltip="task.name"
-                    class="border-b font-bold trun border-primary h-10 flex items-center justify-center text-xs px-0.5 w-full text-center">
+                    class="border-b font-bold trun border-primary truncate px-0.5 w-full text-center">
                     {{ task.name }}
                 </p>
             </div>
             <div class="h-full">
                 <div :key="task.name + new Date().toISOString()" class="flex flex-col justify-between h-full py-1">
-                    <p v-tooltip="task.task" class="text-xs px-1 text-center h-min w-full truncate">
+                    <p v-tooltip="task.task" class="px-1 text-center h-min w-full truncate">
                         {{ task.task }}
                     </p>
-                    <div class="flex text-xs h-min justify-between px-1 items-center">
-                        <div class="flex h-min cursor-default space-x-1  justify-center">
-                            <p v-tooltip.left="'Fecha Fin'" class="text-xs text-center"
-                                :class="new Date(task.endDate) < date ? 'bg-red-500 rounded-md px-1' : ''">
+                    <div class="flex justify-between items-center px-1">
+                        <div class="flex h-min cursor-default space-x-1 justify-center">
+                            <p v-tooltip.left="'Fecha Fin'" class="text-center w-full max-w-20"
+                                :class="new Date(task.endDate) < date ? 'bg-danger rounded-md px-1 text-white' : ''">
                                 {{ task.endDate }}
                             </p>
                         </div>
+                        <p v-if="(new Date(task.endDate) < date) && movil"
+                            class="border truncate px-2 rounded-md bg-danger text-white"> {{ ((new Date() - new
+        Date(task.endDate)) / 86400000).toFixed(0) + ' dias de retraso' }}</p>
+                        <i v-else-if="(new Date(task.endDate) < date)" v-tooltip="((new Date() - new
+        Date(task.endDate)) / 86400000).toFixed(0) + ' dias de retraso'"
+                            class="fa-solid fa-circle-exclamation text-danger animate-pulse"></i>
                         <div
                             class="flex cursor-default bg-success-light px-1 space-x-1 justify-center items-center rounded-md">
                             <p v-tooltip.left="'Hora inicio'" class=" text-center">
@@ -114,21 +113,20 @@ const arrayPersonFilter = ref({
                                 <span v-if="task.employees?.length > 0" v-for="person in task.employees">
                                     <img v-tooltip.top="{ value: person.Nombres_Apellidos, pt: { text: 'text-center' } }"
                                         @click="$emit('togglePerson', $event, person, task, day)" :dragable="true"
-                                        @dragstart="itemDrag = person; option = 'move'"
+                                        @dragstart="itemDrag = person; itemDrag.task = task; option = 'move'"
                                         :src="person.photo ?? '/images/person-default.png'"
                                         class="rounded-full min-h-10 h-10 hover:ring-1 hover:ring-primary w-10 min-w-10 object-cover ring-primary-light shadow-md" />
                                 </span>
                                 <div v-if="(task.employees?.length == 0) && !task.loading"
-                                    class="flex items-center p-1">
-                                    <p
-                                        class="text-center text-danger rounded-md border-dashed bg-danger-light animate-pulse">
+                                    class="flex items-center px-6 text-danger w-full h-full border rounded-md font-bold border-dashed bg-danger-light animate-pulse">
+                                    <p class="text-center ">
                                         Sin personal asignado
                                     </p>
                                 </div>
                             </div>
                             <div v-if="movil" class="min-w-9  h-full items-center flex justify-end">
                                 <Button text rounded raised class="!w-8" severity="success" icon="fa-solid fa-plus"
-                                    @click="movil?$emit('addPerson',$event,task,day):null" />
+                                    @click="movil ? $emit('addPerson', $event, task, day) : null" />
                             </div>
                         </div>
                     </div>
@@ -140,6 +138,6 @@ const arrayPersonFilter = ref({
         </div>
     </div>
     <div v-else class="flex flex-col h-full justify-center">
-        <Empty message="Sin actidades" />
+        <Empty message="Sin actividades" />
     </div>
 </template>
