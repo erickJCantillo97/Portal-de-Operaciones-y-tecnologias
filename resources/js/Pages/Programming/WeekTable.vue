@@ -14,10 +14,6 @@ const props = defineProps({
 const daysOfWeek = ref(
   [
     'Lunes',
-    'Martes',
-    'Miercoles',
-    'Jueves',
-    'Viernes',
   ])
 
 const dates = ref([]);
@@ -114,7 +110,7 @@ const getTaskByDivision = async () => {
 //#region OverlayPanel
 const op = ref()
 const task = ref({})
-const personals = ref()
+const personals = ref([])
 const toggle = (event, data, fecha) => {
   task.value = data
   axios.get(route('get.schedule.task.date', {
@@ -202,7 +198,7 @@ const toggle = (event, data, fecha) => {
       }" />
       </div>
 
-      <div v-if="personals.length > 0" class="space-y-2 rounded-lg border border-gray-300 p-2 text-center">
+      <div class="space-y-2 rounded-lg border border-gray-300 p-2 text-center">
         <div class="bg-blue-500 p-1 rounded-lg">
           <span class="text-xs text-white uppercase">
             Asignaciones

@@ -119,28 +119,27 @@ const optionStatus = {
                   </div>
                   <div class="flex gap-2 items-center justify-center p-2">
                     <!--Botón Aprobar-->
-                    <Link :href="'#'">
-                    <Button v-tooltip.top="'Aprobar'" size="small" icon="pi pi-check-circle" severity="success"
-                      v-if="hasPermission('quote create')" />
+                    <Link :href="'#'" v-if="requirement.estado == 'Aprobado Gerencia'">
+                    <Button v-tooltip.top="'Imprimir'" size="small" icon="pi pi-file-pdf" raised severity="danger" />
                     </Link>
 
-                    <Link :href="'#'" v-if="requirement.estado == 'Oficial'">
-                    <Button v-tooltip.top="'Generar'" size="small" icon="pi pi-file-pdf" raised severity="danger"
-                      v-if="hasPermission('quote delete')" />
+                    <Link :href="'#'">
+                    <Button v-tooltip.top="'Aprobar'" size="small" icon="pi pi-check-circle" severity="success"
+                      v-if="hasPermission('aprobar requerimientos') && requirement.estado != 'Aprobado Gerencia'" />
                     </Link>
 
                     <!--Botón Rechazar-->
                     <Link :href="'#'">
-                    <Button v-tooltip.top="'Rechazar'" size="small" icon="pi pi-times-circle" raised severity="warning"
-                      v-if="hasPermission('quote create')" />
+                    <Button v-tooltip.top="'Rechazar'" size=" small" icon="pi pi-times-circle" raised severity="warning"
+                      v-if="hasPermission('aprobar requerimientos') && requirement.estado != 'Aprobado Gerencia'" />
                     </Link>
 
                     <!--Botón Gestionar-->
                     <Link :href="'#'">
                     <Button v-tooltip.top="'Gestionar'" size="small" raised severity="info"
-                      v-if="hasPermission('quote create')">
+                      v-if="hasPermission('gestionar materiales') && requirement.estado == 'Aprobado DEIPR'">
                       <template #icon>
-                        <i class="fa-solid fa-list-check"></i>
+                        <i class=" fa-solid fa-list-check"></i>
                       </template>
                     </Button>
                     </Link>
@@ -148,13 +147,13 @@ const optionStatus = {
                     <!--Botón Editar-->
                     <Link :href="'#'">
                     <Button v-tooltip.top="'Editar'" size="small" icon="pi pi-pencil" raised severity="warning"
-                      v-if="hasPermission('quote create')" />
+                      v-if="hasPermission('quote create') && requirement.estado != 'Aprobado Gerencia'" />
                     </Link>
 
                     <!--Botón Eliminar-->
                     <Link :href="'#'">
-                    <Button v-tooltip.top="'Eliminar'" size="small" icon="pi pi-trash" raised severity="danger"
-                      v-if="hasPermission('quote delete')" />
+                    <Button v-tooltip.top="'Eliminar'" size=" small" icon="pi pi-trash" raised severity="danger"
+                      v-if="hasPermission('quote delete') && requirement.estado != 'Oficial'" />
                     </Link>
 
                   </div>
