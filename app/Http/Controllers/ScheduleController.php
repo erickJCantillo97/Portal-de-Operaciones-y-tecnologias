@@ -12,10 +12,12 @@ use App\Models\Projects\Project;
 use App\Models\Projects\ProjectWithCalendar;
 use App\Models\Schedule;
 use App\Models\ScheduleTime;
+use App\Models\Shift;
 use App\Models\Views\DetailProjectWithCalendar;
 use App\Models\Views\DetailScheduleTime;
 use App\Models\VirtualTask;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Spatie\Holidays\Countries\Colombia;
@@ -129,6 +131,8 @@ class ScheduleController extends Controller
                 'resources' => ['rows' => $recursos],
                 'assignments' => ['rows' => Assignment::get()],
                 'timeRanges' => ['rows' => []],
+                'shift' => Shift::whereNull('user')->select('id','name')->get()->toArray(),
+                'assignCalendar' => Calendar::all()->select('id','name')->toArray()
             ]);
         } else {
             return response()->json([
@@ -142,6 +146,8 @@ class ScheduleController extends Controller
                 'resources' => ['rows' => $recursos],
                 'assignments' => ['rows' => Assignment::get()],
                 'timeRanges' => ['rows' => []],
+                'shift' => Shift::whereNull('user')->select('id','name')->get()->toArray(),
+                'assignCalendar' => Calendar::all()->select('id','name')->toArray()
             ]);
         }
     }
@@ -426,5 +432,48 @@ class ScheduleController extends Controller
         return response()->json([
             'assignments' => Assignment::where('event', $task->id)->get(),
         ]);
+    }
+
+    public function assignmentCalendar(Request $request){
+        try{
+            DB::beginTransaction();
+            $days ='on ';
+            if($request->newCalendar){
+            $shift = Shift::find($request->shift['id']);
+                foreach($request->days as $day){
+                   $days = $days.$day['code'].',';
+                }
+                $days = substr($days,0,strlen($days)-1);
+                $daysEnd = $days;
+                $days = $days." at ".Carbon::parse($shift->startShift)->format('H:i');
+                $daysEnd =  $daysEnd." at ".Carbon::parse($shift->endShift)->format('H:i');
+                $calendar = Calendar::create([
+                    'expanded' => 1,
+                    'version' => 2,
+                    'name' => $request->name,
+                    'unspecifiedTimeIsWorking' => count($request->isWorking) > 0 ? false:true
+                ]);
+                $calendar->save();
+                CalendarInterval::create([
+                    'calendar_id' => $calendar->id,
+                    'isWorking' => count($request->isWorking) > 0 ? false:true,
+                    'priority' => 20,
+                    'recurrentEndDate' =>$daysEnd,
+                    'recurrentStartDate' => $days
+                ]);
+                $project = Project::find($request->project);
+                $project->calendar_id = $calendar->id;
+                $project->save();
+                }else{
+                    $project = Project::find($request->project);
+                    $project->calendar_id = $request->calendar['id'];
+                    $project->save();
+                } 
+            DB::commit();
+            return response()->json(['status' => true,'mensaje' => 'Calendario agregado']);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => false,'mensaje' => $e->getMessage()]);
+        }
     }
 }
