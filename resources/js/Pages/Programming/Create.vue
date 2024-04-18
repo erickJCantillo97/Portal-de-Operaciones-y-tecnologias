@@ -341,8 +341,8 @@ const save = async (mode) => {
 
     await axios.post(route('programming.saveCustomizedSchedule'), formEditShift.value)
         .then((res) => {
-            taskEdit.value.employees = res.data.task
             if (res.data.status) {
+                taskEdit.value.employees = res.data.task
                 toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
                 modhours.value = false
             }
