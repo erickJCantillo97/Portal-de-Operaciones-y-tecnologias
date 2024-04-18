@@ -31,11 +31,12 @@ const materials = ref([])
 
 const getMaterial = async () => {
   materialsLoaded.value = true
-  await axios.get(route('materials.index', props.requirement.id)).then((res) => {
-    materials.value = res.data.material
-    materialsLoaded.value = false
-  })
-  return materials.value
+  if (props.requirement.id != null) {
+    await axios.get(route('materials.index', props.requirement.id)).then((res) => {
+      materials.value = res.data.material
+      materialsLoaded.value = false
+    })
+  }
 }
 
 getMaterial()
@@ -63,7 +64,7 @@ watch(() => props.materialsLoaded, (newValue, oldValue) => {
 const optionStatus = {
   'PENDIENTE': {
     icon: 'fa-solid fa-user-clock',
-    color: 'bg-orange-600 text-white'
+    color: 'bg-danger text-white'
   },
   'APROBADO': {
     icon: 'fa-solid fa-check',
@@ -76,7 +77,11 @@ const optionStatus = {
   'DISPONIBLE GECON': {
     icon: '',
     color: 'bg-success text-white'
-  }
+  },
+  'DISPONIBLE SAP INHOUSE': {
+    icon: '',
+    color: 'bg-success text-white'
+  },
 }
 </script>
 <template>
@@ -114,23 +119,27 @@ const optionStatus = {
                   </div>
                   <div class="flex gap-2 items-center justify-center p-2">
                     <!--Botón Aprobar-->
+                    <Link :href="'#'" v-if="requirement.estado == 'Aprobado Gerencia'">
+                    <Button v-tooltip.top="'Imprimir'" size="small" icon="pi pi-file-pdf" raised severity="danger" />
+                    </Link>
+
                     <Link :href="'#'">
                     <Button v-tooltip.top="'Aprobar'" size="small" icon="pi pi-check-circle" severity="success"
-                      v-if="hasPermission('quote create')" />
+                      v-if="hasPermission('aprobar requerimientos') && requirement.estado != 'Aprobado Gerencia'" />
                     </Link>
 
                     <!--Botón Rechazar-->
                     <Link :href="'#'">
-                    <Button v-tooltip.top="'Rechazar'" size="small" icon="pi pi-times-circle" raised severity="warning"
-                      v-if="hasPermission('quote create')" />
+                    <Button v-tooltip.top="'Rechazar'" size=" small" icon="pi pi-times-circle" raised severity="warning"
+                      v-if="hasPermission('aprobar requerimientos') && requirement.estado != 'Aprobado Gerencia'" />
                     </Link>
 
                     <!--Botón Gestionar-->
                     <Link :href="'#'">
                     <Button v-tooltip.top="'Gestionar'" size="small" raised severity="info"
-                      v-if="hasPermission('quote create')">
+                      v-if="hasPermission('gestionar materiales') && requirement.estado == 'Aprobado DEIPR'">
                       <template #icon>
-                        <i class="fa-solid fa-list-check"></i>
+                        <i class=" fa-solid fa-list-check"></i>
                       </template>
                     </Button>
                     </Link>
@@ -138,14 +147,15 @@ const optionStatus = {
                     <!--Botón Editar-->
                     <Link :href="'#'">
                     <Button v-tooltip.top="'Editar'" size="small" icon="pi pi-pencil" raised severity="warning"
-                      v-if="hasPermission('quote create')" />
+                      v-if="hasPermission('quote create') && requirement.estado != 'Aprobado Gerencia'" />
                     </Link>
 
                     <!--Botón Eliminar-->
                     <Link :href="'#'">
-                    <Button v-tooltip.top="'Eliminar'" size="small" icon="pi pi-trash" raised severity="danger"
-                      v-if="hasPermission('quote delete')" />
+                    <Button v-tooltip.top="'Eliminar'" size=" small" icon="pi pi-trash" raised severity="danger"
+                      v-if="hasPermission('quote delete') && requirement.estado != 'Oficial'" />
                     </Link>
+
                   </div>
                   <article class="w-full p-2">
                     <div class=" border border-solid rounded-lg p-2 mb-2">

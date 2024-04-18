@@ -311,9 +311,16 @@
     </Toast>
     <ConfirmPopup>
         <template #message="slotProps">
-            <div class="flex flex-col items-center w-full gap-3 p-3">
+            <div class="flex flex-col items-center text-center w-full gap-3 p-3">
+                {{ console.log(slotProps.message) }}
                 <i :class="slotProps.message.icon" class="text-4xl"></i>
-                <p class="font-bold">{{ slotProps.message.message }}</p>
+                <span v-if="slotProps.message.message.subMessage===undefined?true:false">
+                    <p class="font-bold w-60">{{ slotProps.message.message}}</p>
+                </span>
+                <span v-else>
+                    <p class="font-bold w-60">{{ slotProps.message.message.message}}</p>
+                    <p class="w-60">{{ slotProps.message.message.subMessage}}</p>
+                </span>
             </div>
         </template>
     </ConfirmPopup>

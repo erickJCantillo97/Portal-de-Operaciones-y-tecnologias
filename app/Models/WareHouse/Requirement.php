@@ -17,6 +17,7 @@ class Requirement extends Model implements Auditable
     use SoftDeletes;
 
     protected $guarded = [];
+    protected $appends = ['estado'];
 
     public function getConsevutivoAttribute()
     {
@@ -44,5 +45,25 @@ class Requirement extends Model implements Auditable
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getEstadoAttribute()
+    {
+        $estado = 'Por Aprobar';
+
+        if ($this->approved_dipr_date != null) {
+            $estado = 'Aprobado DEIPR';
+        }
+        if ($this->oficial_date != null) {
+            $estado = 'Oficial';
+        }
+        if ($this->approved_ppc_date != null) {
+            $estado = 'Aprobado DEPPC';
+        }
+        if ($this->approved_manager_date != null) {
+            $estado = 'Aprobado Gerencia';
+        }
+
+        return $estado;
     }
 }

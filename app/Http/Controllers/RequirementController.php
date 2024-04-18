@@ -18,22 +18,36 @@ class RequirementController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    private function getAttributesRequiremnts($requirement)
+    {
+
+        return [
+            'id' => $requirement->id,
+            'consecutivo' => $requirement->consecutive,
+            'proyecto' => $requirement->project->name,
+            'bloque' => $requirement->bloque,
+            'grupo' => $requirement->sistema_grupo,
+            'dibujante' => $requirement->user->short_name,
+            'estado' => $requirement->estado,
+            'fecha' => Carbon::parse($requirement->preeliminar_date)->format('d-m-Y'),
+            'nota' => $requirement->note,
+        ];
+    }
     public function index(Request $request)
     {
         //  dd($request->all());
         $projects = Project::active()->get();
-        $requirements = Requirement::has('project')->with('project', 'user')->get()->map(function ($requirement) {
-            return [
-                'id' => $requirement->id,
-                'consecutivo' => $requirement->consecutive,
-                'proyecto' => $requirement->project->name,
-                'bloque' => $requirement->bloque,
-                'grupo' => $requirement->sistema_grupo,
-                'dibujante' => $requirement->user->short_name,
-                'estado' => $requirement->oficial_date != null ? 'Oficial' : 'Aprobado DIPR',
-                'fecha' => Carbon::parse($requirement->preeliminar_date)->format('d-m-Y'),
-            ];
-        });
+        $requirements = [];
+        if (auth()->user()->hasRole('Super intendente de Materiales' . '%TOP%' . auth()->user()->gerencia)) {
+            $requirements = Requirement::has('project')->with('project', 'user')->get()->map(function ($requirement) {
+                return $this->getAttributesRequiremnts($requirement);
+            });
+        } else if (auth()->user()->hasRole('ADMIN DIPR' . '%TOP%' . auth()->user()->gerencia)) {
+            $requirements = Requirement::has('project')->with('project', 'user')->whereNull('oficial_date')->get()->map(function ($requirement) {
+                return $this->getAttributesRequiremnts($requirement);
+            });
+        }
 
         return Inertia::render('WareHouse/Requirements/Index', [
             'projects' => $projects,
@@ -45,9 +59,9 @@ class RequirementController extends Controller
     public function getRequirementByRole()
     {
         $requirements = [];
-        if (auth()->user()->hasRole('ADMIN' . '%TOP%' . auth()->user()->gerencia)) {
+        if (auth()->user()->hasRole('ADMIN DIPR' . '%TOP%' . auth()->user()->gerencia)) {
             // return Requirement::has('project')->with('project', 'user')->get();
-            $requirements = Requirement::has('project')->with('project', 'user')->get()->map(function ($r) {
+            $requirements = Requirement::has('project')->with('project', 'user')->whereNull('oficial_date')->get()->map(function ($r) {
                 return [
                     'id' => $r->id,
                     'title' => 'Requerimiento ' . $r->consecutive,
