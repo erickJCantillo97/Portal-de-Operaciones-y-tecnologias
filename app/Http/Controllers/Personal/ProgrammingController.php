@@ -695,41 +695,43 @@ class ProgrammingController extends Controller
             Assignment::where('event', $schedule->task_id)
                 ->where('resource', $schedule->employee_id)->delete();
             // dd($schedule);
-            switch ($request->type) {
-                    //SOLO EL $request->date
-                case 1:
-                    ScheduleTime::where('schedule_id', $schedule->id)->delete();
+            ScheduleTime::where('schedule_id', $schedule->id)->delete();
                     $schedule->delete();
-                    break;
-                case 2:
-                    //RESTO DE LA ACTIVIDAD
-                    $schedules = Schedule::where('fecha', '>=', $schedule->fecha)
-                        ->where('task_id', $schedule->task_id)
-                        ->where('employee_id', $schedule->employee_id)->pluck('id')->toArray();
-                    Schedule::whereIn('id', $schedules)->delete();
-                    ScheduleTime::whereIn('schedule_id', $schedules)->delete();
-                    break;
-                    // case 3:
-                    //     //RANGO DE FECHAS
-                    //     $schedule = Schedule::where('employee_id', $request->idUser)
-                    //         ->whereBetween('fecha', [$request->details[0], $request->details[1]])->get();
-                    //     $itemsToRemove = $schedule->map(function ($item) {
-                    //         return $item->id;
-                    //     });
-                    //     ScheduleTime::whereIn('schedule_id', $itemsToRemove)->delete();
-                    //     Schedule::whereBetween('fecha', [$request->details[0], $request->details[1]])->delete();
-                    //     break;
-                case 4:
-                    //FECHAS ESPECIFICAS
-                    $schedules = Schedule::whereIn('fecha', $request->details)
-                        ->where('task_id', $schedule->task_id)
-                        ->where('employee_id', $schedule->employee_id)->pluck('id')->toArray();
-                    Schedule::whereIn('id', $schedules)->delete();
-                    ScheduleTime::whereIn('schedule_id', $schedules)->delete();
-                    break;
-                default:
-                    break;
-            }
+            // switch ($request->type) {
+            //         //SOLO EL $request->date
+            //     case 1:
+            //         ScheduleTime::where('schedule_id', $schedule->id)->delete();
+            //         $schedule->delete();
+            //         break;
+            //     case 2:
+            //         //RESTO DE LA ACTIVIDAD
+            //         $schedules = Schedule::where('fecha', '>=', $schedule->fecha)
+            //             ->where('task_id', $schedule->task_id)
+            //             ->where('employee_id', $schedule->employee_id)->pluck('id')->toArray();
+            //         Schedule::whereIn('id', $schedules)->delete();
+            //         ScheduleTime::whereIn('schedule_id', $schedules)->delete();
+            //         break;
+            //         // case 3:
+            //         //     //RANGO DE FECHAS
+            //         //     $schedule = Schedule::where('employee_id', $request->idUser)
+            //         //         ->whereBetween('fecha', [$request->details[0], $request->details[1]])->get();
+            //         //     $itemsToRemove = $schedule->map(function ($item) {
+            //         //         return $item->id;
+            //         //     });
+            //         //     ScheduleTime::whereIn('schedule_id', $itemsToRemove)->delete();
+            //         //     Schedule::whereBetween('fecha', [$request->details[0], $request->details[1]])->delete();
+            //         //     break;
+            //     case 4:
+            //         //FECHAS ESPECIFICAS
+            //         $schedules = Schedule::whereIn('fecha', $request->details)
+            //             ->where('task_id', $schedule->task_id)
+            //             ->where('employee_id', $schedule->employee_id)->pluck('id')->toArray();
+            //         Schedule::whereIn('id', $schedules)->delete();
+            //         ScheduleTime::whereIn('schedule_id', $schedules)->delete();
+            //         break;
+            //     default:
+            //         break;
+            // }
             DB::commit();
 
             return response()->json([

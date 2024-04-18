@@ -43,10 +43,10 @@ const itemDrag = defineModel('itemDrag', {
             <span v-if="arrayPersonFilter.loading" class="">
                 <ProgressBar mode="indeterminate" style="height: 4px"/>
             </span>
-            <div v-for="item in personal" :key="item.Nombres_Apellidos" :draggable="true" @dragstart="itemDrag = item"
+            <div v-for="item in personal" v-ripple :key="item.Nombres_Apellidos" :draggable="true" @dragstart="itemDrag = item"
                 v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
                 :class="[(item.Nombres_Apellidos.toUpperCase().includes(filter.toUpperCase()) || item.Cargo.toUpperCase().includes(filter.toUpperCase())) ? '' : '!hidden', !(arrayPersonFilter.loading) ? (arrayPersonFilter.data?.programados.find(objeto => objeto.name === item.Nombres_Apellidos) !== undefined ? 'bg-green-200' : (arrayPersonFilter.data?.noProgramados.find(objeto => objeto.name === item.Nombres_Apellidos) !== undefined ?'bg-red-200':'')) : '']"
-                class="min-w-[25vw] sm:min-w-32 z-10 rounded-xl border border-primary h-full sm:h-16 shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
+                class="p-ripple min-w-[25vw] sm:min-w-32 z-10 rounded-xl border border-primary h-full sm:h-16 shadow-md cursor-pointer hover:bg-primary-light hover:ring-1 hover:ring-primary">
                 <div class="flex flex-col h-full justify-center gap-x-1 p-1">
                     <div class="flex flex-col justify-center">
                         <p class="text-sm font-semibold truncate text-gray-900">

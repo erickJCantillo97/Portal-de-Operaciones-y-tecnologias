@@ -17,6 +17,7 @@ import Tooltip from "primevue/tooltip";
 import VueApexCharts from "vue3-apexcharts";
 import VueChatScroll from 'vue3-chat-scroll'
 import BadgeDirective from 'primevue/badgedirective';
+import Ripple from 'primevue/ripple';
 
 const appName =
     import.meta.env.VITE_APP_NAME || "Portal";
@@ -73,6 +74,7 @@ createInertiaApp({
             .component("Head", Head)
             .directive("tooltip", Tooltip)
             .directive("badge", BadgeDirective)
+            .directive('ripple', Ripple)
             .mount(el);
     },
     progress: {
