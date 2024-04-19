@@ -118,7 +118,7 @@ const overlayAddPerson = ref()
 const personsEdit = ref()
 const tabActive = ref(0)
 const personal = ref()
-const personDrag = ref({})
+const personDrag = ref([])
 const arrayPersonFilter = ref({
     loading: false,
     data: {
@@ -142,7 +142,7 @@ const items = ref([
         command: () => {
             console.log('Hace algo');
         },
-        visible: (mode.value === 'week')
+        visible:mode=='week'
     },
     {
         label: 'Cortar',
@@ -213,10 +213,11 @@ async function onDrop(task, fecha) {
                     personDrag.value.task.loading = false
                     toast.add({ severity: 'error', group: "customToast", text: res.data.mensaje, life: 2000 })
                 } else {
-                    personDrag.value.task.employees = personDrag.value.task.employees.filter(person => person.NumSAP !== personDrag.value.NumSAP);
                     task.employees = res.data.task
                     task.loading = false
                     personDrag.value.task.loading = false
+                    personDrag.value.task.employees = personDrag.value.task.employees.filter(person => person.Num_SAP !== personDrag.value.Num_SAP);
+                    // console.log(personDrag.value.task.employees)
                     toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
                 }
             })
@@ -229,6 +230,7 @@ async function onDrop(task, fecha) {
                     task.loading = false
                     task.value = task
                     task.employees = res.data.task
+                    toast.add({ severity: 'error', group: "customToast", text: 'Persona ya programada', life: 2000 })
                 } else if (res.data.status == false) {
                     task.loading = false
                     task.employees = res.data.task
@@ -250,31 +252,8 @@ async function onDrop(task, fecha) {
 
 //#region edicion de horarios
 
-// const formEditHour = ref({
-//     userName: null, //nombre de la persona
-//     timeName: null, // nombre del horario personalizado
-//     startShift: '07:00',// hora inicio
-//     endShift: '16:30',// hora fin
-//     timeBreak: null,
-//     schedule_time: null,
-//     schedule: null, // id del schedule/cronograma (TABLA SCHEDULES)
-//     idUser: null, // Id de la persona seleccionada (COLUMNA EMPLOYEE_ID DE LA TABLA SCHEDULES)
-//     date: date, // fecha seleccionada en el calendario
-//     personalized: true, // Seleccionar turno => false, Seleccionar Horario Personalizado => false, Nuevo horario personalizado =>true
-//     type: 1,// Solo el => 1; Resto de la actividad => 2; Rango de fechas => 3; Fechas específicos => 4
-//     details: [],
-//     loading: false,
-//     /* la propiedad details depende de la propiedad type, es decir:
-//         si la opción type es 1, en details se debe enviar la fecha (Solo el =>) ej: ['2024-03-07']
-//         si la opcion type es 2, en details se debe enviar el id de la actividad seleccionada (EN BASE DE DATOS ES LA TABLA TASK) ej: [7683]
-//         si la opcion type es 3, en details se debe enviar la fecha inicial y la fecha final (EN LA PRIMERA POSICION SIEMPRE SE DEBE MANDAR LA FECHA INICIAL), ej: ['2024-03-01','2024-03-10']
-//         si la opcion type es 4, en details se debe enviar las fechas seleccionadas en el calendario, no importa el orden ej: ['2024-03-01', '2024-03-10', '2024-01-01','2024-02-10']
-//     */
-// });
 
-
-const scheduleTime = ref({
-})
+const scheduleTime = ref({})
 
 const modhours = ref(false)
 const dateSelect = ref()
@@ -475,7 +454,7 @@ const confirmDelete = (event, schedule_time) => {
                                 <span class="grid grid-cols-7 col-span-9 overflow-y-auto overflow-x-hidden">
                                     <div v-for="dia, index in diasSemana" class="flex flex-col h-full items-center"
                                         :class="[index > 4 ? 'bg-warning-light' : '', dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
-                                        <TaskProgramming :project="project.id" :day="dia"
+                                        <TaskProgramming :project="project.id" :day="dia" @menu="onImageRightClick"
                                             :key="dates.toDateString() + project.id" type="week" @drop="onDrop"
                                             v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
                                     </div>
