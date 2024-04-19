@@ -580,7 +580,7 @@ const project = ref(
         listeners: {
             syncFail: (e) => {
                 console.log(e)
-                toast.add({ severity: 'error', group: 'customToast', text: 'Ha ocurrido un error, reiniciando...', life: 3000 });
+                toast.add({ severity: 'error', group: 'customToast', text: e.response.mensaje, life: 3000 });
                 // setTimeout(() => { location.reload() }, 3000);
             },
             beforeSync: (data) => {
@@ -1020,6 +1020,7 @@ const listDays = ref([
    {name:'Domingo', code:"SUNDAY"}
 ]);
 const listCalendar = ref([]);
+const loadSaveCalendar = ref(false);
 const listShift = ref([]);
 const formCalendar = ref({
     newCalendar: false,
@@ -1040,6 +1041,7 @@ const newCalendar = () => {
     formCalendar.value.newCalendar = true;
 }
 const submit = async  () => {
+    loadSaveCalendar.value = true;
      let gantt = ganttref.value.instance.value
     console.log(formCalendar.value);
     let error = false;
@@ -1051,6 +1053,7 @@ const submit = async  () => {
                     text: 'Debe ingresar el nombre del calendario',
                     life: 2000
                 });
+
                 error = true;
         }else if(formCalendar.value.days == []){
             toast.add({
@@ -1081,7 +1084,7 @@ const submit = async  () => {
         }
     }
     if(!error){
-        await axios.post(route('assignment.calendar'), formCalendar.value).then((res)=>{1
+        await axios.post(route('assignment.calendar'), formCalendar.value).then((res)=>{
             console.log(res.data);
             if(res.data.status){
                 toast.add({
@@ -1090,6 +1093,7 @@ const submit = async  () => {
                     text: res.data.mensaje,
                     life: 4000
                 })
+                loadSaveCalendar.value = false;
                 gantt.project.load();
                 calendar.value.hide();
             }else{
@@ -1100,7 +1104,6 @@ const submit = async  () => {
                     life: 4000
                 })
             }
-
         }).catch((e)=>{
             console.log(e);
                 toast.add({
@@ -1110,6 +1113,9 @@ const submit = async  () => {
                     life: 4000
                 })
         })
+    }else{
+        
+        loadSaveCalendar.value = false;
     }
 }
 </script>
@@ -1284,7 +1290,7 @@ const submit = async  () => {
             </section>
         </div>
         <InputGroup>
-            <Button severity="success" :loading="loadImport" label="Guardar" @click="submit"/>
+            <Button severity="success" :loading="loadSaveCalendar" label="Guardar" @click="submit"/>
         </InputGroup>
     </OverlayPanel>
 
