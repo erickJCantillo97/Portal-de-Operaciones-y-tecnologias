@@ -187,7 +187,7 @@ function programming($date, $user, $star, $end, $task, $name, $constoHora)
         'fecha' => $date,
     ]);
     $schedule->save();
-    ScheduleTime::create([
+    ScheduleTime::firstOrCreate([
         'schedule_id' => $schedule->id,
         'hora_inicio' => $star,
         'hora_fin' => $end,

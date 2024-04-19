@@ -155,7 +155,7 @@ class ScheduleController extends Controller
     public function sync(Project $project, Request $request)
     {
         $complete = true;
-        $mensaje = '';
+        $mensaje = 'Acción realizada';
         $rows = [];
         $removed = [];
         $rowsDependecy = [];
@@ -256,8 +256,7 @@ class ScheduleController extends Controller
             $now = Carbon::now();
             $task = VirtualTask::find( $request->assignments['added'][0]['event']);
             if (Carbon::parse($task->endDate)->lt($now->format('Y-m-d'))) {
-                $complete = false;
-                $mensaje = 'No se pudo programar al personal seleccionado porque la tarea: ' . $task->name. ' Finalizó';
+                $mensaje = 'Recurso Agregado';
             } 
             if (count(VirtualTask::where('task_id',$request->assignments['added'][0]['event'])->get()) > 0) {
                 $complete = false;  
