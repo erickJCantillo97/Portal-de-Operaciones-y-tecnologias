@@ -579,7 +579,7 @@ const project = ref(
         listeners: {
             syncFail: (e) => {
                 console.log(e)
-                toast.add({ severity: 'error', group: 'customToast', text: 'Ha ocurrido un error, reiniciando...', life: 3000 });
+                toast.add({ severity: 'error', group: 'customToast', text: e.response.mensaje, life: 3000 });
                 // setTimeout(() => { location.reload() }, 3000);
             },
             beforeSync: (data) => {
@@ -1052,6 +1052,7 @@ const listDays = ref([
     { name: 'Domingo', code: "SUNDAY" }
 ]);
 const listCalendar = ref([]);
+const loadSaveCalendar = ref(false);
 const listShift = ref([]);
 const formCalendar = ref({
     newCalendar: false,
@@ -1071,20 +1072,22 @@ const newCalendar = () => {
     calendarCreate.value = false;
     formCalendar.value.newCalendar = true;
 }
-const submit = async () => {
-    let gantt = ganttref.value.instance.value
+const submit = async  () => {
+    loadSaveCalendar.value = true;
+     let gantt = ganttref.value.instance.value
     console.log(formCalendar.value);
     let error = false;
     if (formCalendar.value.newCalendar) {
         if (formCalendar.value.name == '') {
             toast.add({
-                severity: 'error',
-                group: 'customToast',
-                text: 'Debe ingresar el nombre del calendario',
-                life: 2000
-            });
-            error = true;
-        } else if (formCalendar.value.days == []) {
+                    severity: 'error',
+                    group: 'customToast',
+                    text: 'Debe ingresar el nombre del calendario',
+                    life: 2000
+                });
+
+                error = true;
+        }else if(formCalendar.value.days == []){
             toast.add({
                 severity: 'error',
                 group: 'customToast',
@@ -1112,9 +1115,8 @@ const submit = async () => {
             error = true;
         }
     }
-    if (!error) {
-        await axios.post(route('assignment.calendar'), formCalendar.value).then((res) => {
-            1
+    if(!error){
+        await axios.post(route('assignment.calendar'), formCalendar.value).then((res)=>{
             console.log(res.data);
             if (res.data.status) {
                 toast.add({
@@ -1123,6 +1125,7 @@ const submit = async () => {
                     text: res.data.mensaje,
                     life: 4000
                 })
+                loadSaveCalendar.value = false;
                 gantt.project.load();
                 calendar.value.hide();
             } else {
@@ -1133,8 +1136,7 @@ const submit = async () => {
                     life: 4000
                 })
             }
-
-        }).catch((e) => {
+        }).catch((e)=>{
             console.log(e);
             toast.add({
                 severity: 'error',
@@ -1143,6 +1145,9 @@ const submit = async () => {
                 life: 4000
             })
         })
+    }else{
+        
+        loadSaveCalendar.value = false;
     }
 }
 </script>

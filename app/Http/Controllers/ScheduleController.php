@@ -154,6 +154,8 @@ class ScheduleController extends Controller
 
     public function sync(Project $project, Request $request)
     {
+        $complete = true;
+        $mensaje = 'Acción realizada';
         $rows = [];
         $removed = [];
         $rowsDependecy = [];
@@ -253,25 +255,18 @@ class ScheduleController extends Controller
             DB::beginTransaction();
             $now = Carbon::now();
             $task = VirtualTask::find( $request->assignments['added'][0]['event']);
-            if ($task->endDate < $now->format('Y-m-d')) {
-                return response()->json([
-                    'status' => false,
-                    'mensaje' => 'No se pudo programar al personal seleccionado porque la tarea: ' . $task->name
-                        . ' finalizó.',
-                        'conflict' => []
-                ]);
+            if (Carbon::parse($task->endDate)->lt($now->format('Y-m-d'))) {
+                $mensaje = 'Recurso Agregado';
             } 
             if (count(VirtualTask::where('task_id',$request->assignments['added'][0]['event'])->get()) > 0) {
-                    return response()->json([
-                        'status' => false,
-                        'mensaje' => 'No se puede programar en esta actividad porque no es de ultimo nivel', 'conflict' => []
-                    ]);
+                $complete = false;  
+                $mensaje = 'No se puede programar en esta actividad porque no es de ultimo nivel';
+            }
+            if($now->lt(Carbon::parse($task->startDate))){
+                $now = Carbon::parse($task->startDate);
             }
             foreach ($request->assignments['added'] as $assignment) {
-                if (!is_numeric($assignment['resource'])) {
-                    $idResource = str_replace('CA', '', $assignment['resource']);
-                    $labor = Labor::find($idResource);
-                } else {
+                if (is_numeric($assignment['resource'])) {
                     $employee = searchEmpleados('Num_SAP', $assignment['resource'])->first();
                     do {
                         if (getWorkingDays($now)) {
@@ -293,10 +288,13 @@ class ScheduleController extends Controller
                             );
                         }
                         $now = $now->addDays(1);
-                    } while ($now->format('Y-m-d') <= $task->endDate);
-                    $now = Carbon::now();
-                
-                $assigmmentCreate = Assignment::firstOrCreate([
+                    } while ($now->lte(Carbon::parse($task->endDate)));
+                    if(Carbon::now()->lt(Carbon::parse($task->startDate))){
+                        $now = Carbon::parse($task->endDate);
+                    }else{
+                        $now = Carbon::now();    
+                    }
+                    $assigmmentCreate = Assignment::firstOrCreate([
                     'event' => $assignment['event'],
                     'resource' => $assignment['resource'],
                     'units' => $assignment['units'],
@@ -383,7 +381,8 @@ class ScheduleController extends Controller
             $project->update();
         }
         return response()->json([
-            'success' => true,
+            'success' => $complete,
+            'mensaje' => $mensaje,
             'requestId' => $request->requestId,
             'tasks' => [
                 'rows' => $rows,
