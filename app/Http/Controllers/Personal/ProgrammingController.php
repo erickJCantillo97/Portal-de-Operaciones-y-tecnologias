@@ -854,14 +854,7 @@ class ProgrammingController extends Controller
         try {
             DB::beginTransaction();
             $schedule = Schedule::where('id', $request->schedule)->first();
-            $newTask = VirtualTask::find($request->task);
-            if ($newTask->endDate < Carbon::now()->format('Y-m-d')) {
-                return response()->json([
-                    'status' => false,
-                    'mensaje' => 'No se puede mover a:' . $schedule->name . ' porque la tarea ya finalizó.'
-                    // 'task' => $this->getSchedule($schedule->fecha, $schedule->task_id)
-                ]);
-            }
+       
             $newSchedule = Schedule::firstOrCreate([
                 'employee_id' => $schedule->employee_id,
                 'name' => $schedule->name,
