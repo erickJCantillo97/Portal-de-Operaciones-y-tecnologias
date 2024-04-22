@@ -801,7 +801,7 @@ class ProgrammingController extends Controller
         return response()->json(
             VirtualTask::has('project')->has('task')
                 ->where('project_id', $project->id)
-                ->where('executor', 'LIKE', ' %' . $request->executor . '%')
+                ->where('executor', 'LIKE', '%' . auth()->user()->oficina . '%')
                 ->where('percentDone', '<', 100)
                 ->where('startDate', '<=', $date)
                 // ->where(function ($query) use ($request) {
