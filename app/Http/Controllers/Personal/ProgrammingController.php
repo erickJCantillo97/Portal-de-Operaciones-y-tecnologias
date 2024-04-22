@@ -761,7 +761,7 @@ class ProgrammingController extends Controller
         if ($date->isSaturday() || $date->isSunday()) {
             return response()->json(
                 ExtendedSchedule::has('project')->has('task')->where('project_id', $project->id)
-                    ->where('executor', 'LIKE', '%' . $request->executor . '%')
+                    ->where('executor', 'LIKE', '%' . auth()->user()->oficina . '%')
                     ->where('date', $date)
                     ->get()->map(function ($task) use ($date) {
                         return [
@@ -943,21 +943,22 @@ class ProgrammingController extends Controller
         }
     }
 
-    public function removeAll(Request $request){
-        try{
-        DB::beginTransaction();
-            Schedule::whereIn('id',$request->schedules)->delete();
-            foreach($request->schedules as $schedule){
-                ScheduleTime::where('schedule_id',$schedule)->delete();
+    public function removeAll(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            Schedule::whereIn('id', $request->schedules)->delete();
+            foreach ($request->schedules as $schedule) {
+                ScheduleTime::where('schedule_id', $schedule)->delete();
             }
-        DB::commit();
-        return response()->json([
-            'status' => true,
-            'mensaje' => 'Personal eliminado'
-        ]);
-        }catch (Exception $e) {
+            DB::commit();
+            return response()->json([
+                'status' => true,
+                'mensaje' => 'Personal eliminado'
+            ]);
+        } catch (Exception $e) {
             DB::rollBack();
             return response()->json(['status' => false, 'mensaje' => $e->getMessage()]);
-        } 
+        }
     }
 }
