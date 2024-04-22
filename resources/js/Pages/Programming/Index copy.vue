@@ -4,7 +4,7 @@ import { ref, computed } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import Dropdown from 'primevue/dropdown'
 import NoContentToShow from '@/Components/NoContentToShow.vue'
-import DivisionsByProject from '@/Pages/Programming/DivisionsByProject.vue'
+import WeekTable from '@/Pages/Programming/WeekTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
 import Knob from 'primevue/knob'
@@ -198,8 +198,29 @@ const url = [
             <div class="flex justify-between items-center px-4 h-min">
                 <span class="text-xl font-bold text-primary h-full items-center flex">
                     <p> Programación de Actividades </p>
+                    <!-- <CustomInput type="week" v-model:input="date" @change="getTask('date'); getPersonalData()" /> -->
                 </span>
                 <div class="flex items-center space-x-2">
+                    <span class="flex flex-col sm:flex-row items-center sm:space-x-2">
+                        <Dropdown :options="projects" placeholder="Seleccione un proyecto" optionLabel="name"
+                            optionValue="id" showClear :filter="true" filterPlaceholder="Buscar proyecto"
+                            v-model="project" :pt="{
+                                root: '!h-8',
+                                input: '!py-0 !flex !items-center !text-sm !font-normal',
+                                item: '!py-1 !px-3 !text-sm !font-normal',
+                                filterInput: '!h-8'
+                            }" />
+                    </span>
+                    <span class="flex flex-col sm:flex-row items-center sm:space-x-2">
+                        <Dropdown :options="divisionsOptions" placeholder="Seleccione una división" showClear
+                            :filter="true" filterPlaceholder="Buscar proyecto" v-model="project" :pt="{
+                                root: '!h-8',
+                                input: '!py-0 !flex !items-center !text-sm !font-normal',
+                                item: '!py-1 !px-3 !text-sm !font-normal',
+                                filterInput: '!h-8'
+                            }" />
+                    </span>
+                    <!-- <CustomInput type="week" placeholder="Seleccione una semana"></CustomInput> -->
                     <Link :href="route('programming.create')">
                     <Button label="Programación Ordinaria" severity="success" icon="fa-solid fa-plus"
                         :project="project" />
@@ -208,15 +229,15 @@ const url = [
                         @click="openDialog()" />
                 </div>
             </div>
-            <DivisionsByProject :projects />
-            <!-- <div class="mt-2 px-4 h-[79vh] overflow-y-auto">
+            <div class="mt-2 px-4 h-[79vh] overflow-y-auto">
                 <div v-if="!project && !loading" class="flex items-center">
                     <NoContentToShow class="mt-5" :subject="'Por favor seleccione un Proyecto'" />
                 </div>
-        </div> -->
+                <WeekTable v-else />
+            </div>
         </div>
 
-        <!--CUSTOM MODAL - EXTENDIDOS-->
+        <!--CUSTOM MODAL-->
         <CustomModal v-model:visible="openModal" width="70vw">
             <template #icon>
                 <i class="fa-solid fa-file-contract"></i>
