@@ -942,4 +942,22 @@ class ProgrammingController extends Controller
             return response()->json(['status' => false, 'mensaje' => $e->getMessage()]);
         }
     }
+
+    public function removeAll(Request $request){
+        try{
+        DB::beginTransaction();
+            Schedule::whereIn('id',$request->schedules)->delete();
+            foreach($request->schedules as $schedule){
+                ScheduleTime::where('schedule_id',$schedule)->delete();
+            }
+        DB::commit();
+        return response()->json([
+            'status' => true,
+            'mensaje' => 'Personal eliminado'
+        ]);
+        }catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => false, 'mensaje' => $e->getMessage()]);
+        } 
+    }
 }
