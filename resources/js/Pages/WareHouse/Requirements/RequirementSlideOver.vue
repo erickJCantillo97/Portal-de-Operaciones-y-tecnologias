@@ -2,11 +2,11 @@
 const { hasRole, hasPermission } = usePermissions()
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { Link } from '@inertiajs/vue3'
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { usePermissions } from '@/composable/permission'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
-import Accordion from 'primevue/accordion';
-import AccordionTab from 'primevue/accordiontab';
+import Accordion from 'primevue/accordion'
+import AccordionTab from 'primevue/accordiontab'
 import Badge from 'primevue/badge'
 import DescriptionItem from '@/Components/DescriptionItem.vue'
 import ListBox from 'primevue/listbox'
@@ -31,16 +31,23 @@ const materials = ref([])
 
 const getMaterial = async () => {
   materialsLoaded.value = true
-  if (props.requirement.id != null) {
-    await axios.get(route('materials.index', props.requirement.id)).then((res) => {
-      materials.value = res.data.material
-      materialsLoaded.value = false
-    })
+
+  try {
+    if (props.requirement.id != null) {
+      await axios.get(route('materials.index', props.requirement.id))
+        .then((res) => {
+          materials.value = res.data.material
+          materialsLoaded.value = false
+        })
+    }
+  } catch (error) {
+    console.error('Problema al obtener materiales, error: ' + error)
   }
 }
 
-getMaterial()
-
+onMounted(() => {
+  getMaterial()
+})
 
 const optionStatusRequirement = {
   'Oficial': {
@@ -175,8 +182,8 @@ const optionStatus = {
                         </div>
                         <div class="shadow-md my-4 px-2 h-full" v-for="material in materials">
                           <Accordion :pt="{
-    content: '!h-[80vh] !p-2 !overflow-y-auto'
-  }">
+                            content: '!h-[80vh] !p-2 !overflow-y-auto'
+                          }">
                             <AccordionTab :activeIndex="0">
                               <template #header>
                                 <span class="flex align-items-center gap-2 w-full">
