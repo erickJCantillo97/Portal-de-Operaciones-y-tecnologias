@@ -21,7 +21,11 @@ import { useToast } from "primevue/usetoast";
 import TaskProgramming from './Components/TaskProgramming.vue';
 import Knob from 'primevue/knob';
 import Dropdown from 'primevue/dropdown';
+import Listbox from 'primevue/listbox';
 import UserStatusProgramming from '@/Components/sections/UserStatusProgramming.vue';
+import ContextMenu from 'primevue/contextmenu';
+import { useConfirm } from "primevue/useconfirm";
+const confirm = useConfirm();
 const toast = useToast();
 // const { hasRole, hasPermission } = usePermissions()
 
@@ -83,193 +87,6 @@ function obtenerDiaSemana(dato) {
     return fecha;
 }
 
-//#endregion
-
-//#region variables
-const openConflict = ref(false)
-const date = ref(new Date())
-const conflicts = ref()
-const task = ref([])
-const mode = ref('date')
-const dates = ref(new Date(date.value.getFullYear(), date.value.getMonth(), date.value.getDate() + 1))
-const diasSemana = ref(obtenerFechasSemana(dates.value))
-const projectsSelected = ref([])
-const overlayPerson = ref()
-const personsEdit = ref()
-const tabActive = ref()
-const selectDays = ref([])
-const personDrag = ref({})
-const arrayPersonFilter = ref({
-    loading: false,
-    data: {
-        programados: [],
-        noProgramados: []
-    }
-})
-
-//#endregion
-
-//#region Consultas
-
-const getTask = async (option) => {
-    if (option == null) {
-        option = mode.value
-    }
-    if (option == 'week') {
-        mode.value = option
-        !(dates.value instanceof Array)??(dates.value = obtenerFormatoSemana(new Date()))
-    } else if (option == 'date') {
-        mode.value = option
-        !(dates.value instanceof Date)??(dates.value = new Date())
-    } else if (mode.value == 'month') {
-
-    } else {
-
-    }
-};
-
-//#endregion
-
-//#region drag
-
-async function onDrop(task, fecha, option) {
-    if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
-        task.loading = true
-        if (option == 'move') {
-            console.log(personDrag.value)
-
-
-            task.loading = false
-        } else {
-            await axios.post(route('programming.store'), { task_id: task.id, employee_id: personDrag.value.Num_SAP, name: personDrag.value.Nombres_Apellidos, fecha }).then((res) => {
-                if (Object.values(res.data.conflict).length > 0) {
-                    conflicts.value = Object.values(res.data.conflict)
-                    openConflict.value = true;
-                    task.loading = false
-                    task.value = task
-                    task.employees = res.data.task
-                } else if (res.data.status == false) {
-                    task.loading = false
-                    task.employees = res.data.task
-                    toast.add({ severity: 'error', group: "customToast", text: 'Hubo un error al programar', life: 2000 })
-                } else {
-                    getPersonalStatus([fecha])
-                    task.employees = res.data.task
-                    task.loading = false
-                    toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
-                }
-            })
-        }
-    } else {
-        toast.add({ severity: 'error', group: "customToast", text: 'No se puede programar en dias anteriores', life: 2000 })
-    }
-}
-
-//#endregion
-
-
-//#region edicion de horarios
-
-const formEditHour = ref({
-    userName: null, //nombre de la persona
-    timeName: null, // nombre del horario personalizado
-    startShift: '07:00',// hora inicio
-    endShift: '16:30',// hora fin
-    timeBreak: null,
-    schedule_time: null,
-    schedule: null, // id del schedule/cronograma (TABLA SCHEDULES)
-    idUser: null, // Id de la persona seleccionada (COLUMNA EMPLOYEE_ID DE LA TABLA SCHEDULES)
-    date: date, // fecha seleccionada en el calendario
-    personalized: true, // Seleccionar turno => false, Seleccionar Horario Personalizado => false, Nuevo horario personalizado =>true
-    type: 1,// Solo el => 1; Resto de la actividad => 2; Rango de fechas => 3; Fechas específicos => 4
-    details: [],
-    loading: false,
-    /* la propiedad details depende de la propiedad type, es decir:
-        si la opción type es 1, en details se debe enviar la fecha (Solo el =>) ej: ['2024-03-07']
-        si la opcion type es 2, en details se debe enviar el id de la actividad seleccionada (EN BASE DE DATOS ES LA TABLA TASK) ej: [7683]
-        si la opcion type es 3, en details se debe enviar la fecha inicial y la fecha final (EN LA PRIMERA POSICION SIEMPRE SE DEBE MANDAR LA FECHA INICIAL), ej: ['2024-03-01','2024-03-10']
-        si la opcion type es 4, en details se debe enviar las fechas seleccionadas en el calendario, no importa el orden ej: ['2024-03-01', '2024-03-10', '2024-01-01','2024-02-10']
-    */
-});
-const editHorario = ref({
-    name: null
-})
-const nuevoHorario = ref({})
-const modhours = ref(false)
-const dateSelect = ref()
-
-const togglePerson = (event, persons, task, date) => {
-    dateSelect.value = date
-    editHorario.value.data = task
-    personsEdit.value = persons
-    overlayPerson.value.toggle(event);
-}
-
-const editHour = (horario, option) => {
-    Object.assign(editHorario.value, horario)
-    editHorario.value.option = option
-    formEditHour.value.idUser = editHorario.value.data.employee_id
-    formEditHour.value.schedule = horario.idSchedule
-    formEditHour.value.schedule_time = horario.idScheduleTime
-    // formEditHour.value.userName = editHorario.value.data.name
-    nuevoHorario.value = {}
-    modhours.value = true
-}
-const save = async () => {
-    task.value = editHorario.value.data
-    formEditHour.value.loading = true
-    if (tabActive.value != 2) {
-        formEditHour.value.personalized = false
-        formEditHour.value.startShift = new Date(nuevoHorario.value.startShift).toLocaleString('es-CO',
-            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-        formEditHour.value.endShift = new Date(nuevoHorario.value.endShift).toLocaleString('es-CO',
-            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-        formEditHour.value.timeBreak = parseFloat(nuevoHorario.value.timeBreak)
-    } else {
-        formEditHour.value.startShift = new Date(formEditHour.value.startShift).toLocaleString('es-CO',
-            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-        formEditHour.value.endShift = new Date(formEditHour.value.endShift).toLocaleString('es-CO',
-            { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-        formEditHour.value.timeBreak = parseFloat(formEditHour.value.timeBreak)
-    }
-
-    if (formEditHour.value.type == 1) {
-        formEditHour.value.details[0] = date.value.toISOString().split("T")[0]
-    } else if (formEditHour.value.type == 2) {
-        formEditHour.value.details[0] = formEditHour.value.schedule
-    }
-    else {
-        selectDays.value.forEach((day, index) => {
-            formEditHour.value.details[index] = new Date(day).toISOString().split("T")[0]
-        })
-    }
-
-    await axios.post(route(editHorario.value.option != 'delete' ? 'programming.saveCustomizedSchedule' : 'programming.removeSchedule'), formEditHour.value)
-        .then((res) => {
-            if (res.data.status) {
-                modhours.value = false
-                editHorario.value.data.employees = res.data.task
-                editHorario.value.data.hora_inicio = formEditHour.value.startShift
-                editHorario.value.data.hora_fin = formEditHour.value.endShift
-                toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
-            }
-            else {
-                conflicts.value = Object.values(res.data.conflict)
-                if (conflicts.value.length > 0) {
-                    openConflict.value = true;
-                    // task.value.id = schedule
-                }
-                // toast.add({ severity: 'danger', group: "customToast", text: res.data.mensaje, life: 2000 })
-            }
-            formEditHour.value.loading = false
-        }).catch((error) => {
-            formEditHour.value.loading = false
-            console.log(error)
-            toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 2000 })
-        });
-}
-//#endregion
-
 function esMovil() {
     const dispositivos = [
         /Android/i,
@@ -286,13 +103,289 @@ function esMovil() {
     });
 }
 
+//#endregion
+
+//#region variables
+const openConflict = ref(false)
+const date = ref(new Date())
+const conflicts = ref()
+const mode = ref('date')
+const dates = ref(new Date(date.value.getFullYear(), date.value.getMonth(), date.value.getDate() + 1))
+const diasSemana = ref(obtenerFechasSemana(dates.value))
+const projectsSelected = ref([])
+const overlayPerson = ref()
+const overlayAddPerson = ref()
+const personsEdit = ref()
+const tabActive = ref(0)
+const personal = ref()
+const personDrag = ref([])
+const arrayPersonFilter = ref({
+    loading: false,
+    data: {
+        programados: [],
+        noProgramados: []
+    }
+})
+const personsSelect = ref()
+const menu = ref();
+const items = ref([
+    {
+        label: 'Copiar',
+        icon: 'fa-regular fa-copy',
+        command: () => {
+            console.log('Hace algo');
+        }
+    },
+    {
+        label: 'Copiar al dia siguiente',
+        icon: 'fa-regular fa-copy',
+        command: () => {
+            console.log('Hace algo');
+        },
+        visible:mode=='week'
+    },
+    {
+        label: 'Cortar',
+        icon: 'fa-solid fa-scissors',
+        command: () => {
+            console.log('Hace algo');
+        }
+    },
+    {
+        label: 'Pegar',
+        icon: 'fa-regular fa-paste',
+        command: () => {
+            console.log('Hace algo');
+        }
+    },
+    {
+        label: 'Quitar todos',
+        icon: 'fa-solid fa-trash',
+        command: () => {
+            console.log('Hace algo');
+        }
+    },
+]);
+
+//#endregion
+
+//#region Consultas
+
+const getTask = async (option) => {
+    if (option == null) {
+        option = mode.value
+    }
+    if (option == 'week') {
+        mode.value = option
+        !(dates.value instanceof Array) ?? (dates.value = obtenerFormatoSemana(new Date()))
+    } else if (option == 'date') {
+        mode.value = option
+        !(dates.value instanceof Date) ?? (dates.value = new Date())
+    } else if (mode.value == 'month') {
+
+    } else {
+
+    }
+};
+
+const getPersonalData = () => {
+    axios.get(route('get.personal.user')).then((res) => {
+        personal.value = Object.values(res.data.personal)
+    })
+}
 if (esMovil()) {
-    console.log("El usuario está en un dispositivo móvil.");
-} else {
-    console.log("El usuario no está en un dispositivo móvil.");
+    getPersonalData()
+}
+//#endregion
+
+//#region drag
+
+async function onDrop(task, fecha) {
+    if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
+        task.loading = true
+        // console.log(personDrag.value)
+        if (personDrag.value.option == 'move') {
+            personDrag.value.task.loading = true
+            await axios.post(route('programming.move'), { task: task.id, date: fecha, schedule: personDrag.value.times[0].idSchedule }).then((res) => {
+                // console.log(res.data)
+                if (res.data.status == false) {
+                    task.loading = false
+                    personDrag.value.task.loading = false
+                    toast.add({ severity: 'error', group: "customToast", text: res.data.mensaje, life: 2000 })
+                } else {
+                    task.employees = res.data.task
+                    task.loading = false
+                    personDrag.value.task.loading = false
+                    personDrag.value.task.employees = personDrag.value.task.employees.filter(person => person.Num_SAP !== personDrag.value.Num_SAP);
+                    // console.log(personDrag.value.task.employees)
+                    toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
+                }
+            })
+            task.loading = false
+        } else {
+            await axios.post(route('programming.store'), { task_id: task.id, employee_id: personDrag.value.Num_SAP, name: personDrag.value.Nombres_Apellidos, fecha }).then((res) => {
+                if (Object.values(res.data.conflict).length > 0) {
+                    conflicts.value = Object.values(res.data.conflict)
+                    openConflict.value = true;
+                    task.loading = false
+                    task.value = task
+                    task.employees = res.data.task
+                    toast.add({ severity: 'error', group: "customToast", text: 'Persona ya programada', life: 2000 })
+                } else if (res.data.status == false) {
+                    task.loading = false
+                    task.employees = res.data.task
+                    toast.add({ severity: 'error', group: "customToast", text: 'Hubo un error al programar', life: 2000 })
+                } else {
+                    task.employees = res.data.task
+                    task.loading = false
+                    toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
+                }
+            })
+        }
+    } else {
+        toast.add({ severity: 'error', group: "customToast", text: 'No se puede programar en dias anteriores', life: 2000 })
+    }
+}
+
+//#endregion
+
+
+//#region edicion de horarios
+
+
+const scheduleTime = ref({})
+
+const modhours = ref(false)
+const dateSelect = ref()
+const taskEdit = ref()
+
+function addPerson(event) {
+    overlayAddPerson.value.toggle(event)
+}
+
+const togglePerson = (event, persons, task, date) => {
+    dateSelect.value = date
+    taskEdit.value = task
+    personsEdit.value = persons
+    overlayPerson.value.toggle(event);
 }
 
 
+const formEditShift = ref({
+    startShift: '07:00',// hora inicio
+    endShift: '16:30',// hora fin
+    timeBreak: 0,
+    personalized: false, // Seleccionar turno => false, Seleccionar Horario Personalizado => false, Nuevo horario personalizado =>true
+    timeName: null, // nombre del horario personalizado
+    schedule_time: null,
+    //control formulario
+    loading: false
+})
+
+const shiftSelect = ref({})
+const editHour = (schedule_time) => {
+    scheduleTime.value = schedule_time
+    console.log(taskEdit.value)
+    modhours.value = true
+}
+
+const save = async (mode) => {
+    formEditShift.value.loading = true
+    if (tabActive.value == 0) {
+        formEditShift.value.personalized = false
+        if (shiftSelect.value.startShift == undefined) {
+            formEditShift.value.loading = false
+            toast.add({ severity: 'error', group: "customToast", text: 'Seleccione un horario', life: 2000 })
+            return
+        }
+        formEditShift.value.startShift = format24h(shiftSelect.value.startShift)
+        formEditShift.value.endShift = format24h(shiftSelect.value.endShift)
+        formEditShift.value.timeBreak = parseFloat(shiftSelect.value.timeBreak)
+    } else if (tabActive.value == 1) {
+        if (mode == 'custom') {
+            formEditShift.value.startShift = format24h(formEditShift.value.startShift)
+            formEditShift.value.endShift = format24h(formEditShift.value.endShift)
+            formEditShift.value.timeBreak = parseFloat(formEditShift.value.timeBreak)
+        } else if (shiftSelect.value.startShift == undefined) {
+            formEditShift.value.loading = false
+            toast.add({ severity: 'error', group: "customToast", text: 'Seleccione un horario', life: 2000 })
+            return
+        } else {
+            formEditShift.value.startShift = format24h(shiftSelect.value.startShift)
+            formEditShift.value.endShift = format24h(shiftSelect.value.endShift)
+            formEditShift.value.timeBreak = parseFloat(shiftSelect.value.timeBreak)
+        }
+    }
+    formEditShift.value.schedule_time = scheduleTime.value.idScheduleTime
+
+    await axios.post(route('programming.saveCustomizedSchedule'), formEditShift.value)
+        .then((res) => {
+            if (res.data.status) {
+                taskEdit.value.employees = res.data.task
+                toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
+                modhours.value = false
+            }
+            else {
+                conflicts.value = Object.values(res.data.conflict)
+                if (conflicts.value.length > 0) {
+                    openConflict.value = true;
+                }
+                toast.add({ severity: 'danger', group: "customToast", text: res.data.mensaje, life: 2000 })
+            }
+        }).catch((error) => {
+            console.log(error)
+            toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 2000 })
+        });
+    formEditShift.value.loading = false
+}
+
+//#endregion
+
+
+const onImageRightClick = (event, task, day) => {
+    menu.value.show(event);
+};
+
+const confirmDelete = (event, schedule_time) => {
+    // console.log(personsEdit.value)
+    confirm.require({
+        target: event.currentTarget,
+        message: {
+            message: '¿Está totalmente seguro?',
+            subMessage: 'No se puede deshacer'
+        },
+        icon: 'pi pi-exclamation-triangle text-danger',
+        rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+        acceptClass: 'p-button-sm p-button-success',
+        rejectLabel: 'No',
+        acceptLabel: 'Sí',
+        accept: async () => {
+            taskEdit.value.loading = true
+            await axios.post(route('programming.removeSchedule'), { schedule: schedule_time.idSchedule, type: 1 }).then((res) => {
+                if (res.data.status) {
+                    taskEdit.value.employees = res.data.task
+                    if (!(taskEdit.value.employees.some(empleado => empleado.NumSAP === schedule_time.idUsuario))) {
+                        overlayPerson.value.hide()
+                    }
+                    toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
+                }
+                else {
+                    conflicts.value = Object.values(res.data.conflict)
+                    if (conflicts.value.length > 0) {
+                        openConflict.value = true;
+                    }
+                }
+                taskEdit.value.loading = false
+            }).catch((error) => {
+                console.log(error)
+                toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 2000 })
+            })
+            taskEdit.value.loading = false
+        }, reject: () => {
+
+        }
+    })
+}
 </script>
 
 <template>
@@ -300,11 +393,11 @@ if (esMovil()) {
         <div class="h-full w-full flex flex-col sm:flex-row ">
             <div class="sm:w-full h-full pt-1 px-1 flex flex-col">
                 <div class="sm:flex gap-1 sm:justify-between h-20 sm:h-10 items-center sm:pr-1">
-                    <div class="flex w-full justify-between sm:w-fit space-x-4">
-                        <p class="text-xl font-bold text-primary h-full items-center flex">
+                    <div class="flex w-full justify-between items-center sm:w-fit space-x-4">
+                        <p class="text-xl font-bold text-primary truncate">
                             Programación de actividades
                         </p>
-                        <p class="border px-2 bg-primary rounded-lg text-white flex items-center">
+                        <p class="border h-min px-2 bg-primary rounded-lg text-white flex items-center">
                             {{ $page.props.auth.user.oficina }}
                         </p>
                     </div>
@@ -315,8 +408,7 @@ if (esMovil()) {
                             optionLabel="name" @change="getTask()" class="sm:hidden flex" />
                         <ButtonGroup class="hidden sm:block">
                             <Button label="Semana" @click="getTask('week')" :outlined="mode != 'week'" />
-                            <Button label="dia" @click="getTask('date')"
-                                :outlined="mode != 'date'" />
+                            <Button label="dia" @click="getTask('date')" :outlined="mode != 'date'" />
                         </ButtonGroup>
                         <div class="sm:w-52 w-full">
                             <CustomInput v-model:input="dates" :type="mode" :manualInput="false"
@@ -332,9 +424,9 @@ if (esMovil()) {
                                 <p class="flex w-full justify-center items-baseline font-bold">Proyecto</p>
                             </div>
                             <span class="grid grid-cols-7 col-span-9">
-                                <div v-for="dia, index in diasSemana" class="flex flex-col items-center"
+                                <div v-for="dia, index in diasSemana" class="flex w-full flex-col items-center"
                                     :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary rounded-t-md font-bold' : '']">
-                                    <p class="flex capitalize border-b w-full justify-center items-baseline">{{
+                                    <p class="capitalize border-b w-full truncate text-center">{{
                                 dia.toLocaleDateString('es-CO', {
                                     weekday: 'long', year: 'numeric', month: 'numeric', day:
                                         'numeric'
@@ -362,9 +454,9 @@ if (esMovil()) {
                                 <span class="grid grid-cols-7 col-span-9 overflow-y-auto overflow-x-hidden">
                                     <div v-for="dia, index in diasSemana" class="flex flex-col h-full items-center"
                                         :class="[index > 4 ? 'bg-warning-light' : '', dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
-                                        <TaskProgramming :project="project.id" :day="dia" :key="dates.toDateString() + project.id"
-                                            type="week" @drop="onDrop" v-model:itemDrag="personDrag"
-                                            @togglePerson="togglePerson" />
+                                        <TaskProgramming :project="project.id" :day="dia" @menu="onImageRightClick"
+                                            :key="dates.toDateString() + project.id" type="week" @drop="onDrop"
+                                            v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
                                     </div>
                                 </span>
 
@@ -373,22 +465,22 @@ if (esMovil()) {
                                 <NoContentToShow subject="Seleccione uno o mas proyectos" />
                             </div>
                         </div>
-
-                        <div class="grid-cols-10 h-8 text-sm grid pr-3 pl-2 border-t shadow-lg mt-1 ">
+                        <div class="grid-cols-10 h-8 text-sm grid pr-3 items-center pl-2 border-t shadow-lg mt-1 ">
                             <div>
-                                <p class="w-full h-full flex items-center justify-center font-bold">
+                                <p class="w-full h-full truncate font-bold">
                                     Total personas
                                 </p>
                             </div>
-                            <span class="col-span-9 grid grid-cols-7 z-10">
-                                <div v-for="dia, index in diasSemana">
+                            <div class="col-span-9 grid grid-cols-7 z-10">
+                                <span v-for="dia in diasSemana">
                                     <UserStatusProgramming :date="dia" :key="dia"
                                         v-model:statusSelect="arrayPersonFilter" />
-                                </div>
-                            </span>
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <div v-if="mode == 'date'" class="h-full border rounded-md flex flex-col justify-between">
+                    <div v-if="mode == 'date'"
+                        class="h-full border overflow-hidden rounded-md flex flex-col justify-between">
                         <p class="sm:block hidden w-full h-6 text-center bg-primary-light font-bold">
                             Programacion del dia {{ dates.toLocaleDateString() }}
                         </p>
@@ -413,15 +505,17 @@ if (esMovil()) {
                                     </div>
                                 </div>
                                 <div class="h-full sm:h-full p-1 w-full overflow-y-auto">
-                                    <TaskProgramming :project="project.id" :day="dates" :key="dates.toDateString() + project.id"
-                                        @drop="onDrop" v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
+                                    <TaskProgramming type="day" @addPerson="addPerson" :movil="esMovil()"
+                                        @menu="onImageRightClick" :project="project.id" :day="dates"
+                                        :key="dates.toDateString() + project.id" @drop="onDrop"
+                                        v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
                                 </div>
                             </div>
                             <div v-else>
                                 <NoContentToShow subject="Seleccione uno o mas proyectos" />
                             </div>
                         </div>
-                        <div class="w-full flex justify-center z-10" oncontextmenu="return false">
+                        <div class="w-full flex justify-center h-min z-10" oncontextmenu="return false">
                             <UserStatusProgramming :letters="true" :date="dates" :key="dates.toISOString()"
                                 v-model:statusSelect="arrayPersonFilter" />
                         </div>
@@ -431,22 +525,21 @@ if (esMovil()) {
             </div>
             <!--#region LISTA PERSONAL-->
             <span v-if="!esMovil()">
-                <ListPersonDrag  v-model:itemDrag="personDrag" :arrayPersonFilter="arrayPersonFilter" />
+                <ListPersonDrag class="sm:block hidden" v-model:itemDrag="personDrag"
+                    :arrayPersonFilter="arrayPersonFilter" />
             </span>
         </div>
     </AppLayout>
 
     <OverlayPanel ref="overlayPerson">
         <div class="flex flex-col space-y-1">
-            <!-- {{ personsEdit }} -->
             <div class="flex flex-col border p-1 rounded-md justify-between">
                 <p class="text-sm font-bold">{{ personsEdit.Nombres_Apellidos }}</p>
                 <div class="grid gap-2">
                     <span v-for="schedule_time in personsEdit.times"
-                        class="text-xs flex bg-success-light justify-center hover:justify-between rounded-md p-1 hover:space-x-1 group">
-                        <button
-                            class="rounded shadow-2xl px-1 hover:ring-1 ring-warning  hover:bg-warning-light hidden group-hover:block"
-                            @click="editHour(schedule_time, 'modify')">
+                        class="text-xs flex bg-success-light justify-center space-x-3 rounded-md p-1">
+                        <button class="rounded shadow-2xl px-1 hover:ring-1 ring-warning  hover:bg-warning-light"
+                            @click="editHour(schedule_time)">
                             <i class="fa-solid fa-pencil text-warning"></i>
                         </button>
                         <div class="grid grid-cols-2 space-x-1">
@@ -455,8 +548,8 @@ if (esMovil()) {
                             <p>{{ schedule_time.horaFin.slice(0,
                                 schedule_time.horaFin.lastIndexOf(':')) }}</p>
                         </div>
-                        <button @click="editHour(schedule_time, 'delete')"
-                            class="rounded shadow-2xl px-1 hover:ring-1 ring-danger  hover:bg-danger-light hidden group-hover:block">
+                        <button @click="confirmDelete($event, schedule_time)"
+                            class="rounded shadow-2xl px-1 hover:ring-1 ring-danger  hover:bg-danger-light">
                             <i class="fa-solid fa-trash-can text-danger"></i>
                         </button>
                     </span>
@@ -467,113 +560,114 @@ if (esMovil()) {
 
     <!--#region MODALES -->
 
+    <OverlayPanel ref="overlayAddPerson" :pt="{ root: 'w-96' }">
+        <Listbox v-model="personsSelect" multiple filter :options="personal" optionLabel="Nombres_Apellidos"
+            class="w-full" listStyle="max-height:250px">
+            <template #option="slotProps">
+                <div class="flex">
+                    <div>{{ slotProps.option.Nombres_Apellidos }}</div>
+                </div>
+            </template>
+        </Listbox>
+        <div class="flex w-full pt-2 px-4 space-x-2 justify-center">
+            <!-- <Button label="Cancelar" severity="danger"/> -->
+            <Button label="Programar" severity="success" />
+        </div>
+    </OverlayPanel>
+
     <CustomModal v-if="modhours" v-model:visible="modhours" :footer="false" icon="fa-regular fa-clock" width="60vw"
-        :closeOnEscape="false"
-        :titulo="editHorario?.option != 'delete' ? 'Modificar horario de ' + editHorario?.nombre : 'Eliminando a ' + editHorario?.nombre + ' de la actividad ' + editHorario?.nombreTask">
+        :closeOnEscape="false" :titulo="'Modificar horario de ' + scheduleTime?.nombre">
         <template #body>
-            <form @submit.prevent="save" class="pb-2">
-                <div v-if="editHorario?.option != 'delete'" class="flex flex-col gap-1">
-                    <div class="flex items-center justify-between col-span-3 ">
-                        <p class="font-bold">Horario actual:</p>
-                        <p class="px-1 py-1 text-green-900 bg-green-200 rounded-md">
-                            {{ format24h(editHorario.horaInicio.slice(0,
-                                editHorario.horaInicio.lastIndexOf(':'))) }}
-                            {{ format24h(editHorario.horaFin.slice(0,
-                                editHorario.horaFin.lastIndexOf(':'))) }}
-                        </p>
-                    </div>
-                    <TabView v-model:activeIndex="tabActive" class="border rounded-md p-1" :pt="{
+            <!-- {{ tabActive }} -->
+            <div class="flex flex-col gap-1">
+                <div class="flex items-center justify-between col-span-3 ">
+                    <p class="font-bold">Horario actual:</p>
+                    <p class="px-1 py-1 text-green-900 bg-green-200 rounded-md">
+                        <!-- {{ scheduleTime }} -->
+                        {{ format24h(scheduleTime.horaInicio.slice(0,
+                                scheduleTime.horaInicio.lastIndexOf(':'))) }}
+                        {{ format24h(scheduleTime.horaFin.slice(0,
+                                scheduleTime.horaFin.lastIndexOf(':'))) }}
+                    </p>
+                </div>
+
+                <TabView v-model:activeIndex="tabActive" class="border rounded-md p-1 mb-2" :pt="{
                                 nav: '!flex !justify-between',
                                 panelContainer: '!p-1'
                             }">
-                        <TabPanel header="Seleccionar Turno" :pt="{
+                    <TabPanel header="Seleccionar turno predefinido" :pt="{
                                 root: 'w-full',
+                                headerAction: tabActive == 0 ? 'bg-primary text-white' : '',
                                 headerTitle: '!w-full !flex !justify-center',
                             }">
-                            <CustomShiftSelector v-model:shift="nuevoHorario" />
-                        </TabPanel>
-                        <TabPanel header="Seleccionar Horario Personalizado" :pt="{
+                        <div class="">
+                            <CustomShiftSelector v-model:shift="shiftSelect" />
+                        </div>
+                        <span class="w-full flex justify-end pt-3 items-center">
+                            <Button v-if="tabActive == 0" @click="save()" label="Guardar" icon="fa-solid fa-floppy-disk"
+                                severity="success" :loading="formEditShift.loading" />
+                        </span>
+                    </TabPanel>
+                    <TabPanel header="Seleccionar turno Personalizado" :pt="{
                                 root: 'w-full',
+                                headerAction: tabActive == 1 ? 'bg-primary text-white' : '',
                                 headerTitle: '!w-full !flex !justify-center',
                             }">
-                            <CustomShiftSelector :shiftUser="parseInt($page.props.auth.user.id)"
-                                v-model:shift="nuevoHorario" />
-                        </TabPanel>
-                        <TabPanel header="Personalizado" :pt="{
-                                root: 'w-full',
-                                headerTitle: '!w-full !flex !justify-center',
-                            }">
-                            <div class="h-52 space-y-2 m-1 mt-3">
-                                <span class="flex gap-2 items-center">
-                                    <label class="-mb-0.5" for="switch1">Guardar en personalizados?</label>
-                                    <InputSwitch inputId="switch1" v-model="formEditHour.personalized" />
-                                </span>
-                                <CustomInput v-if="formEditHour.personalized" v-model:input="formEditHour.timeName"
-                                    label="Nombre" type="text" id="name" placeholder="Nombre del horario"
-                                    :required="tabActive == 2" />
-                                <span class="grid grid-cols-3 gap-x-1">
-                                    <CustomInput v-model:input="formEditHour.startShift" label="Hora inicio" type="time"
-                                        :stepMinute="30" id="start" placeholder="Hora de inicio"
-                                        :required="tabActive === 2" />
-                                    <CustomInput v-model:input="formEditHour.endShift" label="Hora fin" type="time"
-                                        id="end" :stepMinute="30" placeholder="Hora de fin"
-                                        :required="tabActive === 2" />
-                                    <CustomInput v-model:input="formEditHour.timeBreak" label="Descanso" type="number"
-                                        suffix=" Hora" id="break" placeholder="Descanso en horas"
-                                        :required="tabActive === 2" />
-                                </span>
+                        <div class="h-80 grid grid-cols-2 gap-3">
+                            <div class="border w-full flex flex-col justify-between p-2 rounded-md space-y-3">
+                                <CustomShiftSelector :shiftUser="parseInt($page.props.auth.user.id)"
+                                    v-model:shift="shiftSelect" />
+                                <div class="flex justify-end">
+                                    <Button @click="save()" label="Guardar" icon="fa-solid fa-floppy-disk"
+                                        severity="success" :loading="formEditShift.loading" />
+                                </div>
                             </div>
-                        </TabPanel>
-                    </TabView>
-                </div>
-                <p class="font-bold text-xl">Aplicar por:</p>
-                <div class="flex items-center p-2 gap-4">
-                    <div v-for="category in [
-                                { name: 'Solo el ' + dateSelect.toISOString().split('T')[0], key: 1 },
-                                { name: 'Resto de la actividad', key: 2 },
-                                // { name: 'Rango de fechas', key: 3 },
-                                { name: 'Fechas específicas', key: 4 }
-                            ]" :key="category.key" class="flex items-center">
-                        <RadioButton v-model="formEditHour.type" :inputId="category.key + category.name" name="dynamic"
-                            :value="category.key" @click="formEditHour.details = []" />
-                        <label :for="category.key" class="ml-1 mb-0">{{ category.name }}</label>
-                    </div>
-                    <Calendar v-if="formEditHour.type == 3 || formEditHour.type == 4" show-icon v-model="selectDays"
-                        class="col-span-3" :selectionMode="'multiple'" :min-date="date" :manualInput="false" :pt="{
-                                input: '!h-8'
-                            }" />
-                </div>
-                <!-- {{editHorario?.option != 'delete'?tabActive != 2? nuevoHorario?.startShift!=null?false:true:false:false }} -->
-                <span class="w-full grid grid-cols-4 justify-end gap-5 items-center">
-                    <Button type="submit" class="col-start-4" :loading="formEditHour.loading"
-                        :disabled="(editHorario?.option !== 'delete') && (tabActive !== 2) && (nuevoHorario?.startShift !== null)"
-                        :severity="editHorario?.option != 'delete' ? 'success' : 'danger'"
-                        :icon="editHorario?.option != 'delete' ? 'fa-solid fa-floppy-disk' : 'fa-solid fa-trash-can'"
-                        :label="editHorario?.option != 'delete' ? 'Guardar' : 'Eliminar'" />
-                </span>
-            </form>
+                            <form @submit.prevent="save('custom')"
+                                class="border w-full flex flex-col justify-between p-2 rounded-md space-y-3">
+                                <label class="text-center w-full font-bold text-gray-900">
+                                    Personalizar turno</label>
+                                <span class="grid grid-cols-2 gap-2">
+                                    <CustomInput label="Hora inicio" type="time"
+                                        v-model:input="formEditShift.startShift" :stepMinute="30" id="start"
+                                        placeholder="Hora de inicio" :required="true" />
+                                    <CustomInput label="Hora fin" type="time" id="end"
+                                        v-model:input="formEditShift.endShift" :stepMinute="30"
+                                        placeholder="Hora de fin" :required="true" />
+                                    <CustomInput label="Descanso" type="number" v-model:input="formEditShift.timeBreak"
+                                        suffix=" Hora" id="break" placeholder="Descanso en horas" :required="true" />
+                                    <div class="flex flex-col items-center">
+                                        <label class="w-full text-center" for="switch1">¿Guardar?</label>
+                                        <InputSwitch inputId="switch1" v-model="formEditShift.personalized" />
+                                    </div>
+                                    <CustomInput v-if="formEditShift.personalized" class="col-span-2"
+                                        v-model:input="formEditShift.timeName" label="Nombre" type="text" id="name"
+                                        placeholder="Nombre del horario" :required="true" />
+                                </span>
+                                <div class="flex justify-end w-full">
+                                    <Button type="submit"
+                                        :label="formEditShift.personalized ? 'Guardar turno y aplicar' : 'Aplicar'"
+                                        icon="fa-solid fa-floppy-disk" severity="success"
+                                        :loading="formEditShift.loading" />
+                                </div>
+                            </form>
+                        </div>
+                    </TabPanel>
+                </TabView>
+            </div>
         </template>
     </CustomModal>
 
-    <ModalColisions v-model:visible="openConflict" v-model:conflicts="conflicts" v-model:task="task">
-    </ModalColisions>
+    <!-- <ModalColisions v-model:visible="openConflict" v-model:conflicts="conflicts" v-model:task="taskEdit">
+    </ModalColisions> -->
 
     <!--#endregion-->
+    <ContextMenu ref="menu" :model="items">
+        <template #item="{ item, props }">
+            <!-- {{console.log(props)}} -->
+            <a v-ripple class="flex items-center" v-bind="props.action">
+                <span :class="item.icon" />
+                <span class="ml-2">{{ item.label }}</span>
+            </a>
+        </template>
+    </ContextMenu>
 </template>
-
-<style scoped>
-.custom-image {
-    width: 200px;
-    height: 50px;
-    /* object-position: 50% 30%; */
-    border-radius: 5px 10px;
-    object-fit: cover;
-    /* Opciones: 'cover', 'contain', 'fill', etc. */
-}
-
-.info-resto {
-    font-size: 15px;
-    text-wrap: balance;
-    opacity: .5;
-}
-</style>

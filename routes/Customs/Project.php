@@ -37,6 +37,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::post('/syncGantt/{project}', [ScheduleController::class, 'sync'])->name('syncGantt');
 
+    Route::post('/Schedule/assignmentCalendar', [ScheduleController::class, 'assignmentCalendar'])->name('assignment.calendar');
+
     Route::post('/syncGanttImporter/{project}', [ScheduleController::class, 'syncImporter'])->name('syncImporter');
 
     //CRUD Projects

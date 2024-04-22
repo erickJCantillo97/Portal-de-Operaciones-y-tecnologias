@@ -31,6 +31,7 @@ class RequirementController extends Controller
             'dibujante' => $requirement->user->short_name,
             'estado' => $requirement->estado,
             'fecha' => Carbon::parse($requirement->preeliminar_date)->format('d-m-Y'),
+            'nota' => $requirement->note,
         ];
     }
     public function index(Request $request)
@@ -58,9 +59,9 @@ class RequirementController extends Controller
     public function getRequirementByRole()
     {
         $requirements = [];
-        if (auth()->user()->hasRole('ADMIN' . '%TOP%' . auth()->user()->gerencia)) {
+        if (auth()->user()->hasRole('ADMIN DIPR' . '%TOP%' . auth()->user()->gerencia)) {
             // return Requirement::has('project')->with('project', 'user')->get();
-            $requirements = Requirement::has('project')->with('project', 'user')->get()->map(function ($r) {
+            $requirements = Requirement::has('project')->with('project', 'user')->whereNull('oficial_date')->get()->map(function ($r) {
                 return [
                     'id' => $r->id,
                     'title' => 'Requerimiento ' . $r->consecutive,

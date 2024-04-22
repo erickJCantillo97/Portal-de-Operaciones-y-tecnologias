@@ -39,7 +39,7 @@ const shift = defineModel('shift', {
         <Listbox :options="shifts" filterPlaceholder="Escriba aqui para filtrar turno" :optionValue="optionValue"
             v-model="shift" :filterFields="['name', 'startShift', 'endShift', 'timeBreak', 'hours']" optionLabel="name"
             filter :pt="{
-                list: '!h-40 !p-1 !space-y-1',
+                list: 'max-h-48 h-48 flex flex-col !p-1 !space-y-1',
                 item: '!h-10 !p-0 !rounded-md hover:!bg-primary-light',
                 filterInput: '!h-8',
                 header: '!p-1'

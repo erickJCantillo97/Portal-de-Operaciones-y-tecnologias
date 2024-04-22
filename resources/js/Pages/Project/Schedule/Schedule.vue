@@ -14,6 +14,8 @@ import Checkbox from 'primevue/checkbox';
 import CustomModal from '@/Components/CustomModal.vue';
 import FileUpload from 'primevue/fileupload';
 import CustomInput from '@/Components/CustomInput.vue';
+import Dropdown from 'primevue/dropdown';
+import MultiSelect from 'primevue/multiselect';
 
 const toast = useToast();
 const fontSize = ref('10px')
@@ -577,7 +579,7 @@ const project = ref(
         listeners: {
             syncFail: (e) => {
                 console.log(e)
-                toast.add({ severity: 'error', group: 'customToast', text: 'Ha ocurrido un error, reiniciando...', life: 3000 });
+                toast.add({ severity: 'error', group: 'customToast', text: e.response.mensaje, life: 3000 });
                 // setTimeout(() => { location.reload() }, 3000);
             },
             beforeSync: (data) => {
@@ -589,9 +591,12 @@ const project = ref(
                 canRedo.value = gantt.project.stm.canRedo
                 canUndo.value = gantt.project.stm.canUndo
             },
-            load: () => {
+            load: (e) => {
                 onExpandAllClick()
                 onZoomToFitClick()
+                listCalendar.value = e.response.assignCalendar;
+                listShift.value = e.response.shift;
+                formCalendar.value.project = props.project.id;
             }
         },
     },
@@ -622,6 +627,17 @@ const ganttConfig = ref({
             width: 150,
             showAvatars: true,
             align: 'center',
+            finalizeCellEdit: ({ record }) => {
+                if (record.data.children.length == 0) {
+                    // if (DateHelper.isBefore(record.data.endDate, new Date())) {
+                    //     return 'La actividad ya finalizo'
+                    // } else {
+                    //     return true
+                    // }
+                }else{
+                    return 'No se puede programar recursos en esta actividad'
+                }
+            },
             editor: {
                 chipView: {
                     itemTpl: assignment => assignment.resourceName
@@ -729,33 +745,55 @@ const onEditTaskClick = () => {
 }
 
 const onExpandAllClick = () => {
-    let gantt = ganttref.value.instance.value
-    gantt.expandAll();
+    try {
+        let gantt = ganttref.value.instance.value
+        gantt.expandAll();
+    } catch (error) {
+        // console.log(error)
+    }
 }
 
 //recojer todas las tareas
 const onCollapseAllClick = () => {
-    let gantt = ganttref.value.instance.value
-    gantt.collapseAll();
+    try {
+        let gantt = ganttref.value.instance.value
+        gantt.collapseAll();
+    } catch (error) {
+        // console.log(error)
+    }
+
 }
 
 const zoom = ref()
 function onZoomInClick() {
-    let gantt = ganttref.value.instance.value
-    gantt.zoomIn();
+    try {
+        let gantt = ganttref.value.instance.value
+        gantt.zoomIn();
+    } catch (error) {
+        // console.log(error)
+    }
 }
 
 function onZoomOutClick() {
-    let gantt = ganttref.value.instance.value
-    gantt.zoomOut();
+    try {
+        let gantt = ganttref.value.instance.value
+        gantt.zoomOut();
+    } catch (error) {
+        // console.log(error)
+    }
 }
 
 function onZoomToFitClick() {
-    let gantt = ganttref.value.instance.value
-    gantt.zoomToFit({
-        leftMargin: 50,
-        rightMargin: 50
-    });
+    try {
+        let gantt = ganttref.value.instance.value
+        gantt.zoomToFit({
+            leftMargin: 50,
+            rightMargin: 50
+        });
+    } catch (error) {
+        // console.log(error)
+    }
+
 }
 
 const fecha = ref()
@@ -1000,6 +1038,118 @@ const url = [
         active: true
     }
 ]
+
+const calendar = ref();
+const calendarCreate = ref(true);
+
+const listDays = ref([
+    { name: 'Lunes', code: "MONDAY" },
+    { name: 'Martes', code: "TUESDAY" },
+    { name: 'Miercoles', code: "WEDNESDAY" },
+    { name: 'Jueves', code: "THURSDAY" },
+    { name: 'Viernes', code: "FRIDAY" },
+    { name: 'Sabado', code: "SATURDAY" },
+    { name: 'Domingo', code: "SUNDAY" }
+]);
+const listCalendar = ref([]);
+const loadSaveCalendar = ref(false);
+const listShift = ref([]);
+const formCalendar = ref({
+    newCalendar: false,
+    project: '',
+    calendar: null,
+    name: '',
+    days: [],
+    shift: null,
+    isWorking: []
+})
+const toggleCalendar = (event) => {
+    formCalendar.value.newCalendar = false;
+    calendarCreate.value = true;
+    calendar.value.toggle(event);
+}
+const newCalendar = () => {
+    calendarCreate.value = false;
+    formCalendar.value.newCalendar = true;
+}
+const submit = async  () => {
+    loadSaveCalendar.value = true;
+     let gantt = ganttref.value.instance.value
+    console.log(formCalendar.value);
+    let error = false;
+    if (formCalendar.value.newCalendar) {
+        if (formCalendar.value.name == '') {
+            toast.add({
+                    severity: 'error',
+                    group: 'customToast',
+                    text: 'Debe ingresar el nombre del calendario',
+                    life: 2000
+                });
+
+                error = true;
+        }else if(formCalendar.value.days == []){
+            toast.add({
+                severity: 'error',
+                group: 'customToast',
+                text: 'Debe deleccionar al menos 1 dia',
+                life: 2000
+            });
+            error = true;
+        } else if (formCalendar.value.shift == null) {
+            toast.add({
+                severity: 'error',
+                group: 'customToast',
+                text: 'Debe deleccionar al menos 1 dia',
+                life: 3000
+            });
+            error = true;
+        }
+    } else {
+        if (formCalendar.value.calendar == null) {
+            toast.add({
+                severity: 'error',
+                group: 'customToast',
+                text: 'Debe seleccionar un calendario',
+                life: 3000
+            });
+            error = true;
+        }
+    }
+    if(!error){
+        await axios.post(route('assignment.calendar'), formCalendar.value).then((res)=>{
+            console.log(res.data);
+            if (res.data.status) {
+                toast.add({
+                    severity: 'success',
+                    group: 'customToast',
+                    text: res.data.mensaje,
+                    life: 4000
+                })
+                loadSaveCalendar.value = false;
+                gantt.project.load();
+                calendar.value.hide();
+            } else {
+                toast.add({
+                    severity: 'error',
+                    group: 'customToast',
+                    text: res.data.mensaje,
+                    life: 4000
+                })
+            }
+        }).catch((e)=>{
+            console.log(e);
+            toast.add({
+                severity: 'error',
+                group: 'customToast',
+                text: e.mensaje,
+                life: 4000
+            })
+        })
+    }else{
+        
+        loadSaveCalendar.value = false;
+    }
+}
 </script>
 <template>
     <AppLayout :href="url">
@@ -1048,6 +1198,8 @@ const url = [
                         placeholder="Buscar por fecha" class=" !h-8 shadow-md" showIcon :pt="{ input: '!h-8' }" />
                     <InputText v-model="texto" @input="onFilterChange" placeholder="Buscar por actividad"
                         class="shadow-md" />
+                    <Button raised v-tooltip.bottom="'Agregar Calendario'" icon="fa-regular fa-calendar-plus"
+                        v-if="!readOnly" @click="toggleCalendar" />
                     <Button raised v-tooltip.bottom="'Guardar en linea base'" icon="fa-solid fa-grip-lines"
                         @click="setLB.toggle($event);" v-if="!readOnly" />
                     <Button raised v-tooltip.bottom="'Ver lineas base'" icon="fa-solid fa-eye"
@@ -1143,6 +1295,43 @@ const url = [
                 @click="importMSP" />
         </template>
     </CustomModal>
+    <OverlayPanel ref="calendar" class="w-96">
+        <div v-if="calendarCreate">
+            <section class="grid grid-cols-1 gap-2">
+                <div class="flex flex-column gap-20">
+                    <label class="w-full">Asignación de calendario</label>
+                    <Button severity="success" class="button-right" v-tooltip.bottom="'Nuevo Calendario'"
+                        icon="fa-solid fa-plus" @click="newCalendar" />
+                </div>
+                <Dropdown v-model="formCalendar.calendar" :options="listCalendar" optionLabel="name"
+                    placeholder="Seleccione un calendario" checkmark :highlightOnSelect="false" class="w-full"
+                    showClear />
+                <br>
+            </section>
+        </div>
+        <!-- F0rmulario de creación -->
+        <div v-if="!calendarCreate">
+            <h1 class="text-center">Nuevo Calendario</h1>
+            <CustomInput label="Nombre" id="name" v-model:input="formCalendar.name"
+                placeholder="Nombre del Calendario" />
+            <br>
+            <section class="grid grid-cols-2 gap-2">
+                <MultiSelect v-model="formCalendar.days" :options="listDays" optionLabel="name"
+                    placeholder="Seleccione días" :maxSelectedLabels="3" class="w-full md:w-20rem" display="chip" />
+                <Dropdown v-model="formCalendar.shift" :options="listShift" optionLabel="name"
+                    placeholder="Seleccione horario" checkmark :highlightOnSelect="false" class="w-full" showClear />
+                <div class="flex align-items-center">
+                    <Checkbox v-model="formCalendar.isWorking" inputId="isWorking" name="Día Laboral"
+                        value="isWorking" />
+                    <label for="isWorking" class="ml-2"> Día Laboral </label>
+                </div><br>
+            </section>
+        </div>
+        <div>
+            <Button severity="success" :loading="loadImport" label="Guardar" @click="submit" />
+        </div>
+    </OverlayPanel>
+
 </template>
 
 

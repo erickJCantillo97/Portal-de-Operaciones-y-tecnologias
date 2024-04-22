@@ -695,41 +695,43 @@ class ProgrammingController extends Controller
             Assignment::where('event', $schedule->task_id)
                 ->where('resource', $schedule->employee_id)->delete();
             // dd($schedule);
-            switch ($request->type) {
-                    //SOLO EL $request->date
-                case 1:
-                    ScheduleTime::where('schedule_id', $schedule->id)->delete();
+            ScheduleTime::where('schedule_id', $schedule->id)->delete();
                     $schedule->delete();
-                    break;
-                case 2:
-                    //RESTO DE LA ACTIVIDAD
-                    $schedules = Schedule::where('fecha', '>=', $schedule->fecha)
-                        ->where('task_id', $schedule->task_id)
-                        ->where('employee_id', $schedule->employee_id)->pluck('id')->toArray();
-                    Schedule::whereIn('id', $schedules)->delete();
-                    ScheduleTime::whereIn('schedule_id', $schedules)->delete();
-                    break;
-                    // case 3:
-                    //     //RANGO DE FECHAS
-                    //     $schedule = Schedule::where('employee_id', $request->idUser)
-                    //         ->whereBetween('fecha', [$request->details[0], $request->details[1]])->get();
-                    //     $itemsToRemove = $schedule->map(function ($item) {
-                    //         return $item->id;
-                    //     });
-                    //     ScheduleTime::whereIn('schedule_id', $itemsToRemove)->delete();
-                    //     Schedule::whereBetween('fecha', [$request->details[0], $request->details[1]])->delete();
-                    //     break;
-                case 4:
-                    //FECHAS ESPECIFICAS
-                    $schedules = Schedule::whereIn('fecha', $request->details)
-                        ->where('task_id', $schedule->task_id)
-                        ->where('employee_id', $schedule->employee_id)->pluck('id')->toArray();
-                    Schedule::whereIn('id', $schedules)->delete();
-                    ScheduleTime::whereIn('schedule_id', $schedules)->delete();
-                    break;
-                default:
-                    break;
-            }
+            // switch ($request->type) {
+            //         //SOLO EL $request->date
+            //     case 1:
+            //         ScheduleTime::where('schedule_id', $schedule->id)->delete();
+            //         $schedule->delete();
+            //         break;
+            //     case 2:
+            //         //RESTO DE LA ACTIVIDAD
+            //         $schedules = Schedule::where('fecha', '>=', $schedule->fecha)
+            //             ->where('task_id', $schedule->task_id)
+            //             ->where('employee_id', $schedule->employee_id)->pluck('id')->toArray();
+            //         Schedule::whereIn('id', $schedules)->delete();
+            //         ScheduleTime::whereIn('schedule_id', $schedules)->delete();
+            //         break;
+            //         // case 3:
+            //         //     //RANGO DE FECHAS
+            //         //     $schedule = Schedule::where('employee_id', $request->idUser)
+            //         //         ->whereBetween('fecha', [$request->details[0], $request->details[1]])->get();
+            //         //     $itemsToRemove = $schedule->map(function ($item) {
+            //         //         return $item->id;
+            //         //     });
+            //         //     ScheduleTime::whereIn('schedule_id', $itemsToRemove)->delete();
+            //         //     Schedule::whereBetween('fecha', [$request->details[0], $request->details[1]])->delete();
+            //         //     break;
+            //     case 4:
+            //         //FECHAS ESPECIFICAS
+            //         $schedules = Schedule::whereIn('fecha', $request->details)
+            //             ->where('task_id', $schedule->task_id)
+            //             ->where('employee_id', $schedule->employee_id)->pluck('id')->toArray();
+            //         Schedule::whereIn('id', $schedules)->delete();
+            //         ScheduleTime::whereIn('schedule_id', $schedules)->delete();
+            //         break;
+            //     default:
+            //         break;
+            // }
             DB::commit();
 
             return response()->json([
@@ -844,61 +846,101 @@ class ProgrammingController extends Controller
         );
     }
 
-    public function moveEmployee(Request $request){
-        // $request->fecha = '2024-04-19';
+    public function moveEmployee(Request $request)
+    {
+        // $request->date = '2024-04-19';
         // $request->task = 4613;
         // $request->schedule = '1427';
         try {
-        DB::beginTransaction();
-            $schedule = Schedule::where('id',$request->schedule)->first();
-            $newTask = VirtualTask::find($request->task);
-            if($newTask->endDate < Carbon::now()->format('Y-m-d')){
-                return response()->json([
-                    'status' => false,
-                    'mensaje' => 'No se puede mover a:'.$schedule->name.' porque la tarea ya finalizó.'
-                   // 'task' => $this->getSchedule($schedule->fecha, $schedule->task_id)
+            DB::beginTransaction();
+            $conflict = [];
+            $status = true;
+            $schedule = Schedule::find($request->schedule);
+            $mensaje = 'Se ha movido de tarea a: ' . $schedule->name . '.';
+            $exist = DetailScheduleTime::where('idUsuario', $schedule->employee_id)
+            ->where('fecha', $request->date)
+            ->get();
+        if ($exist->count() > 0) {
+            if($exist->count() == 1 && $exist[0]->fecha == Carbon::parse($schedule->fecha)->format('Y-m-d')){
+                $schedule = Schedule::find($request->schedule);
+                Assignment::where('event',$schedule->task_id)
+                ->where('resource',$schedule->employee_id)->delete();
+                $schedule->task_id = $request->task;
+                $schedule->save();
+                //se agregan los recursos al cronograma.
+                $employee = searchEmpleados('Num_SAP', $schedule->employee_id)->first();
+
+                Assignment::firstOrCreate([
+                    'event' => $request->task,
+                    'resource' => $schedule->employee_id,
+                    'units' => 100,
+                    'name' => $schedule->name,
+                    'costo_hora' => $employee->Costo_Hora
                 ]);
+
+            }else{
+                $exist = collect($exist)->each(function ($DetailScheduleTime) {
+                    $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
+                });
+                $conflict[$schedule->fecha] = $exist;
+                $mensaje = 'Se han generado colisiones al mover a: '.$schedule->name.' ';
+                $status = false;
             }
+        }else{
+
             $newSchedule = Schedule::firstOrCreate([
                 'employee_id' => $schedule->employee_id,
                 'name' => $schedule->name,
                 'task_id' => $request->task,
-                'fecha' => $schedule->fecha
+                'fecha' => $request->date
             ]);
-            $scheduleTimes = ScheduleTime::where('schedule_id',$request->schedule)->get();
-            foreach($scheduleTimes as $scheduleTime){
+            $newSchedule->save();
+            $scheduleTimes = ScheduleTime::where('schedule_id', $request->schedule)->get();
+            foreach ($scheduleTimes as $scheduleTime) {
                 ScheduleTime::firstOrCreate([
                     'schedule_id' => $newSchedule->id,
                     'hora_inicio' => $scheduleTime->hora_inicio,
                     'hora_fin' => $scheduleTime->hora_fin,
                 ]);
             }
-            Assignment::where('resource',$schedule->employee_id)->where('event','=',$schedule->task_id)->delete();
-            ScheduleTime::where('schedule_id',$schedule->id)->delete();
+            Assignment::where('resource', $schedule->employee_id)->where('event', '=', $schedule->task_id)->delete();
+            ScheduleTime::where('schedule_id', $schedule->id)->delete();
             $schedule->delete();
+        }
             DB::commit();
             return response()->json([
-                'status' => true,
-                'mensaje' => 'Se ha movido de tarea a: '.$schedule->name.'.'
-               // 'task' => $this->getSchedule($schedule->fecha, $schedule->task_id)
+                'status' => $status,
+                'conflict' => $conflict,
+                'mensaje' => $mensaje,
+                'task' => $this->getSchedule($request->date, $request->task),
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            return response()->json(['status' => false,'mensaje' => $e->getMessage()]);
+            return response()->json(['status' => false, 'mensaje' => $e->getMessage()]);
         }
     }
 
-    public function copyPaste (Request $request){
+    public function copyPaste(Request $request)
+    {
         try {
             DB::beginTransaction();
-            
-                return response()->json([
-                    'status' => true,
-                    'mensaje' => 'Mensaje desde el controlador'
-                ]);
-            } catch (Exception $e) {
-                DB::rollBack();
-                return response()->json(['status' => false,'mensaje' => $e->getMessage()]);
+            $data = DetailScheduleTime::where('idTask',$request->task)
+            ->where('fecha',$request->date)->get();
+            foreach($data as $item){
+                $employee = searchEmpleados('Num_SAP', $item->idUsuario)->first();
+                programming($request->newDate,$item->idUsuario,$item->horaInicio,$item->horaFin,$request->newTask,$item->nombre,$employee->Costo_Hora);
+                if($request->cut){
+                    disprogramming($item->idSchedule);
+                }
             }
+
+            return response()->json([
+                'status' => true,
+                'mensaje' => 'Acción realizada'
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => false, 'mensaje' => $e->getMessage()]);
+        }
     }
 }

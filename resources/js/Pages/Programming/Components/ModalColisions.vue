@@ -246,7 +246,7 @@ async function resolveCollision(form) {
 </script>
 <template>
         <CustomModal icon="fa-solid fa-triangle-exclamation" :base-z-index="10" v-model:visible="openConflict"
-            severity="danger" :closable="false" :close-on-escape="false" width="90vw"
+            severity="danger" width="90vw"
             :titulo="'Existen colisiones al programar tarea: ' + task.name">
             <template #body>
                 <div class="py-2 flex flex-col gap-4">

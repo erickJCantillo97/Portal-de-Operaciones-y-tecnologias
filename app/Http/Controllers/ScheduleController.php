@@ -12,10 +12,12 @@ use App\Models\Projects\Project;
 use App\Models\Projects\ProjectWithCalendar;
 use App\Models\Schedule;
 use App\Models\ScheduleTime;
+use App\Models\Shift;
 use App\Models\Views\DetailProjectWithCalendar;
 use App\Models\Views\DetailScheduleTime;
 use App\Models\VirtualTask;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Spatie\Holidays\Countries\Colombia;
@@ -129,6 +131,8 @@ class ScheduleController extends Controller
                 'resources' => ['rows' => $recursos],
                 'assignments' => ['rows' => Assignment::get()],
                 'timeRanges' => ['rows' => []],
+                'shift' => Shift::whereNull('user')->select('id','name')->get()->toArray(),
+                'assignCalendar' => Calendar::all()->select('id','name')->toArray()
             ]);
         } else {
             return response()->json([
@@ -142,12 +146,16 @@ class ScheduleController extends Controller
                 'resources' => ['rows' => $recursos],
                 'assignments' => ['rows' => Assignment::get()],
                 'timeRanges' => ['rows' => []],
+                'shift' => Shift::whereNull('user')->select('id','name')->get()->toArray(),
+                'assignCalendar' => Calendar::all()->select('id','name')->toArray()
             ]);
         }
     }
 
     public function sync(Project $project, Request $request)
     {
+        $complete = true;
+        $mensaje = 'Acción realizada';
         $rows = [];
         $removed = [];
         $rowsDependecy = [];
@@ -247,25 +255,33 @@ class ScheduleController extends Controller
             DB::beginTransaction();
             $now = Carbon::now();
             $task = VirtualTask::find( $request->assignments['added'][0]['event']);
-            if ($task->endDate < $now->format('Y-m-d')) {
-                return response()->json([
-                    'status' => false,
-                    'mensaje' => 'No se pudo programar al personal seleccionado porque la tarea: ' . $task->name
-                        . ' finalizó.',
-                        'conflict' => []
-                ]);
-            } 
-            if (count(VirtualTask::where('task_id',$request->assignments['added'][0]['event'])->get()) > 0) {
-                    return response()->json([
-                        'status' => false,
-                        'mensaje' => 'No se puede programar en esta actividad porque no es de ultimo nivel', 'conflict' => []
+            if (Carbon::parse($task->endDate)->lt($now->format('Y-m-d'))) {
+                foreach ($request->assignments['added'] as $assignment) {
+                    $employee = searchEmpleados('Num_SAP', $assignment['resource'])->first();
+                    $assigmmentCreate = Assignment::firstOrCreate([
+                        'event' => $assignment['event'],
+                        'resource' => $assignment['resource'],
+                        'units' => $assignment['units'],
+                        'name' => $employee->Nombres_Apellidos,
+                        'costo_hora' => $employee->Costo_Hora,
                     ]);
+                    array_push($assgimentRows, [
+                        '$PhantomId' => end($assignment),
+                        'id' => $assigmmentCreate['id'],
+                        'added_dt' => $assigmmentCreate->created_at,
+                    ]); 
+                }
+                $mensaje = 'Recurso Agregado';
+            }else{   
+            if (count(VirtualTask::where('task_id',$request->assignments['added'][0]['event'])->get()) > 0) {
+                $complete = false;  
+                $mensaje = 'No se puede programar en esta actividad porque no es de ultimo nivel';
+            }
+            if($now->lt(Carbon::parse($task->startDate))){
+                $now = Carbon::parse($task->startDate);
             }
             foreach ($request->assignments['added'] as $assignment) {
-                if (!is_numeric($assignment['resource'])) {
-                    $idResource = str_replace('CA', '', $assignment['resource']);
-                    $labor = Labor::find($idResource);
-                } else {
+                if (is_numeric($assignment['resource'])) {
                     $employee = searchEmpleados('Num_SAP', $assignment['resource'])->first();
                     do {
                         if (getWorkingDays($now)) {
@@ -273,7 +289,7 @@ class ScheduleController extends Controller
                             ->where('fecha',$now)->get();
                             if(count($exist)>0){ 
                                 foreach($exist as $details){
-                                    disprogramming($details->idTask,$assignment['resource'],$now);
+                                    disprogramming($details->idSchedule);
                                 }
                             }
                             programming(
@@ -287,10 +303,13 @@ class ScheduleController extends Controller
                             );
                         }
                         $now = $now->addDays(1);
-                    } while ($now->format('Y-m-d') <= $task->endDate);
-                    $now = Carbon::now();
-                
-                $assigmmentCreate = Assignment::firstOrCreate([
+                    } while ($now->lte(Carbon::parse($task->endDate)));
+                    if(Carbon::now()->lt(Carbon::parse($task->startDate))){
+                        $now = Carbon::parse($task->startDate);
+                    }else{
+                        $now = Carbon::now();    
+                    }
+                    $assigmmentCreate = Assignment::firstOrCreate([
                     'event' => $assignment['event'],
                     'resource' => $assignment['resource'],
                     'units' => $assignment['units'],
@@ -304,6 +323,7 @@ class ScheduleController extends Controller
                 ]);
             }
             }
+        }
             DB::commit();
             
         }
@@ -377,7 +397,8 @@ class ScheduleController extends Controller
             $project->update();
         }
         return response()->json([
-            'success' => true,
+            'success' => $complete,
+            'mensaje' => $mensaje,
             'requestId' => $request->requestId,
             'tasks' => [
                 'rows' => $rows,
@@ -426,5 +447,48 @@ class ScheduleController extends Controller
         return response()->json([
             'assignments' => Assignment::where('event', $task->id)->get(),
         ]);
+    }
+
+    public function assignmentCalendar(Request $request){
+        try{
+            DB::beginTransaction();
+            $days ='on ';
+            if($request->newCalendar){
+            $shift = Shift::find($request->shift['id']);
+                foreach($request->days as $day){
+                   $days = $days.$day['code'].',';
+                }
+                $days = substr($days,0,strlen($days)-1);
+                $daysEnd = $days;
+                $days = $days." at ".Carbon::parse($shift->startShift)->format('H:i');
+                $daysEnd =  $daysEnd." at ".Carbon::parse($shift->endShift)->format('H:i');
+                $calendar = Calendar::create([
+                    'expanded' => 1,
+                    'version' => 2,
+                    'name' => $request->name,
+                    'unspecifiedTimeIsWorking' => count($request->isWorking) > 0 ? false:true
+                ]);
+                $calendar->save();
+                CalendarInterval::create([
+                    'calendar_id' => $calendar->id,
+                    'isWorking' => count($request->isWorking) > 0 ? false:true,
+                    'priority' => 20,
+                    'recurrentEndDate' =>$daysEnd,
+                    'recurrentStartDate' => $days
+                ]);
+                $project = Project::find($request->project);
+                $project->calendar_id = $calendar->id;
+                $project->save();
+                }else{
+                    $project = Project::find($request->project);
+                    $project->calendar_id = $request->calendar['id'];
+                    $project->save();
+                } 
+            DB::commit();
+            return response()->json(['status' => true,'mensaje' => 'Calendario agregado']);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => false,'mensaje' => $e->getMessage()]);
+        }
     }
 }
