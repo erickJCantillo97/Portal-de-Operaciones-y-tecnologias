@@ -32,26 +32,6 @@ const divisions = ref([
     name: 'HABITABILIDAD',
     short: 'DVHAB'
   },
-  {
-    name: 'HABITABILIDAD',
-    short: 'DVHAB'
-  },
-  {
-    name: 'HABITABILIDAD',
-    short: 'DVHAB'
-  },
-  {
-    name: 'HABITABILIDAD',
-    short: 'DVHAB'
-  },
-  {
-    name: 'HABITABILIDAD',
-    short: 'DVHAB'
-  },
-  {
-    name: 'HABITABILIDAD',
-    short: 'DVHAB'
-  },
 ])
 
 const dates = ref([]);
@@ -72,17 +52,17 @@ const dates = ref([]);
     </div>
   </div>
   <div class="space-y-2">
-    <div v-for="project in projects" class="flex w-full  rounded-lg p-2 justify-left items-center">
+    <div v-for="project in projects" class="flex w-full bg-slate-200 rounded-lg p-2 justify-left items-center">
       <h2>{{ project.name }}</h2>
-      <div class="flex justify-between p-4 bg-gray-200 w-full text-xs">
+      <div class="flex justify-between p-4  w-full text-sm">
         <div v-for="day in daysOfWeek" class="grid grid-cols-3 gap-2 text-center px-2">
           <div v-for="division in divisions"
-            class="flex px-1.5 text-center bg-slate-400 space-x-2 justify-center items-center rounded-lg">
-            <div class="bg-primary p-1 rounded-full">
+            class="cursor-pointer hover:scale-110 flex text-center bg-slate-400 text-white justify-center items-center rounded-lg">
+            <div class="bg-primary h-full w-full flex items-center p-1 rounded-l-lg">
               <p class="font-extrabold text-white">12</p>
             </div>
             <div class="space-y-1">
-              <div class="border-b">DVPIN</div>
+              <div class="border-b font-bold bg-white text-black px-2 rounded-tr-lg">{{ division.short }}</div>
               <div>$12M</div>
             </div>
           </div>
