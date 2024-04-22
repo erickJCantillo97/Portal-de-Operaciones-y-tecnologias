@@ -289,7 +289,7 @@ class ScheduleController extends Controller
                             ->where('fecha',$now)->get();
                             if(count($exist)>0){ 
                                 foreach($exist as $details){
-                                    disprogramming($details->idTask,$assignment['resource'],$now);
+                                    disprogramming($details->idSchedule);
                                 }
                             }
                             programming(
