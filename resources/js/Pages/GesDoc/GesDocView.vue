@@ -189,13 +189,13 @@ const url = [
             :filterFields="['name', 'SAP_code', 'status,', 'contract.name', 'gerencia', 'start_date', 'end_date']"
             optionLabel="name" filterPlaceholder="Buscar proyecto" :virtualScrollerOptions="{ itemSize: 38 }"
             listStyle="height:70vh" class="w-full md:w-14rem" :pt="{
-            filterInput: '!h-8',
-            item: '!h-20',
-          }">
+    filterInput: '!h-8',
+    item: '!h-20',
+  }">
             <template #header>
               <div class="bg-blue-800 rounded-t-sm">
                 <h2 class="flex justify-center items-center font-semibold first-letter:uppercase text-white italic">
-                  Proyectos
+                  Expedientes - Proyectos
                 </h2>
               </div>
             </template>
@@ -203,10 +203,10 @@ const url = [
             <template #option="slotProps">
               <ul class="text-sm italic [&>li>p]:font-semibold snap-start">
                 <div v-tooltip.top="{
-            value: getProjectDetails(slotProps.option),
-            class: '!w-full',
-            autoHide: false
-          }" class="flex flex-nowrap w-full space-x-1 size-12">
+    value: getProjectDetails(slotProps.option),
+    class: '!w-full',
+    autoHide: false
+  }" class="flex flex-nowrap w-full space-x-1 size-12">
                   <img class="object-cover rounded-lg" :src="'/images/generic-boat.png'" :alt="slotProps.option.name" />
                   <li class="w-full space-y-2">
                     <p class="w-full text-blue-800 text-md font-semibold truncate">
@@ -240,9 +240,9 @@ const url = [
             <Listbox :key="listTipologia" v-model="tipologia" :options="tipologias" filter
               filterPlaceholder="Buscar tipología" optionLabel="name" @change="selectedTipologia()"
               listStyle="max-height:70vh" class="w-full md:w-14rem" :pt="{
-            item: '!p-2',
-            filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
-          }">
+    item: '!p-2',
+    filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
+  }">
 
               <template #header>
                 <div class="bg-blue-800 rounded-t-sm">
@@ -300,8 +300,8 @@ const url = [
 
         <template #body>
           <TabView :pt="{
-            // nav: '!flex !justify-between !w-full'
-          }">
+    // nav: '!flex !justify-between !w-full'
+  }">
             <TabPanel header="Documentos">
               <div class="w-full h-[89vh] overflow-y-auto">
                 <CustomDataTable :data="tipologiaFiles.files" :rows-default="100" :columnas="columnas"
@@ -315,9 +315,9 @@ const url = [
                   <Listbox :key="listTipologia" v-model="fileListboxSelected" :options="tipologiaFiles.images" filter
                     filterPlaceholder="Seleccione un archivo" optionLabel="name" @change="fileSelected($event)"
                     listStyle="max-height:61.5vh" class="w-full md:w-14rem" :pt="{
-            item: '!p-2',
-            filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
-          }">
+    item: '!p-2',
+    filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
+  }">
                     <template #option="slotProps">
                       <div v-tooltip.top="slotProps.option.tipologia_name"
                         class="flex items-center justify-between h-min">

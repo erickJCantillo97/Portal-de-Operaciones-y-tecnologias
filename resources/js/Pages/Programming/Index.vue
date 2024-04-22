@@ -205,25 +205,24 @@ const url = [
                         <Dropdown :options="projects" placeholder="Seleccione un proyecto" optionLabel="name"
                             optionValue="id" showClear :filter="true" filterPlaceholder="Buscar proyecto"
                             v-model="project" :pt="{
-                                root: '!h-8',
-                                input: '!py-0 !flex !items-center !text-sm !font-normal',
-                                item: '!py-1 !px-3 !text-sm !font-normal',
-                                filterInput: '!h-8'
-                            }" />
+        root: '!h-8',
+        input: '!py-0 !flex !items-center !text-sm !font-normal',
+        item: '!py-1 !px-3 !text-sm !font-normal',
+        filterInput: '!h-8'
+    }" />
                     </span>
                     <span class="flex flex-col sm:flex-row items-center sm:space-x-2">
                         <Dropdown :options="divisionsOptions" placeholder="Seleccione una división" showClear
                             :filter="true" filterPlaceholder="Buscar proyecto" v-model="project" :pt="{
-                                root: '!h-8',
-                                input: '!py-0 !flex !items-center !text-sm !font-normal',
-                                item: '!py-1 !px-3 !text-sm !font-normal',
-                                filterInput: '!h-8'
-                            }" />
+        root: '!h-8',
+        input: '!py-0 !flex !items-center !text-sm !font-normal',
+        item: '!py-1 !px-3 !text-sm !font-normal',
+        filterInput: '!h-8'
+    }" />
                     </span>
                     <!-- <CustomInput type="week" placeholder="Seleccione una semana"></CustomInput> -->
                     <Link :href="route('programming.create')">
-                    <Button label="Programación Ordinaria" severity="success" icon="fa-solid fa-plus"
-                        :project="project" />
+                    <Button label="Programar Personal" severity="success" icon="fa-solid fa-plus" :project="project" />
                     </Link>
                     <Button label="Programación de Extendidos" severity="warning" icon="fa-solid fa-plus"
                         @click="openDialog()" />

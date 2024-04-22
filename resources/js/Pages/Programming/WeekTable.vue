@@ -30,26 +30,7 @@ const divisions = ref([
     name: 'HABITABILIDAD',
     short: 'DVHAB'
   },
-  {
-    name: 'HABITABILIDAD',
-    short: 'DVHAB'
-  },
-  {
-    name: 'HABITABILIDAD',
-    short: 'DVHAB'
-  },
-  {
-    name: 'HABITABILIDAD',
-    short: 'DVHAB'
-  },
-  {
-    name: 'HABITABILIDAD',
-    short: 'DVHAB'
-  },
-  {
-    name: 'HABITABILIDAD',
-    short: 'DVHAB'
-  },
+
 ])
 
 const getFormattedDate = (day) => {
