@@ -187,7 +187,7 @@ function programming($date, $user, $star, $end, $task, $name, $constoHora)
         'fecha' => $date,
     ]);
     $schedule->save();
-    ScheduleTime::create([
+    ScheduleTime::firstOrCreate([
         'schedule_id' => $schedule->id,
         'hora_inicio' => $star,
         'hora_fin' => $end,
@@ -201,10 +201,10 @@ function programming($date, $user, $star, $end, $task, $name, $constoHora)
     ]);
 }
 
-function disprogramming($task, $user, $date){
-    Assignment::where('resource',$user)->where('event','=',$task)->delete();
-    $deleteIds = Schedule::where('employee_id', $user)
-    ->where('fecha',$date)->pluck('id')->toArray();
+function disprogramming($idSchedule){
+    $schedule = Schedule::find($idSchedule);
+    $deleteIds = Schedule::find($schedule)->pluck('id')->toArray();
+    Assignment::where('resource',$schedule->employee_id)->where('event','=',$schedule->task_id)->delete();
     ScheduleTime::whereIn('schedule_id', $deleteIds)->delete();
-    Schedule::where('employee_id', $user)->where('fecha',$date)->delete();
+    Schedule::find($schedule)->delete();
 }

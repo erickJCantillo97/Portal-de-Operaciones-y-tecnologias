@@ -155,7 +155,7 @@ class ScheduleController extends Controller
     public function sync(Project $project, Request $request)
     {
         $complete = true;
-        $mensaje = '';
+        $mensaje = 'Acción realizada';
         $rows = [];
         $removed = [];
         $rowsDependecy = [];
@@ -256,9 +256,23 @@ class ScheduleController extends Controller
             $now = Carbon::now();
             $task = VirtualTask::find( $request->assignments['added'][0]['event']);
             if (Carbon::parse($task->endDate)->lt($now->format('Y-m-d'))) {
-                $complete = false;
-                $mensaje = 'No se pudo programar al personal seleccionado porque la tarea: ' . $task->name. ' Finalizó';
-            } 
+                foreach ($request->assignments['added'] as $assignment) {
+                    $employee = searchEmpleados('Num_SAP', $assignment['resource'])->first();
+                    $assigmmentCreate = Assignment::firstOrCreate([
+                        'event' => $assignment['event'],
+                        'resource' => $assignment['resource'],
+                        'units' => $assignment['units'],
+                        'name' => $employee->Nombres_Apellidos,
+                        'costo_hora' => $employee->Costo_Hora,
+                    ]);
+                    array_push($assgimentRows, [
+                        '$PhantomId' => end($assignment),
+                        'id' => $assigmmentCreate['id'],
+                        'added_dt' => $assigmmentCreate->created_at,
+                    ]); 
+                }
+                $mensaje = 'Recurso Agregado';
+            }else{   
             if (count(VirtualTask::where('task_id',$request->assignments['added'][0]['event'])->get()) > 0) {
                 $complete = false;  
                 $mensaje = 'No se puede programar en esta actividad porque no es de ultimo nivel';
@@ -275,7 +289,7 @@ class ScheduleController extends Controller
                             ->where('fecha',$now)->get();
                             if(count($exist)>0){ 
                                 foreach($exist as $details){
-                                    disprogramming($details->idTask,$assignment['resource'],$now);
+                                    disprogramming($details->idSchedule);
                                 }
                             }
                             programming(
@@ -291,7 +305,7 @@ class ScheduleController extends Controller
                         $now = $now->addDays(1);
                     } while ($now->lte(Carbon::parse($task->endDate)));
                     if(Carbon::now()->lt(Carbon::parse($task->startDate))){
-                        $now = Carbon::parse($task->endDate);
+                        $now = Carbon::parse($task->startDate);
                     }else{
                         $now = Carbon::now();    
                     }
@@ -309,6 +323,7 @@ class ScheduleController extends Controller
                 ]);
             }
             }
+        }
             DB::commit();
             
         }
