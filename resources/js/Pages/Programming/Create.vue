@@ -11,8 +11,6 @@ import ProgressBar from 'primevue/progressbar';
 import OverlayPanel from 'primevue/overlaypanel';
 import NoContentToShow from '@/Components/NoContentToShow.vue';
 import CustomModal from '@/Components/CustomModal.vue';
-import Calendar from 'primevue/calendar';
-import RadioButton from 'primevue/radiobutton';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import InputSwitch from 'primevue/inputswitch';
@@ -128,44 +126,7 @@ const arrayPersonFilter = ref({
 })
 const personsSelect = ref()
 const menu = ref();
-const items = ref([
-    {
-        label: 'Copiar',
-        icon: 'fa-regular fa-copy',
-        command: () => {
-            console.log('Hace algo');
-        }
-    },
-    {
-        label: 'Copiar al dia siguiente',
-        icon: 'fa-regular fa-copy',
-        command: () => {
-            console.log('Hace algo');
-        },
-        visible:mode=='week'
-    },
-    {
-        label: 'Cortar',
-        icon: 'fa-solid fa-scissors',
-        command: () => {
-            console.log('Hace algo');
-        }
-    },
-    {
-        label: 'Pegar',
-        icon: 'fa-regular fa-paste',
-        command: () => {
-            console.log('Hace algo');
-        }
-    },
-    {
-        label: 'Quitar todos',
-        icon: 'fa-solid fa-trash',
-        command: () => {
-            console.log('Hace algo');
-        }
-    },
-]);
+
 
 //#endregion
 
@@ -203,11 +164,9 @@ if (esMovil()) {
 async function onDrop(task, fecha) {
     if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
         task.loading = true
-        // console.log(personDrag.value)
         if (personDrag.value.option == 'move') {
             personDrag.value.task.loading = true
             await axios.post(route('programming.move'), { task: task.id, date: fecha, schedule: personDrag.value.times[0].idSchedule }).then((res) => {
-                // console.log(res.data)
                 if (res.data.status == false) {
                     task.loading = false
                     personDrag.value.task.loading = false
@@ -217,7 +176,6 @@ async function onDrop(task, fecha) {
                     task.loading = false
                     personDrag.value.task.loading = false
                     personDrag.value.task.employees = personDrag.value.task.employees.filter(person => person.Num_SAP !== personDrag.value.Num_SAP);
-                    // console.log(personDrag.value.task.employees)
                     toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
                 }
             })
@@ -339,13 +297,6 @@ const save = async (mode) => {
     formEditShift.value.loading = false
 }
 
-//#endregion
-
-
-const onImageRightClick = (event, task, day) => {
-    menu.value.show(event);
-};
-
 const confirmDelete = (event, schedule_time) => {
     // console.log(personsEdit.value)
     confirm.require({
@@ -386,6 +337,81 @@ const confirmDelete = (event, schedule_time) => {
         }
     })
 }
+
+//#endregion
+
+//#region click derecho
+var tempRightClick = {}
+const taskRightClick = (event, task, day) => {
+    tempRightClick.task = task.id
+    tempRightClick.day = day
+    if (dataRightClick.task != undefined) {
+        console.log('datos')
+        items.value[3].visible = true
+    } else {
+        items.value[3].visible = false
+    }
+    menu.value.show(event);
+};
+
+var dataRightClick = {}
+
+const items = ref([
+    {
+        label: 'Copiar',
+        icon: 'fa-regular fa-copy text-success',
+        tooltip: 'Copia las personas programadas',
+        command: () => {
+            dataRightClick.task = tempRightClick.task
+            dataRightClick.date = tempRightClick.day
+            dataRightClick.cut = false
+            console.log('Copia');
+        }
+    },
+    {
+        label: 'Copiar al dia siguiente',
+        icon: 'fa-regular fa-copy text-primary',
+        tooltip: 'Copia las personas programadas y las pega el dia siguiente',
+        visible: mode == 'week',
+        command: () => {
+            console.log('Copia al dia siguiente');
+        },
+    },
+    {
+        label: 'Cortar',
+        icon: 'fa-solid fa-scissors text-warning',
+        tooltip: 'Corta las personas programadas',
+        command: () => {
+            dataRightClick.task = tempRightClick.task
+            dataRightClick.date = tempRightClick.day
+            dataRightClick.cut = true
+            console.log('Corta');
+        }
+    },
+    {
+        label: 'Pegar',
+        icon: 'fa-regular fa-paste text-info',
+        tooltip: 'Pega las personas copiadas o cortadas anteriormente',
+        command: async () => {
+            dataRightClick.newTask = tempRightClick.task
+            dataRightClick.newDate = tempRightClick.day
+            await axios.post(route('programming.copy'), { dataRightClick }).then((res) => {
+                console.log(res)
+            })
+            console.log('Pega');
+        },
+    },
+    {
+        label: 'Quitar todos',
+        icon: 'fa-solid fa-trash text-danger',
+        tooltip: 'Elimina todas las personas programadas de la tarea',
+        command: () => {
+            console.log('Desprograma');
+        }
+    },
+]);
+
+//#endregion
 </script>
 
 <template>
@@ -506,7 +532,7 @@ const confirmDelete = (event, schedule_time) => {
                                 </div>
                                 <div class="h-full sm:h-full p-1 w-full overflow-y-auto">
                                     <TaskProgramming type="day" @addPerson="addPerson" :movil="esMovil()"
-                                        @menu="onImageRightClick" :project="project.id" :day="dates"
+                                        @menu="taskRightClick" :project="project.id" :day="dates"
                                         :key="dates.toDateString() + project.id" @drop="onDrop"
                                         v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
                                 </div>
@@ -663,8 +689,8 @@ const confirmDelete = (event, schedule_time) => {
     <!--#endregion-->
     <ContextMenu ref="menu" :model="items">
         <template #item="{ item, props }">
-            <!-- {{console.log(props)}} -->
-            <a v-ripple class="flex items-center" v-bind="props.action">
+            <!-- {{ console.log(props) }} -->
+            <a v-ripple v-tooltip="item.tooltip" class="flex items-center" v-bind="props.action">
                 <span :class="item.icon" />
                 <span class="ml-2">{{ item.label }}</span>
             </a>
