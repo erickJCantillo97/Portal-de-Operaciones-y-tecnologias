@@ -343,15 +343,20 @@ const confirmDelete = (event, schedule_time) => {
 //#region click derecho
 var tempRightClick = {}
 const taskRightClick = (event, task, day) => {
-    tempRightClick.task = task.id
-    tempRightClick.day = day
-    if (dataRightClick.task != undefined) {
-        console.log('datos')
-        items.value[3].visible = true
-    } else {
-        items.value[3].visible = false
+    if (task.employees.length > 0) {
+        tempRightClick.task = task.id
+        tempRightClick.day = day
+        if (dataRightClick.task != undefined) {
+            console.log('datos')
+            items.value[3].visible = true
+        } else {
+            items.value[3].visible = false
+        }
+        menu.value.show(event);
+    }else{
+
     }
-    menu.value.show(event);
+
 };
 
 var dataRightClick = {}
@@ -395,7 +400,7 @@ const items = ref([
         command: async () => {
             dataRightClick.newTask = tempRightClick.task
             dataRightClick.newDate = tempRightClick.day
-            await axios.post(route('programming.copy'), { dataRightClick }).then((res) => {
+            await axios.post(route('programming.copy'),  dataRightClick ).then((res) => {
                 console.log(res)
             })
             console.log('Pega');
@@ -480,7 +485,7 @@ const items = ref([
                                 <span class="grid grid-cols-7 col-span-9 overflow-y-auto overflow-x-hidden">
                                     <div v-for="dia, index in diasSemana" class="flex flex-col h-full items-center"
                                         :class="[index > 4 ? 'bg-warning-light' : '', dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
-                                        <TaskProgramming :project="project.id" :day="dia" @menu="onImageRightClick"
+                                        <TaskProgramming :project="project.id" :day="dia" @menu="taskRightClick"
                                             :key="dates.toDateString() + project.id" type="week" @drop="onDrop"
                                             v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
                                     </div>

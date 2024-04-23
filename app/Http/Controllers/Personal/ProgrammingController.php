@@ -763,7 +763,7 @@ class ProgrammingController extends Controller
         if ($date->isSaturday() || $date->isSunday()) {
             return response()->json(
                 ExtendedSchedule::has('project')->has('task')->where('project_id', $project->id)
-                    ->where('executor', 'LIKE', '%' . auth()->user()->oficina . '%')
+                    // ->where('executor', 'LIKE', '%' . auth()->user()->oficina . '%')
                     ->where('date', $date)
                     ->get()->map(function ($task) use ($date) {
                         return [
@@ -805,7 +805,7 @@ class ProgrammingController extends Controller
         return response()->json(
             VirtualTask::has('project')->has('task')
                 ->where('project_id', $project->id)
-                ->where('executor', 'LIKE', '%' . auth()->user()->oficina . '%')
+                // ->where('executor', 'LIKE', '%' . auth()->user()->oficina . '%')
                 ->where('percentDone', '<', 100)
                 ->where('startDate', '<=', $date)
                 // ->where(function ($query) use ($request) {
