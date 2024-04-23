@@ -1,17 +1,15 @@
 <?php
 
 use App\Events\ContractEvent;
-use App\Events\TestWebsocket;
 use App\Exports\ProjectsDetailsExport;
 use App\Http\Controllers\Dashboard\DashboardEstimacionesController;
 use App\Http\Controllers\DatabaseBackController;
 use App\Http\Controllers\NotificationUserController;
 use App\Http\Controllers\Suggestion\SuggestionController;
 use App\Ldap\User;
-use App\Models\User as UserNotify;
-use App\Models\Comment;
-use App\Models\Gantt\Task;
 use App\Models\Process;
+use App\Models\Project\Operation;
+use App\Models\Project\ProgressProjectWeek;
 use App\Models\Projects\Customer;
 use App\Models\Projects\Project;
 use App\Models\Projects\TypeShip;
@@ -21,37 +19,22 @@ use App\Models\Quotes\QuoteTypeShip;
 use App\Models\Quotes\QuoteVersion;
 use App\Models\SWBS\SubSystem;
 use App\Models\SWBS\System;
-use App\Models\VirtualTask;
-use App\Notifications\QuoteAssignmentNotify;
-use App\Notifications\QuoteNotify;
-use Carbon\Carbon;
+use App\Models\User as UserNotify;
+use App\Models\Views\Cost;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-use App\Mail\AssignmentToolsMail;
-use App\Models\NotificationUser;
-use App\Models\Personal\Employee;
-use App\Models\Project\Operation;
-use App\Models\Project\ProgressProjectWeek;
-use App\Models\Projects\Contract;
-use App\Models\Projects\ProjectsShip;
-use App\Models\Projects\Ship;
-use App\Models\Views\Cost;
-use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
-use Maatwebsite\Excel\Facades\Excel;
-use Spatie\Holidays\Countries\Colombia;
-use Spatie\Holidays\Holidays;
 
 Route::get('/', function () {
 
     // $processId = 1;// Asigna un identificador único para cada proceso de carga
     // return event(new ContractEvent($processId));
-    if (auth()->user() != null)
+    if (auth()->user() != null) {
         return Inertia::render('Dashboard');
+    }
+
     return Inertia::render('Auth/Login', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -73,14 +56,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-
-
     Route::get('get/gerencias', function () {
         return response()->json(['gerencias' => gerencias()]);
     })->name('get.gerencias');
-
-
-
 
     //SUGERENCIAS
     Route::resource('suggestion', SuggestionController::class);
@@ -111,29 +89,24 @@ Route::get('recuperarDatos', function () {
     return System::get();
 });
 
-
-
-
-
 Route::get('/timeline', [DashboardEstimacionesController::class, 'getQuotesStatus'])->name('timeline');
-
-
 
 Route::get('estmaciones_anterior', function () {
     QuoteStatus::truncate();
     // QuoteTypeShip::forceDeleted();
     QuoteVersion::truncate();
     Quote::truncate();
-    $estimaciones =  DB::connection('sqlsrv_anterior')->table('estimacions')->get();
+    $estimaciones = DB::connection('sqlsrv_anterior')->table('estimacions')->get();
     foreach ($estimaciones as $estimacion) {
         $quote = Quote::where('consecutive', $estimacion->consecutivo)->first();
-        if (!$quote)
+        if (! $quote) {
             $quote = Quote::create([
                 'gerencia' => auth()->user()->gerencia,
                 'name' => $estimacion->nombre,
                 'consecutive' => $estimacion->consecutivo,
-                'user_id' =>  auth()->user()->id
+                'user_id' => auth()->user()->id,
             ]);
+        }
 
         $cliente = DB::connection('sqlsrv_anterior')->table('clientes')->where('id', $estimacion->cliente_id)->first();
         $cliente_id = null;
@@ -144,7 +117,7 @@ Route::get('estmaciones_anterior', function () {
             'quote_id' => $quote->id,
             'version' => $estimacion->version,
             'estimador_id' => $estimacion->estimador_id,
-            'customer_id' =>  $cliente_id,
+            'customer_id' => $cliente_id,
             'expeted_answer_date' => $estimacion->fecha_respuesta_esperada,
             'estimador_anaswer_date' => $estimacion->fecha_respuesta_estimador,
             'offer_type' => $estimacion->tipo_oferta,
@@ -156,7 +129,7 @@ Route::get('estmaciones_anterior', function () {
         $quote->current_version_id = $quoteVersion->id;
         $quote->save();
         if ($estimacion->clase_id) {
-            $class =  DB::connection('sqlsrv_anterior')->table('clases')->where('id', $estimacion->clase_id)->first();
+            $class = DB::connection('sqlsrv_anterior')->table('clases')->where('id', $estimacion->clase_id)->first();
             $clase = TypeShip::where('name', $class->name)->first();
             $quoteShip = QuoteTypeShip::FirstOrCreate([
                 'quote_version_id' => $quoteVersion->id,
@@ -181,10 +154,10 @@ Route::get('estmaciones_anterior', function () {
         if ($estimacion->firmada) {
             $estado = 3;
             $fecha = $estimacion->fecha_firma;
-        } else if ($estimacion->fecha_pendiente_firma != null) {
+        } elseif ($estimacion->fecha_pendiente_firma != null) {
             $estado = 2;
             $fecha = $estimacion->fecha_pendiente_firma ?? '2023-07-18';
-        } else if ($estimacion->fecha_respuesta_estimador != null) {
+        } elseif ($estimacion->fecha_respuesta_estimador != null) {
             $estado = 1;
             $fecha = $estimacion->fecha_respuesta_estimador;
         }
@@ -193,7 +166,7 @@ Route::get('estmaciones_anterior', function () {
                 'quote_version_id' => $quoteVersion->id,
                 'status' => $estado,
                 'fecha' => $fecha,
-                'user_id' => auth()->user()->id
+                'user_id' => auth()->user()->id,
             ]);
         }
     }
@@ -209,6 +182,7 @@ Route::get('/mailable', function () {
     $project = Project::first();
     // dd($project);
     $customer = Customer::first()->name;
+
     return new App\Mail\CreateProjectMail($project, $customer);
 });
 Route::get('/prueba', function (Request $request) {
@@ -219,41 +193,45 @@ Route::get('/prueba', function (Request $request) {
 
     $projects = ProgressProjectWeek::with('project')->where('week', $week)->where('CPI', '<>', 0)->get()->pluck('project.SAP_code');
 
-
     // return $projects;
-    $codes =  DB::table('peps_view')->whereIn('code', $projects)
+    $codes = DB::table('peps_view')->whereIn('code', $projects)
         // ->join('costs_view as costo', 'costo.project', '=', 'peps_view.code_project')
         ->get();
     // return $codes;
     // return $projects->pluck('SAP_code')->toArray();
     // return $codes;
-    $costos =  Cost::whereIn('project', $codes->pluck('code_project'))->select(DB::raw('SUM(value) as total'), 'project')->groupBy('project')->get();
+    $costos = Cost::whereIn('project', $codes->pluck('code_project'))->select(DB::raw('SUM(value) as total'), 'project')->groupBy('project')->get();
     $ejecutado_total = 0;
     $ejecutado_acumulado = 0;
     foreach ($costos as $c) {
         $ejecutado_total += $c->total;
         // return $c->total;
 
-        $code_sap =  DB::table('peps_view')->where('code_project', $c->project)->first()->code;
+        $code_sap = DB::table('peps_view')->where('code_project', $c->project)->first()->code;
 
         $project = Project::where('SAP_code', $code_sap)->first()->id;
         // return $project;
         $ejecutado_acumulado += ProgressProjectWeek::where('project_id', $project)->with('project')->where('week', $week)->first()->CPI * $c->total;
+
         return $ejecutado_acumulado;
         // return $code_sap;
     }
 
     return $ejecutado_acumulado / $ejecutado_total;
-    $code =  DB::table('operations_view')->where('grafo', 'LIKE', '%' . $op[0])->where('operacion', 'LIKE', end($op))->get()->first()->costo_cod;
+    $code = DB::table('operations_view')->where('grafo', 'LIKE', '%'.$op[0])->where('operacion', 'LIKE', end($op))->get()->first()->costo_cod;
+
     return $op;
     // return back()->withErrors(['errors' => ['messaje', 'default1', 'messaje1', 'default2', 'messaje4', 'default4', 'messaje', 'default',]]);
 
     // return Excegl::download(new ProjectsDetailsExport, 'invoices.xlsx');
 })->name('prueba');
 
-
 Route::get('add-super-user', function () {
     $user = UserNotify::where('username', 'gdiaz')->first()->assignRole('Super Admin');
 });
 
 Route::resource('getNotifications', NotificationUserController::class);
+
+Route::get('hellotop', function () {
+    return Inertia::render('HelloTop');
+});

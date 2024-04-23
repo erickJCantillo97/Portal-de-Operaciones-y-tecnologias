@@ -195,7 +195,11 @@ const url = [
         <div class="size-full">
             <div class="flex justify-between items-center px-4 h-min">
                 <span class="text-xl font-bold text-primary h-full items-center flex">
-                    <p> Programación de Actividades </p>
+                    <p> Reporte Programación de Actividades por Proyectos
+                        <span class="italic text-xs text-red-700">
+                            (EN DESARROLLO)
+                        </span>
+                    </p>
                 </span>
                 <div class="flex items-center space-x-2">
                     <Link :href="route('programming.create')">
