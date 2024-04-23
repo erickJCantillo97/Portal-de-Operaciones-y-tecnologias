@@ -1116,6 +1116,7 @@ const submit = async  () => {
         }
     }
     if(!error){
+        loadSaveCalendar.value = true;
         await axios.post(route('assignment.calendar'), formCalendar.value).then((res)=>{
             console.log(res.data);
             if (res.data.status) {
@@ -1328,7 +1329,7 @@ const submit = async  () => {
             </section>
         </div>
         <div>
-            <Button severity="success" :loading="loadImport" label="Guardar" @click="submit" />
+            <Button severity="success" :loading="loadSaveCalendar" label="Guardar" @click="submit" />
         </div>
     </OverlayPanel>
 

@@ -923,16 +923,24 @@ class ProgrammingController extends Controller
     {
         try {
             DB::beginTransaction();
+            if(Carbon::parse($request->date)->eq(Carbon::parse($request->newDate))){
+                return response()->json([
+                    'status' => false,
+                    'mensaje' => 'No se puede copiar al personal para el mismo día'
+                ]);
+            }
             $data = DetailScheduleTime::where('idTask', $request->task)
                 ->where('fecha', $request->date)->get();
             foreach ($data as $item) {
+                $exist = DetailScheduleTime::where('idUsuario', $item->idUsuario)
+                ->where('fecha', $request->date)->get();
+
                 $employee = searchEmpleados('Num_SAP', $item->idUsuario)->first();
                 programming($request->newDate, $item->idUsuario, $item->horaInicio, $item->horaFin, $request->newTask, $item->nombre, $employee->Costo_Hora);
                 if ($request->cut) {
                     disprogramming($item->idSchedule);
                 }
             }
-
             return response()->json([
                 'status' => true,
                 'mensaje' => 'Acción realizada'
@@ -947,9 +955,7 @@ class ProgrammingController extends Controller
         try{
         DB::beginTransaction();
             Schedule::whereIn('id',$request->schedules)->delete();
-            foreach($request->schedules as $schedule){
-                ScheduleTime::where('schedule_id',$schedule)->delete();
-            }
+            ScheduleTime::whereIn('schedule_id',$request->schedules)->delete();
         DB::commit();
         return response()->json([
             'status' => true,
