@@ -50,21 +50,17 @@ class ProgrammingController extends Controller
 
     public function create()
     {
-        $projects = VirtualTask::has('project')->whereNull('task_id')->get()->map(function ($item) {
+        $projects = Project::active()->get()->map(function ($project) {
+            $task = VirtualTask::where('project_id', $project->id)->whereNull('task_id')->first();
             return [
-                'task_id' => $item->id,
-                'task_name' => $item['name'],
-                'id' => $item->project->id,
-                // 'project' => $item->project,
-                'avance' => $item['percentDone'],
-                'name' => $item->project->name,
-                // 'file' => $item->project->contract->ship->file,
-                'duracion' => $item->duration,
-                'fechaI' => $item->startDate,
-                'fechaF' => $item->endDate,
-                'unidadDuracion' => $item->durationUnit,
+                'name' => $project->name,
+                'id' => $project->id,
+                'fechaI' => $task->startDate,
+                'fechaF' => $task->endDate,
+                'avance' => $task->percentDone,
             ];
         });
+
 
         return Inertia::render('Programming/Create', [
             'projects' => $projects,
