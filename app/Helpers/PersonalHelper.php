@@ -203,8 +203,8 @@ function programming($date, $user, $star, $end, $task, $name, $constoHora)
 
 function disprogramming($idSchedule){
     $schedule = Schedule::find($idSchedule);
-    $deleteIds = Schedule::find($schedule)->pluck('id')->toArray();
+    $deleteIds = Schedule::where('id', $idSchedule)->pluck('id')->toArray();
     Assignment::where('resource',$schedule->employee_id)->where('event','=',$schedule->task_id)->delete();
     ScheduleTime::whereIn('schedule_id', $deleteIds)->delete();
-    Schedule::find($schedule)->delete();
+    $schedule->delete();
 }
