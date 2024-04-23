@@ -22,7 +22,9 @@ const props = defineProps({
     contracts: Array,
     gerentes: Array,
     weekTasks: Array,
-    milestones: Array
+    milestones: {
+        default: []
+    }
 })
 
 //#region Referencias (v-model)
@@ -453,6 +455,7 @@ const url = [
                                 :options="scopeOptions" :errorMessage="$page.props.errors.scope"
                                 :invalid="$page.props.errors.scope ? true : false"
                                 v-if="$page.props.auth.user.gerencia == 'GECON'" />
+                           
                             <CustomInput label="Contrato" type="dropdown" placeholder="Seleccione Alcance del Proyecto"
                                 optionValue="id" optionLabel="contract_id" v-model:input="formData.contract_id"
                                 showClear :options="contractsOptions"
@@ -469,10 +472,6 @@ const url = [
                                 :options="Object.values(quotesOptions)" :errorMessage="$page.props.errors.quote_id"
                                 :invalid="$page.props.errors.quote_id ? true : false"
                                 v-if="$page.props.auth.user.gerencia == 'GECON'" />
-
-                            <CustomInput label="Estado del Proyecto" type="dropdown"
-                                placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.status" showClear
-                                :options="statusOptions" />
                         </div>
                     </tab-content>
                     <!--DATOS DEL PROYECTO-->

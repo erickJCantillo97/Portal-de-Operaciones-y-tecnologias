@@ -2,8 +2,6 @@
 import { Link, router } from '@inertiajs/vue3'
 import { ref, computed } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import Dropdown from 'primevue/dropdown'
-import NoContentToShow from '@/Components/NoContentToShow.vue'
 import DivisionsByProject from '@/Pages/Programming/DivisionsByProject.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'

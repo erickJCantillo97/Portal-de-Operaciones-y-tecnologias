@@ -80,6 +80,6 @@ class Project extends Model implements Auditable
 
     public function scopeActive(Builder $query)
     {
-        $query->whereIn('status', ['CONSTRUCCIÓN', 'DISEÑO Y CONSTRUCCIÓN']);
+        $query->whereIn('status', ['CONSTRUCCIÓN', 'DISEÑO Y CONSTRUCCIÓN', 'REPARACIÓN Y MANTENIMIENTO']);
     }
 }
