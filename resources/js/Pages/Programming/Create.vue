@@ -343,17 +343,27 @@ const confirmDelete = (event, schedule_time) => {
 //#region click derecho
 var tempRightClick = {}
 const taskRightClick = (event, task, day) => {
-   
-        tempRightClick.task = task.id
-        tempRightClick.day = day
-        if (dataRightClick.task != undefined) {
-            console.log('datos')
-            items.value[3].visible = true
-        } else {
-            items.value[3].visible = false
-        }
-        menu.value.show(event)
-
+    tempRightClick.taskData = task
+    tempRightClick.task = task.id
+    tempRightClick.day = day
+    if (dataRightClick.task != undefined) {
+        // console.log('datos')
+        items.value[3].visible = true
+    } else {
+        items.value[3].visible = false
+    }
+    if (task.employees.length == 0) {
+        items.value[0].disabled = true
+        items.value[1].disabled = true
+        items.value[2].disabled = true
+        items.value[4].disabled = true
+    } else {
+        items.value[0].disabled = false
+        items.value[1].disabled = false
+        items.value[2].disabled = false
+        items.value[4].disabled = false
+    }
+    menu.value.show(event)
 };
 
 var dataRightClick = {}
@@ -364,6 +374,7 @@ const items = ref([
         icon: 'fa-regular fa-copy text-success',
         tooltip: 'Copia las personas programadas',
         command: () => {
+            dataRightClick.taskData = tempRightClick.taskData
             dataRightClick.task = tempRightClick.task
             dataRightClick.date = tempRightClick.day
             dataRightClick.cut = false
@@ -384,6 +395,7 @@ const items = ref([
         icon: 'fa-solid fa-scissors text-warning',
         tooltip: 'Corta las personas programadas',
         command: () => {
+            dataRightClick.taskData = tempRightClick.taskData
             dataRightClick.task = tempRightClick.task
             dataRightClick.date = tempRightClick.day
             dataRightClick.cut = true
@@ -397,8 +409,23 @@ const items = ref([
         command: async () => {
             dataRightClick.newTask = tempRightClick.task
             dataRightClick.newDate = tempRightClick.day
-            await axios.post(route('programming.copy'),  dataRightClick ).then((res) => {
+            dataRightClick.newTaskData = tempRightClick.taskData
+            await axios.post(route('programming.copy'), dataRightClick).then((res) => {
                 console.log(res)
+                if (res.data.status) {
+                    if(res.data.task){
+                        dataRightClick.newTaskData.employees = res.data.task
+                    }else{
+                        toast.add({ severity: 'error', group: "customToast", text:'Error al cargar la tarea', life: 4000 })
+                    }
+                    if (dataRightClick.cut) {
+                        // console.log(dataRightClick.taskData)
+                        dataRightClick.taskData.employees = []
+                    }
+                    toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
+                } else {
+                    toast.add({ severity: 'error', group: "customToast", text: res.data.mensaje, life: 2000 })
+                }
             })
             console.log('Pega');
         },
