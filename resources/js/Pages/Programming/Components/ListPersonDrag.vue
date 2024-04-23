@@ -3,14 +3,13 @@ import { ref } from 'vue';
 import axios from 'axios';
 import ProgressBar from 'primevue/progressbar';
 import Loading from '@/Components/Loading.vue';
-import CustomInput from '@/Components/CustomInput.vue';
 import Listbox from 'primevue/listbox';
+import ToggleButton from 'primevue/togglebutton';
 
 
 const loadingPerson = ref(true);
 const personal = ref([])
-const filter = ref('');
-
+const typePersonal=ref()
 defineProps({
     arrayPersonFilter: Object
 })
@@ -33,25 +32,21 @@ const item=ref()
 </script>
 <template>
     <div class="sm:flex sm:flex-col h-36 w-full sm:w-52 sm:rounded-lg  divide-y space-y-1 sm:h-full p-1 gap-1">
-        <!-- <div class="h-8">
-            <CustomInput v-model:input="filter" type="search" icon="fa-solid fa-magnifying-glass" />
-        </div> -->
         <div v-if="loadingPerson" class="w-full h-full flex flex-col justify-center">
             <Loading class="mt-10 hidden sm:flex" message="Cargando personas" />
             <ProgressBar mode="indeterminate" class="flex sm:hidden" style="height: 4px" />
         </div>
         <div v-if="personal.length > 0" oncontextmenu="return false" :key="personal.length"
-            class="sm:overflow-y-auto overflow-x-visible flex sm:block overflow-y-hidden space-x-1 space-y-0 sm:space-y-1 sm:space-x-0 sm:w-full">
+            class="overflow-x-visible flex sm:block overflow-y-hidden space-x-1 space-y-0 sm:space-y-1 sm:space-x-0 sm:w-full">
             <span v-if="arrayPersonFilter.loading" class="">
                 <ProgressBar mode="indeterminate" style="height: 4px" />
             </span>
-            <div class="grid grid-cols-2">
-                <!-- <Button label="contratista"></Button>
-                <Button label="Cotecmar"></Button> -->
+            <div class="flex justify-center">
+                <ToggleButton v-model="typePersonal" onLabel="Ver Cotecmar" offLabel="Ver Contratista" :pt="{root:'h-8'}"/>
             </div>
             <Listbox :options="personal" class="max-h-full" v-model="item" filter :filterFields="['Nombres_Apellidos','Cargo','Oficina']" optionLabel="Nombres_Apellidos"  :pt="{
                 header:'!h-10',
-                wrapper:'h-[80vh]',
+                wrapper:'h-[75vh]',
                 item: '!p-0 !rounded-md hover:!bg-primary-light',
                 filterInput: '!h-8',
                 header: '!p-1'
