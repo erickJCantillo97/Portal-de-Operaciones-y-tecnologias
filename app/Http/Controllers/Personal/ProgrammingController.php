@@ -346,10 +346,12 @@ class ProgrammingController extends Controller
         return DetailScheduleTime::groupBy('idUsuario')->where('idTask', $task)->where('fecha', $fecha)->select(
             Db::raw('MIN(nombre) as name'),
             Db::raw('MIN(idUsuario) as id'),
+            Db::raw('MIN(idSchedule) as schedule'),
         )->get()->map(function ($d) use ($task, $fecha) {
             return [
                 'Nombres_Apellidos' => $d->name,
                 'Num_SAP' => $d->id,
+                'schedule' => $d->schedule,
                 'times' => DetailScheduleTime::where([
                     ['fecha', '=', $fecha],
                     ['idTask', '=', $task],
@@ -761,7 +763,7 @@ class ProgrammingController extends Controller
         if ($date->isSaturday() || $date->isSunday()) {
             return response()->json(
                 ExtendedSchedule::has('project')->has('task')->where('project_id', $project->id)
-                    // ->where('executor','LIKE ,'%'.$request->executor.'%)
+                    // ->where('executor', 'LIKE', '%' . auth()->user()->oficina . '%')
                     ->where('date', $date)
                     ->get()->map(function ($task) use ($date) {
                         return [
@@ -776,10 +778,12 @@ class ProgrammingController extends Controller
                             'employees' => DetailScheduleTime::groupBy('idUsuario')->where('idTask', $task['task']['id'])->where('fecha', $date)->select(
                                 Db::raw('MIN(nombre) as name'),
                                 Db::raw('MIN(idUsuario) as id'),
+                                Db::raw('MIN(idSchedule) as schedule'),
                             )->get()->map(function ($d) use ($task, $date) {
                                 return [
                                     'name' => $d->name,
                                     'user_id' => $d->id,
+                                    'schedule'=>$d->schedule,
                                     'times' => DetailScheduleTime::where([
                                         ['fecha', '=', $date],
                                         ['idTask', '=', $task['id']],
@@ -801,7 +805,7 @@ class ProgrammingController extends Controller
         return response()->json(
             VirtualTask::has('project')->has('task')
                 ->where('project_id', $project->id)
-                ->where('executor', 'LIKE', '%' . $request->executor . '%')
+                // ->where('executor', 'LIKE', '%' . auth()->user()->oficina . '%')
                 ->where('percentDone', '<', 100)
                 ->where('startDate', '<=', $date)
                 // ->where(function ($query) use ($request) {
@@ -824,10 +828,12 @@ class ProgrammingController extends Controller
                         'employees' => DetailScheduleTime::groupBy('idUsuario')->where('idTask', $task['id'])->where('fecha', $date)->select(
                             Db::raw('MIN(nombre) as name'),
                             Db::raw('MIN(idUsuario) as id'),
+                            Db::raw('MIN(idSchedule) as schedule'),
                         )->get()->map(function ($d) use ($task, $date) {
                             return [
                                 'Nombres_Apellidos' => $d->name,
                                 'Num_SAP' => $d->id,
+                                'schedule'=>$d->schedule,
                                 'times' => DetailScheduleTime::where([
                                     ['fecha', '=', $date],
                                     ['idTask', '=', $task['id']],
@@ -964,6 +970,6 @@ class ProgrammingController extends Controller
         }catch (Exception $e) {
             DB::rollBack();
             return response()->json(['status' => false, 'mensaje' => $e->getMessage()]);
-        } 
+        }
     }
 }
