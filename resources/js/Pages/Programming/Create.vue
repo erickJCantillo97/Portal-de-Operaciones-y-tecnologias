@@ -436,10 +436,10 @@ const items = ref([
         tooltip: 'Elimina todas las personas programadas de la tarea',
         command: async () => {
             const deleteSchedule = tempRightClick.taskData.employees.map(item => item.schedule)
-            await axios.post(route('programming.removeAll'), deleteSchedule).then((res) => {
+            await axios.post(route('programming.removeAll'), {schedules:deleteSchedule}).then((res) => {
                 console.log(res)
                 if (res.data.status) {
-                    dataRightClick.taskData.employees = []
+                    tempRightClick.taskData.employees = []
                     toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
                 } else {
                     toast.add({ severity: 'error', group: "customToast", text: res.data.mensaje, life: 2000 })
@@ -557,14 +557,14 @@ const items = ref([
                                     <p class="font-bold">
                                         {{ project.name }}
                                     </p>
-                                    <div class="text-xs sm:block flex">
+                                    <div v-if="project.name!='ANRP'" class="text-xs sm:block flex">
                                         <p v-tooltip="'Fecha de inicio'" class="px-2">{{ project.fechaI }}</p>
                                         <p v-tooltip="'Fecha de fin'" class="px-2">{{ project.fechaF }}</p>
                                     </div>
-                                    <Knob v-tooltip="'Avance'" :model-value="parseInt(project.avance)" readonly
+                                    <Knob v-if="project.name!='ANRP'" v-tooltip="'Avance'" :model-value="parseInt(project.avance)" readonly
                                         :size="40" valueTemplate="{value}%" class="sm:flex hidden" />
                                     <div class="h-6 w-1/2 sm:hidden">
-                                        <ProgressBar :value="parseInt(project.avance)" class="" v-tooltip="'Avance'"
+                                        <ProgressBar v-if="project.name!='ANRP'" :value="parseInt(project.avance)" class="" v-tooltip="'Avance'"
                                             :pt="{ label: 'text-xs font-thin' }">
                                         </ProgressBar>
                                     </div>
