@@ -413,10 +413,10 @@ const items = ref([
             await axios.post(route('programming.copy'), dataRightClick).then((res) => {
                 console.log(res)
                 if (res.data.status) {
-                    if(res.data.task){
+                    if (res.data.task) {
                         dataRightClick.newTaskData.employees = res.data.task
-                    }else{
-                        toast.add({ severity: 'error', group: "customToast", text:'Error al cargar la tarea', life: 4000 })
+                    } else {
+                        toast.add({ severity: 'error', group: "customToast", text: 'Error al cargar la tarea', life: 4000 })
                     }
                     if (dataRightClick.cut) {
                         // console.log(dataRightClick.taskData)
@@ -434,7 +434,17 @@ const items = ref([
         label: 'Quitar todos',
         icon: 'fa-solid fa-trash text-danger',
         tooltip: 'Elimina todas las personas programadas de la tarea',
-        command: () => {
+        command: async () => {
+            const deleteSchedule = tempRightClick.taskData.employees.map(item => item.schedule)
+            await axios.post(route('programming.removeAll'), deleteSchedule).then((res) => {
+                console.log(res)
+                if (res.data.status) {
+                    dataRightClick.taskData.employees = []
+                    toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
+                } else {
+                    toast.add({ severity: 'error', group: "customToast", text: res.data.mensaje, life: 2000 })
+                }
+            })
             console.log('Desprograma');
         }
     },
