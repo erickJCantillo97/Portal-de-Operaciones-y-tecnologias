@@ -343,7 +343,7 @@ const confirmDelete = (event, schedule_time) => {
 //#region click derecho
 var tempRightClick = {}
 const taskRightClick = (event, task, day) => {
-    if (task.employees.length > 0) {
+   
         tempRightClick.task = task.id
         tempRightClick.day = day
         if (dataRightClick.task != undefined) {
@@ -352,10 +352,7 @@ const taskRightClick = (event, task, day) => {
         } else {
             items.value[3].visible = false
         }
-        menu.value.show(event);
-    }else{
-
-    }
+        menu.value.show(event)
 
 };
 
