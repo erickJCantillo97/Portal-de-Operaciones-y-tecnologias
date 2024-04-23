@@ -930,10 +930,10 @@ class ProgrammingController extends Controller
                 ]);
             }
             $data = DetailScheduleTime::where('idTask', $request->task)
-                ->where('fecha', $request->date)->get();
+                ->where('fecha', Carbon::parse($request->date)->format('Y-m-d'))->get();
             foreach ($data as $item) {
-                $exist = DetailScheduleTime::where('idUsuario', $item->idUsuario)
-                ->where('fecha', $request->date)->get();
+                // $exist = DetailScheduleTime::where('idUsuario', $item->idUsuario)
+                // ->where('fecha', $request->date)->get();
 
                 $employee = searchEmpleados('Num_SAP', $item->idUsuario)->first();
                 programming($request->newDate, $item->idUsuario, $item->horaInicio, $item->horaFin, $request->newTask, $item->nombre, $employee->Costo_Hora);
