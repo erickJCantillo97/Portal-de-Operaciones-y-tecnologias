@@ -2,8 +2,6 @@
 import { Link, router } from '@inertiajs/vue3'
 import { ref, computed } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import Dropdown from 'primevue/dropdown'
-import NoContentToShow from '@/Components/NoContentToShow.vue'
 import DivisionsByProject from '@/Pages/Programming/DivisionsByProject.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
@@ -207,7 +205,7 @@ const url = [
                         @click="openDialog()" />
                 </div>
             </div>
-            <!-- <DivisionsByProject :projects /> -->
+            <DivisionsByProject :projects />
             <!-- <div class="mt-2 px-4 h-[79vh] overflow-y-auto">
                 <div v-if="!project && !loading" class="flex items-center">
                     <NoContentToShow class="mt-5" :subject="'Por favor seleccione un Proyecto'" />
