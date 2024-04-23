@@ -16,7 +16,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow
+class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow, ShouldQueue
 {
     private $project;
 
@@ -31,21 +31,13 @@ class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow
      */
     public function collection(Collection $collection)
     {
-
-        Validator::make($collection->toArray(), [
-            '*.objeto' => 'required',
-            '*.clase_de_coste' => 'required',
-            '*.valor' => 'required|numeric',
-        ])->validate();
         $grafos = [];
 
         foreach ($collection as $key => $row) {
             try {
-                $pep = Pep::where('grafo_id', 'LIKE', $row['objeto'])->first();
-                if (!isset($pep)) {
-                    $pep = Grafo::where('grafo_id', 'LIKE', $row['objeto'])->first();
-                }
-                if (!isset($pep)) {
+                if (!is_numeric(str_replace(" ", "", $row['objeto']))) {
+                    $pep = Pep::where('grafo_id', 'LIKE', $row['objeto'])->first();
+                } else {
                     $operacion = explode(' ', $row['objeto']);
                     $pep = Operation::where('grafo_id', 'LIKE', $operacion[0] . '%')->where('grafo_id', 'LIKE', '%' . $operacion[1])->first();
                 }
@@ -80,6 +72,6 @@ class ExecutedImport implements ToCollection, WithChunkReading, WithHeadingRow
 
     public function chunkSize(): int
     {
-        return 300;
+        return 1000;
     }
 }
