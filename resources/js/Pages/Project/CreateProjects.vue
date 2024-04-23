@@ -56,6 +56,7 @@ const typeOptions = [
 
 //Estado de Proyecto
 const statusOptions = [
+    'REPARACIÓN Y MANTENIMIENTO',
     'CONSTRUCCIÓN',
     'DISEÑO',
     'GARANTIA',
@@ -456,6 +457,7 @@ const url = [
                                 optionValue="id" optionLabel="contract_id" v-model:input="formData.contract_id"
                                 showClear :options="contractsOptions"
                                 v-if="$page.props.auth.user.gerencia == 'GECON'" />
+
                             <CustomInput label="Autorizaciones" type="dropdown" placeholder="Seleccione Autorización"
                                 optionLabel="name" v-model:input="authorizationSelect" showClear
                                 :options="authorizationsOptions" :errorMessage="$page.props.errors.authorization_id"
@@ -467,6 +469,10 @@ const url = [
                                 :options="Object.values(quotesOptions)" :errorMessage="$page.props.errors.quote_id"
                                 :invalid="$page.props.errors.quote_id ? true : false"
                                 v-if="$page.props.auth.user.gerencia == 'GECON'" />
+
+                            <CustomInput label="Estado del Proyecto" type="dropdown"
+                                placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.status" showClear
+                                :options="statusOptions" />
                         </div>
                     </tab-content>
                     <!--DATOS DEL PROYECTO-->
