@@ -111,7 +111,7 @@ defineEmits(['drop', 'togglePerson', 'addPerson', 'menu'])
                             class="px-2 flex h-full w-full justify-between sm:justify-center items-center overflow-hidden">
                             <div
                                 class="overflow-x-hidden hover:overflow-x-auto gap-x-1 flex items-center h-full px-2 py-1 max-w-full flex-nowrap">
-                                <i v-if="task.loading"
+                                <i v-if="task.loading>0"
                                     class="fa-solid fa-circle-notch font-bold text-3xl animate-spin"></i>
                                 <span v-if="task.employees?.length > 0" v-for="person in task.employees">
                                     <img v-tooltip.top="{ value: person.Nombres_Apellidos, pt: { text: 'text-center' } }"
