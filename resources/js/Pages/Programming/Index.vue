@@ -99,6 +99,7 @@ const url = [
                 </div>
             </div>
             <DivisionsByProject :projects />
+
             <!-- <div class="mt-2 px-4 h-[79vh] overflow-y-auto">
                 <div v-if="!project && !loading" class="flex items-center">
                     <NoContentToShow class="mt-5" :subject="'Por favor seleccione un Proyecto'" />

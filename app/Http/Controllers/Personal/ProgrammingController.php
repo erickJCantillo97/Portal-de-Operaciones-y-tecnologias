@@ -68,6 +68,27 @@ class ProgrammingController extends Controller
         ]);
     }
 
+    public function getProgrammingDate(Request $request)
+    {
+        $date = Carbon::parse($request->fecha);
+        $schedules = DetailScheduleTime::where('fecha', $date->format('Y-m-d'))
+            ->orderBy('idproyecto')
+            ->orderBy('idTask')
+            ->get()->map(function ($d) {
+                $employee = Employee::where('Num_SAP', 'LIKE', '%' . $d['idUsuario'])->first();
+                return [
+                    'id' => $d['id'],
+                    'task' => $d['nombreTask'],
+                    'project' => $d['nombrePadreTask'],
+                    'user' => $d['nombre'],
+                    'turno' => Carbon::createFromFormat('H:i:s', substr($d['horaInicio'], 0, 8))->format('g:i') . ' - ' . Carbon::createFromFormat('H:i:s', substr($d['horaFin'], 0, 8))->format('g:i'),
+                    'cargo' => $employee->Cargo
+                ];
+            });
+
+        return $schedules;
+    }
+
     /**
      * La función almacena una programación y crea un horario para una tarea y luego devuelve la
      * información de la tarea junto con la programación.
