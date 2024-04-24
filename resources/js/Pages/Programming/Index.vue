@@ -35,7 +35,6 @@ const formData = ref({
     tasks: [],
     description: '',
 })
-//#endregion
 
 //#region CustomDataTable
 const projectsByTask = ref()
@@ -115,52 +114,7 @@ const openDialog = () => {
     openModal.value = true
 }
 
-//#region Requests
-const submit = () => {
-    if (!selectedTaskId.value) {
-        router.post(route('extended.schedule.store'), formData.value, {
-            onSuccess: () => {
-                toast.add({
-                    severity: 'success',
-                    group: 'customToast',
-                    text: 'Tarea extendida creada con éxito',
-                    life: 2000
-                })
-                resetFormData()
-            },
-            onError: (errors) => {
-                toast.add({
-                    severity: 'danger',
-                    group: 'customToast',
-                    text: 'No se ha podido guardar la tarea ' + errors,
-                    life: 2000
-                })
-                resetFormData()
-            }
-        })
-    } else {
-        router.put(route('extended.schedule.update', selectedTaskId.value), formData.value, {
-            onSuccess: () => {
-                toast.add({
-                    severity: 'success',
-                    group: 'customToast',
-                    text: 'Tarea extendida actualizada con éxito',
-                    life: 2000
-                })
-                resetFormData()
-            },
-            onError: (errors) => {
-                toast.add({
-                    severity: 'danger',
-                    group: 'customToast',
-                    text: 'No se ha podido actualizar la tarea ' + errors,
-                    life: 2000
-                })
-                resetFormData()
-            }
-        })
-    }
-}
+
 
 const taskOptions = ref()
 const getTaskByProjects = async () => {
@@ -174,60 +128,6 @@ const getTaskByProjects = async () => {
     }
 }
 
-const editTask = async (task) => {
-    try {
-        // console.log(task)
-        editMode.value = true
-        selectedTaskId.value = task.task_id
-        projectSelected.value = parseInt(task.project_id)
-        await getTaskByProjects()
-        formData.value.dates = formatDateTime24h(task.date).split(", ")[0]
-        formData.value.start_hour = format24h(task.start_hour)
-        formData.value.end_hour = format24h(task.end_hour)
-        formData.value.tasks = [parseInt(task.task_id)]
-        formData.value.description = task.description
-    } catch (error) {
-        console.error('Error ' + error)
-    }
-}
-
-const cloneTask = async (task) => {
-    try {
-        // console.log(task)
-        selectedTaskId.value = null
-        projectSelected.value = parseInt(task.project_id)
-        await getTaskByProjects()
-        formData.value.dates = formatDateTime24h(task.date).split(", ")[0]
-        formData.value.start_hour = format24h(task.start_hour)
-        formData.value.end_hour = format24h(task.end_hour)
-        formData.value.tasks = []
-        formData.value.description = task.description
-    } catch (error) {
-        console.error('Error ' + error)
-    }
-}
-
-const deleteTask = (id_task) => {
-    router.delete(route('extended.schedule.destroy', id_task), {
-        onSuccess: () => {
-            toast.add({
-                severity: 'success',
-                group: 'customToast',
-                text: 'Tarea Elimnada',
-                life: 2000
-            })
-        },
-        onError: (errors) => {
-            toast.add({
-                severity: 'danger',
-                group: 'customToast',
-                text: 'No se ha podido eliminar la tarea ' + errors,
-                life: 2000
-            })
-        }
-    })
-}
-//#endregion
 
 const resetFormData = () => {
     openModal.value = false

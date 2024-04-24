@@ -312,7 +312,7 @@
     <ConfirmPopup>
         <template #message="slotProps">
             <div class="flex flex-col items-center text-center w-full gap-3 p-3">
-                {{ console.log(slotProps.message) }}
+                <!-- {{ console.log(slotProps.message) }} -->
                 <i :class="slotProps.message.icon" class="text-4xl"></i>
                 <span v-if="slotProps.message.message.subMessage===undefined?true:false">
                     <p class="font-bold w-60">{{ slotProps.message.message}}</p>
