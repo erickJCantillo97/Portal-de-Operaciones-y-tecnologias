@@ -23,6 +23,10 @@ const props = defineProps({
     movil: {
         type: Boolean,
         default: false
+    },
+    dataRightClick:{
+        type:Object,
+        default:{}
     }
 })
 
@@ -65,10 +69,10 @@ defineEmits(['drop', 'togglePerson', 'addPerson', 'menu'])
     </div>
     <div v-else-if="tasks.data.length > 0" v-for="task in tasks.data" @contextmenu="$emit('menu', $event, task, day)"
         @drop="!movil ? $emit('drop', task, day) : null; option = null" @dragover.prevent @dragenter.prevent
-        class=" sm:h-full w-full sm:max-h-44 p-0.5" :class="[type == 'day' ? 'sm:w-1/3 float-left' : '']"
+        class=" sm:h-full w-full sm:max-h-44 p-0.5" :class="[type == 'day' ? 'sm:w-1/3 float-left' : '',]"
         :key="task.name + date.toDateString()">
         <div class="flex border pb-1 rounded-md border-primary hover:bg-primary-light flex-col justify-between h-full"
-            :class="type === 'day' ? 'text-sm' : 'text-xs'">
+            :class="[type === 'day' ? 'text-sm' : 'text-xs']">
             <div class="h-min w-full">
                 <p v-tooltip="task.name"
                     class="border-b font-bold trun border-primary truncate px-0.5 w-full text-center">
