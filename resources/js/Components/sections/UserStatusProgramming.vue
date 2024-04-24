@@ -1,5 +1,6 @@
 <script setup>
 import ProgressBar from 'primevue/progressbar';
+import ProgressSpinner from 'primevue/progressspinner';
 import { ref } from 'vue'
 const props = defineProps({
     date: {
@@ -9,7 +10,11 @@ const props = defineProps({
     letters: {
         type: Boolean,
         default: false
-    }
+    },
+    loadingType: {
+        type: String,
+        default: 'bar'
+    },
 })
 const status = ref({
     loading: false,
@@ -39,8 +44,11 @@ const statusSelect = defineModel('statusSelect', {
 <template>
     <div class="h-7"
         :class="[(date.toDateString() == new Date().toDateString()) ? 'bg-secondary rounded-b-md' : '', (statusSelect == status) ? 'border-success border rounded-md bg-success-light' : '', letters == true ? 'bg-white' : '']">
-        <div v-if="status.loading" class="h-8 w-40 grid items-center px-2">
-            <ProgressBar mode="indeterminate" style="height: 4px" />
+        <div v-if="status.loading" class="grid items-center w-12 h-8 px-2">
+            <ProgressBar mode="indeterminate" style="height: 4px" v-if="loadingType == 'bar'" />
+            <ProgressSpinner style="width: 25px; height: 25px" strokeWidth="8" fill="var(--surface-ground)"
+                animationDuration=".5s" aria-label="Custom ProgressSpinner" v-else />
+
         </div>
         <div v-else class="grid grid-cols-2 sm:max-w-[30vw] justify-center gap-x-1 z-10 p-1 cursor-pointer" @click="!(statusSelect == status) ? statusSelect = status : (statusSelect = {
             loading: false,

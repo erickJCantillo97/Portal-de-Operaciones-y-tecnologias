@@ -415,20 +415,6 @@ const url = [
                     <CustomUpload mode="advanced" titleModal="Subir Costos Ejecutados"
                         icon-button="fa-solid fa-money-bill-transfer" tooltip="Subir ejecutado" accept=".xlsx,.xls"
                         :url="route('upload.execute', project.id)" severity="info" />
-
-                    <!--
-
-
-                    <CustomUpload mode="advanced" titleModal="Subir Presupuesto del proyecto"
-                        icon-button="fa-solid fa-hand-holding-dollar" tooltip="Subir Presupuesto" accept=".xlsx,.xls"
-                        :url="route('upload.budget', props.project.id)" severity="success" />
-
-                    <CustomUpload mode="advanced" :multiple="true" titleModal="Subir el avance planeado del proyecto"
-                        tooltip="Subir Curva S" accept=".xlsx,.xls" url="prueba" severity="info" />
-
-                    <CustomUpload mode="advanced" :multiple="true" titleModal="Subir Costos ejecutados por el proyecto"
-                        icon-button="fa-solid fa-money-bill-trend-up" tooltip="Subir Costos Ejecutados" accept=".xlsx,.xls"
-                        url="prueba" severity="danger" /> -->
                 </div>
             </div>
             <div class="p-2">
