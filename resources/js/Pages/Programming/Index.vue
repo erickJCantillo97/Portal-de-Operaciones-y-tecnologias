@@ -1,8 +1,9 @@
 <script setup>
 import { Link, router } from '@inertiajs/vue3'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import DivisionsByProject from '@/Pages/Programming/DivisionsByProject.vue'
+import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
 import Knob from 'primevue/knob'
@@ -11,6 +12,7 @@ import { useCommonUtilities } from "@/composable/useCommonUtilities"
 const { format_ES_Date, formatDateTime24h } = useCommonUtilities()
 
 import { useToast } from "primevue/usetoast"
+import axios from 'axios'
 const toast = useToast()
 
 const props = defineProps({
@@ -18,7 +20,9 @@ const props = defineProps({
 })
 
 const loading = ref(false)
+const date = ref(new Date())
 const project = ref()
+const programmin = ref([])
 const selectedTaskId = ref(null)
 const editMode = ref(false)
 const disabled = computed(() => selectedTaskId.value !== null && editMode.value)
@@ -33,6 +37,38 @@ const formData = ref({
     tasks: [],
     description: '',
 })
+
+//#region CustomDataTable
+const projectsByTask = ref()
+
+const getProgramming = async () => {
+    await axios.get(route('get.programming.date', { date: date.value }))
+        .then(res => {
+            programmin.value = res.data.programming
+        })
+}
+getProgramming();
+
+const columnas = [
+    // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
+    { field: 'project', header: 'Proyecto', filter: true, sortable: true },
+    { field: 'task', header: 'Tarea', filter: true, sortable: true },
+    { field: 'turno', header: 'Turno', filter: true, sortable: true },
+    { field: 'division', header: 'Oficina', filter: true, sortable: true },
+    { field: 'user', header: 'Personal', filter: true, sortable: true },
+    { field: 'cargo', header: 'Cargo', filter: true, sortable: true },
+
+]
+
+
+
+const goToProjectOverview = (event, data) => {
+    try {
+        router.get(route('projects.goToProjectOverview', data.id))
+    } catch (error) {
+        console.log(error)
+    }
+}
 //#endregion
 
 /**
@@ -55,52 +91,7 @@ const openDialog = () => {
     openModal.value = true
 }
 
-//#region Requests
-const submit = () => {
-    if (!selectedTaskId.value) {
-        router.post(route('extended.schedule.store'), formData.value, {
-            onSuccess: () => {
-                toast.add({
-                    severity: 'success',
-                    group: 'customToast',
-                    text: 'Tarea extendida creada con éxito',
-                    life: 2000
-                })
-                resetFormData()
-            },
-            onError: (errors) => {
-                toast.add({
-                    severity: 'danger',
-                    group: 'customToast',
-                    text: 'No se ha podido guardar la tarea ' + errors,
-                    life: 2000
-                })
-                resetFormData()
-            }
-        })
-    } else {
-        router.put(route('extended.schedule.update', selectedTaskId.value), formData.value, {
-            onSuccess: () => {
-                toast.add({
-                    severity: 'success',
-                    group: 'customToast',
-                    text: 'Tarea extendida actualizada con éxito',
-                    life: 2000
-                })
-                resetFormData()
-            },
-            onError: (errors) => {
-                toast.add({
-                    severity: 'danger',
-                    group: 'customToast',
-                    text: 'No se ha podido actualizar la tarea ' + errors,
-                    life: 2000
-                })
-                resetFormData()
-            }
-        })
-    }
-}
+
 
 const taskOptions = ref()
 const getTaskByProjects = async () => {
@@ -114,60 +105,6 @@ const getTaskByProjects = async () => {
     }
 }
 
-const editTask = async (task) => {
-    try {
-        // console.log(task)
-        editMode.value = true
-        selectedTaskId.value = task.task_id
-        projectSelected.value = parseInt(task.project_id)
-        await getTaskByProjects()
-        formData.value.dates = formatDateTime24h(task.date).split(", ")[0]
-        formData.value.start_hour = format24h(task.start_hour)
-        formData.value.end_hour = format24h(task.end_hour)
-        formData.value.tasks = [parseInt(task.task_id)]
-        formData.value.description = task.description
-    } catch (error) {
-        console.error('Error ' + error)
-    }
-}
-
-const cloneTask = async (task) => {
-    try {
-        // console.log(task)
-        selectedTaskId.value = null
-        projectSelected.value = parseInt(task.project_id)
-        await getTaskByProjects()
-        formData.value.dates = formatDateTime24h(task.date).split(", ")[0]
-        formData.value.start_hour = format24h(task.start_hour)
-        formData.value.end_hour = format24h(task.end_hour)
-        formData.value.tasks = []
-        formData.value.description = task.description
-    } catch (error) {
-        console.error('Error ' + error)
-    }
-}
-
-const deleteTask = (id_task) => {
-    router.delete(route('extended.schedule.destroy', id_task), {
-        onSuccess: () => {
-            toast.add({
-                severity: 'success',
-                group: 'customToast',
-                text: 'Tarea Elimnada',
-                life: 2000
-            })
-        },
-        onError: (errors) => {
-            toast.add({
-                severity: 'danger',
-                group: 'customToast',
-                text: 'No se ha podido eliminar la tarea ' + errors,
-                life: 2000
-            })
-        }
-    })
-}
-//#endregion
 
 const resetFormData = () => {
     openModal.value = false
@@ -209,7 +146,15 @@ const url = [
                         @click="openDialog()" />
                 </div>
             </div>
-            <DivisionsByProject :projects />
+
+            <!-- <DivisionsByProject :projects /> -->
+
+            <div class="w-full h-full overflow-y-auto">
+                <CustomDataTable :filterButtons="filterButtons" :data="programmin" :rows-default="100"
+                    :columnas="columnas" :actions="buttons">
+                </CustomDataTable>
+            </div>
+
             <!-- <div class="mt-2 px-4 h-[79vh] overflow-y-auto">
                 <div v-if="!project && !loading" class="flex items-center">
                     <NoContentToShow class="mt-5" :subject="'Por favor seleccione un Proyecto'" />

@@ -6,13 +6,14 @@ use App\Models\Project\Grafo;
 use App\Models\Project\Operation;
 use App\Models\Project\Pep;
 use App\Models\WareHouse\Tool;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class BudgetImport implements ToCollection,  WithHeadingRow
+class BudgetImport implements ToCollection,  WithHeadingRow, WithChunkReading, ShouldQueue
 {
     public $proyecto;
 
@@ -65,5 +66,10 @@ class BudgetImport implements ToCollection,  WithHeadingRow
                 // dd($pep);
             }
         }
+    }
+
+    public function chunkSize(): int
+    {
+        return 300;
     }
 }
