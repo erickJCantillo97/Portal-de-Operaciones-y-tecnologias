@@ -47,7 +47,10 @@ const getProgramming = async () => {
             programmin.value = res.data.programming
         })
 }
-getProgramming();
+
+onMounted(() => {
+    getProgramming()
+})
 
 const columnas = [
     // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
@@ -57,18 +60,7 @@ const columnas = [
     { field: 'division', header: 'Oficina', filter: true, sortable: true },
     { field: 'user', header: 'Personal', filter: true, sortable: true },
     { field: 'cargo', header: 'Cargo', filter: true, sortable: true },
-
 ]
-
-
-
-const goToProjectOverview = (event, data) => {
-    try {
-        router.get(route('projects.goToProjectOverview', data.id))
-    } catch (error) {
-        console.log(error)
-    }
-}
 //#endregion
 
 /**
@@ -91,8 +83,6 @@ const openDialog = () => {
     openModal.value = true
 }
 
-
-
 const taskOptions = ref()
 const getTaskByProjects = async () => {
     try {
@@ -104,7 +94,6 @@ const getTaskByProjects = async () => {
         console.error('Error ' + error)
     }
 }
-
 
 const resetFormData = () => {
     openModal.value = false
