@@ -579,7 +579,7 @@ const items = ref([
                                         :class="[index > 5 ? 'bg-warning-light' : '', data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
                                         <TaskProgramming :project="project.id" :day="data.day" @menu="taskRightClick"
                                             :key="dates.day.toDateString() + project.id + mode" type="week"
-                                            @drop="onDrop" v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
+                                            @drop="onDrop" v-model:itemDrag="personDrag" @togglePerson="togglePerson" :dataRightClick />
                                     </div>
                                 </span>
                             </div>
@@ -595,7 +595,7 @@ const items = ref([
                             </div>
                             <div class="col-span-9 grid grid-cols-7 pr-4 z-10">
                                 <span v-for="data in diasSemana">
-                                    <UserStatusProgramming :date="data.day" :key="data.key"
+                                    <UserStatusProgramming :date="data.day" :key="data.key+data.day"
                                         v-model:statusSelect="arrayPersonFilter" />
                                 </span>
                             </div>
@@ -631,7 +631,7 @@ const items = ref([
                                     <TaskProgramming type="day" @addPerson="addPerson" :movil="esMovil()"
                                         @menu="taskRightClick" :project="project.id" :day="dates.day"
                                         :key="dates.day.toDateString() + project.id" @drop="onDrop"
-                                        v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
+                                        v-model:itemDrag="personDrag" @togglePerson="togglePerson" :dataRightClick/>
                                 </div>
                             </div>
                             <div v-else>
@@ -639,7 +639,7 @@ const items = ref([
                             </div>
                         </div>
                         <div class="w-full flex justify-center h-min z-10" oncontextmenu="return false">
-                            <UserStatusProgramming :letters="true" :date="dates.day" :key="dates.key"
+                            <UserStatusProgramming :letters="true" :date="dates.day" :key="dates.key+dates.day"
                                 v-model:statusSelect="arrayPersonFilter" />
                         </div>
                     </div>
