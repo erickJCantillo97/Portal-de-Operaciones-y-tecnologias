@@ -42,10 +42,10 @@ const statusSelect = defineModel('statusSelect', {
 </script>
 
 <template>
-    <div class="h-7"
+    <div class="h-8"
         :class="[(date.toDateString() == new Date().toDateString()) ? 'bg-secondary rounded-b-md' : '', (statusSelect == status) ? 'border-success border rounded-md bg-success-light' : '', letters == true ? 'bg-white' : '']">
-        <div v-if="status.loading" class="grid items-center w-12 h-8 px-2">
-            <ProgressBar mode="indeterminate" style="height: 4px" v-if="loadingType == 'bar'" />
+        <div v-if="status.loading" class="flex justify-center items-center h-8 px-2">
+            <ProgressBar mode="indeterminate" style="height: 4px; width: 80px;" v-if="loadingType == 'bar'" />
             <ProgressSpinner style="width: 25px; height: 25px" strokeWidth="8" fill="var(--surface-ground)"
                 animationDuration=".5s" aria-label="Custom ProgressSpinner" v-else />
 
@@ -58,7 +58,7 @@ const statusSelect = defineModel('statusSelect', {
             }
         })">
             <p class="rounded w-full text-center px-2 text-white"
-                :class="[status.data.programados.length !== 0 ? 'bg-primary' : 'bg-success', status.data.programados.length == 0 ? 'col-span-2' : '']"
+                :class="[status.data.noProgramados.length !== 0 ? 'bg-primary' : 'bg-success col-span-2']"
                 v-if="status.data.programados.length !== 0"
                 v-tooltip="{ value: status.data.programados?.length > 0 ? `<div><p class='w-full text-center font-bold'>Programados</p>${status.data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
                 <span v-if="letters">Programados: </span>

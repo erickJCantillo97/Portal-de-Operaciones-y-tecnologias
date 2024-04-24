@@ -106,7 +106,7 @@ function esMovil() {
 //#region variables
 const openConflict = ref(false)
 const date = ref(new Date())
-const conflicts = ref()
+const conflicts = ref({})
 const mode = ref('date')
 const dates = ref({ key: Math.random().toFixed(5), day: new Date(date.value.getFullYear(), date.value.getMonth(), date.value.getDate() + 1) })
 const diasSemana = ref(obtenerFechasSemana(dates.value.day))
@@ -139,7 +139,7 @@ const getTask = async (option) => {
     if (option == 'week') {
         mode.value = option
         !(dates.value.day instanceof Array) ?? (dates.value.day = obtenerFormatoSemana(new Date()))
-        (diasSemana = obtenerFechasSemana(obtenerDiaSemana(dates.value.day))) 
+            (diasSemana = obtenerFechasSemana(obtenerDiaSemana(dates.value.day)))
     } else if (option == 'date') {
         mode.value = option
         !(dates.value.day instanceof Date) ?? (dates.value.day = new Date())
@@ -162,51 +162,75 @@ if (esMovil()) {
 
 //#region drag
 
-async function onDrop(task, fecha) {
-    console.log(fecha)
-    if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
-        task.loading==undefined?task.loading=1:task.loading++
-        if (personDrag.value.option == 'move') {
-            personDrag.value.task.loading = true
-            await axios.post(route('programming.move'), { task: task.id, date: fecha, schedule: personDrag.value.times[0].idSchedule }).then((res) => {
-                if (res.data.status) {
-                    task.employees = res.data.task
-                    task.employeesLoad=
-                    task.loading--
-                    personDrag.value.task.loading = false
-                    personDrag.value.task.employees = personDrag.value.task.employees.filter(person => person.Num_SAP !== personDrag.value.Num_SAP);
-                    toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
-                } else {
-                    task.loading = false
-                    personDrag.value.task.loading = false
-                    toast.add({ severity: 'error', group: "customToast", text: res.data.mensaje, life: 2000 })
-                }
+function loadingPrograming(fecha) {
+    if (fecha != undefined) {
+        if (fecha instanceof Array) {
+            fecha.forEach((dia) => {
+                if (mode.value == 'week') diasSemana.value.find(data => data.day.toISOString().split("T")[0] === dia.toISOString().split("T")[0]).key = Math.random().toFixed(5);
             })
-            task.loading--
         } else {
-            await axios.post(route('programming.store'), { task_id: task.id, employee_id: personDrag.value.Num_SAP, name: personDrag.value.Nombres_Apellidos, fecha }).then((res) => {
-                if (Object.values(res.data.conflict).length > 0) {
-                    conflicts.value = Object.values(res.data.conflict)
-                    openConflict.value = true;
-                    task.loading--
-                    task.value = task
-                    task.employees = res.data.task
-                    toast.add({ severity: 'error', group: "customToast", text: 'Persona ya programada', life: 2000 })
-                } else if (res.data.status == false) {
-                    task.loading--
-                    task.employees = res.data.task
-                    toast.add({ severity: 'error', group: "customToast", text: 'Hubo un error al programar', life: 2000 })
-                } else {
-                    task.employees = res.data.task
-                    task.loading--
-                    toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
-                }
-            })
+            if (mode.value == 'week') diasSemana.value.find(data => data.day.toISOString().split("T")[0] === fecha.toISOString().split("T")[0]).key = Math.random().toFixed(5);
         }
-        if (mode.value == 'week') diasSemana.value.find(data => data.day === fecha).key = Math.random().toFixed(5);
-        if (mode.value == 'date') dates.value.key = Math.random().toFixed(5);
-        arrayPersonFilter.value.data.programados = []
-        arrayPersonFilter.value.data.noProgramados = []
+    }
+    if (mode.value == 'date') dates.value.key = Math.random().toFixed(5);
+    arrayPersonFilter.value.data.programados = []
+    arrayPersonFilter.value.data.noProgramados = []
+}
+
+async function onDrop(task, fecha) {
+    if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
+        task.loading == undefined ? task.loading = 1 : task.loading++
+        if (personDrag.value.option == 'move') {
+            personDrag.value.task.loading == undefined ? personDrag.value.task.loading = 1 : personDrag.value.task.loading++
+            await axios.post(route('programming.move'), { task: task.id, date: fecha, schedule: personDrag.value.person.schedule })
+                .then((res) => {
+                    if (res.data.status) {
+                        task.employees = res.data.task
+                        personDrag.value.task.employees = personDrag.value.task.employees.filter(person => person.Num_SAP !== personDrag.value.person.Num_SAP);
+                        toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
+                    } else {
+                        if (Object.values(res.data.conflict).length > 0) {
+                            conflicts.value.data = Object.values(res.data.conflict)
+                            conflicts.value.task = task
+                            openConflict.value = true;
+                            toast.add({ severity: 'error', group: "customToast", text: 'Existe sobreasignación', life: 2000 })
+                        } else {
+                            toast.add({ severity: 'error', group: "customToast", text: res.data?.mensaje ?? 'Hubo un error al programar', life: 2000 })
+                        }
+                    }
+                    task.loading--
+                    personDrag.value.task.loading--
+                })
+                .catch((error) => {
+                    console.log(error)
+                    task.employees = res.data.task
+                    task.loading--
+                })
+        } else {
+            await axios.post(route('programming.store'), { task_id: task.id, employee_id: personDrag.value.Num_SAP, name: personDrag.value.Nombres_Apellidos, fecha })
+                .then((res) => {
+                    if (res.data.status) {
+                        toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
+                    } else {
+                        if (Object.values(res.data.conflict).length > 0) {
+                            conflicts.value.data = Object.values(res.data.conflict)
+                            conflicts.value.task = task
+                            openConflict.value = true;
+                            toast.add({ severity: 'error', group: "customToast", text: 'Existe sobreasignación', life: 2000 })
+                        } else {
+                            toast.add({ severity: 'error', group: "customToast", text: res.data?.mensaje ?? 'Hubo un error al programar', life: 2000 })
+                        }
+                    }
+                    task.employees = res.data.task
+                    task.loading--
+                })
+                .catch((error) => {
+                    console.log(error)
+                    task.employees = res.data.task
+                    task.loading--
+                })
+        }
+        loadingPrograming(fecha)
     } else {
         toast.add({ severity: 'error', group: "customToast", text: 'No se puede programar en dias anteriores', life: 2000 })
     }
@@ -250,12 +274,11 @@ const formEditShift = ref({
 const shiftSelect = ref({})
 const editHour = (schedule_time) => {
     scheduleTime.value = schedule_time
-    console.log(taskEdit.value)
     modhours.value = true
 }
 
 const save = async (mode) => {
-    formEditShift.value.loading  ==undefined?formEditShift.value.loading=1:formEditShift.value.loading++
+    formEditShift.value.loading == undefined ? formEditShift.value.loading = 1 : formEditShift.value.loading++
     if (tabActive.value == 0) {
         formEditShift.value.personalized = false
         if (shiftSelect.value.startShift == undefined) {
@@ -291,16 +314,17 @@ const save = async (mode) => {
                 modhours.value = false
             }
             else {
-                conflicts.value = Object.values(res.data.conflict)
-                if (conflicts.value.length > 0) {
+                if (Object.values(res.data.conflict).length > 0) {
+                    conflicts.value.data = Object.values(res.data.conflict)
+                    conflicts.value.task = taskEdit.value
                     openConflict.value = true;
+                    toast.add({ severity: 'error', group: "customToast", text: 'Existe sobreasignación', life: 2000 })
+                } else {
+                    toast.add({ severity: 'error', group: "customToast", text: res.data?.mensaje ?? 'Hubo un error al programar', life: 2000 })
                 }
-                toast.add({ severity: 'danger', group: "customToast", text: res.data.mensaje, life: 2000 })
             }
             // if (mode.value == 'week') diasSemana.value.find(data => data.day === fecha).key = Math.random().toFixed(5);
-            if (mode.value == 'date') dates.value.key = Math.random().toFixed(5);
-            arrayPersonFilter.value.data.noProgramados=[]
-            arrayPersonFilter.value.data.programados=[]
+            loadingPrograming()
         }).catch((error) => {
             console.log(error)
             toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 2000 })
@@ -322,7 +346,7 @@ const confirmDelete = (event, schedule_time) => {
         rejectLabel: 'No',
         acceptLabel: 'Sí',
         accept: async () => {
-            taskEdit.value.loading ==undefined?taskEdit.value.loading=1:taskEdit.value.loading++
+            taskEdit.value.loading == undefined ? taskEdit.value.loading = 1 : taskEdit.value.loading++
             await axios.post(route('programming.removeSchedule'), { schedule: schedule_time.idSchedule, type: 1 }).then((res) => {
                 if (res.data.status) {
                     taskEdit.value.employees = res.data.task
@@ -391,7 +415,6 @@ const items = ref([
             dataRightClick.task = tempRightClick.task
             dataRightClick.date = tempRightClick.day
             dataRightClick.cut = false
-            console.log('Copia');
         }
     },
     {
@@ -412,7 +435,6 @@ const items = ref([
             dataRightClick.task = tempRightClick.task
             dataRightClick.date = tempRightClick.day
             dataRightClick.cut = true
-            console.log('Corta');
         }
     },
     {
@@ -423,31 +445,40 @@ const items = ref([
             dataRightClick.newTask = tempRightClick.task
             dataRightClick.newDate = tempRightClick.day
             dataRightClick.newTaskData = tempRightClick.taskData
-            tempRightClick.taskData.loading ==undefined?tempRightClick.taskData.loading=1:tempRightClick.taskData.loading++
-            dataRightClick.taskData.loading ==undefined?dataRightClick.taskData.loading=1:dataRightClick.taskData.loading++
-            await axios.post(route('programming.copy'), dataRightClick).then((res) => {
-                if (res.data.status) {
-                    if (res.data.task) {
-                        dataRightClick.newTaskData.employees = res.data.task
+            tempRightClick.taskData.loading == undefined ? tempRightClick.taskData.loading = 1 : tempRightClick.taskData.loading++
+            dataRightClick.taskData.loading == undefined ? dataRightClick.taskData.loading = 1 : dataRightClick.taskData.loading++
+            await axios.post(route('programming.copy'), dataRightClick)
+                .then((res) => {
+                    if (res.data.status) {
+                        if (res.data.task) {
+                            dataRightClick.newTaskData.employees = res.data.task
+                        } else {
+                            toast.add({ severity: 'error', group: "customToast", text: 'Error al cargar la tarea', life: 4000 })
+                        }
+                        if (dataRightClick.cut) {
+                            dataRightClick.taskData.employees = []
+                        }
+                        loadingPrograming([dataRightClick.date, dataRightClick.newDate])
+                        // loadingPrograming(dataRightClick.newDate)
+                        toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
                     } else {
-                        toast.add({ severity: 'error', group: "customToast", text: 'Error al cargar la tarea', life: 4000 })
+                        if (Object.values(res.data.conflict).length > 0) {
+                            conflicts.value.data = Object.values(res.data.conflict)
+                            conflicts.value.task = dataRightClick.newTaskData
+                            openConflict.value = true;
+                            toast.add({ severity: 'error', group: "customToast", text: 'Existe sobreasignación', life: 2000 })
+                        } else {
+                            toast.add({ severity: 'error', group: "customToast", text: res.data?.mensaje ?? 'Hubo un error al programar', life: 2000 })
+                        }
                     }
-                    if (dataRightClick.cut) {
-                        dataRightClick.taskData.employees = []
-                    }
-                    if (mode.value == 'week') diasSemana.value.find(data => data.day === dataRightClick.date).key = Math.random().toFixed(5);
-                    if (mode.value == 'week') diasSemana.value.find(data => data.day === dataRightClick.newDate).key = Math.random().toFixed(5);
-                    if (mode.value == 'date') dates.value.key = Math.random().toFixed(5);
-                    arrayPersonFilter.value.programados = []
-                    arrayPersonFilter.value.noProgramados = []
-                    toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
-                } else {
-                    toast.add({ severity: 'error', group: "customToast", text: res.data.mensaje, life: 2000 })
-                }
-                tempRightClick.taskData.loading--
-                dataRightClick.taskData.loading--
-            })
-            console.log('Pega');
+                    tempRightClick.taskData.loading--
+                    dataRightClick.taskData.loading--
+                })
+                .catch((error) => {
+                    tempRightClick.taskData.loading--
+                    dataRightClick.taskData.loading--
+                    console.log(error)
+                })
         },
     },
     {
@@ -456,8 +487,9 @@ const items = ref([
         tooltip: 'Elimina todas las personas programadas de la tarea',
         command: async () => {
             const deleteSchedule = tempRightClick.taskData.employees.map(item => item.schedule)
-            tempRightClick.taskData.loading ==undefined?tempRightClick.taskData.loading=1:tempRightClick.taskData.loading++
-            await axios.post(route('programming.removeAll'), { schedules: deleteSchedule }).then((res) => {
+            tempRightClick.taskData.loading == undefined ? tempRightClick.taskData.loading = 1 : tempRightClick.taskData.loading++
+            await axios.post(route('programming.removeAll'), { schedules: deleteSchedule })
+            .then((res) => {
                 if (res.data.status) {
                     tempRightClick.taskData.employees = []
                     toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
@@ -465,12 +497,12 @@ const items = ref([
                     toast.add({ severity: 'error', group: "customToast", text: res.data.mensaje, life: 2000 })
                 }
                 tempRightClick.taskData.loading--
-                if (mode.value == 'week') diasSemana.value.find(data => data.day === tempRightClick.day).key = Math.random().toFixed(5);
-                if (mode.value == 'date') dates.value.key = Math.random().toFixed(5);
-                arrayPersonFilter.value.programados = []
-                arrayPersonFilter.value.noProgramados = []
+                loadingPrograming(tempRightClick.day)
             })
-            console.log('Desprograma');
+            .catch((error)=>{
+                tempRightClick.taskData.loading--
+                console.log(error)
+            })
         }
     },
 ]);
@@ -748,8 +780,8 @@ const items = ref([
         </template>
     </CustomModal>
 
-    <!-- <ModalColisions v-model:visible="openConflict" v-model:conflicts="conflicts" v-model:task="taskEdit">
-    </ModalColisions> -->
+    <ModalColisions v-model:visible="openConflict" v-model:conflicts="conflicts">
+    </ModalColisions>
 
     <!--#endregion-->
     <ContextMenu ref="menu" :model="items">

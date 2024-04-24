@@ -76,12 +76,12 @@ defineEmits(['drop', 'togglePerson', 'addPerson', 'menu'])
                 </p>
             </div>
             <div class="h-full">
-                <div :key="task.name + new Date().toISOString()" class="flex flex-col h-full py-1"
-                :class="task.task=='ANRP'?'justify-center':'justify-between'">
-                    <p v-if="task.task!='ANRP'" v-tooltip="task.task" class="px-1 text-center h-min w-full truncate">
+                <div :key="task.name" class="flex flex-col h-full py-1"
+                    :class="task.task == 'ANRP' ? 'justify-center' : 'justify-between'">
+                    <p v-if="task.task != 'ANRP'" v-tooltip="task.task" class="px-1 text-center h-min w-full truncate">
                         {{ task.task }}
                     </p>
-                    <div v-if="task.task!='ANRP'" class="flex justify-between items-center px-1">
+                    <div v-if="task.task != 'ANRP'" class="flex justify-between items-center px-1">
                         <div class="flex h-min cursor-default space-x-1 justify-center">
                             <p v-tooltip.left="'Fecha Fin'" class="text-center w-full max-w-20"
                                 :class="new Date(task.endDate) < date ? 'bg-danger rounded-md px-1 text-white' : ''">
@@ -111,12 +111,12 @@ defineEmits(['drop', 'togglePerson', 'addPerson', 'menu'])
                             class="px-2 flex h-full w-full justify-between sm:justify-center items-center overflow-hidden">
                             <div
                                 class="overflow-x-hidden hover:overflow-x-auto gap-x-1 flex items-center h-full px-2 py-1 max-w-full flex-nowrap">
-                                <i v-if="task.loading>0"
+                                <i v-if="task.loading > 0"
                                     class="fa-solid fa-circle-notch font-bold text-3xl animate-spin"></i>
                                 <span v-if="task.employees?.length > 0" v-for="person in task.employees">
                                     <img v-tooltip.top="{ value: person.Nombres_Apellidos, pt: { text: 'text-center' } }"
                                         @click="$emit('togglePerson', $event, person, task, day)" :dragable="true"
-                                        @dragstart="itemDrag = person; itemDrag.task = task; itemDrag.option = 'move'"
+                                        @dragstart="itemDrag.person = person; itemDrag.task = task; itemDrag.option = 'move'; itemDrag.day = day"
                                         :src="person.photo ?? '/images/person-default.png'"
                                         class="rounded-full min-h-10 h-10 hover:ring-1 hover:ring-primary w-10 min-w-10 object-cover ring-primary-light shadow-md" />
                                 </span>
@@ -133,8 +133,8 @@ defineEmits(['drop', 'togglePerson', 'addPerson', 'menu'])
                             </div>
                         </div>
                     </div>
-                    <ProgressBar  v-if="task.task!='ANRP'" :value="parseFloat(task.percentDone)" class="h-3 mx-1" v-tooltip="'Avance'"
-                        :pt="{ label: 'text-xs font-thin' }">
+                    <ProgressBar v-if="task.task != 'ANRP'" :value="parseFloat(task.percentDone)" class="h-3 mx-1"
+                        v-tooltip="'Avance'" :pt="{ label: 'text-xs font-thin' }">
                     </ProgressBar>
                 </div>
             </div>
