@@ -76,11 +76,12 @@ defineEmits(['drop', 'togglePerson', 'addPerson', 'menu'])
                 </p>
             </div>
             <div class="h-full">
-                <div :key="task.name + new Date().toISOString()" class="flex flex-col justify-between h-full py-1">
-                    <p v-tooltip="task.task" class="px-1 text-center h-min w-full truncate">
+                <div :key="task.name + new Date().toISOString()" class="flex flex-col h-full py-1"
+                :class="task.task=='ANRP'?'justify-center':'justify-between'">
+                    <p v-if="task.task!='ANRP'" v-tooltip="task.task" class="px-1 text-center h-min w-full truncate">
                         {{ task.task }}
                     </p>
-                    <div class="flex justify-between items-center px-1">
+                    <div v-if="task.task!='ANRP'" class="flex justify-between items-center px-1">
                         <div class="flex h-min cursor-default space-x-1 justify-center">
                             <p v-tooltip.left="'Fecha Fin'" class="text-center w-full max-w-20"
                                 :class="new Date(task.endDate) < date ? 'bg-danger rounded-md px-1 text-white' : ''">
@@ -132,7 +133,7 @@ defineEmits(['drop', 'togglePerson', 'addPerson', 'menu'])
                             </div>
                         </div>
                     </div>
-                    <ProgressBar :value="parseFloat(task.percentDone)" class="h-3 mx-1" v-tooltip="'Avance'"
+                    <ProgressBar  v-if="task.task!='ANRP'" :value="parseFloat(task.percentDone)" class="h-3 mx-1" v-tooltip="'Avance'"
                         :pt="{ label: 'text-xs font-thin' }">
                     </ProgressBar>
                 </div>

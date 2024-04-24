@@ -924,28 +924,44 @@ class ProgrammingController extends Controller
     public function copyPaste(Request $request)
     {
         try {
+            $conflict = [];
+            $status = true;
             DB::beginTransaction();
-            if(Carbon::parse($request->date)->eq(Carbon::parse($request->newDate))){
+            $data = DetailScheduleTime::where('idTask', $request->task)
+                ->where('fecha', Carbon::parse($request->date)->format('Y-m-d'))->get();
+            if($data->count() == 0 ){    
+                return response()->json([
+                'status' => false,
+                'mensaje' => 'No hay personal para pegar en esta tarea'
+            ]);
+            }
+            if(Carbon::parse($request->date)->eq(Carbon::parse($request->newDate)) && !$request->cut ){
                 return response()->json([
                     'status' => false,
                     'mensaje' => 'No se puede copiar al personal para el mismo día'
                 ]);
             }
-            $data = DetailScheduleTime::where('idTask', $request->task)
-                ->where('fecha', Carbon::parse($request->date)->format('Y-m-d'))->get();
             foreach ($data as $item) {
                 // $exist = DetailScheduleTime::where('idUsuario', $item->idUsuario)
                 // ->where('fecha', $request->date)->get();
 
                 $employee = searchEmpleados('Num_SAP', $item->idUsuario)->first();
-                programming($request->newDate, $item->idUsuario, $item->horaInicio, $item->horaFin, $request->newTask, $item->nombre, $employee->Costo_Hora);
+                programming(Carbon::parse($request->newDate)->format('Y-m-d'), 
+                $item->idUsuario, 
+                $item->horaInicio, 
+                $item->horaFin, 
+                $request->newTask, 
+                $item->nombre, 
+                $employee->Costo_Hora);
                 if ($request->cut) {
                     disprogramming($item->idSchedule);
                 }
             }
+            DB::commit();
             return response()->json([
-                'status' => true,
-                'mensaje' => 'Acción realizada'
+                'status' => $status,
+                'mensaje' => 'Acción realizada',
+                'task' => $this->getSchedule($request->newDate, $request->newTask)
             ]);
         } catch (Exception $e) {
             DB::rollBack();
