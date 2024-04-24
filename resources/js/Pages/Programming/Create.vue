@@ -33,8 +33,12 @@ defineProps({
 
 // #region funciones basicas
 function format24h(hora) {
+
     try {
-        if (hora.length > 5) {
+        if (hora instanceof Date) {
+            return hora.toLocaleString('es-CO',
+                { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+        } else if (hora.length > 6) {
             return new Date(hora).toLocaleString('es-CO',
                 { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
         } else {
@@ -278,7 +282,7 @@ const editHour = (schedule_time) => {
 }
 
 const save = async (mode) => {
-    formEditShift.value.loading == undefined ? formEditShift.value.loading = 1 : formEditShift.value.loading++
+    formEditShift.value.loading = true
     if (tabActive.value == 0) {
         formEditShift.value.personalized = false
         if (shiftSelect.value.startShift == undefined) {
@@ -324,12 +328,12 @@ const save = async (mode) => {
                 }
             }
             // if (mode.value == 'week') diasSemana.value.find(data => data.day === fecha).key = Math.random().toFixed(5);
-            loadingPrograming()
+            loadingPrograming(dateSelect)
         }).catch((error) => {
             console.log(error)
             toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 2000 })
         });
-    formEditShift.value.loading--
+    formEditShift.value.loading = false
 }
 
 const confirmDelete = (event, schedule_time) => {
@@ -489,20 +493,20 @@ const items = ref([
             const deleteSchedule = tempRightClick.taskData.employees.map(item => item.schedule)
             tempRightClick.taskData.loading == undefined ? tempRightClick.taskData.loading = 1 : tempRightClick.taskData.loading++
             await axios.post(route('programming.removeAll'), { schedules: deleteSchedule })
-            .then((res) => {
-                if (res.data.status) {
-                    tempRightClick.taskData.employees = []
-                    toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
-                } else {
-                    toast.add({ severity: 'error', group: "customToast", text: res.data.mensaje, life: 2000 })
-                }
-                tempRightClick.taskData.loading--
-                loadingPrograming(tempRightClick.day)
-            })
-            .catch((error)=>{
-                tempRightClick.taskData.loading--
-                console.log(error)
-            })
+                .then((res) => {
+                    if (res.data.status) {
+                        tempRightClick.taskData.employees = []
+                        toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
+                    } else {
+                        toast.add({ severity: 'error', group: "customToast", text: res.data.mensaje, life: 2000 })
+                    }
+                    tempRightClick.taskData.loading--
+                    loadingPrograming(tempRightClick.day)
+                })
+                .catch((error) => {
+                    tempRightClick.taskData.loading--
+                    console.log(error)
+                })
         }
     },
 ]);
@@ -579,7 +583,8 @@ const items = ref([
                                         :class="[index > 5 ? 'bg-warning-light' : '', data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
                                         <TaskProgramming :project="project.id" :day="data.day" @menu="taskRightClick"
                                             :key="dates.day.toDateString() + project.id + mode" type="week"
-                                            @drop="onDrop" v-model:itemDrag="personDrag" @togglePerson="togglePerson" :dataRightClick />
+                                            @drop="onDrop" v-model:itemDrag="personDrag" @togglePerson="togglePerson"
+                                            :dataRightClick />
                                     </div>
                                 </span>
                             </div>
@@ -595,7 +600,7 @@ const items = ref([
                             </div>
                             <div class="col-span-9 grid grid-cols-7 pr-4 z-10">
                                 <span v-for="data in diasSemana">
-                                    <UserStatusProgramming :date="data.day" :key="data.key+data.day"
+                                    <UserStatusProgramming :date="data.day" :key="data.key + data.day"
                                         v-model:statusSelect="arrayPersonFilter" />
                                 </span>
                             </div>
@@ -631,7 +636,7 @@ const items = ref([
                                     <TaskProgramming type="day" @addPerson="addPerson" :movil="esMovil()"
                                         @menu="taskRightClick" :project="project.id" :day="dates.day"
                                         :key="dates.day.toDateString() + project.id" @drop="onDrop"
-                                        v-model:itemDrag="personDrag" @togglePerson="togglePerson" :dataRightClick/>
+                                        v-model:itemDrag="personDrag" @togglePerson="togglePerson" :dataRightClick />
                                 </div>
                             </div>
                             <div v-else>
@@ -639,7 +644,7 @@ const items = ref([
                             </div>
                         </div>
                         <div class="w-full flex justify-center h-min z-10" oncontextmenu="return false">
-                            <UserStatusProgramming :letters="true" :date="dates.day" :key="dates.key+dates.day"
+                            <UserStatusProgramming :letters="true" :date="dates.day" :key="dates.key + dates.day"
                                 v-model:statusSelect="arrayPersonFilter" />
                         </div>
                     </div>
@@ -750,6 +755,7 @@ const items = ref([
                                 <label class="text-center w-full font-bold text-gray-900">
                                     Personalizar turno</label>
                                 <span class="grid grid-cols-2 gap-2">
+
                                     <CustomInput label="Hora inicio" type="time"
                                         v-model:input="formEditShift.startShift" :stepMinute="30" id="start"
                                         placeholder="Hora de inicio" :required="true" />
@@ -777,6 +783,7 @@ const items = ref([
                     </TabPanel>
                 </TabView>
             </div>
+            {{ formEditShift }}
         </template>
     </CustomModal>
 
