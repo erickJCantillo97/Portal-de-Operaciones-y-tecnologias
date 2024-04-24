@@ -15,6 +15,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/programming/delete/{schedule}', [ProgrammingController::class, 'deleteSchedule'])->name('programming.delete');
 
     Route::get('actividadesDeultimonivel', [ProgrammingController::class, 'endNivelActivities'])->name('actividadesDeultimonivel');
+    Route::get('getProjectWithProgrammingDate', [ProgrammingController::class, 'getProjectWithProgrammingDate'])->name('get.project.programming');
 
     Route::get('scheduleTask', [ProgrammingController::class, 'getScheduleTask'])->name('get.schedule.task');
 

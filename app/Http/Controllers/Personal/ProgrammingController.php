@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\Personal\PersonalScheduleDayJob;
 use App\Ldap\User;
 use App\Models\Gantt\Assignment;
+use App\Models\Personal\Employee;
 use App\Models\Personal\ExtendedSchedule;
 use App\Models\Projects\Project;
 use App\Models\Schedule;
@@ -55,9 +56,9 @@ class ProgrammingController extends Controller
             return [
                 'name' => $project->name,
                 'id' => $project->id,
-                'fechaI' => $task->startDate,
-                'fechaF' => $task->endDate,
-                'avance' => $task->percentDone,
+                'fechaI' => $task->startDate ?? '',
+                'fechaF' => $task->endDate ?? '',
+                'avance' => $task->percentDone ?? 0,
             ];
         });
 
@@ -102,6 +103,7 @@ class ProgrammingController extends Controller
                 $conflict[$date->format('Y-m-d')] = $exist;
                 $status = false;
             } else {
+                $employee = Employee::where('Num_SAP', 'LIKE', '%' . $validateData['employee_id'])->first();
                 $schedule = Schedule::firstOrNew([
                     'task_id' => $validateData['task_id'],
                     'employee_id' => $validateData['employee_id'],
@@ -109,12 +111,12 @@ class ProgrammingController extends Controller
                     'fecha' => $date->format('Y-m-d'),
                 ]);
                 $schedule->save();
+
                 ScheduleTime::firstOrCreate([
                     'schedule_id' => $schedule->id,
                     'hora_inicio' => Carbon::parse($task->project->shiftObject->startShift)->format('H:i'),
                     'hora_fin' => Carbon::parse($task->project->shiftObject->endShift)->format('H:i'),
                 ]);
-                $employee = searchEmpleados('Num_SAP', $validateData['employee_id'])->first();
                 /* adicional de guardar en schedule y scheduleTime, se guarda en la tabla Assignment para 
                 que pueda aparecer en los recursos del gantt */
                 Assignment::firstOrCreate([
@@ -779,7 +781,7 @@ class ProgrammingController extends Controller
                                 return [
                                     'name' => $d->name,
                                     'user_id' => $d->id,
-                                    'schedule'=>$d->schedule,
+                                    'schedule' => $d->schedule,
                                     'times' => DetailScheduleTime::where([
                                         ['fecha', '=', $date],
                                         ['idTask', '=', $task['id']],
@@ -829,7 +831,7 @@ class ProgrammingController extends Controller
                             return [
                                 'Nombres_Apellidos' => $d->name,
                                 'Num_SAP' => $d->id,
-                                'schedule'=>$d->schedule,
+                                'schedule' => $d->schedule,
                                 'times' => DetailScheduleTime::where([
                                     ['fecha', '=', $date],
                                     ['idTask', '=', $task['id']],
@@ -929,13 +931,13 @@ class ProgrammingController extends Controller
             DB::beginTransaction();
             $data = DetailScheduleTime::where('idTask', $request->task)
                 ->where('fecha', Carbon::parse($request->date)->format('Y-m-d'))->get();
-            if($data->count() == 0 ){    
+            if ($data->count() == 0) {
                 return response()->json([
-                'status' => false,
-                'mensaje' => 'No hay personal para pegar en esta tarea'
-            ]);
+                    'status' => false,
+                    'mensaje' => 'No hay personal para pegar en esta tarea'
+                ]);
             }
-            if(Carbon::parse($request->date)->eq(Carbon::parse($request->newDate)) && !$request->cut ){
+            if (Carbon::parse($request->date)->eq(Carbon::parse($request->newDate)) && !$request->cut) {
                 return response()->json([
                     'status' => false,
                     'mensaje' => 'No se puede copiar al personal para el mismo día'
@@ -946,13 +948,15 @@ class ProgrammingController extends Controller
                 // ->where('fecha', $request->date)->get();
 
                 $employee = searchEmpleados('Num_SAP', $item->idUsuario)->first();
-                programming(Carbon::parse($request->newDate)->format('Y-m-d'), 
-                $item->idUsuario, 
-                $item->horaInicio, 
-                $item->horaFin, 
-                $request->newTask, 
-                $item->nombre, 
-                $employee->Costo_Hora);
+                programming(
+                    Carbon::parse($request->newDate)->format('Y-m-d'),
+                    $item->idUsuario,
+                    $item->horaInicio,
+                    $item->horaFin,
+                    $request->newTask,
+                    $item->nombre,
+                    $employee->Costo_Hora
+                );
                 if ($request->cut) {
                     disprogramming($item->idSchedule);
                 }
@@ -969,19 +973,44 @@ class ProgrammingController extends Controller
         }
     }
 
-    public function removeAll(Request $request){
-        try{
-        DB::beginTransaction();
-            Schedule::whereIn('id',$request->schedules)->delete();
-            ScheduleTime::whereIn('schedule_id',$request->schedules)->delete();
-        DB::commit();
-        return response()->json([
-            'status' => true,
-            'mensaje' => 'Personal eliminado'
-        ]);
-        }catch (Exception $e) {
+    public function removeAll(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            Schedule::whereIn('id', $request->schedules)->delete();
+            ScheduleTime::whereIn('schedule_id', $request->schedules)->delete();
+            DB::commit();
+            return response()->json([
+                'status' => true,
+                'mensaje' => 'Personal eliminado'
+            ]);
+        } catch (Exception $e) {
             DB::rollBack();
             return response()->json(['status' => false, 'mensaje' => $e->getMessage()]);
         }
+    }
+
+    public function getProjectWithProgrammingDate(Request $request)
+    {
+        $date = Carbon::parse($request->date)->format('Y-m-d');
+
+        $projects = Schedule::where('fecha', $date)
+            ->join('tasks as t', 't.id', '=', 'schedules.task_id')
+            ->join('projects as p', 'p.id', '=', 't.project_id')
+            ->select('p.id', DB::raw('MIN(p.name) as name'))
+            ->groupBy('p.id')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name
+                ];
+            });
+
+        return $projects;
+        return response()->json([
+            'project' => $this->getProject($date),
+            'programming' => $this->getProgramming($date),
+        ]);
     }
 }

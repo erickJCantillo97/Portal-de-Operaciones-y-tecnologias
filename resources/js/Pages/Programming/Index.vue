@@ -33,20 +33,8 @@ const formData = ref({
     tasks: [],
     description: '',
 })
-//#endregion
 
-/**
- * The above code is a JavaScript function that takes a time string in 24-hour format (e.g., "13:30")
-// and converts it to a 12-hour format with AM/PM indicator. It creates a new Date object with the time
-// string appended to a date string ("1970-01-01T") and then uses the toLocaleString method with
-// options to format the time in 12-hour format with the 'es-CO' locale and 'h23' hour cycle.
-//
- * @param {*} hora
- */
-function format24h(hora) {
-    return new Date(hora).toLocaleString('es-CO',
-        { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-}
+
 
 const openModal = ref(false)
 
@@ -55,52 +43,7 @@ const openDialog = () => {
     openModal.value = true
 }
 
-//#region Requests
-const submit = () => {
-    if (!selectedTaskId.value) {
-        router.post(route('extended.schedule.store'), formData.value, {
-            onSuccess: () => {
-                toast.add({
-                    severity: 'success',
-                    group: 'customToast',
-                    text: 'Tarea extendida creada con éxito',
-                    life: 2000
-                })
-                resetFormData()
-            },
-            onError: (errors) => {
-                toast.add({
-                    severity: 'danger',
-                    group: 'customToast',
-                    text: 'No se ha podido guardar la tarea ' + errors,
-                    life: 2000
-                })
-                resetFormData()
-            }
-        })
-    } else {
-        router.put(route('extended.schedule.update', selectedTaskId.value), formData.value, {
-            onSuccess: () => {
-                toast.add({
-                    severity: 'success',
-                    group: 'customToast',
-                    text: 'Tarea extendida actualizada con éxito',
-                    life: 2000
-                })
-                resetFormData()
-            },
-            onError: (errors) => {
-                toast.add({
-                    severity: 'danger',
-                    group: 'customToast',
-                    text: 'No se ha podido actualizar la tarea ' + errors,
-                    life: 2000
-                })
-                resetFormData()
-            }
-        })
-    }
-}
+
 
 const taskOptions = ref()
 const getTaskByProjects = async () => {
@@ -114,60 +57,6 @@ const getTaskByProjects = async () => {
     }
 }
 
-const editTask = async (task) => {
-    try {
-        // console.log(task)
-        editMode.value = true
-        selectedTaskId.value = task.task_id
-        projectSelected.value = parseInt(task.project_id)
-        await getTaskByProjects()
-        formData.value.dates = formatDateTime24h(task.date).split(", ")[0]
-        formData.value.start_hour = format24h(task.start_hour)
-        formData.value.end_hour = format24h(task.end_hour)
-        formData.value.tasks = [parseInt(task.task_id)]
-        formData.value.description = task.description
-    } catch (error) {
-        console.error('Error ' + error)
-    }
-}
-
-const cloneTask = async (task) => {
-    try {
-        // console.log(task)
-        selectedTaskId.value = null
-        projectSelected.value = parseInt(task.project_id)
-        await getTaskByProjects()
-        formData.value.dates = formatDateTime24h(task.date).split(", ")[0]
-        formData.value.start_hour = format24h(task.start_hour)
-        formData.value.end_hour = format24h(task.end_hour)
-        formData.value.tasks = []
-        formData.value.description = task.description
-    } catch (error) {
-        console.error('Error ' + error)
-    }
-}
-
-const deleteTask = (id_task) => {
-    router.delete(route('extended.schedule.destroy', id_task), {
-        onSuccess: () => {
-            toast.add({
-                severity: 'success',
-                group: 'customToast',
-                text: 'Tarea Elimnada',
-                life: 2000
-            })
-        },
-        onError: (errors) => {
-            toast.add({
-                severity: 'danger',
-                group: 'customToast',
-                text: 'No se ha podido eliminar la tarea ' + errors,
-                life: 2000
-            })
-        }
-    })
-}
-//#endregion
 
 const resetFormData = () => {
     openModal.value = false

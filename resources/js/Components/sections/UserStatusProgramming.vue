@@ -1,5 +1,6 @@
 <script setup>
 import ProgressBar from 'primevue/progressbar';
+import ProgressSpinner from 'primevue/progressspinner';
 import { ref } from 'vue'
 const props = defineProps({
     date: {
@@ -9,7 +10,11 @@ const props = defineProps({
     letters: {
         type: Boolean,
         default: false
-    }
+    },
+    loadingType: {
+        type: String,
+        default: 'bar'
+    },
 })
 const status = ref({
     loading: false,
@@ -38,9 +43,12 @@ const statusSelect = defineModel('statusSelect', {
 
 <template>
     <div class="h-7"
-        :class="[(date.toDateString() == new Date().toDateString()) ? 'bg-secondary rounded-b-md' : '', (statusSelect == status) ? 'border-success border rounded-md bg-success-light' : '', letters==true?'bg-white':'']">
-        <div v-if="status.loading" class="grid items-center w-36 h-8 px-2">
-            <ProgressBar mode="indeterminate" style="height: 4px" />
+        :class="[(date.toDateString() == new Date().toDateString()) ? 'bg-secondary rounded-b-md' : '', (statusSelect == status) ? 'border-success border rounded-md bg-success-light' : '', letters == true ? 'bg-white' : '']">
+        <div v-if="status.loading" class="grid items-center w-12 h-8 px-2">
+            <ProgressBar mode="indeterminate" style="height: 4px" v-if="loadingType == 'bar'" />
+            <ProgressSpinner style="width: 25px; height: 25px" strokeWidth="8" fill="var(--surface-ground)"
+                animationDuration=".5s" aria-label="Custom ProgressSpinner" v-else />
+
         </div>
         <div v-else class="grid grid-cols-2 sm:max-w-[30vw] justify-center gap-x-1 z-10 p-1 cursor-pointer" @click="!(statusSelect == status) ? statusSelect = status : (statusSelect = {
             loading: false,
@@ -50,7 +58,7 @@ const statusSelect = defineModel('statusSelect', {
             }
         })">
             <p class="rounded w-full text-center px-2 text-white"
-                :class="[status.data.programados.length !== 0 ? 'bg-primary' : 'bg-success',status.data.programados.length == 0?'col-span-2':'']"
+                :class="[status.data.programados.length !== 0 ? 'bg-primary' : 'bg-success', status.data.programados.length == 0 ? 'col-span-2' : '']"
                 v-if="status.data.programados.length !== 0"
                 v-tooltip="{ value: status.data.programados?.length > 0 ? `<div><p class='w-full text-center font-bold'>Programados</p>${status.data.programados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
                 <span v-if="letters">Programados: </span>
@@ -58,7 +66,7 @@ const statusSelect = defineModel('statusSelect', {
                 </span>
             </p>
             <p class="rounded w-full text-center px-2 text-white bg-danger"
-                :class="status.data.programados.length == 0?'col-span-2':''"
+                :class="status.data.programados.length == 0 ? 'col-span-2' : ''"
                 v-if="status.data.noProgramados.length !== 0"
                 v-tooltip="{ value: status.data.noProgramados?.length > 0 ? `<div><p class='w-full text-center font-bold'>No programados</p>${status.data.noProgramados.map((employee) => `<p class='w-44 text-sm truncate'>${employee.name}</p>`).join('')}</div>` : null, escape: false, pt: { text: 'text-center w-52' } }">
                 <span v-if="letters">No Programados: </span>
