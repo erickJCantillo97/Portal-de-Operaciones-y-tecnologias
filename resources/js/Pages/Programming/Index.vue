@@ -20,7 +20,9 @@ const props = defineProps({
 })
 
 const loading = ref(false)
+const date = ref(new Date())
 const project = ref()
+const programmin = ref([])
 const selectedTaskId = ref(null)
 const editMode = ref(false)
 const disabled = computed(() => selectedTaskId.value !== null && editMode.value)
@@ -39,51 +41,26 @@ const formData = ref({
 //#region CustomDataTable
 const projectsByTask = ref()
 
-const getProjectsByTask = async () => {
-    await axios.get(route(''))
+const getProgramming = async () => {
+    await axios.get(route('get.programming.date', { date: date.value }))
         .then(res => {
-            projectsByTask.value = res.data
+            programmin.value = res.data.programming
         })
 }
-
-onMounted(() => {
-    // getProjectsByTask()
-})
+getProgramming();
 
 const columnas = [
     // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
-    { field: 'name', header: 'Nombre', rowClass: "underline !text-left !text-sm", filter: true, sortable: true, type: 'button', event: 'goToProjectOverview', severity: 'info', text: true, },
-    { field: 'gerencia', header: 'Gerencia', filter: true, sortable: true, visible: false },
-    { field: 'contract.contract_id', header: 'Contrato', filter: true, sortable: true },
-    { field: 'cost_sale', header: 'Costo de Venta', type: 'currency', filter: true, sortable: true },
-    { field: 'SAP_code', header: 'Código SAP', filter: true, sortable: true },
-    { field: 'contract.end_date', header: 'Fecha Finalización', filter: true, sortable: true },
-    {
-        field: 'status', header: 'Estado', filter: true, sortable: true, type: 'tag', filtertype: 'EQUALS', visible: false,
-        severitys: [
-            { text: 'DISEÑO Y CONSTRUCCIÓN', severity: 'primary', class: '' },
-            { text: 'CONSTRUCCIÓN', severity: 'success', class: '' },
-            { text: 'DISEÑO', severity: 'info', class: '' },
-            { text: 'GARANTIA', severity: 'warning', class: '' },
-            { text: 'SERVICIO POSTVENTA', severity: 'success', class: '' },
-            { text: 'SIN ESTADO', severity: 'danger', class: 'animate-pulse' }
-        ]
-    },
+    { field: 'project', header: 'Proyecto', filter: true, sortable: true },
+    { field: 'task', header: 'Tarea', filter: true, sortable: true },
+    { field: 'turno', header: 'Turno', filter: true, sortable: true },
+    { field: 'division', header: 'Oficina', filter: true, sortable: true },
+    { field: 'user', header: 'Personal', filter: true, sortable: true },
+    { field: 'cargo', header: 'Cargo', filter: true, sortable: true },
+
 ]
 
-const filterButtons = [
-    { field: 'status', label: 'CONSTRUCCIÓN', data: 'CONSTRUCCIÓN', severity: 'success' },
-    { field: 'status', label: 'DISEÑO Y CONSTRUCCIÓN', data: 'DISEÑO Y CONSTRUCCIÓN', severity: 'primary' },
-    { field: 'status', label: 'DISEÑO', data: 'DISEÑO', severity: 'info' },
-    { field: 'status', label: 'GARANTIA ', data: 'GARANTIA', severity: 'warning' },
-]
 
-const buttons = [
-    { event: 'addDoc', severity: 'primary', class: '', icon: 'fa-solid fa-cloud-arrow-up', text: true, outlined: false, rounded: false },
-    { event: 'addAct', severity: 'primary', class: '', icon: 'fa-regular fa-calendar-plus', text: true, outlined: false, rounded: false },
-    { event: 'editClic', severity: 'primary', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
-    { event: 'deleteClic', severity: 'danger', icon: 'fa-regular fa-trash-can', class: '!h-8', text: true, outlined: false, rounded: false },
-]
 
 const goToProjectOverview = (event, data) => {
     try {
@@ -173,7 +150,7 @@ const url = [
             <!-- <DivisionsByProject :projects /> -->
 
             <div class="w-full h-full overflow-y-auto">
-                <CustomDataTable :filterButtons="filterButtons" :data="projects" :rows-default="100"
+                <CustomDataTable :filterButtons="filterButtons" :data="programmin" :rows-default="100"
                     :columnas="columnas" :actions="buttons">
                 </CustomDataTable>
             </div>

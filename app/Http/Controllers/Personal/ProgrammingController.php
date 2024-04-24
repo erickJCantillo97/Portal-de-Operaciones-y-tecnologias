@@ -71,22 +71,25 @@ class ProgrammingController extends Controller
     public function getProgrammingDate(Request $request)
     {
         $date = Carbon::parse($request->fecha);
-        $schedules = DetailScheduleTime::where('fecha', $date->format('Y-m-d'))
+        $programmin = DetailScheduleTime::where('fecha', $date->format('Y-m-d'))
             ->orderBy('idproyecto')
             ->orderBy('idTask')
             ->get()->map(function ($d) {
-                $employee = Employee::where('Num_SAP', 'LIKE', '%' . $d['idUsuario'])->first();
                 return [
-                    'id' => $d['id'],
                     'task' => $d['nombreTask'],
-                    'project' => $d['nombrePadreTask'],
+                    'project' => $d['NombreProyecto'],
                     'user' => $d['nombre'],
+                    'cargo' => $d['Cargo'],
+                    'division' => $d['Oficina'],
                     'turno' => Carbon::createFromFormat('H:i:s', substr($d['horaInicio'], 0, 8))->format('g:i') . ' - ' . Carbon::createFromFormat('H:i:s', substr($d['horaFin'], 0, 8))->format('g:i'),
-                    'cargo' => $employee->Cargo
                 ];
             });
-
-        return $schedules;
+        return response()->json(
+            [
+                'programming' =>  $programmin
+            ],
+            200
+        );
     }
 
     /**
