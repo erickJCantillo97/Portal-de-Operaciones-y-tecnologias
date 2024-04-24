@@ -67,7 +67,7 @@ function obtenerFechasSemana(diaSeleccionado) {
 
     // Generamos las fechas para cada día de la semana
     for (let i = 0; i < 7; i++) {
-        fechasSemana.push(new Date(fechaSeleccionada));
+        fechasSemana.push({ key: Math.random().toFixed(5), day: new Date(fechaSeleccionada) });
         fechaSeleccionada.setDate(fechaSeleccionada.getDate() + 1);
     }
 
@@ -108,8 +108,8 @@ const openConflict = ref(false)
 const date = ref(new Date())
 const conflicts = ref()
 const mode = ref('date')
-const dates = ref(new Date(date.value.getFullYear(), date.value.getMonth(), date.value.getDate() + 1))
-const diasSemana = ref(obtenerFechasSemana(dates.value))
+const dates = ref({ key: Math.random().toFixed(5), day: new Date(date.value.getFullYear(), date.value.getMonth(), date.value.getDate() + 1) })
+const diasSemana = ref(obtenerFechasSemana(dates.value.day))
 const projectsSelected = ref([])
 const overlayPerson = ref()
 const overlayAddPerson = ref()
@@ -138,10 +138,11 @@ const getTask = async (option) => {
     }
     if (option == 'week') {
         mode.value = option
-        !(dates.value instanceof Array) ?? (dates.value = obtenerFormatoSemana(new Date()))
+        !(dates.value.day instanceof Array) ?? (dates.value.day = obtenerFormatoSemana(new Date()))
+        (diasSemana = obtenerFechasSemana(obtenerDiaSemana(dates.value.day))) 
     } else if (option == 'date') {
         mode.value = option
-        !(dates.value instanceof Date) ?? (dates.value = new Date())
+        !(dates.value.day instanceof Date) ?? (dates.value.day = new Date())
     } else if (mode.value == 'month') {
 
     } else {
@@ -162,44 +163,50 @@ if (esMovil()) {
 //#region drag
 
 async function onDrop(task, fecha) {
+    console.log(fecha)
     if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
-        task.loading = true
+        task.loading==undefined?task.loading=1:task.loading++
         if (personDrag.value.option == 'move') {
             personDrag.value.task.loading = true
             await axios.post(route('programming.move'), { task: task.id, date: fecha, schedule: personDrag.value.times[0].idSchedule }).then((res) => {
-                if (res.data.status == false) {
-                    task.loading = false
-                    personDrag.value.task.loading = false
-                    toast.add({ severity: 'error', group: "customToast", text: res.data.mensaje, life: 2000 })
-                } else {
+                if (res.data.status) {
                     task.employees = res.data.task
-                    task.loading = false
+                    task.employeesLoad=
+                    task.loading--
                     personDrag.value.task.loading = false
                     personDrag.value.task.employees = personDrag.value.task.employees.filter(person => person.Num_SAP !== personDrag.value.Num_SAP);
                     toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
+                } else {
+                    task.loading = false
+                    personDrag.value.task.loading = false
+                    toast.add({ severity: 'error', group: "customToast", text: res.data.mensaje, life: 2000 })
                 }
             })
-            task.loading = false
+            task.loading--
         } else {
             await axios.post(route('programming.store'), { task_id: task.id, employee_id: personDrag.value.Num_SAP, name: personDrag.value.Nombres_Apellidos, fecha }).then((res) => {
                 if (Object.values(res.data.conflict).length > 0) {
                     conflicts.value = Object.values(res.data.conflict)
                     openConflict.value = true;
-                    task.loading = false
+                    task.loading--
                     task.value = task
                     task.employees = res.data.task
                     toast.add({ severity: 'error', group: "customToast", text: 'Persona ya programada', life: 2000 })
                 } else if (res.data.status == false) {
-                    task.loading = false
+                    task.loading--
                     task.employees = res.data.task
                     toast.add({ severity: 'error', group: "customToast", text: 'Hubo un error al programar', life: 2000 })
                 } else {
                     task.employees = res.data.task
-                    task.loading = false
+                    task.loading--
                     toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
                 }
             })
         }
+        if (mode.value == 'week') diasSemana.value.find(data => data.day === fecha).key = Math.random().toFixed(5);
+        if (mode.value == 'date') dates.value.key = Math.random().toFixed(5);
+        arrayPersonFilter.value.data.programados = []
+        arrayPersonFilter.value.data.noProgramados = []
     } else {
         toast.add({ severity: 'error', group: "customToast", text: 'No se puede programar en dias anteriores', life: 2000 })
     }
@@ -248,7 +255,7 @@ const editHour = (schedule_time) => {
 }
 
 const save = async (mode) => {
-    formEditShift.value.loading = true
+    formEditShift.value.loading  ==undefined?formEditShift.value.loading=1:formEditShift.value.loading++
     if (tabActive.value == 0) {
         formEditShift.value.personalized = false
         if (shiftSelect.value.startShift == undefined) {
@@ -290,11 +297,15 @@ const save = async (mode) => {
                 }
                 toast.add({ severity: 'danger', group: "customToast", text: res.data.mensaje, life: 2000 })
             }
+            // if (mode.value == 'week') diasSemana.value.find(data => data.day === fecha).key = Math.random().toFixed(5);
+            if (mode.value == 'date') dates.value.key = Math.random().toFixed(5);
+            arrayPersonFilter.value.data.noProgramados=[]
+            arrayPersonFilter.value.data.programados=[]
         }).catch((error) => {
             console.log(error)
             toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 2000 })
         });
-    formEditShift.value.loading = false
+    formEditShift.value.loading--
 }
 
 const confirmDelete = (event, schedule_time) => {
@@ -311,7 +322,7 @@ const confirmDelete = (event, schedule_time) => {
         rejectLabel: 'No',
         acceptLabel: 'Sí',
         accept: async () => {
-            taskEdit.value.loading = true
+            taskEdit.value.loading ==undefined?taskEdit.value.loading=1:taskEdit.value.loading++
             await axios.post(route('programming.removeSchedule'), { schedule: schedule_time.idSchedule, type: 1 }).then((res) => {
                 if (res.data.status) {
                     taskEdit.value.employees = res.data.task
@@ -326,12 +337,14 @@ const confirmDelete = (event, schedule_time) => {
                         openConflict.value = true;
                     }
                 }
-                taskEdit.value.loading = false
+                if (mode.value == 'date') dates.value.key = Math.random().toFixed(5);
+                arrayPersonFilter.value.programados = []
+                arrayPersonFilter.value.noProgramados = []
             }).catch((error) => {
                 console.log(error)
                 toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 2000 })
             })
-            taskEdit.value.loading = false
+            taskEdit.value.loading--
         }, reject: () => {
 
         }
@@ -410,8 +423,8 @@ const items = ref([
             dataRightClick.newTask = tempRightClick.task
             dataRightClick.newDate = tempRightClick.day
             dataRightClick.newTaskData = tempRightClick.taskData
-            tempRightClick.taskData.loading=true
-            dataRightClick.taskData.loading=true
+            tempRightClick.taskData.loading ==undefined?tempRightClick.taskData.loading=1:tempRightClick.taskData.loading++
+            dataRightClick.taskData.loading ==undefined?dataRightClick.taskData.loading=1:dataRightClick.taskData.loading++
             await axios.post(route('programming.copy'), dataRightClick).then((res) => {
                 if (res.data.status) {
                     if (res.data.task) {
@@ -420,15 +433,19 @@ const items = ref([
                         toast.add({ severity: 'error', group: "customToast", text: 'Error al cargar la tarea', life: 4000 })
                     }
                     if (dataRightClick.cut) {
-                        // console.log(dataRightClick.taskData)
                         dataRightClick.taskData.employees = []
                     }
+                    if (mode.value == 'week') diasSemana.value.find(data => data.day === dataRightClick.date).key = Math.random().toFixed(5);
+                    if (mode.value == 'week') diasSemana.value.find(data => data.day === dataRightClick.newDate).key = Math.random().toFixed(5);
+                    if (mode.value == 'date') dates.value.key = Math.random().toFixed(5);
+                    arrayPersonFilter.value.programados = []
+                    arrayPersonFilter.value.noProgramados = []
                     toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
                 } else {
                     toast.add({ severity: 'error', group: "customToast", text: res.data.mensaje, life: 2000 })
                 }
-                tempRightClick.taskData.loading=false
-                dataRightClick.taskData.loading=false
+                tempRightClick.taskData.loading--
+                dataRightClick.taskData.loading--
             })
             console.log('Pega');
         },
@@ -439,16 +456,19 @@ const items = ref([
         tooltip: 'Elimina todas las personas programadas de la tarea',
         command: async () => {
             const deleteSchedule = tempRightClick.taskData.employees.map(item => item.schedule)
-            tempRightClick.taskData.loading=true
-            await axios.post(route('programming.removeAll'), {schedules:deleteSchedule}).then((res) => {
-                console.log(res)
+            tempRightClick.taskData.loading ==undefined?tempRightClick.taskData.loading=1:tempRightClick.taskData.loading++
+            await axios.post(route('programming.removeAll'), { schedules: deleteSchedule }).then((res) => {
                 if (res.data.status) {
                     tempRightClick.taskData.employees = []
                     toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
                 } else {
                     toast.add({ severity: 'error', group: "customToast", text: res.data.mensaje, life: 2000 })
                 }
-                tempRightClick.taskData.loading=false
+                tempRightClick.taskData.loading--
+                if (mode.value == 'week') diasSemana.value.find(data => data.day === tempRightClick.day).key = Math.random().toFixed(5);
+                if (mode.value == 'date') dates.value.key = Math.random().toFixed(5);
+                arrayPersonFilter.value.programados = []
+                arrayPersonFilter.value.noProgramados = []
             })
             console.log('Desprograma');
         }
@@ -481,8 +501,8 @@ const items = ref([
                             <Button label="dia" @click="getTask('date')" :outlined="mode != 'date'" />
                         </ButtonGroup>
                         <div class="sm:w-52 w-full">
-                            <CustomInput v-model:input="dates" :type="mode" :manualInput="false"
-                                @valueChange="mode == 'week' ? (diasSemana = obtenerFechasSemana(obtenerDiaSemana(dates))) : getTask()" />
+                            <CustomInput v-model:input="dates.day" :type="mode" :manualInput="false"
+                                @valueChange="getTask()" />
                         </div>
                     </div>
                 </div>
@@ -493,11 +513,11 @@ const items = ref([
                             <div class="flex flex-col items-center">
                                 <p class="flex w-full justify-center items-baseline font-bold">Proyecto</p>
                             </div>
-                            <span class="grid grid-cols-7 col-span-9">
-                                <div v-for="dia, index in diasSemana" class="flex w-full flex-col items-center"
-                                    :class="[dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary rounded-t-md font-bold' : '']">
+                            <span class="grid grid-cols-7 col-span-9 pr-4">
+                                <div v-for="data, index in diasSemana" class="flex w-full flex-col items-center"
+                                    :class="[data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary rounded-t-md font-bold' : '']">
                                     <p class="capitalize border-b w-full truncate text-center">{{
-                                dia.toLocaleDateString('es-CO', {
+                                data.day.toLocaleDateString('es-CO', {
                                     weekday: 'long', year: 'numeric', month: 'numeric', day:
                                         'numeric'
                                 }) }}
@@ -505,7 +525,7 @@ const items = ref([
                                 </div>
                             </span>
                         </div>
-                        <div class="h-full space-y-2 overflow-y-auto pl-1 ">
+                        <div class="h-full space-y-2 overflow-y-scroll pl-1 ">
                             <div v-if="projectsSelected.length > 0" v-for="project in projectsSelected"
                                 class="grid-cols-10 ml-0.5 divide-x divide-y cursor-default h-full divide-gray-100 border border-indigo-200 rounded-l-md text-lg leading-6 grid">
                                 <div class="flex flex-col items-center px-2">
@@ -513,25 +533,25 @@ const items = ref([
                                         <p>
                                             {{ project.name }}
                                         </p>
-                                        <Knob v-if="project.name!='ANRP'" v-tooltip="'Avance'" :model-value="parseInt(project.avance)" readonly
-                                            :size="40" valueTemplate="{value}%" />
-                                        <div v-if="project.name!='ANRP'" class="text-xs">
+                                        <Knob v-if="project.name != 'ANRP'" v-tooltip="'Avance'"
+                                            :model-value="parseInt(project.avance)" readonly :size="40"
+                                            valueTemplate="{value}%" />
+                                        <div v-if="project.name != 'ANRP'" class="text-xs">
                                             <p v-tooltip="'Fecha de inicio'" class="px-2">{{ project.fechaI }}</p>
                                             <p v-tooltip="'Fecha de fin'" class="px-2">{{ project.fechaF }}</p>
                                         </div>
                                     </div>
                                 </div>
-                                <span class="grid grid-cols-7 col-span-9 overflow-y-auto overflow-x-hidden">
-                                    <div v-for="dia, index in diasSemana" class="flex flex-col h-full items-center"
-                                        :class="[index > 4 ? 'bg-warning-light' : '', dia.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
-                                        <TaskProgramming :project="project.id" :day="dia" @menu="taskRightClick"
-                                            :key="dates.toDateString() + project.id" type="week" @drop="onDrop"
-                                            v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
+                                <span class="grid grid-cols-7 col-span-9 overflow-y-scroll overflow-x-hidden">
+                                    <div v-for="data, index in diasSemana" class="flex flex-col h-full items-center"
+                                        :class="[index > 5 ? 'bg-warning-light' : '', data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
+                                        <TaskProgramming :project="project.id" :day="data.day" @menu="taskRightClick"
+                                            :key="dates.day.toDateString() + project.id + mode" type="week"
+                                            @drop="onDrop" v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
                                     </div>
                                 </span>
-
                             </div>
-                            <div class="h-full" v-else>
+                            <div class="" v-else>
                                 <NoContentToShow subject="Seleccione uno o mas proyectos" />
                             </div>
                         </div>
@@ -541,9 +561,9 @@ const items = ref([
                                     Total personas
                                 </p>
                             </div>
-                            <div class="col-span-9 grid grid-cols-7 z-10">
-                                <span v-for="dia in diasSemana">
-                                    <UserStatusProgramming :date="dia" :key="dia"
+                            <div class="col-span-9 grid grid-cols-7 pr-4 z-10">
+                                <span v-for="data in diasSemana">
+                                    <UserStatusProgramming :date="data.day" :key="data.key"
                                         v-model:statusSelect="arrayPersonFilter" />
                                 </span>
                             </div>
@@ -552,7 +572,7 @@ const items = ref([
                     <div v-if="mode == 'date'"
                         class="h-full border overflow-hidden rounded-md flex flex-col justify-between">
                         <p class="sm:block hidden w-full h-6 text-center bg-primary-light font-bold">
-                            Programacion del dia {{ dates.toLocaleDateString() }}
+                            Programacion del dia {{ dates.day.toLocaleDateString() }}
                         </p>
                         <div class="h-full sm:p-1 overflow-hidden sm:overflow-y-auto space-y-1">
                             <div v-if="projectsSelected.length > 0" v-for="project in projectsSelected"
@@ -562,22 +582,23 @@ const items = ref([
                                     <p class="font-bold">
                                         {{ project.name }}
                                     </p>
-                                    <div v-if="project.name!='ANRP'" class="text-xs sm:block flex">
+                                    <div v-if="project.name != 'ANRP'" class="text-xs sm:block flex">
                                         <p v-tooltip="'Fecha de inicio'" class="px-2">{{ project.fechaI }}</p>
                                         <p v-tooltip="'Fecha de fin'" class="px-2">{{ project.fechaF }}</p>
                                     </div>
-                                    <Knob v-if="project.name!='ANRP'" v-tooltip="'Avance'" :model-value="parseInt(project.avance)" readonly
-                                        :size="40" valueTemplate="{value}%" class="sm:flex hidden" />
+                                    <Knob v-if="project.name != 'ANRP'" v-tooltip="'Avance'"
+                                        :model-value="parseInt(project.avance)" readonly :size="40"
+                                        valueTemplate="{value}%" class="sm:flex hidden" />
                                     <div class="h-6 w-1/2 sm:hidden">
-                                        <ProgressBar v-if="project.name!='ANRP'" :value="parseInt(project.avance)" class="" v-tooltip="'Avance'"
-                                            :pt="{ label: 'text-xs font-thin' }">
+                                        <ProgressBar v-if="project.name != 'ANRP'" :value="parseInt(project.avance)"
+                                            class="" v-tooltip="'Avance'" :pt="{ label: 'text-xs font-thin' }">
                                         </ProgressBar>
                                     </div>
                                 </div>
                                 <div class="h-full sm:h-full p-1 w-full overflow-y-auto">
                                     <TaskProgramming type="day" @addPerson="addPerson" :movil="esMovil()"
-                                        @menu="taskRightClick" :project="project.id" :day="dates"
-                                        :key="dates.toDateString() + project.id" @drop="onDrop"
+                                        @menu="taskRightClick" :project="project.id" :day="dates.day"
+                                        :key="dates.day.toDateString() + project.id" @drop="onDrop"
                                         v-model:itemDrag="personDrag" @togglePerson="togglePerson" />
                                 </div>
                             </div>
@@ -586,7 +607,7 @@ const items = ref([
                             </div>
                         </div>
                         <div class="w-full flex justify-center h-min z-10" oncontextmenu="return false">
-                            <UserStatusProgramming :letters="true" :date="dates" :key="dates.toISOString()"
+                            <UserStatusProgramming :letters="true" :date="dates.day" :key="dates.key"
                                 v-model:statusSelect="arrayPersonFilter" />
                         </div>
                     </div>
