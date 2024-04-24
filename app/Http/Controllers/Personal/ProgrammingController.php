@@ -126,73 +126,6 @@ class ProgrammingController extends Controller
                 ]);
                 $status = true;
             }
-
-            // $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
-            // $conflict = [];
-            // $end_date = '';
-            // $project = Project::find(VirtualTask::find($request->task_id)->project_id);
-            // if ($hours < 9.5) {
-            //     $task = VirtualTask::find($validateData['task_id']);
-            //     $date = Carbon::parse($validateData['fecha']);
-            //     if ($project->daysPerWeek == 5) {
-            //         $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::FRIDAY);
-            //     } elseif ($project->daysPerWeek == 6) {
-            //         $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::SATURDAY);
-            //     } else {
-            //         $end_date = Carbon::parse($validateData['fecha'])->next(Carbon::SUNDAY);
-            //     }
-
-            //     $employee = searchEmpleados('Num_SAP', $validateData['employee_id'])->first();
-            //     do {
-            //         if (getWorkingDays($date->format('Y-m-d'), intval($project->daysPerWeek))) {
-            //             $exist = DetailScheduleTime::where('idUsuario', $validateData['employee_id'])
-            //                 ->where('fecha', $date)
-            //                 ->get();
-            //             if ($exist->count() > 0) {
-            //                 //obtengo las actividades diferentes a la actual
-            //                 $exist = $exist->filter(function ($item) use ($validateData) {
-            //                     return $item->idTask != $validateData['task_id'];
-            //                 })->values()->all();
-
-            //                 // se agrega el task a las actividades que generan conflictos.
-            //                 $exist = collect($exist)->each(function ($DetailScheduleTime) {
-            //                     $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
-            //                 });
-            //                 // se guardan las actividades que generan conflictos
-            //                 if ($exist->count() > 0) {
-            //                     $conflict[$date->format('Y-m-d')] = $exist;
-            //                     $status = false;
-            //                 }
-            //             } else {
-            //                 $schedule = Schedule::firstOrNew([
-            //                     'task_id' => $validateData['task_id'],
-            //                     'employee_id' => $validateData['employee_id'],
-            //                     'name' => $validateData['name'],
-            //                     'fecha' => $date->format('Y-m-d'),
-            //                 ]);
-            //                 $schedule->save();
-            //                 ScheduleTime::create([
-            //                     'schedule_id' => $schedule->id,
-            //                     'hora_inicio' => Carbon::parse($task->project->shiftObject->startShift)->format('H:i'),
-            //                     'hora_fin' => Carbon::parse($task->project->shiftObject->endShift)->format('H:i'),
-            //                 ]);
-            //                 /* adicional de guardar en schedule y scheduleTime, se guarda en la tabla Assignment para 
-            //                 que pueda aparecer en los recursos del gantt */
-            //                 Assignment::firstOrCreate([
-            //                     'event' => $validateData['task_id'],
-            //                     'resource' => $validateData['employee_id'],
-            //                     'units' => 100,
-            //                     'name' => $validateData['name'],
-            //                     'costo_hora' => $employee->Costo_Hora,
-            //                 ]);
-            //             }
-            //         }
-            //         $date = $date->addDays(1);
-            //     } while ($end_date->gte($date));
-
-            //     $hours = $this->getAssignmentHour($validateData['fecha'], $validateData['employee_id']);
-            // }
-
             DB::commit();
 
             return response()->json([
@@ -202,7 +135,6 @@ class ProgrammingController extends Controller
             ], 200);
         } catch (Exception $e) {
             DB::rollBack();
-
             return $e;
         }
     }
@@ -406,7 +338,8 @@ class ProgrammingController extends Controller
         try {
             DB::beginTransaction();
             $conflict = [];
-            $task = VirtualTask::find(Schedule::find($request->schedule)->task_id);
+            $detailScheduleTime = DetailScheduleTime::where('idScheduleTime',$request->schedule_time)->first();
+            $task = VirtualTask::find(Schedule::find($detailScheduleTime->idSchedule)->task_id);
             $project = Project::find($task->project_id);
             if ($request->personalized) {
                 Shift::firstOrCreate([
@@ -415,232 +348,44 @@ class ProgrammingController extends Controller
                     'endShift' => new DateTime('1970-01-01T' . $request->endShift . ':00'),
                     'timeBreak' => $request->timeBreak,
                     'status' => false,
-                    'user' => $request->idUser,
+                    'user' => ''
                 ]);
             }
-            switch ($request->type) {
-                    //SOLO EL $request->date
-                case 1:
-                    $exist = DetailScheduleTime::where('fecha', $request->date)
-                        ->where('idSchedule', '!=', $request->schedule)
-                        ->where('idUsuario', $request->idUser)
-                        ->where(function ($query) use ($request) {
-                            $query->where(function ($subquery) use ($request) {
-                                $subquery->whereTime('horaInicio', '<=', $request->startShift)
-                                    ->whereTime('horaFin', '>=', $request->startShift);
-                            })->orWhere(function ($subquery) use ($request) {
-                                $subquery->whereTime('horaInicio', '<=', $request->endShift)
-                                    ->whereTime('horaFin', '>=', $request->endShift);
-                            })->orWhere(function ($subquery) use ($request) {
-                                $subquery->whereBetween('horaInicio', [$request->startShift, $request->endShift])
-                                    ->whereBetween('horaFin', [$request->startShift, $request->endShift]);
-                            });
-                        })->get();
-                    // return $exist;
-                    if ($exist->count() > 0) {
-                        $exist = $exist->each(function ($DetailScheduleTime) {
-                            $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
-                        });
-                        $conflict[$request->date] = $exist;
-                    } else {
-                        if (getWorkingDays($request->date, $project->daysPerWeek)) {
-                            $ScheduleTime = ScheduleTime::find($request->schedule_time);
-                            $ScheduleTime->hora_inicio = $request->startShift;
-                            $ScheduleTime->hora_fin = $request->endShift;
-                            $ScheduleTime->save();
-                        } else {
-                            $conflict[$request->date] = $exist;
-                        }
-                    }
-                    break;
-                case 2:
-                    //RESTO DE LA ACTIVIDAD
-                    $date = Carbon::parse($request->date);
-                    $end_date = Carbon::parse($task->endDate);
-                    //esta consulta se usa para saber si la persona está programada en una actividad
-                    //diferente a la actual (La primera)
-                    $firts = DetailScheduleTime::where('fecha', $request->date)
-                        ->where('idSchedule', '!=', $request->schedule)
-                        ->where('idUsuario', $request->idUser)
-                        ->where(function ($query) use ($request) {
-                            $query->where(function ($subquery) use ($request) {
-                                $subquery->whereTime('horaInicio', '<=', $request->startShift)
-                                    ->whereTime('horaFin', '>=', $request->startShift);
-                            })->orWhere(function ($subquery) use ($request) {
-                                $subquery->whereTime('horaInicio', '<=', $request->endShift)
-                                    ->whereTime('horaFin', '>=', $request->endShift);
-                            })->orWhere(function ($subquery) use ($request) {
-                                $subquery->whereBetween('horaInicio', [$request->startShift, $request->endShift])
-                                    ->whereBetween('horaFin', [$request->startShift, $request->endShift]);
-                            });
-                        })->get();
-
-                    if ($firts->count() > 0) {
-                        $firts = $firts->each(function ($DetailScheduleTime) {
-                            $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
-                        });
-                        $conflict[$date->format('Y-m-d')] = $firts;
-                    } else {
-                        $ScheduleTime = ScheduleTime::find($request->schedule_time);
-                        $ScheduleTime->hora_inicio = $request->startShift;
-                        $ScheduleTime->hora_fin = $request->endShift;
-                        $ScheduleTime->save();
-                    }
-                    $date = $date->addDays(1);
-                    do {
-                        $exist = DetailScheduleTime::where('fecha', $date)
-                            ->where('idUsuario', $request->idUser)
-                            ->where(function ($query) use ($request) {
-                                $query->where(function ($subquery) use ($request) {
-                                    $subquery->whereTime('horaInicio', '<=', $request->startShift)
-                                        ->whereTime('horaFin', '>=', $request->startShift);
-                                })->orWhere(function ($subquery) use ($request) {
-                                    $subquery->whereTime('horaInicio', '<=', $request->endShift)
-                                        ->whereTime('horaFin', '>=', $request->endShift);
-                                })->orWhere(function ($subquery) use ($request) {
-                                    $subquery->whereBetween('horaInicio', [$request->startShift, $request->endShift])
-                                        ->whereBetween('horaFin', [$request->startShift, $request->endShift]);
-                                });
-                            })->get();
-                        if ($exist->count() > 0) {
-                            $exist = $exist->each(function ($DetailScheduleTime) {
-                                $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
-                            });
-                            $conflict[$date->format('Y-m-d')] = $exist;
-                        } else {
-                            if (getWorkingDays($date, $project->daysPerWeek)) {
-                                $schedule = Schedule::firstOrNew([
-                                    'task_id' => $task->id,
-                                    'employee_id' => $request->idUser,
-                                    'name' => $request->userName,
-                                    'fecha' => $date->format('Y-m-d'),
-                                ]);
-                                $schedule->save();
-                                $ScheduleTime = ScheduleTime::create([
-                                    'schedule_id' => $schedule->id,
-                                    'hora_inicio' => Carbon::parse($request->startShift)->format('H:i'),
-                                    'hora_fin' => Carbon::parse($request->endShift)->format('H:i'),
-                                ]);
-                                $ScheduleTime->save();
-                            }
-                        }
-                        $date = $date->addDays(1);
-                    } while ($end_date->gte($date));
-                    // return $date;
-                    break;
-                case 3:
-                    //  RANGO DE FECHAS
-                    $date = Carbon::parse($request->details[0]);
-                    $end_date = Carbon::parse($request->details[1]);
-
-                    //esta validacion verifica que el rango de fechas seleccionadas esté dentro del rango de fecha de la actividad
-                    if (Carbon::parse($task->startDate)->gt($end_date) || Carbon::parse(($task->endDate))->lt($date)) {
-                        return response()->json([
-                            'status' => false,
-                            'mensaje' => 'No se puede programar en el rango de fecha seleccionado porque no concuerdan con el rango de fecha de la actividad.',
-                            'conflict' => $conflict,
-                        ]);
-                    }
-                    do {
-                        $exist = DetailScheduleTime::where('fecha', $date)
-                            ->where('idUsuario', $request->idUser)
-                            ->where(function ($query) use ($request) {
-                                $query->where(function ($subquery) use ($request) {
-                                    $subquery->whereTime('horaInicio', '<=', $request->startShift)
-                                        ->whereTime('horaFin', '>=', $request->startShift);
-                                })->orWhere(function ($subquery) use ($request) {
-                                    $subquery->whereTime('horaInicio', '<=', $request->endShift)
-                                        ->whereTime('horaFin', '>=', $request->endShift);
-                                })->orWhere(function ($subquery) use ($request) {
-                                    $subquery->whereBetween('horaInicio', [$request->startShift, $request->endShift])
-                                        ->whereBetween('horaFin', [$request->startShift, $request->endShift]);
-                                });
-                            })->get();
-                        if ($exist->count() > 0) {
-                            $exist = $exist->each(function ($DetailScheduleTime) {
-                                $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
-                            });
-                            $conflict[$date->format('Y-m-d')] = $exist;
-                        } else {
-                            if (getWorkingDays($request->date, $project->daysPerWeek)) {
-                                $schedule = Schedule::firstOrNew([
-                                    'task_id' => $task->id,
-                                    'employee_id' => $request->idUser,
-                                    'name' => $request->userName,
-                                    'fecha' => $date->format('Y-m-d'),
-                                ]);
-                                $schedule->save();
-                                $ScheduleTime = ScheduleTime::create([
-                                    'schedule_id' => $schedule->id,
-                                    'hora_inicio' => Carbon::parse($request->startShift)->format('H:i'),
-                                    'hora_fin' => Carbon::parse($request->endShift)->format('H:i'),
-                                ]);
-                                $ScheduleTime->save();
-                            }
-                        }
-                        $date = $date->addDays(1);
-                    } while ($end_date->gte($date));
-                    break;
-                case 4:
-                    // FECHAS ESPECIFICAS
-                    foreach ($request->details as $date) {
-
-                        $exist = DetailScheduleTime::where('fecha', $date)
-                            ->where('idUsuario', $request->idUser)
-                            ->where(function ($query) use ($request) {
-                                $query->where(function ($subquery) use ($request) {
-                                    $subquery->whereTime('horaInicio', '<=', $request->startShift)
-                                        ->whereTime('horaFin', '>=', $request->startShift);
-                                })->orWhere(function ($subquery) use ($request) {
-                                    $subquery->whereTime('horaInicio', '<=', $request->endShift)
-                                        ->whereTime('horaFin', '>=', $request->endShift);
-                                })->orWhere(function ($subquery) use ($request) {
-                                    $subquery->whereBetween('horaInicio', [$request->startShift, $request->endShift])
-                                        ->whereBetween('horaFin', [$request->startShift, $request->endShift]);
-                                });
-                            })->get();
-                        if ($exist->count() > 0) {
-                            $exist = $exist->each(function ($DetailScheduleTime) {
-                                $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
-                            });
-                            $conflict[$date] = $exist;
-                        } else {
-                            if (getWorkingDays($date, $project->daysPerWeek)) {
-                                $schedule = Schedule::firstOrNew([
-                                    'task_id' => $task->id,
-                                    'employee_id' => $request->idUser,
-                                    'name' => $request->userName,
-                                    'fecha' => $date,
-                                    'status' => 0,
-                                ]);
-                                $schedule->save();
-                                $ScheduleTime = ScheduleTime::create([
-                                    'schedule_id' => $schedule->id,
-                                    'hora_inicio' => Carbon::parse($request->startShift)->format('H:i'),
-                                    'hora_fin' => Carbon::parse($request->endShift)->format('H:i'),
-                                ]);
-                                $ScheduleTime->save();
-                            }
-                        }
-                    }
-                    break;
-                default:
-                    return response()->json([
-                        'status' => false,
-                        'mensaje' => 'Opcion no valida',
-                        'response_type' => 'Error', //question y success
-                        'conflict' => [],
-                    ]);
+            $exist = DetailScheduleTime::where('fecha', $detailScheduleTime->fecha)
+                ->where('idSchedule', '!=', $detailScheduleTime->idSchedule)
+                ->where('idUsuario', $detailScheduleTime->idUsuario)
+                ->where(function ($query) use ($request) {
+                    $query->where(function ($subquery) use ($request) {
+                        $subquery->whereTime('horaInicio', '<=', $request->startShift)
+                            ->whereTime('horaFin', '>=', $request->startShift);
+                    })->orWhere(function ($subquery) use ($request) {
+                        $subquery->whereTime('horaInicio', '<=', $request->endShift)
+                            ->whereTime('horaFin', '>=', $request->endShift);
+                    })->orWhere(function ($subquery) use ($request) {
+                        $subquery->whereBetween('horaInicio', [$request->startShift, $request->endShift])
+                            ->whereBetween('horaFin', [$request->startShift, $request->endShift]);
+                    });
+                })->get();
+            if ($exist->count() > 0) {
+                $exist = $exist->each(function ($DetailScheduleTime) {
+                    $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
+                });
+                $conflict[$request->date] = $exist;
+            } else {
+                if (getWorkingDays($detailScheduleTime->fecha, $project->daysPerWeek)) {
+                    $ScheduleTime = ScheduleTime::find($request->schedule_time);
+                    $ScheduleTime->hora_inicio = $request->startShift;
+                    $ScheduleTime->hora_fin = $request->endShift;
+                    $ScheduleTime->save();
+                } 
             }
             DB::commit();
             if (count($conflict) > 0) {
-                return response()->json(['status' => false, 'conflict' => $conflict, 'mensaje' => '', 'task' => $this->getSchedule($request->date, $task->id)]);
+                return response()->json(['status' => false, 'conflict' => $conflict, 'mensaje' => '', 'task' => $this->getSchedule($detailScheduleTime->fecha, $task->id)]);
             }
-
-            return response()->json(['status' => true, 'conflict' => [], 'mensaje' => 'Horario asignado', 'task' => $this->getSchedule($request->date, $task->id)]);
+            return response()->json(['status' => true, 'conflict' => [], 'mensaje' => 'Horario asignado', 'task' => $this->getSchedule($detailScheduleTime->fecha, $task->id)]);
         } catch (Exception $e) {
             DB::rollBack();
-
             return $e;
         }
     }
@@ -675,7 +420,6 @@ class ProgrammingController extends Controller
                     break;
             }
             DB::commit();
-
             return response()->json(['status' => true, 'mensaje' => $mensaje]);
         } catch (Exception $e) {
             DB::rollBack();
@@ -859,9 +603,24 @@ class ProgrammingController extends Controller
             $status = true;
             $schedule = Schedule::find($request->schedule);
             $mensaje = 'Se ha movido de tarea a: ' . $schedule->name . '.';
-            $exist = DetailScheduleTime::where('idUsuario', $schedule->employee_id)
-                ->where('fecha', $request->date)
-                ->get();
+            $scheduleTimes = DetailScheduleTime::where('idUsuario', $schedule->employee_id)
+            ->where('fecha',$request->date)->get();
+            foreach($scheduleTimes as $item){
+            $exist = DetailScheduleTime::where('fecha', $request->date)
+            ->where('idUsuario', $schedule->employee_id)
+            ->where(function ($query) use ($item) {
+                $query->where(function ($subquery) use ($item) {
+                    $subquery->whereTime('horaInicio', '<=', $item->horaInicio)
+                        ->whereTime('horaFin', '>=', $item->horaInicio);
+                })->orWhere(function ($subquery) use ($item) {
+                    $subquery->whereTime('horaInicio', '<=', $item->horaFin)
+                        ->whereTime('horaFin', '>=',  $item->horaFin);
+                })->orWhere(function ($subquery) use ($item) {
+                    $subquery->whereBetween('horaInicio', [$item->horaInicio, $item->horaFin])
+                        ->whereBetween('horaFin', [$item->horaInicio, $item->horaFin]);
+                });
+            })->get();
+            
             if ($exist->count() > 0) {
                 if ($exist->count() == 1 && $exist[0]->fecha == Carbon::parse($schedule->fecha)->format('Y-m-d')) {
                     $schedule = Schedule::find($request->schedule);
@@ -908,6 +667,7 @@ class ProgrammingController extends Controller
                 ScheduleTime::where('schedule_id', $schedule->id)->delete();
                 $schedule->delete();
             }
+            }
             DB::commit();
             return response()->json([
                 'status' => $status,
@@ -942,9 +702,28 @@ class ProgrammingController extends Controller
                 ]);
             }
             foreach ($data as $item) {
-                // $exist = DetailScheduleTime::where('idUsuario', $item->idUsuario)
-                // ->where('fecha', $request->date)->get();
-
+                $exist = DetailScheduleTime::where('fecha', $request->newDate)
+                ->where('idUsuario', $item->idUsuario)
+                ->where(function ($query) use ($item) {
+                    $query->where(function ($subquery) use ($item) {
+                        $subquery->whereTime('horaInicio', '<=', $item->horaInicio)
+                            ->whereTime('horaFin', '>=', $item->horaInicio);
+                    })->orWhere(function ($subquery) use ($item) {
+                        $subquery->whereTime('horaInicio', '<=', $item->horaFin)
+                            ->whereTime('horaFin', '>=',  $item->horaFin);
+                    })->orWhere(function ($subquery) use ($item) {
+                        $subquery->whereBetween('horaInicio', [$item->horaInicio, $item->horaFin])
+                            ->whereBetween('horaFin', [$item->horaInicio, $item->horaFin]);
+                    });
+                })->get();
+                
+                if ($exist->count() > 0) {
+                    $exist = $exist->each(function ($DetailScheduleTime) {
+                        $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
+                    });
+                    $conflict[$request->date] = $exist;
+                    $status = false;
+                }else{
                 $employee = searchEmpleados('Num_SAP', $item->idUsuario)->first();
                 programming(Carbon::parse($request->newDate)->format('Y-m-d'), 
                 $item->idUsuario, 
@@ -957,10 +736,12 @@ class ProgrammingController extends Controller
                     disprogramming($item->idSchedule);
                 }
             }
+            }
             DB::commit();
             return response()->json([
                 'status' => $status,
                 'mensaje' => 'Acción realizada',
+                'conflict' => $conflict,
                 'task' => $this->getSchedule($request->newDate, $request->newTask)
             ]);
         } catch (Exception $e) {
