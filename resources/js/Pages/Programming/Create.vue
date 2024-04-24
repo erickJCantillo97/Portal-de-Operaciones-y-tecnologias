@@ -185,6 +185,7 @@ async function onDrop(task, fecha) {
     if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
         task.loading == undefined ? task.loading = 1 : task.loading++
         if (personDrag.value.option == 'move') {
+            if (personDrag.value.day.toDateString()==fecha.toDateString()){
             personDrag.value.task.loading == undefined ? personDrag.value.task.loading = 1 : personDrag.value.task.loading++
             await axios.post(route('programming.move'), { task: task.id, date: fecha, schedule: personDrag.value.person.schedule })
                 .then((res) => {
@@ -210,6 +211,10 @@ async function onDrop(task, fecha) {
                     task.employees = res.data.task
                     task.loading--
                 })
+            }else{
+                task.loading--
+                toast.add({ severity: 'error', group: "customToast", text: 'No se puede mover a otra fecha, use copiar', life: 2000 })
+            }
         } else {
             await axios.post(route('programming.store'), { task_id: task.id, employee_id: personDrag.value.Num_SAP, name: personDrag.value.Nombres_Apellidos, fecha })
                 .then((res) => {
@@ -328,7 +333,7 @@ const save = async (mode) => {
                 }
             }
             // if (mode.value == 'week') diasSemana.value.find(data => data.day === fecha).key = Math.random().toFixed(5);
-            loadingPrograming(dateSelect)
+            loadingPrograming(dateSelect.value)
         }).catch((error) => {
             console.log(error)
             toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 2000 })
@@ -365,9 +370,7 @@ const confirmDelete = (event, schedule_time) => {
                         openConflict.value = true;
                     }
                 }
-                if (mode.value == 'date') dates.value.key = Math.random().toFixed(5);
-                arrayPersonFilter.value.programados = []
-                arrayPersonFilter.value.noProgramados = []
+                loadingPrograming(dateSelect.value)
             }).catch((error) => {
                 console.log(error)
                 toast.add({ severity: 'error', group: "customToast", text: 'Error no controlado', life: 2000 })
@@ -466,7 +469,7 @@ const items = ref([
                         // loadingPrograming(dataRightClick.newDate)
                         toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
                     } else {
-                        if (Object.values(res.data.conflict).length > 0) {
+                        if (Object.values(res.data.conflict)?.length > 0) {
                             conflicts.value.data = Object.values(res.data.conflict)
                             conflicts.value.task = dataRightClick.newTaskData
                             openConflict.value = true;
@@ -783,7 +786,6 @@ const items = ref([
                     </TabPanel>
                 </TabView>
             </div>
-            {{ formEditShift }}
         </template>
     </CustomModal>
 
