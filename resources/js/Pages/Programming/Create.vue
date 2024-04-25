@@ -188,32 +188,37 @@ async function onDrop(task, fecha) {
         task.loading == undefined ? task.loading = 1 : task.loading++
         if (personDrag.value.option == 'move') {
             if (personDrag.value.day.toDateString() == fecha.toDateString()) {
-                personDrag.value.task.loading == undefined ? personDrag.value.task.loading = 1 : personDrag.value.task.loading++
-                await axios.post(route('programming.move'), { task: task.id, date: fecha, schedule: personDrag.value.person.schedule })
-                    .then((res) => {
-                        if (res.data.status) {
-                            task.employees = res.data.task
-                            personDrag.value.task.employees = personDrag.value.task.employees.filter(person => person.Num_SAP !== personDrag.value.person.Num_SAP);
-                            toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
-                        } else {
-                            if (Object.values(res.data.conflict).length > 0) {
-                                conflicts.value.data = Object.values(res.data.conflict)
-                                conflicts.value.task = task
-                                openConflict.value = true;
-                                toast.add({ severity: 'error', group: "customToast", text: 'Existe sobreasignación', life: 2000 })
+                if(personDrag.value.task.id!=task.id){
+                    personDrag.value.task.loading == undefined ? personDrag.value.task.loading = 1 : personDrag.value.task.loading++
+                    await axios.post(route('programming.move'), { task: task.id, date: fecha, schedule: personDrag.value.person.schedule })
+                        .then((res) => {
+                            if (res.data.status) {
+                                task.employees = res.data.task
+                                personDrag.value.task.employees = personDrag.value.task.employees.filter(person => person.Num_SAP !== personDrag.value.person.Num_SAP);
+                                toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
                             } else {
-                                toast.add({ severity: 'error', group: "customToast", text: res.data?.mensaje ?? 'Hubo un error al programar', life: 2000 })
+                                if (Object.values(res.data.conflict).length > 0) {
+                                    conflicts.value.data = Object.values(res.data.conflict)
+                                    conflicts.value.task = task
+                                    openConflict.value = true;
+                                    toast.add({ severity: 'error', group: "customToast", text: 'Existe sobreasignación', life: 2000 })
+                                } else {
+                                    toast.add({ severity: 'error', group: "customToast", text: res.data?.mensaje ?? 'Hubo un error al programar', life: 2000 })
+                                }
                             }
-                        }
-                        loadingPrograming(fecha)
-                        task.loading--
-                        personDrag.value.task.loading--
-                    })
-                    .catch((error) => {
-                        console.log(error)
-                        task.employees = res.data.task
-                        task.loading--
-                    })
+                            loadingPrograming(fecha)
+                            task.loading--
+                            personDrag.value.task.loading--
+                        })
+                        .catch((error) => {
+                            console.log(error)
+                            task.employees = res.data.task
+                            task.loading--
+                        })
+                }else{
+                    task.loading--
+                    toast.add({ severity: 'success', group: "customToast", text: 'Persona esta programada aqui', life: 2000 })
+                }
             } else {
                 task.loading--
                 toast.add({ severity: 'error', group: "customToast", text: 'No se puede mover a otra fecha, use copiar', life: 2000 })
