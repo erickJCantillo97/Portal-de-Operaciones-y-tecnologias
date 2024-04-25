@@ -13,6 +13,7 @@ const { format_ES_Date, formatDateTime24h } = useCommonUtilities()
 
 import { useToast } from "primevue/usetoast"
 import axios from 'axios'
+import CounterUp from '@/Components/sections/CounterUp.vue'
 const toast = useToast()
 
 const props = defineProps({
@@ -40,11 +41,12 @@ const formData = ref({
 
 //#region CustomDataTable
 const projectsByTask = ref()
-
+const contador = ref([])
 const getProgramming = async () => {
     await axios.get(route('get.programming.date', { date: date.value }))
         .then(res => {
             programming.value = res.data.programming
+            contarPersonasPorProyecto(programmin.value)
         })
 }
 
@@ -52,9 +54,23 @@ onMounted(() => {
     getProgramming()
 })
 
+function contarPersonasPorProyecto(arrayProyectos) {
+    let conteo = {};
+    arrayProyectos.forEach(proyecto => {
+        if (conteo[proyecto.project]) {
+            conteo[proyecto.project]++;
+        } else {
+            conteo[proyecto.project] = 1;
+        }
+    });
+    for (let idProyecto in conteo) {
+        contador.value.push({ idProyecto: idProyecto, cantidadPersonas: conteo[idProyecto] });
+    }
+}
+
 const columnas = [
     // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
-    { field: 'project', header: 'Proyecto', filter: true, sortable: true },
+    { field: 'project', header: 'Proyecto', filter: true, sortable: true, filterType: 'dropdown', filterOptions: contador, filterValue: 'idProyecto', filterLabel: 'idProyecto' },
     { field: 'task', header: 'Tarea', filter: true, sortable: true },
     { field: 'turno', header: 'Turno', filter: true, sortable: true },
     { field: 'division', header: 'Oficina', filter: true, sortable: true },
@@ -127,6 +143,7 @@ const url = [
                         </span>
                     </p>
                 </span>
+
                 <div class="flex items-center space-x-2">
                     <Link :href="route('programming.create')">
                     <Button label="Programar Personal" severity="success" icon="fa-solid fa-plus" :project="project" />
@@ -135,7 +152,10 @@ const url = [
                         @click="openDialog()" />
                 </div>
             </div>
-
+            <div class="flex my-4 px-4 w-full space-x-4 overflow-x-auto cursor-default sm:w-1/3 snap-x snap-mandatory">
+                <CounterUp :label="project.idProyecto" :value="project.cantidadPersonas" v-for="project in contador">
+                </CounterUp>
+            </div>
             <!-- <DivisionsByProject :projects /> -->
 
             <div class="w-full h-full overflow-y-auto">
