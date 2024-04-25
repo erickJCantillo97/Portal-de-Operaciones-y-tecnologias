@@ -33,7 +33,7 @@ class ShiftController extends Controller
                 ], 200);
 
         return response()->json([
-            Shift::where('user',$request->user)->orderBy('name')->get()->map(function ($shift) {
+            Shift::where('user',auth()->user()->num_sap)->orderBy('name')->get()->map(function ($shift) {
                 return [
                     'id' => $shift['id'],
                     'name' => $shift['name'],
