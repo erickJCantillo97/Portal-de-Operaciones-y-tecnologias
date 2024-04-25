@@ -35,6 +35,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::post('/programming/removeAll', [ProgrammingController::class, 'removeAll'])->name('programming.removeAll');
 
+    Route::get('/programming/contractor', [ProgrammingController::class, 'getDataContractor'])->name('programming.contractor');
+
     Route::get('getScheduleTaskDate/{fecha}/{task}', [ProgrammingController::class, 'getSchedule'])->name('get.task.schedule.date');
 
     /********************************  Rutas del controlador ExtendedScheduleController  ******************************/
