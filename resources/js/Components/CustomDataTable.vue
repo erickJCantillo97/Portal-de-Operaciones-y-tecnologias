@@ -201,6 +201,7 @@ const selectedElement = ref([]);
                                 <InputText v-model="filters.global.value" type="search" size="small"
                                     placeholder="Buscar" />
                             </IconField>
+                            <slot name="filterSpace" />
                         </div>
                         <div class="w-full overflow-x-auto">
 
@@ -214,9 +215,9 @@ const selectedElement = ref([]);
                         </div>
                     </div>
                     <div class="space-x-2 hidden sm:flex items-center">
-                        <Button v-if="selectionMode == 'multiple' && selectedElement.length > 0"
-                            v-tooltip.left="''" @click="$emit('selectionAction', $event, selectedElement)"
-                            severity="primary" label="Gestionar" />
+                        <Button v-if="selectionMode == 'multiple' && selectedElement.length > 0" v-tooltip.left="''"
+                            @click="$emit('selectionAction', $event, selectedElement)" severity="primary"
+                            label="Gestionar" />
 
                         <Button v-if="exportRute != ''" text @click="exportar" icon="fa-solid fa-download" :pt="{
         root: '!border-0 !ring-0',

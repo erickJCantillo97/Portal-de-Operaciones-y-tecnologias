@@ -15,6 +15,10 @@ const promedios = ref({
   cpi: 0,
   spi: 0
 })
+const ponderados = ref({
+  cpi: 0,
+  spi: 0
+})
 const scatterSeries = ref([])
 
 const getData = () => {
@@ -58,6 +62,8 @@ const getPromedio = () => {
   axios.get(route('get.cpispi.promedio')).then((res) => {
     promedios.value.cpi = res.data.cpi
     promedios.value.spi = res.data.spi
+    ponderados.value.spi = res.data.spiPonderado
+    ponderados.value.cpi = res.data.cpiPonderado
     showLineChart.value++
   })
 }
@@ -79,8 +85,8 @@ const getPromedio = () => {
           <h2 class="text-md font-semibold">PONDERADO</h2>
         </div>
         <div class="flex justify-center size-full">
-          <GaugeGradeChart :key="showLineChart" title="CPI" :value="1.002" />
-          <GaugeGradeChart :key="showLineChart" title="SPI" :value="0.968" />
+          <GaugeGradeChart :key="showLineChart" title="CPI" :value="ponderados.cpi" />
+          <GaugeGradeChart :key="showLineChart" title="SPI" :value="promedios.spi" />
         </div>
       </div>
     </div>

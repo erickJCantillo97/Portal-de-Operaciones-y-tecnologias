@@ -7,13 +7,13 @@ import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
 import Knob from 'primevue/knob'
-
+import axios from 'axios'
+import CounterUp from '@/Components/sections/CounterUp.vue'
 import { useCommonUtilities } from "@/composable/useCommonUtilities"
 const { format_ES_Date, formatDateTime24h } = useCommonUtilities()
 
 import { useToast } from "primevue/usetoast"
-import axios from 'axios'
-import CounterUp from '@/Components/sections/CounterUp.vue'
+
 const toast = useToast()
 
 const props = defineProps({
@@ -41,12 +41,15 @@ const formData = ref({
 
 //#region CustomDataTable
 const projectsByTask = ref()
-const contador = ref([])
+const contadorProject = ref([])
+const contadorDivision = ref([])
 const getProgramming = async () => {
+    loading.value = true
     await axios.get(route('get.programming.date', { date: date.value }))
         .then(res => {
             programmin.value = res.data.programming
-            contarPersonasPorProyecto(programmin.value)
+            contarPersonasPorGrupos(programmin.value)
+            loading.value = false
         })
 }
 
@@ -54,23 +57,50 @@ onMounted(() => {
     getProgramming()
 })
 
-function contarPersonasPorProyecto(arrayProyectos) {
-    let conteo = {};
+const turnos = [
+    {
+        label: 'Turno Dia',
+        value: '4'
+    },
+    {
+        label: 'Turno Amanecida',
+        value: 1
+    },
+    {
+        label: 'Turno Nocturno',
+        value: 1
+    },
+]
+
+function contarPersonasPorGrupos(arrayProyectos) {
+    contadorProject.value = []
+    contadorDivision.value = []
+    let conteoProject = {};
+    let conteoDivision = {};
     arrayProyectos.forEach(proyecto => {
-        if (conteo[proyecto.project]) {
-            conteo[proyecto.project]++;
+        if (conteoProject[proyecto.project]) {
+            conteoProject[proyecto.project]++;
+
         } else {
-            conteo[proyecto.project] = 1;
+            conteoProject[proyecto.project] = 1;
+        }
+        if (conteoDivision[proyecto.division]) {
+            conteoDivision[proyecto.division]++;
+        } else {
+            conteoDivision[proyecto.division] = 1;
         }
     });
-    for (let idProyecto in conteo) {
-        contador.value.push({ idProyecto: idProyecto, cantidadPersonas: conteo[idProyecto] });
+    for (let idProyecto in conteoProject) {
+        contadorProject.value.push({ idProyecto: idProyecto, cantidadPersonas: conteoProject[idProyecto] });
+    }
+    for (let division in conteoDivision) {
+        contadorDivision.value.push({ division: division, cantidadPersonas: conteoDivision[division] });
     }
 }
 
 const columnas = [
     // { field: 'id', header: 'Id', frozen: true, filter: true, sortable: true },
-    { field: 'project', header: 'Proyecto', filter: true, sortable: true, filterType: 'dropdown', filterOptions: contador, filterValue: 'idProyecto', filterLabel: 'idProyecto' },
+    { field: 'project', header: 'Proyecto', filter: true, sortable: true, filterType: 'dropdown', filterOptions: contadorProject, filterValue: 'idProyecto', filterLabel: 'idProyecto' },
     { field: 'task', header: 'Tarea', filter: true, sortable: true },
     { field: 'turno', header: 'Turno', filter: true, sortable: true },
     { field: 'division', header: 'Oficina', filter: true, sortable: true },
@@ -152,14 +182,31 @@ const url = [
                         @click="openDialog()" />
                 </div>
             </div>
-            <div class="flex my-4 px-4 w-full space-x-4 overflow-x-auto cursor-default sm:w-1/3 snap-x snap-mandatory">
-                <CounterUp :label="project.idProyecto" :value="project.cantidadPersonas" v-for="project in contador">
-                </CounterUp>
+            <div
+                class="border-slate-300 my-2 block w-full justify-between rounded-lg border-b py-1 shadow-md sm:flex space-x-4">
+                <div class="flex w-full space-x-2 overflow-x-auto cursor-default">
+                    <CounterUp :label="project.idProyecto" :value="project.cantidadPersonas"
+                        v-for="project in contadorProject" />
+                </div>
+                <div class="flex w-full space-x-2 overflow-x-auto cursor-default snap-x snap-mandatory">
+                    <CounterUp :label="division.division" :value="division.cantidadPersonas"
+                        v-for="division in contadorDivision" />
+                </div>
+                <div class="flex w-full space-x-2 overflow-x-auto cursor-default justify-center snap-x snap-mandatory">
+                    <CounterUp :label="turno.label" :value="turno.value" v-for="turno in turnos" />
+                </div>
             </div>
+
             <!-- <DivisionsByProject :projects /> -->
 
-            <div class="w-full overflow-y-auto h-[80vh]">
-                <CustomDataTable :data="programmin" :rows-default="10" :columnas="columnas">
+            <div class="w-full overflow-y-auto h-[78vh]">
+                <CustomDataTable :data="programmin" :loading :rows-default="100" :key="programmin" :columnas="columnas">
+                    <template #filterSpace>
+                        <div class="sm:w-52 w-full">
+                            <CustomInput v-model:input="date" type="date" :manualInput="false"
+                                @valueChange="getProgramming()" />
+                        </div>
+                    </template>
                 </CustomDataTable>
             </div>
 
