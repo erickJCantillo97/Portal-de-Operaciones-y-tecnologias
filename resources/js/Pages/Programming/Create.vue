@@ -142,15 +142,17 @@ const getTask = async (option) => {
     }
     if (option == 'week') {
         mode.value = option
-        !(dates.value.day instanceof Array) ?? (dates.value.day = obtenerFormatoSemana(new Date()))
-            (diasSemana = obtenerFechasSemana(obtenerDiaSemana(dates.value.day)))
+        if (dates.value.day instanceof Date) {
+            dates.value.day = obtenerFormatoSemana(new Date())
+        }
+        diasSemana.value = obtenerFechasSemana(obtenerDiaSemana(dates.value.day))
     } else if (option == 'date') {
         mode.value = option
-        !(dates.value.day instanceof Date) ?? (dates.value.day = new Date())
-    } else if (mode.value == 'month') {
-
-    } else {
-
+        if (!(dates.value.day instanceof Date)) {
+            dates.value=={}
+            dates.value.key = Math.random().toFixed(5)
+            dates.value.day = new Date()
+        }
     }
 };
 
@@ -185,33 +187,34 @@ async function onDrop(task, fecha) {
     if (new Date(fecha) >= new Date(date.value.toISOString().split("T")[0])) {
         task.loading == undefined ? task.loading = 1 : task.loading++
         if (personDrag.value.option == 'move') {
-            if (personDrag.value.day.toDateString()==fecha.toDateString()){
-            personDrag.value.task.loading == undefined ? personDrag.value.task.loading = 1 : personDrag.value.task.loading++
-            await axios.post(route('programming.move'), { task: task.id, date: fecha, schedule: personDrag.value.person.schedule })
-                .then((res) => {
-                    if (res.data.status) {
-                        task.employees = res.data.task
-                        personDrag.value.task.employees = personDrag.value.task.employees.filter(person => person.Num_SAP !== personDrag.value.person.Num_SAP);
-                        toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
-                    } else {
-                        if (Object.values(res.data.conflict).length > 0) {
-                            conflicts.value.data = Object.values(res.data.conflict)
-                            conflicts.value.task = task
-                            openConflict.value = true;
-                            toast.add({ severity: 'error', group: "customToast", text: 'Existe sobreasignación', life: 2000 })
+            if (personDrag.value.day.toDateString() == fecha.toDateString()) {
+                personDrag.value.task.loading == undefined ? personDrag.value.task.loading = 1 : personDrag.value.task.loading++
+                await axios.post(route('programming.move'), { task: task.id, date: fecha, schedule: personDrag.value.person.schedule })
+                    .then((res) => {
+                        if (res.data.status) {
+                            task.employees = res.data.task
+                            personDrag.value.task.employees = personDrag.value.task.employees.filter(person => person.Num_SAP !== personDrag.value.person.Num_SAP);
+                            toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
                         } else {
-                            toast.add({ severity: 'error', group: "customToast", text: res.data?.mensaje ?? 'Hubo un error al programar', life: 2000 })
+                            if (Object.values(res.data.conflict).length > 0) {
+                                conflicts.value.data = Object.values(res.data.conflict)
+                                conflicts.value.task = task
+                                openConflict.value = true;
+                                toast.add({ severity: 'error', group: "customToast", text: 'Existe sobreasignación', life: 2000 })
+                            } else {
+                                toast.add({ severity: 'error', group: "customToast", text: res.data?.mensaje ?? 'Hubo un error al programar', life: 2000 })
+                            }
                         }
-                    }
-                    task.loading--
-                    personDrag.value.task.loading--
-                })
-                .catch((error) => {
-                    console.log(error)
-                    task.employees = res.data.task
-                    task.loading--
-                })
-            }else{
+                        loadingPrograming(fecha)
+                        task.loading--
+                        personDrag.value.task.loading--
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                        task.employees = res.data.task
+                        task.loading--
+                    })
+            } else {
                 task.loading--
                 toast.add({ severity: 'error', group: "customToast", text: 'No se puede mover a otra fecha, use copiar', life: 2000 })
             }
@@ -230,6 +233,7 @@ async function onDrop(task, fecha) {
                             toast.add({ severity: 'error', group: "customToast", text: res.data?.mensaje ?? 'Hubo un error al programar', life: 2000 })
                         }
                     }
+                    loadingPrograming(fecha)
                     task.employees = res.data.task
                     task.loading--
                 })
@@ -239,7 +243,7 @@ async function onDrop(task, fecha) {
                     task.loading--
                 })
         }
-        loadingPrograming(fecha)
+
     } else {
         toast.add({ severity: 'error', group: "customToast", text: 'No se puede programar en dias anteriores', life: 2000 })
     }
@@ -267,8 +271,6 @@ const togglePerson = (event, persons, task, date) => {
     personsEdit.value = persons
     overlayPerson.value.toggle(event);
 }
-
-
 const formEditShift = ref({
     startShift: '07:00',// hora inicio
     endShift: '16:30',// hora fin
@@ -286,7 +288,7 @@ const editHour = (schedule_time) => {
     modhours.value = true
 }
 
-const save = async (mode) => {
+const saveCustomizedSchedule = async (mode) => {
     formEditShift.value.loading = true
     if (tabActive.value == 0) {
         formEditShift.value.personalized = false
@@ -392,27 +394,27 @@ const taskRightClick = (event, task, day) => {
     tempRightClick.day = day
     if (dataRightClick.task != undefined) {
         // console.log('datos')
-        items.value[3].visible = true
+        itemsMenuContext.value[3].visible = true
     } else {
-        items.value[3].visible = false
+        itemsMenuContext.value[3].visible = false
     }
     if (task.employees.length == 0) {
-        items.value[0].disabled = true
-        items.value[1].disabled = true
-        items.value[2].disabled = true
-        items.value[4].disabled = true
+        itemsMenuContext.value[0].disabled = true
+        itemsMenuContext.value[1].disabled = true
+        itemsMenuContext.value[2].disabled = true
+        itemsMenuContext.value[4].disabled = true
     } else {
-        items.value[0].disabled = false
-        items.value[1].disabled = false
-        items.value[2].disabled = false
-        items.value[4].disabled = false
+        itemsMenuContext.value[0].disabled = false
+        itemsMenuContext.value[1].disabled = false
+        itemsMenuContext.value[2].disabled = false
+        itemsMenuContext.value[4].disabled = false
     }
     menu.value.show(event)
 };
 
 var dataRightClick = {}
 
-const items = ref([
+const itemsMenuContext = ref([
     {
         label: 'Copiar',
         icon: 'fa-regular fa-copy text-success',
@@ -465,8 +467,6 @@ const items = ref([
                         if (dataRightClick.cut) {
                             dataRightClick.taskData.employees = []
                         }
-                        loadingPrograming([dataRightClick.date, dataRightClick.newDate])
-                        // loadingPrograming(dataRightClick.newDate)
                         toast.add({ severity: 'success', group: "customToast", text: res.data.mensaje, life: 2000 })
                     } else {
                         if (Object.values(res.data.conflict)?.length > 0) {
@@ -478,6 +478,7 @@ const items = ref([
                             toast.add({ severity: 'error', group: "customToast", text: res.data?.mensaje ?? 'Hubo un error al programar', life: 2000 })
                         }
                     }
+                    loadingPrograming([dataRightClick.date, dataRightClick.newDate])
                     tempRightClick.taskData.loading--
                     dataRightClick.taskData.loading--
                 })
@@ -555,7 +556,7 @@ const items = ref([
                             <span class="grid grid-cols-7 col-span-9 pr-4">
                                 <div v-for="data, index in diasSemana" class="flex w-full flex-col items-center"
                                     :class="[data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary rounded-t-md font-bold' : '']">
-                                    <p class="capitalize border-b w-full truncate text-center">{{
+                                    <p class="capitalize border-b w-full truncate text-center" :key="data.key">{{
                                 data.day.toLocaleDateString('es-CO', {
                                     weekday: 'long', year: 'numeric', month: 'numeric', day:
                                         'numeric'
@@ -585,7 +586,7 @@ const items = ref([
                                     <div v-for="data, index in diasSemana" class="flex flex-col h-full items-center"
                                         :class="[index > 5 ? 'bg-warning-light' : '', data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
                                         <TaskProgramming :project="project.id" :day="data.day" @menu="taskRightClick"
-                                            :key="dates.day.toDateString() + project.id + mode" type="week"
+                                            :key="dates.day + project.id + mode" type="week"
                                             @drop="onDrop" v-model:itemDrag="personDrag" @togglePerson="togglePerson"
                                             :dataRightClick />
                                     </div>
@@ -611,7 +612,7 @@ const items = ref([
                     </div>
                     <div v-if="mode == 'date'"
                         class="h-full border overflow-hidden rounded-md flex flex-col justify-between">
-                        <p class="sm:block hidden w-full h-6 text-center bg-primary-light font-bold">
+                        <p class="sm:block hidden w-full h-6 text-center bg-primary-light font-bold" :key="dates.key">
                             Programacion del dia {{ dates.day.toLocaleDateString() }}
                         </p>
                         <div class="h-full sm:p-1 overflow-hidden sm:overflow-y-auto space-y-1">
@@ -735,8 +736,8 @@ const items = ref([
                             <CustomShiftSelector v-model:shift="shiftSelect" />
                         </div>
                         <span class="w-full flex justify-end pt-3 items-center">
-                            <Button v-if="tabActive == 0" @click="save()" label="Guardar" icon="fa-solid fa-floppy-disk"
-                                severity="success" :loading="formEditShift.loading" />
+                            <Button v-if="tabActive == 0" @click="saveCustomizedSchedule()" label="Guardar"
+                                icon="fa-solid fa-floppy-disk" severity="success" :loading="formEditShift.loading" />
                         </span>
                     </TabPanel>
                     <TabPanel header="Seleccionar turno Personalizado" :pt="{
@@ -749,11 +750,12 @@ const items = ref([
                                 <CustomShiftSelector :shiftUser="parseInt($page.props.auth.user.id)"
                                     v-model:shift="shiftSelect" />
                                 <div class="flex justify-end">
-                                    <Button @click="save()" label="Guardar" icon="fa-solid fa-floppy-disk"
-                                        severity="success" :loading="formEditShift.loading" />
+                                    <Button @click="saveCustomizedSchedule()" label="Guardar"
+                                        icon="fa-solid fa-floppy-disk" severity="success"
+                                        :loading="formEditShift.loading" />
                                 </div>
                             </div>
-                            <form @submit.prevent="save('custom')"
+                            <form @submit.prevent="saveCustomizedSchedule('custom')"
                                 class="border w-full flex flex-col justify-between p-2 rounded-md space-y-3">
                                 <label class="text-center w-full font-bold text-gray-900">
                                     Personalizar turno</label>
@@ -793,7 +795,7 @@ const items = ref([
     </ModalColisions>
 
     <!--#endregion-->
-    <ContextMenu ref="menu" :model="items">
+    <ContextMenu ref="menu" :model="itemsMenuContext">
         <template #item="{ item, props }">
             <!-- {{ console.log(props) }} -->
             <a v-ripple v-tooltip="item.tooltip" class="flex items-center" v-bind="props.action">
