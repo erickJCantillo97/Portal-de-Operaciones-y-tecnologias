@@ -22,7 +22,7 @@ const props = defineProps({
 const loading = ref(false)
 const date = ref(new Date())
 const project = ref()
-const programmin = ref([])
+const programming = ref([])
 const selectedTaskId = ref(null)
 const editMode = ref(false)
 const disabled = computed(() => selectedTaskId.value !== null && editMode.value)
@@ -44,7 +44,7 @@ const projectsByTask = ref()
 const getProgramming = async () => {
     await axios.get(route('get.programming.date', { date: date.value }))
         .then(res => {
-            programmin.value = res.data.programming
+            programming.value = res.data.programming
         })
 }
 
@@ -139,7 +139,7 @@ const url = [
             <!-- <DivisionsByProject :projects /> -->
 
             <div class="w-full h-full overflow-y-auto">
-                <CustomDataTable :filterButtons="filterButtons" :data="programmin" :rows-default="100"
+                <CustomDataTable :filterButtons="filterButtons" :data="programming" :rows-default="100"
                     :columnas="columnas" :actions="buttons">
                 </CustomDataTable>
             </div>
