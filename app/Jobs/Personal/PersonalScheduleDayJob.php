@@ -42,7 +42,7 @@ class PersonalScheduleDayJob implements ShouldQueue
     public function handle(): void
     {
         $collisions = DetailScheduleTime::where('fecha', $this->date)->where('idUsuario', $this->personal_id)->orderBy('horaInicio')->get();
-        $employee = searchEmpleados('Num_SAP', $this->personal_id)->firstOrNew();
+        $employee = searchEmpleados('Num_SAP', $this->personal_id)->first();
         //validamos si solamente hay 1 colisión
         if (count($collisions) == 1) {
             $horario = $collisions->first();

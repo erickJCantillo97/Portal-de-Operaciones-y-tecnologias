@@ -424,21 +424,24 @@ class ProgrammingController extends Controller
             // $request->scheduleTime = 333;
             // $request->idTask = 18;
             DB::beginTransaction();
-            $DetailScheduleTime = DetailScheduleTime::where('idScheduleTime', $request->scheduleTime)->first();
+            $detailScheduleTime = DetailScheduleTime::where('idScheduleTime', $request->scheduleTime)->first();
+            //return $detailScheduleTime;
             $mensaje = '';
             switch ($request->actionType) {
-                case 1:
-                    $schedule = Schedule::find($DetailScheduleTime->idSchedule);
+                case 2:
+                    //ACCIÓN REEMPLAZAR
+                    $schedule = Schedule::find($detailScheduleTime->idSchedule);
                     $schedule->task_id = $request->idTask;
                     $schedule->save();
                     if ($request->endSchedule) {
-                        PersonalScheduleDayJob::dispatch($DetailScheduleTime->fecha, $DetailScheduleTime->idUsuario, $request->idTask)->onConnection('sync');
+                        PersonalScheduleDayJob::dispatch($detailScheduleTime->fecha, $detailScheduleTime->idUsuario, $request->idTask)->onConnection('sync');
                         $mensaje = 'registro actualizado';
                     }
                     break;
-                case 2:
+                case 1:
+                    //ACCIÓN OMITIR
                     if ($request->endSchedule) {
-                        PersonalScheduleDayJob::dispatch($DetailScheduleTime->fecha, $DetailScheduleTime->idUsuario, $request->idTask)->onConnection('sync');
+                        PersonalScheduleDayJob::dispatch($detailScheduleTime->fecha, $detailScheduleTime->idUsuario, $request->idTask)->onConnection('sync');
                         $mensaje = 'registro actualizado';
                     }
                     break;
@@ -446,10 +449,16 @@ class ProgrammingController extends Controller
                     break;
             }
             DB::commit();
-            return response()->json(['status' => true, 'mensaje' => $mensaje]);
+            return response()->json(
+                ['status' => true, 
+                'mensaje' => $mensaje,
+                'task' => $request->actionType == 1 ?
+                 $this->getSchedule($detailScheduleTime->fecha, $detailScheduleTime->idTask) : 
+                 $this->getSchedule($schedule->fecha, $request->idTask)
+
+            ]);
         } catch (Exception $e) {
             DB::rollBack();
-
             return response()->json(['status' => true, 'mensaje' => 'Se ha generado un error: ' . $e->getMessage()]);
         }
     }
