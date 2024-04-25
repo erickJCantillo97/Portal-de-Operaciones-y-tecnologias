@@ -32,6 +32,7 @@ const formColision = ref({
 
 async function confirm1(event, scheduleTime, option, data) {
     formColision.value.idTask = conflicts.value.task.id
+    formColision.value.scheduleTime=scheduleTime.idScheduleTime
     formColision.value.startShift = format24h(conflicts.value.task.shift.startShift)
     formColision.value.endShift = format24h(conflicts.value.task.shift.endShift)
     if (option == 'omit') {
@@ -39,6 +40,7 @@ async function confirm1(event, scheduleTime, option, data) {
         formColision.value.actionType = 1
         formColision.value.endSchedule = data.find((a) => { a.status == null }) == undefined
         scheduleTime.status = undefined
+        // formColision.value.scheduleTime=data.idScheduleTime
         if (formColision.value.endSchedule) {
             confirm.require({
                 target: event.currentTarget,
@@ -122,59 +124,60 @@ async function confirm1(event, scheduleTime, option, data) {
             rejectLabel: 'No',
             acceptLabel: 'Sí',
             accept: async () => {
-                if (option == 'omitAll') {
-                    let error
-                    data.forEach((scheduleD) => {
-                        const endIndex = scheduleD.findLastIndex((element) => element.status == null)
-                        scheduleD.forEach((scheduleT, index) => {
-                            if (scheduleT.status == null) {
-                                formColision.value.endSchedule = endIndex == index ? true : false
-                                formColision.value.actionType = 2
-                                formColision.value.scheduleTime = scheduleT.idScheduleTime
-                                let status = resolveCollision(formColision.value)
-                                if (!status) {
-                                    error = scheduleT
-                                    toast.add({ severity: 'error', group: "error", text: 'Hubo un error inesperado', life: 3000 });
-                                } else {
-                                    scheduleT.status = 'remplace'
-                                }
-                            }
-                        })
-                    })
-                    if (error) {
-                        toast.add({ severity: 'warn', group: "customToast", text: 'Se remplazaron todas con errores', life: 3000 });
-                    } else {
-                        conflicts.value = []
-                        openConflict.value = conflicts.value.length > 0
-                        toast.add({ severity: 'success', group: "customToast", text: 'Se remplazaron todas', life: 3000 });
-                    }
-                } else if (option == 'remplaceAll') {
-                    let error
-                    data.forEach((scheduleD) => {
-                        const endIndex = scheduleD.findLastIndex((element) => element.status == null)
-                        scheduleD.forEach((scheduleT, index) => {
-                            if (scheduleT.status == null) {
-                                formColision.value.endSchedule = endIndex == index ? true : false
-                                formColision.value.actionType = 1
-                                formColision.value.scheduleTime = scheduleT.idScheduleTime
-                                let status = resolveCollision(formColision.value)
-                                if (!status) {
-                                    error = scheduleT
-                                    toast.add({ severity: 'error', group: "error", text: 'Hubo un error inesperado', life: 3000 });
-                                } else {
-                                    scheduleT.status = 'remplace'
-                                }
-                            }
-                        })
-                    })
-                    if (error) {
-                        toast.add({ severity: 'warn', group: "customToast", text: 'Se remplazaron todas con errores', life: 3000 });
-                    } else {
-                        conflicts.value = []
-                        openConflict.value = conflicts.value.length > 0
-                        toast.add({ severity: 'success', group: "customToast", text: 'Se remplazaron todas', life: 3000 });
-                    }
-                } else if (option == 'omitAllDay') {
+                // if (option == 'omitAll') {
+                //     let error
+                //     data.forEach((scheduleD) => {
+                //         const endIndex = scheduleD.findLastIndex((element) => element.status == null)
+                //         scheduleD.forEach((scheduleT, index) => {
+                //             if (scheduleT.status == null) {
+                //                 formColision.value.endSchedule = endIndex == index ? true : false
+                //                 formColision.value.actionType = 2
+                //                 formColision.value.scheduleTime = scheduleT.idScheduleTime
+                //                 let status = resolveCollision(formColision.value)
+                //                 if (!status) {
+                //                     error = scheduleT
+                //                     toast.add({ severity: 'error', group: "error", text: 'Hubo un error inesperado', life: 3000 });
+                //                 } else {
+                //                     scheduleT.status = 'remplace'
+                //                 }
+                //             }
+                //         })
+                //     })
+                //     if (error) {
+                //         toast.add({ severity: 'warn', group: "customToast", text: 'Se remplazaron todas con errores', life: 3000 });
+                //     } else {
+                //         conflicts.value = []
+                //         openConflict.value = conflicts.value.length > 0
+                //         toast.add({ severity: 'success', group: "customToast", text: 'Se remplazaron todas', life: 3000 });
+                //     }
+                // } else if (option == 'remplaceAll') {
+                //     let error
+                //     data.forEach((scheduleD) => {
+                //         const endIndex = scheduleD.findLastIndex((element) => element.status == null)
+                //         scheduleD.forEach((scheduleT, index) => {
+                //             if (scheduleT.status == null) {
+                //                 formColision.value.endSchedule = endIndex == index ? true : false
+                //                 formColision.value.actionType = 1
+                //                 formColision.value.scheduleTime = scheduleT.idScheduleTime
+                //                 let status = resolveCollision(formColision.value)
+                //                 if (!status) {
+                //                     error = scheduleT
+                //                     toast.add({ severity: 'error', group: "error", text: 'Hubo un error inesperado', life: 3000 });
+                //                 } else {
+                //                     scheduleT.status = 'remplace'
+                //                 }
+                //             }
+                //         })
+                //     })
+                //     if (error) {
+                //         toast.add({ severity: 'warn', group: "customToast", text: 'Se remplazaron todas con errores', life: 3000 });
+                //     } else {
+                //         conflicts.value = []
+                //         openConflict.value = conflicts.value.length > 0
+                //         toast.add({ severity: 'success', group: "customToast", text: 'Se remplazaron todas', life: 3000 });
+                //     }
+                // } else 
+                if (option == 'omitAllDay') {
                     let error
                     const endIndex = data.findLastIndex((element) => element.status == null)
                     await data.forEach((scheduleT, index) => {
@@ -244,7 +247,7 @@ async function resolveCollision(form) {
 
 </script>
 <template>
-    <CustomModal icon="fa-solid fa-triangle-exclamation" :base-z-index="10" v-model:visible="openConflict"
+    <CustomModal :closable="false" :close-on-escape="false" icon="fa-solid fa-triangle-exclamation" :base-z-index="10" v-model:visible="openConflict"
         severity="danger" width="90vw"
         :titulo="'Existe sobreasignación al programarlo en la actividad: ' + conflicts.task?.name ?? ''">
         <template #body>
