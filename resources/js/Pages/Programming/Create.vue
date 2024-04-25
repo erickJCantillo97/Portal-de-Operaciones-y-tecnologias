@@ -149,7 +149,7 @@ const getTask = async (option) => {
     } else if (option == 'date') {
         mode.value = option
         if (!(dates.value.day instanceof Date)) {
-            dates.value == {}
+            dates.value=={}
             dates.value.key = Math.random().toFixed(5)
             dates.value.day = new Date()
         }
@@ -586,9 +586,7 @@ const itemsMenuContext = ref([
                                     <div v-for="data, index in diasSemana" class="flex flex-col h-full items-center"
                                         :class="[index > 5 ? 'bg-warning-light' : '', data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
                                         <TaskProgramming :project="project.id" :day="data.day" @menu="taskRightClick"
-                                            <<<<<<< HEAD :key="dates.day.toDateString() + project.id + mode"
-                                            type="week"=======:key="dates.day + project.id + mode" type="week">>>>>>>
-                                            ce235dd404d0cabb262d9957af4366d4e78ec57e
+                                            :key="dates.day + project.id + mode" type="week"
                                             @drop="onDrop" v-model:itemDrag="personDrag" @togglePerson="togglePerson"
                                             :dataRightClick />
                                     </div>
