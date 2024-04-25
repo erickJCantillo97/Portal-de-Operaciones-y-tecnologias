@@ -15,6 +15,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/programming/delete/{schedule}', [ProgrammingController::class, 'deleteSchedule'])->name('programming.delete');
 
     Route::get('actividadesDeultimonivel', [ProgrammingController::class, 'endNivelActivities'])->name('actividadesDeultimonivel');
+    
     Route::get('getProgrammingDate', [ProgrammingController::class, 'getProgrammingDate'])->name('get.programming.date');
 
     Route::get('scheduleTask', [ProgrammingController::class, 'getScheduleTask'])->name('get.schedule.task');
@@ -34,6 +35,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/programming/copy', [ProgrammingController::class, 'copyPaste'])->name('programming.copy');
 
     Route::post('/programming/removeAll', [ProgrammingController::class, 'removeAll'])->name('programming.removeAll');
+
+    Route::post('/programming/contractor', [ProgrammingController::class, 'getDataContractor'])->name('programming.contractor');
 
     Route::get('getScheduleTaskDate/{fecha}/{task}', [ProgrammingController::class, 'getSchedule'])->name('get.task.schedule.date');
 

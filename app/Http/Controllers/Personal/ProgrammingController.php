@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\Personal\PersonalScheduleDayJob;
 use App\Ldap\User;
 use App\Models\Gantt\Assignment;
+use App\Models\Personal\ContractorEmployee;
 use App\Models\Personal\Employee;
 use App\Models\Personal\ExtendedSchedule;
 use App\Models\Projects\Project;
@@ -791,5 +792,17 @@ class ProgrammingController extends Controller
             'project' => $this->getProject($date),
             'programming' => $this->getProgramming($date),
         ]);
+    }
+
+    
+    public function getDataContractor(){
+        try {
+            return response()->json([
+                'status' => true,
+                'data' => ContractorEmployee::select('id','contractor')->distinct()->get()
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['status' => false, 'mensaje' => $e->getMessage()]);
+        }
     }
 }
