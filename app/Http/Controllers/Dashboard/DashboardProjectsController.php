@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project\Operation;
+use App\Models\Project\Pep;
 use App\Models\Project\ProgressProjectWeek;
 use App\Models\Projects\Project;
 use App\Models\VirtualTask;
@@ -45,19 +46,29 @@ class DashboardProjectsController extends Controller
         $cpi = 0;
         $spi = 0;
 
+        $total_ejecutado = 0;
+        $cpiPonderado = 0;
+        $spiPonderado = 0;
+
+
         foreach ($semanas as $semana) {
+
             $progre =  ProgressProjectWeek::where('project_id', $semana->project_id)->where('week', $semana->week)->first();
-            $materials_ejecutados = Operation::where('project_id', $semana->project_id)->get()->sum('materials_ejecutados');
-
-            $labor_ejecutados = Operation::where('project_id', $semana->project_id)->get()->sum('labor_ejecutados');
-
-            $services_ejecutados = Operation::where('project_id', $semana->project_id)->get()->sum('services_ejecutados');
+            $o = Operation::where('project_id', $semana->project_id)->select(DB::raw('SUM(materials_ejecutados) as me'), DB::raw('SUM(labor_ejecutados) as le'), DB::raw('SUM(services_ejecutados) as se'))->first();
+            $p = Pep::where('project_id', $semana->project_id)->select(DB::raw('SUM(materials_ejecutados) as me'), DB::raw('SUM(labor_ejecutados) as le'), DB::raw('SUM(services_ejecutados) as se'))->first();
+            // return $o;
+            $total_ejecutado += ($o->me + $o->le + $o->se) + ($p->me + $p->le + $p->se);
+            $cpiPonderado += $progre->CPI * (($o->me + $o->le + $o->se) + ($p->me + $p->le + $p->se));
+            $spiPonderado += $progre->SPI * (($o->me + $o->le + $o->se) + ($p->me + $p->le + $p->se));
             $cpi += $progre->CPI;
             $spi += $progre->SPI;
         }
+
         return response()->json([
             'cpi' => $cpi / count($semanas),
             'spi' => $spi / count($semanas),
+            'spiPonderado' => $spiPonderado / $total_ejecutado,
+            'cpiPonderado' => $cpiPonderado / $total_ejecutado,
         ]);
     }
     public function getDataCPISPIPonderado()

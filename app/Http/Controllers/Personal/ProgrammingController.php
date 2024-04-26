@@ -71,7 +71,7 @@ class ProgrammingController extends Controller
 
     public function getProgrammingDate(Request $request)
     {
-        $date = Carbon::parse($request->fecha);
+        $date = Carbon::parse($request->date);
         $programmin = DetailScheduleTime::where('fecha', $date->format('Y-m-d'))
             ->orderBy('idproyecto')
             ->orderBy('idTask')
@@ -365,7 +365,7 @@ class ProgrammingController extends Controller
         try {
             DB::beginTransaction();
             $conflict = [];
-            $detailScheduleTime = DetailScheduleTime::where('idScheduleTime',$request->schedule_time)->first();
+            $detailScheduleTime = DetailScheduleTime::where('idScheduleTime', $request->schedule_time)->first();
             $task = VirtualTask::find(Schedule::find($detailScheduleTime->idSchedule)->task_id);
             $project = Project::find($task->project_id);
             if ($request->personalized) {
@@ -404,7 +404,7 @@ class ProgrammingController extends Controller
                     $ScheduleTime->hora_inicio = $request->startShift;
                     $ScheduleTime->hora_fin = $request->endShift;
                     $ScheduleTime->save();
-                } 
+                }
             }
             DB::commit();
             if (count($conflict) > 0) {
@@ -451,12 +451,14 @@ class ProgrammingController extends Controller
             }
             DB::commit();
             return response()->json(
-                ['status' => true, 
-                'mensaje' => $mensaje,
-                'task' => $request->actionType == 1 ?
-                 $this->getSchedule($detailScheduleTime->fecha, $detailScheduleTime->idTask) : 
-                 $this->getSchedule($schedule->fecha, $request->idTask)
-            ]);
+                [
+                    'status' => true,
+                    'mensaje' => $mensaje,
+                    'task' => $request->actionType == 1 ?
+                        $this->getSchedule($detailScheduleTime->fecha, $detailScheduleTime->idTask) :
+                        $this->getSchedule($schedule->fecha, $request->idTask)
+                ]
+            );
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json(['status' => true, 'mensaje' => 'Se ha generado un error: ' . $e->getMessage()]);
@@ -603,69 +605,69 @@ class ProgrammingController extends Controller
             $schedule = Schedule::find($request->schedule);
             $mensaje = 'Se ha movido de tarea a: ' . $schedule->name . '.';
             $scheduleTimes = DetailScheduleTime::where('idUsuario', $schedule->employee_id)
-            ->where('fecha',$request->date)->get();
-            foreach($scheduleTimes as $item){
-            $exist = DetailScheduleTime::where('fecha', $request->date)
-            ->where('idUsuario', $schedule->employee_id)
-            ->where(function ($query) use ($item) {
-                $query->where(function ($subquery) use ($item) {
-                    $subquery->whereTime('horaInicio', '<=', $item->horaInicio)
-                        ->whereTime('horaFin', '>=', $item->horaInicio);
-                })->orWhere(function ($subquery) use ($item) {
-                    $subquery->whereTime('horaInicio', '<=', $item->horaFin)
-                        ->whereTime('horaFin', '>=',  $item->horaFin);
-                })->orWhere(function ($subquery) use ($item) {
-                    $subquery->whereBetween('horaInicio', [$item->horaInicio, $item->horaFin])
-                        ->whereBetween('horaFin', [$item->horaInicio, $item->horaFin]);
-                });
-            })->get();
-            
-            if ($exist->count() > 0) {
-                if ($exist->count() == 1 && $exist[0]->fecha == Carbon::parse($schedule->fecha)->format('Y-m-d')) {
-                    $schedule = Schedule::find($request->schedule);
-                    Assignment::where('event', $schedule->task_id)
-                        ->where('resource', $schedule->employee_id)->delete();
-                    $schedule->task_id = $request->task;
-                    $schedule->save();
-                    //se agregan los recursos al cronograma.
-                    $employee = searchEmpleados('Num_SAP', $schedule->employee_id)->first();
+                ->where('fecha', $request->date)->get();
+            foreach ($scheduleTimes as $item) {
+                $exist = DetailScheduleTime::where('fecha', $request->date)
+                    ->where('idUsuario', $schedule->employee_id)
+                    ->where(function ($query) use ($item) {
+                        $query->where(function ($subquery) use ($item) {
+                            $subquery->whereTime('horaInicio', '<=', $item->horaInicio)
+                                ->whereTime('horaFin', '>=', $item->horaInicio);
+                        })->orWhere(function ($subquery) use ($item) {
+                            $subquery->whereTime('horaInicio', '<=', $item->horaFin)
+                                ->whereTime('horaFin', '>=',  $item->horaFin);
+                        })->orWhere(function ($subquery) use ($item) {
+                            $subquery->whereBetween('horaInicio', [$item->horaInicio, $item->horaFin])
+                                ->whereBetween('horaFin', [$item->horaInicio, $item->horaFin]);
+                        });
+                    })->get();
 
-                    Assignment::firstOrCreate([
-                        'event' => $request->task,
-                        'resource' => $schedule->employee_id,
-                        'units' => 100,
-                        'name' => $schedule->name,
-                        'costo_hora' => $employee->Costo_Hora
-                    ]);
+                if ($exist->count() > 0) {
+                    if ($exist->count() == 1 && $exist[0]->fecha == Carbon::parse($schedule->fecha)->format('Y-m-d')) {
+                        $schedule = Schedule::find($request->schedule);
+                        Assignment::where('event', $schedule->task_id)
+                            ->where('resource', $schedule->employee_id)->delete();
+                        $schedule->task_id = $request->task;
+                        $schedule->save();
+                        //se agregan los recursos al cronograma.
+                        $employee = searchEmpleados('Num_SAP', $schedule->employee_id)->first();
+
+                        Assignment::firstOrCreate([
+                            'event' => $request->task,
+                            'resource' => $schedule->employee_id,
+                            'units' => 100,
+                            'name' => $schedule->name,
+                            'costo_hora' => $employee->Costo_Hora
+                        ]);
+                    } else {
+                        $exist = collect($exist)->each(function ($DetailScheduleTime) {
+                            $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
+                        });
+                        $conflict[$schedule->fecha] = $exist;
+                        $mensaje = 'Se han generado colisiones al mover a: ' . $schedule->name . ' ';
+                        $status = false;
+                    }
                 } else {
-                    $exist = collect($exist)->each(function ($DetailScheduleTime) {
-                        $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
-                    });
-                    $conflict[$schedule->fecha] = $exist;
-                    $mensaje = 'Se han generado colisiones al mover a: ' . $schedule->name . ' ';
-                    $status = false;
-                }
-            } else {
 
-                $newSchedule = Schedule::firstOrCreate([
-                    'employee_id' => $schedule->employee_id,
-                    'name' => $schedule->name,
-                    'task_id' => $request->task,
-                    'fecha' => $request->date
-                ]);
-                $newSchedule->save();
-                $scheduleTimes = ScheduleTime::where('schedule_id', $request->schedule)->get();
-                foreach ($scheduleTimes as $scheduleTime) {
-                    ScheduleTime::firstOrCreate([
-                        'schedule_id' => $newSchedule->id,
-                        'hora_inicio' => $scheduleTime->hora_inicio,
-                        'hora_fin' => $scheduleTime->hora_fin,
+                    $newSchedule = Schedule::firstOrCreate([
+                        'employee_id' => $schedule->employee_id,
+                        'name' => $schedule->name,
+                        'task_id' => $request->task,
+                        'fecha' => $request->date
                     ]);
+                    $newSchedule->save();
+                    $scheduleTimes = ScheduleTime::where('schedule_id', $request->schedule)->get();
+                    foreach ($scheduleTimes as $scheduleTime) {
+                        ScheduleTime::firstOrCreate([
+                            'schedule_id' => $newSchedule->id,
+                            'hora_inicio' => $scheduleTime->hora_inicio,
+                            'hora_fin' => $scheduleTime->hora_fin,
+                        ]);
+                    }
+                    Assignment::where('resource', $schedule->employee_id)->where('event', '=', $schedule->task_id)->delete();
+                    ScheduleTime::where('schedule_id', $schedule->id)->delete();
+                    $schedule->delete();
                 }
-                Assignment::where('resource', $schedule->employee_id)->where('event', '=', $schedule->task_id)->delete();
-                ScheduleTime::where('schedule_id', $schedule->id)->delete();
-                $schedule->delete();
-            }
             }
             DB::commit();
             return response()->json([
@@ -702,41 +704,41 @@ class ProgrammingController extends Controller
             }
             foreach ($data as $item) {
                 $exist = DetailScheduleTime::where('fecha', $request->newDate)
-                ->where('idUsuario', $item->idUsuario)
-                ->where(function ($query) use ($item) {
-                    $query->where(function ($subquery) use ($item) {
-                        $subquery->whereTime('horaInicio', '<=', $item->horaInicio)
-                            ->whereTime('horaFin', '>=', $item->horaInicio);
-                    })->orWhere(function ($subquery) use ($item) {
-                        $subquery->whereTime('horaInicio', '<=', $item->horaFin)
-                            ->whereTime('horaFin', '>=',  $item->horaFin);
-                    })->orWhere(function ($subquery) use ($item) {
-                        $subquery->whereBetween('horaInicio', [$item->horaInicio, $item->horaFin])
-                            ->whereBetween('horaFin', [$item->horaInicio, $item->horaFin]);
-                    });
-                })->get();
-                
+                    ->where('idUsuario', $item->idUsuario)
+                    ->where(function ($query) use ($item) {
+                        $query->where(function ($subquery) use ($item) {
+                            $subquery->whereTime('horaInicio', '<=', $item->horaInicio)
+                                ->whereTime('horaFin', '>=', $item->horaInicio);
+                        })->orWhere(function ($subquery) use ($item) {
+                            $subquery->whereTime('horaInicio', '<=', $item->horaFin)
+                                ->whereTime('horaFin', '>=',  $item->horaFin);
+                        })->orWhere(function ($subquery) use ($item) {
+                            $subquery->whereBetween('horaInicio', [$item->horaInicio, $item->horaFin])
+                                ->whereBetween('horaFin', [$item->horaInicio, $item->horaFin]);
+                        });
+                    })->get();
+
                 if ($exist->count() > 0) {
                     $exist = $exist->each(function ($DetailScheduleTime) {
                         $DetailScheduleTime->taskDetails = VirtualTask::find($DetailScheduleTime->idTask);
                     });
                     $conflict[$request->date] = $exist;
                     $status = false;
-                }else{
-                $employee = searchEmpleados('Num_SAP', $item->idUsuario)->first();
-                programming(
-                    Carbon::parse($request->newDate)->format('Y-m-d'),
-                    $item->idUsuario,
-                    $item->horaInicio,
-                    $item->horaFin,
-                    $request->newTask,
-                    $item->nombre,
-                    $employee->Costo_Hora
-                );
-                if ($request->cut) {
-                    disprogramming($item->idSchedule);
+                } else {
+                    $employee = searchEmpleados('Num_SAP', $item->idUsuario)->first();
+                    programming(
+                        Carbon::parse($request->newDate)->format('Y-m-d'),
+                        $item->idUsuario,
+                        $item->horaInicio,
+                        $item->horaFin,
+                        $request->newTask,
+                        $item->nombre,
+                        $employee->Costo_Hora
+                    );
+                    if ($request->cut) {
+                        disprogramming($item->idSchedule);
+                    }
                 }
-            }
             }
             DB::commit();
             return response()->json([
