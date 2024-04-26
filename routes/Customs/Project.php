@@ -37,7 +37,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::post('/syncGantt/{project}', [ScheduleController::class, 'sync'])->name('syncGantt');
 
-    Route::post('/schedule/beforeSync', [ScheduleController::class, 'beforeSync'])->name('before.sync');
+    Route::post('/schedule/beforeSync/{project}', [ScheduleController::class, 'beforeSync'])->name('before.sync');
 
     Route::post('/Schedule/assignmentCalendar', [ScheduleController::class, 'assignmentCalendar'])->name('assignment.calendar');
 

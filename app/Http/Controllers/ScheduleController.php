@@ -127,7 +127,7 @@ class ScheduleController extends Controller
         }
     }
 
-    public function beforeSync (Request $request){
+    public function beforeSync (Request $request, Project $project){
         try {
             DB::beginTransaction();
             DB::commit();
