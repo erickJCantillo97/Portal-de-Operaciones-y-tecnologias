@@ -19,7 +19,9 @@ class Task extends Model implements Auditable
         'manuallyScheduled' => 'boolean',
     ];
 
-    protected $appends = ['children'];
+    protected $appends = ['children'
+   // , 'calendar_id'
+];
 
     protected $guarded = [];
 
@@ -38,6 +40,10 @@ class Task extends Model implements Auditable
 
         return  strpos($this->name, 'EJECUCION') !== false ? 'green' : '';
     }
+    // public function getCalendarIdAttribute()
+    // {
+    //     return  64;
+    // }
     public function executor(): Attribute
     {
         return Attribute::make(
@@ -45,6 +51,7 @@ class Task extends Model implements Auditable
             get: fn ($value) => json_decode($value),
         );
     }
+    
     
     public function manager(): Attribute
     {

@@ -127,6 +127,17 @@ class ScheduleController extends Controller
         }
     }
 
+    public function beforeSync (Request $request){
+        try {
+            DB::beginTransaction();
+            DB::commit();
+            return response()->json(['status' => true, 'mensaje' => 'Calendario asignado al proyecto correctamente']);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => false, 'mensaje' => $e->getMessage()]);
+        }
+    }
+
     public function sync(Project $project, Request $request)
     {
         $complete = true;
