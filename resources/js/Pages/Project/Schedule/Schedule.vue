@@ -552,7 +552,7 @@ const taskTooltip = ref({
     }
 })
 const criticalPaths = ref({
-    disabled: false
+    disabled: true
 })
 //#endregion
 
@@ -583,6 +583,7 @@ const project = ref(
                 // setTimeout(() => { location.reload() }, 3000);
             },
             beforeSync: (data) => {
+                console.log(data)
                 loading.value = true
             },
             sync: (e) => {
@@ -634,7 +635,7 @@ const ganttConfig = ref({
                     // } else {
                     //     return true
                     // }
-                }else{
+                } else {
                     return 'No se puede programar recursos en esta actividad'
                 }
             },
@@ -954,6 +955,7 @@ const uploadMSP = async (file) => {
             // Import the uploaded mpp-file data (will make a new project and assign it to the gantt)
             await importer.importData(parsedJson.data);
             // destroy old project
+            // console.log(parsedJson.data)
             project.destroy();
             // set the view start date to the loaded project start
             ganttImport.setStartDate(ganttImport.project.startDate);
@@ -1003,10 +1005,23 @@ const importMSP = async () => {
             },
         }
     })
-    Object.assign(ganttImport.project, project.value)
-    await ganttImport.project.sync()
-    await gantt.project.load()
-    modalImport.value = false
+    // Object.assign(ganttImport.project, project.value)
+
+    // await ganttImport.project.sync()
+    // await gantt.project.load()
+    const dataImport = JSON.parse(JSON.stringify(ganttImport.project))
+    const projectImport = dataImport.project
+    const calendarImport = dataImport.calendarsData.find((calendar) => { return calendar.id === projectImport.calendar })
+    await axios.post(route('before.sync', props.project), { project: projectImport, calendar: calendarImport })
+        .then((res) => {
+            console.log(res)
+            toast.add({ text: 'Ha fallado correctamente', severity: 'info', group: 'customToast', life: 3000 });
+        }).catch((error) => {
+            toast.add({ text: 'Lastima, no se hizo', severity: 'error', group: 'customToast', life: 3000 });
+        })
+    console.log(projectImport)
+    console.log(calendarImport)
+    // modalImport.value = false
     loadImport.value = false
 }
 
@@ -1072,22 +1087,22 @@ const newCalendar = () => {
     calendarCreate.value = false;
     formCalendar.value.newCalendar = true;
 }
-const submit = async  () => {
+const submit = async () => {
     loadSaveCalendar.value = true;
-     let gantt = ganttref.value.instance.value
+    let gantt = ganttref.value.instance.value
     console.log(formCalendar.value);
     let error = false;
     if (formCalendar.value.newCalendar) {
         if (formCalendar.value.name == '') {
             toast.add({
-                    severity: 'error',
-                    group: 'customToast',
-                    text: 'Debe ingresar el nombre del calendario',
-                    life: 2000
-                });
+                severity: 'error',
+                group: 'customToast',
+                text: 'Debe ingresar el nombre del calendario',
+                life: 2000
+            });
 
-                error = true;
-        }else if(formCalendar.value.days == []){
+            error = true;
+        } else if (formCalendar.value.days == []) {
             toast.add({
                 severity: 'error',
                 group: 'customToast',
@@ -1115,9 +1130,9 @@ const submit = async  () => {
             error = true;
         }
     }
-    if(!error){
+    if (!error) {
         loadSaveCalendar.value = true;
-        await axios.post(route('assignment.calendar'), formCalendar.value).then((res)=>{
+        await axios.post(route('assignment.calendar'), formCalendar.value).then((res) => {
             console.log(res.data);
             if (res.data.status) {
                 toast.add({
@@ -1137,7 +1152,7 @@ const submit = async  () => {
                     life: 4000
                 })
             }
-        }).catch((e)=>{
+        }).catch((e) => {
             console.log(e);
             toast.add({
                 severity: 'error',
@@ -1146,8 +1161,8 @@ const submit = async  () => {
                 life: 4000
             })
         })
-    }else{
-        
+    } else {
+
         loadSaveCalendar.value = false;
     }
 }
