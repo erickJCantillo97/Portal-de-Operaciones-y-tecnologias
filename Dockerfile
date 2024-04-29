@@ -8,7 +8,7 @@ USER root
 
 
 # Actualizar el archivo de locales para incluir UTF-8 y ISO-8859-15
-RUN apt-get update && apt-get install -y locales
+RUN apt-get update && apt-get install -y locales-all
 
 # Generar los locales
 RUN locale-gen
@@ -21,8 +21,6 @@ ENV LC_ALL=en_US.UTF-8
 # Ejecutar el comando locale-gen
 RUN locale-gen en_US.UTF-8
 
-# Configurar el archivo /etc/locale.conf
-RUN echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
 # Ejecutar el comando dpkg-reconfigure locales
 RUN dpkg-reconfigure locales
