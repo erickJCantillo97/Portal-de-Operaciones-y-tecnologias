@@ -8,7 +8,7 @@ USER root
 
 
 # Actualizar el archivo de locales para incluir UTF-8 y ISO-8859-15
-RUN apt-get update && apt-get install -y locales-all
+RUN apt-get update && apt-get install -y locales && apt-get install -y locales-all
 
 # Generar los locales
 RUN locale-gen
