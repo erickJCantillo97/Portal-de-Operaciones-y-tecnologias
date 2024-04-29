@@ -79,26 +79,27 @@ class ScheduleController extends Controller
                 'costo_hora' => '$ ' . number_format($cargo->costo_hora, 0),
             ];
         })->toArray();
-        $defaultCalendar = Calendar::find($project->calendar_id ?? 1);
         $recursos = array_merge_recursive($cargos, $personal);
         $projectCalendars = DetailProjectWithCalendar::where('project_id', $project->id);
-        if ($projectCalendars) {
-            $calendarInterval = $projectCalendars->select('calendarId', 'name')->distinct()->get()->map(function ($calendar) {
+            $calendarInterval = $projectCalendars->select('calendarId', 'name')->distinct()->get()->map(function ($calendar) use($project) {
                 return [
-                    'id' => $calendar->calendarId,
+                    'id' => intval($calendar->calendarId),
                     'name' => $calendar->name,
+                    'unspecifiedTimeIsWorking' => $calendar->unspecifiedTimeIsWorking == "1" ? true:false,
                     'intervals' => CalendarInterval::where('calendar_id', $calendar->calendarId)->get()->map(function ($interval) {
                         if ($interval->recurrentStartDate) {
                             return [
                                 'recurrentStartDate' => $interval->recurrentStartDate,
                                 'recurrentEndDate'   => $interval->recurrentEndDate,
-                                'isWorking'          => $interval->isWorking == "1" ? true : false
+                                'priority' => 20,
+                                'isWorking'          => $interval->isWorking == "1" ? true : false 
                             ];
                         }
                         return [
                             'startDate' => $interval->startDate,
                             'endDate'   => $interval->endDate,
-                            'isWorking'          => $interval->isWorking == "1" ? true : false
+                            'priority' => 30,
+                            'isWorking'          => $interval->isWorking == "1" ?   true : false
                         ];
                     })->toArray()
                 ];
@@ -106,11 +107,12 @@ class ScheduleController extends Controller
             return response()->json([
                 'success' => true,
                 'project' =>  [
-                    'calendar' => $defaultCalendar == null ? '' : $defaultCalendar->id, // calendario por defecto
-                    'startDate' => $project->startDate,
-                    'hoursPerDay' => $project->hoursPerDay,
-                    'daysPerWeek' => $project->daysPerWeek,
-                    'daysPerMonth' => $project->daysPerMonth
+                    'calendar' => intval($project->calendar_id), // calendario por defecto
+                    'startDate' => doubleval($project->startDate),
+                    'hoursPerDay' => doubleval($project->hoursPerDay),
+                    'daysPerWeek' => doubleval($project->daysPerWeek),
+                    'daysPerMonth' => doubleval($project->daysPerMonth),
+                    'durationUnit'=>'day'
 
                 ],
                 'calendars' => [
@@ -124,14 +126,40 @@ class ScheduleController extends Controller
                 'shift' => Shift::whereNull('user')->select('id', 'name')->get()->toArray(),
                 'assignCalendar' => Calendar::all()->select('id', 'name')->toArray()
             ]);
-        }
+        
     }
 
     public function beforeSync (Request $request, Project $project){
         try {
             DB::beginTransaction();
+                $calendarSave = Calendar::firstOrCreate([
+                    'expanded' => $request->calendar['expanded'],
+                    'version' => $request->calendar['version'],
+                    'name' => $request->calendar['name'],
+                    'unspecifiedTimeIsWorking' => $request->calendar['unspecifiedTimeIsWorking'],
+                ]);
+                $calendarSave->save();
+                if (isset($request->calendar['intervals'])) {
+                    foreach ($request->calendar['intervals'] as $intervals) {
+                        CalendarInterval::firstOrCreate([
+                            'calendar_id' => $calendarSave->id,
+                            'isWorking' => $intervals['isWorking'],
+                            'priority' => $intervals['priority'],
+                            'recurrentStartDate' => isset($intervals['recurrentStartDate']) == true ?  $intervals['recurrentStartDate'] : '',
+                            'recurrentEndDate' => isset($intervals['recurrentEndDate'])  == true ? $intervals['recurrentEndDate'] : '',
+                            'startDate' => isset($intervals['startDate']) == true ? Carbon::parse($intervals['startDate'])->format('Y-m-d H:i') : null,
+                            'endDate' => isset($intervals['endDate']) == true ? Carbon::parse($intervals['endDate'])->format('Y-m-d H:i') : null
+                        ]);
+                    }
+            }
+            ProjectWithCalendar::firstOrCreate([
+                'project_id' => $project->id,
+                'calendar_id' => $calendarSave->id
+            ]);
+            $project->calendar_id = $calendarSave->id;
+            $project->save();
             DB::commit();
-            return response()->json(['status' => true, 'mensaje' => 'Calendario asignado al proyecto correctamente']);
+            return response()->json(['status' => true, 'mensaje' => 'Calendario asignado al proyecto correctamente', 'calendarId'=>$calendarSave->id]);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json(['status' => false, 'mensaje' => $e->getMessage()]);
@@ -397,16 +425,7 @@ class ScheduleController extends Controller
                 'rows' => $rowsDependecy,
                 'removed' => $removedDependecy,
             ],
-            'project' => [
-                'calendar' => $project->id,
-                'startDate' => $project->startDate,
-                'hoursPerDay' => 9,
-                'daysPerWeek' => 6,
-                'daysPerMonth' => 24
-            ],
-            'calendars' => [
-                'rows' => $calendars
-            ]
+            
         ]);
     }
 
