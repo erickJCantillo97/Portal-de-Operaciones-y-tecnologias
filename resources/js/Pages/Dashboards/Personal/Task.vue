@@ -1,6 +1,6 @@
 <template>
     <div class="grid grid-cols-3 gap-6  p-2 ">
-        <div class="border-red-500 border h-full shadow-md shadow-danger rounded-lg p-4">
+        <div class="h-full shadow-sm bg-red-50 shadow-danger rounded-2xl p-4">
             <div class="w-full flex justify-between">
                 <h1 class="font-extrabold text-danger">Tareas Pendientes </h1>
                 <h1 class="font-extrabold text-danger">{{ pending.length }} / {{ (pending.length + inProcess.length +
@@ -74,7 +74,6 @@
             </draggable>
         </div>
     </div>
-
 </template>
 <script setup>
 import axios from "axios";

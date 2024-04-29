@@ -10,7 +10,14 @@ WORKDIR /var/www/html
 RUN yes | pecl install ${XDEBUG_VERSION} \
     && docker-php-ext-enable xdebug
 
+RUN apt-get update && apt-get install -y locales && apt-get clean
+RUN locale-gen es_ES 
+RUN docker-php-ext-install gettext
+
+RUN locale-gen es_ES.UTF-8 && dpkg-reconfigure locales
+
 RUN apt update && apt install -y default-jre
+
 
 RUN apt update; \
     apt install -y libmagickwand-dev; \
