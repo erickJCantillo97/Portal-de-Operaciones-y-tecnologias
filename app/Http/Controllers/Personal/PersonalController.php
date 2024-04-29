@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Personal;
 use App\Http\Controllers\Controller;
 use App\Ldap\User;
 use App\Models\Labor;
+use App\Models\Personal\Employee;
 use App\Models\Personal\Personal;
 use App\Models\Personal\Team;
 use App\Models\Personal\WorkingTeams;
@@ -117,7 +118,7 @@ class PersonalController extends Controller
     public function getPersonalActivo(Request $request)
     {
         //Validar para usuario de tipo administrador, puedan ver todo el personal cotecmar
-        $personal = getPersonalGerenciaOficina(auth()->user()->gerencia)->values()->map(function ($person) {
+        $personal = Employee::get()->map(function ($person) {
             return [
                 'Num_SAP' => (int) $person['Num_SAP'],
                 'Fecha_Final' => $person['Fecha_Final'],

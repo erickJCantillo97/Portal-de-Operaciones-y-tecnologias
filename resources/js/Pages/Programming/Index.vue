@@ -1,16 +1,15 @@
 <script setup>
-import { Link, router } from '@inertiajs/vue3'
+const { format_ES_Date, formatDateTime24h } = useCommonUtilities()
+import { Link } from '@inertiajs/vue3'
 import { ref, computed, onMounted } from 'vue'
+import { useCommonUtilities } from "@/composable/useCommonUtilities"
 import AppLayout from '@/Layouts/AppLayout.vue'
-import DivisionsByProject from '@/Pages/Programming/DivisionsByProject.vue'
+import CounterUp from '@/Components/sections/CounterUp.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
+import DivisionsByProject from '@/Pages/Programming/DivisionsByProject.vue'
 import Knob from 'primevue/knob'
-import axios from 'axios'
-import CounterUp from '@/Components/sections/CounterUp.vue'
-import { useCommonUtilities } from "@/composable/useCommonUtilities"
-const { format_ES_Date, formatDateTime24h } = useCommonUtilities()
 
 import { useToast } from "primevue/usetoast"
 
@@ -23,7 +22,7 @@ const props = defineProps({
 const loading = ref(false)
 const date = ref(new Date())
 const project = ref()
-const programming = ref([])
+const programmin = ref([])
 const selectedTaskId = ref(null)
 const editMode = ref(false)
 const disabled = computed(() => selectedTaskId.value !== null && editMode.value)

@@ -343,13 +343,14 @@ class ProgrammingController extends Controller
 
     public function getTimesSchedulesEmployee(Request $request)
     {
-        $date = Carbon::parse($request->date)->format('Y-m-d');
-        $schedulesIds = Schedule::where('fecha', $date)->with('scheduleTimes')->where('employee_id', $request->employee_id)->pluck('id')->toArray();
+        $employee = $request->employee_id ?? auth()->user()->num_sap;
+        $date = Carbon::parse($request->date ?? Carbon::now())->format('Y-m-d');
+        $schedulesIds = Schedule::where('fecha', $date)->with('scheduleTimes')->where('employee_id', $employee)->pluck('id')->toArray();
         $times = ScheduleTime::whereIn('schedule_id', $schedulesIds)->with('schedule', 'schedule.task', 'schedule.task.project')->get()->map(function ($time) use ($date) {
             return [
                 'id' => $time['id'],
-                'start' => $date . 'T' . Carbon::parse($time['hora_inicio'])->format('H:i:s'),
-                'end' => $date . 'T' . Carbon::parse($time['hora_fin'])->format('H:i:s'),
+                'start' => Carbon::parse($time['hora_inicio'])->format('d/m/Y H:i'),
+                'end' => Carbon::parse($time['hora_fin'])->format('d/m/Y H:i:'),
                 'title' => $time['schedule']['task']['name'] . ' - (' . $time['schedule']['task']['project']['name'] . ')',
                 'project' => $time['schedule']['task']['project']['name'],
             ];
@@ -501,7 +502,7 @@ class ProgrammingController extends Controller
 
         $date = Carbon::parse($request->date);
 
-        if ($date->isSaturday() || $date->isSunday()) {
+        if ($date->isSunday()) {
             return response()->json(
                 ExtendedSchedule::has('project')->has('task')->where('project_id', $project->id)
                     // ->where('executor', 'LIKE', '%' . auth()->user()->oficina . '%')
@@ -794,12 +795,13 @@ class ProgrammingController extends Controller
         ]);
     }
 
-    
-    public function getDataContractor(){
+
+    public function getDataContractor()
+    {
         try {
             return response()->json([
                 'status' => true,
-                'data' => ContractorEmployee::select('id','contractor')->distinct()->get()
+                'data' => ContractorEmployee::select('id', 'contractor')->distinct()->get()
             ]);
         } catch (Exception $e) {
             return response()->json(['status' => false, 'mensaje' => $e->getMessage()]);

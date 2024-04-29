@@ -1006,25 +1006,19 @@ const importMSP = async () => {
         }
     }
     Object.assign(ganttImport.project, project)
-    console.log(ganttImport.project)
+
     const dataImport = JSON.parse(JSON.stringify(ganttImport.project))
     const projectImport = dataImport.project
     const calendarImport = dataImport.calendarsData.find((calendar) => { return calendar.id === projectImport.calendar })
-    // await axios.post(route('before.sync', props.project), { project: projectImport, calendar: calendarImport })
-    //     .then(async (res) => {
-    //         if (res.data.status) {
-    //             await ganttImport.project.sync()
-    //             await gantt.project.load()
-    //             toast.add({ text: 'Bien! Importado con exito.', severity: 'info', group: 'customToast', life: 3000 });
-    //         } else {
-    //             console.log(res)
-    //             toast.add({ text: 'Lastima, no se hizo', severity: 'error', group: 'customToast', life: 3000 });
-    //         }
-
-    //     }).catch(async (error) => {
-    //         console.log(error)
-    //         toast.add({ text: 'Lastima, no se hizo', severity: 'error', group: 'customToast', life: 3000 });
-    //     })
+    await axios.post(route('before.sync', props.project), { project: projectImport, calendar: calendarImport })
+        .then(async (res) => {
+            console.log(res)
+            await ganttImport.project.sync()
+            await gantt.project.load()
+            toast.add({ text: 'Ha fallado correctamente', severity: 'info', group: 'customToast', life: 3000 });
+        })
+    console.log(projectImport)
+    console.log(calendarImport)
     modalImport.value = false
     loadImport.value = false
 }
@@ -1091,6 +1085,10 @@ const toggleCalendar = (event) => {
 const newCalendar = () => {
     calendarCreate.value = false;
     formCalendar.value.newCalendar = true;
+}
+const reload = () =>{
+    let gantt = ganttref.value.instance.value
+    gantt.project.load();
 }
 const submit = async () => {
     loadSaveCalendar.value = true;
@@ -1234,6 +1232,8 @@ const submit = async () => {
                         icon="fa-solid fa-upload" @click="modalImport = true" />
                     <Button raised v-tooltip.bottom="'Ruta critica'" severity="danger"
                         icon="fa-solid fa-circle-exclamation" @click="showCritical()" />
+                    <Button raised v-tooltip.bottom="'Recargar Cronograma'" severity="success"
+                    v-if="!readOnly"  icon="fa-solid fa-arrows-rotate" @click="reload" />
                 </span>
                 <span class="flex space-x-1">
                     <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"

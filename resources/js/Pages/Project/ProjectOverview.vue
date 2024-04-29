@@ -367,8 +367,8 @@ td {
                         <span class="font-bold white-space-nowrap">{{ index + 1 }}. {{ ship.name }}</span>
                         <div class="flex justify-start space-x-2">
                           <Tag v-tooltip.bottom="'Numero de Casco'" :value="ship.idHull" severity="info"></Tag>
-                          <Tag v-tooltip.bottom="'Clase'" :value="ship.type_ship.name" severity="success"></Tag>
-                          <Tag v-tooltip.bottom="'Tipo de Buque'" :value="ship.type_ship.type" severity="primary"></Tag>
+                          <Tag v-tooltip.bottom="'Clase'" :value="ship.type_ship.nombre" severity="success"></Tag>
+                          <Tag v-tooltip.bottom="'Tipo de Buque'" :value="ship.type" severity="primary"></Tag>
                         </div>
                       </div>
                     </template>

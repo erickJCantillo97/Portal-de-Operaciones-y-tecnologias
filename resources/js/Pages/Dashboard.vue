@@ -4,6 +4,7 @@ import Planning from "@/Pages/Dashboards/Projects/Planning.vue"
 import QuotesCard from "@/Pages/Dashboards/Quotes/QuotesCards.vue"
 import UserHeader from "@/Components/sections/UserHeader.vue"
 import Quotes from "./Dashboards/Quotes.vue";
+import Task from "./Dashboards/Personal/Task.vue";
 import WareHouse from "./Dashboards/WareHouse.vue";
 
 const props = defineProps({
@@ -44,10 +45,12 @@ const props = defineProps({
                     </div>
                 </div>
             </div> -->
-            <Quotes v-if="$page.props.auth.user.oficina !== 'DEPPC'" />
+            <!-- <Quotes v-if="$page.props.auth.user.oficina !== 'DEPPC'" />
             <Planning v-if="$page.props.auth.user.oficina != 'DEPPC'" :projects="props.projects" />
-            <!-- <Tools v-if="hasPermission('tool edit')" :projects="props.projects" /> -->
-            <Planning v-if="$page.props.auth.user.oficina == 'DEPPC'" :projects="props.projects" />
+             <Tools v-if="hasPermission('tool edit')" :projects="props.projects" />
+            <Planning v-if="$page.props.auth.user.oficina == 'DEPPC'" :projects="props.projects" /> -->
+
+            <Task></Task>
 
             <!-- <Tools v-if="hasPermission('tool edit')" :projects="props.projects" /> -->
             <!-- <Projects v-else /> -->
