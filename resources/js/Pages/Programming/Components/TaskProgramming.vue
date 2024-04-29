@@ -24,9 +24,9 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    dataRightClick:{
-        type:Object,
-        default:{}
+    dataRightClick: {
+        type: Object,
+        default: {}
     }
 })
 

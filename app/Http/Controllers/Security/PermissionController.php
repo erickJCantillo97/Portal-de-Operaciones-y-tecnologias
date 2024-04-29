@@ -27,12 +27,12 @@ class PermissionController extends Controller
                 'cargo' => $user['cargo'],
                 'gerencia' => $user['gerencia'],
                 'roles' => count($roles) == 0 ? ["Sin rol"] :  collect($roles)->map(function ($role) {
-                    return explode('%TOP%', $role)[0];
+                    return $role;
                 }),
                 'rolesObj' => collect($user['roles'])->map(function ($role) {
                     return [
                         'id' => $role['id'],
-                        'name' => explode('%TOP%', $role['name'])[0]
+                        'name' => $role['name']
                     ];
                 }),
             ];
@@ -41,7 +41,7 @@ class PermissionController extends Controller
         $roles = Role::with('permissions')->get()->map(function ($r) {
             return [
                 'id' => $r['id'],
-                'name' => explode('%TOP%', $r['name'])[0],
+                'name' =>  $r['name'],
                 'description' => $r['description'],
                 'users' => User::role($r['name'])->get(),
                 'permissions' => $r['permissions']
