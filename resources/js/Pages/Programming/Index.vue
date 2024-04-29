@@ -23,7 +23,7 @@ const props = defineProps({
 const loading = ref(false)
 const date = ref(new Date())
 const project = ref()
-const programming = ref([])
+const programmin = ref([])
 const selectedTaskId = ref(null)
 const editMode = ref(false)
 const disabled = computed(() => selectedTaskId.value !== null && editMode.value)

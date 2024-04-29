@@ -225,7 +225,20 @@ class ProjectController extends Controller
     {
         try {
             $ships_ids = ProjectsShip::where('project_id', $project->id)->pluck('ship_id')->toArray();
-            $ships = Ship::with('typeShip')->whereIn('id', $ships_ids)->get();
+            $ships = Ship::with('typeShip')->whereIn('id', $ships_ids)->get()->map(function ($ship) {
+                return [
+                    'name' => $ship->name,
+                    'idHull' => $ship->idHull,
+                    'type' => $ship->typeShip->type,
+                    'type_ship' => [
+                        'nombre' => $ship->typeShip->name,
+                        'tipo buque' => $ship->typeShip->type,
+                        'file' => $ship->typeShip->file,
+                    ]
+
+                    // $ship->typeShip,
+                ];
+            });
             $semana = ProgressProjectWeek::where('project_id', $project->id)->orderBy('real_progress', 'DESC')->first();
             $week = Carbon::now()->weekOfYear;
             $year = Carbon::now()->format('y');

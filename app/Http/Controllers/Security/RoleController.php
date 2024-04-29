@@ -55,7 +55,7 @@ class RoleController extends Controller
             'role' => 'required'
         ]);
         try {
-            $role = $request->role . '%TOP%' . auth()->user()->gerencia;
+            $role = $request->role;
             $user->assignRole($role);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error: ' . $e);
@@ -68,7 +68,7 @@ class RoleController extends Controller
             'role' => 'required'
         ]);
         try {
-            $role = $request->role . '%TOP%' . auth()->user()->gerencia;
+            $role = $request->role;
             $user->removeRole($role);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error: ' . $e);
@@ -97,7 +97,7 @@ class RoleController extends Controller
     {
         $validateData = $request->validate(
             [
-                'name' => 'required|unique:roles,name,'.$role->id,
+                'name' => 'required|unique:roles,name,' . $role->id,
                 'description' => 'required',
             ]
         );
