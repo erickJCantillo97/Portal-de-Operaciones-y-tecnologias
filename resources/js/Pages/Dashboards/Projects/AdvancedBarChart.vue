@@ -36,7 +36,7 @@ const option = ref({
   },
   legend: {
     orient: 'horizontal',
-    height: '5%',
+    height: '100%',
   },
   tooltip: {
     axisPointer: {
@@ -61,7 +61,7 @@ const option = ref({
     })
   },
   grid: {
-    left: '1%',
+    left: '100%',
     right: '1%',
     bottom: '3%',
     containLabel: true
@@ -91,7 +91,7 @@ const option = ref({
 </script>
 <style scoped>
 .chart {
-  height: 300px;
+  height: 400px;
   width: 100%;
 }
 </style>

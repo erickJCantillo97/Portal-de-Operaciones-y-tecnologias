@@ -11,7 +11,7 @@
         "@tailwindcss/typography": "^0.5.2",
         "@vitejs/plugin-vue": "^5.0.4",
         "autoprefixer": "^10.4.7",
-        "axios": "^1.6.7",
+        "axios": "^1.6.8",
         "laravel-vite-plugin": "^1.0.1",
         "postcss": "^8.4.14",
         "sass": "^1.69.7",
@@ -58,6 +58,8 @@
         "vue-height-collapsible": "^0.1.1",
         "vue3-apexcharts": "^1.4.4",
         "vue3-chat-scroll": "^0.2.0",
-        "vue3-form-wizard": "^0.2.1"
+        "vue3-draggable": "^2.0.9",
+        "vue3-form-wizard": "^0.2.1",
+        "vuedraggable": "^4.1.0"
     }
 }

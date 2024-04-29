@@ -28,7 +28,7 @@ class RequirementController extends Controller
             'proyecto' => $requirement->project->name,
             'bloque' => $requirement->bloque,
             'grupo' => $requirement->sistema_grupo,
-            'dibujante' => $requirement->user->short_name,
+            'dibujante' => $requirement->user->short_name ?? '',
             'estado' => $requirement->estado,
             'fecha' => Carbon::parse($requirement->preeliminar_date)->format('d-m-Y'),
             'nota' => $requirement->note,
@@ -39,11 +39,11 @@ class RequirementController extends Controller
         //  dd($request->all());
         $projects = Project::active()->get();
         $requirements = [];
-        if (auth()->user()->hasRole('Super intendente de Materiales' . '%TOP%' . auth()->user()->gerencia)) {
+        if (auth()->user()->hasRole('Super intendente de Materiales')) {
             $requirements = Requirement::has('project')->with('project', 'user')->get()->map(function ($requirement) {
                 return $this->getAttributesRequiremnts($requirement);
             });
-        } else if (auth()->user()->hasRole('ADMIN DIPR' . '%TOP%' . auth()->user()->gerencia)) {
+        } else if (auth()->user()->hasRole('ADMIN DIPR')) {
             $requirements = Requirement::has('project')->with('project', 'user')->whereNull('oficial_date')->get()->map(function ($requirement) {
                 return $this->getAttributesRequiremnts($requirement);
             });

@@ -116,7 +116,7 @@ const openModalRol = (r) => {
 const saveRol = () => {
     rol.transform((data) => ({
         ...data,
-        name: data.name + '%TOP%' + usePage().props.auth.user.gerencia
+        name: data.name
     })
     ).post(route('roles.store'), {
         onSuccess: (s) => {
@@ -132,7 +132,7 @@ const saveRol = () => {
 const updateRol = () => {
     rol.transform((data) => ({
         ...data,
-        name: data.name + '%TOP%' + usePage().props.auth.user.gerencia
+        name: data.name
     }))
     rol.put(route('roles.update', rol.id), {
         onSuccess: (s) => {
@@ -205,7 +205,7 @@ const permissionModal = ref(false)
                 <div>
 
                     <Button label="Nuevo Permiso" icon="fa fa-plus" @click="permissionModal = true"
-                        v-if="$page.props.auth.user.id == 2" />
+                        v-if="$page.props.auth.user.username == 'ecantillo'" />
                 </div>
             </div>
             <div class="grid grid-cols-4 gap-8 m-4">
