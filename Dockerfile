@@ -14,12 +14,12 @@ RUN apt-get update && apt-get install -y locales && apt-get install -y locales-a
 RUN locale-gen
 
 # Configurar el locale
-ENV LANG=en_US.UTF-8
-ENV LANGUAGE=en_US.UTF-8
-ENV LC_ALL=en_US.UTF-8
+ENV LANG=es_CO.UTF-8
+ENV LANGUAGE=es_CO.UTF-8
+ENV LC_ALL=es_CO.UTF-8
 
 # Ejecutar el comando locale-gen
-RUN locale-gen en_US.UTF-8
+RUN locale-gen es_CO.UTF-8
 
 
 # Ejecutar el comando dpkg-reconfigure locales
