@@ -13,8 +13,8 @@ WORKDIR /var/www/html
 RUN yes | pecl install ${XDEBUG_VERSION} \
     && docker-php-ext-enable xdebug
 
-RUN apt-get update && apt-get install -y locales && apt-get clean
-RUN locale-gen es_ES es_ES.UTF-8
+RUN apt-get update && apt-get install -y locales && apt-get install language-pack-es
+RUN locale-gen es_CO es_CO.UTF-8
 
 RUN dpkg-reconfigure locales
 
