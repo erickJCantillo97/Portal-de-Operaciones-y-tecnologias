@@ -6,26 +6,28 @@ ENV TZ=America/Bogota
 ENV LANG=POSIX
 USER root
 
-WORKDIR /var/www/html
 
 # Actualizar el archivo de locales para incluir UTF-8 y ISO-8859-15
-RUN sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen \
-    && sed -i 's/# es_CO.UTF-8 UTF-8/es_CO.UTF-8 UTF-8/' /etc/locale.gen \
-    && sed -i 's/# en_US ISO-8859-1/en_US ISO-8859-15/' /etc/locale.gen \
-    && sed -i 's/# es_CO ISO-8859-1/es_CO ISO-8859-15/' /etc/locale.gen
-
-# Instalar los paquetes de idioma necesarios
-RUN apt-get update && apt-get install -y locales locales-all
+RUN apt-get update && apt-get install -y locales
 
 # Generar los locales
-RUN locale-gen en_US.UTF-8 es_CO.UTF-8 en_US.ISO-8859-15 es_CO.ISO-8859-15
+RUN locale-gen
 
-# Establecer el locale predeterminado
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
+# Configurar el locale
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
 
+# Ejecutar el comando locale-gen
+RUN locale-gen en_US.UTF-8
 
+# Configurar el archivo /etc/locale.conf
+RUN echo "LANG=en_US.UTF-8" > /etc/locale.conf
+
+# Ejecutar el comando dpkg-reconfigure locales
+RUN dpkg-reconfigure locales
+
+WORKDIR /var/www/html
 
 RUN yes | pecl install ${XDEBUG_VERSION} \
     && docker-php-ext-enable xdebug
