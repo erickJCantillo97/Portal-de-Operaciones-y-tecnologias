@@ -52,7 +52,7 @@ try {
 
     $json = shell_exec($shell_command);
     // echo 'llega a json'.$json.' fin json';
-    $jsonencode = mb_convert_encoding($json, 'UTF-8', 'ISO-8859-1');
+    $jsonencode = mb_convert_encoding($json, 'UTF-8', 'ISO-8859-15');
 
     // dd();
 
@@ -61,7 +61,7 @@ try {
     // echo 'llega a decoded ' . $decoded . ' fin decoded';
     if (!$json || !$decoded) {
         unlink($move_path);
-        throw new Exception('Could n ot process uploaded file!<br>Command: ' . $shell_command);
+        throw new Exception('Could not process uploaded file!<br>Command: ' . $shell_command);
     }
     // cleanup copied file
     unlink($move_path);
