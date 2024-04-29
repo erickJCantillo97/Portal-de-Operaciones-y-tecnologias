@@ -1,19 +1,16 @@
 <script setup>
-import { Link, router } from '@inertiajs/vue3'
+const { format_ES_Date, formatDateTime24h } = useCommonUtilities()
+import { Link } from '@inertiajs/vue3'
 import { ref, computed, onMounted } from 'vue'
+import { useCommonUtilities } from "@/composable/useCommonUtilities"
+import { useToast } from "primevue/usetoast"
 import AppLayout from '@/Layouts/AppLayout.vue'
-import DivisionsByProject from '@/Pages/Programming/DivisionsByProject.vue'
+import CounterUp from '@/Components/sections/CounterUp.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
+import DivisionsByProject from '@/Pages/Programming/DivisionsByProject.vue'
 import Knob from 'primevue/knob'
-
-import { useCommonUtilities } from "@/composable/useCommonUtilities"
-const { format_ES_Date, formatDateTime24h } = useCommonUtilities()
-
-import { useToast } from "primevue/usetoast"
-import axios from 'axios'
-import CounterUp from '@/Components/sections/CounterUp.vue'
 const toast = useToast()
 
 const props = defineProps({
@@ -46,7 +43,7 @@ const getProgramming = async () => {
     await axios.get(route('get.programming.date', { date: date.value }))
         .then(res => {
             programming.value = res.data.programming
-            contarPersonasPorProyecto(programmin.value)
+            contarPersonasPorProyecto(programming.value)
         })
 }
 
@@ -153,9 +150,9 @@ const url = [
                 </div>
             </div>
             <div class="flex my-4 px-4 w-full space-x-4 overflow-x-auto cursor-default sm:w-1/3 snap-x snap-mandatory">
-                <CounterUp :label="project.idProyecto" :value="project.cantidadPersonas" v-for="project in contador">
-                </CounterUp>
+                <CounterUp :label="project.idProyecto" :value="project.cantidadPersonas" v-for="project in contador" />
             </div>
+
             <!-- <DivisionsByProject :projects /> -->
 
             <div class="w-full h-full overflow-y-auto">
