@@ -3,6 +3,7 @@
 FROM php:8.2.0-apache
 ARG XDEBUG_VERSION="xdebug-3.3.1"
 ENV TZ=America/Bogota
+ENV LANG=POSIX
 USER root
 
 
@@ -10,16 +11,6 @@ WORKDIR /var/www/html
 
 RUN yes | pecl install ${XDEBUG_VERSION} \
     && docker-php-ext-enable xdebug
-
-RUN apt-get update && apt-get install -y locales
-RUN locale-gen es_CO es_CO.UTF-8
-
-RUN dpkg-reconfigure locales
-
-RUN locale -a
-
-RUN export LC_ALL=es_CO.UTF-8
-RUN export LC_CTYPE=es_CO.UTF-8
 
 RUN docker-php-ext-install gettext
 
