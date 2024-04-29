@@ -20,6 +20,7 @@ ENV LC_ALL=es_CO.UTF-8
 
 # Ejecutar el comando locale-gen
 RUN locale-gen es_CO.UTF-8
+RUN locale-gen es_CO.ISO-8859-15
 
 
 # Ejecutar el comando dpkg-reconfigure locales
