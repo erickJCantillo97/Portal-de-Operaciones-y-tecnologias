@@ -5,6 +5,7 @@ ARG XDEBUG_VERSION="xdebug-3.3.1"
 ENV TZ=America/Bogota
 USER root
 ENV LANGUAGE=es_CO
+ENV LC_ALL=es_CO.UTF-8
 ENV LANG=es_CO.UTF-8
 
 WORKDIR /var/www/html
