@@ -76,7 +76,7 @@ export function useCommonUtilities() {
             currency,
             maximumFractionDigits: 0,
         }).format(parseInt(value));
-        return formattedValue.replace(/\s/g, " "); // Elimina los espacios en blanco
+        return formattedValue; // Elimina los espacios en blanco
     };
 
     /**
