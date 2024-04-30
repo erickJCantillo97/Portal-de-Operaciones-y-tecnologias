@@ -12,8 +12,6 @@ import CustomModal from '@/Components/CustomModal.vue'
 import DivisionsByProject from '@/Pages/Programming/DivisionsByProject.vue'
 import Knob from 'primevue/knob'
 
-import { useToast } from "primevue/usetoast"
-
 const toast = useToast()
 
 const props = defineProps({
