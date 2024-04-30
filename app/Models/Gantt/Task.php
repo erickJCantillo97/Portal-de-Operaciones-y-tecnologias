@@ -3,6 +3,7 @@
 namespace App\Models\Gantt;
 
 use App\Models\Projects\Project;
+use App\Models\Gantt\Segment;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,15 +20,17 @@ class Task extends Model implements Auditable
         'manuallyScheduled' => 'boolean',
     ];
 
-    protected $appends = ['children'
-   // , 'calendar_id'
-];
+    protected $appends = ['children','segments'];
 
     protected $guarded = [];
 
     public function getChildrenAttribute()
     {
         return Task::where('task_id', '=', $this->id)->orderBy('parentIndex')->get();
+    }
+
+    public function getSegmentsAttribute(){
+        return Segment::where('task_id', '=', $this->id)->get();
     }
 
     public function project()

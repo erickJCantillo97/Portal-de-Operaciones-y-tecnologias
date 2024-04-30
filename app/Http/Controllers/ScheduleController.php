@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Gantt\Assignment;
 use App\Models\Gantt\Dependecy;
+use App\Models\Gantt\Segment;
 use App\Models\Gantt\Task;
 use App\Models\Labor;
 use App\Models\Projects\Calendar;
@@ -221,6 +222,7 @@ class ScheduleController extends Controller
             }
         }
         if (isset($request->tasks['updated'])) {
+            
             foreach ($request->tasks['updated'] as $task) {
                 $taskUpdate = Task::where('id', $task['id'])->first();
 
@@ -236,7 +238,28 @@ class ScheduleController extends Controller
                     'manager' => $task['manager'] ?? $taskUpdate->manager,
                     'manuallyScheduled' => $task['manuallyScheduled'] ?? $taskUpdate->manuallyScheduled,
                     'parentIndex' => $task['parentIndex'] ?? intval($taskUpdate->parentIndex),
+                    'note' => $task['note'] ?? $taskUpdate->note
                 ]);
+                if(isset($task['segments'])){
+                   if(isset($task['id'])){
+                    Segment::where('task_id',$task['id'])->delete();
+                   }
+                    foreach($task['segments'] as $segment){
+                        Segment::firstOrCreate([
+                            'calendar_id' =>  $segment['calendar'],
+                            'cls' =>  $segment['cls'],
+                            'direction' =>  $segment['direction'],
+                            'duration' =>  $segment['duration'],
+                            'durationUnit' =>  $segment['durationUnit'],
+                            'endDate' =>  $segment['endDate'],
+                            'manuallyScheduled' =>  $segment['manuallyScheduled'],
+                            'name' =>  $segment['name'],
+                            'startDate' =>  $segment['startDate'],
+                            'unscheduled' =>  $segment['unscheduled'],
+                            'task_id' => $taskUpdate->id
+                        ]);
+                    }
+                }
             }
         }
         if (isset($request->tasks['removed'])) {
