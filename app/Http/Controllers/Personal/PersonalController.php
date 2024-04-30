@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Personal;
 
+use App\Exports\personalExport;
 use App\Http\Controllers\Controller;
 use App\Ldap\User;
 use App\Models\Labor;
@@ -16,6 +17,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PersonalController extends Controller
 {
@@ -118,7 +120,7 @@ class PersonalController extends Controller
     public function getPersonalActivo(Request $request)
     {
         //Validar para usuario de tipo administrador, puedan ver todo el personal cotecmar
-        $personal = Employee::get()->map(function ($person) {
+        $personal = Employee::where('Gerencia', auth()->user()->gerencia)->get()->map(function ($person) {
             return [
                 'Num_SAP' => (int) $person['Num_SAP'],
                 'Fecha_Final' => $person['Fecha_Final'],
@@ -261,5 +263,10 @@ class PersonalController extends Controller
             'programados' => $scheduleComplete,
             'noProgramados' => $scheduleNotComplete
         ]);
+    }
+
+    public function export()
+    {
+        return Excel::download(new personalExport, 'personal.xlsx');
     }
 }

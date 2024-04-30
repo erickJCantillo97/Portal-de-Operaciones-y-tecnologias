@@ -15,7 +15,7 @@ class MaterialRequirementController extends Controller
      */
     public function index(Requirement $requirement)
     {
-        $materials = MaterialRequirement::with('material', 'requirement')->where('requirement_id', $requirement->id)->orderBy('material_id')->get()->map(function ($m) {
+        $materials = MaterialRequirement::has('material',)->with('material', 'requirement')->where('requirement_id', $requirement->id)->orderBy('material_id')->get()->map(function ($m) {
             return [
                 'id' => $m['id'],
                 'material' => $m['material']['description'],

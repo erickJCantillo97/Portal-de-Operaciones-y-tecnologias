@@ -345,16 +345,16 @@ class ProgrammingController extends Controller
     {
         $employee = $request->employee_id ?? auth()->user()->num_sap;
         $date = Carbon::parse($request->date ?? Carbon::now())->format('Y-m-d');
-        $schedulesIds = Schedule::where('fecha', $date)->with('scheduleTimes')->where('employee_id', $employee)->pluck('id')->toArray();
-        $times = ScheduleTime::whereIn('schedule_id', $schedulesIds)->with('schedule', 'schedule.task', 'schedule.task.project')->get()->map(function ($time) use ($date) {
+        $times = DetailScheduleTime::where('fecha', $date)->where('idUsuario', $employee)->get()->map(function ($time) use ($date) {
             return [
-                'id' => $time['id'],
-                'start' => Carbon::parse($time['hora_inicio'])->format('d/m/Y H:i'),
-                'end' => Carbon::parse($time['hora_fin'])->format('d/m/Y H:i:'),
-                'title' => $time['schedule']['task']['name'] . ' - (' . $time['schedule']['task']['project']['name'] . ')',
-                'project' => $time['schedule']['task']['project']['name'],
+                'id' => $time['idScheduleTime'],
+                'start' => Carbon::parse($time['horaInicio'])->format('H:i'),
+                'end' => Carbon::parse($time['horaFin'])->format('H:i:'),
+                'title' => $time['nombreTask'],
+                'project' => $time['NombreProyecto'],
             ];
         });
+
 
         return response()->json([
             'times' => $times,
