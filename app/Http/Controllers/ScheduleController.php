@@ -55,11 +55,36 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function import(Project $project, Request $request)
+    private function importException($code)
     {
-        return Inertia::render('GanttImporter', [
-            'project' => $project
-        ]);
+        switch ($code) {
+            case UPLOAD_ERR_INI_SIZE:
+                return 'The uploaded file exceeds the maximum allowed size';
+            case UPLOAD_ERR_FORM_SIZE:
+                return 'The uploaded file exceeds the maximum allowed size that was specified in the HTML form';
+            case UPLOAD_ERR_PARTIAL:
+                return 'The uploaded file was only partially uploaded';
+            case UPLOAD_ERR_NO_FILE:
+                return 'No file was uploaded';
+            case UPLOAD_ERR_NO_TMP_DIR:
+                return 'Missing a temporary folder';
+            case UPLOAD_ERR_CANT_WRITE:
+                return 'Failed to write file to disk';
+            case UPLOAD_ERR_EXTENSION:
+                return 'File upload stopped by extension';
+        }
+        return 'Unknown upload error';
+    }
+
+
+    public function import(Request $request)
+    {
+        $jar_path = ('modImport/projectreader/target/bryntum-project-reader-6.1.22.jar');
+            $shell_command = 'java -jar ' . escapeshellarg($jar_path) . ' ' . escapeshellarg($request->mppFile->getPathName()) . ' 1';
+
+            $json = shell_exec($shell_command);
+            $json=utf8_encode($json);
+        return $json;
     }
 
     public function get(Project $project)
@@ -81,76 +106,76 @@ class ScheduleController extends Controller
         })->toArray();
         $recursos = array_merge_recursive($cargos, $personal);
         $projectCalendars = DetailProjectWithCalendar::where('project_id', $project->id);
-            $calendarInterval = $projectCalendars->select('calendarId', 'name')->distinct()->get()->map(function ($calendar) use($project) {
-                return [
-                    'id' => intval($calendar->calendarId),
-                    'name' => $calendar->name,
-                    'unspecifiedTimeIsWorking' => $calendar->unspecifiedTimeIsWorking == "1" ? true:false,
-                    'intervals' => CalendarInterval::where('calendar_id', $calendar->calendarId)->get()->map(function ($interval) {
-                        if ($interval->recurrentStartDate) {
-                            return [
-                                'recurrentStartDate' => $interval->recurrentStartDate,
-                                'recurrentEndDate'   => $interval->recurrentEndDate,
-                                'priority' => 20,
-                                'isWorking'          => $interval->isWorking == "1" ? true : false 
-                            ];
-                        }
+        $calendarInterval = $projectCalendars->select('calendarId', 'name')->distinct()->get()->map(function ($calendar) use ($project) {
+            return [
+                'id' => intval($calendar->calendarId),
+                'name' => $calendar->name,
+                'unspecifiedTimeIsWorking' => $calendar->unspecifiedTimeIsWorking == "1" ? true : false,
+                'intervals' => CalendarInterval::where('calendar_id', $calendar->calendarId)->get()->map(function ($interval) {
+                    if ($interval->recurrentStartDate) {
                         return [
-                            'startDate' => $interval->startDate,
-                            'endDate'   => $interval->endDate,
-                            'priority' => 30,
-                            'isWorking'          => $interval->isWorking == "1" ?   true : false
+                            'recurrentStartDate' => $interval->recurrentStartDate,
+                            'recurrentEndDate'   => $interval->recurrentEndDate,
+                            'priority' => 20,
+                            'isWorking'          => $interval->isWorking == "1" ? true : false
                         ];
-                    })->toArray()
-                ];
-            })->toArray();
-            return response()->json([
-                'success' => true,
-                'project' =>  [
-                    'calendar' => intval($project->calendar_id), // calendario por defecto
-                    'startDate' => doubleval($project->startDate),
-                    'hoursPerDay' => doubleval($project->hoursPerDay),
-                    'daysPerWeek' => doubleval($project->daysPerWeek),
-                    'daysPerMonth' => doubleval($project->daysPerMonth),
-                    'durationUnit'=>'day'
+                    }
+                    return [
+                        'startDate' => $interval->startDate,
+                        'endDate'   => $interval->endDate,
+                        'priority' => 30,
+                        'isWorking'          => $interval->isWorking == "1" ?   true : false
+                    ];
+                })->toArray()
+            ];
+        })->toArray();
+        return response()->json([
+            'success' => true,
+            'project' =>  [
+                'calendar' => intval($project->calendar_id), // calendario por defecto
+                'startDate' => doubleval($project->startDate),
+                'hoursPerDay' => doubleval($project->hoursPerDay),
+                'daysPerWeek' => doubleval($project->daysPerWeek),
+                'daysPerMonth' => doubleval($project->daysPerMonth),
+                'durationUnit' => 'day'
 
-                ],
-                'calendars' => [
-                    "rows" => $calendarInterval
-                ],
-                'tasks' => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
-                'dependencies' => ['rows' => Dependecy::get()],
-                'resources' => ['rows' => $recursos],
-                'assignments' => ['rows' => Assignment::get()],
-                'timeRanges' => ['rows' => []],
-                'shift' => Shift::whereNull('user')->select('id', 'name')->get()->toArray(),
-                'assignCalendar' => Calendar::all()->select('id', 'name')->toArray()
-            ]);
-        
+            ],
+            'calendars' => [
+                "rows" => $calendarInterval
+            ],
+            'tasks' => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
+            'dependencies' => ['rows' => Dependecy::get()],
+            'resources' => ['rows' => $recursos],
+            'assignments' => ['rows' => Assignment::get()],
+            'timeRanges' => ['rows' => []],
+            'shift' => Shift::whereNull('user')->select('id', 'name')->get()->toArray(),
+            'assignCalendar' => Calendar::all()->select('id', 'name')->toArray()
+        ]);
     }
 
-    public function beforeSync (Request $request, Project $project){
+    public function beforeSync(Request $request, Project $project)
+    {
         try {
             DB::beginTransaction();
-                $calendarSave = Calendar::firstOrCreate([
-                    'expanded' => $request->calendar['expanded'],
-                    'version' => $request->calendar['version'],
-                    'name' => $request->calendar['name'],
-                    'unspecifiedTimeIsWorking' => $request->calendar['unspecifiedTimeIsWorking'],
-                ]);
-                $calendarSave->save();
-                if (isset($request->calendar['intervals'])) {
-                    foreach ($request->calendar['intervals'] as $intervals) {
-                        CalendarInterval::firstOrCreate([
-                            'calendar_id' => $calendarSave->id,
-                            'isWorking' => $intervals['isWorking'],
-                            'priority' => $intervals['priority'],
-                            'recurrentStartDate' => isset($intervals['recurrentStartDate']) == true ?  $intervals['recurrentStartDate'] : '',
-                            'recurrentEndDate' => isset($intervals['recurrentEndDate'])  == true ? $intervals['recurrentEndDate'] : '',
-                            'startDate' => isset($intervals['startDate']) == true ? Carbon::parse($intervals['startDate'])->format('Y-m-d H:i') : null,
-                            'endDate' => isset($intervals['endDate']) == true ? Carbon::parse($intervals['endDate'])->format('Y-m-d H:i') : null
-                        ]);
-                    }
+            $calendarSave = Calendar::firstOrCreate([
+                'expanded' => $request->calendar['expanded'],
+                'version' => $request->calendar['version'],
+                'name' => $request->calendar['name'],
+                'unspecifiedTimeIsWorking' => $request->calendar['unspecifiedTimeIsWorking'],
+            ]);
+            $calendarSave->save();
+            if (isset($request->calendar['intervals'])) {
+                foreach ($request->calendar['intervals'] as $intervals) {
+                    CalendarInterval::firstOrCreate([
+                        'calendar_id' => $calendarSave->id,
+                        'isWorking' => $intervals['isWorking'],
+                        'priority' => $intervals['priority'],
+                        'recurrentStartDate' => isset($intervals['recurrentStartDate']) == true ?  $intervals['recurrentStartDate'] : '',
+                        'recurrentEndDate' => isset($intervals['recurrentEndDate'])  == true ? $intervals['recurrentEndDate'] : '',
+                        'startDate' => isset($intervals['startDate']) == true ? Carbon::parse($intervals['startDate'])->format('Y-m-d H:i') : null,
+                        'endDate' => isset($intervals['endDate']) == true ? Carbon::parse($intervals['endDate'])->format('Y-m-d H:i') : null
+                    ]);
+                }
             }
             ProjectWithCalendar::firstOrCreate([
                 'project_id' => $project->id,
@@ -159,7 +184,7 @@ class ScheduleController extends Controller
             $project->calendar_id = $calendarSave->id;
             $project->save();
             DB::commit();
-            return response()->json(['status' => true, 'mensaje' => 'Calendario asignado al proyecto correctamente', 'calendarId'=>$calendarSave->id]);
+            return response()->json(['status' => true, 'mensaje' => 'Calendario asignado al proyecto correctamente', 'calendarId' => $calendarSave->id]);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json(['status' => false, 'mensaje' => $e->getMessage()]);
@@ -425,7 +450,7 @@ class ScheduleController extends Controller
                 'rows' => $rowsDependecy,
                 'removed' => $removedDependecy,
             ],
-            
+
         ]);
     }
 
