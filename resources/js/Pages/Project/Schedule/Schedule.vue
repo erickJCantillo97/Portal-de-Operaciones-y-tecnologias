@@ -956,7 +956,7 @@ const uploadMSP = async (file) => {
                 project.destroy();
                 ganttImport.setStartDate(ganttImport.project.startDate);
                 await ganttImport.scrollToDate(ganttImport.project.startDate, { block: 'start' });
-                
+                btnImport.value=false
             }else{
                 console.log(res)
                 toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
