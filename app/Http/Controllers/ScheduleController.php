@@ -106,51 +106,52 @@ class ScheduleController extends Controller
         })->toArray();
         $recursos = array_merge_recursive($cargos, $personal);
         $projectCalendars = DetailProjectWithCalendar::where('project_id', $project->id);
-        $calendarInterval = $projectCalendars->select('calendarId', 'name')->distinct()->get()->map(function ($calendar) use ($project) {
-            return [
-                'id' => intval($calendar->calendarId),
-                'name' => $calendar->name,
-                'unspecifiedTimeIsWorking' => $calendar->unspecifiedTimeIsWorking == "1" ? true : false,
-                'intervals' => CalendarInterval::where('calendar_id', $calendar->calendarId)->get()->map(function ($interval) {
-                    if ($interval->recurrentStartDate) {
+            $calendarInterval = $projectCalendars->select('calendarId', 'name')->distinct()->get()->map(function ($calendar) use($project) {
+                return [
+                    'id' => intval($calendar->calendarId),
+                    'name' => $calendar->name,
+                    'unspecifiedTimeIsWorking' => $calendar->unspecifiedTimeIsWorking == "1" ? true:false,
+                    'intervals' => CalendarInterval::where('calendar_id', $calendar->calendarId)->get()->map(function ($interval) {
+                        if ($interval->recurrentStartDate) {
+                            return [
+                                'recurrentStartDate' => $interval->recurrentStartDate,
+                                'recurrentEndDate'   => $interval->recurrentEndDate,
+                                'priority' => 20,
+                                'isWorking' => $interval->isWorking == "1" ? true : false 
+                            ];
+                        }
                         return [
-                            'recurrentStartDate' => $interval->recurrentStartDate,
-                            'recurrentEndDate'   => $interval->recurrentEndDate,
-                            'priority' => 20,
-                            'isWorking'          => $interval->isWorking == "1" ? true : false
+                            'startDate' => $interval->startDate,
+                            'endDate'   => $interval->endDate,
+                            'priority' => 30,
+                            'isWorking'  => $interval->isWorking == "1" ?   true : false
                         ];
-                    }
-                    return [
-                        'startDate' => $interval->startDate,
-                        'endDate'   => $interval->endDate,
-                        'priority' => 30,
-                        'isWorking'          => $interval->isWorking == "1" ?   true : false
-                    ];
-                })->toArray()
-            ];
-        })->toArray();
-        return response()->json([
-            'success' => true,
-            'project' =>  [
-                'calendar' => intval($project->calendar_id), // calendario por defecto
-                'startDate' => doubleval($project->startDate),
-                'hoursPerDay' => doubleval($project->hoursPerDay),
-                'daysPerWeek' => doubleval($project->daysPerWeek),
-                'daysPerMonth' => doubleval($project->daysPerMonth),
-                'durationUnit' => 'day'
+                    })->toArray()
+                ];
+            })->toArray();
+            return response()->json([
+                'success' => true,
+                'project' =>  [
+                    'calendar' => intval($project->calendar_id), // calendario por defecto
+                    'startDate' => doubleval($project->startDate),
+                    'hoursPerDay' => doubleval($project->hoursPerDay),
+                    'daysPerWeek' => doubleval($project->daysPerWeek),
+                    'daysPerMonth' => doubleval($project->daysPerMonth),
+                    'durationUnit'=>'day'
 
-            ],
-            'calendars' => [
-                "rows" => $calendarInterval
-            ],
-            'tasks' => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
-            'dependencies' => ['rows' => Dependecy::get()],
-            'resources' => ['rows' => $recursos],
-            'assignments' => ['rows' => Assignment::get()],
-            'timeRanges' => ['rows' => []],
-            'shift' => Shift::whereNull('user')->select('id', 'name')->get()->toArray(),
-            'assignCalendar' => Calendar::all()->select('id', 'name')->toArray()
-        ]);
+                ],
+                'calendars' => [
+                    "rows" => $calendarInterval
+                ],
+                'tasks' => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->orderBy('parentIndex')->get()],
+                'dependencies' => ['rows' => Dependecy::get()],
+                'resources' => ['rows' => $recursos],
+                'assignments' => ['rows' => Assignment::get()],
+                'timeRanges' => ['rows' => []],
+                'shift' => Shift::whereNull('user')->select('id', 'name')->get()->toArray(),
+                'assignCalendar' => Calendar::all()->select('id', 'name')->toArray()
+            ]);
+        
     }
 
     public function beforeSync(Request $request, Project $project)
@@ -228,7 +229,8 @@ class ScheduleController extends Controller
                     'durationUnit' => $task['durationUnit'],
                     'startDate' => $task['startDate'],
                     'endDate' => $task['endDate'],
-                    'manuallyScheduled' => $task['manuallyScheduled']
+                    'manuallyScheduled' => $task['manuallyScheduled'],
+                    'parentIndex' => intval($task['parentIndex'])
                 ]);
                 array_push($rows, [
                     '$PhantomId' => $task['$PhantomId'],
@@ -252,6 +254,7 @@ class ScheduleController extends Controller
                     'executor' => $task['executor'] ?? $taskUpdate->executor,
                     'manager' => $task['manager'] ?? $taskUpdate->manager,
                     'manuallyScheduled' => $task['manuallyScheduled'] ?? $taskUpdate->manuallyScheduled,
+                    'parentIndex' => $task['parentIndex'] ?? intval($taskUpdate->parentIndex),
                 ]);
             }
         }

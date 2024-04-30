@@ -27,7 +27,7 @@ class Task extends Model implements Auditable
 
     public function getChildrenAttribute()
     {
-        return Task::where('task_id', '=', $this->id)->get();
+        return Task::where('task_id', '=', $this->id)->orderBy('parentIndex')->get();
     }
 
     public function project()
