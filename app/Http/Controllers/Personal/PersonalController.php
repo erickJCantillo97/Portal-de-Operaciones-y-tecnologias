@@ -120,7 +120,7 @@ class PersonalController extends Controller
     public function getPersonalActivo(Request $request)
     {
         //Validar para usuario de tipo administrador, puedan ver todo el personal cotecmar
-        $personal = Employee::get()->map(function ($person) {
+        $personal = Employee::where('Gerencia', auth()->user()->gerencia)->get()->map(function ($person) {
             return [
                 'Num_SAP' => (int) $person['Num_SAP'],
                 'Fecha_Final' => $person['Fecha_Final'],

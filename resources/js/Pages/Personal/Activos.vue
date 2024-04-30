@@ -25,9 +25,9 @@ const columnas = [
     { field: 'Nombres_Apellidos', header: 'Nombre', filter: true },
     { field: 'Cargo', header: 'cargo' },
     { field: 'Oficina', header: 'Departamento' },
-    { field: 'Fecha_Final', header: 'Fin Contrato' },
-    { field: 'Costo_Hora', header: 'Costo hora' },
-    { field: 'Costo_Mes', header: 'Costo Mes' },
+    { field: 'Fecha_Final', header: 'Fin Contrato', type: 'date' },
+    { field: 'Costo_Hora', header: 'Costo hora', type: 'currency' },
+    { field: 'Costo_Mes', header: 'Costo Mes', type: 'currency' },
 ]
 
 const url = [
