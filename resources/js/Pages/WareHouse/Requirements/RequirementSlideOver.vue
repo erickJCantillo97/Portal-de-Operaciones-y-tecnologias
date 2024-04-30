@@ -11,6 +11,7 @@ import Badge from 'primevue/badge'
 import DescriptionItem from '@/Components/DescriptionItem.vue'
 import ListBox from 'primevue/listbox'
 import Loading from '@/Components/Loading.vue'
+import CustomInput from '@/Components/CustomInput.vue';
 
 const { emit } = defineEmits(['closeSlideOver'])
 
@@ -26,7 +27,11 @@ const props = defineProps({
   },
 
 })
+const approving = ref(false)
 
+const approve = () => {
+
+}
 const materials = ref([])
 
 const getMaterial = async () => {
@@ -130,10 +135,9 @@ const optionStatus = {
                     <Button v-tooltip.top="'Imprimir'" size="small" icon="pi pi-file-pdf" raised severity="danger" />
                     </Link>
 
-                    <Link :href="'#'">
-                    <Button v-tooltip.top="'Aprobar'" size="small" icon="pi pi-check-circle" severity="success"
+                    <Button v-tooltip.top="'Aprobar'" size="small" @click="approving = !approving"
+                      icon="pi pi-check-circle" severity="success"
                       v-if="hasPermission('aprobar requerimientos') && requirement.estado != 'Aprobado Gerencia'" />
-                    </Link>
 
                     <!--Botón Rechazar-->
                     <Link :href="'#'">
@@ -164,6 +168,14 @@ const optionStatus = {
                     </Link>
 
                   </div>
+                  <div v-if="approving" class="space-y-4  p-2 border rounded-lg mx-2">
+                    <CustomInput type="date" class="w-full" />
+                    <div class="flex space-x-4">
+                      <Button class="w-full" label="Aprobar" icon="pi pi-save" severity="success" />
+                      <Button class="w-full" label="Cancelar" icon="fa fa-circle-xmark" @click="approving = !approving"
+                        severity="danger" />
+                    </div>
+                  </div>
                   <article class="w-full p-2">
                     <div class=" border border-solid rounded-lg p-2 mb-2">
                       <!-- {{ requirement }} -->
@@ -182,8 +194,8 @@ const optionStatus = {
                         </div>
                         <div class="shadow-md my-4 px-2 h-full" v-for="material in materials">
                           <Accordion :pt="{
-                            content: '!h-[80vh] !p-2 !overflow-y-auto'
-                          }">
+    content: '!h-[80vh] !p-2 !overflow-y-auto'
+  }">
                             <AccordionTab :activeIndex="0">
                               <template #header>
                                 <span class="flex align-items-center gap-2 w-full">

@@ -13,7 +13,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class BudgetImport implements ToCollection,  WithHeadingRow, WithChunkReading, ShouldQueue
+class BudgetImport implements ToCollection,  WithHeadingRow, WithChunkReading
 {
     public $proyecto;
 
@@ -27,21 +27,6 @@ class BudgetImport implements ToCollection,  WithHeadingRow, WithChunkReading, S
      */
     public function collection(Collection $rows)
     {
-        // foreach ($rows as $row) {
-        //     $tool = Tool::firstorNew([
-        //         'code' => $row['code'],
-        //     ]);
-        //     $tool->serial => $row['serial'];
-        //     $tool->responsible_id = $row['responsible_id'];
-        //     $tool->category_id = $row['category_id'];
-        //     $tool->gerencia = $row['gerencia'];
-        //     $tool->value = $row['value'];
-        //     $tool->brand = $row['brand'];
-        //     $tool->estado = $row['estado'];
-        //     $tool->estado_operativo = $row['estado_operativo'];
-        //     $tool->save();
-        // }
-        // dd($rows[0]);
         Validator::make($rows->toArray(), [
             '*.presupuesto_materiales' => 'nullable|numeric',
             '*.presupuesto_mdo' => 'nullable|numeric',
@@ -62,8 +47,6 @@ class BudgetImport implements ToCollection,  WithHeadingRow, WithChunkReading, S
                 $pep->labor =  $row['presupuesto_mdo'] ?? 0;
                 $pep->services =  $row['presupuesto_servicios'] ?? 0;
                 $pep->save();
-
-                // dd($pep);
             }
         }
     }

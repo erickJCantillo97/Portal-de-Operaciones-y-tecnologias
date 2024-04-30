@@ -11,8 +11,8 @@ class UserObserver
      */
     public function created(User $user): void
     {
-        
-        $user->assignRole('Super Admin');
+        if ($user->gerencia == 'GEMAM')
+            $user->assignRole('ADMIN PPC GEMAM');
         redirect('dashboard');
     }
 

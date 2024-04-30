@@ -150,7 +150,7 @@ class RequirementController extends Controller
     public function manageRequirements(Request $request)
     {
         // dd($request->all());
-        $materials = MaterialRequirement::with('material', 'requirement')->whereIn('requirement_id', $request->requirements)->orderBy('material_id')->get();
+        $materials = MaterialRequirement::has('material')->with('material', 'requirement')->whereIn('requirement_id', $request->requirements)->orderBy('material_id')->get();
 
         return Inertia::render('WareHouse/Requirements/Form', [
             'materials' => $materials,
@@ -188,6 +188,14 @@ class RequirementController extends Controller
                     'code' => $material['codigo_material'],
                 ]);
             } else {
+                $m = MaterialRequirement::create([
+                    'requirement_id' => $material['material']['requirement_id'],
+                    'material_id' => $material['material']['material_id'],
+                    'count' => $material['cantidad'],
+                    'status' => $material['estado'],
+                    'unit' =>  $material['unidad'],
+                    'observation' => $material['observacion'],
+                ]);
             }
         }
         Requirement::find($request['materiales'][0]['material']['requirement_id'])->update([
