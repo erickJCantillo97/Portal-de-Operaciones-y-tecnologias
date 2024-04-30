@@ -1231,9 +1231,10 @@ const submit = async () => {
                         icon="fa-solid fa-arrows-rotate" @click="reload" />
 
                     <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange"
-                        placeholder="Buscar por fecha" class="hidden sm:flex !h-8 shadow-md" showIcon :pt="{ input: '!h-8' }" />
+                        placeholder="Buscar por fecha" class="hidden sm:flex !h-8 shadow-md" showIcon
+                        :pt="{ input: '!h-8' }" />
                     <InputText v-model="texto" @input="onFilterChange" placeholder="Buscar por actividad"
-                        class="shadow-md hidden sm:flex"  />
+                        class="shadow-md hidden sm:flex" />
                 </div>
                 <div class="flex gap-1">
                     <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"
