@@ -948,24 +948,24 @@ const uploadMSP = async (file) => {
     ganttImport.maskBody('Importando, espere por favor ...');
 
     try {
-        await axios.post(route('ganttImporter'),formData)
-        .then(async(res)=>{
-            if (res.status==200){
-                const { project } = ganttImport;
-                await importer.importData(res.data);
-                project.destroy();
-                ganttImport.setStartDate(ganttImport.project.startDate);
-                await ganttImport.scrollToDate(ganttImport.project.startDate, { block: 'start' });
-                btnImport.value=false
-            }else{
-                console.log(res)
+        await axios.post(route('ganttImporter'), formData)
+            .then(async (res) => {
+                if (res.status == 200) {
+                    const { project } = ganttImport;
+                    await importer.importData(res.data);
+                    project.destroy();
+                    ganttImport.setStartDate(ganttImport.project.startDate);
+                    await ganttImport.scrollToDate(ganttImport.project.startDate, { block: 'start' });
+                    btnImport.value = false
+                } else {
+                    console.log(res)
+                    toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
+                }
+            })
+            .catch((error) => {
+                console.log(error)
                 toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
-            }
-        })
-        .catch((error)=>{
-            console.log(error)
-            toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
-        })
+            })
         ganttImport.unmaskBody();
     }
     catch (error) {
@@ -1195,8 +1195,8 @@ const submit = async () => {
                     <i class="fa-solid fa-triangle-exclamation"></i>
                 </span>
             </div>
-            <span class="flex justify-between px-1">
-                <span class="flex space-x-1">
+            <div class="px-1 flex justify-between">
+                <div class="flex flex-wrap gap-1">
                     <Button raised icon="fa-solid fa-plus" v-tooltip.bottom="'Nueva actividad'" severity="success"
                         @click=onAddTaskClick() v-if="!readOnly" />
                     <Button raised icon="fa-solid fa-pen" v-tooltip.bottom="'Editar Actividad'" severity="warning"
@@ -1213,10 +1213,6 @@ const submit = async () => {
                         @click="onSettingsShow" />
                     <Button raised icon="fa-solid fa-magnifying-glass" v-tooltip.bottom="'Zoom'" severity="secondary"
                         @click="zoom.toggle($event)" />
-                    <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange"
-                        placeholder="Buscar por fecha" class=" !h-8 shadow-md" showIcon :pt="{ input: '!h-8' }" />
-                    <InputText v-model="texto" @input="onFilterChange" placeholder="Buscar por actividad"
-                        class="shadow-md" />
                     <Button raised v-tooltip.bottom="'Agregar Calendario'" icon="fa-regular fa-calendar-plus"
                         v-if="!readOnly" @click="toggleCalendar" />
                     <Button raised v-tooltip.bottom="'Guardar en linea base'" icon="fa-solid fa-grip-lines"
@@ -1233,16 +1229,21 @@ const submit = async () => {
                         icon="fa-solid fa-circle-exclamation" @click="showCritical()" />
                     <Button raised v-tooltip.bottom="'Recargar Cronograma'" severity="success" v-if="!readOnly"
                         icon="fa-solid fa-arrows-rotate" @click="reload" />
-                </span>
-                <span class="flex space-x-1">
+
+                    <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange"
+                        placeholder="Buscar por fecha" class="hidden sm:flex !h-8 shadow-md" showIcon :pt="{ input: '!h-8' }" />
+                    <InputText v-model="texto" @input="onFilterChange" placeholder="Buscar por actividad"
+                        class="shadow-md hidden sm:flex"  />
+                </div>
+                <div class="flex gap-1">
                     <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"
                         :icon="readOnly ? 'fa-solid fa-pen-to-square' : 'fa-solid fa-eye'" severity="help" raised
                         @click="editMode" />
                     <Button v-tooltip.left="full ? 'Pantalla normal' : 'Pantalla completa'"
                         :icon="full ? 'fa-solid fa-minimize' : 'fa-solid fa-maximize'" severity="help" raised
                         @click="full = !full" />
-                </span>
-            </span>
+                </div>
+            </div>
             <BryntumGantt :style="'font-size:' + fontSize + ';'" :filterFeature="true" :taskEditFeature="taskEdit"
                 :projectLinesFeature="false" :timelineScrollButtons="true" :cellEditFeature="cellEdit"
                 :pdfExportFeature="pdfExport" :mspExportFeature="true" :projectLines="true"
