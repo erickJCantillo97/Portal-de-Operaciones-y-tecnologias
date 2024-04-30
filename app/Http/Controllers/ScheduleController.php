@@ -55,35 +55,13 @@ class ScheduleController extends Controller
         ]);
     }
 
-    private function importException($code)
-    {
-        switch ($code) {
-            case UPLOAD_ERR_INI_SIZE:
-                return 'The uploaded file exceeds the maximum allowed size';
-            case UPLOAD_ERR_FORM_SIZE:
-                return 'The uploaded file exceeds the maximum allowed size that was specified in the HTML form';
-            case UPLOAD_ERR_PARTIAL:
-                return 'The uploaded file was only partially uploaded';
-            case UPLOAD_ERR_NO_FILE:
-                return 'No file was uploaded';
-            case UPLOAD_ERR_NO_TMP_DIR:
-                return 'Missing a temporary folder';
-            case UPLOAD_ERR_CANT_WRITE:
-                return 'Failed to write file to disk';
-            case UPLOAD_ERR_EXTENSION:
-                return 'File upload stopped by extension';
-        }
-        return 'Unknown upload error';
-    }
-
-
     public function import(Request $request)
     {
         $jar_path = ('modImport/projectreader/target/bryntum-project-reader-6.1.22.jar');
             $shell_command = 'java -jar ' . escapeshellarg($jar_path) . ' ' . escapeshellarg($request->mppFile->getPathName()) . ' 1';
 
             $json = shell_exec($shell_command);
-            $json=utf8_encode($json);
+            // $json=utf8_encode($json);
         return $json;
     }
 
