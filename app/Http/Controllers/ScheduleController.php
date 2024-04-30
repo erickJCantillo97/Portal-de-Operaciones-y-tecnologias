@@ -155,6 +155,9 @@ class ScheduleController extends Controller
                 'calendar_id' => $calendarSave->id
             ]);
             $project->calendar_id = $calendarSave->id;
+            $project->hoursPerDay = $request->project['hoursPerDay'];
+            $project->daysPerWeek = $request->project['daysPerWeek'];
+            $project->daysPerMonth = $request->project['daysPerMonth'];
             $project->save();
             DB::commit();
             return response()->json(['status' => true, 'mensaje' => 'Calendario asignado al proyecto correctamente', 'calendarId' => $calendarSave->id]);
