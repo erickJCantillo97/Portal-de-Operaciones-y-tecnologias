@@ -924,7 +924,6 @@ const ganttConfigImporter = ref({
 }
 )
 const btnImport = ref(true)
-let dataProjectImport
 const uploadMSP = async (file) => {
     let ganttImport = ganttrefimport.value.instance.value
     const importer = new Importer({
@@ -953,8 +952,7 @@ const uploadMSP = async (file) => {
             .then(async (res) => {
                 if (res.status == 200) {
                     const { project } = ganttImport;
-                    dataProjectImport=res.data
-                    await importer.importData(dataProjectImport);
+                    await importer.importData(res.data);
                     project.destroy();
                     ganttImport.setStartDate(ganttImport.project.startDate);
                     await ganttImport.scrollToDate(ganttImport.project.startDate, { block: 'start' });
@@ -1004,11 +1002,9 @@ const importMSP = async () => {
         }
     }
     Object.assign(ganttImport.project, project)
-    // console.log(dataProjectImport)
-    // const dataImport = JSON.parse(JSON.stringify(ganttImport.project))
-    const projectImport = dataProjectImport.project
-    // console.log(dataProjectImport)
-    const calendarImport = dataProjectImport.calendars.children.find((calendar) => { return calendar.id === projectImport.calendar })
+    const dataImport = JSON.parse(JSON.stringify(ganttImport.project))
+    const projectImport = dataImport.project
+    const calendarImport = dataImport.calendarsData.find((calendar) => { return calendar.id === projectImport.calendar })
     await axios.post(route('before.sync', props.project), { project: projectImport, calendar: calendarImport })
         .then(async (res) => {
             // console.log(res)
