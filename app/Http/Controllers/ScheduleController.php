@@ -92,14 +92,14 @@ class ScheduleController extends Controller
                                 'recurrentStartDate' => $interval->recurrentStartDate,
                                 'recurrentEndDate'   => $interval->recurrentEndDate,
                                 'priority' => 20,
-                                'isWorking'          => $interval->isWorking == "1" ? true : false 
+                                'isWorking' => $interval->isWorking == "1" ? true : false 
                             ];
                         }
                         return [
                             'startDate' => $interval->startDate,
                             'endDate'   => $interval->endDate,
                             'priority' => 30,
-                            'isWorking'          => $interval->isWorking == "1" ?   true : false
+                            'isWorking'  => $interval->isWorking == "1" ?   true : false
                         ];
                     })->toArray()
                 ];
@@ -118,7 +118,7 @@ class ScheduleController extends Controller
                 'calendars' => [
                     "rows" => $calendarInterval
                 ],
-                'tasks' => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->get()],
+                'tasks' => ['rows' => Task::where('project_id', $project->id)->whereNull('task_id')->orderBy('parentIndex')->get()],
                 'dependencies' => ['rows' => Dependecy::get()],
                 'resources' => ['rows' => $recursos],
                 'assignments' => ['rows' => Assignment::get()],
@@ -203,7 +203,8 @@ class ScheduleController extends Controller
                     'durationUnit' => $task['durationUnit'],
                     'startDate' => $task['startDate'],
                     'endDate' => $task['endDate'],
-                    'manuallyScheduled' => $task['manuallyScheduled']
+                    'manuallyScheduled' => $task['manuallyScheduled'],
+                    'parentIndex' => intval($task['parentIndex'])
                 ]);
                 array_push($rows, [
                     '$PhantomId' => $task['$PhantomId'],
@@ -227,6 +228,7 @@ class ScheduleController extends Controller
                     'executor' => $task['executor'] ?? $taskUpdate->executor,
                     'manager' => $task['manager'] ?? $taskUpdate->manager,
                     'manuallyScheduled' => $task['manuallyScheduled'] ?? $taskUpdate->manuallyScheduled,
+                    'parentIndex' => $task['parentIndex'] ?? intval($taskUpdate->parentIndex),
                 ]);
             }
         }
