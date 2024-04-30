@@ -583,7 +583,7 @@ const project = ref(
                 // setTimeout(() => { location.reload() }, 3000);
             },
             beforeSync: (data) => {
-                console.log(data)
+                // console.log(data)
                 loading.value = true
             },
             sync: (e) => {
@@ -899,8 +899,8 @@ const fileMSP = ref()
 const ganttrefimport = ref()
 const ganttConfigImporter = ref({
     emptyText: 'Seleccione un archivo',
-    startDate: '2023-01-08',
-    endDate: '2023-04-01',
+    startDate: new Date(),
+    endDate: new Date((new Date).getFullYear(), (new Date).getMonth(), (new Date).getDate() + 30),
     rowHeight: 28,
     dependencyIdField: 'sequenceNumber',
     columns: [
@@ -983,7 +983,7 @@ const importMSP = async () => {
     loadImport.value = true
     let ganttImport = ganttrefimport.value.instance.value
     let gantt = ganttref.value.instance.value
-    const project = ref({
+    let project = {
         autoSync: false,
         autoLoad: false,
         transport: {
@@ -1004,24 +1004,22 @@ const importMSP = async () => {
                 loadImport.value = false
             },
         }
-    })
-    // Object.assign(ganttImport.project, project.value)
+    }
+    Object.assign(ganttImport.project, project)
 
-    // await ganttImport.project.sync()
-    // await gantt.project.load()
     const dataImport = JSON.parse(JSON.stringify(ganttImport.project))
     const projectImport = dataImport.project
     const calendarImport = dataImport.calendarsData.find((calendar) => { return calendar.id === projectImport.calendar })
     await axios.post(route('before.sync', props.project), { project: projectImport, calendar: calendarImport })
-        .then((res) => {
+        .then(async (res) => {
             console.log(res)
+            await ganttImport.project.sync()
+            await gantt.project.load()
             toast.add({ text: 'Ha fallado correctamente', severity: 'info', group: 'customToast', life: 3000 });
-        }).catch((error) => {
-            toast.add({ text: 'Lastima, no se hizo', severity: 'error', group: 'customToast', life: 3000 });
         })
     console.log(projectImport)
     console.log(calendarImport)
-    // modalImport.value = false
+    modalImport.value = false
     loadImport.value = false
 }
 
@@ -1042,6 +1040,7 @@ const showCritical = () => {
 }
 //#endregion
 
+//#region calendario
 const url = [
     {
         ruta: 'projects.index',
@@ -1086,6 +1085,10 @@ const toggleCalendar = (event) => {
 const newCalendar = () => {
     calendarCreate.value = false;
     formCalendar.value.newCalendar = true;
+}
+const reload = () =>{
+    let gantt = ganttref.value.instance.value
+    gantt.project.load();
 }
 const submit = async () => {
     loadSaveCalendar.value = true;
@@ -1166,6 +1169,7 @@ const submit = async () => {
         loadSaveCalendar.value = false;
     }
 }
+//#endregion
 </script>
 <template>
     <AppLayout :href="url">
@@ -1228,6 +1232,8 @@ const submit = async () => {
                         icon="fa-solid fa-upload" @click="modalImport = true" />
                     <Button raised v-tooltip.bottom="'Ruta critica'" severity="danger"
                         icon="fa-solid fa-circle-exclamation" @click="showCritical()" />
+                    <Button raised v-tooltip.bottom="'Recargar Cronograma'" severity="success"
+                    v-if="!readOnly"  icon="fa-solid fa-arrows-rotate" @click="reload" />
                 </span>
                 <span class="flex space-x-1">
                     <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"
@@ -1238,14 +1244,12 @@ const submit = async () => {
                         @click="full = !full" />
                 </span>
             </span>
-            <span class="h-full" :style="'font-size:' + fontSize + ';'">
-                <BryntumGantt :filterFeature="true" :taskEditFeature="taskEdit" :projectLinesFeature="false"
-                    :timelineScrollButtons="true" :cellEditFeature="cellEdit" :pdfExportFeature="pdfExport"
-                    :mspExportFeature="true" :projectLines="true" :baselinesFeature="baselines" ref="ganttref"
-                    class="h-full" :printFeature="true" v-bind="ganttConfig" :dependenciesFeature="{ radius: 5 }"
-                    :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip"
-                    :criticalPathsFeature="criticalPaths" :nonWorkingTimeFeature="nonWorkingTime" />
-            </span>
+            <BryntumGantt :style="'font-size:' + fontSize + ';'" :filterFeature="true" :taskEditFeature="taskEdit"
+                :projectLinesFeature="false" :timelineScrollButtons="true" :cellEditFeature="cellEdit"
+                :pdfExportFeature="pdfExport" :mspExportFeature="true" :projectLines="true"
+                :baselinesFeature="baselines" ref="ganttref" class="h-full" :printFeature="true" v-bind="ganttConfig"
+                :dependenciesFeature="{ radius: 5 }" :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip"
+                :criticalPathsFeature="criticalPaths" :nonWorkingTimeFeature="nonWorkingTime" />
         </div>
     </AppLayout>
     <OverlayPanel id="setLB" ref="setLB" :pt="{ content: '!p-1' }">
@@ -1347,7 +1351,6 @@ const submit = async () => {
             <Button severity="success" :loading="loadSaveCalendar" label="Guardar" @click="submit" />
         </div>
     </OverlayPanel>
-
 </template>
 
 

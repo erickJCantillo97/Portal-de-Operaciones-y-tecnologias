@@ -42,7 +42,7 @@
     </style>
 </head>
 
-<body class="h-full overflow-hidden antialiased font-gotham">
+<body class="h-full overflow-hidden antialiased">
 
     @inertia
 
