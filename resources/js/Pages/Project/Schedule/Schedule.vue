@@ -926,7 +926,6 @@ const ganttConfigImporter = ref({
 const btnImport = ref(true)
 const uploadMSP = async (file) => {
     let ganttImport = ganttrefimport.value.instance.value
-    let projectLoaderScript = '/modImport/php/load.php'
     const importer = new Importer({
         // gantt panel reference
         ganttImport,
@@ -944,38 +943,35 @@ const uploadMSP = async (file) => {
     });
     const formData = new FormData();
 
-    formData.append('mpp-file', file);
+    formData.append('mppFile', file);
 
     ganttImport.maskBody('Importando, espere por favor ...');
 
     try {
-        const { parsedJson } = await AjaxHelper.post(projectLoaderScript, formData, { parseJson: true });
-        if (parsedJson.success && parsedJson.data) {
-            const { project } = ganttImport;
-            // Import the uploaded mpp-file data (will make a new project and assign it to the gantt)
-            await importer.importData(parsedJson.data);
-            // destroy old project
-            // console.log(parsedJson.data)
-            project.destroy();
-            // set the view start date to the loaded project start
-            ganttImport.setStartDate(ganttImport.project.startDate);
-            await ganttImport.scrollToDate(ganttImport.project.startDate, { block: 'start' });
-            // input.clear();
-            // remove "Importing project ..." mask
-            ganttImport.unmaskBody();
-            // Toast.show('Importado con exito!');
-            btnImport.value = false
-        }
-        else {
-            console.log('Error al importar')
-            console.log(parsedJson.msg);
-            toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
-            // onError(`Error al importar: ${parsedJson.msg}`);
-        }
+        await axios.post(route('ganttImporter'), formData)
+            .then(async (res) => {
+                if (res.status == 200) {
+                    const { project } = ganttImport;
+                    await importer.importData(res.data);
+                    project.destroy();
+                    ganttImport.setStartDate(ganttImport.project.startDate);
+                    await ganttImport.scrollToDate(ganttImport.project.startDate, { block: 'start' });
+                    btnImport.value = false
+                } else {
+                    console.log(res)
+                    toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+                toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
+            })
+        ganttImport.unmaskBody();
     }
     catch (error) {
         toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
         console.log(error);
+        ganttImport.unmaskBody();
     }
 }
 const loadImport = ref(false)
@@ -1006,16 +1002,19 @@ const importMSP = async () => {
         }
     }
     Object.assign(ganttImport.project, project)
-
     const dataImport = JSON.parse(JSON.stringify(ganttImport.project))
     const projectImport = dataImport.project
     const calendarImport = dataImport.calendarsData.find((calendar) => { return calendar.id === projectImport.calendar })
     await axios.post(route('before.sync', props.project), { project: projectImport, calendar: calendarImport })
         .then(async (res) => {
-            console.log(res)
+            // console.log(res)
             await ganttImport.project.sync()
             await gantt.project.load()
-            toast.add({ text: 'Ha fallado correctamente', severity: 'info', group: 'customToast', life: 3000 });
+            toast.add({ text: 'Importado correctamente', severity: 'info', group: 'customToast', life: 3000 });
+        })
+        .catch((error) => {
+            console.log(error)
+            toast.add({ text: 'Hubo un error', severity: 'info', group: 'customToast', life: 3000 });
         })
     console.log(projectImport)
     console.log(calendarImport)
@@ -1086,7 +1085,7 @@ const newCalendar = () => {
     calendarCreate.value = false;
     formCalendar.value.newCalendar = true;
 }
-const reload = () =>{
+const reload = () => {
     let gantt = ganttref.value.instance.value
     gantt.project.load();
 }
@@ -1196,8 +1195,8 @@ const submit = async () => {
                     <i class="fa-solid fa-triangle-exclamation"></i>
                 </span>
             </div>
-            <span class="flex justify-between px-1">
-                <span class="flex space-x-1">
+            <div class="px-1 flex justify-between">
+                <div class="flex flex-wrap gap-1">
                     <Button raised icon="fa-solid fa-plus" v-tooltip.bottom="'Nueva actividad'" severity="success"
                         @click=onAddTaskClick() v-if="!readOnly" />
                     <Button raised icon="fa-solid fa-pen" v-tooltip.bottom="'Editar Actividad'" severity="warning"
@@ -1214,10 +1213,6 @@ const submit = async () => {
                         @click="onSettingsShow" />
                     <Button raised icon="fa-solid fa-magnifying-glass" v-tooltip.bottom="'Zoom'" severity="secondary"
                         @click="zoom.toggle($event)" />
-                    <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange"
-                        placeholder="Buscar por fecha" class=" !h-8 shadow-md" showIcon :pt="{ input: '!h-8' }" />
-                    <InputText v-model="texto" @input="onFilterChange" placeholder="Buscar por actividad"
-                        class="shadow-md" />
                     <Button raised v-tooltip.bottom="'Agregar Calendario'" icon="fa-regular fa-calendar-plus"
                         v-if="!readOnly" @click="toggleCalendar" />
                     <Button raised v-tooltip.bottom="'Guardar en linea base'" icon="fa-solid fa-grip-lines"
@@ -1232,18 +1227,23 @@ const submit = async () => {
                         icon="fa-solid fa-upload" @click="modalImport = true" />
                     <Button raised v-tooltip.bottom="'Ruta critica'" severity="danger"
                         icon="fa-solid fa-circle-exclamation" @click="showCritical()" />
-                    <Button raised v-tooltip.bottom="'Recargar Cronograma'" severity="success"
-                    v-if="!readOnly"  icon="fa-solid fa-arrows-rotate" @click="reload" />
-                </span>
-                <span class="flex space-x-1">
+                    <Button raised v-tooltip.bottom="'Recargar Cronograma'" severity="success" v-if="!readOnly"
+                        icon="fa-solid fa-arrows-rotate" @click="reload" />
+
+                    <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange"
+                        placeholder="Buscar por fecha" class="hidden sm:flex !h-8 shadow-md" showIcon :pt="{ input: '!h-8' }" />
+                    <InputText v-model="texto" @input="onFilterChange" placeholder="Buscar por actividad"
+                        class="shadow-md hidden sm:flex"  />
+                </div>
+                <div class="flex gap-1">
                     <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"
                         :icon="readOnly ? 'fa-solid fa-pen-to-square' : 'fa-solid fa-eye'" severity="help" raised
                         @click="editMode" />
                     <Button v-tooltip.left="full ? 'Pantalla normal' : 'Pantalla completa'"
                         :icon="full ? 'fa-solid fa-minimize' : 'fa-solid fa-maximize'" severity="help" raised
                         @click="full = !full" />
-                </span>
-            </span>
+                </div>
+            </div>
             <BryntumGantt :style="'font-size:' + fontSize + ';'" :filterFeature="true" :taskEditFeature="taskEdit"
                 :projectLinesFeature="false" :timelineScrollButtons="true" :cellEditFeature="cellEdit"
                 :pdfExportFeature="pdfExport" :mspExportFeature="true" :projectLines="true"
