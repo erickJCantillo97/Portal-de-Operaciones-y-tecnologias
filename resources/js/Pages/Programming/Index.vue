@@ -3,7 +3,6 @@ const { format_ES_Date, formatDateTime24h } = useCommonUtilities()
 import { Link } from '@inertiajs/vue3'
 import { ref, computed, onMounted } from 'vue'
 import { useCommonUtilities } from "@/composable/useCommonUtilities"
-import { useToast } from "primevue/usetoast"
 import AppLayout from '@/Layouts/AppLayout.vue'
 import CounterUp from '@/Components/sections/CounterUp.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
@@ -11,8 +10,6 @@ import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
 import DivisionsByProject from '@/Pages/Programming/DivisionsByProject.vue'
 import Knob from 'primevue/knob'
-
-import { useToast } from "primevue/usetoast"
 
 const toast = useToast()
 

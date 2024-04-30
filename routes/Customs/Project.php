@@ -23,7 +23,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('/ScheduleNew/{project}', [ScheduleController::class, 'index'])->name('showGantt');
 
-    Route::get('GanttImporter/{project}', [ScheduleController::class, 'import'])->name('ganttImporter');
+    Route::post('GanttImporter', [ScheduleController::class, 'import'])->name('ganttImporter');
 
     Route::get('/ScheduleWizard/{project}', [ScheduleController::class, 'wizard'])->name('wizard');
 

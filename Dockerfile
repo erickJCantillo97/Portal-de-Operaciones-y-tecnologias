@@ -3,12 +3,35 @@
 FROM php:8.2.0-apache
 ARG XDEBUG_VERSION="xdebug-3.3.1"
 ENV TZ=America/Bogota
+ENV LANG=POSIX
 USER root
+
+
+# Actualizar el archivo de locales para incluir UTF-8 y ISO-8859-15
+RUN apt-get update && apt-get install -y locales && apt-get install -y locales-all
+
+# Generar los locales
+RUN locale-gen
+
+# Configurar el locale
+ENV LANG=es_CO.UTF-8
+ENV LANGUAGE=es_CO.UTF-8
+ENV LC_ALL=es_CO.UTF-8
+
+# Ejecutar el comando locale-gen
+RUN locale-gen es_CO.UTF-8
+RUN locale-gen es_CO.ISO-8859-15
+
+
+# Ejecutar el comando dpkg-reconfigure locales
+RUN dpkg-reconfigure locales
 
 WORKDIR /var/www/html
 
 RUN yes | pecl install ${XDEBUG_VERSION} \
     && docker-php-ext-enable xdebug
+
+RUN docker-php-ext-install gettext
 
 RUN apt update && apt install -y default-jre
 

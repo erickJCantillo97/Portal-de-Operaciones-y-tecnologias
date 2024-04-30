@@ -7,10 +7,10 @@
   --info-color: #2196f3;
   --contrast-color: #0e1726;
 
-  font-family: "Gotham";
+  font-family: "Quicksand";
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   font-variation-settings: normal;
-  --font-family: "Gotham", sans-serif;
+  --font-family: "Quicksand", sans-serif;
   --font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   --text-color: #334155;
   --text-color-secondary: #64748b;

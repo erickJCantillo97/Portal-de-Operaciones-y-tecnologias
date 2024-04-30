@@ -583,7 +583,7 @@ const project = ref(
                 // setTimeout(() => { location.reload() }, 3000);
             },
             beforeSync: (data) => {
-                console.log(data)
+                // console.log(data)
                 loading.value = true
             },
             sync: (e) => {
@@ -899,8 +899,8 @@ const fileMSP = ref()
 const ganttrefimport = ref()
 const ganttConfigImporter = ref({
     emptyText: 'Seleccione un archivo',
-    startDate: '2023-01-08',
-    endDate: '2023-04-01',
+    startDate: new Date(),
+    endDate: new Date((new Date).getFullYear(), (new Date).getMonth(), (new Date).getDate() + 30),
     rowHeight: 28,
     dependencyIdField: 'sequenceNumber',
     columns: [
@@ -926,7 +926,6 @@ const ganttConfigImporter = ref({
 const btnImport = ref(true)
 const uploadMSP = async (file) => {
     let ganttImport = ganttrefimport.value.instance.value
-    let projectLoaderScript = '/modImport/php/load.php'
     const importer = new Importer({
         // gantt panel reference
         ganttImport,
@@ -944,38 +943,35 @@ const uploadMSP = async (file) => {
     });
     const formData = new FormData();
 
-    formData.append('mpp-file', file);
+    formData.append('mppFile', file);
 
     ganttImport.maskBody('Importando, espere por favor ...');
 
     try {
-        const { parsedJson } = await AjaxHelper.post(projectLoaderScript, formData, { parseJson: true });
-        if (parsedJson.success && parsedJson.data) {
-            const { project } = ganttImport;
-            // Import the uploaded mpp-file data (will make a new project and assign it to the gantt)
-            await importer.importData(parsedJson.data);
-            // destroy old project
-            // console.log(parsedJson.data)
-            project.destroy();
-            // set the view start date to the loaded project start
-            ganttImport.setStartDate(ganttImport.project.startDate);
-            await ganttImport.scrollToDate(ganttImport.project.startDate, { block: 'start' });
-            // input.clear();
-            // remove "Importing project ..." mask
-            ganttImport.unmaskBody();
-            // Toast.show('Importado con exito!');
-            btnImport.value = false
-        }
-        else {
-            console.log('Error al importar')
-            console.log(parsedJson.msg);
+        await axios.post(route('ganttImporter'),formData)
+        .then(async(res)=>{
+            if (res.status==200){
+                const { project } = ganttImport;
+                await importer.importData(res.data);
+                project.destroy();
+                ganttImport.setStartDate(ganttImport.project.startDate);
+                await ganttImport.scrollToDate(ganttImport.project.startDate, { block: 'start' });
+                
+            }else{
+                console.log(res)
+                toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
+            }
+        })
+        .catch((error)=>{
+            console.log(error)
             toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
-            // onError(`Error al importar: ${parsedJson.msg}`);
-        }
+        })
+        ganttImport.unmaskBody();
     }
     catch (error) {
         toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
         console.log(error);
+        ganttImport.unmaskBody();
     }
 }
 const loadImport = ref(false)
@@ -1006,16 +1002,19 @@ const importMSP = async () => {
         }
     }
     Object.assign(ganttImport.project, project)
-
     const dataImport = JSON.parse(JSON.stringify(ganttImport.project))
     const projectImport = dataImport.project
     const calendarImport = dataImport.calendarsData.find((calendar) => { return calendar.id === projectImport.calendar })
     await axios.post(route('before.sync', props.project), { project: projectImport, calendar: calendarImport })
         .then(async (res) => {
-            console.log(res)
+            // console.log(res)
             await ganttImport.project.sync()
             await gantt.project.load()
-            toast.add({ text: 'Ha fallado correctamente', severity: 'info', group: 'customToast', life: 3000 });
+            toast.add({ text: 'Importado correctamente', severity: 'info', group: 'customToast', life: 3000 });
+        })
+        .catch((error) => {
+            console.log(error)
+            toast.add({ text: 'Hubo un error', severity: 'info', group: 'customToast', life: 3000 });
         })
     console.log(projectImport)
     console.log(calendarImport)
@@ -1040,6 +1039,7 @@ const showCritical = () => {
 }
 //#endregion
 
+//#region calendario
 const url = [
     {
         ruta: 'projects.index',
@@ -1085,7 +1085,7 @@ const newCalendar = () => {
     calendarCreate.value = false;
     formCalendar.value.newCalendar = true;
 }
-const reload = () =>{
+const reload = () => {
     let gantt = ganttref.value.instance.value
     gantt.project.load();
 }
@@ -1168,6 +1168,7 @@ const submit = async () => {
         loadSaveCalendar.value = false;
     }
 }
+//#endregion
 </script>
 <template>
     <AppLayout :href="url">
@@ -1230,8 +1231,8 @@ const submit = async () => {
                         icon="fa-solid fa-upload" @click="modalImport = true" />
                     <Button raised v-tooltip.bottom="'Ruta critica'" severity="danger"
                         icon="fa-solid fa-circle-exclamation" @click="showCritical()" />
-                    <Button raised v-tooltip.bottom="'Recargar Cronograma'" severity="success"
-                    v-if="!readOnly"  icon="fa-solid fa-arrows-rotate" @click="reload" />
+                    <Button raised v-tooltip.bottom="'Recargar Cronograma'" severity="success" v-if="!readOnly"
+                        icon="fa-solid fa-arrows-rotate" @click="reload" />
                 </span>
                 <span class="flex space-x-1">
                     <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"
@@ -1242,14 +1243,12 @@ const submit = async () => {
                         @click="full = !full" />
                 </span>
             </span>
-            <span class="h-full" :style="'font-size:' + fontSize + ';'">
-                <BryntumGantt :filterFeature="true" :taskEditFeature="taskEdit" :projectLinesFeature="false"
-                    :timelineScrollButtons="true" :cellEditFeature="cellEdit" :pdfExportFeature="pdfExport"
-                    :mspExportFeature="true" :projectLines="true" :baselinesFeature="baselines" ref="ganttref"
-                    class="h-full" :printFeature="true" v-bind="ganttConfig" :dependenciesFeature="{ radius: 5 }"
-                    :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip"
-                    :criticalPathsFeature="criticalPaths" :nonWorkingTimeFeature="nonWorkingTime" />
-            </span>
+            <BryntumGantt :style="'font-size:' + fontSize + ';'" :filterFeature="true" :taskEditFeature="taskEdit"
+                :projectLinesFeature="false" :timelineScrollButtons="true" :cellEditFeature="cellEdit"
+                :pdfExportFeature="pdfExport" :mspExportFeature="true" :projectLines="true"
+                :baselinesFeature="baselines" ref="ganttref" class="h-full" :printFeature="true" v-bind="ganttConfig"
+                :dependenciesFeature="{ radius: 5 }" :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip"
+                :criticalPathsFeature="criticalPaths" :nonWorkingTimeFeature="nonWorkingTime" />
         </div>
     </AppLayout>
     <OverlayPanel id="setLB" ref="setLB" :pt="{ content: '!p-1' }">
@@ -1351,7 +1350,6 @@ const submit = async () => {
             <Button severity="success" :loading="loadSaveCalendar" label="Guardar" @click="submit" />
         </div>
     </OverlayPanel>
-
 </template>
 
 
