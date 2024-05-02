@@ -22,6 +22,7 @@ const toast = useToast();
 const fontSize = ref('10px')
 const props = defineProps({
     project: Object,
+    default: { id: 32 }
 })
 
 LocaleManager.applyLocale('Es');
