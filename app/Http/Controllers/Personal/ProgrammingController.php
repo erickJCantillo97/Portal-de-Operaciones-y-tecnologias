@@ -343,14 +343,20 @@ class ProgrammingController extends Controller
 
     public function getTimesSchedulesEmployee(Request $request)
     {
+        // Obtener la fecha actual
+        $friday = Carbon::now()->endOfWeek()->subDays(2);
+
+
         $employee = $request->employee_id ?? auth()->user()->num_sap;
         $date = Carbon::parse($request->date ?? Carbon::now())->format('Y-m-d');
-        $times = DetailScheduleTime::where('fecha', $date)->where('idUsuario', $employee)->get()->map(function ($time) use ($date) {
+
+        $times = DetailScheduleTime::whereBetween('fecha', [Carbon::now(), $friday])->orWhere('fecha', $date)->where('idUsuario', $employee)->get()->map(function ($time) use ($date) {
             return [
                 'id' => $time['idScheduleTime'],
                 'start' => Carbon::parse($time['horaInicio'])->format('H:i'),
                 'end' => Carbon::parse($time['horaFin'])->format('H:i:'),
                 'title' => $time['nombreTask'],
+                'date' => $time['fecha'],
                 'project' => $time['NombreProyecto'],
             ];
         });

@@ -6,16 +6,17 @@ import Tag from "primevue/tag"
 import Knob from "primevue/knob"
 import draggable from "vuedraggable";
 import CustomInput from "@/Components/CustomInput.vue"
+import { useToast } from "primevue/usetoast"
+
 const { truncateString } = useCommonUtilities()
 
+const toast = useToast()
 const inProcessModal = ref(false)
 const doneModal = ref(false)
 const typeChange = ref('')
 const sourceListIndex = ref(null)
 
 const moveList = ref('');
-
-const drag = ref();
 
 const getTaskPendientes = () => {
     axios.get(route('get.times.employees')).then((res) => {
@@ -33,7 +34,6 @@ const pending = ref([
 ])
 
 const inProcess = ref([
-
     {
         id: 2,
         title: 'Nombre de resumen las tareas de resumen',
@@ -67,32 +67,37 @@ const done = ref([
     }
 ])
 
-const draggedItem = ref(null)
-
-const handleDragEnd = (event, move) => {
-    // draggedItem.value = list[event.oldIndex]
+const handleDragStart = (event, move) => {
     moveList.value = move
-    sourceListIndex.value = event.newIndex;
-    // console.log(event['to'])
-
 }
-// watch(inProcess, (oldValue, newValue) => {
-//     console.log('Holaaaaaaaaaa')
-//     console.log(oldValue, newValue)
-// }, deep: true)
 
-// const handleDragEnd = (event) => {
-//     console.log(event)
-// }
-
-const handleDragOver = (event) => {
-    event.preventDefault()
-    // console.log('handleDragOver')
+const handleDragEnd = (event) => {
+    sourceListIndex.value = event.newIndex;
 }
 
 const handleDrop = (type) => {
-    typeChange.value = type
-    inProcessModal.value = true
+    console.log(moveList.value + ' - ' + type)
+    switch (type) {
+        case 'pending':
+            if (moveList.value == 'inProcess')
+                toast.add({ severity: 'success', group: 'customToast', text: 'Añadido en Actividades Pendientes', life: 2000 });
+            else if (moveList.value == 'done') {
+                toast.add({ severity: 'success', group: 'customToast', text: 'Añadido en Actividades Pendientes', life: 2000 });
+            }
+            break;
+        case 'inProcess':
+            if (moveList.value == 'pending')
+                inProcessModal.value = true
+            else if (moveList.value == 'done') {
+                alert('Estas seguro de cancelar la culminación de la tarea?')
+            }
+            break;
+        case 'done':
+            if (moveList.value == 'inProcess' || moveList.value == 'pending') {
+                doneModal.value = true;
+            }
+            break;
+    }
 }
 </script>
 <template>
@@ -103,31 +108,32 @@ const handleDrop = (type) => {
     </div>
     <div class="grid grid-cols-3 gap-x-6 p-2 ">
         <div class="bg-orange-100 h-full rounded-lg p-4 hover:shadow-md hover:shadow-orange-500">
-            <div class="flex justify-between w-full h-8 px-2 mb-8 bg-white/30 backdrop-blur-sm sticky top-0">
+            <div class="flex justify-between w-full p-2 mb-1 bg-white/30 backdrop-blur-sm sticky top-0">
                 <div class="flex space-x-2 justify-center items-center">
-                    <i class="fa-solid fa-circle-exclamation text-orange-600"></i>
-                    <h1 class="font-extrabold text-orange-500">
-                        Asignadas
+                    <i class="fa-solid fa-clock text-blue-400"></i>
+                    <h1 class="font-extrabold text-primary">
+                        Actividades Pendientes
                     </h1>
                 </div>
-                <div class="flex w-8 items-center justify-center rounded-full bg-orange-500 p-1">
+                <div class="flex w-8 items-center justify-center rounded-full bg-primary p-1">
                     <span class="text-white text-sm font-semibold">{{ pending.length }}</span>
                 </div>
             </div>
 
-            <draggable :list="pending" @end="handleDragEnd($event, 'pendding')" :group="{ name: 'taskss', put: false }"
-                :animation="200" ghost-class="ghost-card" class="px-2 pt-4 h-full opacity-70" key="pending">
+            <draggable :list="pending" @start="handleDragStart($event, 'pending')" @end="handleDragEnd"
+                @change="handleDrop('pending')" :group="'taskss'" :animation="200" ghost-class="ghost-card"
+                class="px-2 h-full opacity-70" key="pending">
                 <template #item="{ element }">
                     <div
-                        class="my-2 flex items-center justify-between space-x-8 rounded-lg bg-white p-4 hover:border hover:border-orange-500 cursor-grab">
+                        class="mb-2 flex items-center justify-between space-x-8 rounded-lg bg-white p-4 hover:border hover:border-orange-500 cursor-grab">
                         <div class="space-y-4">
-                            <h3 class="font-bold text-primary text-sm">
-                                {{ truncateString(element.title, 80) }}
+                            <h3 class="font-bold text-primary text-sm" v-tooltip="element.title">
+                                {{ element.title }}
                             </h3>
                             <Tag v-tooltip="`${truncateString(element.project, 60)}`" severity="info"
                                 class="cursor-default" :value="`${truncateString(element.project, 40)}`" rounded />
-                            <p class="flex text-xs italic text-slate-400">
-                                {{ element.init_Hour }} - {{ element.finish_Hour }}
+                            <p class="flex text-sm italic text-slate-800">
+                                {{ element.date }}
                             </p>
                         </div>
                         <div>
@@ -136,29 +142,6 @@ const handleDrop = (type) => {
                     </div>
                 </template>
             </draggable>
-
-            <!-- <div class="h-[80vh] overflow-y-auto snap snap-mandatory">
-                <div :draggable="true" v-for="(item, index) in inProcess" :key="item.id"
-                    @drop="handleDrop($event, index)" @dragstart="handleDragStart(index)" @dragend="handleDragEnd"
-                    @dragover="handleDragOver()" :animation="200">
-                    <div
-                        class="my-2 flex items-center justify-between space-x-8 rounded-lg bg-white p-4 hover:border hover:border-primary cursor-grab">
-                        <div class="space-y-4 ">
-                            <h3 class="font-bold text-primary text-sm">
-                                {{ truncateString(item.title, 80) }}
-                            </h3>
-                            <Tag v-tooltip="`${truncateString(item.project, 60)}`" severity="info"
-                                class="cursor-default" :value="`${truncateString(item.project, 40)}`" rounded />
-                            <p class="flex text-xs italic text-slate-400">
-                                {{ item.start }}, {{ item.init_Hour }} - {{ item.finish_Hour }}
-                            </p>
-                        </div>
-                        <div>
-                            <Knob v-model="progressTask" valueTemplate="{value}%" :size="50" readonly />
-                        </div>
-                    </div>
-                </div>
-            </div> -->
         </div>
         <div class="bg-blue-100 h-full rounded-lg p-4 hover:shadow-md hover:shadow-primary">
             <div class="flex justify-between w-full p-2 mb-1 bg-white/30 backdrop-blur-sm sticky top-0">
@@ -173,11 +156,12 @@ const handleDrop = (type) => {
                 </div>
             </div>
 
-            <draggable :list="inProcess" @start="handleDragEnd" @change="handleDrop('process')" :animation="200"
-                ghost-class="ghost-card" group="taskss" class="px-2 h-full" key="inprocess">
+            <draggable :list="inProcess" @start="handleDragStart($event, 'inProcess')" @end="handleDragEnd"
+                @change="handleDrop('inProcess')" :animation="200" ghost-class="ghost-card" group="taskss"
+                class="px-2 h-full" key="inprocess">
                 <template #item="{ element }">
                     <div
-                        class="mb-2 flex  justify-between rounded-lg bg-white p-4 hover:border hover:border-primary cursor-grab">
+                        class="mb-2 flex justify-between rounded-lg bg-white p-4 hover:border hover:border-primary cursor-grab">
                         <div class="space-y-4 ">
                             <h3 class="font-bold text-primary text-sm">
                                 {{ truncateString(element.title, 80) }}
@@ -200,29 +184,6 @@ const handleDrop = (type) => {
                     </div>
                 </template>
             </draggable>
-
-            <!-- <div class="h-[80vh] overflow-y-auto snap snap-mandatory">
-                <div :draggable="true" v-for="(item, index) in inProcess" :key="item.id"
-                    @drop="handleDrop($event, index)" @dragstart="handleDragStart(index)" @dragend="handleDragEnd"
-                    @dragover="handleDragOver()" :animation="200">
-                    <div
-                        class="my-2 flex items-center justify-between space-x-8 rounded-lg bg-white p-4 hover:border hover:border-primary cursor-grab">
-                        <div class="space-y-4 ">
-                            <h3 class="font-bold text-primary text-sm">
-                                {{ truncateString(item.title, 80) }}
-                            </h3>
-                            <Tag v-tooltip="`${truncateString(item.project, 60)}`" severity="info"
-                                class="cursor-default" :value="`${truncateString(item.project, 40)}`" rounded />
-                            <p class="flex  italic text-slate-400">
-                                {{ item.start }}, {{ item.init_Hour }} - {{ item.finish_Hour }}
-                            </p>
-                        </div>
-                        <div>
-                            <Knob v-model="progressTask" valueTemplate="{value}%" :size="50" readonly />
-                        </div>
-                    </div>
-                </div>
-            </div> -->
         </div>
         <!--DONE-->
         <div class="bg-emerald-100 h-full rounded-lg p-4 hover:shadow-md hover:shadow-emerald-500">
@@ -238,8 +199,9 @@ const handleDrop = (type) => {
                 </div>
             </div>
 
-            <draggable :list="done" @start="handleDragEnd" @change="handleDrop('process')" :animation="200"
-                ghost-class="ghost-card" group="taskss" class="px-2 h-full" key="done">
+            <draggable :list="done" @change="handleDrop('done')" @start="handleDragStart($event, 'done')"
+                @end="handleDragEnd" :animation="200" ghost-class="ghost-card" group="taskss" class="px-2 h-full"
+                key="done">
                 <template #item="{ element }">
                     <div
                         class="mb-2 flex  justify-between rounded-lg bg-white p-4 hover:border hover:border-emerald-500 cursor-grab">
@@ -271,17 +233,19 @@ const handleDrop = (type) => {
     </div>
 
     <!--MODAL DE "EN PROCESO"-->
-    <CustomModal v-model:visible="inProcessModal" :closable="true" width="40rem">
+    <CustomModal v-model:visible="inProcessModal" :closable="false" width="40rem">
         <template #icon>
             <span class="text-white material-symbols-outlined text-3xl">
                 assignment
             </span>
         </template>
         <template #titulo>
-            <span class="text-xl font-bold text-white white-space-nowrap">Registro de Planilla</span>
+            <span class="text-xl font-bold text-white white-space-nowrap">
+                {{ moveList == 'pending' ? 'Añadir Avance a' : 'Devolver' }} {{ inProcess[sourceListIndex].title }}
+            </span>
         </template>
         <template #body>
-            <div v-if="typeChange == 'process'" class="space-y-2 mb-4">
+            <div class="space-y-2 mb-4">
                 <CustomInput type="number" :max="99" label="Porcentaje de avance"
                     v-model:input="inProcess[sourceListIndex].percentDone" />
                 <div class="flex w-full justify-between items-center">
@@ -299,10 +263,10 @@ const handleDrop = (type) => {
     </CustomModal>
 
     <!--MODAL DE "COMPLETADA"-->
-    <CustomModal v-model:visible="doneModal" :closable="true" width="40rem">
+    <CustomModal v-model:visible="doneModal" width="40rem">
         <template #icon>
             <span class="text-white material-symbols-outlined text-3xl">
-                fa-circle-check
+                done
             </span>
         </template>
         <template #titulo>
