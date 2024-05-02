@@ -99,7 +99,7 @@ Route::get('estmaciones_anterior', function () {
     $estimaciones = DB::connection('sqlsrv_anterior')->table('estimacions')->get();
     foreach ($estimaciones as $estimacion) {
         $quote = Quote::where('consecutive', $estimacion->consecutivo)->first();
-        if (! $quote) {
+        if (!$quote) {
             $quote = Quote::create([
                 'gerencia' => auth()->user()->gerencia,
                 'name' => $estimacion->nombre,
@@ -218,7 +218,7 @@ Route::get('/prueba', function (Request $request) {
     }
 
     return $ejecutado_acumulado / $ejecutado_total;
-    $code = DB::table('operations_view')->where('grafo', 'LIKE', '%'.$op[0])->where('operacion', 'LIKE', end($op))->get()->first()->costo_cod;
+    $code = DB::table('operations_view')->where('grafo', 'LIKE', '%' . $op[0])->where('operacion', 'LIKE', end($op))->get()->first()->costo_cod;
 
     return $op;
     // return back()->withErrors(['errors' => ['messaje', 'default1', 'messaje1', 'default2', 'messaje4', 'default4', 'messaje', 'default',]]);

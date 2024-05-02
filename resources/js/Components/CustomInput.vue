@@ -198,11 +198,13 @@ defineEmits(['valueChange'])
 </script>
 <template>
     <div class="flex flex-col">
-        <div v-if="type == 'radiobutton'" class="w-full flex h-8"
-            :class="options.length > 2 ? 'justify-between' : 'space-x-4'">
-            <div v-for="option in options" :key="option.key" class="flex items-center">
-                <RadioButton v-model="input" :inputId="option.key" name="dynamic" :value="option.name" />
-                <label :for="option.key" class="ml-2 -mb-0.5">{{ option.name }}</label>
+        <div v-if="type == 'radiobutton'" class="w-full">
+            <label v-if="label" :for="id" class="mb-0.5 font-bold">{{ label }}</label>
+            <div class="flex" :class="options.length > 2 ? 'justify-between' : 'space-x-4'">
+                <div v-for="option in options" :key="option.key" class="flex items-center">
+                    <RadioButton v-model="input" :inputId="option.key" name="dynamic" :value="option.name" />
+                    <label :for="option.key" class="ml-2 -mb-0.5">{{ option.name }}</label>
+                </div>
             </div>
         </div>
         <span v-else>
