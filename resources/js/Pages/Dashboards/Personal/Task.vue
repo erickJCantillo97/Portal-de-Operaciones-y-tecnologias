@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from "vue"
+import { ref, onMounted } from "vue"
 import { useCommonUtilities } from '@/composable/useCommonUtilities'
 import CustomModal from '@/Components/CustomModal.vue'
 import Tag from "primevue/tag"
@@ -14,9 +14,10 @@ const toast = useToast()
 const inProcessModal = ref(false)
 const doneModal = ref(false)
 const typeChange = ref('')
-const sourceListIndex = ref(null)
+const moveList = ref('') // De donde proviene (oldIndex)
+const sourceListIndex = ref(null) // Donde está (newIndex)
 
-const moveList = ref('');
+
 
 const getTaskPendientes = () => {
     axios.get(route('get.times.employees')).then((res) => {
@@ -28,14 +29,12 @@ onMounted(() => {
     getTaskPendientes()
 })
 
-
-
 const pending = ref([
 ])
 
 const inProcess = ref([
     {
-        id: 2,
+        id: 1,
         title: 'Nombre de resumen las tareas de resumen',
         project: 'Nombre de Proyecto extenso que son la mayoría de los nombres en Cotecmar',
         start: '12/04/2024',
@@ -45,7 +44,7 @@ const inProcess = ref([
         percentDone: 0
     },
     {
-        id: 3,
+        id: 2,
         title: ' los nombres de las tareas de resumen',
         project: 'Nombre de Proyecto extenso que son la mayoría de los nombres en Cotecmar',
         start: '12/04/2024',
@@ -58,7 +57,7 @@ const inProcess = ref([
 
 const done = ref([
     {
-        id: 3,
+        id: 1,
         title: 'Nombre de resumen de tareas contiene los ',
         project: 'Nombre de Proyecto extenso que son la mayoría de los nombres en Cotecmar',
         start: '12/04/2024',
@@ -106,6 +105,7 @@ const handleDrop = (type) => {
             Gestión de Actividades Semanal
         </h2>
     </div>
+    <!--ASIGNADAS-->
     <div class="grid grid-cols-3 gap-x-6 p-2 ">
         <div class="bg-orange-100 h-full rounded-lg p-4 hover:shadow-md hover:shadow-orange-500">
             <div class="flex justify-between w-full p-2 mb-1 bg-white/30 backdrop-blur-sm sticky top-0">
@@ -143,6 +143,7 @@ const handleDrop = (type) => {
                 </template>
             </draggable>
         </div>
+        <!--EN PROCESO-->
         <div class="bg-blue-100 h-full rounded-lg p-4 hover:shadow-md hover:shadow-primary">
             <div class="flex justify-between w-full p-2 mb-1 bg-white/30 backdrop-blur-sm sticky top-0">
                 <div class="flex space-x-2 justify-center items-center">
@@ -168,17 +169,19 @@ const handleDrop = (type) => {
                             </h3>
                             <Tag v-tooltip="`${truncateString(element.project, 60)}`" severity="info"
                                 class="cursor-default" :value="`${truncateString(element.project, 40)}`" rounded />
-                            <div class="flex overflow-x-auto space-x-4 w-[22vw] text-sm cursor-pointer">
+                            <div class="flex overflow-x-auto space-x-4 w-[22vw] text-sm cursor-default">
                                 <div class="italic p-1 text-nowrap border text-emerald-700 rounded-lg bg-emerald-100">
                                     {{ element.init_Hour }} -{{ element.finish_Hour }}
                                 </div>
                             </div>
                         </div>
-                        <div class="">
+                        <div class="flex flex-col justify-center items-center space-y-2 -ml-6">
                             <Knob v-model="element.percentDone" valueTemplate="{value}%" :size="50" readonly />
-                            <div class="flex space-x-1 mt-2">
-                                <Button severity="secondary" text icon="fa-solid fa-pencil"></Button>
-                                <Button severity="secondary" text icon="fa fa-trash-can"></Button>
+                            <div class="flex">
+                                <Button v-tooltip.bottom="'Editar'" severity="secondary" text
+                                    icon="fa-solid fa-pen-to-square hover:text-orange-400" />
+                                <Button v-tooltip.bottom="'Eliminar'" severity="secondary" text
+                                    icon="fa fa-trash-can hover:text-red-600" />
                             </div>
                         </div>
                     </div>
@@ -204,31 +207,31 @@ const handleDrop = (type) => {
                 key="done">
                 <template #item="{ element }">
                     <div
-                        class="mb-2 flex  justify-between rounded-lg bg-white p-4 hover:border hover:border-emerald-500 cursor-grab">
+                        class="mb-2 flex justify-between rounded-lg bg-white p-4 hover:border hover:border-emerald-500 cursor-grab">
                         <div class="space-y-4 ">
                             <h3 class="font-bold text-emerald-500 text-sm">
                                 {{ truncateString(element.title, 80) }}
                             </h3>
                             <Tag v-tooltip="`${truncateString(element.project, 60)}`" severity="info"
                                 class="cursor-default" :value="`${truncateString(element.project, 40)}`" rounded />
-                            <div class="flex overflow-x-auto space-x-4 w-[22vw] text-sm cursor-pointer">
+                            <div class="flex overflow-x-auto space-x-4 w-[22vw] text-sm cursor-default">
                                 <div class="italic p-1 text-nowrap border text-emerald-700 rounded-lg bg-emerald-100">
                                     {{ element.init_Hour }} -{{ element.finish_Hour }}
                                 </div>
                             </div>
                         </div>
-                        <div class="">
+                        <div class="flex flex-col justify-center items-center space-y-2 -ml-6">
                             <Knob v-model="element.percentDone" valueTemplate="{value}%" :size="50" readonly />
-                            <div class="flex space-x-1 mt-2">
-                                <Button severity="secondary" text icon="fa-solid fa-pencil"></Button>
-                                <Button severity="secondary" text icon="fa fa-trash-can"></Button>
+                            <div class="flex">
+                                <Button v-tooltip.bottom="'Editar'" severity="secondary" text
+                                    icon="fa-solid fa-pen-to-square hover:text-orange-400" />
+                                <Button v-tooltip.bottom="'Eliminar'" severity="secondary" text
+                                    icon="fa fa-trash-can hover:text-red-600" />
                             </div>
                         </div>
                     </div>
                 </template>
             </draggable>
-
-
         </div>
     </div>
 
