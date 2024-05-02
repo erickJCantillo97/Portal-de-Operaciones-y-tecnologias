@@ -27,6 +27,9 @@ const props = defineProps({
     dataRightClick: {
         type: Object,
         default: {}
+    },
+    optionsData: {
+        type: Object
     }
 })
 
@@ -60,6 +63,10 @@ const itemDrag = defineModel('itemDrag', {
 })
 defineEmits(['drop', 'togglePerson', 'addPerson', 'menu'])
 
+function getDaysLate(day) {
+    return ((new Date() - new Date(day)) / 86400000).toFixed(0) + ' dias de retraso'
+}
+
 
 
 </script>
@@ -69,7 +76,7 @@ defineEmits(['drop', 'togglePerson', 'addPerson', 'menu'])
     </div>
     <div v-else-if="tasks.data.length > 0" v-for="task in tasks.data" @contextmenu="$emit('menu', $event, task, day)"
         @drop="!movil ? $emit('drop', task, day) : null; option = null" @dragover.prevent @dragenter.prevent
-        class=" sm:h-full w-full sm:max-h-44 p-0.5" :class="[type == 'day' ? 'sm:w-1/3 float-left' : '',]"
+        class=" sm:h-full w-full sm:max-h-44 p-0.5" :class="[type == 'day' ? 'sm:w-1/'+optionsData.colummnsProgramming+' float-left' : '',]"
         :key="task.name + date.toDateString()">
         <div class="flex border pb-1 rounded-md border-primary hover:bg-primary-light flex-col justify-between h-full"
             :class="[type === 'day' ? 'text-sm' : 'text-xs']">
@@ -85,22 +92,23 @@ defineEmits(['drop', 'togglePerson', 'addPerson', 'menu'])
                     <p v-if="task.task != 'ANRP'" v-tooltip="task.task" class="px-1 text-center h-min w-full truncate">
                         {{ task.task }}
                     </p>
-                    <div v-if="task.task != 'ANRP'" class="flex justify-between items-center px-1">
-                        <div class="flex h-min cursor-default space-x-1 justify-center">
-                            <p v-tooltip.left="'Fecha Fin'" class="text-center w-full max-w-20"
+                    <div v-if="task.task != 'ANRP'" class="flex justify-between items-center px-1 w-full">
+                        <div class="flex h-min cursor-default space-x-1 justify-center"
+                            v-if="optionsData.dateEndProgramming">
+                            <p v-tooltip.left="'Fecha Fin'" class="text-center w-full"
                                 :class="new Date(task.endDate) < date ? 'bg-danger rounded-md px-1 text-white' : ''">
                                 {{ task.endDate }}
                             </p>
                         </div>
-                        <div>
-                            <p v-if="(new Date(task.endDate) < date) && type === 'day'"
-                                class="border truncate px-2 rounded-md bg-danger text-white"> {{ ((new Date() - new
-        Date(task.endDate)) / 86400000).toFixed(0) + ' dias de retraso' }}</p>
-                            <i v-else-if="(new Date(task.endDate) < date)" v-tooltip="((new Date() - new
-        Date(task.endDate)) / 86400000).toFixed(0) + ' dias de retraso'"
+                        <div v-if="optionsData.daysLateProgramming">
+                            <p v-if="(new Date(task.endDate) < date) && type === 'day' && (optionsData.colummnsProgramming<4)"
+                                class="border truncate px-2 rounded-md bg-danger text-white">
+                                {{ getDaysLate(task.endDate) }}
+                            </p>
+                            <i v-else-if="(new Date(task.endDate) < date)" v-tooltip="getDaysLate(task.endDate)"
                                 class="fa-solid fa-circle-exclamation text-danger animate-pulse"></i>
                         </div>
-                        <div
+                        <div v-if="optionsData.shiftProgramming"
                             class="flex cursor-default bg-success-light px-1 space-x-1 justify-center items-center rounded-md">
                             <p v-tooltip.left="'Hora inicio'" class=" text-center">
                                 {{ format24h(task.shift?.startShift ?? '') }}
@@ -111,7 +119,7 @@ defineEmits(['drop', 'togglePerson', 'addPerson', 'menu'])
                         </div>
                     </div>
                     <div class="h-16 flex items-center w-full">
-                        <div
+                        <div v-if="optionsData.showPersonProgramming" 
                             class="px-2 flex h-full w-full justify-between sm:justify-center items-center overflow-hidden">
                             <div
                                 class="overflow-x-hidden hover:overflow-x-auto gap-x-1 flex items-center h-full px-2 py-1 max-w-full flex-nowrap">
@@ -137,9 +145,11 @@ defineEmits(['drop', 'togglePerson', 'addPerson', 'menu'])
                             </div>
                         </div>
                     </div>
-                    <ProgressBar v-if="task.task != 'ANRP'" :value="parseFloat(task.percentDone)" class="h-3 mx-1"
-                        v-tooltip="'Avance'" :pt="{ label: 'text-xs font-thin' }">
-                    </ProgressBar>
+                    <span v-if="optionsData.progressProgramming">
+                        <ProgressBar v-if="task.task != 'ANRP'" :value="parseFloat(task.percentDone)" class="h-3 mx-1"
+                            v-tooltip="'Avance'" :pt="{ label: 'text-xs font-thin' }">
+                        </ProgressBar>
+                    </span>
                 </div>
             </div>
         </div>

@@ -23,6 +23,7 @@ import Listbox from 'primevue/listbox';
 import UserStatusProgramming from '@/Components/sections/UserStatusProgramming.vue';
 import ContextMenu from 'primevue/contextmenu';
 import { useConfirm } from "primevue/useconfirm";
+import CustomOverlayConfig from '@/Components/CustomOverlayConfig.vue';
 const confirm = useConfirm();
 const toast = useToast();
 // const { hasRole, hasPermission } = usePermissions()
@@ -132,6 +133,7 @@ const personsSelect = ref()
 const menu = ref();
 
 
+
 //#endregion
 
 //#region Consultas
@@ -149,7 +151,7 @@ const getTask = async (option) => {
     } else if (option == 'date') {
         mode.value = option
         if (!(dates.value.day instanceof Date)) {
-            dates.value=={}
+            dates.value == {}
             dates.value.key = Math.random().toFixed(5)
             dates.value.day = new Date()
         }
@@ -188,7 +190,7 @@ async function onDrop(task, fecha) {
         task.loading == undefined ? task.loading = 1 : task.loading++
         if (personDrag.value.option == 'move') {
             if (personDrag.value.day.toDateString() == fecha.toDateString()) {
-                if(personDrag.value.task.id!=task.id){
+                if (personDrag.value.task.id != task.id) {
                     personDrag.value.task.loading == undefined ? personDrag.value.task.loading = 1 : personDrag.value.task.loading++
                     await axios.post(route('programming.move'), { task: task.id, date: fecha, schedule: personDrag.value.person.schedule })
                         .then((res) => {
@@ -215,7 +217,7 @@ async function onDrop(task, fecha) {
                             task.employees = res.data.task
                             task.loading--
                         })
-                }else{
+                } else {
                     task.loading--
                     toast.add({ severity: 'success', group: "customToast", text: 'Persona esta programada aqui', life: 2000 })
                 }
@@ -521,6 +523,53 @@ const itemsMenuContext = ref([
 ]);
 
 //#endregion
+
+const optionsConfig = ref([
+    {
+        field: 'progressProgramming',
+        label: 'Ver avance',
+        type: 'boolean'
+    },
+    {
+        field: 'daysLateProgramming',
+        label: 'Ver retraso',
+        type: 'boolean'
+    },
+    {
+        field: 'dateEndProgramming',
+        label: 'Ver fecha final',
+        type: 'boolean'
+    },
+    {
+        field: 'shiftProgramming',
+        label: 'Ver horario',
+        type: 'boolean',
+    },
+    {
+        field: 'showPersonProgramming',
+        label: 'Mostrar personas',
+        type: 'boolean',
+    },
+    {
+        field: 'showProjectProgramming',
+        label: 'Mostrar proyectos',
+        type: 'boolean',
+    },
+    {
+        field: 'colummnsProgramming',
+        label: 'Cantidad de columnas',
+        type: 'options',
+        options: ['1', '2', '3', '4', '5', '6'],
+    },
+    {
+        field: 'typeProgramming',
+        label: 'Tipo de programacion',
+        type: 'options',
+        options: ['Diario', 'Semanal', 'Fin de actividad']
+    },
+
+])
+const optionsData=ref({})
 </script>
 
 <template>
@@ -538,27 +587,30 @@ const itemsMenuContext = ref([
                     </div>
                     <div class="sm:flex grid grid-cols-2 items-center gap-2 sm:space-x-2">
                         <MultiSelect v-model="projectsSelected" display="chip" :options="projects" optionLabel="name"
-                            class="w-56 hidden sm:flex" placeholder="Seleccione un proyecto" @change="getTask()" />
+                        class="w-56 hidden sm:flex" placeholder="Seleccione un proyecto" @change="getTask()" />
                         <Dropdown v-model="projectsSelected[0]" placeholder="Seleccione un proyecto" :options="projects"
-                            optionLabel="name" @change="getTask()" class="sm:hidden flex" />
+                        optionLabel="name" @change="getTask()" class="sm:hidden flex" />
                         <ButtonGroup class="hidden sm:block">
                             <Button label="Semana" @click="getTask('week')" :outlined="mode != 'week'" />
                             <Button label="dia" @click="getTask('date')" :outlined="mode != 'date'" />
                         </ButtonGroup>
                         <div class="sm:w-52 w-full">
                             <CustomInput v-model:input="dates.day" :type="mode" :manualInput="false"
-                                @valueChange="getTask()" />
+                            @valueChange="getTask()" />
                         </div>
                     </div>
+                    <CustomOverlayConfig :options="optionsConfig" v-model:optionsData="optionsData" />
                 </div>
                 <!-- region calendario -->
                 <div class="sm:cursor-default h-full overflow-y-auto">
                     <div v-if="mode == 'week'" class="h-full flex flex-col justify-between border rounded-md">
                         <div class="grid-cols-10 h-6 text-lg leading-6 grid pr-3 pl-2 border-b shadow-md mb-1 ">
-                            <div class="flex flex-col items-center">
+                            <div v-if="optionsData.showProjectProgramming" class="flex flex-col items-center">
                                 <p class="flex w-full justify-center items-baseline font-bold">Proyecto</p>
                             </div>
-                            <span class="grid grid-cols-7 col-span-9 pr-4">
+                            <span class="grid grid-cols-7 pr-4"
+                            :class="optionsData.showProjectProgramming?'col-span-9':'col-span-10'"
+                            >
                                 <div v-for="data, index in diasSemana" class="flex w-full flex-col items-center"
                                     :class="[data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary rounded-t-md font-bold' : '']">
                                     <p class="capitalize border-b w-full truncate text-center" :key="data.key">{{
@@ -573,7 +625,7 @@ const itemsMenuContext = ref([
                         <div class="h-full space-y-2 overflow-y-scroll pl-1 ">
                             <div v-if="projectsSelected.length > 0" v-for="project in projectsSelected"
                                 class="grid-cols-10 ml-0.5 divide-x divide-y cursor-default h-full divide-gray-100 border border-indigo-200 rounded-l-md text-lg leading-6 grid">
-                                <div class="flex flex-col items-center px-2">
+                                <div v-if="optionsData.showProjectProgramming" class="flex flex-col items-center px-2">
                                     <div class="flex h-full w-full items-center justify-center flex-col font-bold">
                                         <p>
                                             {{ project.name }}
@@ -587,13 +639,15 @@ const itemsMenuContext = ref([
                                         </div>
                                     </div>
                                 </div>
-                                <span class="grid grid-cols-7 col-span-9 overflow-y-scroll overflow-x-hidden">
+                                <span class="grid grid-cols-7 overflow-y-scroll overflow-x-hidden"
+                                :class="optionsData.showProjectProgramming?'col-span-9':'col-span-10'"
+                                >
                                     <div v-for="data, index in diasSemana" class="flex flex-col h-full items-center"
                                         :class="[index > 5 ? 'bg-warning-light' : '', data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
                                         <TaskProgramming :project="project.id" :day="data.day" @menu="taskRightClick"
-                                            :key="dates.day + project.id + mode" type="week"
-                                            @drop="onDrop" v-model:itemDrag="personDrag" @togglePerson="togglePerson"
-                                            :dataRightClick />
+                                            :key="dates.day + project.id + mode" type="week" @drop="onDrop"
+                                            v-model:itemDrag="personDrag" @togglePerson="togglePerson"
+                                            :dataRightClick :optionsData/>
                                     </div>
                                 </span>
                             </div>
@@ -602,12 +656,14 @@ const itemsMenuContext = ref([
                             </div>
                         </div>
                         <div class="grid-cols-10 h-8 text-sm grid pr-3 items-center pl-2 border-t shadow-lg mt-1 ">
-                            <div>
+                            <div v-if="optionsData.showProjectProgramming">
                                 <p class="w-full h-full truncate font-bold">
                                     Total personas
                                 </p>
                             </div>
-                            <div class="col-span-9 grid grid-cols-7 pr-4 z-10">
+                            <div class=" grid grid-cols-7 pr-4 z-10"
+                            :class="optionsData.showProjectProgramming?'col-span-9':'col-span-10'"
+                            >
                                 <span v-for="data in diasSemana">
                                     <UserStatusProgramming :date="data.day" :key="data.key + data.day"
                                         v-model:statusSelect="arrayPersonFilter" />
@@ -623,8 +679,8 @@ const itemsMenuContext = ref([
                         <div class="h-full sm:p-1 overflow-hidden sm:overflow-y-auto space-y-1">
                             <div v-if="projectsSelected.length > 0" v-for="project in projectsSelected"
                                 class="border h-full w-full flex flex-col sm:flex-row sm:flex sm:p-1 divide-y-2 sm:divide-y-0 rounded-md hover:shadow-md ">
-                                <div
-                                    class="sm:w-80 h-16 sm:h-full sm:max-h-full sm:shadow-none flex items-center flex-col justify-center">
+                                <div v-if="optionsData.showProjectProgramming" 
+                                    class="sm:w-40 h-16 sm:h-full sm:max-h-full sm:shadow-none flex items-center flex-col justify-center">
                                     <p class="font-bold">
                                         {{ project.name }}
                                     </p>
@@ -644,7 +700,7 @@ const itemsMenuContext = ref([
                                 <div class="h-full sm:h-full p-1 w-full overflow-y-auto">
                                     <TaskProgramming type="day" @addPerson="addPerson" :movil="esMovil()"
                                         @menu="taskRightClick" :project="project.id" :day="dates.day"
-                                        :key="dates.day.toDateString() + project.id" @drop="onDrop"
+                                        :key="dates.day.toDateString() + project.id" @drop="onDrop" :optionsData
                                         v-model:itemDrag="personDrag" @togglePerson="togglePerson" :dataRightClick />
                                 </div>
                             </div>
