@@ -350,11 +350,13 @@ class ProgrammingController extends Controller
         $employee = $request->employee_id ?? auth()->user()->num_sap;
         $date = Carbon::parse($request->date ?? Carbon::now())->format('Y-m-d');
 
-        $times = DetailScheduleTime::whereBetween('fecha', [Carbon::now(), $friday])->orWhere('fecha', $date)->where('idUsuario', $employee)->get()->map(function ($time) use ($date) {
+        $times = DetailScheduleTime::whereBetween('fecha', [Carbon::now(), $friday])->orderBy('fecha')->where('idUsuario', $employee)->get()->map(function ($time) use ($date) {
             return [
                 'id' => $time['idScheduleTime'],
                 'start' => Carbon::parse($time['horaInicio'])->format('H:i'),
-                'end' => Carbon::parse($time['horaFin'])->format('H:i:'),
+                'end' => Carbon::parse($time['horaFin'])->format('H:i'),
+                'hours' => (Carbon::parse($time['horaFin'])->diffInMinutes(Carbon::parse($time['horaInicio'])) / 60),
+                'differentDays' => Carbon::parse($date)->floatDiffInRealDays(Carbon::parse($time['fecha']), false),
                 'title' => $time['nombreTask'],
                 'date' => $time['fecha'],
                 'project' => $time['NombreProyecto'],

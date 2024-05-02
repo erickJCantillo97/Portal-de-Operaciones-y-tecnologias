@@ -22,6 +22,8 @@ const sourceListIndex = ref(null) // Donde está (newIndex)
 const getTaskPendientes = () => {
     axios.get(route('get.times.employees')).then((res) => {
         pending.value = res.data.times
+        inProcess.value = res.data.times
+        done.value = res.data.times
     })
 }
 
@@ -29,42 +31,11 @@ onMounted(() => {
     getTaskPendientes()
 })
 
-const pending = ref([
-])
+const pending = ref([])
 
-const inProcess = ref([
-    {
-        id: 1,
-        title: 'Nombre de resumen las tareas de resumen',
-        project: 'Nombre de Proyecto extenso que son la mayoría de los nombres en Cotecmar',
-        start: '12/04/2024',
-        end: '02/05/2024',
-        init_Hour: '07:00',
-        finish_Hour: '12:00',
-        percentDone: 0
-    },
-    {
-        id: 2,
-        title: ' los nombres de las tareas de resumen',
-        project: 'Nombre de Proyecto extenso que son la mayoría de los nombres en Cotecmar',
-        start: '12/04/2024',
-        end: '02/05/2024',
-        init_Hour: '07:00',
-        finish_Hour: '12:00',
-        percentDone: 30
-    },
-])
+const inProcess = ref([])
 
-const done = ref([
-    {
-        id: 1,
-        title: 'Nombre de resumen de tareas contiene los ',
-        project: 'Nombre de Proyecto extenso que son la mayoría de los nombres en Cotecmar',
-        start: '12/04/2024',
-        end: '02/05/2024',
-        percentDone: 30
-    }
-])
+const done = ref([])
 
 const handleDragStart = (event, move) => {
     moveList.value = move
@@ -106,7 +77,7 @@ const handleDrop = (type) => {
         </h2>
     </div>
     <!--ASIGNADAS-->
-    <div class="grid grid-cols-3 gap-x-6 p-2 ">
+    <div class="grid grid-cols-3 gap-x-2 p-2 ">
         <div class="bg-orange-100 h-full rounded-lg p-4 hover:shadow-md hover:shadow-orange-500">
             <div class="flex justify-between w-full p-2 mb-1 bg-white/30 backdrop-blur-sm sticky top-0">
                 <div class="flex space-x-2 justify-center items-center">
@@ -137,6 +108,17 @@ const handleDrop = (type) => {
                             </p>
                         </div>
                         <div>
+                            <div class="text-center bg-emerald-300 rounded-lg text-emerald-800 p-2 font-bold text-sm">
+                                {{ element.hours == 9.5 ? element.hours - 1 : element.hours.toFixed(1) }}
+                                <h4>Horas</h4>
+                            </div>
+
+                            <div class="text-center p-2 text-xs text-success" v-if="element.differentDays > 0">
+                                {{ element.differentDays }} Dias restantes
+                            </div>
+                            <div class="text-center p-2 text-xs text-danger" v-if="element.differentDays < 0">
+                                {{ element.differentDays }} Dias de retraso
+                            </div>
                             <!-- <Knob v-model="element.percentDone" :size="50" readonly /> -->
                         </div>
                     </div>
@@ -244,16 +226,36 @@ const handleDrop = (type) => {
         </template>
         <template #titulo>
             <span class="text-xl font-bold text-white white-space-nowrap">
-                {{ moveList == 'pending' ? 'Añadir Avance a' : 'Devolver' }} {{ inProcess[sourceListIndex].title }}
+                Registrar avance de la Actividad
             </span>
         </template>
         <template #body>
             <div class="space-y-2 mb-4">
+                <div class="text-xl text-center font-extrabold text-primary border-b border-primary">
+                    {{ inProcess[sourceListIndex].id }}.
+                    {{ inProcess[sourceListIndex].project }}
+                </div>
+                <div>
+                    <span class="text-primary font-bold text-lg">
+                        Actividad:
+                    </span>
+                    <span class="text-lg">
+                        {{ inProcess[sourceListIndex].title }}
+                    </span>
+                </div>
+
                 <CustomInput type="number" :max="99" label="Porcentaje de avance"
                     v-model:input="inProcess[sourceListIndex].percentDone" />
                 <div class="flex w-full justify-between items-center">
-                    <CustomInput type="time" label="Hora de Inicio" />
-                    <CustomInput type="time" label="Hora Fin" />
+                    <CustomInput type="time" label="Hora de Inicio" v-model:input="inProcess[sourceListIndex].start" />
+                    <CustomInput type="time" label="Hora Fin" v-model:input="inProcess[sourceListIndex].end" />
+                </div>
+                <div>
+                    <div class="flex overflow-x-auto space-x-4 w-[22vw] text-sm cursor-default">
+                        <div class="italic p-1 text-nowrap border text-emerald-700 rounded-lg bg-emerald-100">
+                            12:00 - 16:30
+                        </div>
+                    </div>
                 </div>
             </div>
         </template>

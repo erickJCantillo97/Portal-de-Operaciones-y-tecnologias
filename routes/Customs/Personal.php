@@ -4,6 +4,7 @@ use App\Http\Controllers\Personal\ContractorEmployeeController;
 use App\Http\Controllers\Personal\PersonalController;
 use App\Http\Controllers\Personal\ProgrammingController;
 use App\Http\Controllers\Personal\TeamController;
+use App\Http\Controllers\ProgrammingAdvanceController;
 use App\Models\Labor;
 use Illuminate\Support\Facades\Route;
 
@@ -43,4 +44,5 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     //Proveedores/Contratistas
     Route::resource('contractorEmployees', ContractorEmployeeController::class);
+    Route::resource('ProgrammingAdvances', ProgrammingAdvanceController::class);
 });
