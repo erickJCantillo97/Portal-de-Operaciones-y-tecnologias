@@ -44,5 +44,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     //Proveedores/Contratistas
     Route::resource('contractorEmployees', ContractorEmployeeController::class);
+    
     Route::resource('ProgrammingAdvances', ProgrammingAdvanceController::class);
 });

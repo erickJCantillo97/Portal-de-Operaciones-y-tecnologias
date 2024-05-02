@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Personal\Employee;
 use App\Models\Personal\ProgrammingAdvance;
-use App\Models\ScheduleTime;
 use App\Models\Views\DetailScheduleTime;
 use Carbon\Carbon;
 use Exception;
@@ -53,12 +52,12 @@ class ProgrammingAdvanceController extends Controller
 
         $validateData['date'] = Carbon::now();
         $validateData['user_id'] = auth()->user()->id;
-        $validateData['task_id'] = DetailScheduleTime::where('idScheduleTime', $validateData['schedule_id'])->idTask;
-        $validateData['cost'] = Employee::where('Num_SAP', 'LIKE', '%' . auth()->user()->num_sap)->Costo_Hora * ($horas > 9.5 ? $horas - 1 : $horas);
+        $validateData['task_id'] = DetailScheduleTime::where('idScheduleTime', $validateData['schedule_id'])->first()->idTask;
+        $validateData['cost'] = Employee::where('Num_SAP', 'LIKE', '%'.auth()->user()->num_sap)->first()->Costo_Hora * ($horas > 9.5 ? $horas - 1 : $horas);
         try {
             ProgrammingAdvance::create($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
     }
 
@@ -90,7 +89,7 @@ class ProgrammingAdvanceController extends Controller
         try {
             $programmingAdvance->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
 
@@ -102,7 +101,7 @@ class ProgrammingAdvanceController extends Controller
         try {
             $programmingAdvance->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }
 }
