@@ -17,11 +17,19 @@ const typeChange = ref('')
 const moveList = ref('') // De donde proviene (oldIndex)
 const sourceListIndex = ref(null) // Donde está (newIndex)
 
-
+const formData = ref({
+    id: null,
+    schedule_id: null,
+    progress: 0,
+    start: null,
+    end: null,
+})
 
 const getTaskPendientes = () => {
     axios.get(route('get.times.employees')).then((res) => {
         pending.value = res.data.times
+        inProcess.value = res.data.inProcess
+        done.value = res.data.times
     })
 }
 
@@ -29,42 +37,11 @@ onMounted(() => {
     getTaskPendientes()
 })
 
-const pending = ref([
-])
+const pending = ref([])
 
-const inProcess = ref([
-    {
-        id: 1,
-        title: 'Nombre de resumen las tareas de resumen',
-        project: 'Nombre de Proyecto extenso que son la mayoría de los nombres en Cotecmar',
-        start: '12/04/2024',
-        end: '02/05/2024',
-        init_Hour: '07:00',
-        finish_Hour: '12:00',
-        percentDone: 0
-    },
-    {
-        id: 2,
-        title: ' los nombres de las tareas de resumen',
-        project: 'Nombre de Proyecto extenso que son la mayoría de los nombres en Cotecmar',
-        start: '12/04/2024',
-        end: '02/05/2024',
-        init_Hour: '07:00',
-        finish_Hour: '12:00',
-        percentDone: 30
-    },
-])
+const inProcess = ref([])
 
-const done = ref([
-    {
-        id: 1,
-        title: 'Nombre de resumen de tareas contiene los ',
-        project: 'Nombre de Proyecto extenso que son la mayoría de los nombres en Cotecmar',
-        start: '12/04/2024',
-        end: '02/05/2024',
-        percentDone: 30
-    }
-])
+const done = ref([])
 
 const handleDragStart = (event, move) => {
     moveList.value = move
@@ -79,14 +56,15 @@ const handleDrop = (type) => {
     switch (type) {
         case 'pending':
             if (moveList.value == 'inProcess')
-                toast.add({ severity: 'success', group: 'customToast', text: 'Añadido en Actividades Pendientes', life: 2000 });
+                toast.add({ severity: 'success', group: 'customToast', text: 'Añadido en Actividades Pendientes', life: 2000 })
             else if (moveList.value == 'done') {
-                toast.add({ severity: 'success', group: 'customToast', text: 'Añadido en Actividades Pendientes', life: 2000 });
+                toast.add({ severity: 'success', group: 'customToast', text: 'Añadido en Actividades Pendientes', life: 2000 })
             }
             break;
         case 'inProcess':
-            if (moveList.value == 'pending')
+            if (moveList.value == 'pending') {
                 inProcessModal.value = true
+            }
             else if (moveList.value == 'done') {
                 alert('Estas seguro de cancelar la culminación de la tarea?')
             }
@@ -98,6 +76,45 @@ const handleDrop = (type) => {
             break;
     }
 }
+
+//# region InProcess Functions
+const inProcessEdit = (idTask) => {
+    inProcessModal.value = true
+}
+
+const inProcessSubmit = () => {
+    try {
+        if (formData.value.id == null) {
+            formData.value.schedule_id = inProcess.value[sourceListIndex.value].id
+            axios.post(route('ProgrammingAdvances.store'), formData.value)
+                .then((res) => {
+                    inProcessModal.value = false
+                    toast(
+                        toast.add({
+                            severity: 'success',
+                            group: 'customToast',
+                            text: 'Añadido en Actividades En Proceso',
+                            life: 2000
+                        }))
+                })
+        } else {
+            axios.put(route('ProgrammingAdvances.update', formData.value.id), formData.value)
+                .then((res) => {
+                    inProcessModal.value = false
+                    toast(
+                        toast.add({
+                            severity: 'success',
+                            group: 'customToast',
+                            text: 'Se ha actualizado la actividad correctamente',
+                            life: 2000
+                        }))
+                })
+        }
+    } catch (error) {
+        console.log('Error: ' + error)
+    }
+}
+//# endregion
 </script>
 <template>
     <div class="w-full pl-4 bg-white/30 backdrop-blur-sm sticky top-0">
@@ -106,7 +123,7 @@ const handleDrop = (type) => {
         </h2>
     </div>
     <!--ASIGNADAS-->
-    <div class="grid grid-cols-3 gap-x-6 p-2 ">
+    <div class="grid grid-cols-3 gap-x-2 p-2 ">
         <div class="bg-orange-100 h-full rounded-lg p-4 hover:shadow-md hover:shadow-orange-500">
             <div class="flex justify-between w-full p-2 mb-1 bg-white/30 backdrop-blur-sm sticky top-0">
                 <div class="flex space-x-2 justify-center items-center">
@@ -137,6 +154,17 @@ const handleDrop = (type) => {
                             </p>
                         </div>
                         <div>
+                            <div class="text-center bg-emerald-300 rounded-lg text-emerald-800 p-2 font-bold text-sm">
+                                {{ element.hours == 9.5 ? element.hours - 1 : element.hours.toFixed(1) }}
+                                <h4>Horas</h4>
+                            </div>
+
+                            <div class="text-center p-2 text-xs text-success" v-if="element.differentDays > 0">
+                                {{ element.differentDays }} Dias restantes
+                            </div>
+                            <div class="text-center p-2 text-xs text-danger" v-if="element.differentDays < 0">
+                                {{ element.differentDays }} Dias de retraso
+                            </div>
                             <!-- <Knob v-model="element.percentDone" :size="50" readonly /> -->
                         </div>
                     </div>
@@ -171,17 +199,17 @@ const handleDrop = (type) => {
                                 class="cursor-default" :value="`${truncateString(element.project, 40)}`" rounded />
                             <div class="flex overflow-x-auto space-x-4 w-[22vw] text-sm cursor-default">
                                 <div class="italic p-1 text-nowrap border text-emerald-700 rounded-lg bg-emerald-100">
-                                    {{ element.init_Hour }} -{{ element.finish_Hour }}
+                                    {{ element.start }} -{{ element.end }}
                                 </div>
                             </div>
                         </div>
                         <div class="flex flex-col justify-center items-center space-y-2 -ml-6">
-                            <Knob v-model="element.percentDone" valueTemplate="{value}%" :size="50" readonly />
+                            <Knob v-model="element.progress" valueTemplate="{value}%" :size="50" readonly />
                             <div class="flex">
                                 <Button v-tooltip.bottom="'Editar'" severity="secondary" text
                                     icon="fa-solid fa-pen-to-square hover:text-orange-400" />
-                                <Button v-tooltip.bottom="'Eliminar'" severity="secondary" text
-                                    icon="fa fa-trash-can hover:text-red-600" />
+                                <Button @click="inProcessSubmit()" v-tooltip.bottom="'Eliminar'" severity="secondary"
+                                    text icon="fa fa-trash-can hover:text-red-600" />
                             </div>
                         </div>
                     </div>
@@ -223,9 +251,9 @@ const handleDrop = (type) => {
                         <div class="flex flex-col justify-center items-center space-y-2 -ml-6">
                             <Knob v-model="element.percentDone" valueTemplate="{value}%" :size="50" readonly />
                             <div class="flex">
-                                <Button v-tooltip.bottom="'Editar'" severity="secondary" text
+                                <Button @click="" v-tooltip.bottom="'Editar'" severity="secondary" text
                                     icon="fa-solid fa-pen-to-square hover:text-orange-400" />
-                                <Button v-tooltip.bottom="'Eliminar'" severity="secondary" text
+                                <Button @click="" v-tooltip.bottom="'Eliminar'" severity="secondary" text
                                     icon="fa fa-trash-can hover:text-red-600" />
                             </div>
                         </div>
@@ -244,23 +272,42 @@ const handleDrop = (type) => {
         </template>
         <template #titulo>
             <span class="text-xl font-bold text-white white-space-nowrap">
-                {{ moveList == 'pending' ? 'Añadir Avance a' : 'Devolver' }} {{ inProcess[sourceListIndex].title }}
+                Registrar avance de la Actividad
             </span>
         </template>
         <template #body>
             <div class="space-y-2 mb-4">
-                <CustomInput type="number" :max="99" label="Porcentaje de avance"
-                    v-model:input="inProcess[sourceListIndex].percentDone" />
+                <div class="text-xl text-center font-extrabold text-primary border-b border-primary">
+                    {{ inProcess[sourceListIndex].id }}.
+                    {{ inProcess[sourceListIndex].project }}
+                </div>
+                <div>
+                    <span class="text-primary font-bold text-lg">
+                        Actividad:
+                    </span>
+                    <span class="text-lg">
+                        {{ inProcess[sourceListIndex].title }}
+                    </span>
+                </div>
+
+                <CustomInput type="number" :max="99" label="Porcentaje de avance" v-model:input="formData.progress" />
                 <div class="flex w-full justify-between items-center">
-                    <CustomInput type="time" label="Hora de Inicio" />
-                    <CustomInput type="time" label="Hora Fin" />
+                    <CustomInput type="time" label="Hora de Inicio" v-model:input="formData.start" />
+                    <CustomInput type="time" label="Hora Fin" v-model:input="formData.end" />
+                </div>
+                <div>
+                    <div class="flex overflow-x-auto space-x-4 w-[22vw] text-sm cursor-default">
+                        <div class="italic p-1 text-nowrap border text-emerald-700 rounded-lg bg-emerald-100">
+                            12:00 - 16:30
+                        </div>
+                    </div>
                 </div>
             </div>
         </template>
         <template #footer>
             <Button @click="inProcessModal = false" label="Cancelar" severity="danger"
                 icon="fa fa-circle-xmark"></Button>
-            <Button label="Guardar" severity="success" icon="pi pi-save"></Button>
+            <Button @click="inProcessSubmit()" label="Guardar" severity="success" icon="pi pi-save"></Button>
 
         </template>
     </CustomModal>

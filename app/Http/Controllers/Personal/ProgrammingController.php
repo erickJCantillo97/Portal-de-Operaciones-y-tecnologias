@@ -9,6 +9,7 @@ use App\Models\Gantt\Assignment;
 use App\Models\Personal\ContractorEmployee;
 use App\Models\Personal\Employee;
 use App\Models\Personal\ExtendedSchedule;
+use App\Models\Personal\ProgrammingAdvance;
 use App\Models\Projects\Project;
 use App\Models\Schedule;
 use App\Models\ScheduleTime;
@@ -346,24 +347,44 @@ class ProgrammingController extends Controller
         // Obtener la fecha actual
         $friday = Carbon::now()->endOfWeek()->subDays(2);
 
-
         $employee = $request->employee_id ?? auth()->user()->num_sap;
         $date = Carbon::parse($request->date ?? Carbon::now())->format('Y-m-d');
 
-        $times = DetailScheduleTime::whereBetween('fecha', [Carbon::now(), $friday])->orWhere('fecha', $date)->where('idUsuario', $employee)->get()->map(function ($time) use ($date) {
+        $advances = ProgrammingAdvance::whereBetween('date', [Carbon::now(), $friday])->where('user_id', auth()->user()->id)->get();
+
+        $advancesIDs = $advances->pluck('task_id');
+
+
+
+        $times = DetailScheduleTime::whereNotIn('idTask', $advancesIDs)->whereBetween('fecha', [Carbon::now(), $friday])->orderBy('fecha')->where('idUsuario', $employee)->get()->map(function ($time) use ($date) {
             return [
                 'id' => $time['idScheduleTime'],
                 'start' => Carbon::parse($time['horaInicio'])->format('H:i'),
-                'end' => Carbon::parse($time['horaFin'])->format('H:i:'),
+                'end' => Carbon::parse($time['horaFin'])->format('H:i'),
+                'hours' => (Carbon::parse($time['horaFin'])->diffInMinutes(Carbon::parse($time['horaInicio'])) / 60),
+                'differentDays' => Carbon::parse($date)->floatDiffInRealDays(Carbon::parse($time['fecha']), false),
                 'title' => $time['nombreTask'],
                 'date' => $time['fecha'],
                 'project' => $time['NombreProyecto'],
             ];
         });
 
+        $inProgress = $advances->where('progress', '<>', 100)->map(function ($time) {
+            $task = DetailScheduleTime::where('idScheduleTime', $time['schedule_id'])->first();
+            return [
+                'id' => $time['id'],
+                'start' => Carbon::parse($time['start'])->format('H:i'),
+                'end' => Carbon::parse($time['end'])->format('H:i'),
+                'title' => $task['nombreTask'],
+                'date' => $time['date'],
+                'progress' => $time['progress'],
+                'project' => $task['NombreProyecto'],
+            ];
+        });
 
         return response()->json([
             'times' => $times,
+            'inProcess' => $inProgress
         ]);
     }
 
