@@ -31,6 +31,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('getAssignmentsTask/{task}', [ScheduleController::class, 'getAssignmentsTask'])->name('get.assignments.task');
 
+    Route::get('getTaskNotes/{project}', [ScheduleController::class, 'getTaskNotes'])->name('get.task.notes');
+
     Route::post('postExcelImport', [TaskController::class, 'excelImport'])->name('post.excel.import');
 
     Route::get('/dataGantt/{project}', [ScheduleController::class, 'get'])->name('dataGantt');

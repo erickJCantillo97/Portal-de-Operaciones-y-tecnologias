@@ -479,6 +479,12 @@ class ScheduleController extends Controller
         ]);
     }
 
+    public function getTaskNotes(Project $project){
+        return Task::where('project_id',$project->id)->whereNotNull('note')->select('note')->get()->map(function ($item){
+            return $item->note;
+        });
+    }
+
     public function assignmentCalendar(Request $request)
     {
         try {
