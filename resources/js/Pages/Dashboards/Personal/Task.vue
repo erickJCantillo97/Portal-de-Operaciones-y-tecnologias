@@ -22,7 +22,8 @@ const sourceListIndex = ref(null) // Donde está (newIndex)
 const getTaskPendientes = () => {
     axios.get(route('get.times.employees')).then((res) => {
         pending.value = res.data.times
-        inProcess.value = res.data.times
+        console.log(res.data.inProcess)
+        inProcess.value = res.data.inProcess
         done.value = res.data.times
     })
 }
@@ -153,12 +154,12 @@ const handleDrop = (type) => {
                                 class="cursor-default" :value="`${truncateString(element.project, 40)}`" rounded />
                             <div class="flex overflow-x-auto space-x-4 w-[22vw] text-sm cursor-default">
                                 <div class="italic p-1 text-nowrap border text-emerald-700 rounded-lg bg-emerald-100">
-                                    {{ element.init_Hour }} -{{ element.finish_Hour }}
+                                    {{ element.start }} -{{ element.end }}
                                 </div>
                             </div>
                         </div>
                         <div class="flex flex-col justify-center items-center space-y-2 -ml-6">
-                            <Knob v-model="element.percentDone" valueTemplate="{value}%" :size="50" readonly />
+                            <Knob v-model="element.progress" valueTemplate="{value}%" :size="50" readonly />
                             <div class="flex">
                                 <Button v-tooltip.bottom="'Editar'" severity="secondary" text
                                     icon="fa-solid fa-pen-to-square hover:text-orange-400" />

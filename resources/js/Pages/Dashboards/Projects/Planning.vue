@@ -92,6 +92,7 @@ const getPromedio = () => {
     </div>
     <div class="grid grid-cols-2 gap-2 p-4">
       <div class="col-span-1">
+        
         <AdvancedBarChart :key="showLineChart" title="Avance Proyectos en Ejecución " :series="series"
           :yAxisData="projects" />
       </div>
