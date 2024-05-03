@@ -5,6 +5,12 @@
         </p>
         <div class="flex justify-end flex-1">
         </div>
+        <span class="sm:w-1/1 hidden"></span>
+        <span class="sm:w-1/2 hidden"></span>
+        <span class="sm:w-1/3 hidden"></span>
+        <span class="sm:w-1/4 hidden"></span>
+        <span class="sm:w-1/5 hidden"></span>
+        <span class="sm:w-1/6 hidden"></span>
     </div>
     <div class="max-h-screen collapsible-vertical" :class="menu ? 'toggle-sidebar' : ''">
         <main class="h-screen flex flex-col">

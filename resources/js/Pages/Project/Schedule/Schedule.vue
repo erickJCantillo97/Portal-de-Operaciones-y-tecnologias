@@ -22,7 +22,7 @@ const toast = useToast();
 const fontSize = ref('10px')
 const props = defineProps({
     project: Object,
-    default: { id: 32 }
+    notes:Array
 })
 
 LocaleManager.applyLocale('Es');
@@ -31,16 +31,7 @@ const loading = ref(false)
 const error = ref(false)
 const canRedo = ref()
 const canUndo = ref()
-const notes = ref()
-function getNotas() {
-    axios.get(route('get.task.notes', props.project.id))
-        .then((res) => {
-            notes.value = res.data
-        })
-        .catch((error) => {
-            console.log(error)
-        })
-}
+
 //#region funciones
 const headerTpl = ({ currentPage, totalPages }) => `
     <div class="flex space-x-3 items-center">
@@ -601,7 +592,6 @@ const project = ref(
             },
             sync: (e) => {
                 loading.value = false
-                getNotas()
                 let gantt = ganttref.value.instance.value
                 canRedo.value = gantt.project.stm.canRedo
                 canUndo.value = gantt.project.stm.canUndo
@@ -609,7 +599,6 @@ const project = ref(
             load: (e) => {
                 onExpandAllClick()
                 onZoomToFitClick()
-                getNotas()
                 listCalendar.value = e.response.assignCalendar;
                 listShift.value = e.response.shift;
                 formCalendar.value.project = props.project.id;

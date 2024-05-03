@@ -75,7 +75,8 @@ async function confirm1(event, scheduleTime, option, index) {
 
 
 async function resolveCollision(form) {
-    await axios.post(route('programming.collisionsPerDay', form)).then((r) => {
+    await axios.post(route('programming.collisionsPerDay', form)).then((res) => {
+        console.log(res)
         return true
     }).catch((e) => {
         console.log(e)

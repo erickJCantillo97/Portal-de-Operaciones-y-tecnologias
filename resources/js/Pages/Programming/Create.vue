@@ -281,50 +281,21 @@ const togglePerson = (event, persons, task, date) => {
 const formEditShift = ref({
     startShift: '07:00',// hora inicio
     endShift: '16:30',// hora fin
-    timeBreak: 0,
-    personalized: false, // Seleccionar turno => false, Seleccionar Horario Personalizado => false, Nuevo horario personalizado =>true
-    timeName: null, // nombre del horario personalizado
-    schedule_time: null,
     //control formulario
     loading: false
 })
 
-const shiftSelect = ref({})
 const editHour = (schedule_time) => {
     scheduleTime.value = schedule_time
     modhours.value = true
 }
 
-const saveCustomizedSchedule = async (mode) => {
-    formEditShift.value.loading = true
-    if (tabActive.value == 0) {
-        formEditShift.value.personalized = false
-        if (shiftSelect.value.startShift == undefined) {
-            formEditShift.value.loading = false
-            toast.add({ severity: 'error', group: "customToast", text: 'Seleccione un horario', life: 2000 })
-            return
-        }
-        formEditShift.value.startShift = format24h(shiftSelect.value.startShift)
-        formEditShift.value.endShift = format24h(shiftSelect.value.endShift)
-        formEditShift.value.timeBreak = parseFloat(shiftSelect.value.timeBreak)
-    } else if (tabActive.value == 1) {
-        if (mode == 'custom') {
-            formEditShift.value.startShift = format24h(formEditShift.value.startShift)
-            formEditShift.value.endShift = format24h(formEditShift.value.endShift)
-            formEditShift.value.timeBreak = parseFloat(formEditShift.value.timeBreak)
-        } else if (shiftSelect.value.startShift == undefined) {
-            formEditShift.value.loading = false
-            toast.add({ severity: 'error', group: "customToast", text: 'Seleccione un horario', life: 2000 })
-            return
-        } else {
-            formEditShift.value.startShift = format24h(shiftSelect.value.startShift)
-            formEditShift.value.endShift = format24h(shiftSelect.value.endShift)
-            formEditShift.value.timeBreak = parseFloat(shiftSelect.value.timeBreak)
-        }
-    }
-    formEditShift.value.schedule_time = scheduleTime.value.idScheduleTime
-
-    await axios.post(route('programming.saveCustomizedSchedule'), formEditShift.value)
+const saveCustomizedSchedule = async () => {
+    await axios.post(route('programming.saveCustomizedSchedule'), {
+        startShift: format24h(formEditShift.value.startShift),
+        endShift: format24h(formEditShift.value.endShift),
+        schedule_time:scheduleTime.value.id
+    })
         .then((res) => {
             if (res.data.status) {
                 taskEdit.value.employees = res.data.task
@@ -341,7 +312,6 @@ const saveCustomizedSchedule = async (mode) => {
                     toast.add({ severity: 'error', group: "customToast", text: res.data?.mensaje ?? 'Hubo un error al programar', life: 2000 })
                 }
             }
-            // if (mode.value == 'week') diasSemana.value.find(data => data.day === fecha).key = Math.random().toFixed(5);
             loadingPrograming(dateSelect.value)
         }).catch((error) => {
             console.log(error)
@@ -528,17 +498,17 @@ const optionsConfig = ref([
     {
         field: 'progressProgramming',
         label: 'Ver avance',
-        type: 'boolean'
+        type: 'boolean',
     },
     {
         field: 'daysLateProgramming',
         label: 'Ver retraso',
-        type: 'boolean'
+        type: 'boolean',
     },
     {
         field: 'dateEndProgramming',
         label: 'Ver fecha final',
-        type: 'boolean'
+        type: 'boolean',
     },
     {
         field: 'shiftProgramming',
@@ -559,17 +529,26 @@ const optionsConfig = ref([
         field: 'colummnsProgramming',
         label: 'Cantidad de columnas',
         type: 'options',
-        options: ['1', '2', '3', '4', '5', '6'],
+        options: ['1', '2', '3', '4', '5', '6']
     },
     {
         field: 'typeProgramming',
         label: 'Tipo de programacion',
         type: 'options',
-        options: ['Diario', 'Semanal', 'Fin de actividad']
+        options: ['Diario', 'Semanal', 'Fin de actividad'],
     },
 
 ])
-const optionsData=ref({})
+const optionsData = ref({
+    progressProgramming: true,
+    daysLateProgramming: true,
+    dateEndProgramming: true,
+    shiftProgramming: true,
+    showPersonProgramming: true,
+    showProjectProgramming: true,
+    colummnsProgramming: '3',
+    typeProgramming: 'Diario'
+})
 </script>
 
 <template>
@@ -587,16 +566,16 @@ const optionsData=ref({})
                     </div>
                     <div class="sm:flex grid grid-cols-2 items-center gap-2 sm:space-x-2">
                         <MultiSelect v-model="projectsSelected" display="chip" :options="projects" optionLabel="name"
-                        class="w-56 hidden sm:flex" placeholder="Seleccione un proyecto" @change="getTask()" />
+                            class="w-56 hidden sm:flex" placeholder="Seleccione un proyecto" @change="getTask()" />
                         <Dropdown v-model="projectsSelected[0]" placeholder="Seleccione un proyecto" :options="projects"
-                        optionLabel="name" @change="getTask()" class="sm:hidden flex" />
+                            optionLabel="name" @change="getTask()" class="sm:hidden flex" />
                         <ButtonGroup class="hidden sm:block">
                             <Button label="Semana" @click="getTask('week')" :outlined="mode != 'week'" />
                             <Button label="dia" @click="getTask('date')" :outlined="mode != 'date'" />
                         </ButtonGroup>
                         <div class="sm:w-52 w-full">
                             <CustomInput v-model:input="dates.day" :type="mode" :manualInput="false"
-                            @valueChange="getTask()" />
+                                @valueChange="getTask()" />
                         </div>
                     </div>
                     <CustomOverlayConfig :options="optionsConfig" v-model:optionsData="optionsData" />
@@ -609,8 +588,7 @@ const optionsData=ref({})
                                 <p class="flex w-full justify-center items-baseline font-bold">Proyecto</p>
                             </div>
                             <span class="grid grid-cols-7 pr-4"
-                            :class="optionsData.showProjectProgramming?'col-span-9':'col-span-10'"
-                            >
+                                :class="optionsData.showProjectProgramming ? 'col-span-9' : 'col-span-10'">
                                 <div v-for="data, index in diasSemana" class="flex w-full flex-col items-center"
                                     :class="[data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary rounded-t-md font-bold' : '']">
                                     <p class="capitalize border-b w-full truncate text-center" :key="data.key">{{
@@ -640,14 +618,13 @@ const optionsData=ref({})
                                     </div>
                                 </div>
                                 <span class="grid grid-cols-7 overflow-y-scroll overflow-x-hidden"
-                                :class="optionsData.showProjectProgramming?'col-span-9':'col-span-10'"
-                                >
+                                    :class="optionsData.showProjectProgramming ? 'col-span-9' : 'col-span-10'">
                                     <div v-for="data, index in diasSemana" class="flex flex-col h-full items-center"
                                         :class="[index > 5 ? 'bg-warning-light' : '', data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
                                         <TaskProgramming :project="project.id" :day="data.day" @menu="taskRightClick"
                                             :key="dates.day + project.id + mode" type="week" @drop="onDrop"
-                                            v-model:itemDrag="personDrag" @togglePerson="togglePerson"
-                                            :dataRightClick :optionsData/>
+                                            v-model:itemDrag="personDrag" @togglePerson="togglePerson" :dataRightClick
+                                            :optionsData />
                                     </div>
                                 </span>
                             </div>
@@ -662,8 +639,7 @@ const optionsData=ref({})
                                 </p>
                             </div>
                             <div class=" grid grid-cols-7 pr-4 z-10"
-                            :class="optionsData.showProjectProgramming?'col-span-9':'col-span-10'"
-                            >
+                                :class="optionsData.showProjectProgramming ? 'col-span-9' : 'col-span-10'">
                                 <span v-for="data in diasSemana">
                                     <UserStatusProgramming :date="data.day" :key="data.key + data.day"
                                         v-model:statusSelect="arrayPersonFilter" />
@@ -679,7 +655,7 @@ const optionsData=ref({})
                         <div class="h-full sm:p-1 overflow-hidden sm:overflow-y-auto space-y-1">
                             <div v-if="projectsSelected.length > 0" v-for="project in projectsSelected"
                                 class="border h-full w-full flex flex-col sm:flex-row sm:flex sm:p-1 divide-y-2 sm:divide-y-0 rounded-md hover:shadow-md ">
-                                <div v-if="optionsData.showProjectProgramming" 
+                                <div v-if="optionsData.showProjectProgramming"
                                     class="sm:w-40 h-16 sm:h-full sm:max-h-full sm:shadow-none flex items-center flex-col justify-center">
                                     <p class="font-bold">
                                         {{ project.name }}
@@ -768,11 +744,11 @@ const optionsData=ref({})
         </div>
     </OverlayPanel>
 
-    <CustomModal v-if="modhours" v-model:visible="modhours" :footer="false" icon="fa-regular fa-clock" width="60vw"
-        :closeOnEscape="false" :titulo="'Modificar horario de ' + scheduleTime?.nombre">
+    <CustomModal v-if="modhours" v-model:visible="modhours" icon="fa-regular fa-clock" width="30vw"
+        :closeOnEscape="false" titulo="Modificar horario">
         <template #body>
-            <!-- {{ tabActive }} -->
             <div class="flex flex-col gap-1">
+                <p class="font-bold text-center">{{ scheduleTime?.nombre }}</p>
                 <div class="flex items-center justify-between col-span-3 ">
                     <p class="font-bold">Horario actual:</p>
                     <p class="px-1 py-1 text-green-900 bg-green-200 rounded-md">
@@ -783,72 +759,26 @@ const optionsData=ref({})
                                 scheduleTime.horaFin.lastIndexOf(':'))) }}
                     </p>
                 </div>
-
-                <TabView v-model:activeIndex="tabActive" class="border rounded-md p-1 mb-2" :pt="{
-                                nav: '!flex !justify-between',
-                                panelContainer: '!p-1'
-                            }">
-                    <TabPanel header="Seleccionar turno predefinido" :pt="{
-                                root: 'w-full',
-                                headerAction: tabActive == 0 ? 'bg-primary text-white' : '',
-                                headerTitle: '!w-full !flex !justify-center',
-                            }">
-                        <div class="">
-                            <CustomShiftSelector v-model:shift="shiftSelect" />
-                        </div>
-                        <span class="w-full flex justify-end pt-3 items-center">
-                            <Button v-if="tabActive == 0" @click="saveCustomizedSchedule()" label="Guardar"
-                                icon="fa-solid fa-floppy-disk" severity="success" :loading="formEditShift.loading" />
-                        </span>
-                    </TabPanel>
-                    <TabPanel header="Seleccionar turno Personalizado" :pt="{
-                                root: 'w-full',
-                                headerAction: tabActive == 1 ? 'bg-primary text-white' : '',
-                                headerTitle: '!w-full !flex !justify-center',
-                            }">
-                        <div class="h-80 grid grid-cols-2 gap-3">
-                            <div class="border w-full flex flex-col justify-between p-2 rounded-md space-y-3">
-                                <CustomShiftSelector :shiftUser="parseInt($page.props.auth.user.id)"
-                                    v-model:shift="shiftSelect" />
-                                <div class="flex justify-end">
-                                    <Button @click="saveCustomizedSchedule()" label="Guardar"
-                                        icon="fa-solid fa-floppy-disk" severity="success"
-                                        :loading="formEditShift.loading" />
-                                </div>
-                            </div>
-                            <form @submit.prevent="saveCustomizedSchedule('custom')"
-                                class="border w-full flex flex-col justify-between p-2 rounded-md space-y-3">
-                                <label class="text-center w-full font-bold text-gray-900">
-                                    Personalizar turno</label>
-                                <span class="grid grid-cols-2 gap-2">
-
-                                    <CustomInput label="Hora inicio" type="time"
-                                        v-model:input="formEditShift.startShift" :stepMinute="30" id="start"
-                                        placeholder="Hora de inicio" :required="true" />
-                                    <CustomInput label="Hora fin" type="time" id="end"
-                                        v-model:input="formEditShift.endShift" :stepMinute="30"
-                                        placeholder="Hora de fin" :required="true" />
-                                    <CustomInput label="Descanso" type="number" v-model:input="formEditShift.timeBreak"
-                                        suffix=" Hora" id="break" placeholder="Descanso en horas" :required="true" />
-                                    <div class="flex flex-col items-center">
-                                        <label class="w-full text-center" for="switch1">¿Guardar?</label>
-                                        <InputSwitch inputId="switch1" v-model="formEditShift.personalized" />
-                                    </div>
-                                    <CustomInput v-if="formEditShift.personalized" class="col-span-2"
-                                        v-model:input="formEditShift.timeName" label="Nombre" type="text" id="name"
-                                        placeholder="Nombre del horario" :required="true" />
-                                </span>
-                                <div class="flex justify-end w-full">
-                                    <Button type="submit"
-                                        :label="formEditShift.personalized ? 'Guardar turno y aplicar' : 'Aplicar'"
-                                        icon="fa-solid fa-floppy-disk" severity="success"
-                                        :loading="formEditShift.loading" />
-                                </div>
-                            </form>
-                        </div>
-                    </TabPanel>
-                </TabView>
+                <form @submit.prevent="" class="border w-full flex flex-col justify-between p-2 rounded-md space-y-3">
+                    <label class="text-center w-full font-bold text-gray-900">
+                        Personalizar turno</label>
+                    <span class="grid grid-cols-2 gap-2">
+                        <CustomInput label="Hora inicio" type="time" v-model:input="formEditShift.startShift"
+                            :stepMinute="30" id="start" placeholder="Hora de inicio" :required="true" />
+                        <CustomInput label="Hora fin" type="time" id="end" v-model:input="formEditShift.endShift"
+                            :stepMinute="30" placeholder="Hora de fin" :required="true" />
+                        <CustomInput label="Descanso" type="number" v-model:input="formEditShift.timeBreak"
+                            suffix=" Hora" id="break" placeholder="Descanso en horas" :required="true" />
+                    </span>
+                    <div class="flex justify-end w-full">
+                    </div>
+                </form>
             </div>
+        </template>
+        <template #footer>
+            <Button @click="saveCustomizedSchedule('custom')"
+                :label="formEditShift.personalized ? 'Guardar turno y aplicar' : 'Aplicar'"
+                icon="fa-solid fa-floppy-disk" severity="success" :loading="formEditShift.loading" />
         </template>
     </CustomModal>
 

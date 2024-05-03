@@ -75,8 +75,8 @@ function getDaysLate(day) {
         <Loading />
     </div>
     <div v-else-if="tasks.data.length > 0" v-for="task in tasks.data" @contextmenu="$emit('menu', $event, task, day)"
-        @drop="!movil ? $emit('drop', task, day) : null; option = null" @dragover.prevent @dragenter.prevent
-        class=" sm:h-full w-full sm:max-h-44 p-0.5" :class="[type == 'day' ? 'sm:w-1/'+optionsData.colummnsProgramming+' float-left' : '',]"
+        @drop="!movil ? $emit('drop', task, day) : null; option = null" @dragover.prevent @dragenter.prevents 
+        class=" sm:h-full w-full sm:max-h-44 p-0.5" :class="[type == 'day' ? 'sm:w-1/'+ optionsData.colummnsProgramming + ' float-left' : '']"
         :key="task.name + date.toDateString()">
         <div class="flex border pb-1 rounded-md border-primary hover:bg-primary-light flex-col justify-between h-full"
             :class="[type === 'day' ? 'text-sm' : 'text-xs']">
