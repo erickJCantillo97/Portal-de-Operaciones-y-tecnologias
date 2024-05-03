@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import ProgressBar from 'primevue/progressbar';
 import Loading from '@/Components/Loading.vue';
 import Empty from '@/Components/Empty.vue';
+import Listbox from 'primevue/listbox';
 
 const date = ref(new Date())
 const tasks = ref({})
@@ -74,7 +75,10 @@ function getDaysLate(day) {
     <div v-if="tasks.loading" class="flex justify-center h-full items-center">
         <Loading />
     </div>
-    <div v-else-if="tasks.data.length > 0" v-for="task in tasks.data" @contextmenu="$emit('menu', $event, task, day)"
+    <Listbox v-else-if="tasks.data.length > 0" :options="tasks.data">
+
+    </Listbox>
+    <div v-else-if="false" v-for="task in tasks.data" @contextmenu="$emit('menu', $event, task, day)"
         @drop="!movil ? $emit('drop', task, day) : null; option = null" @dragover.prevent @dragenter.prevents 
         class=" sm:h-full w-full sm:max-h-44 p-0.5" :class="[type == 'day' ? 'sm:w-1/'+ optionsData.colummnsProgramming + ' float-left' : '']"
         :key="task.name + date.toDateString()">
