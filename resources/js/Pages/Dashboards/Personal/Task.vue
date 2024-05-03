@@ -8,21 +8,35 @@ import draggable from "vuedraggable";
 import CustomInput from "@/Components/CustomInput.vue"
 import { useToast } from "primevue/usetoast"
 
-const { truncateString } = useCommonUtilities()
+const { truncateString, formatUTCOffset } = useCommonUtilities()
 
 const toast = useToast()
 const inProcessModal = ref(false)
 const doneModal = ref(false)
 const typeChange = ref('')
+const loading = ref(false)
 const moveList = ref('') // De donde proviene (oldIndex)
 const sourceListIndex = ref(null) // Donde está (newIndex)
 
-const formData = ref({
+const inProcessFormData = ref({
     id: null,
     schedule_id: null,
     progress: 0,
     start: null,
     end: null,
+})
+
+const doneFormData = ref({
+    id: null,
+    project_id: null,
+    bloque: '',
+    sistema_grupo: '',
+    document_ref: '',
+    start: '',
+    end: '',
+    requirements: null,
+    files: null,
+    note: '',
 })
 
 const getTaskPendientes = () => {
@@ -78,39 +92,106 @@ const handleDrop = (type) => {
     }
 }
 
-//# region InProcess Functions
-const inProcessEdit = (idTask) => {
-    inProcessModal.value = true
-}
-
+//# region InProcess's CRUD
 const inProcessSubmit = () => {
     try {
-        if (formData.value.id == null) {
-            formData.value.schedule_id = inProcess.value[sourceListIndex.value].id
-            axios.post(route('ProgrammingAdvances.store'), formData.value)
-                .then((res) => {
-                    inProcessModal.value = false
-                    toast(
-                        toast.add({
-                            severity: 'success',
-                            group: 'customToast',
-                            text: 'Añadido en Actividades En Proceso',
-                            life: 2000
-                        }))
+        loading.value = true
+        if (inProcessFormData.value.id == null) {
+            inProcessFormData.value.schedule_id = inProcess.value[sourceListIndex.value].id
+            axios.post(route('ProgrammingAdvances.store'), {
+                ...inProcessFormData.value,
+                start: formatUTCOffset(inProcessFormData.value.start),
+                end: formatUTCOffset(inProcessFormData.value.end)
+            }).then((res) => {
+                toast.add({
+                    severity: 'success',
+                    group: 'customToast',
+                    text: 'Añadido en Actividades En Proceso',
+                    life: 2000
                 })
+                inProcessModal.value = false
+            })
         } else {
-            axios.put(route('ProgrammingAdvances.update', formData.value.id), formData.value)
-                .then((res) => {
-                    inProcessModal.value = false
-                    toast(
-                        toast.add({
-                            severity: 'success',
-                            group: 'customToast',
-                            text: 'Se ha actualizado la actividad correctamente',
-                            life: 2000
-                        }))
+            axios.put(route('ProgrammingAdvances.update', inProcessFormData.value.id), {
+                ...inProcessFormData.value,
+                start: formatUTCOffset(inProcessFormData.value.start),
+                end: formatUTCOffset(inProcessFormData.value.end)
+            }).then((res) => {
+                inProcessModal.value = false
+                toast.add({
+                    severity: 'success',
+                    group: 'customToast',
+                    text: 'Se ha actualizado la actividad correctamente',
+                    life: 2000
                 })
+            })
         }
+        getTaskPendientes()
+    } catch (error) {
+        console.log('Error: ' + error)
+    }
+}
+
+const inProcessDelete = () => {
+    try {
+        axios.delete(route(''))
+            .then((res) => {
+
+            })
+    } catch (error) {
+        console.error('Error: ' + error)
+    }
+
+    inProcessModal.value = false
+}
+
+const inProcessEdit = () => {
+    inProcessModal.value = true
+
+    inProcessFormData.schedule_id = inProcess.value[sourceListIndex.value].schedule_id
+    inProcessFormData.progress = inProcess.value[sourceListIndex.value].progress
+    inProcessFormData.start = inProcess.value[sourceListIndex.value].start
+    inProcessFormData.end = inProcess.value[sourceListIndex.value].end
+}
+//# endregion
+
+//# region Done's CRUD
+const doneSubmit = () => {
+    try {
+        loading.value = true
+        if (doneFormData.value.id == null) {
+            doneFormData.value.project_id = done.value[sourceListIndex.value].id
+            axios.post(route('ProgrammingAdvances.store'), {
+                ...doneFormData.value,
+                start: formatUTCOffset(doneFormData.value.start),
+                end: formatUTCOffset(doneFormData.value.end)
+            }).then((res) => {
+                toast(
+                    toast.add({
+                        severity: 'success',
+                        group: 'customToast',
+                        text: 'Añadido en Actividades En Proceso',
+                        life: 2000
+                    }))
+                doneModal.value = false
+            })
+        } else {
+            axios.put(route('ProgrammingAdvances.update', doneFormData.value.id), {
+                ...doneFormData.value,
+                start: formatUTCOffset(doneFormData.value.start),
+                end: formatUTCOffset(doneFormData.value.end)
+            }).then((res) => {
+                doneModal.value = false
+                toast(
+                    toast.add({
+                        severity: 'success',
+                        group: 'customToast',
+                        text: 'Se ha actualizado la actividad correctamente',
+                        life: 2000
+                    }))
+            })
+        }
+        getTaskPendientes()
     } catch (error) {
         console.log('Error: ' + error)
     }
@@ -207,7 +288,7 @@ const inProcessSubmit = () => {
                         <div class="flex flex-col justify-center items-center space-y-2 -ml-6">
                             <Knob v-model="element.progress" valueTemplate="{value}%" :size="50" readonly />
                             <div class="flex">
-                                <Button v-tooltip.bottom="'Editar'" severity="secondary" text
+                                <Button @click="inProcessEdit()" v-tooltip.bottom="'Editar'" severity="secondary" text
                                     icon="fa-solid fa-pen-to-square hover:text-orange-400" />
                                 <Button @click="inProcessSubmit()" v-tooltip.bottom="'Eliminar'" severity="secondary"
                                     text icon="fa fa-trash-can hover:text-red-600" />
@@ -291,10 +372,11 @@ const inProcessSubmit = () => {
                     </span>
                 </div>
 
-                <CustomInput type="number" :max="99" label="Porcentaje de avance" v-model:input="formData.progress" />
+                <CustomInput type="number" :max="99" label="Porcentaje de avance"
+                    v-model:input="inProcessFormData.progress" />
                 <div class="flex w-full justify-between items-center">
-                    <CustomInput type="time" label="Hora de Inicio" v-model:input="formData.start" />
-                    <CustomInput type="time" label="Hora Fin" v-model:input="formData.end" />
+                    <CustomInput type="time" label="Hora de Inicio" v-model:input="inProcessFormData.start" />
+                    <CustomInput type="time" label="Hora Fin" v-model:input="inProcessFormData.end" />
                 </div>
                 <div>
                     <div class="flex overflow-x-auto space-x-4 w-[22vw] text-sm cursor-default">
@@ -313,7 +395,7 @@ const inProcessSubmit = () => {
     </CustomModal>
 
     <!--MODAL DE "COMPLETADA"-->
-    <CustomModal v-model:visible="doneModal" width="40rem">
+    <!-- <CustomModal v-model:visible="doneModal" width="40rem">
         <template #icon>
             <span class="text-white material-symbols-outlined text-3xl">
                 done
@@ -335,8 +417,72 @@ const inProcessSubmit = () => {
             </div>
         </template>
         <template #footer>
-            <Button @click="doneModal = false" label="Cancelar" severity="danger" icon="fa fa-circle-xmark"></Button>
-            <Button label="Guardar" severity="success" icon="pi pi-save"></Button>
+            <Button @click="doneModal = false" label="Cancelar" severity="danger" icon="fa fa-circle-xmark" />
+            <Button label="Guardar" severity="success" icon="pi pi-save" />
+        </template>
+    </CustomModal> -->
+
+    <CustomModal v-model:visible="doneModal" width="100vh">
+        <template #icon>
+            <span class="text-white material-symbols-outlined text-3xl">
+                task_alt
+            </span>
+        </template>
+
+        <template #titulo>
+            <span class="text-xl font-bold text-white white-space-nowrap">
+                Registro de Planilla
+            </span>
+        </template>
+
+        <template #body>
+            <div class="text-xl text-center font-extrabold text-primary border-b border-primary">
+                {{ done[sourceListIndex].id }}.
+                {{ done[sourceListIndex].project }}
+            </div>
+            <div>
+                <span class="text-primary font-bold text-lg">
+                    Actividad:
+                </span>
+                <span class="text-lg">
+                    {{ done[sourceListIndex].title }}
+                </span>
+            </div>
+            <span class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <CustomInput label="Bloque" placeholder="Escribir Bloque" id="bloque" type="number"
+                    v-model:input="doneFormData.bloque">
+                </CustomInput>
+                <CustomInput label="Grupo/Sistema" placeholder="Escribir grupo/sistema" id="grupo"
+                    v-model:input="doneFormData.sistema_grupo">
+                </CustomInput>
+                <CustomInput label="Documento de Referencia" placeholder="Escribir Documento de Referencia"
+                    id="document" v-model:input="doneFormData.document_ref">
+                </CustomInput>
+                <div class="flex gap-2">
+                    <CustomInput type="time" label="Hora de Inicio" v-model:input="doneFormData.start" />
+                    <CustomInput type="time" label="Hora Fin" v-model:input="doneFormData.end" />
+                </div>
+                <CustomInput class="col-span-1" label="Notas" placeholder="Escribir nota" type="textarea"
+                    v-model:input="doneFormData.note">
+                </CustomInput>
+                <div class="col-span-1 space-y-4">
+                    <CustomInput type="file" class="col-span-2" v-model:input="doneFormData.requirements"
+                        label="Adjuntar Requerimiento de Materiales"
+                        acceptFile="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                        id="requirements">
+                    </CustomInput>
+                    <CustomInput type="file" class="col-span-2" v-model:input="doneFormData.files"
+                        label="Adjuntar Documentos de la Actividad"
+                        acceptFile="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                        id="files">
+                    </CustomInput>
+                </div>
+            </span>
+        </template>
+
+        <template #footer>
+            <Button @click="doneModal = false" label="Cancelar" severity="danger" icon="fa fa-circle-xmark" />
+            <Button @click="doneSubmit()" :loading label="Guardar" severity="success" icon="pi pi-save" />
         </template>
     </CustomModal>
 </template>

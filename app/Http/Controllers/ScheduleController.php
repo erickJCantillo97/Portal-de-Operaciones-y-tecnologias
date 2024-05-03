@@ -29,24 +29,11 @@ use Illuminate\Support\Facades\DB as FacadesDB;
 
 class ScheduleController extends Controller
 {
-    public function create(Project $project)
+    public function create(Request $request)
     {
-        // $taskProject = Task::where('project_id', $project->id)->first();
-        // if (!$taskProject) {
-        //     Task::firstOrcreate([
-        //         'project_id' => $project->id,
-        //         'name' => $project->name,
-        //         'percentDone' => 0,
-        //         'duration' => Carbon::parse($project->start_date)->diffInDays($project->end_date),
-        //         'durationUnit' => 'Days',
-        //         'startDate' => $project->start_date,
-        //         'endDate' => $project->end_date,
-        //     ]);
-        // }
-        return Inertia::render('Project/Schedule/Schedule', [
-            'project' => Project::where('id', $project->id)->first(),
-
-        ]);
+        return Inertia::render('Project/Schedule/Schedule',[  
+            'project'=> Project::find($request->project),
+            'task' => VirtualTask::where('project_id',$request->project)->whereNotNull('note')->get()]);
     }
 
     public function index(Project $project)
@@ -216,7 +203,6 @@ class ScheduleController extends Controller
             }
         }
         if (isset($request->tasks['updated'])) {
-            
             foreach ($request->tasks['updated'] as $task) {
                 $taskUpdate = Task::where('id', $task['id'])->first();
 
@@ -234,24 +220,24 @@ class ScheduleController extends Controller
                     'parentIndex' => $task['parentIndex'] ?? intval($taskUpdate->parentIndex),
                     'note' => $task['note'] ?? $taskUpdate->note
                 ]);
-                if(isset($task['segments'])){
-                   if(isset($task['id'])){
+                if(empty($task['segments'])){
                     Segment::where('task_id',$task['id'])->delete();
-                   }
-                    foreach($task['segments'] as $segment){
-                        Segment::firstOrCreate([
-                            'calendar_id' =>  $segment['calendar'],
-                            'cls' =>  $segment['cls'],
-                            'direction' =>  $segment['direction'],
-                            'duration' =>  $segment['duration'],
-                            'durationUnit' =>  $segment['durationUnit'],
-                            'endDate' =>  $segment['endDate'],
-                            'manuallyScheduled' =>  $segment['manuallyScheduled'],
-                            'name' =>  $segment['name'],
-                            'startDate' =>  $segment['startDate'],
-                            'unscheduled' =>  $segment['unscheduled'],
-                            'task_id' => $taskUpdate->id
-                        ]);
+                }else{
+                    Segment::where('task_id',$task['id'])->delete();
+                        foreach($task['segments'] as $segment){
+                            Segment::firstOrCreate([
+                                'calendar_id' =>  $segment['calendar'],
+                                'cls' =>  $segment['cls'],
+                                'direction' =>  $segment['direction'],
+                                'duration' =>  $segment['duration'],
+                                'durationUnit' =>  $segment['durationUnit'],
+                                'endDate' =>  $segment['endDate'],
+                                'manuallyScheduled' =>  $segment['manuallyScheduled'],
+                                'name' =>  $segment['name'],
+                                'startDate' =>  $segment['startDate'],
+                                'unscheduled' =>  $segment['unscheduled'],
+                                'task_id' => $taskUpdate->id
+                            ]);
                     }
                 }
             }
@@ -479,9 +465,6 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function getTaskNotes(Project $project){
-        return Task::where('project_id',$project->id)->whereNotNull('note')->get();
-    }
 
     public function assignmentCalendar(Request $request)
     {
@@ -514,10 +497,18 @@ class ScheduleController extends Controller
                 $project = Project::find($request->project);
                 $project->calendar_id = $calendar->id;
                 $project->save();
+                ProjectWithCalendar::firstOrCreate([
+                    'project_id' => $request->project,
+                    'calendar_id' => $calendar->id
+                ]);
             } else {
                 $project = Project::find($request->project);
                 $project->calendar_id = $request->calendar['id'];
                 $project->save();
+                ProjectWithCalendar::firstOrCreate([
+                    'project_id' => $request->project,
+                    'calendar_id' => $request->calendar['id']
+                ]);
             }
             DB::commit();
             return response()->json(['status' => true, 'mensaje' => 'Calendario agregado']);

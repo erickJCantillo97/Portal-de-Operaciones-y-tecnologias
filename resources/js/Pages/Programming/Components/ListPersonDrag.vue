@@ -15,19 +15,19 @@ defineProps({
     arrayPersonFilter: Object
 })
 
-const getPersonalData = async() => {
+const getPersonalData = async () => {
     await axios.get(route('get.personal.user')).then((res) => {
         personal.value = Object.values(res.data.personal)
     })
 }
-const getContratisaData = async() => {
-    contratista.value=[{nombre:'Contratista 1'},{nombre:'Contratista 2'},{nombre:'Contratista 3'}]
+const getContratisaData = async () => {
+    contratista.value = [{ nombre: 'Contratista 1' }, { nombre: 'Contratista 2' }, { nombre: 'Contratista 3' }]
     // await axios.get(route('get.personal.user')).then((res) => {
     //     contratista.value = Object.values(res.data.personal)
     // })
 }
 
-onMounted(async() => {
+onMounted(async () => {
     loadingPerson.value = true
     await getContratisaData()
     await getPersonalData()
@@ -43,7 +43,8 @@ const item = ref()
 </script>
 <template>
     <div class="sm:flex sm:flex-col h-36 w-full sm:w-52 sm:rounded-lg  divide-y  sm:h-full pt-1 gap-1">
-        <ToggleButton v-model="typePersonal" onLabel="Ver Cotecmar" offLabel="Ver Contratista" :pt="{ root: 'h-8',box:'!border bg-primary-light border-primary' }" />
+        <ToggleButton v-model="typePersonal" onLabel="Ver Cotecmar" offLabel="Ver Contratista"
+            :pt="{ root: 'h-8', box: '!border bg-primary-light border-primary' }" />
         <div v-if="loadingPerson" class="w-full h-full flex flex-col justify-center">
             <Loading class="mt-10 hidden sm:flex" message="Cargando personas" />
             <ProgressBar mode="indeterminate" class="flex sm:hidden" style="height: 4px" />
@@ -55,7 +56,7 @@ const item = ref()
             </span>
             <div class="flex justify-center">
             </div>
-            <Listbox :options="typePersonal?contratista:personal" class="max-h-full" v-model="item" filter
+            <Listbox :options="typePersonal ? contratista : personal" class="max-h-full" v-model="item" filter
                 :filterFields="['Nombres_Apellidos', 'Cargo', 'Oficina']" optionLabel="Nombres_Apellidos" :pt="{
             header: '!h-10',
             wrapper: 'h-[75vh]',
@@ -65,14 +66,14 @@ const item = ref()
         }">
                 <template #option="slotProps">
                     <div v-ripple :key="slotProps.option.Nombres_Apellidos" :draggable="true"
-                        @dragstart="itemDrag = slotProps.option"
+                        @dragstart="itemDrag = slotProps.option; itemDrag.option = null;itemDrag.task = null"
                         v-tooltip.top="{ value: 'Arrastra hasta la tarea donde asignaras la persona', showDelay: 1000, hideDelay: 300, pt: { text: 'text-center' } }"
                         :class="[!(arrayPersonFilter.loading) ? (arrayPersonFilter.data?.programados.find(objeto => objeto.name === slotProps.option.Nombres_Apellidos) !== undefined ? 'bg-green-200' : (arrayPersonFilter.data?.noProgramados.find(objeto => objeto.name === slotProps.option.Nombres_Apellidos) !== undefined ? 'bg-red-200' : '')) : '']"
                         class="p-ripple min-w-[25vw] sm:min-w-32 z-10 rounded-xl border border-primary h-full sm:h-16 shadow-md cursor-pointer hover:bg-primary-light">
                         <div class="flex flex-col h-full justify-center gap-x-1 p-1">
                             <div class="flex flex-col justify-center">
                                 <p class="text-sm font-semibold truncate text-gray-900">
-                                    {{ slotProps.option?.Nombres_Apellidos??slotProps.option.nombre }}
+                                    {{ slotProps.option?.Nombres_Apellidos ?? slotProps.option.nombre }}
                                 </p>
                                 <p class="text-xs truncate  text-gray-500">
                                     {{ slotProps.option.Cargo }}
