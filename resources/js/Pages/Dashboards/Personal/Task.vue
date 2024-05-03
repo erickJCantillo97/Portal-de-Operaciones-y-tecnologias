@@ -26,10 +26,11 @@ const formData = ref({
 })
 
 const getTaskPendientes = () => {
+    inProcessModal.value = false
     axios.get(route('get.times.employees')).then((res) => {
         pending.value = res.data.times
         inProcess.value = res.data.inProcess
-        done.value = res.data.times
+        // done.value = res.data.times
     })
 }
 
@@ -52,7 +53,7 @@ const handleDragEnd = (event) => {
 }
 
 const handleDrop = (type) => {
-    console.log(moveList.value + ' - ' + type)
+
     switch (type) {
         case 'pending':
             if (moveList.value == 'inProcess')
@@ -305,8 +306,7 @@ const inProcessSubmit = () => {
             </div>
         </template>
         <template #footer>
-            <Button @click="inProcessModal = false" label="Cancelar" severity="danger"
-                icon="fa fa-circle-xmark"></Button>
+            <Button @click="getTaskPendientes" label="Cancelar" severity="danger" icon="fa fa-circle-xmark"></Button>
             <Button @click="inProcessSubmit()" label="Guardar" severity="success" icon="pi pi-save"></Button>
 
         </template>

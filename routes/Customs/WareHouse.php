@@ -27,7 +27,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('materials/{requirement}', [MaterialRequirementController::class, 'index'])->name('materials.index');
     Route::get('manageRequeriments', [RequirementController::class, 'manageRequirements'])->name('manage.requirements');
     Route::post('storeRequirementOficials', [RequirementController::class, 'storeRequirementOficials'])->name('store.requirement.oficial');
-
+    Route::post('aproveRequirement/{requirement}', [RequirementController::class, 'aproveRequirement'])->name('aprove.requirement');
 
     // Route::get('categorias_anteriores', [CategoryController::class, 'getDataAnterior']);
     // Route::get('equipos_anteriores', [ToolController::class, 'getDataAnterior']);

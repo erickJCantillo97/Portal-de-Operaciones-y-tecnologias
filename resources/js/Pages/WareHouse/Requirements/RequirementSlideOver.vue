@@ -49,6 +49,13 @@ const getMaterial = async () => {
     console.error('Problema al obtener materiales, error: ' + error)
   }
 }
+const aproveRequirement = () => {
+  axios.post(route('aprove.requirement', props.requirement.id)).then((res) => {
+
+    approving = !approving
+  })
+}
+
 
 onMounted(() => {
   getMaterial()
@@ -78,9 +85,9 @@ const optionStatus = {
     icon: 'fa-solid fa-user-clock',
     color: 'bg-danger text-white'
   },
-  'APROBADO': {
+  'Aprobado DEIPR': {
     icon: 'fa-solid fa-check',
-    color: 'bg-emerald-600 text-white'
+    color: 'bg-success text-white'
   },
   'RECHAZADO': {
     icon: 'fa-solid fa-xmark',
@@ -171,7 +178,8 @@ const optionStatus = {
                   <div v-if="approving" class="space-y-4  p-2 border rounded-lg mx-2">
                     <CustomInput type="date" class="w-full" />
                     <div class="flex space-x-4">
-                      <Button class="w-full" label="Aprobar" icon="pi pi-save" severity="success" />
+                      <Button class="w-full" label="Aprobar" icon="pi pi-save" severity="success"
+                        @click="aproveRequirement" />
                       <Button class="w-full" label="Cancelar" icon="fa fa-circle-xmark" @click="approving = !approving"
                         severity="danger" />
                     </div>

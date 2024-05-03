@@ -28,7 +28,7 @@ const getData = () => {
       {
         name: 'Planeado',
         type: 'bar',
-        data: res.data.indicators.map(p => p.planned_progress),
+        data: res.data.indicators.map(p => parseInt(p.planned_progress)),
         showBackground: true,
         color: ['#4A4B51'],
 
@@ -37,14 +37,14 @@ const getData = () => {
         name: 'real',
         type: 'bar',
         color: ['#2E3092'],
-        data: res.data.indicators.map(p => p.real_progress),
+        data: res.data.indicators.map(p => parseInt(p.real_progress)),
         showBackground: true,
       },
     )
     for (var i of res.data.indicators) {
       scatterSeries.value.push({
         name: i.project,
-        symbolSize: 20,
+        symbolSize: 10,
         data: [
           [i.indicators.CPI, i.indicators.SPI],
         ],
@@ -91,17 +91,14 @@ const getPromedio = () => {
       </div>
     </div>
     <div class="grid grid-cols-2 gap-2 p-4">
-      <div class="col-span-1">
-        
-        <AdvancedBarChart :key="showLineChart" title="Avance Proyectos en Ejecución " :series="series"
-          :yAxisData="projects" />
-      </div>
+      <AdvancedBarChart :key="showLineChart" title="Avance Proyectos en Ejecución " :series="series"
+        :yAxisData="projects" />
       <div class="col-span-1">
         <!-- <AdvancedBar :key="showLineChart" title="Avance Proyectos en Ejecución" :series="series" /> -->
         <SimpleScatterChart :key="showLineChart" title="Proyectos" :series="scatterSeries" />
       </div>
       <div class="shadow-md col-span-1 md:col-span-2 m-4">
-        <BeijingAQIChart />
+        <!-- <BeijingAQIChart /> -->
       </div>
     </div>
   </main>
