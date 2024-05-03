@@ -20,7 +20,7 @@ class Task extends Model implements Auditable
         'manuallyScheduled' => 'boolean',
     ];
 
-    protected $appends = ['children','segments'];
+    protected $appends = ['children','segments' ];
 
     protected $guarded = [];
 
