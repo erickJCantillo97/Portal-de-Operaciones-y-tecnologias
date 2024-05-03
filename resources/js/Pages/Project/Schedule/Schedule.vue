@@ -22,7 +22,7 @@ const toast = useToast();
 const fontSize = ref('10px')
 const props = defineProps({
     project: Object,
-    notes:Array
+    notes: Array
 })
 
 LocaleManager.applyLocale('Es');
@@ -722,22 +722,25 @@ const ganttConfig = ref({
 //#region toolbar
 const onAddTaskClick = async () => {
     let gantt = ganttref.value.instance.value
-    // console.log(gantt.value.instance.value)
-    const added = gantt.taskStore.rootNode.appendChild({
-        name: "Nueva tarea",
-        duration: 1
-    });
-    gantt.indent(added)
-    // wait for immediate commit to calculate new task fields
-    await gantt.project.commitAsync();
+    if (project.value.calendar_id != null) {
+        const added = gantt.taskStore.rootNode.appendChild({
+            name: "Nueva tarea",
+            duration: 1
+        });
+        gantt.indent(added)
+        // wait for immediate commit to calculate new task fields
+        await gantt.project.commitAsync();
 
-    // scroll to the added task
-    await gantt.scrollRowIntoView(added);
+        // scroll to the added task
+        await gantt.scrollRowIntoView(added);
 
-    gantt.features.cellEdit.startEditing({
-        record: added,
-        field: "name"
-    });
+        gantt.features.cellEdit.startEditing({
+            record: added,
+            field: "name"
+        });
+    }else{
+        toast.add({ severity: 'error', group: 'customToast', text: 'Primero debe asociar un calendario', life: 2000 });
+    }
 }
 
 const onEditTaskClick = () => {
