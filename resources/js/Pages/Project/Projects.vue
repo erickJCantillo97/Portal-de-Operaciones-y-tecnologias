@@ -30,7 +30,7 @@ const { toast } = useSweetalert()
 const { confirmDelete } = useSweetalert()
 
 const addAct = (event, p) => {
-    router.get(route('createSchedule.create'), { project: p.uuid })
+    router.get(route('createSchedule.create',p.uuid ))
     // projectSelect.value = p
     // op.value.toggle(event)
 }
