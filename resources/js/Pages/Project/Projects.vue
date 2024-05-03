@@ -30,7 +30,7 @@ const { toast } = useSweetalert()
 const { confirmDelete } = useSweetalert()
 
 const addAct = (event, p) => {
-    router.get(route('createSchedule.create', p.id))
+    router.post(route('createSchedule.create'), { project: p.id })
     // projectSelect.value = p
     // op.value.toggle(event)
 }
@@ -224,9 +224,9 @@ const url = [
                     </p>
                     <Listbox :key="listTipologia" v-model="tipologia" :options="tipologias" filter optionLabel="name"
                         @click="selectTipologia()" listStyle="max-height:59vh" class="w-full md:w-14rem" :pt="{
-                filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
-                item: { class: 'hover:bg-blue-100 text-md !px-1 !py-0.5' },
-            }">
+        filterInput: { class: 'rounded-md border !h-8 border-gray-200' },
+        item: { class: 'hover:bg-blue-100 text-md !px-1 !py-0.5' },
+    }">
                         <template #option="slotProps">
                             <div class="grid grid-cols-7 h-min">
                                 <p class="col-span-6 flex items-center">{{ slotProps.option.name }}</p>

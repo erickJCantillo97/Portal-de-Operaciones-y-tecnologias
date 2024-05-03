@@ -16,12 +16,13 @@ import FileUpload from 'primevue/fileupload';
 import CustomInput from '@/Components/CustomInput.vue';
 import Dropdown from 'primevue/dropdown';
 import MultiSelect from 'primevue/multiselect';
+import Sidebar from 'primevue/sidebar';
 
 const toast = useToast();
 const fontSize = ref('10px')
 const props = defineProps({
     project: Object,
-    groups: Array
+    default: { id: 32 }
 })
 
 LocaleManager.applyLocale('Es');
@@ -30,14 +31,24 @@ const loading = ref(false)
 const error = ref(false)
 const canRedo = ref()
 const canUndo = ref()
-
+const notes = ref()
+function getNotas() {
+    axios.get(route('get.task.notes', props.project.id))
+        .then((res) => {
+            notes.value = res.data
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+}
 //#region funciones
 const headerTpl = ({ currentPage, totalPages }) => `
     <div class="flex space-x-3 items-center">
-        <img class="max-h-8" alt="Company logo" src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
+        <div class="p-0.5 bg-white">
+            <img class="max-h-8" alt="Company logo" src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
+        </div>
         <h3>${props.project.name}</h3>
     </div>
-    <img class="opacity-50" alt="Company logo" src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
     <dl>
         <dt>Fecha y hora de impresion: ${DateHelper.format(new Date(), 'll LT')}</dt>
         <dd>${totalPages ? `Pagina: ${currentPage + 1}/${totalPages}` : ''}</dd>
@@ -456,7 +467,7 @@ const pdfExport = ref({
     exportServer: 'https://dev.bryntum.com:8082',
     headerTpl,
     footerTpl,
-    orientation: 'portrait',
+    orientation: 'landscape',
     paperFormat: 'Letter',
     keepRegionSizes: { locked: true },
     exportDialog: {
@@ -464,7 +475,9 @@ const pdfExport = ref({
         items: {
             columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
         }
-    }
+    },
+    repeatHeader: true,
+    exporterType: 'multipage'
 })
 const taskEdit = ref({
     items: {
@@ -588,6 +601,7 @@ const project = ref(
             },
             sync: (e) => {
                 loading.value = false
+                getNotas()
                 let gantt = ganttref.value.instance.value
                 canRedo.value = gantt.project.stm.canRedo
                 canUndo.value = gantt.project.stm.canUndo
@@ -595,6 +609,7 @@ const project = ref(
             load: (e) => {
                 onExpandAllClick()
                 onZoomToFitClick()
+                getNotas()
                 listCalendar.value = e.response.assignCalendar;
                 listShift.value = e.response.shift;
                 formCalendar.value.project = props.project.id;
@@ -815,7 +830,6 @@ function onFilterChange() {
         gantt.taskStore.clearFilters();
     } else {
         texto.value = texto.value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
         gantt.taskStore.filter({
             filters: task =>
                 task.name && task.name.match(new RegExp(texto.value, "i")),
@@ -1035,6 +1049,9 @@ const showCritical = () => {
     let gantt = ganttref.value.instance.value
     gantt.features.criticalPaths.disabled = critical.value
 }
+
+const visibleNotes = ref(false)
+
 //#endregion
 
 //#region calendario
@@ -1225,8 +1242,10 @@ const submit = async () => {
                         icon="fa-solid fa-upload" @click="modalImport = true" />
                     <Button raised v-tooltip.bottom="'Ruta critica'" severity="danger"
                         icon="fa-solid fa-circle-exclamation" @click="showCritical()" />
-                    <Button raised v-tooltip.bottom="'Recargar Cronograma'" severity="success" v-if="!readOnly"
-                        icon="fa-solid fa-arrows-rotate" @click="reload" />
+                    <Button raised v-tooltip.bottom="'Guardar'" severity="success" icon="fa-solid fa-save"
+                        @click="reload" v-if="!readOnly" />
+                    <Button raised v-tooltip.bottom="'Ver notas'" severity="success" icon="fa-regular fa-note-sticky"
+                        @click="visibleNotes = true" />
 
                     <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange"
                         placeholder="Buscar por fecha" class="hidden sm:flex !h-8 shadow-md" showIcon
@@ -1350,6 +1369,19 @@ const submit = async () => {
             <Button severity="success" :loading="loadSaveCalendar" label="Guardar" @click="submit" />
         </div>
     </OverlayPanel>
+    <Sidebar v-model:visible="visibleNotes" header="Notas del proyecto" position="right">
+        <div class="border-t w-full space-y-2 p-1">
+            <div v-for="note, index in notes"
+                @click="(texto == note.name ? texto = '' : texto = note.name); onFilterChange()"
+                class="border cursor-pointer rounded-md p-1 hover:bg-primary-light"
+                :class="texto == note.name ? 'bg-success-light' : ''">
+                <label :for="index + note.id" class="font-bold w-full text-center">{{ note.name }}</label>
+                <p class="w-full border rounded-md overflow-hidden p-1 text-ellipsis">
+                    {{ note.note }}
+                </p>
+            </div>
+        </div>
+    </Sidebar>
 </template>
 
 
@@ -1358,11 +1390,11 @@ const submit = async () => {
 .b-export-footer {
     display: flex;
     color: #fff;
-    background: #0076f8;
     align-items: center;
 }
 
 .b-export-header {
+    background: rgb(46 48 146);
     text-align: start;
     height: 40px;
     position: relative;

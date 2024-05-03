@@ -43,7 +43,7 @@ const item = ref()
 </script>
 <template>
     <div class="sm:flex sm:flex-col h-36 w-full sm:w-52 sm:rounded-lg  divide-y  sm:h-full pt-1 gap-1">
-        <ToggleButton v-model="typePersonal" onLabel="Ver Cotecmar" offLabel="Ver Contratista" :pt="{ root: 'h-8' }" />
+        <ToggleButton v-model="typePersonal" onLabel="Ver Cotecmar" offLabel="Ver Contratista" :pt="{ root: 'h-8',box:'!border bg-primary-light border-primary' }" />
         <div v-if="loadingPerson" class="w-full h-full flex flex-col justify-center">
             <Loading class="mt-10 hidden sm:flex" message="Cargando personas" />
             <ProgressBar mode="indeterminate" class="flex sm:hidden" style="height: 4px" />
