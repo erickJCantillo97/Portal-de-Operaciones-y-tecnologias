@@ -56,6 +56,18 @@ class RequirementController extends Controller
         ]);
     }
 
+    public function aproveRequirement(Request $request, Requirement $requirement)
+    {
+        if ($requirement->approved_dipr_date == null) {
+            $requirement->approved_dipr_date = Carbon::now();
+            $requirement->approved_dipr_user = auth()->user()->id;
+            $requirement->save();
+            return response()->json([
+                'message' => 'Requerimiento Aprobado'
+            ]);
+        }
+    }
+
     public function getRequirementByRole()
     {
         $requirements = [];

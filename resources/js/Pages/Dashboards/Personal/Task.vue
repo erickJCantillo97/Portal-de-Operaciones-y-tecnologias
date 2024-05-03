@@ -107,12 +107,12 @@ const f_Done_Start = ref(formatUTCOffset(doneFormData.value.start))
 const f_Done_End = ref(formatUTCOffset(doneFormData.value.end))
 
 const getTaskPendientes = () => {
-    axios.get(route('get.times.employees'))
-        .then((res) => {
-            pending.value = res.data.times
-            inProcess.value = res.data.inProcess
-            // done.value = res.data.times
-        })
+    inProcessModal.value = false
+    axios.get(route('get.times.employees')).then((res) => {
+        pending.value = res.data.times
+        inProcess.value = res.data.inProcess
+        // done.value = res.data.times
+    })
 }
 
 onMounted(() => {
@@ -128,7 +128,7 @@ const handleDragEnd = (event) => {
 }
 
 const handleDrop = (type) => {
-    console.log(moveList.value + ' - ' + type)
+
     switch (type) {
         case 'pending':
             if (moveList.value == 'inProcess')
@@ -342,7 +342,7 @@ const doneSubmit = () => {
                             </h3>
                             <Tag v-tooltip="`${truncateString(element.project, 60)}`" severity="info"
                                 class="cursor-default" :value="`${truncateString(element.project, 40)}`" rounded :pt="{
-                                    
+
                                 }" />
                             <div class="flex overflow-x-auto space-x-4 w-[22vw] text-sm cursor-default">
                                 <div class="italic p-1 text-nowrap border text-emerald-700 rounded-lg bg-emerald-100">
@@ -454,8 +454,9 @@ const doneSubmit = () => {
             </div>
         </template>
         <template #footer>
-            <Button @click="inProcessDelete()" label="Cancelar" severity="danger" icon="fa fa-circle-xmark" />
-            <Button @click="inProcessSubmit()" :loading label="Guardar" severity="success" icon="pi pi-save" />
+            <Button @click="getTaskPendientes" label="Cancelar" severity="danger" icon="fa fa-circle-xmark"></Button>
+            <Button @click="inProcessSubmit()" label="Guardar" severity="success" icon="pi pi-save"></Button>
+
         </template>
     </CustomModal>
 

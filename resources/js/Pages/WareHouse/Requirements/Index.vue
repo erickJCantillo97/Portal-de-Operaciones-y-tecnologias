@@ -88,7 +88,7 @@ const columns = [
         field: 'estado', header: 'Estado', filter: true, type: 'tag', filtertype: 'EQUALS',
         severitys: [
             { text: 'Por Aprobar', severity: 'danger', class: 'text-red-800' },
-            { text: 'Aprobado DIPR', severity: 'primary', class: '' },
+            { text: 'Aprobado DEIPR', severity: 'primary', class: '' },
             { text: 'Oficial', severity: 'success', class: '' },
         ]
     },

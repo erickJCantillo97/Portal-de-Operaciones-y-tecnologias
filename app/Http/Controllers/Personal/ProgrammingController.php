@@ -76,6 +76,7 @@ class ProgrammingController extends Controller
         $programmin = DetailScheduleTime::where('fecha', $date->format('Y-m-d'))
             ->orderBy('idproyecto')
             ->orderBy('idTask')
+            ->where('Oficina', auth()->user()->oficina)
             ->get()->map(function ($d) {
                 return [
                     'task' => $d['nombreTask'],
@@ -299,7 +300,7 @@ class ProgrammingController extends Controller
     public function getSchedule($fecha, $task)
     {
 
-        return DetailScheduleTime::groupBy('idUsuario')->where('idTask', $task)->where('fecha', $fecha)->select(
+        return DetailScheduleTime::groupBy('idUsuario')->where('Oficina', auth()->user()->oficina)->where('idTask', $task)->where('fecha', $fecha)->select(
             Db::raw('MIN(nombre) as name'),
             Db::raw('MIN(idUsuario) as id'),
             Db::raw('MIN(idSchedule) as schedule'),
@@ -594,7 +595,7 @@ class ProgrammingController extends Controller
                         'startDate' => $task['startDate'],
                         'percentDone' => $task['percentDone'],
                         'shift' => $task->project->shift ? Shift::where('id', $task->project->shift)->first() : null,
-                        'employees' => DetailScheduleTime::groupBy('idUsuario')->where('idTask', $task['id'])->where('fecha', $date)->select(
+                        'employees' => DetailScheduleTime::groupBy('idUsuario')->where('Oficina', auth()->user()->oficina)->where('idTask', $task['id'])->where('fecha', $date)->select(
                             Db::raw('MIN(nombre) as name'),
                             Db::raw('MIN(idUsuario) as id'),
                             Db::raw('MIN(idSchedule) as schedule'),

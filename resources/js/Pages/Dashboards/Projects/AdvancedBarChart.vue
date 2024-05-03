@@ -54,14 +54,16 @@ const option = ref({
   },
   label: {
     show: true,
-    position: 'right',
+    // position: 'insdeLeft',
+    verticalAlign: 'center',
+    align: 'top',
     valueAnimation: true,
     formatter: (val => {
       return new Intl.NumberFormat().format(Number(val.value).toFixed(2)) + '%'
     })
   },
   grid: {
-    left: '100%',
+    left: '0%',
     right: '1%',
     bottom: '3%',
     containLabel: true
@@ -69,6 +71,7 @@ const option = ref({
   xAxis: {
     type: 'value',
     max: 100,
+    min: 0,
     position: 'bottom',
     splitLine: {
       lineStyle: {
@@ -91,7 +94,7 @@ const option = ref({
 </script>
 <style scoped>
 .chart {
-  height: 350px;
+  height: 40vh;
   width: 100%;
 }
 </style>

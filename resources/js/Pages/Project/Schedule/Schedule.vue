@@ -22,7 +22,7 @@ const toast = useToast();
 const fontSize = ref('10px')
 const props = defineProps({
     project: Object,
-    default: { id: 32 }
+    notes: Array
 })
 
 LocaleManager.applyLocale('Es');
@@ -31,16 +31,7 @@ const loading = ref(false)
 const error = ref(false)
 const canRedo = ref()
 const canUndo = ref()
-const notes = ref()
-function getNotas() {
-    axios.get(route('get.task.notes', props.project.id))
-        .then((res) => {
-            notes.value = res.data
-        })
-        .catch((error) => {
-            console.log(error)
-        })
-}
+
 //#region funciones
 const headerTpl = ({ currentPage, totalPages }) => `
     <div class="flex space-x-3 items-center">
@@ -601,7 +592,6 @@ const project = ref(
             },
             sync: (e) => {
                 loading.value = false
-                getNotas()
                 let gantt = ganttref.value.instance.value
                 canRedo.value = gantt.project.stm.canRedo
                 canUndo.value = gantt.project.stm.canUndo
@@ -609,7 +599,6 @@ const project = ref(
             load: (e) => {
                 onExpandAllClick()
                 onZoomToFitClick()
-                getNotas()
                 listCalendar.value = e.response.assignCalendar;
                 listShift.value = e.response.shift;
                 formCalendar.value.project = props.project.id;
@@ -733,22 +722,25 @@ const ganttConfig = ref({
 //#region toolbar
 const onAddTaskClick = async () => {
     let gantt = ganttref.value.instance.value
-    // console.log(gantt.value.instance.value)
-    const added = gantt.taskStore.rootNode.appendChild({
-        name: "Nueva tarea",
-        duration: 1
-    });
-    gantt.indent(added)
-    // wait for immediate commit to calculate new task fields
-    await gantt.project.commitAsync();
+    if (project.value.calendar_id != null) {
+        const added = gantt.taskStore.rootNode.appendChild({
+            name: "Nueva tarea",
+            duration: 1
+        });
+        gantt.indent(added)
+        // wait for immediate commit to calculate new task fields
+        await gantt.project.commitAsync();
 
-    // scroll to the added task
-    await gantt.scrollRowIntoView(added);
+        // scroll to the added task
+        await gantt.scrollRowIntoView(added);
 
-    gantt.features.cellEdit.startEditing({
-        record: added,
-        field: "name"
-    });
+        gantt.features.cellEdit.startEditing({
+            record: added,
+            field: "name"
+        });
+    }else{
+        toast.add({ severity: 'error', group: 'customToast', text: 'Primero debe asociar un calendario', life: 2000 });
+    }
 }
 
 const onEditTaskClick = () => {
