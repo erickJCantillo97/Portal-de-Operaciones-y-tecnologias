@@ -31,10 +31,12 @@ class ScheduleController extends Controller
 {
     public function create(string $uuid)
     {
+
+
         $project = Project::where('uuid', $uuid)->first();
         return Inertia::render('Project/Schedule/Schedule',[  
             'project'=> $project,
-            'task' => VirtualTask::where('project_id',$project->id)->whereNotNull('note')->get()]);
+            'task' => VirtualTask::where('project_id',$project->id)->whereNotNull('note')->get()->toArray()]);
     }
 
     public function index(Project $project)
@@ -518,5 +520,41 @@ class ScheduleController extends Controller
             DB::rollBack();
             return response()->json(['status' => false, 'mensaje' => $e->getMessage()]);
         }
+    }
+
+    public function getCalendarDetails(Task $task){
+        $data = DetailProjectWithCalendar::where('idTask',$task->id)->where('recurrentStartDate','!=','')->select('recurrentStartDate')->distinct()->get()->map(function ($data){
+            $days = explode(" ", $data);
+            return $days[1];
+        });
+        return response()->json([
+            'task' => $task,
+            'workingDays' => $data->first(),
+            'NonWorkingDate' => DetailProjectWithCalendar::where('idTask',$task->id)->where('isWorking',0)->select('name','startDate','endDate')->distinct()->get()->toArray()
+        ]);
+    }
+
+    public function collisionsPerIntervals(Request $request){
+
+        $horaInicio1 = Carbon::parse('15:10'); 
+        $horaFin1 = Carbon::parse('14:00');   
+
+        $horaInicio2 = Carbon::parse('13:00');  
+        $horaFin2 = Carbon::parse('15:00');          
+
+        $inicio_interseccion = max($horaInicio1, $horaInicio2);
+        $fin_interseccion = min($horaFin1, $horaFin2);
+        if ($inicio_interseccion < $fin_interseccion) {
+           return response()->json([
+            'status' => false,
+            'mensaje'=> "el horario se cruza de " . $inicio_interseccion->format('H:i') . " a " . $fin_interseccion->format('H:i')
+           ]);
+        } else {
+            return response()->json([
+                'status' => true,
+                'mensaje'=> 'el horario no se cruza'
+               ]);
+        }
+        
     }
 }
