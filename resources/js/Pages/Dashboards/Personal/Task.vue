@@ -10,6 +10,10 @@ import { useToast } from "primevue/usetoast"
 
 const { truncateString, formatUTCOffset } = useCommonUtilities()
 
+const pending = ref([])
+const inProcess = ref([])
+const done = ref([])
+
 const toast = useToast()
 const inProcessModal = ref(false)
 const doneModal = ref(false)
@@ -18,12 +22,69 @@ const loading = ref(false)
 const moveList = ref('') // De donde proviene (oldIndex)
 const sourceListIndex = ref(null) // Donde está (newIndex)
 
+const pendingTasks = [
+    {
+        id: 1,
+        name: 'AAAAAAA',
+        project: 'AAAAAAAAAAAA',
+        progress: 30,
+        start: '07:00',
+        end: '16:30',
+    },
+    {
+        id: 2,
+        name: 'AAAAAAA',
+        project: 'AAAAAAAAAAAA',
+        progress: 30,
+        start: '07:00',
+        end: '16:30',
+    },
+]
+
+const inProcessTasks = [
+    {
+        id: 1,
+        name: 'AAAAAAA',
+        project: 'AAAAAAAAAAAA',
+        progress: 30,
+        start: '07:00',
+        end: '16:30',
+    },
+    {
+        id: 2,
+        name: 'AAAAAAA',
+        project: 'AAAAAAAAAAAA',
+        progress: 30,
+        start: '07:00',
+        end: '16:30',
+    },
+]
+
+const doneTasks = [
+    {
+        id: 1,
+        name: 'AAAAAAA',
+        project: 'AAAAAAAAAAAA',
+        progress: 30,
+        start: '07:00',
+        end: '16:30',
+    },
+    {
+        id: 2,
+        name: 'AAAAAAA',
+        project: 'AAAAAAAAAAAA',
+        progress: 30,
+        start: '07:00',
+        end: '16:30',
+    },
+]
+
 const inProcessFormData = ref({
     id: null,
     schedule_id: null,
     progress: 0,
     start: null,
-    end: null,
+    end: null
 })
 
 const doneFormData = ref({
@@ -32,12 +93,18 @@ const doneFormData = ref({
     bloque: '',
     sistema_grupo: '',
     document_ref: '',
-    start: '',
-    end: '',
+    start: null,
+    end: null,
     requirements: null,
     files: null,
-    note: '',
+    note: ''
 })
+
+const f_InProcess_Start = ref(formatUTCOffset(inProcessFormData.value.start))
+const f_InProcess_End = ref(formatUTCOffset(inProcessFormData.value.end))
+
+const f_Done_Start = ref(formatUTCOffset(doneFormData.value.start))
+const f_Done_End = ref(formatUTCOffset(doneFormData.value.end))
 
 const getTaskPendientes = () => {
     axios.get(route('get.times.employees'))
@@ -51,12 +118,6 @@ const getTaskPendientes = () => {
 onMounted(() => {
     getTaskPendientes()
 })
-
-const pending = ref([])
-
-const inProcess = ref([])
-
-const done = ref([])
 
 const handleDragStart = (event, move) => {
     moveList.value = move
@@ -100,8 +161,8 @@ const inProcessSubmit = () => {
             inProcessFormData.value.schedule_id = inProcess.value[sourceListIndex.value].id
             axios.post(route('ProgrammingAdvances.store'), {
                 ...inProcessFormData.value,
-                start: formatUTCOffset(inProcessFormData.value.start),
-                end: formatUTCOffset(inProcessFormData.value.end)
+                start: f_InProcess_Start.value,
+                end: f_InProcess_End.value
             }).then((res) => {
                 toast.add({
                     severity: 'success',
@@ -114,8 +175,8 @@ const inProcessSubmit = () => {
         } else {
             axios.put(route('ProgrammingAdvances.update', inProcessFormData.value.id), {
                 ...inProcessFormData.value,
-                start: formatUTCOffset(inProcessFormData.value.start),
-                end: formatUTCOffset(inProcessFormData.value.end)
+                start: f_InProcess_Start.value,
+                end: f_InProcess_End.value
             }).then((res) => {
                 inProcessModal.value = false
                 toast.add({
@@ -141,7 +202,6 @@ const inProcessDelete = () => {
     } catch (error) {
         console.error('Error: ' + error)
     }
-
     inProcessModal.value = false
 }
 
@@ -150,8 +210,9 @@ const inProcessEdit = () => {
 
     inProcessFormData.schedule_id = inProcess.value[sourceListIndex.value].schedule_id
     inProcessFormData.progress = inProcess.value[sourceListIndex.value].progress
-    inProcessFormData.start = inProcess.value[sourceListIndex.value].start
-    inProcessFormData.end = inProcess.value[sourceListIndex.value].end
+
+    doneFormData.start = inProcess.value[sourceListIndex.value].start
+    doneFormData.end = inProcess.value[sourceListIndex.value].end
 }
 //# endregion
 
@@ -161,10 +222,10 @@ const doneSubmit = () => {
         loading.value = true
         if (doneFormData.value.id == null) {
             doneFormData.value.project_id = done.value[sourceListIndex.value].id
-            axios.post(route('ProgrammingAdvances.store'), {
+            axios.post(route('programming.done.store'), {
                 ...doneFormData.value,
-                start: formatUTCOffset(doneFormData.value.start),
-                end: formatUTCOffset(doneFormData.value.end)
+                start: f_Done_Start.value,
+                end: f_Done_End.value
             }).then((res) => {
                 toast(
                     toast.add({
@@ -176,10 +237,10 @@ const doneSubmit = () => {
                 doneModal.value = false
             })
         } else {
-            axios.put(route('ProgrammingAdvances.update', doneFormData.value.id), {
+            axios.put(route('programming.done.update', doneFormData.value.id), {
                 ...doneFormData.value,
-                start: formatUTCOffset(doneFormData.value.start),
-                end: formatUTCOffset(doneFormData.value.end)
+                start: f_Done_Start.value,
+                end: f_Done_End.value
             }).then((res) => {
                 doneModal.value = false
                 toast(
@@ -207,14 +268,15 @@ const doneSubmit = () => {
     <!--ASIGNADAS-->
     <div class="grid grid-cols-3 gap-x-2 p-2 ">
         <div class="bg-orange-100 h-full rounded-lg p-4 hover:shadow-md hover:shadow-orange-500">
-            <div class="flex justify-between w-full p-2 mb-1 bg-white/30 backdrop-blur-sm sticky top-0">
+            <div
+                class="sticky top-0 mb-1 flex w-full justify-between rounded-lg bg-gradient-to-l from-orange-200 p-2 backdrop-blur-sm">
                 <div class="flex space-x-2 justify-center items-center">
-                    <i class="fa-solid fa-clock text-blue-400"></i>
-                    <h1 class="font-extrabold text-primary">
+                    <i class="fa-solid fa-circle-exclamation text-orange-400"></i>
+                    <h1 class="font-extrabold text-orange-500">
                         Actividades Pendientes
                     </h1>
                 </div>
-                <div class="flex w-8 items-center justify-center rounded-full bg-primary p-1">
+                <div class="flex w-8 items-center justify-center rounded-full bg-orange-500 p-1">
                     <span class="text-white text-sm font-semibold">{{ pending.length }}</span>
                 </div>
             </div>
@@ -255,7 +317,8 @@ const doneSubmit = () => {
         </div>
         <!--EN PROCESO-->
         <div class="bg-blue-100 h-full rounded-lg p-4 hover:shadow-md hover:shadow-primary">
-            <div class="flex justify-between w-full p-2 mb-1 bg-white/30 backdrop-blur-sm sticky top-0">
+            <div
+                class="sticky top-0 mb-1 flex w-full justify-between rounded-lg bg-gradient-to-l from-blue-200 p-2 backdrop-blur-sm">
                 <div class="flex space-x-2 justify-center items-center">
                     <i class="fa-solid fa-clock text-blue-400"></i>
                     <h1 class="font-extrabold text-primary">
@@ -278,7 +341,9 @@ const doneSubmit = () => {
                                 {{ truncateString(element.title, 80) }}
                             </h3>
                             <Tag v-tooltip="`${truncateString(element.project, 60)}`" severity="info"
-                                class="cursor-default" :value="`${truncateString(element.project, 40)}`" rounded />
+                                class="cursor-default" :value="`${truncateString(element.project, 40)}`" rounded :pt="{
+                                    
+                                }" />
                             <div class="flex overflow-x-auto space-x-4 w-[22vw] text-sm cursor-default">
                                 <div class="italic p-1 text-nowrap border text-emerald-700 rounded-lg bg-emerald-100">
                                     {{ element.start }} -{{ element.end }}
@@ -290,7 +355,7 @@ const doneSubmit = () => {
                             <div class="flex">
                                 <Button @click="inProcessEdit()" v-tooltip.bottom="'Editar'" severity="secondary" text
                                     icon="fa-solid fa-pen-to-square hover:text-orange-400" />
-                                <Button @click="inProcessSubmit()" v-tooltip.bottom="'Eliminar'" severity="secondary"
+                                <Button @click="inProcessDelete()" v-tooltip.bottom="'Eliminar'" severity="secondary"
                                     text icon="fa fa-trash-can hover:text-red-600" />
                             </div>
                         </div>
@@ -300,7 +365,8 @@ const doneSubmit = () => {
         </div>
         <!--DONE-->
         <div class="bg-emerald-100 h-full rounded-lg p-4 hover:shadow-md hover:shadow-emerald-500">
-            <div class="flex justify-between w-full p-2 mb-1 bg-white/30 backdrop-blur-sm sticky top-0">
+            <div
+                class="sticky top-0 mb-1 flex w-full justify-between rounded-lg bg-gradient-to-l from-emerald-200 p-2 backdrop-blur-sm">
                 <div class="flex space-x-2 justify-center items-center">
                     <i class="fa-solid fa-circle-check text-emerald-500"></i>
                     <h1 class="font-extrabold text-emerald-600">
@@ -333,9 +399,9 @@ const doneSubmit = () => {
                         <div class="flex flex-col justify-center items-center space-y-2 -ml-6">
                             <Knob v-model="element.percentDone" valueTemplate="{value}%" :size="50" readonly />
                             <div class="flex">
-                                <Button @click="" v-tooltip.bottom="'Editar'" severity="secondary" text
-                                    icon="fa-solid fa-pen-to-square hover:text-orange-400" />
-                                <Button @click="" v-tooltip.bottom="'Eliminar'" severity="secondary" text
+                                <!-- <Button @click="" v-tooltip.bottom="'Editar'" severity="secondary" text
+                                    icon="fa-solid fa-pen-to-square hover:text-orange-400" /> -->
+                                <Button @click="doneDelete()" v-tooltip.bottom="'Eliminar'" severity="secondary" text
                                     icon="fa fa-trash-can hover:text-red-600" />
                             </div>
                         </div>
@@ -388,10 +454,8 @@ const doneSubmit = () => {
             </div>
         </template>
         <template #footer>
-            <Button @click="inProcessModal = false" label="Cancelar" severity="danger"
-                icon="fa fa-circle-xmark"></Button>
-            <Button @click="inProcessSubmit()" :loading label="Guardar" severity="success" icon="pi pi-save"></Button>
-
+            <Button @click="inProcessDelete()" label="Cancelar" severity="danger" icon="fa fa-circle-xmark" />
+            <Button @click="inProcessSubmit()" :loading label="Guardar" severity="success" icon="pi pi-save" />
         </template>
     </CustomModal>
 
