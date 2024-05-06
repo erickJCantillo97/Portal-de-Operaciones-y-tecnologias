@@ -108,10 +108,11 @@ const f_Done_End = ref(formatUTCOffset(doneFormData.value.end))
 
 const getTaskPendientes = () => {
     inProcessModal.value = false
+    doneModal.value = false
     axios.get(route('get.times.employees')).then((res) => {
         pending.value = res.data.times
         inProcess.value = res.data.inProcess
-        // done.value = res.data.times
+        done.value = res.data.done
     })
 }
 
@@ -412,7 +413,7 @@ const doneSubmit = () => {
     </div>
 
     <!--MODAL DE "EN PROCESO"-->
-    <CustomModal v-model:visible="inProcessModal" :closable="false" width="40rem">
+    <CustomModal v-model:visible="inProcessModal" :closable="false">
         <template #icon>
             <span class="text-white material-symbols-outlined text-3xl">
                 assignment
@@ -426,7 +427,7 @@ const doneSubmit = () => {
         <template #body>
             <div class="space-y-2 mb-4">
                 <div class="text-xl text-center font-extrabold text-primary border-b border-primary">
-                    {{ inProcess[sourceListIndex].id }}.
+
                     {{ inProcess[sourceListIndex].project }}
                 </div>
                 <div>
@@ -440,9 +441,11 @@ const doneSubmit = () => {
 
                 <CustomInput type="number" :max="99" label="Porcentaje de avance"
                     v-model:input="inProcessFormData.progress" />
-                <div class="flex w-full justify-between items-center">
-                    <CustomInput type="time" label="Hora de Inicio" v-model:input="inProcessFormData.start" />
-                    <CustomInput type="time" label="Hora Fin" v-model:input="inProcessFormData.end" />
+                <div class="flex w-full justify-between items-center space-x-4">
+                    <CustomInput type="time" class="w-full text-center" label="Hora de Inicio"
+                        v-model:input="inProcessFormData.start" />
+                    <CustomInput type="time" class="w-full text-center" label="Hora Fin"
+                        v-model:input="inProcessFormData.end" />
                 </div>
                 <div>
                     <div class="flex overflow-x-auto space-x-4 w-[22vw] text-sm cursor-default">
@@ -460,35 +463,9 @@ const doneSubmit = () => {
         </template>
     </CustomModal>
 
-    <!--MODAL DE "COMPLETADA"-->
-    <!-- <CustomModal v-model:visible="doneModal" width="40rem">
-        <template #icon>
-            <span class="text-white material-symbols-outlined text-3xl">
-                done
-            </span>
-        </template>
-        <template #titulo>
-            <span class="text-xl font-bold text-white white-space-nowrap">
-                Registro de Planilla
-            </span>
-        </template>
-        <template #body>
-            <div v-if="typeChange == 'done'" class="space-y-2 mb-4">
-                <CustomInput type="number" :max="99" label="Porcentaje de avance"
-                    v-model:input="inProcess[sourceListIndex].percentDone" />
-                <div class="flex w-full justify-between items-center">
-                    <CustomInput type="time" label="Hora de Inicio" />
-                    <CustomInput type="time" label="Hora Fin" />
-                </div>
-            </div>
-        </template>
-        <template #footer>
-            <Button @click="doneModal = false" label="Cancelar" severity="danger" icon="fa fa-circle-xmark" />
-            <Button label="Guardar" severity="success" icon="pi pi-save" />
-        </template>
-    </CustomModal> -->
 
-    <CustomModal v-model:visible="doneModal" width="100vh">
+
+    <CustomModal v-model:visible="doneModal" :closable="false">
         <template #icon>
             <span class="text-white material-symbols-outlined text-3xl">
                 task_alt
@@ -502,10 +479,9 @@ const doneSubmit = () => {
         </template>
 
         <template #body>
-            <div class="text-xl text-center font-extrabold text-primary border-b border-primary">
-                {{ done[sourceListIndex].id }}.
+            <h2 class="text-2xl text-center font-extrabold text-primary border-b border-primary">
                 {{ done[sourceListIndex].project }}
-            </div>
+            </h2>
             <div>
                 <span class="text-primary font-bold text-lg">
                     Actividad:
@@ -547,7 +523,7 @@ const doneSubmit = () => {
         </template>
 
         <template #footer>
-            <Button @click="doneModal = false" label="Cancelar" severity="danger" icon="fa fa-circle-xmark" />
+            <Button @click="getTaskPendientes" label="Cancelar" severity="danger" icon="fa fa-circle-xmark" />
             <Button @click="doneSubmit()" :loading label="Guardar" severity="success" icon="pi pi-save" />
         </template>
     </CustomModal>

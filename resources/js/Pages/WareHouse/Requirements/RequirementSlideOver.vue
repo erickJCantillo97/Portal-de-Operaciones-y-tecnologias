@@ -1,7 +1,7 @@
 <script setup>
 const { hasRole, hasPermission } = usePermissions()
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { Link } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
 import { ref, watch, onMounted } from 'vue'
 import { usePermissions } from '@/composable/permission'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
@@ -16,6 +16,9 @@ import CustomInput from '@/Components/CustomInput.vue';
 const { emit } = defineEmits(['closeSlideOver'])
 
 const materialsLoaded = ref()
+const users = ref([]);
+const user = ref([]);
+
 
 const props = defineProps({
   show: {
@@ -36,7 +39,6 @@ const materials = ref([])
 
 const getMaterial = async () => {
   materialsLoaded.value = true
-
   try {
     if (props.requirement.id != null) {
       await axios.get(route('materials.index', props.requirement.id))
@@ -48,10 +50,22 @@ const getMaterial = async () => {
   } catch (error) {
     console.error('Problema al obtener materiales, error: ' + error)
   }
+  try {
+    if (props.requirement.id != null) {
+      await axios.get(route('personal.activos'))
+        .then((res) => {
+          users.value = res.data.personal
+          materialsLoaded.value = false
+        })
+    }
+  } catch (error) {
+    console.error('Problema al obtener materiales, error: ' + error)
+
+  }
+
 }
 const aproveRequirement = () => {
-  axios.post(route('aprove.requirement', props.requirement.id)).then((res) => {
-
+  router.post(route('aprove.requirement', props.requirement.id)).then((res) => {
     approving = !approving
   })
 }
@@ -66,10 +80,14 @@ const optionStatusRequirement = {
     icon: 'fa-solid fa-check',
     color: 'bg-success text-white'
   },
-  'Aprobado DIPR': {
-    icon: 'fa-solid fa-user-clock',
+  'Aprobado DEIPR': {
+    icon: 'fa-solid fa-user-check',
     color: 'bg-primary text-white'
-  }
+  },
+  'Por Aprobar': {
+    icon: 'fa-solid fa-user-clock',
+    color: 'bg-danger text-white'
+  },
 }
 
 watch(() => props.materialsLoaded, (newValue, oldValue) => {
@@ -169,14 +187,20 @@ const optionStatus = {
                     </Link>
 
                     <!--Botón Eliminar-->
-                    <Link :href="'#'">
+                    <Link
+                      :href="'                                                                                                                                                                                                                                                                                                                               #'">
                     <Button v-tooltip.top="'Eliminar'" size=" small" icon="pi pi-trash" raised severity="danger"
                       v-if="hasPermission('quote delete') && requirement.estado != 'Oficial'" />
                     </Link>
 
                   </div>
                   <div v-if="approving" class="space-y-4  p-2 border rounded-lg mx-2">
-                    <CustomInput type="date" class="w-full" />
+                    <CustomInput label="Fecha de Gestión" type="date" class="w-full" />
+                    <div v-if="hasRole('DEPPC USER GECON')">
+                      <CustomInput label="Responsable" type="dropdown" placeholder="Seleccionar Responsable"
+                        :options="users" option-label="Nombres_Apellidos" option-value="Num_SAP" v-model="user">
+                      </CustomInput>
+                    </div>
                     <div class="flex space-x-4">
                       <Button class="w-full" label="Aprobar" icon="pi pi-save" severity="success"
                         @click="aproveRequirement" />

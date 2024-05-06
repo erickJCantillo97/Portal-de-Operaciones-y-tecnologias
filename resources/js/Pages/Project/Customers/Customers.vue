@@ -7,7 +7,7 @@ import { ref } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import { usePermissions } from '@/composable/permission';
 import { useSweetalert } from '@/composable/sweetAlert';
-import AppLayout from '@/Layouts/AppLayout.vue';
+
 import Button from 'primevue/button';
 import CustomDataTable from '@/Components/CustomDataTable.vue';
 import CustomInput from '@/Components/CustomInput.vue';
@@ -99,17 +99,11 @@ const buttons = [
     { event: 'deleteItem', severity: 'danger', icon: 'fa-solid fa-trash', text: true, outlined: false, rounded: false, show: hasPermission('customer delete') },
 ]
 
-const url = [
-    {
-        ruta: 'customers.index',
-        label: 'Clientes',
-        active: true
-    }
-]
+
 </script>
 
 <template>
-    <AppLayout :href="url">
+    
         <div class="h-full w-full overflow-y-auto">
             <CustomDataTable :data="customers" :rows-default="100" title="Clientes" cacheName="customers"
                 :columnas="columnas" :actions="buttons" @showShips="showShips" @deleteItem="deleteItem"
@@ -120,7 +114,6 @@ const url = [
                 </template>
             </CustomDataTable>
         </div>
-    </AppLayout>
 
     <!--MODAL DE FORMULARIO-->
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\UserConfiguration;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -39,6 +40,7 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             'auth.user.roles' => fn () => $request->user() ? $request->user()->getRoleNames() : null,
             'auth.user.permissions' => fn () => $request->user() ? $request->user()->getAllPermissions()->pluck('name') : null,
+            'auth.user.configuration' => fn () => UserConfiguration::where('user_id', $request->user()->id)->get(),
         ]);
     }
 }
