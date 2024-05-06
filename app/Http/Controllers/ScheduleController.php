@@ -535,26 +535,6 @@ class ScheduleController extends Controller
     }
 
     public function collisionsPerIntervals(Request $request){
-
-        $horaInicio1 = Carbon::parse('15:10'); 
-        $horaFin1 = Carbon::parse('14:00');   
-
-        $horaInicio2 = Carbon::parse('13:00');  
-        $horaFin2 = Carbon::parse('15:00');          
-
-        $inicio_interseccion = max($horaInicio1, $horaInicio2);
-        $fin_interseccion = min($horaFin1, $horaFin2);
-        if ($inicio_interseccion < $fin_interseccion) {
-           return response()->json([
-            'status' => false,
-            'mensaje'=> "el horario se cruza de " . $inicio_interseccion->format('H:i') . " a " . $fin_interseccion->format('H:i')
-           ]);
-        } else {
-            return response()->json([
-                'status' => true,
-                'mensaje'=> 'el horario no se cruza'
-               ]);
-        }
-        
+       return  collisionsPerIntervals('10:00','14:00','13:00','19:00');
     }
 }
