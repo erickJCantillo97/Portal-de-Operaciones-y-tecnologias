@@ -35,8 +35,8 @@ class ScheduleController extends Controller
 
         $project = Project::where('uuid', $uuid)->first();
         return Inertia::render('Project/Schedule/Schedule',[  
-            'project'=> $project,
-            'task' => VirtualTask::where('project_id',$project->id)->whereNotNull('note')->get()->toArray()]);
+            'project'=> $project
+        ]);
     }
 
     public function index(Project $project)
@@ -536,5 +536,10 @@ class ScheduleController extends Controller
 
     public function collisionsPerIntervals(Request $request){
        return  collisionsPerIntervals('10:00','14:00','13:00','19:00');
+    }
+
+    public function getNotes(Project $project){
+        return "OK";
+      //  return VirtualTask::where('project_id',$project->id)->whereNotNull('note')->get()->toArray();
     }
 }
