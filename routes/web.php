@@ -6,6 +6,7 @@ use App\Http\Controllers\Dashboard\DashboardEstimacionesController;
 use App\Http\Controllers\DatabaseBackController;
 use App\Http\Controllers\NotificationUserController;
 use App\Http\Controllers\Suggestion\SuggestionController;
+use App\Http\Controllers\UserConfigurationController;
 use App\Ldap\User;
 use App\Models\Process;
 use App\Models\Project\Operation;
@@ -67,6 +68,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('getNotifications', function () {
         return Inertia::render('Notifications/Index');
     })->name('notifications.index');
+
+    Route::post('userConfiguration', [UserConfigurationController::class, 'store'])->name('userconfiguration.store');
 });
 
 Route::get('recuperarDatos', function () {
@@ -172,19 +175,9 @@ Route::get('estmaciones_anterior', function () {
     }
 });
 
-Route::get('peps_anteriores', [DatabaseBackController::class, 'getPep']);
-Route::get('grafos-anteriores', [DatabaseBackController::class, 'getGrafos']);
-Route::get('operaciones-anteriores', [DatabaseBackController::class, 'getOperations']);
-Route::get('hitos-anteriores', [DatabaseBackController::class, 'getHitos']);
-Route::get('avance_anteriores', [DatabaseBackController::class, 'getProgress']);
 
-Route::get('/mailable', function () {
-    $project = Project::first();
-    // dd($project);
-    $customer = Customer::first()->name;
 
-    return new App\Mail\CreateProjectMail($project, $customer);
-});
+
 Route::get('/prueba', function (Request $request) {
     // setEmpleadosAPI();
     $operacion = Operation::where('project_id', 136)->first();
@@ -226,9 +219,6 @@ Route::get('/prueba', function (Request $request) {
     // return Excegl::download(new ProjectsDetailsExport, 'invoices.xlsx');
 })->name('prueba');
 
-Route::get('add-super-user', function () {
-    $user = UserNotify::where('username', 'gdiaz')->first()->assignRole('Super Admin');
-});
 
 Route::resource('getNotifications', NotificationUserController::class);
 

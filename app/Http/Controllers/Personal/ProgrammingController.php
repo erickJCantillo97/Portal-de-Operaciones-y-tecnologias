@@ -382,10 +382,23 @@ class ProgrammingController extends Controller
                 'project' => $task['NombreProyecto'],
             ];
         });
+        $done = $advances->where('progress', 100)->map(function ($time) {
+            $task = DetailScheduleTime::where('idScheduleTime', $time['schedule_id'])->first();
+            return [
+                'id' => $time['id'],
+                'start' => Carbon::parse($time['start'])->format('H:i'),
+                'end' => Carbon::parse($time['end'])->format('H:i'),
+                'title' => $task['nombreTask'],
+                'date' => $time['date'],
+                'progress' => $time['progress'],
+                'project' => $task['NombreProyecto'],
+            ];
+        });
 
         return response()->json([
             'times' => $times,
-            'inProcess' => $inProgress
+            'inProcess' => $inProgress,
+            'done' => $done
         ]);
     }
 
