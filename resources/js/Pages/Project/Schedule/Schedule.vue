@@ -846,7 +846,10 @@ function baselineRenderer({ baselineRecord, taskRecord, renderData }) {
     }
 }
 // #region exportar
-const visibleExport = ref()
+const visibleExport = ref({
+    modal: false,
+    load: false
+})
 
 const pdfExport = ref({
     exportServer: 'https://dev.bryntum.com:8082',
@@ -861,12 +864,29 @@ const pdfExport = ref({
             columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
         }
     },
-    columns:['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'],
+    columns: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'],
     repeatHeader: true,
     exporterType: 'multipagevertical',
     fileFormat: 'pdf',
-    fileName:'Cronograma-' + props.project.name
+    fileName: 'Cronograma-' + props.project.name
 })
+
+
+const exportSchedule = async() => {
+    visibleExport.value.load = true
+    let gantt = ganttref.value.instance.value
+    await gantt.features.pdfExport.export({ columns: pdfExport.value.columns })
+        .then(result => {
+            console.log(result)
+            toast.add({ text: 'Exportando...', severity: 'success', group: 'customToast', life: 3000 });
+            visibleExport.value.modal = false
+        })
+        .catch((error) => {
+            toast.add({ text: 'Ha ocurrido un error', severity: 'error', group: 'customToast', life: 3000 });
+            console.log(error)
+        });
+    visibleExport.value.load = false
+}
 
 const onExport = () => {
     let gantt = ganttref.value.instance.value
@@ -877,30 +897,6 @@ const onExport = () => {
         filename
     });
 }
-
-const exportSchedule = () => {
-    let gantt = ganttref.value.instance.value
-     gantt.features.pdfExport.export()
-    // gantt.features.pdfExport.export({
-    //     // Required, set list of column ids to export
-    //     columns: gantt.columns.map(c => c.id)
-    // }).then(result => {
-    //     // Response instance and response content in JSON
-    //     let { response, responseJSON } = result;
-    //     console.log(response)
-    //     console.log(responseJSON)
-    //     visibleExport.value = false
-    // });
-    visibleExport.value = false
-    // .then((res) => {
-    //     console.log(res)
-    //     toast.add({ text: 'Exportado con exito', severity: 'success', group: 'customToast', life: 3000 });
-    // }).catch((error) => {
-    //     console.log(error)
-    //     toast.add({ text: 'Ha ocurrido un error', severity: 'error', group: 'customToast', life: 3000 });
-    // });
-}
-
 // #endregion
 
 const setConf = ref()
@@ -1255,7 +1251,7 @@ const submit = async () => {
                     <Button raised v-tooltip.bottom="'Ver lineas base'" icon="fa-solid fa-eye"
                         @click="seeLB.toggle($event)" />
                     <Button raised v-tooltip.bottom="'Exportar a PDF'" icon="fa-solid fa-file-pdf"
-                        @click="visibleExport = true" />
+                        @click="visibleExport.modal = true" />
                     <Button raised v-tooltip.bottom="'Exportar a XML'" icon="fa-solid fa-file-arrow-down"
                         @click="onExport()" />
                     <Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input"
@@ -1407,7 +1403,7 @@ const submit = async () => {
     </Sidebar>
 
     <!-- #region prueba exportar -->
-    <CustomModal v-model:visible="visibleExport" icon="fa-solid fa-file-export" titulo="Exportar cronograma"
+    <CustomModal v-model:visible="visibleExport.modal" icon="fa-solid fa-file-export" titulo="Exportar cronograma"
         width="40vw">
         <template #body>
             <div class="space-y-4">
@@ -1417,9 +1413,8 @@ const submit = async () => {
                 </div>
                 <div class="w-full">
                     <label for="columns">Seleccionar columnas a exportar</label>
-                    <MultiSelect v-model="pdfExport.columns" option-value="type"
-                        option-label="text" class="w-full" id="columns" display="chip"
-                        :options="ganttConfig.columns.slice(0, -1)">
+                    <MultiSelect v-model="pdfExport.columns" option-value="type" option-label="text" class="w-full"
+                        id="columns" display="chip" :options="ganttConfig.columns.slice(0, -1)">
                     </MultiSelect>
                 </div>
                 <div class="grid grid-cols-3 gap-4">
@@ -1448,8 +1443,9 @@ const submit = async () => {
         </template>
         <template #footer>
             <span class="pr-4 mt-4 space-x-2">
-                <Button label="Cancelar" severity="danger" icon="fa-regular fa-circle-xmark" @click="visibleExport = false"/>
-                <Button label="Exportar" severity="success" icon="fa-solid fa-download" @click="exportSchedule()" />
+                <Button label="Cancelar" :loading="visibleExport.load" severity="danger"
+                    icon="fa-regular fa-circle-xmark" @click="visibleExport.modal = false" />
+                <Button label="Exportar" :loading="visibleExport.load" severity="success" icon="fa-solid fa-download" @click="exportSchedule()" />
             </span>
         </template>
     </CustomModal>
