@@ -15,6 +15,8 @@ import OverlayPanel from 'primevue/overlaypanel';
 import Swal from 'sweetalert2';
 import TabPanel from 'primevue/tabpanel';
 import TabView from 'primevue/tabview';
+import CustomModal from '@/Components/CustomModal.vue';
+import Customers from '@/Pages/Project/Customers/Customers.vue';
 
 const props = defineProps({
     estimadores: Object,
@@ -227,6 +229,7 @@ const url = [
     }
 ]
 
+const customer = ref(false)
 
 </script>
 <template>
@@ -266,7 +269,10 @@ const url = [
     }" />
                         </span>
                         <span class="">
-                            <p>Cliente</p>
+                            <div class="flex justify-between">
+                                <p>Cliente</p>
+                                <Button icon="fa fa-plus" text="" severity="success" @click="customer = true" />
+                            </div>
                             <Dropdown v-model="dataQuoteNew.customer_id" :options="customers" filter optionLabel="name"
                                 optionValue="id" placeholder="Selecciona un cliente" class="w-full md:w-14rem !h-8"
                                 showClear :disabled="newQuote ? false : !modEdit" :pt="{
@@ -469,4 +475,27 @@ const url = [
         ">
         </Editor>
     </OverlayPanel>
+
+    <CustomModal v-model:visible="customer" :closable="false">
+        <template #icon>
+            <span class="text-white material-symbols-outlined text-3xl">
+                assignment
+            </span>
+        </template>
+        <template #titulo>
+            <span class="text-xl font-bold text-white white-space-nowrap">
+                Clientes
+            </span>
+        </template>
+        <template #body>
+            <div class="space-y-2 mb-4">
+                <Customers :customers></Customers>
+            </div>
+        </template>
+        <template #footer>
+            <Button @click="customer = false" label="Cancelar" severity="danger" icon="fa fa-circle-xmark"></Button>
+            <!-- <Button @click="inProcessSubmit()" label="Guardar" severity="success" icon="pi pi-save"></Button> -->
+
+        </template>
+    </CustomModal>
 </template>

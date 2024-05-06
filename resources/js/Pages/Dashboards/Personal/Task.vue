@@ -22,63 +22,6 @@ const loading = ref(false)
 const moveList = ref('') // De donde proviene (oldIndex)
 const sourceListIndex = ref(null) // Donde está (newIndex)
 
-const pendingTasks = [
-    {
-        id: 1,
-        name: 'AAAAAAA',
-        project: 'AAAAAAAAAAAA',
-        progress: 30,
-        start: '07:00',
-        end: '16:30',
-    },
-    {
-        id: 2,
-        name: 'AAAAAAA',
-        project: 'AAAAAAAAAAAA',
-        progress: 30,
-        start: '07:00',
-        end: '16:30',
-    },
-]
-
-const inProcessTasks = [
-    {
-        id: 1,
-        name: 'AAAAAAA',
-        project: 'AAAAAAAAAAAA',
-        progress: 30,
-        start: '07:00',
-        end: '16:30',
-    },
-    {
-        id: 2,
-        name: 'AAAAAAA',
-        project: 'AAAAAAAAAAAA',
-        progress: 30,
-        start: '07:00',
-        end: '16:30',
-    },
-]
-
-const doneTasks = [
-    {
-        id: 1,
-        name: 'AAAAAAA',
-        project: 'AAAAAAAAAAAA',
-        progress: 30,
-        start: '07:00',
-        end: '16:30',
-    },
-    {
-        id: 2,
-        name: 'AAAAAAA',
-        project: 'AAAAAAAAAAAA',
-        progress: 30,
-        start: '07:00',
-        end: '16:30',
-    },
-]
-
 const inProcessFormData = ref({
     id: null,
     schedule_id: null,
@@ -99,12 +42,6 @@ const doneFormData = ref({
     files: null,
     note: ''
 })
-
-const f_InProcess_Start = ref(formatUTCOffset(inProcessFormData.value.start))
-const f_InProcess_End = ref(formatUTCOffset(inProcessFormData.value.end))
-
-const f_Done_Start = ref(formatUTCOffset(doneFormData.value.start))
-const f_Done_End = ref(formatUTCOffset(doneFormData.value.end))
 
 const getTaskPendientes = () => {
     inProcessModal.value = false
@@ -162,8 +99,8 @@ const inProcessSubmit = () => {
             inProcessFormData.value.schedule_id = inProcess.value[sourceListIndex.value].id
             axios.post(route('ProgrammingAdvances.store'), {
                 ...inProcessFormData.value,
-                start: f_InProcess_Start.value,
-                end: f_InProcess_End.value
+                start: formatUTCOffset(inProcessFormData.value.start),
+                end: formatUTCOffset(inProcessFormData.value.end)
             }).then((res) => {
                 toast.add({
                     severity: 'success',
@@ -176,8 +113,8 @@ const inProcessSubmit = () => {
         } else {
             axios.put(route('ProgrammingAdvances.update', inProcessFormData.value.id), {
                 ...inProcessFormData.value,
-                start: f_InProcess_Start.value,
-                end: f_InProcess_End.value
+                start: formatUTCOffset(inProcessFormData.value.start),
+                end: formatUTCOffset(inProcessFormData.value.end)
             }).then((res) => {
                 inProcessModal.value = false
                 toast.add({
@@ -225,8 +162,8 @@ const doneSubmit = () => {
             doneFormData.value.project_id = done.value[sourceListIndex.value].id
             axios.post(route('programming.done.store'), {
                 ...doneFormData.value,
-                start: f_Done_Start.value,
-                end: f_Done_End.value
+                start: formatUTCOffset(doneFormData.value.start),
+                end: formatUTCOffset(doneFormData.value.end)
             }).then((res) => {
                 toast(
                     toast.add({
@@ -240,8 +177,8 @@ const doneSubmit = () => {
         } else {
             axios.put(route('programming.done.update', doneFormData.value.id), {
                 ...doneFormData.value,
-                start: f_Done_Start.value,
-                end: f_Done_End.value
+                start: formatUTCOffset(doneFormData.value.start),
+                end: formatUTCOffset(doneFormData.value.end)
             }).then((res) => {
                 doneModal.value = false
                 toast(
@@ -344,7 +281,7 @@ const doneSubmit = () => {
                             <Tag v-tooltip="`${truncateString(element.project, 60)}`" severity="info"
                                 class="cursor-default" :value="`${truncateString(element.project, 40)}`" rounded :pt="{
 
-                                }" />
+                    }" />
                             <div class="flex overflow-x-auto space-x-4 w-[22vw] text-sm cursor-default">
                                 <div class="italic p-1 text-nowrap border text-emerald-700 rounded-lg bg-emerald-100">
                                     {{ element.start }} -{{ element.end }}
