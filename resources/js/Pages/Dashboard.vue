@@ -31,9 +31,9 @@ const props = defineProps({
                     v-if="$page.props.auth.user.oficina == 'DEPPC'" />
             </div>
 
-            <Task></Task>
-            <!-- <Quotes v-if="$page.props.auth.user.oficina == 'DEEST' || $page.props.auth.user.username == 'elara'" />
-            <Planning v-if="$page.props.auth.user.oficina == 'DEPPC'" :projects="props.projects" /> -->
+            <Task v-if="$page.props.auth.user.username == 'ecantillo'""></Task>
+            <Quotes v-if="$page.props.auth.user.oficina == 'DEEST' || $page.props.auth.user.username == 'elara'" />
+            <Planning v-if="$page.props.auth.user.oficina == 'DEPPC'" :projects="props.projects" />
             <!-- <Tools v-if="hasPermission('tool edit')" :projects="props.projects" /> -->
             <!-- <Projects v-else /> -->
             <!-- <CustomUpload mode="advanced" :multiple="true" accept=".xlsx,.xls" url="prueba"/> -->
