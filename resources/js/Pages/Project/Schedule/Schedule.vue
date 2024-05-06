@@ -861,10 +861,11 @@ const pdfExport = ref({
             columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
         }
     },
+    columns:['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'],
     repeatHeader: true,
     exporterType: 'multipagevertical',
     fileFormat: 'pdf',
-    fileName: props.project.SAP_code + '-' + props.project.name
+    fileName:'Cronograma-' + props.project.name
 })
 
 const onExport = () => {
@@ -1416,10 +1417,10 @@ const submit = async () => {
                 </div>
                 <div class="w-full">
                     <label for="columns">Seleccionar columnas a exportar</label>
-                    <!-- <MultiSelect v-model="pdfExport.exportDialog.items.columnsField.value" option-value="type"
+                    <MultiSelect v-model="pdfExport.columns" option-value="type"
                         option-label="text" class="w-full" id="columns" display="chip"
                         :options="ganttConfig.columns.slice(0, -1)">
-                    </MultiSelect> -->
+                    </MultiSelect>
                 </div>
                 <div class="grid grid-cols-3 gap-4">
                     <div class="w-full">
