@@ -17,12 +17,14 @@ import CustomInput from '@/Components/CustomInput.vue';
 import Dropdown from 'primevue/dropdown';
 import MultiSelect from 'primevue/multiselect';
 import Sidebar from 'primevue/sidebar';
+import Empty from '@/Components/Empty.vue';
+import TextInput from '@/Components/TextInput.vue';
 
 const toast = useToast();
 const fontSize = ref('10px')
 const props = defineProps({
     project: Object,
-    notes:Array
+    notes: Array
 })
 
 LocaleManager.applyLocale('Es');
@@ -454,22 +456,6 @@ const editMode = () => {
 
 //#region Features Gantt
 
-const pdfExport = ref({
-    exportServer: 'https://dev.bryntum.com:8082',
-    headerTpl,
-    footerTpl,
-    orientation: 'landscape',
-    paperFormat: 'Letter',
-    keepRegionSizes: { locked: true },
-    exportDialog: {
-        autoSelectVisibleColumns: false,
-        items: {
-            columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
-        }
-    },
-    repeatHeader: true,
-    exporterType: 'multipage'
-})
 const taskEdit = ref({
     items: {
         resourcesTab: {
@@ -615,12 +601,12 @@ const ganttConfig = ref({
         { id: 'wbs', type: 'wbs', text: 'EDT', autoWidth: true }, //gecon
         { id: 'sequence', type: 'sequence', text: 'Secuencia', autoWidth: true },//gemam
         {
-            type: 'manager', autoWidth: true //gemam
+            type: 'manager', autoWidth: true, text: 'Responsable'  //gemam
         },
         {
-            type: 'executor', //gemam
+            type: 'executor', autoWidth: true, text: 'Ejecutor' //gemam
         },
-        { id: 'name', type: 'name', autoWidth: true },
+        { id: 'name', type: 'name', autoWidth: true, text: 'Actividad' },
         { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true, autoWidth: true },
         { id: 'duration', type: 'duration', text: 'Duración', autoWidth: true },
         { id: 'startdate', type: 'startdate', text: 'Fecha Inicio', autoWidth: true },
@@ -722,22 +708,25 @@ const ganttConfig = ref({
 //#region toolbar
 const onAddTaskClick = async () => {
     let gantt = ganttref.value.instance.value
-    // console.log(gantt.value.instance.value)
-    const added = gantt.taskStore.rootNode.appendChild({
-        name: "Nueva tarea",
-        duration: 1
-    });
-    gantt.indent(added)
-    // wait for immediate commit to calculate new task fields
-    await gantt.project.commitAsync();
+    if (project.value.calendar_id != null) {
+        const added = gantt.taskStore.rootNode.appendChild({
+            name: "Nueva tarea",
+            duration: 1
+        });
+        gantt.indent(added)
+        // wait for immediate commit to calculate new task fields
+        await gantt.project.commitAsync();
 
-    // scroll to the added task
-    await gantt.scrollRowIntoView(added);
+        // scroll to the added task
+        await gantt.scrollRowIntoView(added);
 
-    gantt.features.cellEdit.startEditing({
-        record: added,
-        field: "name"
-    });
+        gantt.features.cellEdit.startEditing({
+            record: added,
+            field: "name"
+        });
+    } else {
+        toast.add({ severity: 'error', group: 'customToast', text: 'Primero debe asociar un calendario', life: 2000 });
+    }
 }
 
 const onEditTaskClick = () => {
@@ -856,6 +845,27 @@ function baselineRenderer({ baselineRecord, taskRecord, renderData }) {
         renderData.className['b-baseline-on-time'] = 1;
     }
 }
+// #region exportar
+const visibleExport = ref()
+
+const pdfExport = ref({
+    exportServer: 'https://dev.bryntum.com:8082',
+    headerTpl,
+    footerTpl,
+    orientation: 'landscape',
+    paperFormat: 'Letter',
+    keepRegionSizes: { locked: true },
+    exportDialog: {
+        autoSelectVisibleColumns: false,
+        items: {
+            columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
+        }
+    },
+    repeatHeader: true,
+    exporterType: 'multipagevertical',
+    fileFormat: 'pdf',
+    fileName: props.project.SAP_code + '-' + props.project.name
+})
 
 const onExport = () => {
     let gantt = ganttref.value.instance.value
@@ -867,10 +877,30 @@ const onExport = () => {
     });
 }
 
-const onExportPDF = () => {
+const exportSchedule = () => {
     let gantt = ganttref.value.instance.value
-    gantt.features.pdfExport.showExportDialog();
+     gantt.features.pdfExport.export()
+    // gantt.features.pdfExport.export({
+    //     // Required, set list of column ids to export
+    //     columns: gantt.columns.map(c => c.id)
+    // }).then(result => {
+    //     // Response instance and response content in JSON
+    //     let { response, responseJSON } = result;
+    //     console.log(response)
+    //     console.log(responseJSON)
+    //     visibleExport.value = false
+    // });
+    visibleExport.value = false
+    // .then((res) => {
+    //     console.log(res)
+    //     toast.add({ text: 'Exportado con exito', severity: 'success', group: 'customToast', life: 3000 });
+    // }).catch((error) => {
+    //     console.log(error)
+    //     toast.add({ text: 'Ha ocurrido un error', severity: 'error', group: 'customToast', life: 3000 });
+    // });
 }
+
+// #endregion
 
 const setConf = ref()
 const rowHeight = ref()
@@ -1224,7 +1254,7 @@ const submit = async () => {
                     <Button raised v-tooltip.bottom="'Ver lineas base'" icon="fa-solid fa-eye"
                         @click="seeLB.toggle($event)" />
                     <Button raised v-tooltip.bottom="'Exportar a PDF'" icon="fa-solid fa-file-pdf"
-                        @click="onExportPDF()" />
+                        @click="visibleExport = true" />
                     <Button raised v-tooltip.bottom="'Exportar a XML'" icon="fa-solid fa-file-arrow-down"
                         @click="onExport()" />
                     <Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input"
@@ -1360,7 +1390,10 @@ const submit = async () => {
     </OverlayPanel>
     <Sidebar v-model:visible="visibleNotes" header="Notas del proyecto" position="right">
         <div class="border-t w-full space-y-2 p-1">
-            <div v-for="note, index in notes"
+            <div v-if="!notes" class="mt-10">
+                <Empty message="No hay notas"></Empty>
+            </div>
+            <div v-else v-for="note, index in notes"
                 @click="(texto == note.name ? texto = '' : texto = note.name); onFilterChange()"
                 class="border cursor-pointer rounded-md p-1 hover:bg-primary-light"
                 :class="texto == note.name ? 'bg-success-light' : ''">
@@ -1371,6 +1404,55 @@ const submit = async () => {
             </div>
         </div>
     </Sidebar>
+
+    <!-- #region prueba exportar -->
+    <CustomModal v-model:visible="visibleExport" icon="fa-solid fa-file-export" titulo="Exportar cronograma"
+        width="40vw">
+        <template #body>
+            <div class="space-y-4">
+                <div class="w-full">
+                    <label for="exportName">Nombre del archivo</label>
+                    <!-- <InputText id="exportName" class="w-full" v-model="pdfExport.fileName" /> -->
+                </div>
+                <div class="w-full">
+                    <label for="columns">Seleccionar columnas a exportar</label>
+                    <!-- <MultiSelect v-model="pdfExport.exportDialog.items.columnsField.value" option-value="type"
+                        option-label="text" class="w-full" id="columns" display="chip"
+                        :options="ganttConfig.columns.slice(0, -1)">
+                    </MultiSelect> -->
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="w-full">
+                        <label for="orientation">Orientación</label>
+                        <Dropdown v-model="pdfExport.orientation" option-value="value" option-label="text"
+                            class="w-full" id="orientation"
+                            :options="[{ text: 'Panoramica', value: 'landscape' }, { text: 'Retrato', value: 'portrait' }]">
+                        </Dropdown>
+                    </div>
+                    <div class="w-full">
+                        <label for="format">Formato de hoja</label>
+                        <Dropdown v-model="pdfExport.paperFormat" option-value="value" option-label="text"
+                            class="w-full" id="format"
+                            :options="[{ text: 'A1', value: 'A1' }, { text: 'A2', value: 'A2' }, { text: 'A3', value: 'A3' }, { text: 'A4', value: 'A4' }, { text: 'A5', value: 'A5' }, { text: 'Oficio', value: 'Legal' }, { text: 'Carta', value: 'Letter' }]">
+                        </Dropdown>
+                    </div>
+                    <div class="w-full">
+                        <label for="fileformat">Formato de archivo</label>
+                        <Dropdown v-model="pdfExport.fileFormat" option-value="value" option-label="text" class="w-full"
+                            id="fileformat" :options="[{ text: 'PDF', value: 'pdf' }, { text: 'PNG', value: 'png' }]">
+                        </Dropdown>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template #footer>
+            <span class="pr-4 mt-4 space-x-2">
+                <Button label="Cancelar" severity="danger" icon="fa-regular fa-circle-xmark" @click="visibleExport = false"/>
+                <Button label="Exportar" severity="success" icon="fa-solid fa-download" @click="exportSchedule()" />
+            </span>
+        </template>
+    </CustomModal>
+    <!-- #endregion -->
 </template>
 
 

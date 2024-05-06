@@ -600,9 +600,9 @@ const optionsData = ref({
                                 </div>
                             </span>
                         </div>
-                        <div class="h-full space-y-2 overflow-y-scroll pl-1 ">
-                            <div v-if="projectsSelected.length > 0" v-for="project in projectsSelected"
-                                class="grid-cols-10 ml-0.5 divide-x divide-y cursor-default h-full divide-gray-100 border border-indigo-200 rounded-l-md text-lg leading-6 grid">
+                        <div v-if="projectsSelected.length > 0" class="h-full space-y-2 overflow-y-scroll pl-1 snap-mandatory snap-y">
+                            <div v-for="project in projectsSelected"
+                                class="snap-start grid-cols-10 ml-0.5 ursor-default h-full  border-indigo-200 rounded-l-md text-lg leading-6 grid">
                                 <div v-if="optionsData.showProjectProgramming" class="flex flex-col items-center px-2">
                                     <div class="flex h-full w-full items-center justify-center flex-col font-bold">
                                         <p>
@@ -628,9 +628,9 @@ const optionsData = ref({
                                     </div>
                                 </span>
                             </div>
-                            <div class="" v-else>
-                                <NoContentToShow subject="Seleccione uno o mas proyectos" />
-                            </div>
+                        </div>
+                        <div class="" v-else>
+                            <NoContentToShow subject="Seleccione uno o mas proyectos" />
                         </div>
                         <div class="grid-cols-10 h-8 text-sm grid pr-3 items-center pl-2 border-t shadow-lg mt-1 ">
                             <div v-if="optionsData.showProjectProgramming">
