@@ -206,7 +206,6 @@ class RequirementController extends Controller
                         'observation' => $material['observacion'],
                     ]
                 );
-
                 // dd($material['material']['material']['id']);
                 Material::find($material['material']['material']['id'])->update([
                     'code' => $material['codigo_material'],

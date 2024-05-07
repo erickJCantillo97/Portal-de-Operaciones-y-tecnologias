@@ -63,9 +63,17 @@ class User extends Authenticatable implements LdapAuthenticatable
         'profile_photo_url',
         'short_name',
         'photo',
+        'configurations'
     ];
 
-    
+    public function getConfigurationsAttribute()
+    {
+        return UserConfiguration::where('user_id', $this->id)->get()->map(function ($config) {
+            return [
+                $config['key'] => $config['value'],
+            ];
+        });
+    }
 
 
     public function getShortNameAttribute()
