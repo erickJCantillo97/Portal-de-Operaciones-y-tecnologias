@@ -196,7 +196,8 @@ class ScheduleController extends Controller
                     'startDate' => $task['startDate'],
                     'endDate' => $task['endDate'],
                     'manuallyScheduled' => $task['manuallyScheduled'],
-                    'parentIndex' => intval($task['parentIndex'])
+                    'parentIndex' => intval($task['parentIndex']),
+                    'calendar_id' => $task['calendar'],
                 ]);
                 array_push($rows, [
                     '$PhantomId' => $task['$PhantomId'],
@@ -539,7 +540,6 @@ class ScheduleController extends Controller
     }
 
     public function getNotes(Project $project){
-        return "OK";
-      //  return VirtualTask::where('project_id',$project->id)->whereNotNull('note')->get()->toArray();
+       return VirtualTask::where('project_id',$project->id)->whereNotNull('note')->get()->toArray();
     }
 }

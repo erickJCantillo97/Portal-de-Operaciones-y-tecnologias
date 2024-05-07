@@ -958,6 +958,7 @@ const ganttConfigImporter = ref({
     },
 }
 )
+let auxproj
 const btnImport = ref(true)
 const uploadMSP = async (file) => {
     let ganttImport = ganttrefimport.value.instance.value
@@ -988,7 +989,8 @@ const uploadMSP = async (file) => {
                 if (res.status == 200) {
                     const { project } = ganttImport;
                     await importer.importData(res.data);
-                    project.destroy();
+                    auxproj=res.data.project
+                    // project.destroy();
                     ganttImport.setStartDate(ganttImport.project.startDate);
                     await ganttImport.scrollToDate(ganttImport.project.startDate, { block: 'start' });
                     btnImport.value = false
@@ -1040,7 +1042,7 @@ const importMSP = async () => {
     const dataImport = JSON.parse(JSON.stringify(ganttImport.project))
     const projectImport = dataImport.project
     const calendarImport = dataImport.calendarsData.find((calendar) => { return calendar.id === projectImport.calendar })
-    await axios.post(route('before.sync', props.project), { project: projectImport, calendar: calendarImport })
+    await axios.post(route('before.sync', props.project), { project: auxproj, calendar: calendarImport })
         .then(async (res) => {
             // console.log(res)
             await ganttImport.project.sync()
@@ -1337,7 +1339,7 @@ const submit = async () => {
                 @click="onZoomToFitClick()" />
         </div>
     </OverlayPanel>
-    <CustomModal v-model:visible="modalImport" icon="fa-solid fa-upload" titulo="Importar desde project" width="80vw">
+    <CustomModal v-model:visible="modalImport" icon="fa-solid fa-upload" titulo="Importar desde project" width="80vw" >
         <template #body>
             <div class="w-full flex h-[70vh] flex-col">
                 <div class="flex space-x-4 items-center">
