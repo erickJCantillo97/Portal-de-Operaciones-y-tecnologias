@@ -579,11 +579,11 @@ const optionsData = ref({})
                 <div class="sm:cursor-default h-full overflow-y-auto">
                     <div v-if="mode == 'week'" class="h-full flex flex-col justify-between border rounded-md">
                         <div class="grid-cols-10 h-6 text-lg leading-6 grid pr-3 pl-2 border-b shadow-md mb-1 ">
-                            <div v-if="optionsData.showProjectProgramming" class="flex flex-col items-center">
+                            <div v-if="optionsData.showProjectProgramming?.data" class="flex flex-col items-center">
                                 <p class="flex w-full justify-center items-baseline font-bold">Proyecto</p>
                             </div>
                             <span class="grid grid-cols-7 pr-4"
-                                :class="optionsData.showProjectProgramming ? 'col-span-9' : 'col-span-10'">
+                                :class="optionsData.showProjectProgramming?.data ? 'col-span-9' : 'col-span-10'">
                                 <div v-for="data, index in diasSemana" class="flex w-full flex-col items-center"
                                     :class="[data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary rounded-t-md font-bold' : '']">
                                     <p class="capitalize border-b w-full truncate text-center" :key="data.key">{{
@@ -598,7 +598,7 @@ const optionsData = ref({})
                         <div v-if="projectsSelected.length > 0" class="h-full space-y-2 overflow-y-scroll pl-1 snap-mandatory snap-y">
                             <div v-for="project in projectsSelected"
                                 class="snap-start grid-cols-10 ml-0.5 ursor-default h-full  border-indigo-200 rounded-l-md text-lg leading-6 grid">
-                                <div v-if="optionsData.showProjectProgramming" class="flex flex-col items-center px-2">
+                                <div v-if="optionsData.showProjectProgramming?.data" class="flex flex-col items-center px-2">
                                     <div class="flex h-full w-full items-center justify-center flex-col font-bold">
                                         <p>
                                             {{ project.name }}
@@ -613,7 +613,7 @@ const optionsData = ref({})
                                     </div>
                                 </div>
                                 <span class="grid grid-cols-7 overflow-y-scroll overflow-x-hidden"
-                                    :class="optionsData.showProjectProgramming ? 'col-span-9' : 'col-span-10'">
+                                    :class="optionsData.showProjectProgramming?.data ? 'col-span-9' : 'col-span-10'">
                                     <div v-for="data, index in diasSemana" class="flex flex-col h-full items-center"
                                         :class="[index > 5 ? 'bg-warning-light' : '', data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
                                         <TaskProgramming :project="project.id" :day="data.day" @menu="taskRightClick"
@@ -628,13 +628,13 @@ const optionsData = ref({})
                             <NoContentToShow subject="Seleccione uno o mas proyectos" />
                         </div>
                         <div class="grid-cols-10 h-8 text-sm grid pr-3 items-center pl-2 border-t shadow-lg mt-1 ">
-                            <div v-if="optionsData.showProjectProgramming">
+                            <div v-if="optionsData.showProjectProgramming?.data">
                                 <p class="w-full h-full truncate font-bold">
                                     Total personas
                                 </p>
                             </div>
                             <div class=" grid grid-cols-7 pr-4 z-10"
-                                :class="optionsData.showProjectProgramming ? 'col-span-9' : 'col-span-10'">
+                                :class="optionsData.showProjectProgramming?.data ? 'col-span-9' : 'col-span-10'">
                                 <span v-for="data in diasSemana">
                                     <UserStatusProgramming :date="data.day" :key="data.key + data.day"
                                         v-model:statusSelect="arrayPersonFilter" />
@@ -650,7 +650,7 @@ const optionsData = ref({})
                         <div class="h-full sm:p-1 overflow-hidden sm:overflow-y-auto space-y-1">
                             <div v-if="projectsSelected.length > 0" v-for="project in projectsSelected"
                                 class="border h-full w-full flex flex-col sm:flex-row sm:flex sm:p-1 divide-y-2 sm:divide-y-0 rounded-md hover:shadow-md ">
-                                <div v-if="optionsData.showProjectProgramming"
+                                <div v-if="optionsData.showProjectProgramming?.data"
                                     class="sm:w-40 h-16 sm:h-full sm:max-h-full sm:shadow-none flex items-center flex-col justify-center">
                                     <p class="font-bold">
                                         {{ project.name }}
