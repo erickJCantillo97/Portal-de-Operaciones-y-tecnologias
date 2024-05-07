@@ -3,11 +3,13 @@ import OverlayPanel from 'primevue/overlaypanel';
 import { ref } from 'vue';
 import InputSwitch from 'primevue/inputswitch';
 import Dropdown from 'primevue/dropdown';
+import axios from 'axios';
+import { usePage } from '@inertiajs/vue3';
 
-defineProps({
+const props = defineProps({
     options: {
-        type:Array,
-        default:[]
+        type: Array,
+        default: []
     }
 })
 const optionsGen = ref([
@@ -31,16 +33,36 @@ const toggle = (event) => {
 }
 
 const optionsData = defineModel('optionsData', {
-    default:{},
+    default: {},
     type: Object
 })
 
-function changeOptionGeneral() {
-    var element = document.getElementsByClassName('sizegeneralfont');
-    element[0].style.fontSize = optionsData.value.generalfontsize;
-    // user
+usePage().props.auth.user.configurations.forEach(element => {
+    Object.assign(optionsData.value, element)
+});
+
+props.options.forEach((option) => {
+    if (optionsData.value[option.field] == undefined) {
+        optionsData.value[option.field] = { type: option.type, data: option.default }
+    }
+})
+console.log(optionsData.value)
+async function saveConfig(key, data, type) {
+    let aux = {}
+    aux[key] = JSON.stringify({ 'type': type, 'data': data })
+    console.log(aux)
+    if (key == 'generalfontsize') {
+        changeFontSize(data)
+    }
+    await axios.post(route('userconfiguration.store'), aux)
 }
 
+function changeFontSize(size) {
+    var element = document.getElementsByClassName('sizegeneralfont');
+    element[0].style.fontSize = size;
+}
+
+changeFontSize(optionsData.value?.generalfontsize.data ?? '12px')
 </script>
 
 <template>
@@ -55,22 +77,25 @@ function changeOptionGeneral() {
                 <div v-if="(option.type == 'options')" class="grid grid-cols-2 items-center w-full">
                     <label class="w-full mb-0.5" :for="option.field"> {{ option.label }}</label>
                     <Dropdown :id="option.field" option-value="value" option-label="text" class="w-full"
-                        v-model="optionsData[option.field]" :options="option.options" @change="changeOptionGeneral" />
+                        v-model="optionsData[option.field].data" :options="option.options"
+                        @change="saveConfig(option.field, optionsData[option.field].data, option.type)" />
                 </div>
             </span>
         </div>
-        <p v-if="options.length>0" class="font-bold text-lg my-5 text-center">Configuracion de la pagina</p>
+        <p v-if="options.length > 0" class="font-bold text-lg my-5 text-center">Configuracion de la pagina</p>
         <div class="gap-2" :class="options.length > 4 ? 'grid grid-cols-2 w-96' : 'flex flex-col'">
             <span v-for="option, key in options"
                 :class="(option.visible == undefined ? true : option.visible) ? undefined : 'hidden'">
                 <div class="grid grid-cols-5" v-if="(option.type == 'boolean')">
                     <label class="col-span-4" :for="option.field"> {{ option.label }}</label>
-                    <InputSwitch :id="option.field" v-model="optionsData[option.field]" />
+                    <InputSwitch :id="option.field" v-model="optionsData[option.field].data"
+                        @change="saveConfig(option.field, optionsData[option.field].data, option.type)" />
                 </div>
                 <div v-if="(option.type == 'options')">
                     <label class="col-span-4" :for="option.field"> {{ option.label }}</label>
-                    <Dropdown :id="option.field" class="w-full" v-model="optionsData[option.field]"
-                        :options="option.options" />
+                    <Dropdown :id="option.field" class="w-full" v-model="optionsData[option.field].data"
+                        :options="option.options"
+                        @change="saveConfig(option.field, optionsData[option.field].data, option.type)" />
                 </div>
                 <!-- <CustomInput :label="option.label" v-tooltip="option.tooltip" v-model:input="optionsData[option.field]" :type="option.type" :options="option.options"/> -->
             </span>

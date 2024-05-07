@@ -495,56 +495,55 @@ const optionsConfig = ref([
         field: 'progressProgramming',
         label: 'Ver avance',
         type: 'boolean',
+        default:true
     },
     {
         field: 'daysLateProgramming',
         label: 'Ver retraso',
         type: 'boolean',
+        default:true
     },
     {
         field: 'dateEndProgramming',
         label: 'Ver fecha final',
         type: 'boolean',
+        default:true
     },
     {
         field: 'shiftProgramming',
         label: 'Ver horario',
         type: 'boolean',
+        default:true
     },
     {
         field: 'showPersonProgramming',
         label: 'Mostrar personas',
         type: 'boolean',
+        default:true
     },
     {
         field: 'showProjectProgramming',
         label: 'Mostrar proyectos',
         type: 'boolean',
+        default:true
     },
     {
         field: 'colummnsProgramming',
         label: 'Cantidad de columnas',
         type: 'options',
-        options: ['1', '2', '3', '4', '5', '6']
+        options: ['1', '2', '3', '4', '5', '6'],
+        default:'1'
     },
     {
         field: 'typeProgramming',
         label: 'Tipo de programacion',
         type: 'options',
         options: ['Diario', 'Semanal', 'Fin de actividad'],
+        default:'Diario'
     },
 
 ])
-const optionsData = ref({
-    progressProgramming: true,
-    daysLateProgramming: true,
-    dateEndProgramming: true,
-    shiftProgramming: true,
-    showPersonProgramming: true,
-    showProjectProgramming: true,
-    colummnsProgramming: '3',
-    typeProgramming: 'Diario'
-})
+const optionsData = ref({})
 </script>
 
 <template>

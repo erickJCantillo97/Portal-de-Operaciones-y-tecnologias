@@ -70,7 +70,7 @@ class User extends Authenticatable implements LdapAuthenticatable
     {
         return UserConfiguration::where('user_id', $this->id)->get()->map(function ($config) {
             return [
-                $config['key'] => $config['value'],
+                $config['key'] => json_decode(stripslashes($config['value'])),
             ];
         });
     }
