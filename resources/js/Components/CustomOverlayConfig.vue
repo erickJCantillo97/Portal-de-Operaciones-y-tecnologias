@@ -22,7 +22,8 @@ const optionsGen = ref([
             { text: 'Normal (Recomendado)', value: '12px' },
             { text: 'Grande', value: '13px' },
             { text: 'Muy grande', value: '14px' },
-            { text: 'Enorme', value: '15px' }]
+            { text: 'Enorme', value: '15px' }],
+        default: '12px'
     }
 ])
 
@@ -40,6 +41,12 @@ const optionsData = defineModel('optionsData', {
 usePage().props.auth.user.configurations.forEach(element => {
     Object.assign(optionsData.value, element)
 });
+
+optionsGen.value.forEach((option) => {
+    if (optionsData.value[option.field] == undefined) {
+        optionsData.value[option.field] = { type: option.type, data: option.default }
+    }
+})
 
 props.options.forEach((option) => {
     if (optionsData.value[option.field] == undefined) {
@@ -62,7 +69,7 @@ function changeFontSize(size) {
     element[0].style.fontSize = size;
 }
 
-changeFontSize(optionsData.value?.generalfontsize.data ?? '12px')
+changeFontSize(optionsData.value.generalfontsize?.data ?? '12px')
 </script>
 
 <template>
