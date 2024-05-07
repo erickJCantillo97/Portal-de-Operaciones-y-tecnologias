@@ -18,13 +18,12 @@ import Dropdown from 'primevue/dropdown';
 import MultiSelect from 'primevue/multiselect';
 import Sidebar from 'primevue/sidebar';
 import Empty from '@/Components/Empty.vue';
-import TextInput from '@/Components/TextInput.vue';
+import { usePage } from '@inertiajs/vue3';
 
 const toast = useToast();
 const fontSize = ref('10px')
 const props = defineProps({
-    project: Object,
-    notes: Array
+    project: Object
 })
 
 LocaleManager.applyLocale('Es');
@@ -48,7 +47,13 @@ const headerTpl = ({ currentPage, totalPages }) => `
     </dl>
     `;
 
-const footerTpl = () => `<h3 class="">© ${new Date().getFullYear()} TOP - COTECMAR</h3>`;
+const footerTpl = () => `
+<div class="flex justify-between">
+    <p>Impreso por: ${usePage().props.auth.user.name}</p>
+    <h3 class="bg-primary font-white">© ${new Date().getFullYear()} TOP - COTECMAR</h3>
+</div>`;
+
+// console.log(usePage().props.auth.user.name)
 
 if (!Widget.factoryable.registry.resourcelist) {
     class ResourceList extends List {
@@ -554,10 +559,10 @@ const project = ref(
         autoLoad: true,
         transport: {
             load: {
-                url: route('dataGantt', props.project)
+                url: route('dataGantt', props.project.id)
             },
             sync: {
-                url: route('syncGantt', props.project),
+                url: route('syncGantt', props.project.id),
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -852,12 +857,12 @@ const visibleExport = ref({
 })
 
 const pdfExport = ref({
-    exportServer: 'https://dev.bryntum.com:8082',
+    exportServer: 'localhost:9091',
     headerTpl,
     footerTpl,
     orientation: 'landscape',
     paperFormat: 'Letter',
-    keepRegionSizes: { locked: true },
+    keepRegionSizes: { locked: false },
     exportDialog: {
         autoSelectVisibleColumns: false,
         items: {
@@ -868,14 +873,14 @@ const pdfExport = ref({
     repeatHeader: true,
     exporterType: 'multipagevertical',
     fileFormat: 'pdf',
-    fileName: 'Cronograma-' + props.project.name
+    fileName: 'Cronograma-' + props.project.name + '-' + DateHelper.format(new Date(), 'YYYY-MM-DD')
 })
 
 
-const exportSchedule = async() => {
+const exportSchedule = () => {
     visibleExport.value.load = true
     let gantt = ganttref.value.instance.value
-    await gantt.features.pdfExport.export({ columns: pdfExport.value.columns })
+     gantt.features.pdfExport.export({ columns: pdfExport.value.columns })
         .then(result => {
             console.log(result)
             toast.add({ text: 'Exportando...', severity: 'success', group: 'customToast', life: 3000 });
@@ -885,7 +890,7 @@ const exportSchedule = async() => {
             toast.add({ text: 'Ha ocurrido un error', severity: 'error', group: 'customToast', life: 3000 });
             console.log(error)
         });
-    visibleExport.value.load = false
+        visibleExport.value.load = false
 }
 
 const onExport = () => {
@@ -1332,7 +1337,7 @@ const submit = async () => {
                 @click="onZoomToFitClick()" />
         </div>
     </OverlayPanel>
-    <CustomModal v-model:visible="modalImport" icon="fa-solid fa-upload" titulo="Importar desde project">
+    <CustomModal v-model:visible="modalImport" icon="fa-solid fa-upload" titulo="Importar desde project" width="80vw">
         <template #body>
             <div class="w-full flex h-[70vh] flex-col">
                 <div class="flex space-x-4 items-center">
@@ -1409,7 +1414,7 @@ const submit = async () => {
             <div class="space-y-4">
                 <div class="w-full">
                     <label for="exportName">Nombre del archivo</label>
-                    <!-- <InputText id="exportName" class="w-full" v-model="pdfExport.fileName" /> -->
+                    <InputText id="exportName" class="w-full" v-model="pdfExport.fileName" />
                 </div>
                 <div class="w-full">
                     <label for="columns">Seleccionar columnas a exportar</label>
@@ -1445,7 +1450,8 @@ const submit = async () => {
             <span class="pr-4 mt-4 space-x-2">
                 <Button label="Cancelar" :loading="visibleExport.load" severity="danger"
                     icon="fa-regular fa-circle-xmark" @click="visibleExport.modal = false" />
-                <Button label="Exportar" :loading="visibleExport.load" severity="success" icon="fa-solid fa-download" @click="exportSchedule()" />
+                <Button label="Exportar" :loading="visibleExport.load" severity="success" icon="fa-solid fa-download"
+                    @click="exportSchedule()" />
             </span>
         </template>
     </CustomModal>

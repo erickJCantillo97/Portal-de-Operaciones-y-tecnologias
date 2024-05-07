@@ -11,10 +11,6 @@ import ProgressBar from 'primevue/progressbar';
 import OverlayPanel from 'primevue/overlaypanel';
 import NoContentToShow from '@/Components/NoContentToShow.vue';
 import CustomModal from '@/Components/CustomModal.vue';
-import TabView from 'primevue/tabview';
-import TabPanel from 'primevue/tabpanel';
-import InputSwitch from 'primevue/inputswitch';
-import CustomShiftSelector from '@/Components/CustomShiftSelector.vue';
 import { useToast } from "primevue/usetoast";
 import TaskProgramming from './Components/TaskProgramming.vue';
 import Knob from 'primevue/knob';
@@ -23,7 +19,7 @@ import Listbox from 'primevue/listbox';
 import UserStatusProgramming from '@/Components/sections/UserStatusProgramming.vue';
 import ContextMenu from 'primevue/contextmenu';
 import { useConfirm } from "primevue/useconfirm";
-import CustomOverlayConfig from '@/Components/CustomOverlayConfig.vue';
+// import CustomOverlayConfig from '@/Components/CustomOverlayConfig.vue';
 const confirm = useConfirm();
 const toast = useToast();
 // const { hasRole, hasPermission } = usePermissions()
@@ -552,7 +548,7 @@ const optionsData = ref({
 </script>
 
 <template>
-    <AppLayout>
+    <AppLayout :optionsConfig v-model:optionsData="optionsData">
         <div class="h-full w-full flex flex-col sm:flex-row ">
             <div class="sm:w-full h-full pt-1 px-1 flex flex-col">
                 <div class="sm:flex gap-1 sm:justify-between h-20 sm:h-10 items-center sm:pr-1">
@@ -578,7 +574,7 @@ const optionsData = ref({
                                 @valueChange="getTask()" />
                         </div>
                     </div>
-                    <CustomOverlayConfig :options="optionsConfig" v-model:optionsData="optionsData" />
+                    <!-- <CustomOverlayConfig :options="optionsConfig" v-model:optionsData="optionsData" /> -->
                 </div>
                 <!-- region calendario -->
                 <div class="sm:cursor-default h-full overflow-y-auto">

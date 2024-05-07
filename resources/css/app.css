@@ -572,9 +572,9 @@
     }
 }
 
-html {
+.sizegeneralfont {
     font-family: 'Quicksand';
-    font-size: 12px;
+    /* font-size: 12px; */
 }
 
 /* swal2 */
