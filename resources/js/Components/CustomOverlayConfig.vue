@@ -53,11 +53,9 @@ props.options.forEach((option) => {
         optionsData.value[option.field] = { type: option.type, data: option.default }
     }
 })
-console.log(optionsData.value)
 async function saveConfig(key, data, type) {
     let aux = {}
     aux[key] = JSON.stringify({ 'type': type, 'data': data })
-    console.log(aux)
     if (key == 'generalfontsize') {
         changeFontSize(data)
     }
