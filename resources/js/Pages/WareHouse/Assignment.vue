@@ -55,9 +55,9 @@ const getPersonal = async () => {
 const columnas = [
   // { field: 'project.name', header: 'Proyecto', filter: true, sortable: true },
   { field: 'employee_name', header: 'Empleado', filter: true, sortable: true },
-  { field: 'tool.name', header: 'Equipo', filter: true, sortable: true },
-  { field: 'tool.serial', header: 'Serial', filter: true, sortable: true },
-  { field: 'tool.code', header: 'Codigo Interno', filter: true, sortable: true },
+  { field: 'name', header: 'Equipo', filter: true, sortable: true },
+  { field: 'serial', header: 'Serial', filter: true, sortable: true },
+  { field: 'code', header: 'Codigo Interno', filter: true, sortable: true },
   { field: 'status', header: 'Estado ', filter: true, sortable: true },
   { field: 'assigment_date', header: 'Fecha de Prestamo', type: "date", filter: true, sortable: true },
 ]
@@ -179,7 +179,7 @@ const url = [
   </AppLayout>
 
   <!--Modal Asignación de Equipos-->
-  <CustomModal v-model:visible="openDialog" :closable="true" >
+  <CustomModal v-model:visible="openDialog" :closable="true">
     <template #icon>
       <span class="material-symbols-outlined font-semibold text-3xl">
         construction

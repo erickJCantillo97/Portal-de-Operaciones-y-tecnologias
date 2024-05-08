@@ -37,7 +37,7 @@ const columnas = [
     { field: 'serial', header: 'Serial', filter: true, sortable: true },
     { field: 'estado_operativo', header: 'Operatividad', filter: true, sortable: true },
     { field: 'estado', header: 'Disponibilidad', filter: true, sortable: true },
-    { field: 'assignment_name', header: 'Persona Asignada', filter: true, sortable: true },
+    { field: 'employee_name', header: 'Persona Asignada', filter: true, sortable: true },
 ]
 
 const filterButtons = [
@@ -221,13 +221,13 @@ const url = [
         </template>
     </CustomModal>
     <Toast position="bottom-center" :pt="{
-                root: '!h-10 !w-64',
-                container: {
-                    class: form.error ? '!bg-danger !h-10 !rounded-lg' : '!bg-primary !h-10 !rounded-lg'
-                },
-                content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
-                buttonContainer: '!hidden',
-                icon: '!hidden',
-                detail: '!hidden'
-            }" />
+        root: '!h-10 !w-64',
+        container: {
+            class: form.error ? '!bg-danger !h-10 !rounded-lg' : '!bg-primary !h-10 !rounded-lg'
+        },
+        content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
+        buttonContainer: '!hidden',
+        icon: '!hidden',
+        detail: '!hidden'
+    }" />
 </template>

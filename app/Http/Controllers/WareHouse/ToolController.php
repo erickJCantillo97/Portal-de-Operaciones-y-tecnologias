@@ -23,8 +23,8 @@ class ToolController extends Controller
     {
 
         $warehouse = Warehouse::where('department', auth()->user()->oficina)->first()->id ?? 4;
-        $tools = Tool::where('warehouse_id', $warehouse)->with('category', 'warehouse')->orderBy('category_id')->get();
-        $categories = Category::has('padre')->with('padre', 'padre.padre')->where('level', 'Descripcion')->get();
+        $tools = DB::table('tools_with_assigment_employee')->where('warehouse_id', $warehouse)->get();
+        $categories = Category::where('level', 'Descripcion')->get();
         return Inertia::render('WareHouse/Tools/Index', [
             'tools' => $tools,
             'categories' => $categories,
