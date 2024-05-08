@@ -259,7 +259,7 @@ const url = [
       </span>
     </template>
     <template #titulo>
-      <p>Descargar Equipo {{ toolDownload.tool.name }} de {{ toolDownload.employee_name }}</p>
+      <p>Descargar Equipo {{ toolDownload.name }} de {{ toolDownload.employee_name }}</p>
     </template>
     <template #body>
       <section class="p-2 [&>div>p]:text-xs [&>div>p]:text-gray-500 [&>div>p]:italic">
