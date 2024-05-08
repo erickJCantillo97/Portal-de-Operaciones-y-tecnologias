@@ -540,6 +540,6 @@ class ScheduleController extends Controller
     }
 
     public function getNotes(Project $project){
-       return VirtualTask::where('project_id',$project->id)->whereNotNull('note')->get()->toArray();
+       return VirtualTask::where('project_id',$project->id)->whereNotNull('note')->where('note', '!=', '')->get()->toArray();
     }
 }
