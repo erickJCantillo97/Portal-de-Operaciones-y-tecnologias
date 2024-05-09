@@ -70,12 +70,12 @@ class ScheduleController extends Controller
         })->toArray();
         $recursos = array_merge_recursive($cargos, $personal);
         $projectCalendars = DetailProjectWithCalendar::where('project_id', $project->id);
-        $calendarInterval = $projectCalendars->select('calendarId', 'name')->distinct()->get()->map(function ($calendar) use ($project) {
+        $calendarInterval = $projectCalendars->select('calendarId', 'name')->distinct()->get()->map(function ($calendar) {
             return [
                 'id' => intval($calendar->calendarId),
                 'name' => $calendar->name,
                 'unspecifiedTimeIsWorking' => $calendar->unspecifiedTimeIsWorking == "1" ? true : false,
-                'intervals' => CalendarInterval::where('calendar_id', $calendar->calendarId)->get()->map(function ($interval) {
+                'intervals' => CalendarInterval::where('calendar_id', $calendar->calendarId)->distinct()->get()->map(function ($interval) {
                     if ($interval->recurrentStartDate) {
                         return [
                             'recurrentStartDate' => $interval->recurrentStartDate,
@@ -88,6 +88,7 @@ class ScheduleController extends Controller
                         'startDate' => $interval->startDate,
                         'endDate'   => $interval->endDate,
                         'priority' => 30,
+                        'name' =>  $interval->name,
                         'isWorking'  => $interval->isWorking == "1" ?   true : false
                     ];
                 })->toArray()
@@ -97,12 +98,12 @@ class ScheduleController extends Controller
             'success' => true,
             'project' =>  [
                 'calendar' => intval($project->calendar_id), // calendario por defecto
-                'startDate' => doubleval($project->startDate),
+                'startDate' => '2024-04-04',
                 'hoursPerDay' => doubleval($project->hoursPerDay),
                 'daysPerWeek' => doubleval($project->daysPerWeek),
                 'daysPerMonth' => doubleval($project->daysPerMonth),
-                'durationUnit' => 'day'
-
+                'durationUnit' => 'day',
+                'direction' => 'Forward'
             ],
             'calendars' => [
                 "rows" => $calendarInterval
@@ -223,7 +224,8 @@ class ScheduleController extends Controller
                     'manuallyScheduled' => $task['manuallyScheduled'] ?? $taskUpdate->manuallyScheduled,
                     'parentIndex' => $task['parentIndex'] ?? intval($taskUpdate->parentIndex),
                     'note' => $task['note'] ?? $taskUpdate->note,
-                    'calendar_id' => $task['calendar'] ?? $taskUpdate->calendar
+                    'calendar_id' => $task['calendar'] ?? $taskUpdate->calendar,
+                    'rowcolor' => $task['rowcolor'] ?? $taskUpdate->rowcolor
                 ]);
                 if(empty($task['segments'])){
                     Segment::where('task_id',$task['id'])->delete();
@@ -394,7 +396,8 @@ class ScheduleController extends Controller
                             'recurrentStartDate' => isset($intervals['recurrentStartDate']) == true ?  $intervals['recurrentStartDate'] : '',
                             'recurrentEndDate' => isset($intervals['recurrentEndDate'])  == true ? $intervals['recurrentEndDate'] : '',
                             'startDate' => isset($intervals['startDate']) == true ? Carbon::parse($intervals['startDate'])->format('Y-m-d H:i') : null,
-                            'endDate' => isset($intervals['endDate']) == true ? Carbon::parse($intervals['endDate'])->format('Y-m-d H:i') : null
+                            'endDate' => isset($intervals['endDate']) == true ? Carbon::parse($intervals['endDate'])->format('Y-m-d H:i') : null,
+                            'name' => isset($intervals['name']) == true ? $intervals['endDate'] : ''
                         ]);
                         array_push($calendarsDetails, [
                             'id' => $intervals['$PhantomId'],

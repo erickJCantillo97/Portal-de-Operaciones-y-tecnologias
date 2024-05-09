@@ -38,21 +38,20 @@ const canUndo = ref()
 const headerTpl = ({ currentPage, totalPages }) => `
     <div class="flex space-x-3 items-center">
         <div class="p-0.5 bg-white">
-            <img class="max-h-8" alt="Company logo" src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
+            <img src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
         </div>
         <h3>${props.project.name}</h3>
     </div>
     <dl>
         <dt>Fecha y hora de impresion: ${DateHelper.format(new Date(), 'll LT')}</dt>
+        <dd c>Impreso por: ${usePage().props.auth.user.name}</dd>
         <dd>${totalPages ? `Pagina: ${currentPage + 1}/${totalPages}` : ''}</dd>
     </dl>
     `;
 
-const footerTpl = () => `
-<div class="flex justify-between">
-    <p>Impreso por: ${usePage().props.auth.user.name}</p>
-    <h3 class="bg-primary font-white">© ${new Date().getFullYear()} TOP - COTECMAR</h3>
-</div>`;
+const footerTpl = ({ currentPage, totalPages }) => `
+<h3>© ${new Date().getFullYear()} TOP - COTECMAR</h3></div>
+`;
 
 // console.log(usePage().props.auth.user.name)
 
@@ -430,29 +429,29 @@ if (!Widget.factoryable.registry.TaskManagerColumn) {
     ColumnStore.registerColumnType(TaskManagerColumn);
 }
 
-if (!Widget.factoryable.registry.TaskColorrowColumn) {
-    class TaskColorrowColumn extends Column {
+if (!Widget.factoryable.registry.TaskRowcolorColumn) {
+    class TaskRowcolorColumn extends Column {
         // unique alias of the column
         static get type() {
-            return 'colorrow';
+            return 'rowcolor';
         }
 
         // indicates that the column should be present in "Add New..." column
         static get isGanttColumn() {
-            return true;
+            return false;
         }
 
         static get defaults() {
             return {
                 // the column is mapped to "priority" field of the Task model
-                field: 'colorrow',
+                field: 'rowcolor',
                 // the column title
                 text: 'Color',
                 align: 'center',
             };
         }
     }
-    ColumnStore.registerColumnType(TaskColorrowColumn);
+    ColumnStore.registerColumnType(TaskRowcolorColumn);
 }
 
 class Task extends TaskModel {
@@ -461,7 +460,7 @@ class Task extends TaskModel {
 
     get cls() {
         let obj = {}
-        obj[super.getData('colorrow')] = true
+        obj[super.getData('rowcolor')] = true
         return Object.assign(super.cls, obj);
     }
 }
@@ -474,19 +473,19 @@ onMounted(() => {
 
 const full = ref(false)
 const readOnly = ref()
-const nonWorkingTime = ref(false)
-const notes=ref({load:true,data:[]})
-async function getNotes(){
-    notes.value.load=true
-    await axios.get(route('get.notes',props.project.id))
-    .then((res)=>{
-        // console.log(res)
-        notes.value.data=res.data
-    })
-    .catch((error)=>{
-        console.log(error)
-    })
-    notes.value.load=false
+const nonWorkingTime = ref(true)
+const notes = ref({ load: true, data: [] })
+async function getNotes() {
+    notes.value.load = true
+    await axios.get(route('get.notes', props.project.id))
+        .then((res) => {
+            // console.log(res)
+            notes.value.data = res.data
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+    notes.value.load = false
 }
 
 const editMode = () => {
@@ -658,7 +657,6 @@ const ganttConfig = ref({
         { id: 'duration', type: 'duration', text: 'Duración', autoWidth: true },
         { id: 'startdate', type: 'startdate', text: 'Fecha Inicio', autoWidth: true },
         { id: 'enddate', type: 'enddate', text: 'Fecha fin', autoWidth: true },
-        { type: 'colorrow',  autoWidth: true },
         {
             id: 'resourceassignment',
             type: 'resourceassignment',
@@ -898,20 +896,25 @@ const visibleExport = ref({
     modal: false,
     load: false
 })
+const columnsExport = ref([])
+function showModalExport() {
+    let gantt = ganttref.value.instance.value
+    columnsExport.value = gantt.columns.map((c) => {
+        if (c.type != 'addnew' && c.text != null) {
+            return { text: c.text, type: c.id }
+        }
+    }).filter((c)=>c!==undefined)
+    visibleExport.value.modal = true
+}
+
 
 const pdfExport = ref({
-    exportServer: 'localhost:9091',
+    exportServer: 'https://dev.bryntum.com:8082',
     headerTpl,
     footerTpl,
     orientation: 'landscape',
     paperFormat: 'Letter',
-    keepRegionSizes: { locked: false },
-    exportDialog: {
-        autoSelectVisibleColumns: false,
-        items: {
-            columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
-        }
-    },
+    keepRegionSizes: { locked: true },
     columns: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'],
     repeatHeader: true,
     exporterType: 'multipagevertical',
@@ -920,12 +923,12 @@ const pdfExport = ref({
 })
 
 
-const exportSchedule = () => {
+const exportSchedule = async () => {
     visibleExport.value.load = true
     let gantt = ganttref.value.instance.value
-    gantt.features.pdfExport.export({ columns: pdfExport.value.columns })
+    await gantt.features.pdfExport.export({ columns: pdfExport.value.columns })
         .then(result => {
-            console.log(result)
+            // console.log(result)
             toast.add({ text: 'Exportando...', severity: 'success', group: 'customToast', life: 3000 });
             visibleExport.value.modal = false
         })
@@ -1251,35 +1254,33 @@ const submit = async () => {
 }
 //#endregion
 
-const colorRow = ref('bg-green-400')
+const colorRow = ref('bg-green-200')
 const colors = [
-    {value:'bg-red-400',name:'Rojo'},
-    {value:'bg-white',name:'Blanco'},
-    {value:'bg-green-400',name:'Verde'},
-    {value:'bg-yellow-400',name:'Amarillo'},
-    {value:'bg-blue-400',name:'Azul'},
-    {value:'bg-orange-400',name:'Naranja'},
-    {value:'bg-cyan-400',name:'Acua'},
-    {value:'bg-amber-400',name:'Ámbar'},
-    {value:'bg-lime-400',name:'Lima'},
-    {value:'bg-emerald-400',name:'Esmeralda'},
-    {value:'bg-teal-400',name:'Turquesa'},
-    {value:'bg-sky-400',name:'Cielo'},
-    {value:'bg-indigo-400',name:'Índigo'},
-    {value:'bg-violet-400',name:'Violeta'},
-    {value:'bg-purple-400',name:'Purpura'},
-    {value:'bg-fuchsia-400',name:'Fucsia'},
-    {value:'bg-pink-400',name:'Rosado'},
-    {value:'bg-rose-400',name:'Rosa'},
+    { value: 'bg-inherit', name: 'Sin fondo' },
+    { value: 'bg-red-200', name: 'Rojo' },
+    { value: 'bg-green-200', name: 'Verde' },
+    { value: 'bg-yellow-200', name: 'Amarillo' },
+    { value: 'bg-blue-200', name: 'Azul' },
+    { value: 'bg-orange-200', name: 'Naranja' },
+    { value: 'bg-cyan-200', name: 'Acua' },
+    { value: 'bg-amber-200', name: 'Ámbar' },
+    { value: 'bg-lime-200', name: 'Lima' },
+    { value: 'bg-emerald-200', name: 'Esmeralda' },
+    { value: 'bg-teal-200', name: 'Turquesa' },
+    { value: 'bg-sky-200', name: 'Cielo' },
+    { value: 'bg-indigo-200', name: 'Índigo' },
+    { value: 'bg-violet-200', name: 'Violeta' },
+    { value: 'bg-purple-200', name: 'Purpura' },
+    { value: 'bg-fuchsia-200', name: 'Fucsia' },
+    { value: 'bg-pink-200', name: 'Rosado' },
+    { value: 'bg-rose-200', name: 'Rosa' },
 ]
 function changeColorRow(color) {
     colorRow.value = color
     let gantt = ganttref.value.instance.value
     if (gantt.selectedRecords.length > 0) {
-        // console.log(gantt.selectedRecords)
         gantt.selectedRecords.forEach((task) => {
-            task.set('colorrow', color)
-            // task.set('name','Editada')
+            task.set('rowcolor', color)
         })
     } else {
         toast.add({ severity: 'error', group: 'customToast', text: 'Debe seleccionar la tarea a editar', life: 2000 });
@@ -1340,7 +1341,7 @@ function changeColorRow(color) {
                         <template #menubuttonicon>
                             <i class="fa-solid fa-fill-drip"></i>
                         </template>
-                        <template #item="{item}">
+                        <template #item="{ item }">
                             <div :class="item.value" v-tooltip="item.name" @click="changeColorRow(item.value)"
                                 class="w-8 h-6 border cursor-pointer hover:ring-1" />
                         </template>
@@ -1356,7 +1357,7 @@ function changeColorRow(color) {
                     <Button raised v-tooltip.bottom="'Ver lineas base'" icon="fa-solid fa-eye"
                         @click="seeLB.toggle($event)" />
                     <Button raised v-tooltip.bottom="'Exportar a PDF'" icon="fa-solid fa-file-pdf"
-                        @click="visibleExport.modal = true" />
+                        @click="showModalExport()" />
                     <Button raised v-tooltip.bottom="'Exportar a XML'" icon="fa-solid fa-file-arrow-down"
                         @click="onExport()" />
                     <Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input"
@@ -1365,7 +1366,8 @@ function changeColorRow(color) {
                         icon="fa-solid fa-circle-exclamation" @click="showCritical()" />
                     <Button raised v-tooltip.bottom="'Guardar'" severity="success" icon="fa-solid fa-save"
                         @click="reload" v-if="!readOnly" />
-                    <Button raised v-tooltip.bottom="'Ver notas'" :disabled="notes.data.length==0" :loading="notes.load" severity="success" icon="fa-regular fa-note-sticky"
+                    <Button raised v-tooltip.bottom="'Ver notas'" :disabled="notes.data.length == 0"
+                        :loading="notes.load" severity="success" icon="fa-regular fa-note-sticky"
                         @click="visibleNotes = true" />
 
                     <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange"
@@ -1388,7 +1390,7 @@ function changeColorRow(color) {
                 :pdfExportFeature="pdfExport" :mspExportFeature="true" :projectLines="true"
                 :baselinesFeature="baselines" ref="ganttref" class="h-full" :printFeature="true" v-bind="ganttConfig"
                 :dependenciesFeature="{ radius: 5 }" :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip"
-                :criticalPathsFeature="criticalPaths" :nonWorkingTimeFeature="nonWorkingTime" />
+                :criticalPathsFeature="criticalPaths" :nonWorkingTimeFeature="nonWorkingTime"  />
         </div>
     </AppLayout>
     <OverlayPanel id="setLB" ref="setLB" :pt="{ content: '!p-1' }">
@@ -1492,8 +1494,8 @@ function changeColorRow(color) {
     </OverlayPanel>
     <Sidebar v-model:visible="visibleNotes" header="Notas del proyecto" position="right">
         <div class="border-t w-full space-y-2 p-1">
-            <div v-if="notes.data.length==0" class="mt-10">
-                <Empty message="No hay notas"/>
+            <div v-if="notes.data.length == 0" class="mt-10">
+                <Empty message="No hay notas" />
             </div>
             <div v-else v-for="note, index in notes.data"
                 @click="(texto == note.name ? texto = '' : texto = note.name); onFilterChange()"
@@ -1519,8 +1521,9 @@ function changeColorRow(color) {
                 <div class="w-full">
                     <label for="columns">Seleccionar columnas a exportar</label>
                     <MultiSelect v-model="pdfExport.columns" option-value="type" option-label="text" class="w-full"
-                        id="columns" display="chip" :options="ganttConfig.columns.slice(0, -1)">
+                        id="columns" display="chip" :options="columnsExport">
                     </MultiSelect>
+                    <!-- {{ columnsExport }} -->
                 </div>
                 <div class="grid grid-cols-3 gap-4">
                     <div class="w-full">
@@ -1564,13 +1567,14 @@ function changeColorRow(color) {
 .b-export-footer {
     display: flex;
     color: #fff;
+    background: #2E3092;
     align-items: center;
+    z-index: 10000;
 }
 
 .b-export-header {
-    background: rgb(46 48 146);
     text-align: start;
-    height: 40px;
+    height: 44px;
     position: relative;
     padding: 0.7em 1em 0.5em 1em;
     display: flex;
@@ -1578,6 +1582,10 @@ function changeColorRow(color) {
     justify-content: space-between;
 }
 
+.b-export-header img {
+    height: 32px;
+    width: 32px;
+}
 
 .b-export-header dl {
     margin: 0;
