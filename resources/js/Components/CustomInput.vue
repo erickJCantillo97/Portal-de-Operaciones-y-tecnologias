@@ -222,20 +222,20 @@ defineEmits(['valueChange'])
                     :loading @change="$emit('change', $event)" showClear :filter="optionLabel ? true : false"
                     :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" class="w-full"
                     :pt="{
-            root: '!h-8',
-            input: '!py-0 !flex !items-center !text-sm !font-normal',
-            item: '!py-1 !px-3 !text-sm !font-normal',
-            filterInput: '!h-8'
-        }" />
+                        root: '!h-8',
+                        input: '!py-0 !flex !items-center !text-sm !font-normal',
+                        item: '!py-1 !px-3 !text-sm !font-normal',
+                        filterInput: '!h-8'
+                    }" />
                 <Dropdown v-else-if="type == 'country'" :optionValue :id :disabled :placeholder :filterPlaceholder
                     filter resetFilterOnHide :options="countries" :loading :class="invalid ? 'p-invalid' : ''"
                     v-model="input" optionLabel="translations.spa.common" :aria-describedby="id + '-help'"
                     class="w-full" :pt="{
-            root: '!h-8 ',
-            input: '!py-0 !flex !items-center !text-sm !font-normal',
-            item: '!py-1 !px-3 !text-sm !font-normal',
-            filterInput: '!h-8'
-        }">
+                        root: '!h-8 ',
+                        input: '!py-0 !flex !items-center !text-sm !font-normal',
+                        item: '!py-1 !px-3 !text-sm !font-normal',
+                        filterInput: '!h-8'
+                    }">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class="flex space-x-1">
                             <img :src="slotProps.value.flags.svg" width="30" :alt="slotProps.value">
@@ -257,14 +257,14 @@ defineEmits(['valueChange'])
                 <MultiSelect v-else-if="type == 'multiselect'" :optionValue :id display="chip" v-model="input" :options
                     :optionLabel :loading :maxSelectedLabels :placeholder :disabled :filter="optionLabel ? true : false"
                     :class="invalid ? 'p-invalid' : ''" class="w-full" :aria-describedby="id + '-help'" :pt="{
-            root: '!h-8',
-            label: '!py-0.5 !flex !h-full !items-center !text-sm !font-normal',
-            token: '!py-0 !px-1',
-            tokenLabel: '!text-sm',
-            item: '!py-1 !px-3 !text-sm !font-normal',
-            filterInput: '!h-8',
-            header: '!h-min !py-0.5'
-        }" />
+                        root: '!h-8',
+                        label: '!py-0.5 !flex !h-full !items-center !text-sm !font-normal',
+                        token: '!py-0 !px-1',
+                        tokenLabel: '!text-sm',
+                        item: '!py-1 !px-3 !text-sm !font-normal',
+                        filterInput: '!h-8',
+                        header: '!h-min !py-0.5'
+                    }" />
                 <span v-else-if="type == 'groupcheckbox'">
                     <div class="card flex flex-wrap justify-content-center gap-3">
                         <div class="flex h-8 space-x-1 items-center" v-for="option in options" :key="option.key">
@@ -277,25 +277,26 @@ defineEmits(['valueChange'])
                     :pt="{ root: '!h-8' }" />
 
                 <span v-else-if="type == 'datetime'">
-                    <Calendar :id v-model="input" :minDate :maxDate showTime :required hourFormat="24" showIcon
-                        :stepMinute dateFormat="dd/mm/yy" @date-select="$emit('valueChange', $event)" :disabledDays :pt="{
-            root: '!w-full',
-            input: '!h-8'
-        }" />
+                    <Calendar :id v-model="input" :minDate :maxDate :placeholder showTime :required hourFormat="24"
+                        showIcon :stepMinute dateFormat="dd/mm/yy" @date-select="$emit('valueChange', $event)"
+                        :disabledDays :pt="{
+                            root: '!w-full',
+                            input: '!h-8'
+                        }" />
                 </span>
                 <span v-else-if="type == 'date'">
-                    <Calendar :id v-model="input" :minDate :maxDate :required showIcon :disabledDays :selectionMode
-                        @date-select="$emit('valueChange', $event)" dateFormat="dd/mm/yy" :pt="{
-            root: '!w-full',
-            input: '!h-8 text-center'
-        }" />
+                    <Calendar :id v-model="input" :minDate :maxDate :placeholder :required showIcon :disabledDays
+                        :selectionMode @date-select="$emit('valueChange', $event)" dateFormat="dd/mm/yy" :pt="{
+                            root: '!w-full',
+                            input: '!h-8 !text-center '
+                        }" />
                 </span>
                 <span v-else-if="type == 'time'">
-                    <Calendar :id v-model="input" timeOnly hourFormat="24" :required showIcon dateFormat="dd/mm/yy"
-                        :stepMinute @date-select="$emit('valueChange', $event)" :pt="{
-            root: '!w-full',
-            input: '!h-8'
-        }" />
+                    <Calendar :id v-model="input" timeOnly hourFormat="24" :placeholder :required showIcon
+                        dateFormat="dd/mm/yy" :stepMinute @date-select="$emit('valueChange', $event)" :pt="{
+                            root: '!w-full',
+                            input: '!h-8'
+                        }" />
                 </span>
                 <IconField v-else-if="loading || icon" iconPosition="left" class="w-full">
                     <InputIcon :class="loading ? 'fa-solid fa-spinner animate-spin' : icon" />

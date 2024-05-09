@@ -210,10 +210,10 @@ const clearErrors = () => {
                                             Cargar Actividades
                                         </DialogTitle>
 
-                                        <TextInput v-for="s of processes" :key="s.id" class="mt-2 text-left"
+                                        <!-- <TextInput v-for="s of processes" :key="s.id" class="mt-2 text-left"
                                             :label="'Dias por Mes' + s.name"
                                             :placeholder="'Escriba Numero de Horas por Dia'">
-                                        </TextInput>
+                                        </TextInput> -->
                                     </div>
                                 </div>
                                 <div class="flex px-2 mt-2 space-x-4">
