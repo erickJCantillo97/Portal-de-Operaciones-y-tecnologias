@@ -29,18 +29,17 @@ class UserConfigurationController extends Controller
      */
     public function store(Request $request)
     {
-        $validateData = $request->validate([
-            'key' => 'required',
-            'value' => 'required',
-        ]);
-
+        // $validateData = $request->validate([
+        //     'key' => 'required',
+        //     'value' => 'required',
+        // ]);
         try {
-
+            $key = array_keys($request->all());
             $config = UserConfiguration::firstOrNew([
                 'user_id' => auth()->user()->id,
-                'key' => $validateData['key'],
+                'key' => $key[0],
             ]);
-            $config->value = $validateData['value'];
+            $config->value = $request[$key[0]];
             $config->save();
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);

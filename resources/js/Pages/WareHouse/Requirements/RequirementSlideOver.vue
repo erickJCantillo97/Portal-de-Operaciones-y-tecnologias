@@ -3,17 +3,23 @@ const { hasRole, hasPermission } = usePermissions()
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { Link, router } from '@inertiajs/vue3'
 import { ref, watch, onMounted } from 'vue'
+import { useConfirm } from 'primevue/useconfirm'
 import { usePermissions } from '@/composable/permission'
+import { useToast } from "primevue/usetoast"
 import { XMarkIcon } from '@heroicons/vue/24/outline'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
 import Badge from 'primevue/badge'
+import ConfirmPopup from 'primevue/confirmpopup'
+import CustomInput from '@/Components/CustomInput.vue'
 import DescriptionItem from '@/Components/DescriptionItem.vue'
 import ListBox from 'primevue/listbox'
 import Loading from '@/Components/Loading.vue'
-import CustomInput from '@/Components/CustomInput.vue';
 
 const { emit } = defineEmits(['closeSlideOver'])
+
+const confirm = useConfirm()
+const toast = useToast()
 
 const materialsLoaded = ref()
 const users = ref([]);
@@ -35,6 +41,7 @@ const approving = ref(false)
 const approve = () => {
 
 }
+
 const materials = ref([])
 
 const getMaterial = async () => {
@@ -64,12 +71,107 @@ const getMaterial = async () => {
   }
 
 }
-const aproveRequirement = () => {
-  router.post(route('aprove.requirement', props.requirement.id)).then((res) => {
-    approving = !approving
-  })
+
+//#region Requirement's CRUD
+const approvedRequirement = async () => {
+  console.log('Approved')
+  try {
+    await axios.post(route('aprove.requirement', props.requirement.id))
+      .then((res) => {
+        approving.value = !approving.value
+      })
+  } catch (error) {
+    console.error('Error: ' + error)
+  }
 }
 
+const printRequirement = async () => {
+  console.log('Print')
+  try {
+    await axios.get(route('aprove.requirement', props.requirement.id))
+      .then((res) => {
+        approving.value = !approving.value
+      })
+  } catch (error) {
+    console.error('Error: ' + error)
+  }
+}
+
+const rejectedRequirement = async () => {
+  console.log('Rejected')
+  try {
+    await axios.post(route('aprove.requirement', props.requirement.id))
+      .then((res) => {
+        approving.value = !approving.value
+      })
+  } catch (error) {
+    console.error('Error: ' + error)
+  }
+}
+
+const manageRequirement = async () => {
+  // route('manage.requirements', { requirements: requirement.map((x) => x.id) })
+  console.log('Gestionar')
+  try {
+    await axios.get(route('manage.requirements', {
+      requirements: requirement.map((x) => x.id)
+    })).then((res) => {
+      approving.value = !approving.value
+    })
+  } catch (error) {
+    console.error('Error: ' + error)
+  }
+}
+
+const editRequirement = async () => {
+  console.log('Edit')
+  try {
+    await axios.put(route('aprove.requirement', props.requirement.id))
+      .then((res) => {
+        approving.value = !approving.value
+      })
+  } catch (error) {
+    console.error('Error: ' + error)
+  }
+}
+
+const confirmDelete = (event, requirement) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: {
+      message: `¿Está seguro de eliminar el requerimiento ${requirement.consecutivo} permanentemente?`,
+      subMessage: 'Esta acción no se puede deshacer'
+    },
+    icon: 'pi pi-exclamation-triangle text-danger',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-sm p-button-danger',
+    rejectLabel: 'No',
+    acceptLabel: 'Sí',
+    accept: () => {
+      // await axios.delete(route('requirement.delete'), requirement_id)
+      //   .then((res) => {
+      //     console.log('Hace algo')
+      //   })
+      console.log('Hace algo')
+      toast.add({
+        severity: 'success',
+        group: 'customToast',
+        text: `Se ha eliminado el requerimiento ${requirement.consecutivo} correctamente.`,
+        life: 3000
+      })
+    },
+    reject: () => {
+      console.log('Hace algo aquí también')
+      // toast.add({
+      //   severity: 'error',
+      //   summary: 'Rejected',
+      //   detail: 'You have rejected',
+      //   life: 3000
+      // })
+    }
+  })
+}
+//#endregion
 
 onMounted(() => {
   getMaterial()
@@ -122,7 +224,7 @@ const optionStatus = {
 }
 </script>
 <template>
-  <TransitionRoot as="template" :show="show">
+  <TransitionRoot as="template" :show>
     <Dialog as="div" class="relative z-10" @close="$emit('closeSlideOver')">
       <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0" enter-to="opacity-100"
         leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
@@ -155,22 +257,26 @@ const optionStatus = {
                     </h2>
                   </div>
                   <div class="flex gap-2 items-center justify-center p-2">
-                    <!--Botón Aprobar-->
+                    <!--Botón Imprimir-->
                     <Link :href="'#'" v-if="requirement.estado == 'Aprobado Gerencia'">
-                    <Button v-tooltip.top="'Imprimir'" size="small" icon="pi pi-file-pdf" raised severity="danger" />
+                    <Button @click="printRequirement()" v-tooltip.top="'Imprimir'" size="small" icon="pi pi-file-pdf"
+                      raised severity="danger" />
                     </Link>
 
-                    <Button v-tooltip.top="'Aprobar'" size="small" @click="approving = !approving"
-                      icon="pi pi-check-circle" severity="success"
+                    <!--Botón Aprobar-->
+                    <Button @click="approving = true" v-tooltip.top="'Aprobar'" size="small" icon="pi pi-check-circle"
+                      severity="success"
                       v-if="hasPermission('aprobar requerimientos') && requirement.estado != 'Aprobado Gerencia'" />
 
                     <!--Botón Rechazar-->
                     <Link :href="'#'">
-                    <Button v-tooltip.top="'Rechazar'" size=" small" icon="pi pi-times-circle" raised severity="warning"
+                    <Button @click="rejectedRequirement()" v-tooltip.top="'Rechazar'" size=" small"
+                      icon="pi pi-times-circle" raised severity="warning"
                       v-if="hasPermission('aprobar requerimientos') && requirement.estado != 'Aprobado Gerencia'" />
                     </Link>
 
                     <!--Botón Gestionar-->
+                    <!-- <Link :href="route('manage.requirements', { requirements: requirement.map((data) => data.id) })"> -->
                     <Link :href="'#'">
                     <Button v-tooltip.top="'Gestionar'" size="small" raised severity="info"
                       v-if="hasPermission('gestionar materiales') && requirement.estado == 'Aprobado DEIPR'">
@@ -182,29 +288,27 @@ const optionStatus = {
 
                     <!--Botón Editar-->
                     <Link :href="'#'">
-                    <Button v-tooltip.top="'Editar'" size="small" icon="pi pi-pencil" raised severity="warning"
+                    <Button @click="editRequirement()" v-tooltip.top="'Editar'" size="small" icon="pi pi-pencil" raised
+                      severity="warning"
                       v-if="hasPermission('quote create') && requirement.estado != 'Aprobado Gerencia'" />
                     </Link>
 
                     <!--Botón Eliminar-->
-                    <Link
-                      :href="'                                                                                                                                                                                                                                                                                                                               #'">
-                    <Button v-tooltip.top="'Eliminar'" size=" small" icon="pi pi-trash" raised severity="danger"
+                    <Link :href="'#'">
+                    <Button @click="confirmDelete($event, requirement)" v-tooltip.top="'Eliminar'" size=" small"
+                      icon="pi pi-trash" raised severity="danger"
                       v-if="hasPermission('quote delete') && requirement.estado != 'Oficial'" />
                     </Link>
 
                   </div>
-                  <div v-if="approving" class="space-y-4  p-2 border rounded-lg mx-2">
-                    <CustomInput label="Fecha de Gestión" type="date" class="w-full" />
-                    <div v-if="hasRole('DEPPC USER GECON')">
-                      <CustomInput label="Responsable" type="dropdown" placeholder="Seleccionar Responsable"
-                        :options="users" option-label="Nombres_Apellidos" option-value="Num_SAP" v-model="user">
-                      </CustomInput>
-                    </div>
+                  <div v-if="approving" class="space-y-4 p-2 border rounded-lg mx-2">
+                    <CustomInput type="text" label="Grafo" class="w-full" placeholder="Grafo" />
+                    <CustomInput type="text" label="Solicitud de Pedido" class="w-full" placeholder="Solped" />
+                    <CustomInput type="date" label="Fecha" class="w-full" placeholder="dd/mm/yyyy" />
                     <div class="flex space-x-4">
                       <Button class="w-full" label="Aprobar" icon="pi pi-save" severity="success"
-                        @click="aproveRequirement" />
-                      <Button class="w-full" label="Cancelar" icon="fa fa-circle-xmark" @click="approving = !approving"
+                        @click="approvedRequirement()" />
+                      <Button class="w-full" label="Cancelar" icon="fa fa-circle-xmark" @click="approving = false"
                         severity="danger" />
                     </div>
                   </div>
@@ -226,8 +330,8 @@ const optionStatus = {
                         </div>
                         <div class="shadow-md my-4 px-2 h-full" v-for="material in materials">
                           <Accordion :pt="{
-    content: '!h-[80vh] !p-2 !overflow-y-auto'
-  }">
+                            content: '!h-[80vh] !p-2 !overflow-y-auto'
+                          }">
                             <AccordionTab :activeIndex="0">
                               <template #header>
                                 <span class="flex align-items-center gap-2 w-full">

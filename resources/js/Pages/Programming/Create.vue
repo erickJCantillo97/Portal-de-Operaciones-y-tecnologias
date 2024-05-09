@@ -11,10 +11,6 @@ import ProgressBar from 'primevue/progressbar';
 import OverlayPanel from 'primevue/overlaypanel';
 import NoContentToShow from '@/Components/NoContentToShow.vue';
 import CustomModal from '@/Components/CustomModal.vue';
-import TabView from 'primevue/tabview';
-import TabPanel from 'primevue/tabpanel';
-import InputSwitch from 'primevue/inputswitch';
-import CustomShiftSelector from '@/Components/CustomShiftSelector.vue';
 import { useToast } from "primevue/usetoast";
 import TaskProgramming from './Components/TaskProgramming.vue';
 import Knob from 'primevue/knob';
@@ -23,7 +19,7 @@ import Listbox from 'primevue/listbox';
 import UserStatusProgramming from '@/Components/sections/UserStatusProgramming.vue';
 import ContextMenu from 'primevue/contextmenu';
 import { useConfirm } from "primevue/useconfirm";
-import CustomOverlayConfig from '@/Components/CustomOverlayConfig.vue';
+// import CustomOverlayConfig from '@/Components/CustomOverlayConfig.vue';
 const confirm = useConfirm();
 const toast = useToast();
 // const { hasRole, hasPermission } = usePermissions()
@@ -499,60 +495,59 @@ const optionsConfig = ref([
         field: 'progressProgramming',
         label: 'Ver avance',
         type: 'boolean',
+        default:true
     },
     {
         field: 'daysLateProgramming',
         label: 'Ver retraso',
         type: 'boolean',
+        default:true
     },
     {
         field: 'dateEndProgramming',
         label: 'Ver fecha final',
         type: 'boolean',
+        default:true
     },
     {
         field: 'shiftProgramming',
         label: 'Ver horario',
         type: 'boolean',
+        default:true
     },
     {
         field: 'showPersonProgramming',
         label: 'Mostrar personas',
         type: 'boolean',
+        default:true
     },
     {
         field: 'showProjectProgramming',
         label: 'Mostrar proyectos',
         type: 'boolean',
+        default:true
     },
     {
         field: 'colummnsProgramming',
         label: 'Cantidad de columnas',
         type: 'options',
-        options: ['1', '2', '3', '4', '5', '6']
+        options: ['1', '2', '3', '4', '5', '6'],
+        default:'1'
     },
     {
         field: 'typeProgramming',
         label: 'Tipo de programacion',
         type: 'options',
         options: ['Diario', 'Semanal', 'Fin de actividad'],
+        default:'Diario'
     },
 
 ])
-const optionsData = ref({
-    progressProgramming: true,
-    daysLateProgramming: true,
-    dateEndProgramming: true,
-    shiftProgramming: true,
-    showPersonProgramming: true,
-    showProjectProgramming: true,
-    colummnsProgramming: '3',
-    typeProgramming: 'Diario'
-})
+const optionsData = ref({})
 </script>
 
 <template>
-    <AppLayout>
+    <AppLayout :optionsConfig v-model:optionsData="optionsData">
         <div class="h-full w-full flex flex-col sm:flex-row ">
             <div class="sm:w-full h-full pt-1 px-1 flex flex-col">
                 <div class="sm:flex gap-1 sm:justify-between h-20 sm:h-10 items-center sm:pr-1">
@@ -578,17 +573,17 @@ const optionsData = ref({
                                 @valueChange="getTask()" />
                         </div>
                     </div>
-                    <CustomOverlayConfig :options="optionsConfig" v-model:optionsData="optionsData" />
+                    <!-- <CustomOverlayConfig :options="optionsConfig" v-model:optionsData="optionsData" /> -->
                 </div>
                 <!-- region calendario -->
                 <div class="sm:cursor-default h-full overflow-y-auto">
                     <div v-if="mode == 'week'" class="h-full flex flex-col justify-between border rounded-md">
                         <div class="grid-cols-10 h-6 text-lg leading-6 grid pr-3 pl-2 border-b shadow-md mb-1 ">
-                            <div v-if="optionsData.showProjectProgramming" class="flex flex-col items-center">
+                            <div v-if="optionsData.showProjectProgramming?.data" class="flex flex-col items-center">
                                 <p class="flex w-full justify-center items-baseline font-bold">Proyecto</p>
                             </div>
                             <span class="grid grid-cols-7 pr-4"
-                                :class="optionsData.showProjectProgramming ? 'col-span-9' : 'col-span-10'">
+                                :class="optionsData.showProjectProgramming?.data ? 'col-span-9' : 'col-span-10'">
                                 <div v-for="data, index in diasSemana" class="flex w-full flex-col items-center"
                                     :class="[data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary rounded-t-md font-bold' : '']">
                                     <p class="capitalize border-b w-full truncate text-center" :key="data.key">{{
@@ -603,7 +598,7 @@ const optionsData = ref({
                         <div v-if="projectsSelected.length > 0" class="h-full space-y-2 overflow-y-scroll pl-1 snap-mandatory snap-y">
                             <div v-for="project in projectsSelected"
                                 class="snap-start grid-cols-10 ml-0.5 ursor-default h-full  border-indigo-200 rounded-l-md text-lg leading-6 grid">
-                                <div v-if="optionsData.showProjectProgramming" class="flex flex-col items-center px-2">
+                                <div v-if="optionsData.showProjectProgramming?.data" class="flex flex-col items-center px-2">
                                     <div class="flex h-full w-full items-center justify-center flex-col font-bold">
                                         <p>
                                             {{ project.name }}
@@ -618,7 +613,7 @@ const optionsData = ref({
                                     </div>
                                 </div>
                                 <span class="grid grid-cols-7 overflow-y-scroll overflow-x-hidden"
-                                    :class="optionsData.showProjectProgramming ? 'col-span-9' : 'col-span-10'">
+                                    :class="optionsData.showProjectProgramming?.data ? 'col-span-9' : 'col-span-10'">
                                     <div v-for="data, index in diasSemana" class="flex flex-col h-full items-center"
                                         :class="[index > 5 ? 'bg-warning-light' : '', data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
                                         <TaskProgramming :project="project.id" :day="data.day" @menu="taskRightClick"
@@ -633,13 +628,13 @@ const optionsData = ref({
                             <NoContentToShow subject="Seleccione uno o mas proyectos" />
                         </div>
                         <div class="grid-cols-10 h-8 text-sm grid pr-3 items-center pl-2 border-t shadow-lg mt-1 ">
-                            <div v-if="optionsData.showProjectProgramming">
+                            <div v-if="optionsData.showProjectProgramming?.data">
                                 <p class="w-full h-full truncate font-bold">
                                     Total personas
                                 </p>
                             </div>
                             <div class=" grid grid-cols-7 pr-4 z-10"
-                                :class="optionsData.showProjectProgramming ? 'col-span-9' : 'col-span-10'">
+                                :class="optionsData.showProjectProgramming?.data ? 'col-span-9' : 'col-span-10'">
                                 <span v-for="data in diasSemana">
                                     <UserStatusProgramming :date="data.day" :key="data.key + data.day"
                                         v-model:statusSelect="arrayPersonFilter" />
@@ -655,7 +650,7 @@ const optionsData = ref({
                         <div class="h-full sm:p-1 overflow-hidden sm:overflow-y-auto space-y-1">
                             <div v-if="projectsSelected.length > 0" v-for="project in projectsSelected"
                                 class="border h-full w-full flex flex-col sm:flex-row sm:flex sm:p-1 divide-y-2 sm:divide-y-0 rounded-md hover:shadow-md ">
-                                <div v-if="optionsData.showProjectProgramming"
+                                <div v-if="optionsData.showProjectProgramming?.data"
                                     class="sm:w-40 h-16 sm:h-full sm:max-h-full sm:shadow-none flex items-center flex-col justify-center">
                                     <p class="font-bold">
                                         {{ project.name }}

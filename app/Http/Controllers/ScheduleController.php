@@ -224,7 +224,8 @@ class ScheduleController extends Controller
                     'manuallyScheduled' => $task['manuallyScheduled'] ?? $taskUpdate->manuallyScheduled,
                     'parentIndex' => $task['parentIndex'] ?? intval($taskUpdate->parentIndex),
                     'note' => $task['note'] ?? $taskUpdate->note,
-                    'calendar_id' => $task['calendar'] ?? $taskUpdate->calendar
+                    'calendar_id' => $task['calendar'] ?? $taskUpdate->calendar,
+                    'rowcolor' => $task['rowcolor'] ?? $taskUpdate->rowcolor
                 ]);
                 if(empty($task['segments'])){
                     Segment::where('task_id',$task['id'])->delete();
@@ -542,6 +543,6 @@ class ScheduleController extends Controller
     }
 
     public function getNotes(Project $project){
-       return VirtualTask::where('project_id',$project->id)->whereNotNull('note')->get()->toArray();
+       return VirtualTask::where('project_id',$project->id)->whereNotNull('note')->where('note', '!=', '')->get()->toArray();
     }
 }

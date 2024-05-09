@@ -18,13 +18,13 @@ import Dropdown from 'primevue/dropdown';
 import MultiSelect from 'primevue/multiselect';
 import Sidebar from 'primevue/sidebar';
 import Empty from '@/Components/Empty.vue';
-import TextInput from '@/Components/TextInput.vue';
+import { usePage } from '@inertiajs/vue3';
+import SplitButton from 'primevue/splitbutton';
 
 const toast = useToast();
 const fontSize = ref('10px')
 const props = defineProps({
-    project: Object,
-    notes: Array
+    project: Object
 })
 
 LocaleManager.applyLocale('Es');
@@ -38,17 +38,22 @@ const canUndo = ref()
 const headerTpl = ({ currentPage, totalPages }) => `
     <div class="flex space-x-3 items-center">
         <div class="p-0.5 bg-white">
-            <img class="max-h-8" alt="Company logo" src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
+            <img src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
         </div>
         <h3>${props.project.name}</h3>
     </div>
     <dl>
         <dt>Fecha y hora de impresion: ${DateHelper.format(new Date(), 'll LT')}</dt>
+        <dd c>Impreso por: ${usePage().props.auth.user.name}</dd>
         <dd>${totalPages ? `Pagina: ${currentPage + 1}/${totalPages}` : ''}</dd>
     </dl>
     `;
 
-const footerTpl = () => `<h3 class="">© ${new Date().getFullYear()} TOP - COTECMAR</h3>`;
+const footerTpl = ({ currentPage, totalPages }) => `
+<h3>© ${new Date().getFullYear()} TOP - COTECMAR</h3></div>
+`;
+
+// console.log(usePage().props.auth.user.name)
 
 if (!Widget.factoryable.registry.resourcelist) {
     class ResourceList extends List {
@@ -423,15 +428,41 @@ if (!Widget.factoryable.registry.TaskManagerColumn) {
     }
     ColumnStore.registerColumnType(TaskManagerColumn);
 }
+
+if (!Widget.factoryable.registry.TaskRowcolorColumn) {
+    class TaskRowcolorColumn extends Column {
+        // unique alias of the column
+        static get type() {
+            return 'rowcolor';
+        }
+
+        // indicates that the column should be present in "Add New..." column
+        static get isGanttColumn() {
+            return false;
+        }
+
+        static get defaults() {
+            return {
+                // the column is mapped to "priority" field of the Task model
+                field: 'rowcolor',
+                // the column title
+                text: 'Color',
+                align: 'center',
+            };
+        }
+    }
+    ColumnStore.registerColumnType(TaskRowcolorColumn);
+}
+
 class Task extends TaskModel {
 
     static $name = 'Task';
 
     get cls() {
-        // adds 'b-critical' CSS class to critical tasks
-        return Object.assign(super.cls, { 'b-critical': this.critical });
+        let obj = {}
+        obj[super.getData('rowcolor')] = true
+        return Object.assign(super.cls, obj);
     }
-
 }
 //#endregion
 
@@ -443,6 +474,19 @@ onMounted(() => {
 const full = ref(false)
 const readOnly = ref()
 const nonWorkingTime = ref(false)
+const notes = ref({ load: true, data: [] })
+async function getNotes() {
+    notes.value.load = true
+    await axios.get(route('get.notes', props.project.id))
+        .then((res) => {
+            // console.log(res)
+            notes.value.data = res.data
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+    notes.value.load = false
+}
 
 const editMode = () => {
     let gantt = ganttref.value.instance.value
@@ -554,10 +598,10 @@ const project = ref(
         autoLoad: true,
         transport: {
             load: {
-                url: route('dataGantt', props.project)
+                url: route('dataGantt', props.project.id)
             },
             sync: {
-                url: route('syncGantt', props.project),
+                url: route('syncGantt', props.project.id),
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -581,6 +625,7 @@ const project = ref(
                 let gantt = ganttref.value.instance.value
                 canRedo.value = gantt.project.stm.canRedo
                 canUndo.value = gantt.project.stm.canUndo
+                getNotes()
             },
             load: (e) => {
                 onExpandAllClick()
@@ -588,6 +633,7 @@ const project = ref(
                 listCalendar.value = e.response.assignCalendar;
                 listShift.value = e.response.shift;
                 formCalendar.value.project = props.project.id;
+                getNotes()
             }
         },
     },
@@ -858,26 +904,20 @@ const pdfExport = ref({
     orientation: 'landscape',
     paperFormat: 'Letter',
     keepRegionSizes: { locked: true },
-    exportDialog: {
-        autoSelectVisibleColumns: false,
-        items: {
-            columnsField: { value: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'] }
-        }
-    },
     columns: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'],
     repeatHeader: true,
     exporterType: 'multipagevertical',
     fileFormat: 'pdf',
-    fileName: 'Cronograma-' + props.project.name
+    fileName: 'Cronograma-' + props.project.name + '-' + DateHelper.format(new Date(), 'YYYY-MM-DD')
 })
 
 
-const exportSchedule = async() => {
+const exportSchedule = async () => {
     visibleExport.value.load = true
     let gantt = ganttref.value.instance.value
     await gantt.features.pdfExport.export({ columns: pdfExport.value.columns })
         .then(result => {
-            console.log(result)
+            // console.log(result)
             toast.add({ text: 'Exportando...', severity: 'success', group: 'customToast', life: 3000 });
             visibleExport.value.modal = false
         })
@@ -984,7 +1024,7 @@ const uploadMSP = async (file) => {
                 if (res.status == 200) {
                     const { project } = ganttImport;
                     await importer.importData(res.data);
-                    auxproj=res.data.project
+                    auxproj = res.data.project
                     // project.destroy();
                     ganttImport.setStartDate(ganttImport.project.startDate);
                     await ganttImport.scrollToDate(ganttImport.project.startDate, { block: 'start' });
@@ -1202,6 +1242,40 @@ const submit = async () => {
     }
 }
 //#endregion
+
+const colorRow = ref('bg-green-200')
+const colors = [
+    { value: 'bg-inherit', name: 'Sin fondo' },
+    { value: 'bg-red-200', name: 'Rojo' },
+    { value: 'bg-green-200', name: 'Verde' },
+    { value: 'bg-yellow-200', name: 'Amarillo' },
+    { value: 'bg-blue-200', name: 'Azul' },
+    { value: 'bg-orange-200', name: 'Naranja' },
+    { value: 'bg-cyan-200', name: 'Acua' },
+    { value: 'bg-amber-200', name: 'Ámbar' },
+    { value: 'bg-lime-200', name: 'Lima' },
+    { value: 'bg-emerald-200', name: 'Esmeralda' },
+    { value: 'bg-teal-200', name: 'Turquesa' },
+    { value: 'bg-sky-200', name: 'Cielo' },
+    { value: 'bg-indigo-200', name: 'Índigo' },
+    { value: 'bg-violet-200', name: 'Violeta' },
+    { value: 'bg-purple-200', name: 'Purpura' },
+    { value: 'bg-fuchsia-200', name: 'Fucsia' },
+    { value: 'bg-pink-200', name: 'Rosado' },
+    { value: 'bg-rose-200', name: 'Rosa' },
+]
+function changeColorRow(color) {
+    colorRow.value = color
+    let gantt = ganttref.value.instance.value
+    if (gantt.selectedRecords.length > 0) {
+        gantt.selectedRecords.forEach((task) => {
+            task.set('rowcolor', color)
+        })
+    } else {
+        toast.add({ severity: 'error', group: 'customToast', text: 'Debe seleccionar la tarea a editar', life: 2000 });
+    }
+}
+
 </script>
 <template>
     <AppLayout :href="url">
@@ -1242,6 +1316,25 @@ const submit = async () => {
                         severity="secondary" @click="onExpandAllClick()" />
                     <Button raised icon="fa-solid fa-chevron-up" v-tooltip.bottom="'Contraer todo'" severity="secondary"
                         @click="onCollapseAllClick()" />
+                    <SplitButton raised v-tooltip.bottom="'Colorear'" v-if="!readOnly" :model="colors" text
+                        @click="changeColorRow(colorRow)" :pt="{
+        menu: {
+            root: 'flex',
+            menu: 'grid grid-cols-6 items-center gap-1 flex-wrap space-y-0',
+            menuitem: 'm-0 w-min'
+        }
+    }">
+                        <template #icon>
+                            <div :class="colorRow" class="w-8 h-6"></div>
+                        </template>
+                        <template #menubuttonicon>
+                            <i class="fa-solid fa-fill-drip"></i>
+                        </template>
+                        <template #item="{ item }">
+                            <div :class="item.value" v-tooltip="item.name" @click="changeColorRow(item.value)"
+                                class="w-8 h-6 border cursor-pointer hover:ring-1" />
+                        </template>
+                    </SplitButton>
                     <Button raised icon="fa-solid fa-gear" v-tooltip.bottom="'Ajustes'" severity="secondary"
                         @click="onSettingsShow" />
                     <Button raised icon="fa-solid fa-magnifying-glass" v-tooltip.bottom="'Zoom'" severity="secondary"
@@ -1262,7 +1355,8 @@ const submit = async () => {
                         icon="fa-solid fa-circle-exclamation" @click="showCritical()" />
                     <Button raised v-tooltip.bottom="'Guardar'" severity="success" icon="fa-solid fa-save"
                         @click="reload" v-if="!readOnly" />
-                    <Button raised v-tooltip.bottom="'Ver notas'" severity="success" icon="fa-regular fa-note-sticky"
+                    <Button raised v-tooltip.bottom="'Ver notas'" :disabled="notes.data.length == 0"
+                        :loading="notes.load" severity="success" icon="fa-regular fa-note-sticky"
                         @click="visibleNotes = true" />
 
                     <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange"
@@ -1334,7 +1428,7 @@ const submit = async () => {
                 @click="onZoomToFitClick()" />
         </div>
     </OverlayPanel>
-    <CustomModal v-model:visible="modalImport" icon="fa-solid fa-upload" titulo="Importar desde project" width="80vw" >
+    <CustomModal v-model:visible="modalImport" icon="fa-solid fa-upload" titulo="Importar desde project" width="80vw">
         <template #body>
             <div class="w-full flex h-[70vh] flex-col">
                 <div class="flex space-x-4 items-center">
@@ -1389,10 +1483,10 @@ const submit = async () => {
     </OverlayPanel>
     <Sidebar v-model:visible="visibleNotes" header="Notas del proyecto" position="right">
         <div class="border-t w-full space-y-2 p-1">
-            <div v-if="!notes" class="mt-10">
-                <Empty message="No hay notas"></Empty>
+            <div v-if="notes.data.length == 0" class="mt-10">
+                <Empty message="No hay notas" />
             </div>
-            <div v-else v-for="note, index in notes"
+            <div v-else v-for="note, index in notes.data"
                 @click="(texto == note.name ? texto = '' : texto = note.name); onFilterChange()"
                 class="border cursor-pointer rounded-md p-1 hover:bg-primary-light"
                 :class="texto == note.name ? 'bg-success-light' : ''">
@@ -1411,7 +1505,7 @@ const submit = async () => {
             <div class="space-y-4">
                 <div class="w-full">
                     <label for="exportName">Nombre del archivo</label>
-                    <!-- <InputText id="exportName" class="w-full" v-model="pdfExport.fileName" /> -->
+                    <InputText id="exportName" class="w-full" v-model="pdfExport.fileName" />
                 </div>
                 <div class="w-full">
                     <label for="columns">Seleccionar columnas a exportar</label>
@@ -1447,7 +1541,8 @@ const submit = async () => {
             <span class="pr-4 mt-4 space-x-2">
                 <Button label="Cancelar" :loading="visibleExport.load" severity="danger"
                     icon="fa-regular fa-circle-xmark" @click="visibleExport.modal = false" />
-                <Button label="Exportar" :loading="visibleExport.load" severity="success" icon="fa-solid fa-download" @click="exportSchedule()" />
+                <Button label="Exportar" :loading="visibleExport.load" severity="success" icon="fa-solid fa-download"
+                    @click="exportSchedule()" />
             </span>
         </template>
     </CustomModal>
@@ -1457,35 +1552,38 @@ const submit = async () => {
 
 <style>
 .b-export-header,
-.b-export-footer {
-    display: flex;
-    color: #fff;
-    align-items: center;
+.b-export-footer{
+  display:flex;
+  color:#fff;
+  background:#2E3092;
+  align-items:center;
+  z-index:10000;
 }
 
-.b-export-header {
-    background: rgb(46 48 146);
-    text-align: start;
-    height: 40px;
-    position: relative;
-    padding: 0.7em 1em 0.5em 1em;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
+.b-export-header{
+  text-align:start;
+  height:44px;
+  position:relative;
+  padding:0.7em 1em 0.5em 1em;
+  display:flex;
+  flex-flow:row nowrap;
+  justify-content:space-between;
 }
 
-
-.b-export-header dl {
-    margin: 0;
-    font-size: 10px;
+.b-export-header img{
+  height:32px;
+  width:32px;
+}
+.b-export-header dl{
+  margin:0;
+  font-size:10px;
+}
+.b-export-header dd{
+  margin:0;
 }
 
-.b-export-header dd {
-    margin: 0;
-}
-
-.b-export-footer {
-    justify-content: center;
+.b-export-footer{
+  justify-content:center;
 }
 
 .b-grid-body-container {

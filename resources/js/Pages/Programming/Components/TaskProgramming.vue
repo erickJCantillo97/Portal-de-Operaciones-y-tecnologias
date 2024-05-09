@@ -93,7 +93,7 @@ function search(data, filter) {
             <div v-if="search(task, input)" @contextmenu="$emit('menu', $event, task, day)"
                 @drop="!movil ? $emit('drop', task, day) : null; option = null" @dragover.prevent @dragenter.prevents
                 class=" sm:h-full w-full sm:max-h-44 p-0.5"
-                :class="[type == 'day' ? 'sm:w-1/' + optionsData.colummnsProgramming + ' float-left' : '']"
+                :class="[type == 'day' ? 'sm:w-1/' + optionsData.colummnsProgramming?.data + ' float-left' : '']"
                 :key="task.name + date.toDateString()">
                 <div class="flex border pb-1 rounded-md border-primary hover:bg-primary-light flex-col justify-between h-full"
                     :class="[type === 'day' ? 'text-sm' : 'text-xs']">
@@ -112,21 +112,21 @@ function search(data, filter) {
                             </p>
                             <div v-if="task.task != 'ANRP'" class="flex justify-between items-center px-1 w-full">
                                 <div class="flex h-min cursor-default space-x-1 justify-center"
-                                    v-if="optionsData.dateEndProgramming">
+                                    v-if="optionsData.dateEndProgramming?.data">
                                     <p v-tooltip.left="'Fecha Fin'" class="text-center w-full"
                                         :class="new Date(task.endDate) < date ? 'bg-danger rounded-md px-1 text-white' : ''">
                                         {{ task.endDate }}
                                     </p>
                                 </div>
-                                <div v-if="optionsData.daysLateProgramming">
-                                    <p v-if="(new Date(task.endDate) < date) && type === 'day' && (optionsData.colummnsProgramming < 4)"
+                                <div v-if="optionsData.daysLateProgramming?.data">
+                                    <p v-if="(new Date(task.endDate) < date) && type === 'day' && (optionsData.colummnsProgramming?.data < 4)"
                                         class="border truncate px-2 rounded-md bg-danger text-white">
                                         {{ getDaysLate(task.endDate) }}
                                     </p>
                                     <i v-else-if="(new Date(task.endDate) < date)" v-tooltip="getDaysLate(task.endDate)"
                                         class="fa-solid fa-circle-exclamation text-danger animate-pulse"></i>
                                 </div>
-                                <div v-if="optionsData.shiftProgramming"
+                                <div v-if="optionsData.shiftProgramming?.data"
                                     class="flex cursor-default bg-success-light px-1 space-x-1 justify-center items-center rounded-md">
                                     <p v-tooltip.left="'Hora inicio'" class=" text-center">
                                         {{ format24h(task.shift?.startShift ?? '') }}
@@ -137,7 +137,7 @@ function search(data, filter) {
                                 </div>
                             </div>
                             <div class="h-16 flex items-center w-full">
-                                <div v-if="optionsData.showPersonProgramming"
+                                <div v-if="optionsData.showPersonProgramming?.data"
                                     class="px-2 flex h-full w-full justify-between sm:justify-center items-center overflow-hidden">
                                     <div
                                         class="overflow-x-hidden hover:overflow-x-auto gap-x-1 flex items-center h-full px-2 py-1 max-w-full flex-nowrap">
@@ -165,7 +165,7 @@ function search(data, filter) {
                                     </div>
                                 </div>
                             </div>
-                            <span v-if="optionsData.progressProgramming">
+                            <span v-if="optionsData.progressProgramming?.data">
                                 <ProgressBar v-if="task.task != 'ANRP'" :value="parseFloat(task.percentDone)"
                                     class="h-3 mx-1" v-tooltip="'Avance'" :pt="{ label: 'text-xs font-thin' }">
                                 </ProgressBar>

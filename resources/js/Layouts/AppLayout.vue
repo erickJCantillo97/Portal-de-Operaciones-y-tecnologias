@@ -1,4 +1,5 @@
 <template>
+
     <div v-if="debug == 'true'" class="max-h-[3vh] flex items-center px-6 bg-orange-300 gap-x-6 sm:before:flex-1">
         <p class="space-x-2 text-sm text-white">
             <strong class="font-semibold">Modo de pruebas</strong>
@@ -80,9 +81,8 @@
                         </div>
                     </FlyoutNotificationsMenu>
                     <DolarTRM />
-
-
-                    <DropdownSetting title="Utilidades" />
+                    <CustomOverlayConfig :options="optionsConfig" v-model:optionsData="optionsData" />
+                    <DropdownSetting title="Utilidades" v-if="hasRole('Super Admin')" />
                     <Menu as="div" class="relative inline-block text-left">
                         <div title="Perfil">
                             <MenuButton
@@ -171,7 +171,8 @@
                                                     class="relative flex-col p-2 bg-blue-200 hover:animate-pulse focus:outline-none opacity-80 rounded-tl-3xl rounded-bl-3xl"
                                                     @click="sugerenciaVisible = false">
                                                     <XCircleIcon class="w-6 -rotate-90" />
-                                                    <p class="rotate-180" style="writing-mode: vertical-lr">Cerrar</p>
+                                                    <p class="rotate-180" style="writing-mode: vertical-lr">Cerrar
+                                                    </p>
                                                 </button>
                                             </div>
                                         </TransitionChild>
@@ -224,7 +225,8 @@
                                                                 </svg>
                                                             </div>
                                                             <div class="flex flex-col justify-between col-span-9 pl-2">
-                                                                <p class="text-xs font-bold">{{ suggestion.details }}
+                                                                <p class="text-xs font-bold">{{ suggestion.details
+                                                                    }}
                                                                 </p>
                                                                 <div class="flex pt-1 mt-1 border-t border-gray-300 ">
                                                                     <span v-if="suggestion.type == 'Error'"
@@ -234,7 +236,8 @@
             'Resuelto'
     }}</span>
                                                                     <p class="w-full text-xs text-end">{{
-            formatDateTime24h(suggestion.created_at) }}</p>
+            formatDateTime24h(suggestion.created_at) }}
+                                                                    </p>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -350,7 +353,7 @@ import { router, Link } from '@inertiajs/vue3'
 import { useBroadcastNotifications } from '@/composable/useBroadcastNotifications'
 import { useSweetalert } from '@/composable/sweetAlert'
 import Breadcrumb from 'primevue/breadcrumb';
-import Button from '@/Components/Button.vue'
+// import Button from '@/Components/Button.vue'
 import ConfirmPopup from 'primevue/confirmpopup';
 import DolarTRM from "@/Components/DolarTRM.vue"
 import DropdownSetting from '@/Components/DropdownSetting.vue'
@@ -363,7 +366,9 @@ import RadioButton from 'primevue/radiobutton'
 import Toast from 'primevue/toast'
 import NotificationItem from '@/Components/NotificationItem.vue'
 import NoContentToShow from '@/Components/NoContentToShow.vue';
-
+import CustomOverlayConfig from '@/Components/CustomOverlayConfig.vue';
+import { usePermissions } from '@/composable/permission'
+const { hasRole, hasPermission } = usePermissions()
 const debug = import.meta.env.VITE_APP_DEBUG
 const menu = ref(false)
 const sugerencia = ref('')
@@ -372,10 +377,14 @@ const suggestions = ref([])
 const tipoReporte = ref('Sugerencia')
 
 const props = defineProps({
+    optionsConfig: Array,
     href: {
         type: Array,
         default: []
     }
+})
+const optionsData = defineModel('optionsData', {
+    type: Object
 })
 
 onMounted(() => {
