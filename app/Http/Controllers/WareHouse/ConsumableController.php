@@ -4,6 +4,7 @@ namespace App\Http\Controllers\WareHouse;
 
 use App\Http\Controllers\Controller;
 use App\Models\WareHouse\Consumable;
+use App\Models\WareHouse\ConsumableSAP;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -22,9 +23,17 @@ class ConsumableController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $codigo = $request->codigo_salida;
+
+        $materiales = ConsumableSAP::where('MBLNR', 'like', '%' . $codigo . '%')->get();
+
+        if ($materiales) {
+            return response()->json([
+                'consumibles' => $materiales,
+            ]);
+        }
     }
 
     /**
