@@ -131,6 +131,14 @@ const showClick = (event, data) => {
 }
 
 
+
+onMounted(() => {
+    if (props.requirement_id) {
+        requirement.value = props.requirements.filter(requirement => requirement.id == props.requirement_id)[0]
+        openSlideOver.value = true
+    }
+})
+
 const url = [
     {
         ruta: 'requirements.index',
@@ -138,17 +146,7 @@ const url = [
         active: true
     }
 ]
-
-onMounted(() => {
-    if (props.requirement_id) {
-        requirement.value = props.requirements.filter(requirement => requirement.id == props.requirement_id)[0]
-        openSlideOver.value = true
-    }
-});
-
-
 </script>
-
 <template>
     <AppLayout :href="url">
         <div class="size-full">

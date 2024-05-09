@@ -12,7 +12,7 @@
                 <ul role="list" class="relative font-semibold space-y-0.5 p-4 py-0">
                     <li class="">
                         <ul>
-                            <li v-for="item in  navigation " :key="item.name" class=" nav-item">
+                            <li v-for="item in navigation " :key="item.name" class=" nav-item">
                                 <Link v-if="!item.children" v-show="item.show" :href="route(item.href)" class="group">
                                 <div class="flex pl-3 space-x-2 items-center group-hover:!text-primary">
                                     <component :is="item.icon" class="w-8 h-8 text-gray-400 shrink-0"
@@ -39,7 +39,7 @@
                                 </button>
                                 <vue-collapsible :isOpen="activeDropdown === item.name">
                                     <ul class="text-gray-500 sub-menu dark:text-white">
-                                        <span v-for="children of  item.children ">
+                                        <span v-for="children of item.children ">
                                             <li v-if="children.show && !children.children">
                                                 <Link :href="!children.dev ? route(children.href) : route('dashboard')">
                                                 <span class="">
@@ -317,16 +317,22 @@ const navigation = [
                         dev: false,
                         show: hasPermission('assignmentTool read'),
                     },
+                    {
+                        name: 'Consumibles',
+                        href: 'consumable.index',
+                        dev: false,
+                        show: hasPermission('consumable read'),
+                    },
                 ]
             },
 
             {
-                name: 'Requerimentos',
+                name: 'Requerimientos',
                 dev: false,
                 show: true,
                 children: [
                     {
-                        name: 'Requemientos',
+                        name: 'Requerimientos',
                         href: 'requirements.index',
                         dev: true,
                         show: true,

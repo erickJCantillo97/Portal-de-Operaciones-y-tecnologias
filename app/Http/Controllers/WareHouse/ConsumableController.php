@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\WareHouse\Consumable;
 use Exception;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ConsumableController extends Controller
 {
@@ -15,7 +16,7 @@ class ConsumableController extends Controller
     public function index()
     {
 
-        return inertia('Warehouse/consumable/Index');
+        return Inertia::render('WareHouse/Consumable/Index');
         //
     }
 
@@ -39,7 +40,7 @@ class ConsumableController extends Controller
         try {
             Consumable::create($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
     }
 
@@ -71,7 +72,7 @@ class ConsumableController extends Controller
         try {
             $consumable->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
 
@@ -83,7 +84,7 @@ class ConsumableController extends Controller
         try {
             $consumable->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }
 }

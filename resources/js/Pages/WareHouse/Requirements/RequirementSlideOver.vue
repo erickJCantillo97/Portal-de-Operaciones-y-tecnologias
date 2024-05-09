@@ -304,6 +304,7 @@ const optionStatus = {
                   <div v-if="approving" class="space-y-4 p-2 border rounded-lg mx-2">
                     <CustomInput type="text" label="Grafo" class="w-full" placeholder="Grafo" />
                     <CustomInput type="text" label="Solicitud de Pedido" class="w-full" placeholder="Solped" />
+                    <CustomInput type="text" label="Número de Reserva" class="w-full" placeholder="No° de Reserva" />
                     <CustomInput type="date" label="Fecha" class="w-full" placeholder="dd/mm/yyyy" />
                     <div class="flex space-x-4">
                       <Button class="w-full" label="Aprobar" icon="pi pi-save" severity="success"
