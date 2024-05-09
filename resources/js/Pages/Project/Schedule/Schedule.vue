@@ -473,7 +473,7 @@ onMounted(() => {
 
 const full = ref(false)
 const readOnly = ref()
-const nonWorkingTime = ref(false)
+const nonWorkingTime = ref(true)
 const notes = ref({ load: true, data: [] })
 async function getNotes() {
     notes.value.load = true
@@ -896,6 +896,17 @@ const visibleExport = ref({
     modal: false,
     load: false
 })
+const columnsExport = ref([])
+function showModalExport() {
+    let gantt = ganttref.value.instance.value
+    columnsExport.value = gantt.columns.map((c) => {
+        if (c.type != 'addnew' && c.text != null) {
+            return { text: c.text, type: c.id }
+        }
+    }).filter((c)=>c!==undefined)
+    visibleExport.value.modal = true
+}
+
 
 const pdfExport = ref({
     exportServer: 'https://dev.bryntum.com:8082',
@@ -1346,7 +1357,7 @@ function changeColorRow(color) {
                     <Button raised v-tooltip.bottom="'Ver lineas base'" icon="fa-solid fa-eye"
                         @click="seeLB.toggle($event)" />
                     <Button raised v-tooltip.bottom="'Exportar a PDF'" icon="fa-solid fa-file-pdf"
-                        @click="visibleExport.modal = true" />
+                        @click="showModalExport()" />
                     <Button raised v-tooltip.bottom="'Exportar a XML'" icon="fa-solid fa-file-arrow-down"
                         @click="onExport()" />
                     <Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input"
@@ -1379,7 +1390,7 @@ function changeColorRow(color) {
                 :pdfExportFeature="pdfExport" :mspExportFeature="true" :projectLines="true"
                 :baselinesFeature="baselines" ref="ganttref" class="h-full" :printFeature="true" v-bind="ganttConfig"
                 :dependenciesFeature="{ radius: 5 }" :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip"
-                :criticalPathsFeature="criticalPaths" :nonWorkingTimeFeature="nonWorkingTime" />
+                :criticalPathsFeature="criticalPaths" :nonWorkingTimeFeature="nonWorkingTime"  />
         </div>
     </AppLayout>
     <OverlayPanel id="setLB" ref="setLB" :pt="{ content: '!p-1' }">
@@ -1510,8 +1521,9 @@ function changeColorRow(color) {
                 <div class="w-full">
                     <label for="columns">Seleccionar columnas a exportar</label>
                     <MultiSelect v-model="pdfExport.columns" option-value="type" option-label="text" class="w-full"
-                        id="columns" display="chip" :options="ganttConfig.columns.slice(0, -1)">
+                        id="columns" display="chip" :options="columnsExport">
                     </MultiSelect>
+                    <!-- {{ columnsExport }} -->
                 </div>
                 <div class="grid grid-cols-3 gap-4">
                     <div class="w-full">
@@ -1552,38 +1564,40 @@ function changeColorRow(color) {
 
 <style>
 .b-export-header,
-.b-export-footer{
-  display:flex;
-  color:#fff;
-  background:#2E3092;
-  align-items:center;
-  z-index:10000;
+.b-export-footer {
+    display: flex;
+    color: #fff;
+    background: #2E3092;
+    align-items: center;
+    z-index: 10000;
 }
 
-.b-export-header{
-  text-align:start;
-  height:44px;
-  position:relative;
-  padding:0.7em 1em 0.5em 1em;
-  display:flex;
-  flex-flow:row nowrap;
-  justify-content:space-between;
+.b-export-header {
+    text-align: start;
+    height: 44px;
+    position: relative;
+    padding: 0.7em 1em 0.5em 1em;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
 }
 
-.b-export-header img{
-  height:32px;
-  width:32px;
-}
-.b-export-header dl{
-  margin:0;
-  font-size:10px;
-}
-.b-export-header dd{
-  margin:0;
+.b-export-header img {
+    height: 32px;
+    width: 32px;
 }
 
-.b-export-footer{
-  justify-content:center;
+.b-export-header dl {
+    margin: 0;
+    font-size: 10px;
+}
+
+.b-export-header dd {
+    margin: 0;
+}
+
+.b-export-footer {
+    justify-content: center;
 }
 
 .b-grid-body-container {
