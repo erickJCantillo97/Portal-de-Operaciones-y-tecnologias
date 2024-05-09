@@ -9,7 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
-
+import java.io.PrintStream;
 import net.sf.mpxj.ProjectFile;
 import net.sf.mpxj.reader.UniversalProjectReader;
 
@@ -82,7 +82,9 @@ public class Main {
             String result = new MainJSONBuilder(properties, dateFormat, timeFormat, isMpx).buildJSON(projectFile).toString(indentFactor);
 
             if (printResult) {
-                System.out.println(result);
+                PrintStream out = new PrintStream(System.out, true, "UTF-8");
+                out.println(result);
+                // System.out.println(result);
             } else {
                 BufferedWriter out = new BufferedWriter(new FileWriter(targetFile));
                 out.write(result);
