@@ -1,12 +1,12 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { router } from '@inertiajs/vue3';
-import { useToast } from "primevue/usetoast";
-import AppLayout from '@/Layouts/AppLayout.vue';
-import Button from 'primevue/button';
-import CustomDataTable from '@/Components/CustomDataTable.vue';
-import CustomInput from '@/Components/CustomInput.vue';
-import CustomModal from '@/Components/CustomModal.vue';
+import { ref, onMounted } from 'vue'
+import { router } from '@inertiajs/vue3'
+import { useToast } from "primevue/usetoast"
+import AppLayout from '@/Layouts/AppLayout.vue'
+import Button from 'primevue/button'
+import CustomDataTable from '@/Components/CustomDataTable.vue'
+import CustomInput from '@/Components/CustomInput.vue'
+import CustomModal from '@/Components/CustomModal.vue'
 import RequirementSlideOver from './RequirementSlideOver.vue'
 import { usePermissions } from '@/composable/permission'
 const { hasRole, hasPermission } = usePermissions()
@@ -103,7 +103,7 @@ const submit = () => {
         preserveScroll: true,
         onSuccess: (res) => {
             open.value = false
-            toast.add({ severity: 'success', group: 'customToast', text: 'Atividad Eliminada', life: 2000 });
+            toast.add({ severity: 'success', group: 'customToast', text: 'Actividad Eliminada', life: 2000 });
 
         },
         onError: (errors) => {
