@@ -182,8 +182,10 @@ const url = [
 
                 <CustomInput label="Serial" id="serial" v-model:input="form.serial" placeholder="Serial del equipo"
                     :invalid="form.errors.serial ? true : false" :errorMessage="form.errors.serial" />
+                    
                 <CustomInput label="Codigo SAP" id="SAP_code" v-model:input="form.SAP_code" placeholder="Codigo SAP"
                     :invalid="form.errors.SAP_code ? true : false" :errorMessage="form.errors.SAP_code" />
+
                 <CustomInput label="Valor" id="value" type="number" mode="currency" v-model:input="form.value"
                     placeholder="Valor del equipo" :invalid="form.errors.value ? true : false"
                     :errorMessage="form.errors.value" />
