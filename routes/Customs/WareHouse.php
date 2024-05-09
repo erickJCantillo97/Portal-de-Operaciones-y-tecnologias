@@ -5,6 +5,7 @@ use App\Http\Controllers\MaterialRequirementController;
 use App\Http\Controllers\RequirementController;
 use App\Http\Controllers\WareHouse\AssignmentToolController;
 use App\Http\Controllers\WareHouse\CategoryController;
+use App\Http\Controllers\WareHouse\ConsumableController;
 use App\Http\Controllers\WareHouse\MaterialController;
 use App\Http\Controllers\WareHouse\ToolController;
 use App\Http\Controllers\WarehouseController;
@@ -24,6 +25,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('requirements/getRequirementByRole', [RequirementController::class, 'getRequirementByRole'])->name('get.requirements.role');
     Route::resource('requirements', RequirementController::class);
+    Route::resource('consumable', ConsumableController::class);
     Route::get('materials/{requirement}', [MaterialRequirementController::class, 'index'])->name('materials.index');
     Route::get('manageRequeriments', [RequirementController::class, 'manageRequirements'])->name('manage.requirements');
     Route::post('storeRequirementOficials', [RequirementController::class, 'storeRequirementOficials'])->name('store.requirement.oficial');
