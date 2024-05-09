@@ -33,14 +33,7 @@ class ProgrammingAdvanceController extends Controller
     public function store(Request $request)
     {
 
-        // $table->integer('user_id');
-        // $table->integer('schedule_id');
-        // $table->integer('task_id');
-        // $table->double('progress');
-        // $table->dateTime('start');
-        // $table->dateTime('end');
-        // $table->double('cost');
-        // $table->date('date');
+
         $validateData = $request->validate([
             'schedule_id' => 'required',
             'progress' => 'required',
@@ -51,13 +44,27 @@ class ProgrammingAdvanceController extends Controller
         $horas = Carbon::parse($validateData['start'])->diffInRealHours(Carbon::parse($validateData['end']));
 
         $validateData['date'] = Carbon::now();
+        $planillas = ProgrammingAdvance::where('date', $validateData['date'])->where('user_id', auth()->user()->id)->get();
+        $collision = false;
+        if ($planillas) {
+            foreach ($planillas as $p) {
+                $collision =  collisionsPerIntervals($validateData['start'], $validateData['end'], $p->start, $p->end);
+
+                if ($collision !== false)
+                    return response()->json([
+                        'status' => false,
+                        'collisions' => $collision
+                    ]);
+                return 'collision';
+            }
+        }
         $validateData['user_id'] = auth()->user()->id;
         $validateData['task_id'] = DetailScheduleTime::where('idScheduleTime', $validateData['schedule_id'])->first()->idTask;
-        $validateData['cost'] = Employee::where('Num_SAP', 'LIKE', '%'.auth()->user()->num_sap)->first()->Costo_Hora * ($horas > 9.5 ? $horas - 1 : $horas);
+        $validateData['cost'] = Employee::where('Num_SAP', 'LIKE', '%' . auth()->user()->num_sap)->first()->Costo_Hora * ($horas > 9.5 ? $horas - 1 : $horas);
         try {
             ProgrammingAdvance::create($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
     }
 
@@ -89,7 +96,7 @@ class ProgrammingAdvanceController extends Controller
         try {
             $programmingAdvance->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -101,7 +108,7 @@ class ProgrammingAdvanceController extends Controller
         try {
             $programmingAdvance->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }

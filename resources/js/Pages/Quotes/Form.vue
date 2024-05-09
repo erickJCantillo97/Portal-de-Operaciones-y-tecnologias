@@ -15,6 +15,8 @@ import OverlayPanel from 'primevue/overlaypanel';
 import Swal from 'sweetalert2';
 import TabPanel from 'primevue/tabpanel';
 import TabView from 'primevue/tabview';
+import CustomModal from '@/Components/CustomModal.vue';
+import Customers from '@/Pages/Project/Customers/Customers.vue';
 
 const props = defineProps({
     estimadores: Object,
@@ -226,6 +228,9 @@ const url = [
         active: true
     }
 ]
+
+const customer = ref(false)
+
 </script>
 <template>
     <AppLayout :href="url">
@@ -234,10 +239,10 @@ const url = [
                 <span class="flex justify-between p-1">
                     <p class="text-primary font-bold text-xl">
                         {{
-                            newQuote ? action == 2 ? 'Creando nueva version para estimacion #' + props.quote.consecutive :
-                                'Crear solicitud de estimacion' : 'Editar estimacion #' +
-                            props.quote.consecutive
-                        }}
+        newQuote ? action == 2 ? 'Creando nueva version para estimacion #' + props.quote.consecutive :
+            'Crear solicitud de estimacion' : 'Editar estimacion #' +
+        props.quote.consecutive
+    }}
                     </p>
                     <Button v-if="!newQuote" label="Ver sugerencia" icon="fa-solid fa-file-circle-question" class="!h-8"
                         @click="toggle" />
@@ -258,18 +263,21 @@ const url = [
                             <MultiSelect v-model="dataQuoteNew.type_ships" display="chip" filter optionValue="id"
                                 :disabled="newQuote ? false : !modEdit" :options="typeships" optionLabel="name"
                                 placeholder="Selecciona la(s) clase(s) de buque" class="w-full md:w-20rem !h-8" :pt="{
-                                    label: '!p-0 !px-2 !flex !items-center !h-8',
-                                    token: '!p-0 !px-1',
-                                    tokenLabel: '!text-sm'
-                                }" />
+        label: '!p-0 !px-2 !flex !items-center !h-8',
+        token: '!p-0 !px-1',
+        tokenLabel: '!text-sm'
+    }" />
                         </span>
                         <span class="">
-                            <p>Cliente</p>
+                            <div class="flex justify-between">
+                                <p>Cliente</p>
+                                <Button icon="fa fa-plus" text="" severity="success" @click="customer = true" />
+                            </div>
                             <Dropdown v-model="dataQuoteNew.customer_id" :options="customers" filter optionLabel="name"
                                 optionValue="id" placeholder="Selecciona un cliente" class="w-full md:w-14rem !h-8"
                                 showClear :disabled="newQuote ? false : !modEdit" :pt="{
-                                    input: '!p-0 !pt-1 !px-1 '
-                                }" />
+        input: '!p-0 !pt-1 !px-1 '
+    }" />
                         </span>
                         <span class="" v-if="newQuote">
                             <p>Estimador</p>
@@ -277,8 +285,8 @@ const url = [
                                 optionLabel="name" optionValue="user_id" placeholder="Selecciona un estimador"
                                 :class="errors.estimador_id ? 'p-invalid' : ''" class="w-full md:w-14rem !h-8 "
                                 showClear :pt="{
-                                    input: '!p-0 !pt-1 !px-1 '
-                                }" />
+        input: '!p-0 !pt-1 !px-1 '
+    }" />
                             <small v-if="errors.estimador_id" class="p-error" id="text-error">
                                 Debe seleccionar un estimador
                             </small>
@@ -290,8 +298,8 @@ const url = [
                                 <Calendar v-model="dataQuoteNew.expeted_answer_date" dateFormat="dd/mm/yy" showIcon
                                     :minDate="minDate" class="!h-8 w-full" placeholder="Fecha de respuesta"
                                     :class="errors.expeted_answer_date ? 'p-invalid' : ''" :pt="{
-                                        input: '!p-0 !pt-1 !px-1'
-                                    }" />
+        input: '!p-0 !pt-1 !px-1'
+    }" />
                                 <small v-if="errors.expeted_answer_date" class="p-error" id="text-error">
                                     Debe seleccionar una fecha
                                 </small>
@@ -302,8 +310,8 @@ const url = [
                                     <Dropdown v-model="dataQuoteNew.offer_type" :options="oferta"
                                         :disabled="newQuote ? false : !modEdit" placeholder="Selecciona tipo de oferta"
                                         class="w-full md:w-14rem !h-8" :pt="{
-                                            input: '!p-0 !pt-1 !px-1'
-                                        }" />
+        input: '!p-0 !pt-1 !px-1'
+    }" />
                                 </span>
                             </span>
                             <span :class="newQuote ? '' : 'flex col-span-2 items-end'">
@@ -312,8 +320,8 @@ const url = [
                                     <Dropdown v-model="dataQuoteNew.coin" :options="moneda"
                                         :disabled="newQuote ? false : !modEdit" placeholder="Selecciona la moneda"
                                         class="w-full md:w-14rem !h-8" :pt="{
-                                            input: '!p-0 !pt-1 !px-1 '
-                                        }" />
+        input: '!p-0 !pt-1 !px-1 '
+    }" />
                                 </span>
                                 <span v-if="!newQuote" class="w-full justify-end flex gap-2">
                                     <Button title="Editar estimacion" label="Activar edicion" severity="danger"
@@ -331,11 +339,11 @@ const url = [
                     <span class="space-y-2">
                         <Editor v-model="dataQuoteNew.observation" editorStyle="height: 210px" v-if="newQuote"
                             placeholder="Escriba aqui las sugerencias que seran enviadas al estimador" :pt="{
-                                link: { class: '!hidden' },
-                                image: { class: '!hidden' },
-                                codeBlock: { class: '!hidden' },
-                                toolbar: { class: '!bg-gray-100' }
-                            }">
+        link: { class: '!hidden' },
+        image: { class: '!hidden' },
+        codeBlock: { class: '!hidden' },
+        toolbar: { class: '!bg-gray-100' }
+    }">
                         </Editor>
                         <span v-if="newQuote" class="w-full justify-end flex">
                             <Button severity="success" @click="action == 2 ? quoteNewVersion() : quoteSave()"
@@ -365,18 +373,18 @@ const url = [
                                     <Dropdown v-model="buque.scope" :options="alcance"
                                         placeholder="Selecciona el alcance" class="w-full md:w-14rem !h-8" showClear
                                         :pt="{
-                                            input: '!p-0 !pt-1 !px-1 '
-                                        }
-                                            " />
+        input: '!p-0 !pt-1 !px-1 '
+    }
+        " />
                                 </span>
                                 <span class="">
                                     <p for="username">Madurez</p>
                                     <Dropdown v-model="buque.maturity" :options="madurez"
                                         placeholder="Selecciona la madurez" class="w-full md:w-14rem !h-8" showClear
                                         :pt="{
-                                            input: '!p-0 !pt-1 !px-1 '
-                                        }
-                                            " />
+        input: '!p-0 !pt-1 !px-1 '
+    }
+        " />
                                 </span>
                                 <span class="">
                                     <p for="username">Unidades</p>
@@ -404,9 +412,9 @@ const url = [
                                     <p for="username">IVA</p>
                                     <Dropdown v-model="buque.iva" :options="iva" placeholder="Selecciona el IVA"
                                         class="w-full md:w-14rem !h-8" showClear :pt="{
-                                            input: '!p-0 !pt-1 !px-1 '
-                                        }
-                                            " />
+        input: '!p-0 !pt-1 !px-1 '
+    }
+        " />
                                 </span>
                                 <span class="">
                                     <p for="username">Margen</p>
@@ -418,9 +426,9 @@ const url = [
                                     <Dropdown v-model="buque.white_paper" :options="docTecnico"
                                         placeholder="Selecciona el tipo de DT" class="w-full md:w-14rem !h-8" showClear
                                         :pt="{
-                                            input: '!p-0 !pt-1 !px-1 '
-                                        }
-                                            " />
+        input: '!p-0 !pt-1 !px-1 '
+    }
+        " />
 
                                 </span>
                                 <span class="">
@@ -460,11 +468,34 @@ const url = [
 
     <OverlayPanel ref="op" class="w-96">
         <Editor v-model="dataQuoteNew.observation" editorStyle="height: 210px" :pt="{
-            toolbar: '!hidden',
-            content: '!border-0',
-            root: 'border p-1 !rounded-md'
-        }
-            ">
+        toolbar: '!hidden',
+        content: '!border-0',
+        root: 'border p-1 !rounded-md'
+    }
+        ">
         </Editor>
     </OverlayPanel>
+
+    <CustomModal v-model:visible="customer" :closable="false">
+        <template #icon>
+            <span class="text-white material-symbols-outlined text-3xl">
+                assignment
+            </span>
+        </template>
+        <template #titulo>
+            <span class="text-xl font-bold text-white white-space-nowrap">
+                Clientes
+            </span>
+        </template>
+        <template #body>
+            <div class="space-y-2 mb-4">
+                <Customers :customers></Customers>
+            </div>
+        </template>
+        <template #footer>
+            <Button @click="customer = false" label="Cancelar" severity="danger" icon="fa fa-circle-xmark"></Button>
+            <!-- <Button @click="inProcessSubmit()" label="Guardar" severity="success" icon="pi pi-save"></Button> -->
+
+        </template>
+    </CustomModal>
 </template>

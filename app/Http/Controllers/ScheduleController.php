@@ -35,8 +35,8 @@ class ScheduleController extends Controller
 
         $project = Project::where('uuid', $uuid)->first();
         return Inertia::render('Project/Schedule/Schedule',[  
-            'project'=> $project,
-            'task' => VirtualTask::where('project_id',$project->id)->whereNotNull('note')->get()->toArray()]);
+            'project'=> $project
+        ]);
     }
 
     public function index(Project $project)
@@ -196,7 +196,8 @@ class ScheduleController extends Controller
                     'startDate' => $task['startDate'],
                     'endDate' => $task['endDate'],
                     'manuallyScheduled' => $task['manuallyScheduled'],
-                    'parentIndex' => intval($task['parentIndex'])
+                    'parentIndex' => intval($task['parentIndex']),
+                    'calendar_id' => $task['calendar'],
                 ]);
                 array_push($rows, [
                     '$PhantomId' => $task['$PhantomId'],
@@ -535,26 +536,10 @@ class ScheduleController extends Controller
     }
 
     public function collisionsPerIntervals(Request $request){
+       return  collisionsPerIntervals('10:00','14:00','13:00','19:00');
+    }
 
-        $horaInicio1 = Carbon::parse('15:10'); 
-        $horaFin1 = Carbon::parse('14:00');   
-
-        $horaInicio2 = Carbon::parse('13:00');  
-        $horaFin2 = Carbon::parse('15:00');          
-
-        $inicio_interseccion = max($horaInicio1, $horaInicio2);
-        $fin_interseccion = min($horaFin1, $horaFin2);
-        if ($inicio_interseccion < $fin_interseccion) {
-           return response()->json([
-            'status' => false,
-            'mensaje'=> "el horario se cruza de " . $inicio_interseccion->format('H:i') . " a " . $fin_interseccion->format('H:i')
-           ]);
-        } else {
-            return response()->json([
-                'status' => true,
-                'mensaje'=> 'el horario no se cruza'
-               ]);
-        }
-        
+    public function getNotes(Project $project){
+       return VirtualTask::where('project_id',$project->id)->whereNotNull('note')->where('note', '!=', '')->get()->toArray();
     }
 }

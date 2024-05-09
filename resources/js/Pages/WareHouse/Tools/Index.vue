@@ -37,7 +37,7 @@ const columnas = [
     { field: 'serial', header: 'Serial', filter: true, sortable: true },
     { field: 'estado_operativo', header: 'Operatividad', filter: true, sortable: true },
     { field: 'estado', header: 'Disponibilidad', filter: true, sortable: true },
-    { field: 'assignment_name', header: 'Persona Asignada', filter: true, sortable: true },
+    { field: 'employee_name', header: 'Persona Asignada', filter: true, sortable: true },
 ]
 
 const filterButtons = [
@@ -182,8 +182,10 @@ const url = [
 
                 <CustomInput label="Serial" id="serial" v-model:input="form.serial" placeholder="Serial del equipo"
                     :invalid="form.errors.serial ? true : false" :errorMessage="form.errors.serial" />
+                    
                 <CustomInput label="Codigo SAP" id="SAP_code" v-model:input="form.SAP_code" placeholder="Codigo SAP"
                     :invalid="form.errors.SAP_code ? true : false" :errorMessage="form.errors.SAP_code" />
+
                 <CustomInput label="Valor" id="value" type="number" mode="currency" v-model:input="form.value"
                     placeholder="Valor del equipo" :invalid="form.errors.value ? true : false"
                     :errorMessage="form.errors.value" />
@@ -221,13 +223,13 @@ const url = [
         </template>
     </CustomModal>
     <Toast position="bottom-center" :pt="{
-                root: '!h-10 !w-64',
-                container: {
-                    class: form.error ? '!bg-danger !h-10 !rounded-lg' : '!bg-primary !h-10 !rounded-lg'
-                },
-                content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
-                buttonContainer: '!hidden',
-                icon: '!hidden',
-                detail: '!hidden'
-            }" />
+        root: '!h-10 !w-64',
+        container: {
+            class: form.error ? '!bg-danger !h-10 !rounded-lg' : '!bg-primary !h-10 !rounded-lg'
+        },
+        content: '!h-10 !p-0 !flex !items-center !text-center !text-white ',
+        buttonContainer: '!hidden',
+        icon: '!hidden',
+        detail: '!hidden'
+    }" />
 </template>

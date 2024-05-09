@@ -9,7 +9,6 @@ import Listbox from 'primevue/listbox'
 import Loading from '@/Components/Loading.vue'
 import NoContentToShow from '@/Components/NoContentToShow.vue'
 import OverlayPanel from 'primevue/overlaypanel'
-import ProjectsCard from '@/Components/ProjectsCard.vue'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 

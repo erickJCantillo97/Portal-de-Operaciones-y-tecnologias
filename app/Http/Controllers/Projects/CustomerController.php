@@ -22,7 +22,7 @@ class CustomerController extends Controller
     {
         $customers = Customer::orderBy('name')->get();
 
-        return Inertia::render('Project/Customers', compact('customers'));
+        return Inertia::render('Project/Customers/Index', compact('customers'));
         // return response()->json([
         //     $customer,
         // ], 200);

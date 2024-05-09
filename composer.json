@@ -49,7 +49,8 @@
             "app/Helpers/ConsultApiHelper.php",
             "app/Helpers/CotecmarServices.php",
             "app/Helpers/NotificationUsersHelper.php",
-            "app/Helpers/PersonalHelper.php"
+            "app/Helpers/PersonalHelper.php",
+            "app/Helpers/GeneralHelper.php"
         ]
     },
     "autoload-dev": {

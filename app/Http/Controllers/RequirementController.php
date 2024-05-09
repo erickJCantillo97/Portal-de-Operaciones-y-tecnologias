@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Imports\RequirementImport;
+use App\Models\Personal\Employee;
 use App\Models\Projects\Project;
 use App\Models\WareHouse\Material;
 use App\Models\WareHouse\MaterialRequirement;
@@ -52,7 +53,8 @@ class RequirementController extends Controller
         return Inertia::render('WareHouse/Requirements/Index', [
             'projects' => $projects,
             'requirements' => $requirements,
-            'requirement_id' => $request->requirement
+            'requirement_id' => $request->requirement,
+            // 'employees' => Employee::orderBy('Nombres_Apellidos')->get()
         ]);
     }
 
@@ -60,25 +62,35 @@ class RequirementController extends Controller
     {
         if ($requirement->approved_dipr_date == null) {
             $requirement->approved_dipr_date = Carbon::now();
-            $requirement->approved_dipr_user = auth()->user()->id;
-            $requirement->save();
-            return response()->json([
-                'message' => 'Requerimiento Aprobado'
-            ]);
         }
+        $requirement->approved_dipr_user = auth()->user()->id;
+        $requirement->save();
+        return response()->json([
+            'message' => 'Requerimiento Aprobado'
+        ]);
     }
 
     public function getRequirementByRole()
     {
         $requirements = [];
-        if (auth()->user()->hasRole('ADMIN DIPR' . '%TOP%' . auth()->user()->gerencia)) {
+        if (auth()->user()->hasRole('ADMIN DIPR')) {
             // return Requirement::has('project')->with('project', 'user')->get();
-            $requirements = Requirement::has('project')->with('project', 'user')->whereNull('oficial_date')->get()->map(function ($r) {
+            $requirements = Requirement::has('project')->with('project', 'user')->whereNull('approved_dipr_date')->get()->map(function ($r) {
                 return [
                     'id' => $r->id,
                     'title' => 'Requerimiento ' . $r->consecutive,
                     'user' => $r->user->short_name,
                     'message' => 'Requerimiento en espera de Aprobación',
+                    'ago' => Carbon::parse($r->created_at)->diffForHumans(),
+                ];
+            });
+        } else if (auth()->user()->hasRole('Super intendente de Materiales')) {
+            $requirements = Requirement::has('project')->with('project', 'user')->whereNotNull('approved_dipr_date')->whereNull('oficial_date')->get()->map(function ($r) {
+                return [
+                    'id' => $r->id,
+                    'title' => 'Requerimiento ' . $r->consecutive,
+                    'user' => $r->user->short_name,
+                    'message' => 'Requerimiento Aprobado para gestión',
                     'ago' => Carbon::parse($r->created_at)->diffForHumans(),
                 ];
             });
@@ -198,7 +210,6 @@ class RequirementController extends Controller
                         'observation' => $material['observacion'],
                     ]
                 );
-
                 // dd($material['material']['material']['id']);
                 Material::find($material['material']['material']['id'])->update([
                     'code' => $material['codigo_material'],

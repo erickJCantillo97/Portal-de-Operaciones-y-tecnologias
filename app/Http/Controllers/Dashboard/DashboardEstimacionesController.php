@@ -116,8 +116,9 @@ class DashboardEstimacionesController extends Controller
         );
     }
 
-    public function getQuotesCountry()
+    public function getQuotesCountry(Request $request)
     {
+
         $countQuoteCountry = QuoteVersion::join('customers', 'quote_versions.customer_id', '=', 'customers.id')
             ->select('customers.country_en as country', DB::raw('COUNT(quote_versions.id) AS value'))
             ->groupBy('customers.country_en')
@@ -132,9 +133,16 @@ class DashboardEstimacionesController extends Controller
         ];
     }
 
-    public function getValueTotalCostoContratadas()
+    public function getValueTotalCostoContratadas(Request $request)
     {
-        $year = Carbon::now()->format('Y');
-        // TO DO
+        $year = $request->year ?? Carbon::now()->year;
+        $quotesYear = QuoteVersion::get()->where('status', 5)->filter(function ($q) use ($year) {
+            return Carbon::parse($q['status_date'])->year == $year;
+        });
+        $cost = 0;
+        foreach ($quotesYear as $quote) {
+            $cost += $quote->total_cost[0];
+        }
+        return $cost;
     }
 }
