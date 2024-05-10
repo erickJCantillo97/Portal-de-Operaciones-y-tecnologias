@@ -27,8 +27,8 @@ const getFieldValue = (field) => {
         <dt class="text-gray-900 capitalize ">
           {{ item[0] }}:
         </dt>
-        <dd v-if="item[0] == 'state' || item[0] == 'status' || item[0] == 'estado' || item[0] == 'Estado'"
-          class="p-1 rounded-md " :class="optionStatus[getFieldValue(item[0])]?.color">
+        <dd v-if="item[0] == 'status' || item[0] == 'estado' || item[0] == 'Estado'" class="p-1 rounded-md "
+          :class="optionStatus[getFieldValue(item[0])]?.color">
           <i :class="optionStatus[getFieldValue(item[0])]?.icon"></i>
           {{ getFieldValue(item[0]) || 'SIN DEFINIR' }}
         </dd>

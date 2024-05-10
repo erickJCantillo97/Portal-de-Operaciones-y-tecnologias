@@ -34,6 +34,7 @@
                         </div>
                         </Link>
                         <div class="flex items-center justify-between">
+                            
                             <Breadcrumb :home="home" :model="href" :pt="{
         root: '!h-2 !flex !justify-center !items-center',
         label: '!text-blue-800'
