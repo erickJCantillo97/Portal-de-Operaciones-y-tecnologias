@@ -19,6 +19,7 @@ use App\Models\VirtualTask;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
@@ -239,7 +240,10 @@ class ProjectController extends Controller
                     // $ship->typeShip,
                 ];
             });
-            $semana = ProgressProjectWeek::where('project_id', $project->id)->orderBy('real_progress', 'DESC')->first();
+            $semanas = ProgressProjectWeek::where('real_progress', '<>', 0)->where('project_id', $project->id)->groupBy('project_id')->select('project_id', DB::raw("MAX(week) as week"))->first();
+            $semana =  ProgressProjectWeek::where('project_id', $project->id)->where('week', $semanas->week)->first();
+
+            // $semana = ProgressProjectWeek::where('project_id', $project->id)->orderBy('real_progress', 'DESC')->first();
             $week = Carbon::now()->weekOfYear;
             $year = Carbon::now()->format('y');
             $weekTasks  = WeekTask::where('project_id', $project->id)->where('week', $year . str_pad($week, 2, "0", STR_PAD_LEFT))->get();

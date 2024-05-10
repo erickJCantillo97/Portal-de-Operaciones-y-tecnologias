@@ -22,8 +22,16 @@ const optionsGen = ref([
             { text: 'Normal (Recomendado)', value: '12px' },
             { text: 'Grande', value: '13px' },
             { text: 'Muy grande', value: '14px' },
-            { text: 'Enorme', value: '15px' }],
+            { text: 'Enorme', value: '15px' },
+            { text: 'Muy Enorme', value: '17px' },
+        ],
         default: '12px'
+    },
+    {
+        field: 'generalfontweight',
+        label: 'Negrita',
+        type: 'boolean',
+        default: false
     }
 ])
 
@@ -56,7 +64,7 @@ props.options.forEach((option) => {
 async function saveConfig(key, data, type) {
     let aux = {}
     aux[key] = JSON.stringify({ 'type': type, 'data': data })
-    if (key == 'generalfontsize') {
+    if (key == 'generalfontsize' || key == 'generalfontweight') {
         changeFontSize(data)
     }
     await axios.post(route('userconfiguration.store'), aux)
@@ -65,6 +73,7 @@ async function saveConfig(key, data, type) {
 function changeFontSize(size) {
     var element = document.getElementsByClassName('sizegeneralfont');
     element[0].style.fontSize = size;
+    element[0].style.fontWeight = size ? '900' : '500';
 }
 
 changeFontSize(optionsData.value.generalfontsize?.data ?? '12px')
@@ -85,7 +94,13 @@ changeFontSize(optionsData.value.generalfontsize?.data ?? '12px')
                         v-model="optionsData[option.field].data" :options="option.options"
                         @change="saveConfig(option.field, optionsData[option.field].data, option.type)" />
                 </div>
+                <div class="grid grid-cols-5" v-if="(option.type == 'boolean')">
+                    <label class="col-span-4" :for="option.field"> {{ option.label }}</label>
+                    <InputSwitch :id="option.field" v-model="optionsData[option.field].data"
+                        @change="saveConfig(option.field, optionsData[option.field].data, option.type)" />
+                </div>
             </span>
+
         </div>
         <p v-if="options.length > 0" class="font-bold text-lg my-5 text-center">Configuracion de la pagina</p>
         <div class="gap-2" :class="options.length > 4 ? 'grid grid-cols-2 w-96' : 'flex flex-col'">

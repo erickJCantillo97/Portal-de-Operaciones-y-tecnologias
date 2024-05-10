@@ -159,7 +159,7 @@ const selectedElement = ref([]);
     <DataTable id="tabla" :value="data" v-model:selection="selectedElement" :paginator="data.length > 0 && paginator"
         :rows :selectionMode tableStyle="" sortMode="multiple" scrollable scrollHeight="flex" :loading="loading"
         currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort
-        v-model:filters="filters" stripedRows filterDisplay="menu" class="p-datatable-sm text-xs p-1 rounded-md"
+        v-model:filters="filters" stripedRows filterDisplay="menu" class="p-datatable-sm  p-1 rounded-md"
         stateStorage="session" :stateKey="cacheName ? 'dt-' + cacheName + '-state-session' : null"
         :globalFilterFields="globalFilterFields" @row-click="$emit('rowClic', $event)"
         paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink" :pt="{
@@ -180,7 +180,7 @@ const selectedElement = ref([]);
         <template #header>
             <div class="space-y-1">
                 <span class="flex justify-between ">
-                    <p class="text-xl h-ful flex items-center font-bold leading-6 mb-2 capitalize text-primary">
+                    <p class="text-xl h-ful flex items-center font-extrabold leading-6 mb-2 capitalize text-primary">
                         {{ title }}
                     </p>
                     <span class="space-x-1">
@@ -299,7 +299,7 @@ const selectedElement = ref([]);
     }
         ">
                 <template #header>
-                    <p class="text-sm text-primary uppercase font-bold truncate">{{ col.header }}</p>
+                    <p class="text-sm text-primary uppercase font-extrabold truncate">{{ col.header }}</p>
                 </template>
                 <template #filtericon>
                     <i class="fa-solid fa-filter"></i>
