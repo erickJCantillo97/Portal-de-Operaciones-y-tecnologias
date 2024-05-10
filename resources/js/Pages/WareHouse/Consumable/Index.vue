@@ -3,8 +3,8 @@
 import { ref } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomDataTable from '@/Components/CustomDataTable.vue'
-import CustomModal from '@/Components/CustomModal.vue';
-import CustomInput from '@/Components/CustomInput.vue';
+import CustomModal from '@/Components/CustomModal.vue'
+import CustomInput from '@/Components/CustomInput.vue'
 //#endregion
 
 const codigo_salida = ref()
@@ -92,8 +92,8 @@ const url = [
 
       <template #body>
         <div class="flex justify-center w-full space-x-4 mt-4">
-          <CustomInput class="w-1/4" placeholder="Buscar" v-model:input="codigo_salida" />
-          <Button label="Buscar" severity="success" icon="fa-solid fa-plus" :loading @click="search()" />
+          <CustomInput class="w-1/2" placeholder="Buscar por código de material" v-model:input="codigo_salida" />
+          <Button label="Buscar" severity="primary" icon="fa-solid fa-magnifying-glass" :loading @click="search()" />
         </div>
         <div class="size-full">
           <CustomDataTable :data="materials" title="Materiales" :columnas="columnsModal" :rowsDefault="10" :loading>

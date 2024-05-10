@@ -307,10 +307,10 @@ const optionStatus = {
                     <CustomInput type="text" label="Número de Reserva" class="w-full" placeholder="No° de Reserva" />
                     <CustomInput type="date" label="Fecha" class="w-full" placeholder="dd/mm/yyyy" />
                     <div class="flex space-x-4">
-                      <Button class="w-full" label="Aprobar" icon="pi pi-save" severity="success"
-                        @click="approvedRequirement()" />
                       <Button class="w-full" label="Cancelar" icon="fa fa-circle-xmark" @click="approving = false"
                         severity="danger" />
+                      <Button class="w-full" label="Aprobar" icon="pi pi-save" severity="success"
+                        @click="approvedRequirement()" />
                     </div>
                   </div>
                   <article class="w-full p-2">
