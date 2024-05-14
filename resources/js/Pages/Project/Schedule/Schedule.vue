@@ -1594,7 +1594,7 @@ function changeColorRow(color) {
 
     <!-- #region prueba exportar -->
 
-    <CustomModalCalendars v-model:visible="newCalendarModal"/>
+    <CustomModalCalendars v-model:visible="newCalendarModal" :project="props.project"/>
     <!-- #endregion -->
 </template>
 

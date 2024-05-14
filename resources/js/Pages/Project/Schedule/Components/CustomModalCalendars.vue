@@ -11,6 +11,10 @@ import TabPanel from 'primevue/tabpanel';
 import TabView from 'primevue/tabview';
 import OverlayPanel from 'primevue/overlaypanel';
 
+const props=defineProps({
+    project:Object
+})
+
 const yearsSelect = ref([(new Date).getFullYear()])
 const holidays = ref({})
 const selecDayWeek = ref({})
@@ -20,6 +24,7 @@ const visible = defineModel('visible', {
     required: true
 })
 const form = ref({
+    project:props.project.id,
     name: null,
     statusHolidays: false,
     holidays: [],
@@ -241,10 +246,10 @@ const references = [
 ]
 
 const columnas = [
-    { field: 'startDay', header: 'Dia inicio', type: 'date' },
-    { field: 'endDay', header: 'Dia fin', type: 'date' },
-    { field: 'text', header: 'Descripcion' },
-    { field: 'type', header: 'Tipo' },
+    { field: 'startDay', header: 'Dia inicio', type: 'date',filter:'true' },
+    { field: 'endDay', header: 'Dia fin', type: 'date',filter:'true' },
+    { field: 'text', header: 'Descripcion' ,filter:'true'},
+    { field: 'type', header: 'Tipo' ,filter:'true'},
 ]
 const actions = [
     { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
@@ -308,11 +313,17 @@ function addExeption() {
     overlayAddExeption.value.hide()
 }
 
+
+function save(){
+    console.log(form.value)
+}
+
+
 </script>
 
 <template>
     <CustomModal v-model:visible="visible" :closeOnEscape="false" icon="fa-solid fa-file-export"
-        titulo="Nuevo calendario" width="90vw">
+        :titulo="'Nuevo calendario para el projecto: '+project.name" width="90vw">
         <template #body>
             <div class="grid grid-cols-3">
                 <div class="space-y-1 flex flex-col items-center">
@@ -355,7 +366,7 @@ function addExeption() {
                             </div>
                             <div class="h-[55vh] border rounded-md">
                                 <CustomDataTable title="Exepciones" :actions :showAdd="true" :data="form.holidays"
-                                    @addClick="toggle" :columnas :showHeader="false" :paginator="false"
+                                    @addClick="toggle" :columnas :showHeader="true" :paginator="false"
                                     @deleteClic="removeExeption">
                                 </CustomDataTable>
                             </div>
@@ -435,7 +446,7 @@ function addExeption() {
         </template>
         <template #footer>
             <Button label="Cancelar" severity="danger" icon="fa-regular fa-circle-xmark" @click="visible = false" />
-            <Button label="Guardar" severity="success" icon="fa-solid fa-download" @click="console.log(form)" />
+            <Button label="Guardar" severity="success" icon="fa-solid fa-download" @click="save()" />
         </template>
     </CustomModal>
     <OverlayPanel ref="overlayAddExeption">
