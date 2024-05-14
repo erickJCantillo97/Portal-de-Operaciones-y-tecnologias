@@ -4,6 +4,7 @@ namespace App\Http\Controllers\WareHouse;
 
 use App\Http\Controllers\Controller;
 use App\Models\WareHouse\Material;
+use App\Models\WareHouse\MateriaSAP;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -12,9 +13,23 @@ class MaterialController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $codigo = str_pad(
+            $request->codigo,
+            18,
+            '0',
+            STR_PAD_LEFT
+        );
+
+        $material = MateriaSAP::where('MATNR', $codigo)->first();
+
+        if ($material) {
+            return response()->json([
+                'material' => $material,
+            ]);
+        }
+        return $codigo;
     }
 
     /**

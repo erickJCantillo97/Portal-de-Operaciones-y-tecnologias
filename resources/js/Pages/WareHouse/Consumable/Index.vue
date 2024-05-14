@@ -27,6 +27,8 @@ const columns = [
 //0180055002
 //4900242380
 const columnsModal = [
+  { field: 'REF', header: 'Solped/Reserva', filter: 'true' },
+  { field: 'REF_POS', header: 'Posicion', filter: 'true' },
   { field: 'MATNR', header: 'Código del Material', filter: 'true' },
   { field: 'MAKTX', header: 'Descripción', filter: 'true' },
   { field: 'MENGE', header: 'Cantidad', filter: true, type: 'number' },

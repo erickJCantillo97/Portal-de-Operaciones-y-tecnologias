@@ -26,6 +26,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('requirements/getRequirementByRole', [RequirementController::class, 'getRequirementByRole'])->name('get.requirements.role');
     Route::resource('requirements', RequirementController::class);
     Route::resource('consumable', ConsumableController::class);
+    Route::get('getMaterialSAP', [MaterialController::class, 'index'])->name('get.materialsap');
     Route::get('materials/{requirement}', [MaterialRequirementController::class, 'index'])->name('materials.index');
     Route::get('manageRequeriments', [RequirementController::class, 'manageRequirements'])->name('manage.requirements');
     Route::post('storeRequirementOficials', [RequirementController::class, 'storeRequirementOficials'])->name('store.requirement.oficial');
