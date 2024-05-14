@@ -25,7 +25,8 @@ const formData = ref({
     materials: [
       {
         codigo_material: '',
-        cantidad: ''
+        cantidad: '',
+        material: {}
       }
     ]
   }
@@ -109,7 +110,16 @@ const search = () => {
 
 //#region Charge Modal Functions
 const addMaterial = () => {
-  openChargeModal.value = true
+  formData.value.requirement.materials.push({
+    codigo_material: '',
+    cantidad: '',
+    material: {}
+  })
+}
+
+const removeMaterial = (index) => {
+  if (formData.value.requirement.materials.length !== 1)
+    formData.value.requirement.materials.splice(index, 1)
 }
 
 const cancelChargeModal = () => {
@@ -236,8 +246,8 @@ const url = [
             <div class="flex space-x-4 justify-center items-center w-full bg-yellow-200 rounded-lg p-1">
               <h3 class="text-lg text-gray-800 font-bold">Materiales</h3>
               <Button @click="addMaterial()" severity="success" icon="fa-solid fa-plus" :pt="{
-                root: '!size-6'
-              }" />
+    root: '!size-6'
+  }" />
             </div>
             <div class="h-80 overflow-y-auto space-y-2">
               <div v-for="(material, index) in formData.requirement.materials" :key="index"
@@ -257,18 +267,17 @@ const url = [
                     <CustomInput type="number" label="Cantidad" placeholder="0" :id="'cantidad_' + index"
                       v-model="material.cantidad" :invalid="material.errors && material.errors.cantidad != null"
                       :errorMessage="material.errors && material.errors.cantidad" />
-                    <CustomInput type="number" label="Valor Unitario" placeholder="0" mode="currency"
-                      :id="'cantidad_' + index" v-model="material.valor_unitario"
-                      :invalid="material.errors && material.errors.valor_unitario != null"
-                      :errorMessage="material.errors && material.errors.valor_unitario" />
+
                   </div>
                   <div>
                     <Button @click="removeMaterial(index)" severity="danger" icon="fa-solid fa-minus" class="h-6" />
                   </div>
                 </div>
-                <span class="text-xs italic text-gray-500">
-                  Nombre del material a comprar
-                </span>
+                <div class="text-xs italic text-gray-500 flex justify-between px-4">
+                  <h2 class="font-bold">Nombre del material </h2>
+                  <h2 class="text-success">Disponible</h2>
+                  <h2 class="text-success">Prestar</h2>
+                </div>
               </div>
             </div>
           </div>
