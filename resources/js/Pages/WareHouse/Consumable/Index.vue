@@ -109,6 +109,10 @@ const search = () => {
 }
 
 //#region Charge Modal Functions
+const addItem = () => {
+  openChargeModal.value = true
+}
+
 const addMaterial = () => {
   formData.value.requirement.materials.push({
     codigo_material: '',
@@ -149,8 +153,8 @@ const clearDischargeModalData = () => {
 
 const url = [
   {
-    ruta: 'requirements.index',
-    label: 'Requerimientos',
+    ruta: 'consumable.index',
+    label: 'Consumibles',
     active: true
   }
 ]
@@ -160,7 +164,7 @@ const url = [
     <div class="size-full">
       <CustomDataTable :data="requirements" title="Consumibles" :columnas="columns" :rowsDefault="10">
         <template #buttonHeader>
-          <Button label="Cargar" severity="success" icon="fa-solid fa-plus" @click="addMaterial()" />
+          <Button label="Cargar" severity="success" icon="fa-solid fa-plus" @click="addItem()" />
           <Button label="Descargar" severity="warning" icon="fa-solid fa-circle-down" @click="dischargeMaterial()" />
         </template>
       </CustomDataTable>
@@ -267,9 +271,8 @@ const url = [
                     <CustomInput type="number" label="Cantidad" placeholder="0" :id="'cantidad_' + index"
                       v-model="material.cantidad" :invalid="material.errors && material.errors.cantidad != null"
                       :errorMessage="material.errors && material.errors.cantidad" />
-
                   </div>
-                  <div>
+                  <div v-if="formData.requirement.materials.length !== 1">
                     <Button @click="removeMaterial(index)" severity="danger" icon="fa-solid fa-minus" class="h-6" />
                   </div>
                 </div>
