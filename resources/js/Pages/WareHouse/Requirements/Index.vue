@@ -27,6 +27,7 @@ const materialsLoaded = ref(false)
 const requirement = ref({})
 
 const formData = ref({
+    id: 0,
     requirement: {
         materials: [
             {
@@ -147,16 +148,13 @@ const submit = () => {
 }
 
 const addMaterial = () => {
-    console.log('Agregar')
     formData.value.requirement.materials.push({
         codigo_material: '',
         cantidad: '',
-    });
-    console.log(formData.value.requirement.materials)
+    })
 }
 
 const removeMaterial = (material_id) => {
-    console.log('Quitar')
     formData.value.requirement.materials.splice(material_id, 1)
 }
 //#endregion
@@ -174,7 +172,6 @@ const showClick = (event, data) => {
         openSlideOver.value = true
     }
 }
-
 
 onMounted(() => {
     if (props.requirement_id) {
@@ -204,8 +201,8 @@ const url = [
             </div> -->
             <CustomDataTable :data="requirements" title="Requerimiento de Materiales" @selectionAction="gestion"
                 :columnas="columns" :rowsDefault="10"
-                :selectionMode="hasPermission('gestionar materiales') ? 'multiple' : 'single'" @rowClic="showClick()"
-                @showSlide="showClick()">
+                :selectionMode="hasPermission('gestionar materiales') ? 'multiple' : 'single'" @rowClic="showClick"
+                @showSlide="showClick">
                 <template #buttonHeader>
                     <Button label="Importar Requerimientos" severity="success" icon="fa-solid fa-plus"
                         @click="addItem()" />
@@ -228,7 +225,7 @@ const url = [
                         label="Proyecto" placeholder="Selecione un proyecto" id="bloque"
                         v-model:input="formData.requirement.project_id" :invalid="$attrs.errors.project_id != null"
                         :errorMessage="$attrs.errors.project_id" />
-                    <CustomInput label="Bloque" placeholder="Escriba Bloque" id="bloque" type="number"
+                    <CustomInput type="number" label="Bloque" placeholder="Escriba Bloque" id="bloque"
                         v-model:input="formData.requirement.bloque" :invalid="$attrs.errors.bloque != null"
                         :errorMessage="$attrs.errors.bloque" />
                     <CustomInput label="Grupo/Sistema" placeholder="Escriba El grupo o sistema" id="grupo"
@@ -240,7 +237,7 @@ const url = [
                     <CustomInput type="dropdown" optionLabel="name" optionValue="id" :options="process" id="proceso"
                         label="Proceso" placeholder="Selecione un proceso" v-model:input="formData.requirement.proceso"
                         :invalid="$attrs.errors.proceso != null" :errorMessage="$attrs.errors.proceso" />
-                    <CustomInput v-model:input="formData.requirement.data" label="Adjuntar Requerimientos" type="file"
+                    <CustomInput v-model:input="formData.requirement.data" label="Adjuntar Requerimientos"
                         acceptFile="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                         id="data" :invalid="$attrs.errors.data != null" :errorMessage="$attrs.errors.data" />
                     <!-- <CustomInput class="mt-2 col-span-3" label="Notas" placeholder="Escriba la Nota del requerimiento"
@@ -253,32 +250,38 @@ const url = [
                                 root: '!size-6'
                             }" />
                         </div>
-                        <div class="h-80  overflow-y-auto space-y-2">
+                        <div class="h-80 overflow-y-auto space-y-2">
                             <div v-for="(material, index) in formData.requirement.materials" :key="index"
                                 class="w-full border-b border-slate-300">
                                 <div class="flex w-full space-x-2 items-end">
                                     <div class="w-full pr-2 border-r border-slate-300">
-                                        <label v-if="index == 0" class="text-center">Codigo de
-                                            material</label>
+                                        <label v-if="index == 0" class="text-center">
+                                            Codigo de material
+                                        </label>
                                         <CustomInput placeholder="Escriba Código del Material"
                                             :id="'codigo_material_' + index" v-model="material.codigo_material"
                                             :invalid="material.errors && material.errors.codigo_material != null"
                                             :errorMessage="material.errors && material.errors.codigo_material" />
                                     </div>
-                                    <div>
-                                        <label v-if="index == 0" class="text-center">Cantidad</label>
-                                        <CustomInput type="number" placeholder="0" :id="'cantidad_' + index"
-                                            v-model="material.cantidad"
+                                    <div class="flex space-x-4">
+                                        <!-- <label v-if="index == 0" class="text-center">Cantidad</label> -->
+                                        <CustomInput type="number" label="Cantidad" placeholder="0"
+                                            :id="'cantidad_' + index" v-model="material.cantidad"
                                             :invalid="material.errors && material.errors.cantidad != null"
                                             :errorMessage="material.errors && material.errors.cantidad" />
+                                        <CustomInput type="number" label="Valor Unitario" mode="currency"
+                                            placeholder="0" :id="'cantidad_' + index" v-model="material.valor_unitario"
+                                            :invalid="material.errors && material.errors.valor_unitario != null"
+                                            :errorMessage="material.errors && material.errors.valor_unitario" />
                                     </div>
                                     <div>
                                         <Button @click="removeMaterial(index)" severity="danger"
                                             icon="fa-solid fa-minus" class="h-6" />
                                     </div>
                                 </div>
-                                <span for="" class="text-xs italic text-gray-500">Nombre del material a
-                                    comprar</span>
+                                <span class="text-xs italic text-gray-500">
+                                    Nombre del material a comprar
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -291,7 +294,7 @@ const url = [
             </template>
         </CustomModal>
 
-        <RequirementSlideOver :requirement="requirement" :materials :key="requirement.id" :show="openSlideOver"
+        <RequirementSlideOver :requirement :materials :key="requirement.id" :show="openSlideOver"
             @closeSlideOver="openSlideOver = false" />
     </AppLayout>
 </template>
