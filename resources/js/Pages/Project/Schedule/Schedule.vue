@@ -20,6 +20,7 @@ import Sidebar from 'primevue/sidebar';
 import Empty from '@/Components/Empty.vue';
 import { usePage } from '@inertiajs/vue3';
 import SplitButton from 'primevue/splitbutton';
+import CustomModalCalendars from './Components/CustomModalCalendars.vue';
 
 const toast = useToast();
 const fontSize = ref('10px')
@@ -460,8 +461,12 @@ class Task extends TaskModel {
 
     get cls() {
         let obj = {}
-        obj[super.getData('rowcolor')] = true
-        return Object.assign(super.cls, obj);
+        if (super.getData('rowcolor')!='none'){
+            obj[super.getData('rowcolor')] = true
+            return Object.assign(super.cls, obj);
+        }
+        super.cls={}
+        return super.cls
     }
 }
 //#endregion
@@ -479,7 +484,6 @@ async function getNotes() {
     notes.value.load = true
     await axios.get(route('get.notes', props.project.id))
         .then((res) => {
-            // console.log(res)
             notes.value.data = res.data
         })
         .catch((error) => {
@@ -630,7 +634,7 @@ const project = ref(
             load: (e) => {
                 onExpandAllClick()
                 onZoomToFitClick()
-                listCalendar.value = e.response.assignCalendar;
+                listCalendar.value = e.response.calendars.rows;
                 listShift.value = e.response.shift;
                 formCalendar.value.project = props.project.id;
                 getNotes()
@@ -903,7 +907,7 @@ function showModalExport() {
         if (c.type != 'addnew' && c.text != null) {
             return { text: c.text, type: c.id }
         }
-    }).filter((c)=>c!==undefined)
+    }).filter((c) => c !== undefined)
     visibleExport.value.modal = true
 }
 
@@ -1124,6 +1128,8 @@ const visibleNotes = ref(false)
 //#endregion
 
 //#region calendario
+const newCalendarModal = ref()
+const newCalendarData = ref({})
 const url = [
     {
         ruta: 'projects.index',
@@ -1168,15 +1174,39 @@ const toggleCalendar = (event) => {
 const newCalendar = () => {
     calendarCreate.value = false;
     formCalendar.value.newCalendar = true;
+    newCalendarModal.value = true
+    calendar.value.hide();
 }
 const reload = () => {
     let gantt = ganttref.value.instance.value
     gantt.project.load();
 }
+async function setCalendarToProject() {
+    let gantt = ganttref.value.instance.value
+    loadSaveCalendar.value = true
+    await axios.post(route('assignment.calendar'), formCalendar.value).then(async (res) => {
+        if (res.data.status) {
+            toast.add({
+                severity: 'success',
+                group: 'customToast',
+                text: res.data.mensaje,
+                life: 4000
+            })
+            await gantt.project.setCalendar(formCalendar.value.calendar);
+        } else {
+            toast.add({
+                severity: 'error',
+                group: 'customToast',
+                text: res.data.mensaje,
+                life: 4000
+            })
+        }
+    })
+    loadSaveCalendar.value = false
+}
 const submit = async () => {
     loadSaveCalendar.value = true;
     let gantt = ganttref.value.instance.value
-    console.log(formCalendar.value);
     let error = false;
     if (formCalendar.value.newCalendar) {
         if (formCalendar.value.name == '') {
@@ -1254,9 +1284,11 @@ const submit = async () => {
 }
 //#endregion
 
+//#region cambio color
+
 const colorRow = ref('bg-green-200')
 const colors = [
-    { value: 'bg-inherit', name: 'Sin fondo' },
+    { value: 'none', name: 'Sin fondo' },
     { value: 'bg-red-200', name: 'Rojo' },
     { value: 'bg-green-200', name: 'Verde' },
     { value: 'bg-yellow-200', name: 'Amarillo' },
@@ -1287,6 +1319,7 @@ function changeColorRow(color) {
     }
 }
 
+//#endregion
 </script>
 <template>
     <AppLayout :href="url">
@@ -1390,7 +1423,7 @@ function changeColorRow(color) {
                 :pdfExportFeature="pdfExport" :mspExportFeature="true" :projectLines="true"
                 :baselinesFeature="baselines" ref="ganttref" class="h-full" :printFeature="true" v-bind="ganttConfig"
                 :dependenciesFeature="{ radius: 5 }" :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip"
-                :criticalPathsFeature="criticalPaths" :nonWorkingTimeFeature="nonWorkingTime"  />
+                :criticalPathsFeature="criticalPaths" :nonWorkingTimeFeature="nonWorkingTime" />
         </div>
     </AppLayout>
     <OverlayPanel id="setLB" ref="setLB" :pt="{ content: '!p-1' }">
@@ -1457,20 +1490,17 @@ function changeColorRow(color) {
         </template>
     </CustomModal>
     <OverlayPanel ref="calendar" class="w-96">
-        <div v-if="calendarCreate">
-            <section class="grid grid-cols-1 gap-2">
-                <div class="flex flex-column gap-20">
-                    <label class="w-full">Asignación de calendario</label>
-                    <Button severity="success" class="button-right" v-tooltip.bottom="'Nuevo Calendario'"
-                        icon="fa-solid fa-plus" @click="newCalendar" />
-                </div>
-                <Dropdown v-model="formCalendar.calendar" :options="listCalendar" optionLabel="name"
-                    placeholder="Seleccione un calendario" checkmark :highlightOnSelect="false" class="w-full"
-                    showClear />
-                <br>
-            </section>
+        <div v-if="calendarCreate" class="flex flex-col gap-2 mb-2">
+            <div class="flex justify-between items-center gap-2">
+                <label class="">Asignación de calendario</label>
+                <Button severity="success" v-tooltip.rigth="'Nuevo Calendario'" icon="fa-solid fa-plus"
+                    @click="newCalendar" />
+            </div>
+            <Dropdown v-model="formCalendar.calendar" :options="listCalendar" optionLabel="name"
+                placeholder="Seleccione un calendario" checkmark :highlightOnSelect="false" class="w-full" showClear />
         </div>
         <!-- F0rmulario de creación -->
+
         <div v-if="!calendarCreate">
             <h1 class="text-center">Nuevo Calendario</h1>
             <CustomInput label="Nombre" id="name" v-model:input="formCalendar.name"
@@ -1488,10 +1518,12 @@ function changeColorRow(color) {
                 </div><br>
             </section>
         </div>
-        <div>
-            <Button severity="success" :loading="loadSaveCalendar" label="Guardar" @click="submit" />
-        </div>
+        <span class="flex justify-end">
+            <Button severity="success" :loading="loadSaveCalendar" label="Guardar"
+                @click="calendarCreate ? setCalendarToProject() : submit()" />
+        </span>
     </OverlayPanel>
+
     <Sidebar v-model:visible="visibleNotes" header="Notas del proyecto" position="right">
         <div class="border-t w-full space-y-2 p-1">
             <div v-if="notes.data.length == 0" class="mt-10">
@@ -1558,6 +1590,11 @@ function changeColorRow(color) {
             </span>
         </template>
     </CustomModal>
+    <!-- #endregion -->
+
+    <!-- #region prueba exportar -->
+
+    <CustomModalCalendars v-model:visible="newCalendarModal"/>
     <!-- #endregion -->
 </template>
 

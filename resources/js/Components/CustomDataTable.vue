@@ -16,6 +16,7 @@ import Loading from './Loading.vue';
 import MultiSelect from 'primevue/multiselect';
 import Swal from 'sweetalert2';
 import Tag from 'primevue/tag';
+import InputSwitch from 'primevue/inputswitch';
 
 const props = defineProps({
     data: {
@@ -180,7 +181,8 @@ const selectedElement = ref([]);
         <template #header>
             <div class="space-y-1">
                 <span class="flex justify-between ">
-                    <p class="text-xl h-ful flex items-center font-extrabold leading-6 mb-2 capitalize text-primary">
+                    <p v-if="title"
+                        class="text-xl h-ful flex items-center font-extrabold leading-6 mb-2 capitalize text-primary">
                         {{ title }}
                     </p>
                     <span class="space-x-1">
@@ -375,6 +377,9 @@ const selectedElement = ref([]);
                     </span>
                     <span v-else-if="col.type == 'fileSize'">
                         {{ byteSizeFormatter(data[col.field]) }}
+                    </span>
+                    <span v-else-if="col.type == 'boolean'" class="flex items-center justify-center">
+                        <InputSwitch v-model="data[col.field]"/>
                     </span>
                     <p v-else class="">
                         {{ data[col.field] }}
