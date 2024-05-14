@@ -197,9 +197,7 @@ const selectedElement = ref([]);
                             <Button v-tooltip.top="'Quitar filtros'" @click="clearFilter()" outlined
                                 icon="fa-solid fa-filter-circle-xmark" />
                             <IconField iconPosition="left">
-                                <InputIcon>
-                                    <i class="fa-solid fa-magnifying-glass" />
-                                </InputIcon>
+                                <InputIcon class="fa-solid fa-magnifying-glass"/>
                                 <InputText v-model="filters.global.value" type="search" size="small"
                                     placeholder="Buscar" />
                             </IconField>
