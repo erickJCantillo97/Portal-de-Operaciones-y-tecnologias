@@ -17,6 +17,7 @@ import Listbox from 'primevue/listbox'
 import Loading from '@/Components/Loading.vue'
 import OverlayPanel from 'primevue/overlaypanel'
 import Empty from '@/Components/Empty.vue'
+import Dropdown from 'primevue/dropdown'
 
 const { hasPermission } = usePermissions();
 const { byteSizeFormatter, formatDateTime24h } = useCommonUtilities();
@@ -193,6 +194,7 @@ const url = [
         active: true
     }
 ]
+const x =ref('asdasd')
 </script>
 
 <template>
@@ -205,6 +207,9 @@ const url = [
                     <Button @click="addItem" severity="success" v-if="hasPermission('projects create')"
                         icon="fa-solid fa-plus" label="Agregar" outlined />
                 </template>
+                <!-- <template #title>
+                    <Dropdown v-model="x" :options="['asdasd','asdassdfd']" :pt="{root:'border-none'}"></Dropdown>
+                </template> -->
             </CustomDataTable>
         </div>
     </AppLayout>
