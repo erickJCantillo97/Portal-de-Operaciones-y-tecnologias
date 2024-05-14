@@ -36,6 +36,7 @@
         "@vue-hero-icons/outline": "^1.7.2",
         "@vue-hero-icons/solid": "^1.7.2",
         "apexcharts": "^3.42.0",
+        "colombia-holidays": "^0.0.1",
         "echarts": "^5.4.3",
         "html2canvas": "^1.4.1",
         "inflected": "^2.1.0",

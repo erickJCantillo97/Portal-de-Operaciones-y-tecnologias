@@ -27,12 +27,12 @@ const optionsGen = ref([
         ],
         default: '12px'
     },
-    {
-        field: 'generalfontweight',
-        label: 'Negrita',
-        type: 'boolean',
-        default: false
-    }
+    // {
+    //     field: 'generalfontweight',
+    //     label: 'Negrita',
+    //     type: 'boolean',
+    //     default: false
+    // }
 ])
 
 const overlayConfig = ref()
@@ -73,7 +73,7 @@ async function saveConfig(key, data, type) {
 function changeFontSize(size) {
     var element = document.getElementsByClassName('sizegeneralfont');
     element[0].style.fontSize = size;
-    element[0].style.fontWeight = size ? '900' : '500';
+    // element[0].style.fontWeight = size ? '900' : '500';
 }
 
 changeFontSize(optionsData.value.generalfontsize?.data ?? '12px')

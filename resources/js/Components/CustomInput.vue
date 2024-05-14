@@ -292,7 +292,7 @@ defineEmits(['valueChange'])
                         }" />
                 </span>
                 <span v-else-if="type == 'time'">
-                    <Calendar :id v-model="input" timeOnly hourFormat="24" :placeholder :required showIcon
+                    <Calendar :id v-model="input" :min-date :max-date timeOnly hourFormat="24" :placeholder :required showIcon
                         dateFormat="dd/mm/yy" :stepMinute @date-select="$emit('valueChange', $event)" :pt="{
                             root: '!w-full',
                             input: '!h-8'
