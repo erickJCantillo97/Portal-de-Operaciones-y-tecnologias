@@ -1,30 +1,30 @@
 <script setup>
-// import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
-// import { KeyIcon, SquaresPlusIcon, ClockIcon } from '@heroicons/vue/24/outline'
-// import { ref } from 'vue'
-// import AppLayout from '@/Layouts/AppLayout.vue';
-// import BaseActivities from './../Components/SWBS/BaseActivities.vue';
-// import ConstructiveGrupo from './../Components/SWBS/ConstructiveGrupo.vue';
-// import CustomUpload from '@/Components/CustomUpload.vue';
-// import Gerencias from '../Components/Gerencias.vue';
-// import Processes from './../Components/SWBS/Processes.vue';
-// import Shifts from './../Components/Shifts.vue';
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
+import { KeyIcon, SquaresPlusIcon, ClockIcon } from '@heroicons/vue/24/outline'
+import { ref } from 'vue'
+import AppLayout from '@/Layouts/AppLayout.vue';
+import BaseActivities from './../Components/SWBS/BaseActivities.vue';
+import ConstructiveGrupo from './../Components/SWBS/ConstructiveGrupo.vue';
+import CustomUpload from '@/Components/CustomUpload.vue';
+import Gerencias from '../Components/Gerencias.vue';
+import Processes from './../Components/SWBS/Processes.vue';
+import Shifts from './../Components/Shifts.vue';
 // import SubSystems from './../Components/SWBS/SubSystems.vue';
 // import Systems from './../Components/SWBS/Systems.vue';
-// import Warehouses from '../Components/Warehouses.vue';
+import Warehouses from '../Components/Warehouses.vue';
 
-// const menu = ref('VB')
+const menu = ref('VB')
 
-// const navigation = [
-//     { name: 'Variables Basicas', value: 'VB', icon: SquaresPlusIcon, current: true },
-//     { name: 'SWBS', value: 'SW', icon: KeyIcon, current: false },
-//     { name: 'Horarios', value: 'SC', icon: ClockIcon, current: false }, //SC->schedules
-//     // { name: 'Sugerencias', value: 'SU', icon: UserGroupIcon, current: false },
-//     // { name: 'Clases de Costo', value: 'CC', icon: SquaresPlusIcon, current: false },
-// ]
+const navigation = [
+    { name: 'Variables Basicas', value: 'VB', icon: SquaresPlusIcon, current: true },
+    { name: 'SWBS', value: 'SW', icon: KeyIcon, current: false },
+    { name: 'Horarios', value: 'SC', icon: ClockIcon, current: false }, //SC->schedules
+    // { name: 'Sugerencias', value: 'SU', icon: UserGroupIcon, current: false },
+    // { name: 'Clases de Costo', value: 'CC', icon: SquaresPlusIcon, current: false },
+]
 </script>
 <template>
-    <!-- <AppLayout>
+    <AppLayout>
         <div class=" h-full w-full p-2 lg:grid lg:grid-cols-12 lg:gap-x-2">
             <aside class="px-2 py-6 sm:px-6 lg:col-span-2 lg:px-0 lg:py-0">
                 <nav class="space-y-1">
@@ -164,5 +164,5 @@
                 </div>
             </div>
         </div>
-    </AppLayout> -->
+    </AppLayout>
 </template>
