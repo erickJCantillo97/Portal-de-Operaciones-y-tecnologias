@@ -12,18 +12,18 @@
         <span class="sm:w-1/4 hidden"></span>
         <span class="sm:w-1/5 hidden"></span>
         <span class="sm:w-1/6 hidden"></span>
+        <span class="rotate-0 hidden"></span>
+        <span class="rotate-90 hidden"></span>
     </div>
-    <div class="max-h-screen collapsible-vertical" :class="menu ? 'toggle-sidebar' : ''">
-        <main class="h-screen flex flex-col">
+    <div class="max-h-screen flex">
+        <main class="h-screen flex flex-col w-full pt-0.5">
             <div class="fixed inset-0 bg-[black]/60 z-10" :class="{ hidden: !menu }" @click="menu = !menu"></div>
-            <MenuSidebar class="lg:block " :class="{ hidden: !menu }"></MenuSidebar>
+            <CustomMenuSidebar class="fixed z-20 sm:block" :items="navigation" :class="{ hidden: !menu }" v-model:menu="menu">
+            </CustomMenuSidebar>
             <div
-                class="max-h-[6vh] z-10 flex items-center justify-between h-auto px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 lg:ml-24">
+                class="max-h-16 flex items-center justify-between h-auto px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 sm:ml-14">
                 <div class="w-full flex items-center">
-                    <button type="button" class="-ml-7 p-2.5 text-gray-700 lg:hidden" @click="menu = !menu">
-                        <span class="sr-only">Open sidebar</span>
-                        <Bars3CenterLeftIcon class="w-6 h-6" aria-hidden="true" />
-                    </button>
+                    <Button icon="fa-solid fa-bars" class="-ml-3 lg:hidden" text @click="menu = !menu"/>
                     <div class="hidden md:flex">
                         <Link :href="route('dashboard')" v-tooltip.bottom="'Dashboard'">
                         <div class="flex space-x-2 items-center">
@@ -34,7 +34,7 @@
                         </div>
                         </Link>
                         <div class="flex items-center justify-between">
-                            
+
                             <Breadcrumb :home="home" :model="href" :pt="{
         root: '!h-2 !flex !justify-center !items-center',
         label: '!text-blue-800'
@@ -136,7 +136,7 @@
                 lg:h-[87vh]
                 xl:h-[88vh]
                 2xl:h-[90vh]
-                items-center flex p-1 gap-1 border-gray-200 bg-white rounded-lg shadow-2xl g-white sm:ml-24 sm:mr-1">
+                items-center flex p-1 gap-1 border-gray-200 bg-white rounded-lg shadow-2xl g-white sm:ml-16 sm:mr-2">
                 <slot />
             </div>
             <div class="fixed right-[-5px] z-50 w-10 top-1/4 animate-pulse" data-html2canvas-ignore>
@@ -308,6 +308,7 @@
         </main>
         <Footer fontSize="xs" fontColor="white" marginTop="0" class="bg-gray-500 py-1" />
     </div>
+
     <Toast position="bottom-center" group="customToast"
         :pt="{ content: '!py-1 !items-center !flex !justify-between !px-3 !border-0' }">
         <template #message="slotProps">
@@ -369,6 +370,7 @@ import NotificationItem from '@/Components/NotificationItem.vue'
 import NoContentToShow from '@/Components/NoContentToShow.vue';
 import CustomOverlayConfig from '@/Components/CustomOverlayConfig.vue';
 import { usePermissions } from '@/composable/permission'
+import CustomMenuSidebar from '@/Components/CustomMenuSidebar.vue';
 const { hasRole, hasPermission } = usePermissions()
 const debug = import.meta.env.VITE_APP_DEBUG
 const menu = ref(false)
@@ -468,4 +470,234 @@ const home = ref({
     // label: 'Dashboard',
     //active: true
 })
+
+
+const navigation = [
+    {
+        name: 'Dashboard',
+        href: 'dashboard',
+        icon: 'fa-solid fa-house',
+        current: true,
+        show: true,
+        dev: false
+    },
+    {
+        name: 'Gestion de Personal',
+        icon: 'fa-solid fa-users',
+        current: false,
+        show: hasPermission(['programming read',]),
+        children: [
+            {
+                name: 'Mi Personal',
+                href: 'personal.index',
+                // dev: true
+                show: true,
+            },
+            {
+                name: 'Programación',
+                href: 'programming',
+                // dev: true
+                show: hasPermission('programming read'),
+            },
+            {
+                name: 'Parte Actual',
+                href: 'personal.index',
+                dev: true,
+                show: true,
+            },
+            {
+                name: 'Solicitudes',
+                href: 'personal.index',
+                dev: true,
+                show: true,
+            },
+            {
+                name: 'Personal Activo',
+                href: 'personal.activos',
+                dev: false,
+                show: true
+            },
+            {
+                name: 'Contratistas',
+                href: 'contractorEmployees.index',
+                dev: false,
+                show: true
+            },
+            // { name: 'Programación', href: '#' },
+            // { name: 'Parte Diario', href: '#' },
+            // { name: 'Informes', href: '#' },
+        ],
+    },
+    {
+        name: 'Planillación',
+        show: true,
+        icon: 'fa-solid fa-address-card',
+        current: false,
+        children: [
+            {
+                name: 'Parte de Personal',
+                href: 'dashboard',
+                dev: true,
+                show: true,
+            },
+            {
+                name: 'Planilla',
+                href: 'programming',
+                dev: true,
+                show: true,
+            },
+            {
+                name: 'Novedades',
+                href: 'personal.index',
+                dev: true,
+                show: true,
+            },
+            // { name: 'Programación', href: '#' },
+            // { name: 'Parte Diario', href: '#' },
+            // { name: 'Informes', href: '#' },
+        ],
+    },
+    {
+        name: 'Gestión de Proyectos',
+        icon: 'fa-solid fa-diagram-project',
+        current: false,
+        show: hasPermission(['projects read', 'ship read', 'typeShip read']),
+        children: [
+            {
+                name: 'Proyectos',
+                href: 'projects.index',
+                // dev: true,
+                show: hasPermission('projects read'),
+            },
+            {
+                name: 'Presupuestos',
+                href: 'budget.index',
+                show: true,
+            },
+            {
+                name: 'Unidades',
+                href: 'ships.index',
+                // dev: true,
+                show: hasPermission('ship read'),
+            },
+            {
+                name: 'Clases',
+                href: 'typeShips.index',
+                // dev: true,
+                show: hasPermission('typeShip read'),
+            },
+        ],
+    },
+    {
+        name: 'Gestión Comercial',
+        icon: 'fa-solid fa-handshake',
+        current: false,
+        show: true,
+        children: [
+            {
+                name: 'Clientes',
+                href: 'customers.index',
+                // dev: true,
+                show: hasPermission(['customer read']),
+            },
+            {
+                name: 'Contratos',
+                href: 'contracts.index',
+                // dev: true,
+                show: hasPermission(['contract read']),
+            },
+            {
+                name: 'Autorizaciones',
+                href: 'authorizations.index',
+                dev: true,
+                show: true,
+            },
+            {
+                name: 'Estimaciones',
+                href: 'quotes.index',
+                // dev: true,
+                show: hasPermission(['quote read']),
+            },
+        ],
+    },
+    {
+        name: 'Sugerencias',
+        icon: 'fa-solid fa-comments',
+        show: hasPermission('suggestion reader'),
+        children: [
+            {
+                name: 'Ver sugerencias',
+                href: 'suggestion.index',
+                // dev: true,
+                show: hasPermission('suggestion reader'),
+            },
+        ],
+    },
+    {
+        name: 'Documentos',
+        icon: 'fa-solid fa-folder-open',
+        href: 'get.projectsGD',
+        current: true,
+        show: true
+    },
+    {
+        name: 'Materiales y Equipos',
+        icon: 'fa-solid fa-screwdriver-wrench',
+        show: hasPermission(['category read']),
+        current: false,
+        children: [
+            {
+                name: 'Almacen',
+                show: true,
+                children: [
+                    {
+                        name: 'Reportes',
+                        href: 'tools.reports',
+                        show: hasPermission(['tool read']),
+                    },
+                    {
+                        name: 'Categorías',
+                        href: 'categories.index',
+                        show: hasPermission(['category read']),
+                    },
+                    {
+                        name: 'Equipos y Herramientas',
+                        href: 'tools.index',
+                        dev: false,
+                        show: hasPermission('tool read'),
+                    },
+                    {
+                        name: 'Asignaciones',
+                        href: 'assignmentTool.index',
+                        dev: false,
+                        show: hasPermission('assignmentTool read'),
+                    },
+                    {
+                        name: 'Consumibles',
+                        href: 'consumable.index',
+                        dev: false,
+                        show: hasPermission('consumable read'),
+                    },
+                ]
+            },
+
+            {
+                name: 'Requerimientos',
+                dev: false,
+                show: true,
+                children: [
+                    {
+                        name: 'Requerimientos',
+                        href: 'requirements.index',
+                        dev: true,
+                        show: true,
+                    },
+                ]
+            },
+        ],
+
+    },
+    // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon, current: false },
+    // { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
+]
 </script>
