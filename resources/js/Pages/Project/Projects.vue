@@ -182,7 +182,7 @@ const goToProjectOverview = (event, data) => {
     try {
         router.get(route('projects.goToProjectOverview', data.id))
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }
 //#endregion

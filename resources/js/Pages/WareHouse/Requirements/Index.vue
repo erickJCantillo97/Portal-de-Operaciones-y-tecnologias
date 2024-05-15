@@ -68,7 +68,7 @@ const addItem = () => {
     open.value = true
 }
 
-const process = [
+const processOptions = [
     {
         id: 1,
         name: 'Proceso 1'
@@ -221,6 +221,18 @@ const showClick = (event, data) => {
     }
 }
 
+const process = ref(false)
+const system = ref(false)
+
+const changeDataBySWBS = () => {
+    system.value = false
+
+    if (formData.value.requirement.SWBS == 1 || formData.value.requirement.SWBS == 4) {
+        process.value = processOptions
+        system.value = true
+    }
+}
+
 onMounted(() => {
     if (props.requirement_id) {
         requirement.value = props.requirements.filter(requirement => requirement.id == props.requirement_id)[0]
@@ -279,19 +291,23 @@ const url = [
                         v-model:input="formData.requirement.bloque" :invalid="$attrs.errors.bloque != null"
                         :errorMessage="$attrs.errors.bloque" />
                     <!--SWBS-->
-                    <CustomInput type="dropdown" optionLabel="name" optionValue="id" :options="SWBS" id="swbs"
-                        label="SWBS" placeholder="Selecione SWBS" v-model:input="formData.requirement.SWBS"
-                        :invalid="$attrs.errors.sistema_grupo != null" :errorMessage="$attrs.errors.sistema_grupo" />
+                    <CustomInput @change="changeDataBySWBS" type="dropdown" optionLabel="name" optionValue="id"
+                        :options="SWBS" id="swbs" label="SWBS" placeholder="Selecione SWBS"
+                        v-model:input="formData.requirement.SWBS" :invalid="$attrs.errors.sistema_grupo != null"
+                        :errorMessage="$attrs.errors.sistema_grupo" />
                     <!--Documento de Referencia-->
                     <CustomInput label="Documento de Referencia" placeholder="Escriba Documento de Referencia"
                         id="document" v-model:input="formData.requirement.document"
                         :invalid="$attrs.errors.document != null" :errorMessage="$attrs.errors.document" />
-                    <CustomInput type="dropdown" optionLabel="name" optionValue="id" :options="process" id="proceso"
-                        label="Proceso" placeholder="Selecione un proceso" v-model:input="formData.requirement.proceso"
+                    <!--Proceso-->
+                    <CustomInput type="dropdown" optionLabel="name" :options="process" label="Proceso"
+                        placeholder="Selecione un proceso" v-model:input="process" emptyMessage="Seleccione un SWBS"
                         :invalid="$attrs.errors.proceso != null" :errorMessage="$attrs.errors.proceso" />
-                    <CustomInput type="dropdown" optionLabel="name" optionValue="id" :options="process" id="proceso"
-                        label="Sistema" placeholder="Selecione un sistema" v-model:input="formData.requirement.sistema"
-                        :invalid="$attrs.errors.sistema != null" :errorMessage="$attrs.errors.sistema" />
+                    <!--Sistema-->
+                    <CustomInput v-if="system" type="dropdown" optionLabel="name" optionValue="id" :options="process"
+                        id="proceso" label="Sistema" placeholder="Selecione un sistema"
+                        v-model:input="formData.requirement.sistema" :invalid="$attrs.errors.sistema != null"
+                        :errorMessage="$attrs.errors.sistema" />
                     <div class="col-span-3 w-full">
                         <div class="grid grid-cols-3 gap-4">
                             <!--Notas-->
