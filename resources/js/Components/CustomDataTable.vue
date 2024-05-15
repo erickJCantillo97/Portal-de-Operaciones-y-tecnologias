@@ -225,8 +225,8 @@ const selectedElement = ref([]);
                             severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
                     </span>
                 </span>
-                <div class="flex items-center " :class="filter ? 'justify-between' : 'justify-end'" v-if="showHeader">
-                    <div class="grid gap-2 sm:grid-cols-2" v-if="filter">
+                <div class="flex h-8" :class="filter ? 'justify-between' : 'justify-end'" v-if="showHeader">
+                    <div class="flex flex-col sm:flex-row gap-2" v-if="filter">
                         <div class="flex gap-2">
                             <Button v-tooltip.top="'Quitar filtros'" @click="clearFilter()" outlined
                                 icon="fa-solid fa-filter-circle-xmark" />
@@ -237,8 +237,7 @@ const selectedElement = ref([]);
                             </IconField>
                             <slot name="filterSpace" />
                         </div>
-                        
-                        <div class="w-full overflow-x-auto">
+                        <div class="w-full overflow-y-hidden overflow-x-auto">
                             <ButtonGroup v-if="props.filterButtons && filterOK">
                                 <Button v-for="button in props.filterButtons"
                                     :label="button.label + ': ' + getTotalStatus(button.field, button.data)"
