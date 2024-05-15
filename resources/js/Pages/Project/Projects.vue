@@ -179,6 +179,7 @@ const buttons = [
 ]
 
 const goToProjectOverview = (event, data) => {
+    
     try {
         router.get(route('projects.goToProjectOverview', data.id))
     } catch (error) {
@@ -194,22 +195,18 @@ const url = [
         active: true
     }
 ]
-const x =ref('asdasd')
 </script>
 
 <template>
     <AppLayout :href="url">
         <div class="w-full h-full overflow-y-auto">
-            <CustomDataTable title="Proyectos" :filterButtons="filterButtons" :data="projects" :rows-default="100"
+            <CustomDataTable routeData="projects.index"  title="Proyectos" :filterButtons="filterButtons" :data="projects" :rows-default="100"
                 :columnas="columnas" :actions="buttons" @addDoc="addDoc" @addAct="addAct" @editClic="editClic"
                 @deleteClic="deleteClic" @goToProjectOverview="goToProjectOverview">
                 <template #buttonHeader>
                     <Button @click="addItem" severity="success" v-if="hasPermission('projects create')"
                         icon="fa-solid fa-plus" label="Agregar" outlined />
                 </template>
-                <!-- <template #title>
-                    <Dropdown v-model="x" :options="['asdasd','asdassdfd']" :pt="{root:'border-none'}"></Dropdown>
-                </template> -->
             </CustomDataTable>
         </div>
     </AppLayout>

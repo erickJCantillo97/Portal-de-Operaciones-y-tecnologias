@@ -21,7 +21,8 @@ import InputSwitch from 'primevue/inputswitch';
 const props = defineProps({
     data: {
         type: Array,
-        required: true
+        required: true,
+        default:[]
     },
     routeData: {
         type: String,
@@ -92,11 +93,23 @@ const props = defineProps({
     }
 })
 
-const dataResponse = ref()
-if (props.routeData && props.parameterData) {
-    axios.get(route(routeData, parameterData)).then((res) => {
+const dataResponse = defineModel('dataResponse', {
+    required: false,
+    type:Array,
+    default:[]
+})
+const dataLoading=ref(false)
+
+async function getData(){
+    dataLoading.value=true
+    await axios.get(route(props.routeData, props.parameterData)).then((res) => {
         dataResponse.value=res.data
     })
+    dataLoading.value=false
+}
+
+if (props.routeData) {
+    getData()
 }
 
 //#region Filtros de tabla y visor columnas
@@ -131,6 +144,9 @@ onMounted(() => {
 })
 
 const getTotalStatus = (field, data) => {
+    if (props.routeData){
+        return dataResponse.value.filter(obj => obj[field] == data).length
+    }
     return props.data.filter(obj => obj[field] == data).length
 }
 
@@ -168,11 +184,12 @@ const formatDate = (date) => {
 //#endregion
 
 const selectedElement = ref([]);
+
 </script>
 
 <template>
-    <DataTable id="tabla" :value="props.data" v-model:selection="selectedElement" :paginator="data.length > 0 && paginator"
-        :rows :selectionMode tableStyle="" sortMode="multiple" scrollable scrollHeight="flex" :loading="loading"
+    <DataTable id="tabla" :value="props.routeData==null?props.data:dataResponse" v-model:selection="selectedElement" :paginator="data.length > 0 && paginator"
+        :rows :selectionMode tableStyle="" sortMode="multiple" scrollable scrollHeight="flex" :loading="props.routeData==null?props.loading:dataLoading"
         currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort
         v-model:filters="filters" stripedRows filterDisplay="menu" class="p-datatable-sm  p-1 rounded-md"
         stateStorage="session" :stateKey="cacheName ? 'dt-' + cacheName + '-state-session' : null"
