@@ -32,6 +32,10 @@ const formData = ref({
   }
 })
 
+const loadMaterial = () => {
+  openChargeModal.value = true;
+}
+
 const requirements = [
 ]
 
@@ -108,6 +112,26 @@ const search = () => {
   }
 }
 
+
+const searchMaterial = (index) => {
+  if (formData.value.requirement.materials[index].codigo_material) {
+    axios.get(route('get.materialsap', {
+      codigo: formData.value.requirement.materials[index].codigo_material
+    })).then((res) => {
+      formData.value.requirement.materials[index].material.name = res.data.material?.MAKTX ?? 'No Encontrado'
+    })
+  }
+  if (formData.value.requirement.materials[index].cantidad) {
+
+    formData.value.requirement.materials[index].material.estado = 'Disponible'
+    formData.value.requirement.materials[index].material.resto = formData.value.requirement.materials[index].cantidad - 10
+  }
+
+  // console.log('En busqueda del material: ' + formData.value.requirement.materials[index].codigo_material)
+}
+
+
+
 //#region Charge Modal Functions
 const addMaterial = () => {
   formData.value.requirement.materials.push({
@@ -160,7 +184,7 @@ const url = [
     <div class="size-full">
       <CustomDataTable :data="requirements" title="Consumibles" :columnas="columns" :rowsDefault="10">
         <template #buttonHeader>
-          <Button label="Cargar" severity="success" icon="fa-solid fa-plus" @click="addMaterial()" />
+          <Button label="Cargar" severity="success" icon="fa-solid fa-plus" @click="loadMaterial()" />
           <Button label="Descargar" severity="warning" icon="fa-solid fa-circle-down" @click="dischargeMaterial()" />
         </template>
       </CustomDataTable>
@@ -257,15 +281,16 @@ const url = [
                     <label v-if="index == 0" class="text-center">
                       Codigo de material
                     </label>
-                    <CustomInput placeholder="Escriba Código del Material" :id="'codigo_material_' + index"
-                      v-model="material.codigo_material"
+                    <CustomInput @focusout="searchMaterial(index)" placeholder="Escriba Código del Material"
+                      :id="'codigo_material_' + index" v-model:input="material.codigo_material"
                       :invalid="material.errors && material.errors.codigo_material != null"
                       :errorMessage="material.errors && material.errors.codigo_material" />
                   </div>
                   <div class="flex space-x-4">
                     <!-- <label v-if="index == 0" class="text-center">Cantidad</label> -->
-                    <CustomInput type="number" label="Cantidad" placeholder="0" :id="'cantidad_' + index"
-                      v-model="material.cantidad" :invalid="material.errors && material.errors.cantidad != null"
+                    <CustomInput @focusout="searchMaterial(index)" type="number" label="Cantidad" placeholder="0"
+                      :id="'cantidad_' + index" v-model:input="material.cantidad"
+                      :invalid="material.errors && material.errors.cantidad != null"
                       :errorMessage="material.errors && material.errors.cantidad" />
 
                   </div>
@@ -273,10 +298,15 @@ const url = [
                     <Button @click="removeMaterial(index)" severity="danger" icon="fa-solid fa-minus" class="h-6" />
                   </div>
                 </div>
-                <div class="text-xs italic text-gray-500 flex justify-between px-4">
-                  <h2 class="font-bold">Nombre del material </h2>
-                  <h2 class="text-success">Disponible</h2>
-                  <h2 class="text-success">Prestar</h2>
+                <div class="italic text-gray-500 flex justify-between px-4">
+                  <h2 class="font-bold"> {{ material.material?.name ?? '' }}</h2>
+
+                  <h2 class="text-success">{{ material.material?.resto > 0 ? (material.cantidad -
+    material.material?.resto) + ' Disponibles' : 'Disponibles'
+                    }}</h2>
+                  <h2 class="text-danger underline cursor-pointer" v-if="material.material?.resto > 0"> Prestar los {{
+    material.material?.resto
+    ?? '' }} restantes</h2>
                 </div>
               </div>
             </div>
