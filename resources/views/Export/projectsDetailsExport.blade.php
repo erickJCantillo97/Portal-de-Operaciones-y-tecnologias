@@ -59,19 +59,19 @@
                 <td>{{ $ship->typeShip->CGT }} Ton</td>
                 <td>{{ $ship->typeShip->bollard_pull }}</td>
                 <td>{{ $ship->typeShip->clasification }}</td>
-                <td>{{ $ship->projectsShip->first()->project->name }}</td>
-                <td>{{ $ship->projectsShip->first()->project->SAP_code }}</td>
-                <td>{{ $ship->projectsShip->first()->project->supervisor }}</td>
-                <td>{{ $ship->projectsShip->first()->project->type }}</td>
-                <td>{{ $ship->projectsShip->first()->project->status }}</td>
-                <td>{{ $ship->projectsShip->first()->project->scope }}</td>
-                <td>{{ $ship->projectsShip->first()->project->cost_sale[0] }}</td>
-                <td>{{ $ship->projectsShip->first()->project->contract->contract_id }}</td>
-                <td>{{ $ship->projectsShip->first()->project->contract->subject }}</td>
-                <td>{{ $ship->projectsShip->first()->project->contract->type_of_sale }}</td>
-                <td>{{ $ship->projectsShip->first()->project->contract->start_date }}</td>
-                <td>{{ $ship->projectsShip->first()->project->contract->end_date }}</td>
-                <td>{{ $ship->projectsShip->first()->project->contract->state }}</td>
+                <td>{{ $ship->projectsShip->first()->project->name ?? '' }}</td>
+                <td>{{ $ship->projectsShip->first()->project->SAP_code ?? '' }}</td>
+                <td>{{ $ship->projectsShip->first()->project->supervisor ?? '' }}</td>
+                <td>{{ $ship->projectsShip->first()->project->type ?? '' }}</td>
+                <td>{{ $ship->projectsShip->first()->project->status ?? '' }}</td>
+                <td>{{ $ship->projectsShip->first()->project->scope ?? '' }}</td>
+                <td>{{ $ship->projectsShip->first()->project->cost_sale[0] ?? '' }}</td>
+                <td>{{ $ship->projectsShip->first()->project->contract->contract_id ?? '' }}</td>
+                <td>{{ $ship->projectsShip->first()->project->contract->subject ?? '' }}</td>
+                <td>{{ $ship->projectsShip->first()->project->contract->type_of_sale ?? '' }}</td>
+                <td>{{ $ship->projectsShip->first()->project->contract->start_date ?? '' }}</td>
+                <td>{{ $ship->projectsShip->first()->project->contract->end_date ?? '' }}</td>
+                <td>{{ $ship->projectsShip->first()->project->contract->state ?? '' }}</td>
             </tr>
         @endforeach
     </tbody>

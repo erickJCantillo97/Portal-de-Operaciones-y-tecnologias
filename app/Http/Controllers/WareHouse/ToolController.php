@@ -23,6 +23,9 @@ class ToolController extends Controller
     {
 
         $warehouse = Warehouse::where('department', auth()->user()->oficina)->first()->id ?? 4;
+        if (auth()->user()->gerencia == 'GECON') {
+            $warehouse = 4;
+        }
         $tools = DB::table('tools_with_assigment_employee')->where('warehouse_id', $warehouse)->get();
         $categories = Category::where('level', 'Descripcion')->get();
         return Inertia::render('WareHouse/Tools/Index', [
