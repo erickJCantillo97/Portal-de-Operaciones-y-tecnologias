@@ -188,7 +188,7 @@ const selectedElement = ref([]);
 </script>
 
 <template>
-    <DataTable id="tabla" :value="props.routeData==null?props.data:dataResponse" v-model:selection="selectedElement" :paginator="data.length > 0 && paginator"
+    <DataTable id="tabla" :value="props.routeData==null?props.data:dataResponse" v-model:selection="selectedElement" :paginator="(dataResponse.length>0 || data.length > 0) && paginator"
         :rows :selectionMode tableStyle="" sortMode="multiple" scrollable scrollHeight="flex" :loading="props.routeData==null?props.loading:dataLoading"
         currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort
         v-model:filters="filters" stripedRows filterDisplay="menu" class="p-datatable-sm  p-1 rounded-md"
