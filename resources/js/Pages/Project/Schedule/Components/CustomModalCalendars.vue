@@ -11,8 +11,8 @@ import TabPanel from 'primevue/tabpanel';
 import TabView from 'primevue/tabview';
 import OverlayPanel from 'primevue/overlaypanel';
 
-const props=defineProps({
-    project:Object
+const props = defineProps({
+    project: Object
 })
 
 const yearsSelect = ref([(new Date).getFullYear()])
@@ -24,7 +24,7 @@ const visible = defineModel('visible', {
     required: true
 })
 const form = ref({
-    project:props.project.id,
+    project: props.project.id,
     name: null,
     statusHolidays: false,
     holidays: [],
@@ -211,14 +211,14 @@ function compareDates(date) {
     });
 
     if (existeFestivo) {
-        if(existeFestivo.type=='Festivo legal'){
+        if (existeFestivo.type == 'Festivo legal') {
             return 2
-        }else if(existeFestivo.type=='Festivo local'){
+        } else if (existeFestivo.type == 'Festivo local') {
             return 4
         }
-        else if(existeFestivo.type=='Vacaciones colectivas'){
+        else if (existeFestivo.type == 'Vacaciones colectivas') {
             return 5
-        }else{
+        } else {
             return 6
         }
     }
@@ -246,10 +246,10 @@ const references = [
 ]
 
 const columnas = [
-    { field: 'startDay', header: 'Dia inicio', type: 'date',filter:'true' },
-    { field: 'endDay', header: 'Dia fin', type: 'date',filter:'true' },
-    { field: 'text', header: 'Descripcion' ,filter:'true'},
-    { field: 'type', header: 'Tipo' ,filter:'true'},
+    { field: 'startDay', header: 'Dia inicio', type: 'date', filter: 'true' },
+    { field: 'endDay', header: 'Dia fin', type: 'date', filter: 'true' },
+    { field: 'text', header: 'Descripcion', filter: 'true' },
+    { field: 'type', header: 'Tipo', filter: 'true' },
 ]
 const actions = [
     { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
@@ -300,7 +300,7 @@ const newExeption = ref({
     text: null,
     startDay: null,
     endDay: null,
-    type: null
+    type: 'No laborable'
 })
 function addExeption() {
     form.value.holidays.push(newExeption.value)
@@ -314,7 +314,7 @@ function addExeption() {
 }
 
 
-function save(){
+function save() {
     console.log(form.value)
 }
 
@@ -323,10 +323,10 @@ function save(){
 
 <template>
     <CustomModal v-model:visible="visible" :closeOnEscape="false" icon="fa-solid fa-file-export"
-        :titulo="'Nuevo calendario para el projecto: '+project.name" width="90vw">
+        :titulo="'Nuevo calendario para el projecto: ' + project.name" width="90vw">
         <template #body>
-            <div class="grid grid-cols-3">
-                <div class="space-y-1 flex flex-col items-center">
+            <div class="flex gap-2 h-[75vh]">
+                <div class="space-y-1 w-min flex flex-col items-center">
                     <div class="w-full px-3">
                         <CustomInput v-model:input="form.name" class="w-full"
                             placeholder="Escriba un nombre para el calendario" label="Nombre del calendario">
@@ -348,10 +348,10 @@ function save(){
                         </span>
                     </div>
                 </div>
-                <span class="col-span-2">
-                    <TabView>
-                        <TabPanel header="Exepciones">
-                            <div class="grid grid-cols-2 p-2">
+                <div class="px-2 h-full w-full max-w-full">
+                    <TabView :pt="{ root: 'h-full overflow-hidden', navContainer: '!h-12', panelContainer: '!h-full' }">
+                        <TabPanel header="Exepciones" :pt="{ root: 'h-full' }">
+                            <div class="grid grid-cols-2 p-2 h-">
                                 <div class="flex space-x-3 items-center">
                                     <label class="mb-0.5" for="holidays">¿Agregar dias festivos?</label>
                                     <InputSwitch id="holidays" @change="activateHolidays(true)"
@@ -364,7 +364,7 @@ function save(){
                                     </Multiselect>
                                 </div>
                             </div>
-                            <div class="h-[55vh] border rounded-md">
+                            <div class="h-[85%] border rounded-md">
                                 <CustomDataTable title="Exepciones" :actions :showAdd="true" :data="form.holidays"
                                     @addClick="toggle" :columnas :showHeader="true" :paginator="false"
                                     @deleteClic="removeExeption">
@@ -441,7 +441,7 @@ function save(){
                             </div>
                         </TabPanel>
                     </TabView>
-                </span>
+                </div>
             </div>
         </template>
         <template #footer>
@@ -451,14 +451,14 @@ function save(){
     </CustomModal>
     <OverlayPanel ref="overlayAddExeption">
         <div class="flex flex-col w-96">
-            <CustomInput v-model:input="newExeption.text" label="Descripcion" />
+            <CustomInput v-model:input="newExeption.text" placeholder="Descripcion del dia a agregar a exepciones" label="Descripcion" />
             <span class="grid grid-cols-2 gap-3">
-                <CustomInput v-model:input="newExeption.startDay" type="date" label="Dia inicio" />
-                <CustomInput v-model:input="newExeption.endDay" type="date" label="Dia fin" />
+                <CustomInput v-model:input="newExeption.startDay"  type="date" label="Dia inicio" @value-change="newExeption.endDay=null" />
+                <CustomInput v-model:input="newExeption.endDay" :minDate="newExeption.startDay" type="date" label="Dia fin" />
             </span>
             <span class=" grid grid-cols-2">
                 <CustomInput label="Tipo" v-model:input="newExeption.type" type="dropdown"
-                    :options="['Festivo local', 'Vacaciones colectivas', 'Otros']" />
+                    :options="['No laborable','Festivo local', 'Vacaciones colectivas', 'Otros']" />
                 <span class="flex items-end justify-end">
                     <Button severity="success" label="Agregar" icon="fa-solid fa-plus" @click="addExeption" />
                 </span>
