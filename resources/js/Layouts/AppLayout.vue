@@ -113,7 +113,7 @@
                     </Menu>
                 </div>
             </div>
-            <div v-if="!debug == 'true'" class="max-h-4 flex items-center justify-center px-6 bg-orange-300 gap-x-6">
+            <div v-if="debug == 'true'" class="max-h-4 flex items-center justify-center px-6 bg-orange-300 gap-x-6">
                 <p class="font-semibold text-sm text-white">
                     Modo de pruebas
                 </p>
