@@ -20,13 +20,17 @@ class Task extends Model implements Auditable
         'manuallyScheduled' => 'boolean',
     ];
 
-    protected $appends = ['children','segments' ];
+    protected $appends = ['children','segments', 'schedulingMode' ];
 
     protected $guarded = [];
 
     public function getChildrenAttribute()
     {
         return Task::where('task_id', '=', $this->id)->orderBy('parentIndex')->get();
+    }
+
+    public function getSchedulingModeAttribute(){
+        return "FixedDuration";
     }
 
     public function getSegmentsAttribute(){

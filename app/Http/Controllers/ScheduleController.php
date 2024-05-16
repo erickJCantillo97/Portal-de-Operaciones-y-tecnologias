@@ -98,11 +98,11 @@ class ScheduleController extends Controller
             'success' => true,
             'project' =>  [
                 'calendar' => intval($project->calendar_id), // calendario por defecto
-                'startDate' => '2024-04-04',
+                'startDate' => '2024-04-04T06:30:00',
                 'hoursPerDay' => doubleval($project->hoursPerDay),
                 'daysPerWeek' => doubleval($project->daysPerWeek),
                 'daysPerMonth' => doubleval($project->daysPerMonth),
-                'durationUnit' => 'day',
+                //'durationUnit' => 'day',
                 'direction' => 'Forward'
             ],
             'calendars' => [
@@ -210,7 +210,6 @@ class ScheduleController extends Controller
         if (isset($request->tasks['updated'])) {
             foreach ($request->tasks['updated'] as $task) {
                 $taskUpdate = Task::where('id', $task['id'])->first();
-
                 $taskUpdate->update([
                     'name' => $task['name'] ?? $taskUpdate->name,
                     'task_id' => $task['parentId'] ?? $taskUpdate->task_id,
@@ -397,7 +396,7 @@ class ScheduleController extends Controller
                             'recurrentEndDate' => isset($intervals['recurrentEndDate'])  == true ? $intervals['recurrentEndDate'] : '',
                             'startDate' => isset($intervals['startDate']) == true ? Carbon::parse($intervals['startDate'])->format('Y-m-d H:i') : null,
                             'endDate' => isset($intervals['endDate']) == true ? Carbon::parse($intervals['endDate'])->format('Y-m-d H:i') : null,
-                            'name' => isset($intervals['name']) == true ? $intervals['endDate'] : ''
+                            'name' => isset($intervals['name']) ? $intervals['name'] : ''
                         ]);
                         array_push($calendarsDetails, [
                             'id' => $intervals['$PhantomId'],

@@ -1,6 +1,7 @@
 package bryntum.gantt.projectreader;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 
@@ -170,11 +171,20 @@ public class TasksJSONBuilder implements JSONBuilder<JSONObject> {
      * @return JSON object keeping the extracted task data
      */
     public JSONObject getTaskJSON(Task task) {
-        JSONObject taskJSON = new JSONObject();
+        JSONObject  taskJSON = new JSONObject();
+        ArrayList customTask = new ArrayList();
+
 
         taskJSON.put(idField, task.getUniqueID());
         taskJSON.put(nameField, task.getName());
-
+        for(int i =1; i<=30; i++){
+        String data = task.getText(i);
+        if(data != null){
+            customTask.add(data);
+            taskJSON.put("Text"+i, data);
+        }
+        }
+        taskJSON.put("custom", customTask );
         if (task.getStart() != null) {
             taskJSON.put(startField, dateFormat.format(task.getStart()));
         }
