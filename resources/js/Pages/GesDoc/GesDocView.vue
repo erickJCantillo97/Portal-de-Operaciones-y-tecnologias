@@ -180,20 +180,20 @@ const url = [
 <template>
   <AppLayout :href="url">
     <!-- <ProjectsCard /> -->
-    <main class="h-[89vh] overflow-y-auto">
-      <section class="grid grid-cols-2 size-full max-w-full gap-4 p-2">
+    <main class="h-full overflow-y-auto w-full">
+      <section class="grid grid-cols-3 w-full gap-4 p-2">
         <!--Lista de Proyectos-->
-        <article class="col-span-1">
+        <article class="">
           <Listbox v-model="selectedProjects" @change="getTipologias()" :options="projectsOptions" filter
             :filterFields="['name', 'SAP_code', 'status,', 'contract.name', 'gerencia', 'start_date', 'end_date']"
             optionLabel="name" filterPlaceholder="Buscar proyecto" :virtualScrollerOptions="{ itemSize: 38 }"
-            listStyle="height:70vh" class="w-full md:w-14rem" :pt="{
+            listStyle="height:75vh" class="w-full md:w-14rem" :pt="{
     filterInput: '!h-8',
     item: '!h-20',
   }">
             <template #header>
               <div class="bg-blue-800 rounded-t-sm">
-                <h2 class="flex justify-center items-center font-semibold first-letter:uppercase text-white italic">
+                <h2 class="flex justify-center items-center font-semibold first-letter:uppercase text-white itali c">
                   Expedientes - Proyectos
                 </h2>
               </div>

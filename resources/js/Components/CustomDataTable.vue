@@ -22,14 +22,14 @@ const props = defineProps({
     data: {
         type: Array,
         required: true,
-        default:[]
+        default: []
     },
     routeData: {
         type: String,
         required: false
     },
-    parameterData:{
-        default:null
+    parameterData: {
+        default: null
     },
     changeRows: {
         type: Boolean,
@@ -95,17 +95,17 @@ const props = defineProps({
 
 const dataResponse = defineModel('dataResponse', {
     required: false,
-    type:Array,
-    default:[]
+    type: Array,
+    default: []
 })
-const dataLoading=ref(false)
+const dataLoading = ref(false)
 
-async function getData(){
-    dataLoading.value=true
+async function getData() {
+    dataLoading.value = true
     await axios.get(route(props.routeData, props.parameterData)).then((res) => {
-        dataResponse.value=res.data
+        dataResponse.value = res.data
     })
-    dataLoading.value=false
+    dataLoading.value = false
 }
 
 if (props.routeData) {
@@ -144,7 +144,7 @@ onMounted(() => {
 })
 
 const getTotalStatus = (field, data) => {
-    if (props.routeData){
+    if (props.routeData) {
         return dataResponse.value.filter(obj => obj[field] == data).length
     }
     return props.data.filter(obj => obj[field] == data).length
@@ -188,8 +188,9 @@ const selectedElement = ref([]);
 </script>
 
 <template>
-    <DataTable id="tabla" :value="props.routeData==null?props.data:dataResponse" v-model:selection="selectedElement" :paginator="data.length > 0 && paginator"
-        :rows :selectionMode tableStyle="" sortMode="multiple" scrollable scrollHeight="flex" :loading="props.routeData==null?props.loading:dataLoading"
+    <DataTable id="tabla" :value="props.routeData == null ? props.data : dataResponse" v-model:selection="selectedElement"
+        :paginator="(dataResponse.length > 0 || data.length > 0) && paginator" :rows :selectionMode tableStyle=""
+        sortMode="multiple" scrollable scrollHeight="flex" :loading="props.routeData == null ? props.loading : dataLoading"
         currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort
         v-model:filters="filters" stripedRows filterDisplay="menu" class="p-datatable-sm  p-1 rounded-md"
         stateStorage="session" :stateKey="cacheName ? 'dt-' + cacheName + '-state-session' : null"
@@ -237,7 +238,7 @@ const selectedElement = ref([]);
                             </IconField>
                             <slot name="filterSpace" />
                         </div>
-                        
+
                         <div class="w-full overflow-x-auto">
                             <ButtonGroup v-if="props.filterButtons && filterOK">
                                 <Button v-for="button in props.filterButtons"
@@ -284,7 +285,7 @@ const selectedElement = ref([]);
         <!-- #region ajustes de tabla -->
         <template #empty>
             <div class="flex flex-col items-center space-y-1">
-                <ApplicationLogo />
+                <ApplicationLogo class="w-32" />
                 <p class="text-center font-bold italic">
                     No hay registros
                 </p>

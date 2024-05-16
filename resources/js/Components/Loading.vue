@@ -44,7 +44,7 @@ defineProps({
 <template>
     <div class="w-full flex flex-col items-center text-center">
         <span class="grid items-center justify-center loader">
-            <ApplicationLogo class="justify-center" :letras="true"></ApplicationLogo>
+            <ApplicationLogo class="w-14" :letras="true"></ApplicationLogo>
         </span>
         <p class="font-bold pt-4 animate-pulse text-primary">{{ message }}</p>
     </div>

@@ -1,6 +1,6 @@
 <template>
-    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" :width="props.widthLogo + 'px'"
-        :height="props.heightLogo + 'px'" viewBox="0 0 210.3 211.1" version="1.1">
+    <svg :class xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" :width="props.widthLogo?props.widthLogo+'px':null"
+        :height="props.heightLogo?props.heightLogo+'px':null" viewBox="0 0 210.3 211.1" version="1.1">
 
         <defs>
 
@@ -117,16 +117,19 @@
 const props = defineProps({
     widthLogo: {
         type: Number,
-        default: 50
+        default: null
     },
     heightLogo: {
         type: Number,
-        default: 50
+        default: null
     },
     letras: {
         type: Boolean,
         default: true
     },
-
+    class:{
+        type:String,
+        default:null
+    }
 })
 </script>

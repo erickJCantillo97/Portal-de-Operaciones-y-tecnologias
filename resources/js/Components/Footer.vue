@@ -1,5 +1,4 @@
 <script setup>
-import moment from "moment";
 
 const props = defineProps({
   fontSize: {
@@ -22,13 +21,13 @@ const props = defineProps({
 </script>
 
 <template>
-  <section :class="class" class="absolute bottom-0 py-1 flex justify-center items-center w-full text-center">
-    <footer :class="`text-${props.fontSize} text-${props.fontColor}`" class="italic">
-      © TOP - COTECMAR {{ moment().format('YYYY') }} - Todos los derechos reservados.
+  <div :class class="h-12 flex justify-center w-full text-center">
+    <span :class="`text-${props.fontSize} text-${props.fontColor}`" class="italic">
+      © TOP - COTECMAR {{ new Date().getFullYear() }} - Todos los derechos reservados.
       <div class="inline-block w-36 bg-blue-800">
         <span class="text-white ">#Seguimos </span>
         <span class="text-yellow-300">Avante</span>
       </div>
-    </footer>
-  </section>
+    </span>
+  </div>
 </template>
