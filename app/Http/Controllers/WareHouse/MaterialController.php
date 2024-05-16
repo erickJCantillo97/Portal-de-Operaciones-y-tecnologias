@@ -24,12 +24,9 @@ class MaterialController extends Controller
 
         $material = MateriaSAP::where('MATNR', $codigo)->first();
 
-        if ($material) {
-            return response()->json([
-                'material' => $material,
-            ]);
-        }
-        return $codigo;
+        return response()->json([
+            'material' => $material,
+        ]);
     }
 
     /**

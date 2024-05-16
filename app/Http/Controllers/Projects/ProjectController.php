@@ -34,12 +34,11 @@ class ProjectController extends Controller
      */
     public function index(Request $request)
     {
-        $projects = Project::with('contract')->where('name', '!=', 'ANRP')->orderBy('created_at', 'DESC')->get();
         if ($request->expectsJson()) {
-            return response()->json(['projects' => $projects]);
+            return response()->json(Project::with('contract')->where('name', '!=', 'ANRP')->orderBy('created_at', 'DESC')->get());
         }
 
-        return Inertia::render('Project/Projects', compact('projects'));
+        return Inertia::render('Project/Projects');
     }
 
     /**

@@ -21,7 +21,15 @@ import InputSwitch from 'primevue/inputswitch';
 const props = defineProps({
     data: {
         type: Array,
-        required: true
+        required: true,
+        default: []
+    },
+    routeData: {
+        type: String,
+        required: false
+    },
+    parameterData: {
+        default: null
     },
     changeRows: {
         type: Boolean,
@@ -85,6 +93,25 @@ const props = defineProps({
     }
 })
 
+const dataResponse = defineModel('dataResponse', {
+    required: false,
+    type: Array,
+    default: []
+})
+const dataLoading = ref(false)
+
+async function getData() {
+    dataLoading.value = true
+    await axios.get(route(props.routeData, props.parameterData)).then((res) => {
+        dataResponse.value = res.data
+    })
+    dataLoading.value = false
+}
+
+if (props.routeData) {
+    getData()
+}
+
 //#region Filtros de tabla y visor columnas
 const rows = ref(props.rowsDefault)
 const filters = ref({});
@@ -117,6 +144,9 @@ onMounted(() => {
 })
 
 const getTotalStatus = (field, data) => {
+    if (props.routeData) {
+        return dataResponse.value.filter(obj => obj[field] == data).length
+    }
     return props.data.filter(obj => obj[field] == data).length
 }
 
@@ -154,11 +184,13 @@ const formatDate = (date) => {
 //#endregion
 
 const selectedElement = ref([]);
+
 </script>
 
 <template>
-    <DataTable id="tabla" :value="data" v-model:selection="selectedElement" :paginator="data.length > 0 && paginator"
-        :rows :selectionMode tableStyle="" sortMode="multiple" scrollable scrollHeight="flex" :loading="loading"
+    <DataTable id="tabla" :value="props.routeData == null ? props.data : dataResponse" v-model:selection="selectedElement"
+        :paginator="(dataResponse.length > 0 || data.length > 0) && paginator" :rows :selectionMode tableStyle=""
+        sortMode="multiple" scrollable scrollHeight="flex" :loading="props.routeData == null ? props.loading : dataLoading"
         currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort
         v-model:filters="filters" stripedRows filterDisplay="menu" class="p-datatable-sm  p-1 rounded-md"
         stateStorage="session" :stateKey="cacheName ? 'dt-' + cacheName + '-state-session' : null"
@@ -181,10 +213,13 @@ const selectedElement = ref([]);
         <template #header>
             <div class="space-y-1">
                 <span class="flex justify-between ">
-                    <p v-if="title"
-                        class="text-xl h-ful flex items-center font-extrabold leading-6 mb-2 capitalize text-primary">
-                        {{ title }}
-                    </p>
+                    <div class="flex space-x-3">
+                        <p v-if="title"
+                            class="text-xl h-ful flex items-center font-extrabold leading-6 mb-2 capitalize text-primary">
+                            {{ title }}
+                        </p>
+                        <slot name="title" />
+                    </div>
                     <span class="space-x-1">
                         <slot name="buttonHeader" />
                         <Button v-if="showAdd" v-tooltip.left="'Añadir'" @click="$emit('addClick', $event)"
@@ -197,16 +232,16 @@ const selectedElement = ref([]);
                             <Button v-tooltip.top="'Quitar filtros'" @click="clearFilter()" outlined
                                 icon="fa-solid fa-filter-circle-xmark" />
                             <IconField iconPosition="left">
-                                <InputIcon class="fa-solid fa-magnifying-glass"/>
+                                <InputIcon class="fa-solid fa-magnifying-glass" />
                                 <InputText v-model="filters.global.value" type="search" size="small"
                                     placeholder="Buscar" />
                             </IconField>
                             <slot name="filterSpace" />
                         </div>
-                        <div class="w-full overflow-x-auto">
 
-                            <ButtonGroup v-if="props.filterButtons && filterOK" class="flex">
-                                <Button v-for="button in props.filterButtons" class="font-bold truncate"
+                        <div class="w-full overflow-x-auto">
+                            <ButtonGroup v-if="props.filterButtons && filterOK">
+                                <Button v-for="button in props.filterButtons"
                                     :label="button.label + ': ' + getTotalStatus(button.field, button.data)"
                                     :severity=button.severity
                                     @click="filters[button.field].value == button.data ? filters[button.field].value = null : filters[button.field].value = button.data"
@@ -250,7 +285,7 @@ const selectedElement = ref([]);
         <!-- #region ajustes de tabla -->
         <template #empty>
             <div class="flex flex-col items-center space-y-1">
-                <ApplicationLogo />
+                <ApplicationLogo class="w-32" />
                 <p class="text-center font-bold italic">
                     No hay registros
                 </p>
@@ -377,7 +412,7 @@ const selectedElement = ref([]);
                         {{ byteSizeFormatter(data[col.field]) }}
                     </span>
                     <span v-else-if="col.type == 'boolean'" class="flex items-center justify-center">
-                        <InputSwitch v-model="data[col.field]"/>
+                        <InputSwitch v-model="data[col.field]" />
                     </span>
                     <p v-else class="">
                         {{ data[col.field] }}

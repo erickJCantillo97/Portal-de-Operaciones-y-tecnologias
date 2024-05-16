@@ -17,6 +17,7 @@ import Listbox from 'primevue/listbox'
 import Loading from '@/Components/Loading.vue'
 import OverlayPanel from 'primevue/overlaypanel'
 import Empty from '@/Components/Empty.vue'
+import Dropdown from 'primevue/dropdown'
 
 const { hasPermission } = usePermissions();
 const { byteSizeFormatter, formatDateTime24h } = useCommonUtilities();
@@ -178,10 +179,11 @@ const buttons = [
 ]
 
 const goToProjectOverview = (event, data) => {
+    
     try {
         router.get(route('projects.goToProjectOverview', data.id))
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }
 //#endregion
@@ -198,7 +200,7 @@ const url = [
 <template>
     <AppLayout :href="url">
         <div class="w-full h-full overflow-y-auto">
-            <CustomDataTable title="Proyectos" :filterButtons="filterButtons" :data="projects" :rows-default="100"
+            <CustomDataTable routeData="projects.index"  title="Proyectos" :filterButtons="filterButtons" :data="projects" :rows-default="100"
                 :columnas="columnas" :actions="buttons" @addDoc="addDoc" @addAct="addAct" @editClic="editClic"
                 @deleteClic="deleteClic" @goToProjectOverview="goToProjectOverview">
                 <template #buttonHeader>

@@ -110,15 +110,19 @@ const props = defineProps({
         default: null
     },
     optionLabel: {
-        typ: String,
+        type: String,
+        default: null
+    },
+    emptyMessage: {
+        type: String,
         default: null
     },
     optionValue: {
-        typ: String,
+        type: String,
         default: null
     },
     showClear: {
-        typ: Boolean,
+        type: Boolean,
         default: true
     },
     acceptFile: {
@@ -215,10 +219,10 @@ defineEmits(['valueChange'])
                 <InputNumber v-else-if="type == 'number'" :max :min :id :disabled :placeholder :minFractionDigits
                     :maxFractionDigits class="w-full" :class="invalid ? 'p-invalid' : ''" v-model="input"
                     :aria-describedby="id + '-help'" :required :useGrouping="mode == 'currency' ? '' : useGrouping"
-                    :currency="currency" :mode="mode" :suffix :prefix :pt="{ input: '!w-full' }" />
+                    :currency="currency" :mode="mode" :suffix :prefix :pt="{ input: '!w-full !text-sm' }" />
                 <Textarea v-else-if="type == 'textarea'" :id :disabled :rows="rowsTextarea" class="w-full" :required
                     :placeholder :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
-                <Dropdown v-else-if="type == 'dropdown'" :optionValue :id :disabled :placeholder :options :optionLabel
+                <Dropdown v-else-if="type == 'dropdown'" :optionValue :id :disabled :placeholder :options :optionLabel :emptyMessage
                     :loading @change="$emit('change', $event)" showClear :filter="optionLabel ? true : false"
                     :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" class="w-full"
                     :pt="{
@@ -292,8 +296,8 @@ defineEmits(['valueChange'])
                         }" />
                 </span>
                 <span v-else-if="type == 'time'">
-                    <Calendar :id v-model="input" :min-date :max-date timeOnly hourFormat="24" :placeholder :required showIcon
-                        dateFormat="dd/mm/yy" :stepMinute @date-select="$emit('valueChange', $event)" :pt="{
+                    <Calendar :id v-model="input" :min-date :max-date timeOnly hourFormat="24" :placeholder :required
+                        showIcon dateFormat="dd/mm/yy" :stepMinute @date-select="$emit('valueChange', $event)" :pt="{
                             root: '!w-full',
                             input: '!h-8'
                         }" />
@@ -306,7 +310,9 @@ defineEmits(['valueChange'])
                 <span v-else class="w-full">
                     <InputText size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''"
                         @change="$emit('valueChange', $event)" v-model="input" :type :required
-                        :aria-describedby="id + '-help'" class="w-full" />
+                        :aria-describedby="id + '-help'" class="w-full" :pt="{
+                            input: '!text-sm'
+                        }" />
                 </span>
                 <label v-if="floatLabel && label" :for="id" class="">{{ label }}</label>
             </span>

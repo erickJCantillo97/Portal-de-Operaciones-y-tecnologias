@@ -1,30 +1,37 @@
 <script setup>
-// import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
-// import { KeyIcon, SquaresPlusIcon, ClockIcon } from '@heroicons/vue/24/outline'
-// import { ref } from 'vue'
-// import AppLayout from '@/Layouts/AppLayout.vue';
-// import BaseActivities from './../Components/SWBS/BaseActivities.vue';
-// import ConstructiveGrupo from './../Components/SWBS/ConstructiveGrupo.vue';
-// import CustomUpload from '@/Components/CustomUpload.vue';
-// import Gerencias from '../Components/Gerencias.vue';
-// import Processes from './../Components/SWBS/Processes.vue';
-// import Shifts from './../Components/Shifts.vue';
-// import SubSystems from './../Components/SWBS/SubSystems.vue';
-// import Systems from './../Components/SWBS/Systems.vue';
-// import Warehouses from '../Components/Warehouses.vue';
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
+import { KeyIcon, SquaresPlusIcon, ClockIcon } from '@heroicons/vue/24/outline'
+import { ref } from 'vue'
+import AppLayout from '@/Layouts/AppLayout.vue'
+import BaseActivities from './../Components/SWBS/BaseActivities.vue'
+import ConstructiveGroup from './../Components/SWBS/ConstructiveGroup.vue'
+import CustomUpload from '@/Components/CustomUpload.vue'
+import Gerencias from '../Components/Gerencias.vue'
+import Processes from './../Components/SWBS/Processes.vue'
+import Shifts from './../Components/Shifts.vue'
+import SubSystems from './../Components/SWBS/SubSystems.vue'
+import Systems from './../Components/SWBS/Systems.vue'
+import Warehouses from '../Components/Warehouses.vue'
 
-// const menu = ref('VB')
+const menu = ref('VB')
 
-// const navigation = [
-//     { name: 'Variables Basicas', value: 'VB', icon: SquaresPlusIcon, current: true },
-//     { name: 'SWBS', value: 'SW', icon: KeyIcon, current: false },
-//     { name: 'Horarios', value: 'SC', icon: ClockIcon, current: false }, //SC->schedules
-//     // { name: 'Sugerencias', value: 'SU', icon: UserGroupIcon, current: false },
-//     // { name: 'Clases de Costo', value: 'CC', icon: SquaresPlusIcon, current: false },
-// ]
+const navigation = [
+    { name: 'Variables Basicas', value: 'VB', icon: SquaresPlusIcon, current: true },
+    { name: 'SWBS', value: 'SW', icon: KeyIcon, current: false },
+    { name: 'Horarios', value: 'SC', icon: ClockIcon, current: false }, //SC->schedules
+    // { name: 'Sugerencias', value: 'SU', icon: UserGroupIcon, current: false },
+    // { name: 'Clases de Costo', value: 'CC', icon: SquaresPlusIcon, current: false },
+]
+
+/**
+ * CRUD Sistema: Grupo Constructivo, Código y Descripción
+ * CRUD Subsistema: Sistema, Código y Descripción
+ * CRUD Proceso: Subsistema, Código y Descripción
+ * CRUD Actividades Básica: Proceso, Código y Descripción
+*/
 </script>
 <template>
-    <!-- <AppLayout>
+    <AppLayout>
         <div class=" h-full w-full p-2 lg:grid lg:grid-cols-12 lg:gap-x-2">
             <aside class="px-2 py-6 sm:px-6 lg:col-span-2 lg:px-0 lg:py-0">
                 <nav class="space-y-1">
@@ -57,7 +64,7 @@
                                 <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
                             <DisclosurePanel class="pt-4 pb-2 h-[50vh] text-sm text-gray-500">
-                                <Gerencias></Gerencias>
+                                <Gerencias />
                             </DisclosurePanel>
                         </Disclosure>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
@@ -81,7 +88,7 @@
                                 <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
                             <DisclosurePanel class="pt-4 pb-2 h-[50vh] text-sm text-gray-500">
-                                <Warehouses></Warehouses>
+                                <Warehouses />
                             </DisclosurePanel>
                         </Disclosure>
                     </div>
@@ -95,37 +102,37 @@
                         </div>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-blue-700 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Grupos Constructivos</span>
                                 <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
                             <DisclosurePanel class="pb-2 text-sm text-gray-500">
-                                <ConstructiveGrupo></ConstructiveGrupo>
+                                <ConstructiveGroup />
                             </DisclosurePanel>
                         </Disclosure>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-blue-700 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Sistemas</span>
                                 <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
                             <DisclosurePanel class="pb-2 text-sm text-gray-500">
-                                <Systems></Systems>
+                                <Systems />
                             </DisclosurePanel>
                         </Disclosure>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-blue-700 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Sub-Sistemas</span>
                                 <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
                             <DisclosurePanel class="pb-2 text-sm text-gray-500">
-                                <SubSystems></SubSystems>
+                                <SubSystems />
                             </DisclosurePanel>
                         </Disclosure>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-blue-700 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Proceso</span>
                                 <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
@@ -135,7 +142,7 @@
                         </Disclosure>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-blue-700 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Actividades basicas</span>
                                 <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
@@ -152,7 +159,7 @@
                         </div>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
                             <DisclosureButton
-                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white uppercase bg-primary  rounded-lg hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white uppercase bg-primary  rounded-lg hover:bg-blue-700 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                                 <span>Horarios</span>
                                 <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
@@ -164,5 +171,5 @@
                 </div>
             </div>
         </div>
-    </AppLayout> -->
+    </AppLayout>
 </template>

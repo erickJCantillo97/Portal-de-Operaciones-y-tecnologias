@@ -68,7 +68,7 @@ const addItem = () => {
     open.value = true
 }
 
-const process = [
+const processOptions = [
     {
         id: 1,
         name: 'Proceso 1'
@@ -120,6 +120,37 @@ const options = [
         name: 'GRUPO 900',
         value: 900
     },
+]
+
+const SWBS = [
+    {
+        id: 0,
+        name: '100 - Casco y Estructura',
+    },
+    {
+        id: 1,
+        name: '200 - Propulsión',
+    },
+    {
+        id: 2,
+        name: '300 - Electricidad y Electrónica',
+    },
+    {
+        id: 3,
+        name: '400 - Electricidad y Electrónica',
+    },
+    {
+        id: 4,
+        name: '500 - Sistemas Auxiliares',
+    },
+    {
+        id: 5,
+        name: '600 - Habitabilidad y Matcom',
+    },
+    {
+        id: 6,
+        name: '800 - Maniobras y Soporte a la Producción',
+    }
 ]
 
 const columns = [
@@ -190,6 +221,18 @@ const showClick = (event, data) => {
     }
 }
 
+const process = ref(false)
+const system = ref(false)
+
+const changeDataBySWBS = () => {
+    system.value = false
+
+    if (formData.value.requirement.SWBS == 1 || formData.value.requirement.SWBS == 4) {
+        process.value = processOptions
+        system.value = true
+    }
+}
+
 onMounted(() => {
     if (props.requirement_id) {
         requirement.value = props.requirements.filter(requirement => requirement.id == props.requirement_id)[0]
@@ -238,34 +281,53 @@ const url = [
 
             <template #body>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!--Proyecto-->
                     <CustomInput type="dropdown" optionLabel="name" optionValue="id" :options="projects"
                         label="Proyecto" placeholder="Selecione un proyecto" id="bloque"
                         v-model:input="formData.requirement.project_id" :invalid="$attrs.errors.project_id != null"
                         :errorMessage="$attrs.errors.project_id" />
+                    <!--Bloque-->
                     <CustomInput type="number" label="Bloque" placeholder="Escriba Bloque" id="bloque"
                         v-model:input="formData.requirement.bloque" :invalid="$attrs.errors.bloque != null"
                         :errorMessage="$attrs.errors.bloque" />
-                    <CustomInput label="Grupo/Sistema" placeholder="Escriba El grupo o sistema" id="grupo"
-                        v-model:input="formData.requirement.sistema_grupo"
-                        :invalid="$attrs.errors.sistema_grupo != null" :errorMessage="$attrs.errors.sistema_grupo" />
+                    <!--SWBS-->
+                    <CustomInput @change="changeDataBySWBS" type="dropdown" optionLabel="name" optionValue="id"
+                        :options="SWBS" id="swbs" label="SWBS" placeholder="Selecione SWBS"
+                        v-model:input="formData.requirement.SWBS" :invalid="$attrs.errors.sistema_grupo != null"
+                        :errorMessage="$attrs.errors.sistema_grupo" />
+                    <!--Documento de Referencia-->
                     <CustomInput label="Documento de Referencia" placeholder="Escriba Documento de Referencia"
                         id="document" v-model:input="formData.requirement.document"
                         :invalid="$attrs.errors.document != null" :errorMessage="$attrs.errors.document" />
-                    <CustomInput type="dropdown" optionLabel="name" optionValue="id" :options="process" id="proceso"
-                        label="Proceso" placeholder="Selecione un proceso" v-model:input="formData.requirement.proceso"
+                    <!--Proceso-->
+                    <CustomInput type="dropdown" optionLabel="name" :options="process" label="Proceso"
+                        placeholder="Selecione un proceso" v-model:input="process" emptyMessage="Seleccione un SWBS"
                         :invalid="$attrs.errors.proceso != null" :errorMessage="$attrs.errors.proceso" />
-                    <CustomInput v-model:input="formData.requirement.data" label="Adjuntar Requerimientos"
-                        acceptFile="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                        id="data" :invalid="$attrs.errors.data != null" :errorMessage="$attrs.errors.data" />
-                    <!-- <CustomInput class="mt-2 col-span-3" label="Notas" placeholder="Escriba la Nota del requerimiento"
-                        type="textarea" v-model:input="formData.requirement.note" :invalid="$attrs.errors.note != null"
-                        :errorMessage="$attrs.errors.note"/> -->
+                    <!--Sistema-->
+                    <CustomInput v-if="system" type="dropdown" optionLabel="name" optionValue="id" :options="process"
+                        id="proceso" label="Sistema" placeholder="Selecione un sistema"
+                        v-model:input="formData.requirement.sistema" :invalid="$attrs.errors.sistema != null"
+                        :errorMessage="$attrs.errors.sistema" />
+                    <div class="col-span-3 w-full">
+                        <div class="grid grid-cols-3 gap-4">
+                            <!--Notas-->
+                            <CustomInput class="col-span-2" label="Notas"
+                                placeholder="Escriba la Nota del requerimiento" type="textarea"
+                                v-model:input="formData.requirement.note" :invalid="$attrs.errors.note != null"
+                                :errorMessage="$attrs.errors.note" />
+                            <!--File-->
+                            <CustomInput type="file" v-model:input="formData.requirement.data"
+                                label="Adjuntar Requerimientos"
+                                acceptFile="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                                id="data" :invalid="$attrs.errors.data != null" :errorMessage="$attrs.errors.data" />
+                        </div>
+                    </div>
                     <div class="col-span-3 space-y-2 border border-slate-300 rounded-lg p-2 ">
                         <div class="flex space-x-4 justify-center items-center w-full bg-yellow-200 rounded-lg p-1">
                             <h3 class="text-lg text-gray-800 font-bold">Materiales</h3>
                             <Button @click="addMaterial()" severity="success" icon="fa-solid fa-plus" :pt="{
-        root: '!size-6'
-    }" />
+                                root: '!size-6'
+                            }" />
                         </div>
                         <div class="h-80 overflow-y-auto space-y-2">
                             <div v-for="(material, index) in formData.requirement.materials" :key="index"
@@ -297,8 +359,9 @@ const url = [
                                             icon="fa-solid fa-minus" class="h-6" />
                                     </div>
                                 </div>
-                                <span for="" class="text-xs italic text-gray-500">{{ material.material?.MAKTX ??
-        '' }}</span>
+                                <span class="text-xs italic text-gray-500">
+                                    {{ material.material?.MAKTX ?? '' }}
+                                </span>
                             </div>
                         </div>
                     </div>
