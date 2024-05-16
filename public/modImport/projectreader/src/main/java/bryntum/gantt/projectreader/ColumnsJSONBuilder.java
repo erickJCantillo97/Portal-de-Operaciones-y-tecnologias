@@ -44,12 +44,18 @@ public class ColumnsJSONBuilder implements JSONBuilder<JSONArray> {
                     // get column options if any
                     String options = properties.getProperty("columnOptions." + fieldTypeName);
                     String columnXType = properties.getProperty("columnXType." + fieldTypeName);
-
-                    // skip unknown columns
-                    if (options == null && columnXType == null)
-                        continue;
-
                     columnJSON = options != null ? new JSONObject(options) : new JSONObject();
+                    // skip unknown columns
+                    if (options == null && columnXType == null){
+                        if(fieldType.toString().contains("Text")){
+                            columnJSON.put("field",fieldType.toString());
+                            columnJSON.put("label",column.getTitle());
+                            columnJSON.put("personalized",true);
+                            result.put(columnJSON);
+                        }
+                        continue;
+                    }
+
 
                     if (columnXType != null) {
                         columnJSON.put(properties.getProperty("column.XTYPE"), columnXType);
