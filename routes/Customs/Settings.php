@@ -18,7 +18,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::resource('baseActivities', BaseActivityController::class);
     Route::resource('specificActivities', SpecificActivityController::class);
-    Route::resource('system', SystemController::class);
+    Route::resource('systems', SystemController::class);
     Route::resource('subsystem', SubSystemController::class);
     Route::resource('process', ProcessController::class);
 
@@ -31,5 +31,4 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     })->name('gruposConstructivos.index');
 
     Route::resource('shift', ShiftController::class);
-
 });

@@ -11,7 +11,7 @@ const groups = ref([])
 
 const formData = useForm({
   id: null,
-  constructive_group: '',
+  constructive_group_id: '',
   code: '',
   name: ''
 })
@@ -61,9 +61,9 @@ const constructive_groups = [
 
 //#region CustomDatatable
 const columns = [
-  { field: 'consecutivo', header: 'Grupo Constructivo', filter: true },
-  { field: 'proyecto', header: 'Código', filter: true },
-  { field: 'bloque', header: 'Nombre', filter: true }
+  { field: 'constructive_group_id', header: 'Grupo Constructivo', filter: true },
+  { field: 'code', header: 'Código', filter: true },
+  { field: 'name', header: 'Nombre', filter: true }
 ]
 
 const buttons = [
@@ -86,6 +86,10 @@ const getConstructivesGroups = () => {
     })
 }
 
+const submit = () => {
+  formData.post(route('systems.store'));
+}
+
 const addSystem = () => {
   openSystemModal.value = true
 }
@@ -96,7 +100,8 @@ onMounted(() => {
 </script>
 <template>
   <div class="size-full overflow-y-auto">
-    <CustomDataTable :data="systems" :rows-default="100" :columnas="columns" :actions="buttons" :loading>
+    <CustomDataTable :data="systems" route-data="systems.index" :rows-default="100" :columnas="columns"
+      :actions="buttons" :loading>
       <template #buttonHeader>
         <Button @click="addSystem" severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
       </template>
@@ -114,7 +119,7 @@ onMounted(() => {
       <div class="flex flex-col gap-4">
         <!--Proyecto-->
         <CustomInput type="dropdown" optionLabel="name" optionValue="id" :options="groups" label="Grupo Constructivo"
-          placeholder="Selecione un Grupo Constructivo" v-model:input="formData.constructive_group" />
+          placeholder="Selecione un Grupo Constructivo" v-model:input="formData.constructive_group_id" />
         <!--Código-->
         <CustomInput type="number" optionLabel="name" optionValue="id" label="Código" placeholder="Escriba un código"
           v-model:input="formData.code" />
