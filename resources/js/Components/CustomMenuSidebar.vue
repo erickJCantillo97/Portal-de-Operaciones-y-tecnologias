@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue';
 import ApplicationLogo from './ApplicationLogo.vue';
 import CustomItemMenuSidebar from './sections/CustomItemMenuSidebar.vue';
 
@@ -9,12 +10,14 @@ defineProps({
         default: []
     }
 })
-
+const menu = ref(false)
 </script>
 <template>
-    <div class="min-h-screen bg-gray-100">
-        <div
-            class="sidebar min-h-screen w-[3.35rem] overflow-hidden border-r  hover:w-80 bg-white hover:shadow-lg">
+    <Button icon="fa-solid fa-bars" class="text-2xl top-7 fixed lg:hidden" text @click="menu = !menu" />
+    <div class="fixed inset-0 bg-[black]/60 z-10" :class="{ hidden: !menu }" @click="menu = !menu"></div>
+    <div class="min-h-screen bg-gray-100 fixed z-20 sm:block" :class="{ hidden: !menu }">
+        <div :class="menu?'w-80':'hover:w-80'"
+            class="sidebar min-h-screen w-[3.35rem] overflow-hidden border-r bg-white hover:shadow-lg">
             <div class="flex h-screen flex-col justify-between pb-16">
                 <div class="flex h-12 items-center justify-center w-full shadow-md">
                     <ApplicationLogo class="w-10 mb-2" :letras="true" />
