@@ -13,7 +13,7 @@ const load = ref(false)
 </script>
 
 <template>
-    <label>
+    <label v-if="item.show">
         <input v-model="open" class="absolute scale-0" type="checkbox"/>
         <span :class="(closed && open) ? 'max-h-[100vh] flex flex-col' : 'max-h-12 flex flex-col h-12'"
             class="overflow-hidden rounded-lg transition-all duration-1000 ease-in-out">
