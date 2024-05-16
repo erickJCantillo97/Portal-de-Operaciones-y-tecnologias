@@ -188,9 +188,10 @@ const selectedElement = ref([]);
 </script>
 
 <template>
-    <DataTable id="tabla" :value="props.routeData == null ? props.data : dataResponse" v-model:selection="selectedElement"
-        :paginator="(dataResponse.length > 0 || data.length > 0) && paginator" :rows :selectionMode tableStyle=""
-        sortMode="multiple" scrollable scrollHeight="flex" :loading="props.routeData == null ? props.loading : dataLoading"
+    <DataTable id="tabla" :value="props.routeData == null ? props.data : dataResponse"
+        v-model:selection="selectedElement" :paginator="(dataResponse.length > 0 || data.length > 0) && paginator" :rows
+        :selectionMode tableStyle="" sortMode="multiple" scrollable scrollHeight="flex"
+        :loading="props.routeData == null ? props.loading : dataLoading"
         currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort
         v-model:filters="filters" stripedRows filterDisplay="menu" class="p-datatable-sm  p-1 rounded-md"
         stateStorage="session" :stateKey="cacheName ? 'dt-' + cacheName + '-state-session' : null"
@@ -211,7 +212,7 @@ const selectedElement = ref([]);
     }
         ">
         <template #header>
-            <div class="space-y-1">
+            <div class="space-y-1 w-full">
                 <span class="flex justify-between ">
                     <div class="flex space-x-3">
                         <p v-if="title"
@@ -226,9 +227,10 @@ const selectedElement = ref([]);
                             severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
                     </span>
                 </span>
-                <div class="flex items-center " :class="filter ? 'justify-between' : 'justify-end'" v-if="showHeader">
-                    <div class="grid gap-2 sm:grid-cols-2" v-if="filter">
-                        <div class="flex gap-2">
+                <div class="flex items-center w-full " :class="filter ? 'justify-between' : 'justify-end'"
+                    v-if="showHeader">
+                    <div class="h-8 flex gap-2 w-full" v-if="filter">
+                        <div class="flex gap-2 w-min">
                             <Button v-tooltip.top="'Quitar filtros'" @click="clearFilter()" outlined
                                 icon="fa-solid fa-filter-circle-xmark" />
                             <IconField iconPosition="left">
@@ -238,16 +240,13 @@ const selectedElement = ref([]);
                             </IconField>
                             <slot name="filterSpace" />
                         </div>
-
-                        <div class="w-full overflow-x-auto">
-                            <ButtonGroup v-if="props.filterButtons && filterOK">
-                                <Button v-for="button in props.filterButtons"
-                                    :label="button.label + ': ' + getTotalStatus(button.field, button.data)"
-                                    :severity=button.severity
-                                    @click="filters[button.field].value == button.data ? filters[button.field].value = null : filters[button.field].value = button.data"
-                                    :outlined="filters[button.field].value != button.data" icon="" />
-                            </ButtonGroup>
-                        </div>
+                        <ButtonGroup v-if="props.filterButtons && filterOK">
+                            <Button v-for="button in props.filterButtons"
+                                :label="button.label + ': ' + getTotalStatus(button.field, button.data)"
+                                :severity=button.severity
+                                @click="filters[button.field].value == button.data ? filters[button.field].value = null : filters[button.field].value = button.data"
+                                :outlined="filters[button.field].value != button.data" icon="" />
+                        </ButtonGroup>
                     </div>
                     <div class="space-x-2 hidden sm:flex items-center">
                         <Button v-if="selectionMode == 'multiple' && selectedElement.length > 0" v-tooltip.left="''"

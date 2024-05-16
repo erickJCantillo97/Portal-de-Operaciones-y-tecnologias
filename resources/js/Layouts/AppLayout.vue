@@ -1,27 +1,19 @@
 <template>
-
-    <div v-if="debug == 'true'" class="max-h-[3vh] flex items-center px-6 bg-orange-300 gap-x-6 sm:before:flex-1">
-        <p class="space-x-2 text-sm text-white">
-            <strong class="font-semibold">Modo de pruebas</strong>
-        </p>
-        <div class="flex justify-end flex-1">
-        </div>
-        <!-- #region Clases tailwind  -->
-        <span class="sm:w-1/1 hidden"></span>
-        <span class="sm:w-1/2 hidden"></span>
-        <span class="sm:w-1/3 hidden"></span>
-        <span class="sm:w-1/4 hidden"></span>
-        <span class="sm:w-1/5 hidden"></span>
-        <span class="sm:w-1/6 hidden"></span>
-        <span class="rotate-0 hidden"></span>
-        <span class="rotate-90 hidden"></span>
-        <!-- #endregion -->
-    </div>
-    <div class="max-h-screen flex">
-        <main class="h-screen flex flex-col w-full pt-0.5">
-            <CustomMenuSidebar :items="navigation"/>
+    <!-- #region Clases tailwind  -->
+    <span class="sm:w-1/1 hidden"></span>
+    <span class="sm:w-1/2 hidden"></span>
+    <span class="sm:w-1/3 hidden"></span>
+    <span class="sm:w-1/4 hidden"></span>
+    <span class="sm:w-1/5 hidden"></span>
+    <span class="sm:w-1/6 hidden"></span>
+    <span class="rotate-0 hidden"></span>
+    <span class="rotate-90 hidden"></span>
+    <!-- #endregion -->
+    <main class="max-h-screen">
+        <div class="h-screen flex flex-col w-full bg-primary-light">
+            <CustomMenuSidebar :items="navigation" />
             <div
-                class="max-h-16 flex items-center justify-between px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 sm:ml-14">
+                class="max-h-16 flex items-center justify-between px-4 pl-8 bg-white border-b border-gray-200 shadow-md shrink-0 gap-x-4 sm:gap-x-6 sm:pl-6 lg:pl-8 sm:ml-12">
                 <div class="w-full flex items-center">
                     <div class="hidden md:flex">
                         <Link :href="route('dashboard')" v-tooltip.bottom="'Dashboard'">
@@ -34,9 +26,9 @@
                         </Link>
                         <div class="flex items-center justify-between">
                             <Breadcrumb :home="home" :model="href" :pt="{
-        root: '!h-2 !flex !justify-center !items-center',
-        label: '!text-blue-800'
-    }">
+                root: '!h-2 !flex !justify-center !items-center',
+                label: '!text-blue-800'
+            }">
                                 <template #item="{ item, props }">
 
                                     <div v-if="item.active" class="flex space-x-2 items-center">
@@ -91,7 +83,7 @@
                                     :src="$page.props.auth.user.photo" alt="" />
                                 <span class="hidden lg:flex lg:items-center">
                                     <span class="ml-4 text-xs font-semibold text-gray-900" aria-hidden="true">{{
-        $page.props.auth.user.short_name }}</span>
+                $page.props.auth.user.short_name }}</span>
                                 </span>
                                 <ChevronDownIcon class="size-5 ml-2 -mr-1 text-violet-200 hover:text-violet-100"
                                     aria-hidden="true" />
@@ -108,8 +100,8 @@
                                 <div class="px-1 py-1">
                                     <MenuItem v-slot="{ active }">
                                     <button @click="logout" :class="[
-        active ? 'bg-primary text-white' : 'text-gray-900',
-        'group flex w-full items-center rounded-md px-2 py-2 text-sm',]">
+                active ? 'bg-primary text-white' : 'text-gray-900',
+                'group flex w-full items-center rounded-md px-2 py-2 text-sm',]">
                                         <ArrowLeftCircleIcon :active="active" class="w-5 h-5 mr-2 text-violet-400"
                                             aria-hidden="true" />
                                         Salir
@@ -121,20 +113,18 @@
                     </Menu>
                 </div>
             </div>
-            <!--
-                sm:border-red-500
-                md:border-fuchsia-600
-                lg:border-green-500
-                xl:border-blue-500
-                2xl:border-yellow-500
-             -->
+            <div v-if="!debug == 'true'" class="max-h-4 flex items-center justify-center px-6 bg-orange-300 gap-x-6">
+                <p class="font-semibold text-sm text-white">
+                    Modo de pruebas
+                </p>
+            </div>
             <div class="h-full overflow-hidden 
-                items-center flex p-1 mb-2 border-gray-200 bg-white rounded-lg shadow-2xl g-white sm:ml-16 sm:mr-3">
+                items-center flex p-0.5 my-1 bg-white rounded-lg shadow-2xl sm:ml-14 sm:mr-2">
                 <slot />
             </div>
-            <Footer fontSize="xs" fontColor="white" class="bg-gray-500 pt-1" />
-        </main>
-    </div>
+            <Footer fontSize="xs" fontColor="white" class="bg-gray-500 border max-h-5 items-center" />
+        </div>
+    </main>
 
     <div class="fixed right-[-5px] z-50 w-10 top-1/4 animate-pulse" data-html2canvas-ignore>
         <button v-tooltip="'¿Alguna sugerencia?'" @click="sugerenciaVisible = true" v-if="!sugerenciaVisible"
@@ -224,11 +214,11 @@
                                                             <span v-if="suggestion.type == 'Error'"
                                                                 class="flex justify-center px-2 text-xs font-medium rounded-md"
                                                                 :class="suggestion.status == 1 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-success'">{{
-        suggestion.status == 1 ? 'Pendiente' :
-            'Resuelto'
-    }}</span>
+                suggestion.status == 1 ? 'Pendiente' :
+                    'Resuelto'
+            }}</span>
                                                             <p class="w-full text-xs text-end">{{
-            formatDateTime24h(suggestion.created_at) }}
+                    formatDateTime24h(suggestion.created_at) }}
                                                             </p>
                                                         </div>
                                                     </div>
