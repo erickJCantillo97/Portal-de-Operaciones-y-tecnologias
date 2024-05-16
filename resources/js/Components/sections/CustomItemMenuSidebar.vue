@@ -18,8 +18,8 @@ const load = ref(false)
             <Link v-if="item.href" :href="route(item.href)" :aria-label="item.name" @click="load = true"
                 class="flex justify-between cursor-pointer items-center hover:bg-primary-light px-4 py-3 text-primary">
             <div class="flex space-x-5 items-center">
-                <i class="h-5 w-5" :class="[item.icon, 'text-primary']" />
-                <span :class="['-mr-1 font-medium', { 'font-semibold': item.children || primary }]">
+                <i class="h-5 w-5" :class="[item.icon, 'text-slate-500']" />
+                <span :class="['-mr-1 font-medium text-black', { 'font-semibold': item.children || primary }]">
                     {{ item.name }}
                 </span>
             </div>
@@ -31,8 +31,8 @@ const load = ref(false)
             <div v-else :aria-label="item.name"
                 class="flex justify-between cursor-pointer items-center hover:bg-primary-light px-4 py-3 text-primary">
                 <div class="flex space-x-5 items-center">
-                    <i class="h-5 w-5" :class="[item.icon, 'text-primary']" />
-                    <span :class="['-mr-1 font-medium text-left', { 'font-semibold': item.children || primary }]">
+                    <i class="h-5 w-5" :class="[item.icon, 'text-slate-500']" />
+                    <span :class="['-mr-1 text-black font-medium text-left', { 'font-semibold': item.children || primary }]">
                         {{ item.name }}
                     </span>
                 </div>

@@ -6,6 +6,7 @@
         </p>
         <div class="flex justify-end flex-1">
         </div>
+        <!-- #region Clases tailwind  -->
         <span class="sm:w-1/1 hidden"></span>
         <span class="sm:w-1/2 hidden"></span>
         <span class="sm:w-1/3 hidden"></span>
@@ -14,16 +15,14 @@
         <span class="sm:w-1/6 hidden"></span>
         <span class="rotate-0 hidden"></span>
         <span class="rotate-90 hidden"></span>
+        <!-- #endregion -->
     </div>
     <div class="max-h-screen flex">
         <main class="h-screen flex flex-col w-full pt-0.5">
-            <div class="fixed inset-0 bg-[black]/60 z-10" :class="{ hidden: !menu }" @click="menu = !menu"></div>
-            <CustomMenuSidebar class="fixed z-20 sm:block" :items="navigation" :class="{ hidden: !menu }"
-                v-model:menu="menu" />
+            <CustomMenuSidebar :items="navigation"/>
             <div
-                class="max-h-16 flex items-center justify-between h-auto px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 sm:ml-14">
+                class="max-h-16 flex items-center justify-between px-4 pl-8 mb-2 bg-white border-b border-gray-200 shadow-sm shrink-0 gap-x-4 sm:gap-x-6 sm:px-6 lg:px-8 sm:ml-14">
                 <div class="w-full flex items-center">
-                    <Button icon="fa-solid fa-bars" class="-ml-3 lg:hidden" text @click="menu = !menu" />
                     <div class="hidden md:flex">
                         <Link :href="route('dashboard')" v-tooltip.bottom="'Dashboard'">
                         <div class="flex space-x-2 items-center">
@@ -34,7 +33,6 @@
                         </div>
                         </Link>
                         <div class="flex items-center justify-between">
-
                             <Breadcrumb :home="home" :model="href" :pt="{
         root: '!h-2 !flex !justify-center !items-center',
         label: '!text-blue-800'
@@ -321,7 +319,6 @@
 </template>
 
 <script setup>
-import { Bars3CenterLeftIcon } from '@heroicons/vue/24/outline'
 import {
     ChevronDownIcon, ArrowLeftCircleIcon,
     QuestionMarkCircleIcon,
@@ -338,15 +335,12 @@ import { router, Link } from '@inertiajs/vue3'
 import { useBroadcastNotifications } from '@/composable/useBroadcastNotifications'
 import { useSweetalert } from '@/composable/sweetAlert'
 import Breadcrumb from 'primevue/breadcrumb';
-// import Button from '@/Components/Button.vue'
 import ConfirmPopup from 'primevue/confirmpopup';
 import DolarTRM from "@/Components/DolarTRM.vue"
 import DropdownSetting from '@/Components/DropdownSetting.vue'
-import UserStatusProgramming from '@/Components/sections/UserStatusProgramming.vue'
 import FlyoutNotificationsMenu from '@/Components/FlyoutNotificationsMenu.vue'
 import Footer from "@/Components/Footer.vue"
 import html2canvas from 'html2canvas'
-import MenuSidebar from '@/Components/MenuSidebar.vue'
 import RadioButton from 'primevue/radiobutton'
 import Toast from 'primevue/toast'
 import NotificationItem from '@/Components/NotificationItem.vue'
@@ -356,7 +350,7 @@ import { usePermissions } from '@/composable/permission'
 import CustomMenuSidebar from '@/Components/CustomMenuSidebar.vue';
 const { hasRole, hasPermission } = usePermissions()
 const debug = import.meta.env.VITE_APP_DEBUG
-const menu = ref(false)
+
 const sugerencia = ref('')
 const sugerenciaVisible = ref(false)
 const suggestions = ref([])
