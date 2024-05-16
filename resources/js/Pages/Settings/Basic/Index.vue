@@ -9,7 +9,7 @@ import CustomUpload from '@/Components/CustomUpload.vue'
 import Gerencias from '../Components/Gerencias.vue'
 import Processes from './../Components/SWBS/Processes.vue'
 import Shifts from './../Components/Shifts.vue'
-// import SubSystems from './../Components/SWBS/SubSystems.vue'
+import SubSystems from './../Components/SWBS/SubSystems.vue'
 import Systems from './../Components/SWBS/Systems.vue'
 import Warehouses from '../Components/Warehouses.vue'
 
@@ -127,7 +127,7 @@ const navigation = [
                                 <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
                             </DisclosureButton>
                             <DisclosurePanel class="pb-2 text-sm text-gray-500">
-                                <SubSystems></SubSystems>
+                                <SubSystems />
                             </DisclosurePanel>
                         </Disclosure>
                         <Disclosure as="div" class="mt-2" v-slot="{ open }">
