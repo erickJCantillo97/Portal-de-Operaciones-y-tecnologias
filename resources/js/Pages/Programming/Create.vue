@@ -553,7 +553,7 @@ const optionsData = ref({})
                 <div class="sm:flex gap-1 sm:justify-between h-20 sm:h-10 items-center sm:pr-1">
                     <div class="flex w-full justify-between items-center sm:w-fit space-x-4">
                         <p class="text-xl font-bold text-primary truncate">
-                            Programación de actividades
+                            Programación
                         </p>
                         <p class="border h-min px-2 bg-primary rounded-lg text-white flex items-center">
                             {{ $page.props.auth.user.oficina }}
