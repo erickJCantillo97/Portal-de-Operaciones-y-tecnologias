@@ -16,13 +16,14 @@ class SystemController extends Controller
     {
 
         $systems = System::get();
-        if($request->grupo){
-            $systems = System::where('constructive_group_id', 'LIKE', ($request->grupo/100))->orderBy('code')->get();
+        if ($request->grupo) {
+            $systems = System::where('constructive_group_id', 'LIKE', ($request->grupo / 100))->orderBy('code')->get();
         }
 
-        return response()->json([
-            $systems
-        ]);
+        return response()->json(
+            $systems,
+            200
+        );
     }
 
     /**
@@ -39,13 +40,15 @@ class SystemController extends Controller
     public function store(Request $request)
     {
         $validateData = $request->validate([
-            //
+            'constructive_group_id' => 'required|numeric',
+            'code' => 'required|numeric|unique:systems',
+            'name' => 'required',
         ]);
 
-        try{
+        try {
             System::create($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
     }
 
@@ -71,14 +74,15 @@ class SystemController extends Controller
     public function update(Request $request, System $system)
     {
         $validateData = $request->validate([
+            'constructive_group_id' => 'required|numeric',
+            'code' => 'required|numeric|unique:systems',
             'name' => 'required',
-            'code' => 'required',
         ]);
 
-        try{
+        try {
             $system->update($validateData);
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -87,10 +91,10 @@ class SystemController extends Controller
      */
     public function destroy(System $system)
     {
-        try{
+        try {
             $system->delete();
-        }catch(Exception $e){
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+        } catch (Exception $e) {
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }

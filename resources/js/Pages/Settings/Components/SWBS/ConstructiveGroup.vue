@@ -17,12 +17,11 @@ const filters = ref({
 onMounted(() => {
     initFilters();
     loading.value = true;
-    axios.get(route('gruposConstructivos.index')).then(
-        (res) => {
+    axios.get(route('gruposConstructivos.index'))
+        .then((res) => {
             groups.value = res.data[0]
             loading.value = false;
-        }
-    );
+        })
 })
 
 const initFilters = () => {
