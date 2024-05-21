@@ -527,7 +527,7 @@ async function addItem(item) {
             </Column>
         </span>
         <Column frozen alignFrozen="right" class="w-[8%]"
-            v-if="props.actions.length > 0 || routes.update || routes.delete || showItem">
+            v-if="props.actions.length > 0 || routes?.update || routes?.delete || showItem">
             <template #body="{ data }">
                 <div class="flex items-center justify-center bg-white rounded-md shadow-sm">
                     <span v-for="button in props.actions">
