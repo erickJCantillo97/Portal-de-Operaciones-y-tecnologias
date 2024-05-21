@@ -11,6 +11,8 @@ import TabPanel from 'primevue/tabpanel';
 import TabView from 'primevue/tabview';
 import OverlayPanel from 'primevue/overlaypanel';
 import Dropdown from 'primevue/dropdown';
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 
 const props = defineProps({
     project: Object,
@@ -315,6 +317,7 @@ const loadSaveCalendar = ref()
 const formCalendar = ref({
     project: props.project.id,
     calendar: props.project.calendar,
+    newCalendar: false
 })
 const toggleCalendar = (event) => {
     calendar.value.toggle(event);
@@ -323,9 +326,13 @@ const newCalendar = () => {
     visible.value = true
     calendar.value.hide();
 }
+const gantt = defineModel('gantt', {
+    type: Object,
+})
 async function setCalendarToProject() {
+    if(formCalendar.value.calendar != null){
     loadSaveCalendar.value = true
-    await axios.post(route('assignment.calendar'), formCalendar.value).then(async (res) => {
+    await axios.post(route('create.calendar',formCalendar.value.project), formCalendar.value).then(async (res) => {
         if (res.data.status) {
             toast.add({
                 severity: 'success',
@@ -333,7 +340,7 @@ async function setCalendarToProject() {
                 text: res.data.mensaje,
                 life: 4000
             })
-            await gantt.value.project.setCalendar(formCalendar.value.calendar);
+           // await gantt.value.project.load();
         } else {
             toast.add({
                 severity: 'error',
@@ -344,6 +351,7 @@ async function setCalendarToProject() {
         }
     })
     loadSaveCalendar.value = false
+}
 }
 
 

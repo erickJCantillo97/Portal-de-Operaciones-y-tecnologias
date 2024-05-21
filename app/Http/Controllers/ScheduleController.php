@@ -477,6 +477,7 @@ class ScheduleController extends Controller
 
     public function createCalendar(Request $request, Project $project)
     {
+        //dd( $request);
         //return "OK";
         // $request->exeptions = [];
         // $request->recurrent = [];
@@ -508,13 +509,14 @@ class ScheduleController extends Controller
                         'recurrentStartDate' => 'on '.$recurrent->day.' at '.$recurrent->startHour,
                     ]);
                 }
+                $project->calendar_id = $calendar->id ;
                 $project->save();
                 ProjectWithCalendar::firstOrCreate([
                     'project_id' => $project->id,
                     'calendar_id' => $calendar->id
                 ]);
             } else {
-                $project->calendar_id = $request->calendar;
+                $project->calendar_id = $request->calendar['id'];
                 $project->save();
                 ProjectWithCalendar::firstOrCreate([
                     'project_id' => $request->project,
