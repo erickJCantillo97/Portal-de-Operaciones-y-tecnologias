@@ -238,7 +238,7 @@ const options = ref({
             </span>
             <CustomImportGantt class="ml-1" v-model:gantt="gantt" v-if="!config.readOnly" :project="props.project"/>
             <CustomNotesGantt class="ml-1" :notes="notes" v-model:taskFilter="taskFilter" />
-            <CustomModalCalendars class="ml-1" :listCalendar :project="props.project" v-if="!config.readOnly" />
+            <CustomModalCalendars class="ml-1" v-model:gantt="gantt" :listCalendar :project="props.project" v-if="!config.readOnly" />
             <CustomColorSelect v-if="!config.readOnly" class="ml-1" @changeColorRow="changeColorRow($event)"
                 :gama="'200'" />
             <InputText v-model="taskFilter" @input="filterChange" placeholder="Buscar por actividad"

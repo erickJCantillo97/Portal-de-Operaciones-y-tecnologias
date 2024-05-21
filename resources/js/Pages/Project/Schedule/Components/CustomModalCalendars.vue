@@ -340,7 +340,7 @@ async function setCalendarToProject() {
                 text: res.data.mensaje,
                 life: 4000
             })
-           // await gantt.value.project.load();
+           await gantt.value.project.load();
         } else {
             toast.add({
                 severity: 'error',
@@ -397,7 +397,7 @@ async function save() {
                     text: res.data.mensaje,
                     life: 4000
                 })
-                // await gantt.value.project.setCalendar(formCalendar.value.calendar);
+                await gantt.value.project.setCalendar(formCalendar.value.calendar);
             } else {
                 toast.add({
                     severity: 'error',
