@@ -367,7 +367,7 @@ function convertirHorasARecurrent(objeto) {
     return resultado;
 }
 
-function save() {
+async function save() {
     let aux = deepCopy(form.value)
     aux.holidays.forEach((item) => {
         item.startDay = new Date(item.startDay).toLocaleDateString('es-CO', { year: 'numeric', month: 'numeric', day: 'numeric' });
@@ -380,6 +380,34 @@ function save() {
         recurrent: convertirHorasARecurrent(aux.daysWeek)
     }
     console.log(data)
+    await axios.post(route('create.calendar', props.project.id), data)
+        .then(async () => {
+            if (res.data.status) {
+                toast.add({
+                    severity: 'success',
+                    group: 'customToast',
+                    text: res.data.mensaje,
+                    life: 4000
+                })
+                // await gantt.value.project.setCalendar(formCalendar.value.calendar);
+            } else {
+                toast.add({
+                    severity: 'error',
+                    group: 'customToast',
+                    text: res.data.mensaje,
+                    life: 4000
+                })
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+            toast.add({
+                severity: 'error',
+                group: 'customToast',
+                text: 'Error no controlado',
+                life: 4000
+            })
+        })
 }
 
 
