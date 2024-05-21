@@ -18,9 +18,10 @@ class Task extends Model implements Auditable
     use SoftDeletes;
     protected $casts = [
         'manuallyScheduled' => 'boolean',
+        'duration' => 'float'
     ];
 
-    protected $appends = ['children','segments', 'schedulingMode' ];
+    protected $appends = ['children','segments', 'schedulingMode', 'calendar' ];
 
     protected $guarded = [];
 
@@ -29,8 +30,12 @@ class Task extends Model implements Auditable
         return Task::where('task_id', '=', $this->id)->orderBy('parentIndex')->get();
     }
 
+    public function getCalendarAttribute(){
+        return intval($this->calendar_id);
+    }
+
     public function getSchedulingModeAttribute(){
-        return "FixedDuration";
+        return "Normal";
     }
 
     public function getSegmentsAttribute(){

@@ -10,19 +10,19 @@ import MultiSelect from 'primevue/multiselect';
 import TabPanel from 'primevue/tabpanel';
 import TabView from 'primevue/tabview';
 import OverlayPanel from 'primevue/overlaypanel';
+import Dropdown from 'primevue/dropdown';
 
 const props = defineProps({
-    project: Object
+    project: Object,
+    listCalendar: Array,
+    class: String
 })
 
 const yearsSelect = ref([(new Date).getFullYear()])
 const holidays = ref({})
 const selecDayWeek = ref({})
-// holidays.value[yearsSelect.value[0]] = getDays.getColombiaHolidaysByYear(yearsSelect.value[0])
 const newCalendarData = ref({})
-const visible = defineModel('visible', {
-    required: true
-})
+const visible = ref()
 const form = ref({
     project: props.project.id,
     name: null,
@@ -163,7 +163,7 @@ function activateHolidays(option) {
     if (yearsSelect.value.length == 0) {
         form.value.statusHolidays = false
     }
-    form.value.holidays = form.value.holidays.filter(day => day.type !== 'Festivo legal');
+    form.value.holidays = form.value.holidays.filter(day => day.type !== 'Festivo');
     yearsSelect.value.sort((a, b) => a - b)
     yearsSelect.value.forEach(year => {
         getholidays(year)
@@ -174,8 +174,9 @@ function activateHolidays(option) {
                     form.value.holidays.push({
                         startDay: holiday.holiday,
                         endDay: holiday.holiday,
-                        text: holiday.celebration,
-                        type: 'Festivo legal'
+                        description: holiday.celebration,
+                        type: 'Festivo',
+                        isWorking: false
                     });
                 }
             });
@@ -206,20 +207,14 @@ function compareDates(date) {
 
 
     const existeFestivo = form.value.holidays.find(h => {
-        // console.log(formatDate(day))
         return formatDate(day) >= h.startDay && formatDate(day) <= h.endDay;
     });
 
     if (existeFestivo) {
-        if (existeFestivo.type == 'Festivo legal') {
-            return 2
-        } else if (existeFestivo.type == 'Festivo local') {
-            return 4
-        }
-        else if (existeFestivo.type == 'Vacaciones colectivas') {
-            return 5
+        if (existeFestivo.isWorking) {
+        return 1
         } else {
-            return 6
+            return 2
         }
     }
 
@@ -230,26 +225,22 @@ function compareDates(date) {
             return 1;
         }
     }
-
     return 3;
 }
 
 
 const references = [
     { class: 'bg-white', text: 'Laborable' },
-    { class: 'bg-blue-500 text-white', text: 'Laborable modificado' },
-    { class: 'bg-red-500 text-white', text: 'Festivo legal' },
-    { class: 'bg-yellow-500 text-white', text: 'No laborable' },
-    { class: 'bg-orange-500 text-white', text: 'Festivo local' },
-    { class: 'bg-green-500 text-white', text: 'Vacaciones colectivas' },
-    { class: 'bg-pink-500 text-white', text: 'Otros' },
+    { class: 'bg-blue-500 text-white', text: 'Laborable exepcion' },
+    { class: 'bg-red-500 text-white', text: 'No laborable' },
+    { class: 'bg-yellow-500 text-white', text: 'Descanso' },
 ]
 
 const columnas = [
+    { field: 'description', header: 'Descripcion', filter: 'true' },
     { field: 'startDay', header: 'Dia inicio', type: 'date', filter: 'true' },
     { field: 'endDay', header: 'Dia fin', type: 'date', filter: 'true' },
-    { field: 'text', header: 'Descripcion', filter: 'true' },
-    { field: 'type', header: 'Tipo', filter: 'true' },
+    { field: 'isWorking', header: 'Laborable', filter: 'true', type: 'boolean' },
 ]
 const actions = [
     { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
@@ -297,33 +288,103 @@ const toggle = (event) => {
 }
 
 const newExeption = ref({
-    text: null,
+    description: null,
     startDay: null,
     endDay: null,
-    type: 'No laborable'
+    startHour: null,
+    endHour: null,
+    type: 'Personalizado',
+    isWorking: false
 })
 function addExeption() {
     form.value.holidays.push(newExeption.value)
     newExeption.value = {
-        text: null,
+        description: null,
         startDay: null,
         endDay: null,
-        type: null
+        startHour: null,
+        endHour: null,
+        type: 'Personalizado',
+        isWorking: false
     }
     overlayAddExeption.value.hide()
 }
 
+const calendar = ref()
+const loadSaveCalendar = ref()
+const formCalendar = ref({
+    project: props.project.id,
+    calendar: props.project.calendar,
+})
+const toggleCalendar = (event) => {
+    calendar.value.toggle(event);
+}
+const newCalendar = () => {
+    visible.value = true
+    calendar.value.hide();
+}
+async function setCalendarToProject() {
+    loadSaveCalendar.value = true
+    await axios.post(route('assignment.calendar'), formCalendar.value).then(async (res) => {
+        if (res.data.status) {
+            toast.add({
+                severity: 'success',
+                group: 'customToast',
+                text: res.data.mensaje,
+                life: 4000
+            })
+            await gantt.value.project.setCalendar(formCalendar.value.calendar);
+        } else {
+            toast.add({
+                severity: 'error',
+                group: 'customToast',
+                text: res.data.mensaje,
+                life: 4000
+            })
+        }
+    })
+    loadSaveCalendar.value = false
+}
+
+
+function convertirHorasARecurrent(objeto) {
+    const dias = Object.keys(objeto);
+    const resultado = [];
+    for (const dia of dias) {
+        const horas = objeto[dia].hours;
+        for (const hora of horas) {
+            const startHour = new Date(hora.start).toLocaleTimeString('es-CO', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const endHour = new Date(hora.end).toLocaleTimeString('es-CO', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            resultado.push({
+                isWorking: true,
+                day: dia,
+                startHour,
+                endHour
+            });
+        }
+    }
+
+    return resultado;
+}
 
 function save() {
     console.log(form.value)
+    let data={
+        name:form.value.name,
+        exeptions:form.value.holidays,
+        recurrent:convertirHorasARecurrent(form.value.daysWeek)
+    } 
+    console.log(data)
 }
 
 
 </script>
 
 <template>
+    <Button :class raised v-tooltip.bottom="'Agregar Calendario'" icon="fa-solid fa-calendar-plus"
+        @click="toggleCalendar" />
     <CustomModal v-model:visible="visible" :closeOnEscape="false" icon="fa-solid fa-file-export"
-        :titulo="'Nuevo calendario para el projecto: ' + project.name" width="90vw">
+        :titulo="'Nuevo calendario para el projecto: ' + project.name" width="80vw">
         <template #body>
             <div class="flex gap-2 h-[75vh]">
                 <div class="space-y-1 w-min flex flex-col items-center">
@@ -341,9 +402,10 @@ function save() {
                         </template>
                     </Calendar>
                     <div class="grid grid-cols-2 pr-5 gap-1">
-                        <span v-for="reference in references" class="flex gap-1 w-full">
+                        <span v-for="reference in references" class="flex gap-1 w-full cursor-default">
                             <div :class="reference.class" class=" w-full p-1 border rounded-md h-6 flex items-center">
-                                <p class="text-center w-full">{{ reference.text }}</p>
+                                <p v-tooltip="reference.text" class="text-center w-full truncate">{{ reference.text }}
+                                </p>
                             </div>
                         </span>
                     </div>
@@ -365,9 +427,9 @@ function save() {
                                 </div>
                             </div>
                             <div class="h-[85%] border rounded-md">
-                                <CustomDataTable title="Exepciones" :actions :showAdd="true" :data="form.holidays"
-                                    @addClick="toggle" :columnas :showHeader="true" :paginator="false"
-                                    @deleteClic="removeExeption">
+                                <CustomDataTable showItem title="Exepciones" :actions :showAdd="true"
+                                    :data="form.holidays" @addClick="toggle" :columnas :showHeader="true"
+                                    :paginator="false" @deleteClic="removeExeption">
                                 </CustomDataTable>
                             </div>
                         </TabPanel>
@@ -451,18 +513,39 @@ function save() {
     </CustomModal>
     <OverlayPanel ref="overlayAddExeption">
         <div class="flex flex-col w-96">
-            <CustomInput v-model:input="newExeption.text" placeholder="Descripcion del dia a agregar a exepciones" label="Descripcion" />
+            <CustomInput v-model:input="newExeption.description" placeholder="Descripcion del dia a agregar a exepciones"
+                label="Descripcion" />
             <span class="grid grid-cols-2 gap-3">
-                <CustomInput v-model:input="newExeption.startDay"  type="date" label="Dia inicio" @value-change="newExeption.endDay=null" />
-                <CustomInput v-model:input="newExeption.endDay" :minDate="newExeption.startDay" type="date" label="Dia fin" />
+                <CustomInput v-model:input="newExeption.startDay" type="date" label="Dia inicio"
+                    @value-change="newExeption.endDay = newExeption.startDay" />
+                <CustomInput v-model:input="newExeption.endDay" :minDate="newExeption.startDay" type="date"
+                    label="Dia fin" />
             </span>
-            <span class=" grid grid-cols-2">
-                <CustomInput label="Tipo" v-model:input="newExeption.type" type="dropdown"
-                    :options="['No laborable','Festivo local', 'Vacaciones colectivas', 'Otros']" />
+            <span class="space-y-2 mt-2">
+                <CustomInput label="Laborable" v-model:input="newExeption.isWorking" type="boolean" />
+                <span class="flex gap-2">
+                    <CustomInput label="Hora inicio" v-model:input="newExeption.startHour" type="time" />
+                    <CustomInput label="Hora fin" v-model:input="newExeption.endHour" type="time" />
+                </span>
                 <span class="flex items-end justify-end">
                     <Button severity="success" label="Agregar" icon="fa-solid fa-plus" @click="addExeption" />
                 </span>
             </span>
         </div>
+    </OverlayPanel>
+    <OverlayPanel ref="calendar" class="w-96">
+        <div class="flex flex-col gap-2 mb-2">
+            <div class="flex justify-between items-center gap-2">
+                <label class="">Asignación de calendario</label>
+                <Button severity="success" v-tooltip.rigth="'Nuevo Calendario'" icon="fa-solid fa-plus"
+                    @click="newCalendar" />
+            </div>
+            <Dropdown v-model="formCalendar.calendar" :options="listCalendar" optionLabel="name"
+                placeholder="Seleccione un calendario" checkmark :highlightOnSelect="false" class="w-full" showClear />
+        </div>
+
+        <span class="flex justify-end">
+            <Button severity="success" label="Guardar" :loading="loadSaveCalendar" @click="setCalendarToProject()" />
+        </span>
     </OverlayPanel>
 </template>

@@ -17,19 +17,34 @@ import MultiSelect from 'primevue/multiselect';
 import Swal from 'sweetalert2';
 import Tag from 'primevue/tag';
 import InputSwitch from 'primevue/inputswitch';
+import ConfirmDialog from 'primevue/confirmdialog';
+import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
+import Toast from 'primevue/toast';
+import CustomModal from './CustomModal.vue';
+import CustomInput from './CustomInput.vue';
+import Sidebar from 'primevue/sidebar';
+
+const confirm = useConfirm();
+const toast = useToast();
+const dt = ref()
+const totalItems = ref();
 
 const props = defineProps({
     data: {
         type: Array,
-        required: true,
         default: []
     },
-    routeData: {
-        type: String,
+    routes: {
+        type: Object,
         required: false
     },
     parameterData: {
         default: null
+    },
+    requestData: {
+        type: Object,
+        default: {}
     },
     changeRows: {
         type: Boolean,
@@ -81,7 +96,7 @@ const props = defineProps({
     },
     rowsDefault: {
         type: Number,
-        defaul: 10
+        defaul: 100
     },
     showHeader: {
         type: Boolean,
@@ -90,7 +105,11 @@ const props = defineProps({
     selectionMode: {
         type: String,
         default: 'single'
-    }
+    },
+    showItem: {
+        default: false,
+        type: Boolean
+    },
 })
 
 const dataResponse = defineModel('dataResponse', {
@@ -98,22 +117,30 @@ const dataResponse = defineModel('dataResponse', {
     type: Array,
     default: []
 })
+const selectAll = defineModel('selectAll')
+
+defineEmits(['rowClick', 'buttonRowClick','addClick'])
+
 const dataLoading = ref(false)
 
 async function getData() {
     dataLoading.value = true
-    await axios.get(route(props.routeData, props.parameterData)).then((res) => {
+    await axios.get(route(props.routes.get, props.parameterData), props.requestData).then((res) => {
         dataResponse.value = res.data
     })
     dataLoading.value = false
 }
+const selectedElement = ref([]);
 
-if (props.routeData) {
-    getData()
-}
+onMounted(() => {
+    rows.value = props.rowsDefault
+    if (props.routes) {
+        getData()
+    }
+})
 
 //#region Filtros de tabla y visor columnas
-const rows = ref(props.rowsDefault)
+const rows = ref()
 const filters = ref({});
 const globalFilterFields = ref([])
 const columnasSelect = ref()
@@ -183,19 +210,97 @@ const formatDate = (date) => {
 }
 //#endregion
 
-const selectedElement = ref([]);
+// #region crud
+
+
+
+const modal = ref(false)
+const visibleSidebar = ref(false)
+const item = ref({
+    type: null,
+    data: {}
+})
+function deleteItem(event, data) {
+    confirm.require({
+        target: event.currentTarget,
+        message: '¿Esta seguro de eliminar el registro?',
+        icon: 'pi pi-exclamation-triangle text-danger',
+        rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+        acceptClass: 'p-button-sm p-button-danger',
+        rejectLabel: 'Cancelar',
+        acceptLabel: 'Eliminar',
+        accept: () => {
+            console.log(data)
+            axios.delete(route(props.routes.delete, data.id))
+                .then(async (res) => {
+                    await getData()
+                    toast.add({ severity: 'error', icon: 'fa-solid fa-trash-can', summary: '¡Accion realizada!', detail: 'Se elimino con exito', group: 'customTooltipDataTable', life: 5000 });
+                })
+                .catch((error) => {
+                    console.log(error)
+                    toast.add({ severity: 'error', summary: 'Error', detail: 'Error al eliminar', life: 3000 })
+                })
+        },
+        reject: () => {
+            // toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+        }
+    });
+}
+function open(event, data, type) {
+    item.value.data.id = data.id
+    props.columnas.forEach((column) => {
+        item.value.data[column.field] = data[column.field]
+    })
+    item.value.type = type
+    if (type == 'show') {
+        visibleSidebar.value = true
+    } else {
+        modal.value = true
+    }
+}
+
+async function editItem(item) {
+    dataLoading.value = true
+    await axios.post(route(props.routes.update, item.id), item)
+        .then(async () => {
+            await getData()
+            modal.value = false
+            toast.add({ severity: 'success', icon: 'fa-solid fa-floppy-disk', summary: '¡Accion realizada!', detail: 'Se guardaron los cambios', group: 'customTooltipDataTable', life: 5000 });
+        })
+        .catch((error) => {
+            console.log(error)
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Error al guardar', group: 'customTooltipDataTable', life: 3000 })
+        })
+    dataLoading.value = false
+}
+
+async function addItem(item) {
+    dataLoading.value = true
+    await axios.post(route(props.routes.store), item)
+        .then(async () => {
+            await getData()
+            modal.value = false
+            toast.add({ severity: 'success', icon: 'fa-solid fa-floppy-disk', summary: '¡Accion realizada!', detail: 'Se agrego un registro', group: 'customTooltipDataTable', life: 5000 });
+        })
+        .catch((error) => {
+            console.log(error)
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Error al guardar', group: 'customTooltipDataTable', life: 3000 })
+        })
+    dataLoading.value = false
+}
+// #endregion
 
 </script>
 
 <template>
-    <DataTable id="tabla" :value="props.routeData == null ? props.data : dataResponse"
-        v-model:selection="selectedElement" :paginator="(dataResponse.length > 0 || data.length > 0) && paginator" :rows
-        :selectionMode tableStyle="" sortMode="multiple" scrollable scrollHeight="flex"
-        :loading="props.routeData == null ? props.loading : dataLoading"
+    <DataTable ref="dt" id="tabla" :value="props.routes == null ? props.data : dataResponse"
+        v-model:selection="selectedElement" :selectAll="selectAll"
+        :paginator="(dataResponse.length > 0 || data.length > 0) && paginator" :rows :selectionMode sortMode="multiple"
+        scrollable scrollHeight="flex" :loading="props.routes == null ? props.loading : dataLoading"
         currentPageReportTemplate="{first} al {last} de un total de {totalRecords}" removableSort
         v-model:filters="filters" stripedRows filterDisplay="menu" class="p-datatable-sm  p-1 rounded-md"
         stateStorage="session" :stateKey="cacheName ? 'dt-' + cacheName + '-state-session' : null"
-        :globalFilterFields="globalFilterFields" @row-click="$emit('rowClic', $event)"
+        :globalFilterFields="globalFilterFields" @row-click="$emit('rowClick', $event)"
         paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink" :pt="{
         paginator: {
             paginatorWrapper: '!p-0',
@@ -223,7 +328,8 @@ const selectedElement = ref([]);
                     </div>
                     <span class="space-x-1">
                         <slot name="buttonHeader" />
-                        <Button v-if="showAdd" v-tooltip.left="'Añadir'" @click="$emit('addClick', $event)"
+                        <Button v-if="showAdd || routes?.store" v-tooltip.left="'Añadir'"
+                            @click="routes?.store ? open($event, {}, 'new') : $emit('addClick', $event)"
                             severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
                     </span>
                 </span>
@@ -281,6 +387,7 @@ const selectedElement = ref([]);
                 </div>
             </div>
         </template>
+
         <!-- #region ajustes de tabla -->
         <template #empty>
             <div class="flex flex-col items-center space-y-1">
@@ -398,7 +505,7 @@ const selectedElement = ref([]);
                     <span v-else-if="col.type == 'button'" class="w-full">
                         <Button :label="String(data[col.field])" class="w-full truncate" :class="col.rowClass"
                             :icon="col.icon" :outlined="col.outlined" :text="col.text" :severity="col.severity"
-                            :rounded="col.rounded" @click="$emit(col.event, $event, data)">
+                            :rounded="col.rounded" @click="$emit('buttonRowClick', $event, data)">
                         </Button>
                     </span>
                     <span v-else-if="col.type == 'array'" class="w-full flex space-x-1">
@@ -419,18 +526,101 @@ const selectedElement = ref([]);
                 </template>
             </Column>
         </span>
-        <Column frozen alignFrozen="right" class="w-[8%]" v-if="props.actions.length > 0">
+        <Column frozen alignFrozen="right" class="w-[8%]"
+            v-if="props.actions.length > 0 || routes?.update || routes?.delete || showItem">
             <template #body="{ data }">
-                <div class="flex items-center justify-center w-full bg-white rounded-md shadow-sm">
+                <div class="flex items-center justify-center bg-white rounded-md shadow-sm">
                     <span v-for="button in props.actions">
                         <Button @click="$emit(button.event, $event, data)" :text="button.text"
                             :severity="button.severity" :outlined="button.outlined" :rounded="button.rounded"
                             :icon="button.icon" :title="button.label" :class="button.class"
                             v-if="button.show == null ? true : button.show" />
                     </span>
+                    <Button v-if="showItem" @click="open($event, data, 'show')" text icon="fa-solid fa-eye"
+                        severity="success"></Button>
+                    <Button v-if="routes?.update" @click="open($event, data, 'edit')" text icon="fa-solid fa-pencil"
+                        severity="warning"></Button>
+                    <Button v-if="routes?.delete" @click="deleteItem($event, data)" text icon="fa-solid fa-trash-can"
+                        severity="danger"></Button>
+
                 </div>
             </template>
         </Column>
         <!-- #endregion -->
     </DataTable>
+    <ConfirmDialog group="customDeleteDataTable">
+        <template #container="{ message, acceptCallback, rejectCallback }">
+            <div class="flex flex-col items-center p-5 rounded-full">
+                <i :class="message.icon" class="text-5xl p-4 rounded-full -mt-16 shadow-2xl"></i>
+                <span class="font-bold text-3xl block mb-2 mt-4">{{ message.header }}</span>
+                <p class="text-2xl">{{ message.message }}</p>
+                <div class="flex items-center gap-4 mt-4">
+                    <Button :icon="message.rejectIcon" :label="message.rejectLabel" @click="rejectCallback"
+                        :class="message.rejectClass" />
+                    <Button :icon="message.acceptIcon" :label="message.acceptLabel" @click="acceptCallback"
+                        :class="message.acceptClass" />
+                </div>
+            </div>
+        </template>
+    </ConfirmDialog>
+    <Toast group="customTooltipDataTable">
+        <template #message="{ message }">
+            <div class="flex items-center gap-3" style="flex: 1">
+                <i :class="message.icon" class="text-4xl"></i>
+                <div class="flex flex-col">
+                    <span class="font-bold">{{ message.summary }}</span>
+                    <div class="font-medium text-lg">{{ message.detail }}</div>
+                </div>
+            </div>
+        </template>
+    </Toast>
+    <CustomModal v-model:visible="modal" icon="fa-solid fa-pencil"
+        :titulo="item.type == 'edit' ? 'Editando registro' : 'Nuevo registro'">
+        <template #body>
+            <span v-if="!$slots.modal">
+                <p class="rounded bg-warning text-white text-center">En pruebas</p>
+                <div class="grid grid-cols-4 w-full gap-x-2">
+                    <span v-for="col in columnas" :class="[col.input == false ? 'hidden' : 'w-full', col.input?.class]">
+                        <CustomInput :disabled="dataLoading" v-if="col.input != false" :label="col.header"
+                            v-model:input="item.data[col.field]" :acceptFile="col.input?.acceptFile"
+                            :type="col.input?.type ?? 'text'" :multiple="col.input?.multiple"
+                            :options="col.input?.options" :mode="col.input?.mode" :suffix="col.input?.suffix" />
+                    </span>
+                </div>
+            </span>
+            <slot name="modal" :item="item" />
+            <slot name="modalAdd" :item="item" />
+            <!-- {{ item }} -->
+        </template>
+        <template #footer>
+            <Button severity="danger" :disabled="dataLoading" label="Cancelar" icon="fa-regular fa-circle-xmark"
+                @click="modal = false" />
+            <Button severity="success" :loading="dataLoading" label="Guardar" icon="fa-solid fa-floppy-disk"
+                @click="item.type == 'edit' ? editItem(item.data) : addItem(item.data)" />
+        </template>
+
+    </CustomModal>
+    <Sidebar v-model:visible="visibleSidebar" :showCloseIcon="false" position="right">
+        <div v-if="!$slots.sidebar" class="flex flex-col gap-2">
+            <span v-for="col in columnas" :class="item.data[col.field] ? 'block' : 'hidden'">
+                <span v-if="col.input?.acceptFile?.includes('image')">
+                    <div class="flex flex-col items-center border rounded-md p-2 gap-2">
+                        <p class="font-bold text-center" :for="col.field"> {{ col.header }}</p>
+                        <img :src="item.data[col.field]" alt="ImageShip" onerror="this.src='/svg/cotecmar-logo.svg'"
+                            class="min-w-32 py-0.5  sm:w-16 object-cover" draggable="false" />
+                    </div>
+                </span>
+                <span v-else>
+                    <div class="border grid items-center grid-cols-2 rounded-md p-1">
+                        <p class="font-bold" :for="col.field"> {{ col.header }}</p>
+                        <p>{{item.data[col.field]}} <span>{{ col.input?.suffix }}</span></p>
+                    </div>
+                </span>
+            </span>
+        </div>
+        <div>
+            <slot name="sidebar" :item="item" />
+            <slot name="sidebarAdd" :item="item" />
+        </div>
+    </Sidebar>
 </template>

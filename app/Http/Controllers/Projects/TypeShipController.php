@@ -18,17 +18,11 @@ class TypeShipController extends Controller
      */
     public function index(Request $request)
     {
-        $typeShips = TypeShip::with('ships')->get();
-
         if ($request->expectsJson()) {
-            return response()->json([
-                'typeShips' => $typeShips
-            ]);
+            return response()->json(TypeShip::with('ships')->get());
         }
 
-        return Inertia::render('TypeShips', [
-            'typeShips' => $typeShips,
-        ]);
+        return Inertia::render('TypeShips');
     }
 
     /**
@@ -69,11 +63,11 @@ class TypeShipController extends Controller
         ]);
 
         try {
-            if ($request->image != null) {
+            if ($request->render != null) {
                 $validateData['render'] = Storage::putFileAs(
                     'public/TypeShips/',
-                    $request->image,
-                    $validateData['name'] . '.' . $request->image->getClientOriginalExtension()
+                    $request->render,
+                    $validateData['name'] . '.' . $request->render->getClientOriginalExtension()
                 );
             }
             TypeShip::create($validateData);
@@ -141,11 +135,11 @@ class TypeShipController extends Controller
         ]);
 
         try {
-            if ($request->image != null) {
+            if ($request->render != null) {
                 $validateData['render'] = Storage::putFileAs(
                     'public/TypeShips/',
-                    $request->image,
-                    $validateData['name'] . '.' . $request->image->getClientOriginalExtension()
+                    $request->render,
+                    $validateData['render'] . '.' . $request->render->getClientOriginalExtension()
                 );
             }
 
