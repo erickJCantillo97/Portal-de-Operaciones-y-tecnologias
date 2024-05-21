@@ -2,6 +2,7 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { onMounted, ref } from 'vue';
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
+import '@bryntum/gantt/gantt.material.css';
 import { BryntumGantt } from '@bryntum/gantt-vue-3';
 import { DateHelper, List, LocaleManager, StringHelper, Widget, ColumnStore, Column, TaskModel } from '@bryntum/gantt';
 import { useToast } from "primevue/usetoast";
@@ -530,21 +531,21 @@ const headerTpl = ({ currentPage, totalPages }) => `
     </dl>
     `;
 
-const footerTpl = ({ currentPage, totalPages }) => `
+const footerTpl = () => `
 <h3>© ${new Date().getFullYear()} TOP - COTECMAR</h3></div>
 `;
 const pdfExport = ref({
     exportServer: 'https://dev.bryntum.com:8082',
     headerTpl,
     footerTpl,
-    orientation: 'landscape',
-    paperFormat: 'Letter',
-    keepRegionSizes: { locked: true },
-    columns: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'],
-    repeatHeader: true,
-    exporterType: 'multipagevertical',
-    fileFormat: 'pdf',
-    fileName: 'Cronograma-' + props.project.name + '-' + DateHelper.format(new Date(), 'YYYY-MM-DD')
+    // orientation: 'landscape',
+    // paperFormat: 'Letter',
+    // keepRegionSizes: { locked: true },
+    // columns: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'],
+    // repeatHeader: true,
+    // exporterType: 'multipagevertical',
+    // fileFormat: 'pdf',
+    // fileName: 'Cronograma-' + props.project.name + '-' + DateHelper.format(new Date(), 'YYYY-MM-DD')
 })
 
 const rowHeight = ref()
@@ -686,8 +687,7 @@ const url = [
         :icon="full ? 'fa-solid fa-minimize' : 'fa-solid fa-maximize'" severity="help" raised @click="full = !full" />
 </div>
 </div> -->
-            <CustomToolbar v-if="!load" :notes :listCalendar v-model:config="config" :project="props.project" v-model:gantt="ganttref.instance.value">
-            </CustomToolbar>
+            <CustomToolbar v-if="!load" :notes :listCalendar v-model:config="config" :project="props.project" v-model:gantt="ganttref.instance.value"/>
             <div v-else class="h-10 flex flex-col justify-center px-20">
                 <ProgressBar  mode="indeterminate" style="height: 6px"></ProgressBar>
             </div>

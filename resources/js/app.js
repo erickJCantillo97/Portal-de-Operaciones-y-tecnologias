@@ -1,5 +1,4 @@
 import 'material-icons/iconfont/material-icons.css';
-import '@bryntum/gantt/gantt.material.css';
 import "../css/app.css";
 import "../css/aura-light-indigo/theme.css"
 import "./bootstrap";
@@ -19,7 +18,19 @@ import VueApexCharts from "vue3-apexcharts";
 import VueChatScroll from 'vue3-chat-scroll'
 import BadgeDirective from 'primevue/badgedirective';
 import Ripple from 'primevue/ripple';
+import axios from 'axios';
 
+// Configura Axios con el interceptor para manejar el error 419
+axios.interceptors.response.use(
+    response => response,
+    error => {
+        // Verificar si el error corresponde a un error 419 (Token CSRF Mismatch)
+        if (error.response && error.response.status === 419) {
+            alert('esta accion es solo para peronas logueadas')
+        }
+        return Promise.reject(error);
+    }
+);
 const appName =
     import.meta.env.VITE_APP_NAME || "Portal";
 

@@ -223,41 +223,38 @@ class ProjectController extends Controller
 
     public function goToProjectOverview(Project $project)
     {
-        try {
-            $ships_ids = ProjectsShip::where('project_id', $project->id)->pluck('ship_id')->toArray();
-            $ships = Ship::with('typeShip')->whereIn('id', $ships_ids)->get()->map(function ($ship) {
-                return [
-                    'name' => $ship->name,
-                    'idHull' => $ship->idHull,
-                    'type' => $ship->typeShip->type,
-                    'type_ship' => [
-                        'nombre' => $ship->typeShip->name,
-                        'tipo buque' => $ship->typeShip->type,
-                        'file' => $ship->typeShip->file,
-                    ]
 
-                    // $ship->typeShip,
-                ];
-            });
-            $semanas = ProgressProjectWeek::where('real_progress', '<>', 0)->where('project_id', $project->id)->groupBy('project_id')->select('project_id', DB::raw("MAX(week) as week"))->first();
-            $semana =  ProgressProjectWeek::where('project_id', $project->id)->where('week', $semanas->week)->first();
-
-            // $semana = ProgressProjectWeek::where('project_id', $project->id)->orderBy('real_progress', 'DESC')->first();
-            $week = Carbon::now()->weekOfYear;
-            $year = Carbon::now()->format('y');
-            $weekTasks  = WeekTask::where('project_id', $project->id)->where('week', $year . str_pad($week, 2, "0", STR_PAD_LEFT))->get();
-            return Inertia::render(
-                'Project/ProjectOverview',
-                [
-                    'project' => Project::with('projectShip', 'contract', 'milestone')->findOrFail($project->id),
-                    'ships' => $ships,
-                    'semana' => $semana,
-                    'weekTasks' => $weekTasks
+        $ships_ids = ProjectsShip::where('project_id', $project->id)->pluck('ship_id')->toArray();
+        $ships = Ship::with('typeShip')->whereIn('id', $ships_ids)->get()->map(function ($ship) {
+            return [
+                'name' => $ship->name,
+                'idHull' => $ship->idHull,
+                'type' => $ship->typeShip->type,
+                'type_ship' => [
+                    'nombre' => $ship->typeShip->name,
+                    'tipo buque' => $ship->typeShip->type,
+                    'file' => $ship->typeShip->file,
                 ]
-            );
-        } catch (Exception $e) {
-            return back()->withErrors(['message', 'Error al cargar la página' . $e]);
-        }
+
+                // $ship->typeShip,
+            ];
+        });
+        $semanas = ProgressProjectWeek::where('real_progress', '<>', 0)->where('project_id', $project->id)->groupBy('project_id')->select('project_id', DB::raw("MAX(week) as week"))->first();
+        $semana =  ProgressProjectWeek::where('project_id', $project->id)->where('week', $semanas->week)->first();
+
+        // $semana = ProgressProjectWeek::where('project_id', $project->id)->orderBy('real_progress', 'DESC')->first();
+        $week = Carbon::now()->weekOfYear;
+        $year = Carbon::now()->format('y');
+        $weekTasks  = WeekTask::where('project_id', $project->id)->where('week', $year . str_pad($week, 2, "0", STR_PAD_LEFT))->get();
+        return Inertia::render(
+            'Project/ProjectOverview',
+            [
+                'project' => Project::with('projectShip', 'contract', 'milestone')->findOrFail($project->id),
+                'ships' => $ships,
+                'semana' => $semana,
+                'weekTasks' => $weekTasks
+            ]
+        );
     }
 
     public function addShips(Request $request, Project $project)

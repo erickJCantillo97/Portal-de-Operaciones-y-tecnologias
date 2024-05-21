@@ -155,7 +155,7 @@ const url = [
 <template>
     <AppLayout :href="url">
         <div class="w-full h-full overflow-y-auto">
-            <CustomDataTable :rowsDefault="100" title="Herramientas y equipos" :data="tools" :columnas="columnas"
+            <CustomDataTable :rowsDefault="100" title="Herramientas y equipos" :data="tools.data" :columnas="columnas"
                 :actions="actions" @edit="showModal" @goToToolOverview="goToToolOverview" @cloneItem="showModalClone"
                 :filterButtons="filterButtons">
                 <template #buttonHeader>
@@ -182,7 +182,7 @@ const url = [
 
                 <CustomInput label="Serial" id="serial" v-model:input="form.serial" placeholder="Serial del equipo"
                     :invalid="form.errors.serial ? true : false" :errorMessage="form.errors.serial" />
-                    
+
                 <CustomInput label="Codigo SAP" id="SAP_code" v-model:input="form.SAP_code" placeholder="Codigo SAP"
                     :invalid="form.errors.SAP_code ? true : false" :errorMessage="form.errors.SAP_code" />
 
