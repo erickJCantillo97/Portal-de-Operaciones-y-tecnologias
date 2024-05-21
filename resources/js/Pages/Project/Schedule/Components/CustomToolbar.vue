@@ -8,6 +8,7 @@ import CustomNotesGantt from './CustomNotesGantt.vue';
 import InputText from 'primevue/inputtext';
 import Calendar from 'primevue/calendar';
 import CustomExportGantt from './CustomExportGantt.vue';
+import CustomImportGantt from './CustomImportGantt.vue';
 const toast = useToast();
 const zoom = ref()
 
@@ -235,6 +236,7 @@ const options = ref({
                     </span>
                 </span>
             </span>
+            <CustomImportGantt class="ml-1" v-model:gantt="gantt" v-if="!config.readOnly" :project="props.project"/>
             <CustomNotesGantt class="ml-1" :notes="notes" v-model:taskFilter="taskFilter" />
             <CustomModalCalendars class="ml-1" :listCalendar :project="props.project" v-if="!config.readOnly" />
             <CustomColorSelect v-if="!config.readOnly" class="ml-1" @changeColorRow="changeColorRow($event)"
@@ -266,6 +268,7 @@ const options = ref({
 
 <Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input" icon="fa-solid fa-upload"
     @click="modalImport = true" />
+
 <Button raised v-tooltip.bottom="'Ruta critica'" severity="danger" icon="fa-solid fa-circle-exclamation"
     @click="showCritical()" />
 <Button raised v-tooltip.bottom="'Guardar'" severity="success" icon="fa-solid fa-save" @click="reload"

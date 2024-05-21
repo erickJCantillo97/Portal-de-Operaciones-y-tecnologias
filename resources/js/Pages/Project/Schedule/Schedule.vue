@@ -2,6 +2,7 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { onMounted, ref } from 'vue';
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
+import '@bryntum/gantt/gantt.material.css';
 import { BryntumGantt } from '@bryntum/gantt-vue-3';
 import { DateHelper, List, LocaleManager, StringHelper, Widget, ColumnStore, Column, TaskModel } from '@bryntum/gantt';
 import { useToast } from "primevue/usetoast";
@@ -537,14 +538,14 @@ const pdfExport = ref({
     exportServer: 'https://dev.bryntum.com:8082',
     headerTpl,
     footerTpl,
-    orientation: 'landscape',
-    paperFormat: 'Letter',
-    keepRegionSizes: { locked: true },
-    columns: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'],
-    repeatHeader: true,
-    exporterType: 'multipagevertical',
-    fileFormat: 'pdf',
-    fileName: 'Cronograma-' + props.project.name + '-' + DateHelper.format(new Date(), 'YYYY-MM-DD')
+    // orientation: 'landscape',
+    // paperFormat: 'Letter',
+    // keepRegionSizes: { locked: true },
+    // columns: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'],
+    // repeatHeader: true,
+    // exporterType: 'multipagevertical',
+    // fileFormat: 'pdf',
+    // fileName: 'Cronograma-' + props.project.name + '-' + DateHelper.format(new Date(), 'YYYY-MM-DD')
 })
 
 const rowHeight = ref()

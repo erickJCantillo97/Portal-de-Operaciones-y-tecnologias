@@ -1,5 +1,4 @@
 import 'material-icons/iconfont/material-icons.css';
-import '@bryntum/gantt/gantt.material.css';
 import "../css/app.css";
 import "../css/aura-light-indigo/theme.css"
 import "./bootstrap";
