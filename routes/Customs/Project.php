@@ -45,7 +45,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::post('/schedule/beforeSync/{project}', [ScheduleController::class, 'beforeSync'])->name('before.sync');
 
-    Route::get('/Schedule/createCalendar/{project}', [ScheduleController::class, 'createCalendar'])->name('create.calendar');
+    Route::post('/Schedule/createCalendar/{project}', [ScheduleController::class, 'createCalendar'])->name('create.calendar');
 
     Route::post('/syncGanttImporter/{project}', [ScheduleController::class, 'syncImporter'])->name('syncImporter');
 
