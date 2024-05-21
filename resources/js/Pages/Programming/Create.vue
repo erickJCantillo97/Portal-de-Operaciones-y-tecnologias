@@ -115,7 +115,6 @@ const projectsSelected = ref([])
 const overlayPerson = ref()
 const overlayAddPerson = ref()
 const personsEdit = ref()
-const tabActive = ref(0)
 const personal = ref()
 const personDrag = ref([])
 const arrayPersonFilter = ref({
@@ -546,7 +545,7 @@ const optionsConfig = ref([
 const optionsData = ref({})
 
 
-const filterTaskMode = ref('date')
+const filterTaskMode = ref(null)
 </script>
 
 <template>
@@ -565,15 +564,23 @@ const filterTaskMode = ref('date')
                     <div class="sm:flex grid grid-cols-2 items-center gap-2 sm:space-x-2">
                         <MultiSelect v-model="projectsSelected" display="chip" :options="projects" optionLabel="name"
                             class="w-56 hidden sm:flex" placeholder="Seleccione un proyecto" @change="getTask()" />
-                        <ButtonGroup class="">
-                            <Button label="Hoy" :outlined="filterTaskMode != 'today'" />
-                            <Button label=" Mañana" :outlined="filterTaskMode != 'tomorrow'" />
-                            <Button label=" Atrasadas" :outlined="filterTaskMode != 'atrasadas'" />
-                            <Button label="Todas" :outlined="filterTaskMode != 'all'" />
+                        <!-- {{ dates.day. }} -->
+                        <ButtonGroup>
+                        <Button :icon="filterTaskMode == 'atrasadas'?'fa-solid fa-filter':undefined" label="Atrasadas"
+                            @click="filterTaskMode == 'atrasadas' ? filterTaskMode = null : filterTaskMode = 'atrasadas'"
+                            :outlined="filterTaskMode != 'atrasadas'" />
+                        <Button :icon="filterTaskMode == 'all'?'fa-solid fa-filter':undefined" label="Todas" @click="filterTaskMode == 'all' ? filterTaskMode = null : filterTaskMode = 'all'"
+                            :outlined="filterTaskMode != 'all'" />
                         </ButtonGroup>
-
                         <Dropdown v-model="projectsSelected[0]" placeholder="Seleccione un proyecto" :options="projects"
                             optionLabel="name" @change="getTask()" class="sm:hidden flex" />
+                            <ButtonGroup class="">
+                            <Button label="Hoy" v-if="mode != 'week'" @click="dates.day = new Date()"
+                                :outlined="(dates.day.toDateString() != new Date().toDateString())" />
+                            <Button label="Mañana" v-if="mode != 'week'"
+                                @click="dates.day = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1)"
+                                :outlined="(dates.day.toDateString() != new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1).toDateString())" />
+                        </ButtonGroup>
                         <ButtonGroup class="hidden sm:block">
                             <Button label="Semana" @click="getTask('week')" :outlined="mode != 'week'" />
                             <Button label="dia" @click="getTask('date')" :outlined="mode != 'date'" />
@@ -629,7 +636,7 @@ const filterTaskMode = ref('date')
                                     <div v-for="data, index in diasSemana" class="flex flex-col h-full items-center"
                                         :class="[index > 5 ? 'bg-warning-light' : '', data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
                                         <TaskProgramming :project="project.id" :day="data.day" @menu="taskRightClick"
-                                            :key="dates.day + project.id + mode" type="week" @drop="onDrop"
+                                            :key="dates.day + project.id + mode + filterTaskMode" type="week" @drop="onDrop" :filterTaskMode
                                             v-model:itemDrag="personDrag" @togglePerson="togglePerson" :dataRightClick
                                             :optionsData />
                                     </div>
@@ -657,10 +664,9 @@ const filterTaskMode = ref('date')
 
                     <div v-if="mode == 'date'"
                         class="h-full border overflow-hidden rounded-md flex flex-col justify-between">
-
                         <div class="h-full sm:p-1 overflow-hidden sm:overflow-y-auto space-y-1">
                             <div v-if="projectsSelected.length > 0" v-for="project in projectsSelected"
-                                class="border h-full w-full flex flex-col sm:flex-row sm:flex sm:p-1 divide-y-2 sm:divide-y-0 rounded-md hover:shadow-md ">
+                                class="border sm:items-center max-h-full h-min w-full flex flex-col sm:flex-row sm:flex sm:p-1 divide-y-2 sm:divide-y-0 rounded-md hover:shadow-md ">
                                 <div v-if="optionsData.showProjectProgramming?.data"
                                     class="sm:w-40 h-16 sm:h-full sm:max-h-full sm:shadow-none flex items-center flex-col justify-center">
                                     <p class="font-bold">
@@ -681,9 +687,10 @@ const filterTaskMode = ref('date')
                                 </div>
                                 <div class="h-full sm:h-full p-1 w-full overflow-y-auto">
                                     <TaskProgramming type="day" @addPerson="addPerson" :movil="esMovil()"
-                                        @menu="taskRightClick" :project="project.id" :day="dates.day"
-                                        :key="dates.day.toDateString() + project.id" @drop="onDrop" :optionsData
-                                        v-model:itemDrag="personDrag" @togglePerson="togglePerson" :dataRightClick />
+                                        @menu="taskRightClick" :project="project.id" :day="dates.day" :filterTaskMode
+                                        :key="dates.day.toDateString() + project.id + filterTaskMode" @drop="onDrop"
+                                        :optionsData v-model:itemDrag="personDrag" @togglePerson="togglePerson"
+                                        :dataRightClick />
                                 </div>
                             </div>
                             <div v-else>
