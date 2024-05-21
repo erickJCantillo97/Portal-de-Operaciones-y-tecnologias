@@ -12,6 +12,9 @@ import MultiSelect from 'primevue/multiselect';
 import RadioButton from 'primevue/radiobutton';
 import Textarea from 'primevue/textarea';
 import ToggleButton from 'primevue/togglebutton';
+import { useCommonUtilities } from '@/composable/useCommonUtilities';
+import InputSwitch from 'primevue/inputswitch';
+const { byteSizeFormatter } = useCommonUtilities()
 
 const props = defineProps({
     //general
@@ -127,7 +130,7 @@ const props = defineProps({
     },
     acceptFile: {
         type: String,
-        default: '*'
+        default: null
     },
     maxSelectedLabels: {
         type: Number,
@@ -146,6 +149,10 @@ const props = defineProps({
         type: String,
         default: 'single'
     },
+    previewImage: {
+        type: Boolean,
+        default: false
+    },
     onLabel: {
         type: String,
         default: 'Si'
@@ -158,6 +165,7 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
+    //calendar
     minDate: {
         type: Date,
         default: null
@@ -170,7 +178,6 @@ const props = defineProps({
         type: Number,
         default: 4
     },
-    //calendar
     stepMinute: {
         type: Number,
         default: 30
@@ -197,6 +204,16 @@ const input = defineModel('input', {
     required: true
 })
 
+const onRemoveTemplatingFile = (removeFileCallback, index) => {
+    if (props.multiple) {
+        removeFileCallback(index);
+    }
+    else {
+        input.value = null
+        removeFileCallback(index);
+    }
+};
+
 defineEmits(['valueChange'])
 
 </script>
@@ -214,32 +231,92 @@ defineEmits(['valueChange'])
         <span v-else>
             <label v-if="label && !floatLabel" :for="id" class="mb-0.5 font-bold">{{ label }}</label>
             <span :class="!(label && !floatLabel) ? 'p-float-label' : undefined">
-                <FileUpload v-if="type == 'file'" mode="basic" :multiple :accept="acceptFile" :maxFileSize
-                    @input="input = $event.target.files[0]" class="w-full h-8" customUpload />
+                <span v-if="type == 'file'">
+                    <span v-if="mode == 'advanced'">
+                        <FileUpload mode="advanced" :multiple :accept="acceptFile" :maxFileSize
+                            @remove="input = multiple ? $event.files : $event.files[0]"
+                            @select="input = multiple ? $event.files : $event.files[0]" class="" customUpload>
+                            <template #empty>
+                                <div class="text-primary flex flex-col items-center justify-center">
+                                    <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
+                                    <p class="font-bold text-center">Arrastra aqui</p>
+                                </div>
+                            </template>
+                            <template #header="{ chooseCallback, clearCallback, files }">
+                                <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">
+                                    <div class="flex gap-2">
+                                        <Button
+                                            @click="{ !multiple ? input = null : undefined; !multiple ? clearCallback() : undefined; chooseCallback() }"
+                                            icon="fa-solid fa-file-import" text label="Seleccionar"></Button>
+                                        <Button @click="clearCallback(); input = null" icon="fa-solid fa-circle-xmark"
+                                            text severity="danger" label="Quitar todos"
+                                            :disabled="!files || files.length === 0"></Button>
+                                    </div>
+                                </div>
+                            </template>
+                            <template #content="{ files, removeFileCallback }">
+                                <div v-if="files.length > 0">
+                                    <div class="grid w-full p-0 sm:p-1 gap-2">
+                                        <div v-for="(file, index) of files" :key="file.name + file.type + file.size"
+                                            class="flex w-full border rounded-md p-2 justify-between items-center hover:bg-gray-100">
+                                            <div class="flex space-x-2 cursor-default" v-tooltip.left="file.name">
+                                                <span class="w-24 h-14 flex items-center justify-center">
+                                                    <img v-if="file.type.includes('image')" class="w-full p-1"
+                                                        :alt="file.name" :src="file.objectURL" />
+                                                    <i v-else-if="file.type.includes('pdf')"
+                                                        class="fa-solid fa-file-pdf text-6xl text-red-600" />
+                                                    <i v-else-if="file.type == 'text/plain'"
+                                                        class="fa-regular fa-file-lines text-6xl  text-gray-600" />
+                                                    <i v-else-if="file.type.includes('spreadsheet') || file.type.includes('excel')"
+                                                        class="fa-solid fa-file-excel text-6xl  text-green-600" />
+                                                    <i v-else-if="file.type.includes('word')"
+                                                        class="fa-solid fa-file-word text-6xl  text-primary" />
+                                                    <i v-else class="fa-solid fa-file text-6xl  text-gray-600" />
+                                                </span>
+                                                <div class="w-full">
+                                                    <p class="font-semibold">{{ file.name }}
+                                                    </p>
+                                                    <p class="text-xs">{{ byteSizeFormatter(file.size) }}</p>
+                                                </div>
+                                            </div>
+                                            <Button icon="fa-solid fa-trash-can" v-tooltip.rigth="'Quitar'"
+                                                @click="onRemoveTemplatingFile(removeFileCallback, index)" text
+                                                severity="danger" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </FileUpload>
+                    </span>
+                    <span v-else>
+                        <FileUpload mode="basic" :multiple :accept="acceptFile" :maxFileSize
+                            @input="input = $event.target.files[0]" class="w-full h-8" customUpload />
+                    </span>
+                </span>
                 <InputNumber v-else-if="type == 'number'" :max :min :id :disabled :placeholder :minFractionDigits
                     :maxFractionDigits class="w-full" :class="invalid ? 'p-invalid' : ''" v-model="input"
                     :aria-describedby="id + '-help'" :required :useGrouping="mode == 'currency' ? '' : useGrouping"
                     :currency="currency" :mode="mode" :suffix :prefix :pt="{ input: '!w-full !text-sm' }" />
                 <Textarea v-else-if="type == 'textarea'" :id :disabled :rows="rowsTextarea" class="w-full" :required
                     :placeholder :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" />
-                <Dropdown v-else-if="type == 'dropdown'" :optionValue :id :disabled :placeholder :options :optionLabel :emptyMessage
-                    :loading @change="$emit('change', $event)" showClear :filter="optionLabel ? true : false"
-                    :class="invalid ? 'p-invalid' : ''" v-model="input" :aria-describedby="id + '-help'" class="w-full"
-                    :pt="{
-                        root: '!h-8',
-                        input: '!py-0 !flex !items-center !text-sm !font-normal',
-                        item: '!py-1 !px-3 !text-sm !font-normal',
-                        filterInput: '!h-8'
-                    }" />
+                <Dropdown v-else-if="type == 'dropdown'" :optionValue :id :disabled :placeholder :options :optionLabel
+                    :emptyMessage :loading @change="$emit('valueChange', $event)" showClear
+                    :filter="optionLabel ? true : false" :class="invalid ? 'p-invalid' : ''" v-model="input"
+                    :aria-describedby="id + '-help'" class="w-full" :pt="{
+            root: '!h-8',
+            input: '!py-0 !flex !items-center !text-sm !font-normal',
+            item: '!py-1 !px-3 !text-sm !font-normal',
+            filterInput: '!h-8'
+        }" />
                 <Dropdown v-else-if="type == 'country'" :optionValue :id :disabled :placeholder :filterPlaceholder
                     filter resetFilterOnHide :options="countries" :loading :class="invalid ? 'p-invalid' : ''"
                     v-model="input" optionLabel="translations.spa.common" :aria-describedby="id + '-help'"
                     class="w-full" :pt="{
-                        root: '!h-8 ',
-                        input: '!py-0 !flex !items-center !text-sm !font-normal',
-                        item: '!py-1 !px-3 !text-sm !font-normal',
-                        filterInput: '!h-8'
-                    }">
+            root: '!h-8 ',
+            input: '!py-0 !flex !items-center !text-sm !font-normal',
+            item: '!py-1 !px-3 !text-sm !font-normal',
+            filterInput: '!h-8'
+        }">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class="flex space-x-1">
                             <img :src="slotProps.value.flags.svg" width="30" :alt="slotProps.value">
@@ -261,14 +338,14 @@ defineEmits(['valueChange'])
                 <MultiSelect v-else-if="type == 'multiselect'" :optionValue :id display="chip" v-model="input" :options
                     :optionLabel :loading :maxSelectedLabels :placeholder :disabled :filter="optionLabel ? true : false"
                     :class="invalid ? 'p-invalid' : ''" class="w-full" :aria-describedby="id + '-help'" :pt="{
-                        root: '!h-8',
-                        label: '!py-0.5 !flex !h-full !items-center !text-sm !font-normal',
-                        token: '!py-0 !px-1',
-                        tokenLabel: '!text-sm',
-                        item: '!py-1 !px-3 !text-sm !font-normal',
-                        filterInput: '!h-8',
-                        header: '!h-min !py-0.5'
-                    }" />
+            root: '!h-8',
+            label: '!py-0.5 !flex !h-full !items-center !text-sm !font-normal',
+            token: '!py-0 !px-1',
+            tokenLabel: '!text-sm',
+            item: '!py-1 !px-3 !text-sm !font-normal',
+            filterInput: '!h-8',
+            header: '!h-min !py-0.5'
+        }" />
                 <span v-else-if="type == 'groupcheckbox'">
                     <div class="card flex flex-wrap justify-content-center gap-3">
                         <div class="flex h-8 space-x-1 items-center" v-for="option in options" :key="option.key">
@@ -277,30 +354,33 @@ defineEmits(['valueChange'])
                         </div>
                     </div>
                 </span>
-                <ToggleButton v-else-if="type == 'tooglebutton'" v-model="input" :onLabel :offLabel
-                    :pt="{ root: '!h-8' }" />
-
+                <div v-else-if="type == 'tooglebutton'" class="">
+                    <ToggleButton v-model="input" :onLabel :offLabel :pt="{ root: '!h-8' }" />
+                </div>
+                <div v-else-if="type == 'boolean'" class="">
+                    <InputSwitch v-model="input" />
+                </div>
                 <span v-else-if="type == 'datetime'">
                     <Calendar :id v-model="input" :minDate :maxDate :placeholder showTime :required hourFormat="24"
                         showIcon :stepMinute dateFormat="dd/mm/yy" @date-select="$emit('valueChange', $event)"
                         :disabledDays :pt="{
-                            root: '!w-full',
-                            input: '!h-8'
-                        }" />
+            root: '!w-full',
+            input: '!h-8'
+        }" />
                 </span>
                 <span v-else-if="type == 'date'">
                     <Calendar :id v-model="input" :minDate :maxDate :placeholder :required showIcon :disabledDays
                         :selectionMode @date-select="$emit('valueChange', $event)" dateFormat="dd/mm/yy" :pt="{
-                            root: '!w-full',
-                            input: '!h-8 !text-center '
-                        }" />
+            root: '!w-full',
+            input: '!h-8 !text-center '
+        }" />
                 </span>
                 <span v-else-if="type == 'time'">
                     <Calendar :id v-model="input" :min-date :max-date timeOnly hourFormat="24" :placeholder :required
                         showIcon dateFormat="dd/mm/yy" :stepMinute @date-select="$emit('valueChange', $event)" :pt="{
-                            root: '!w-full',
-                            input: '!h-8'
-                        }" />
+            root: '!w-full',
+            input: '!h-8'
+        }" />
                 </span>
                 <IconField v-else-if="loading || icon" iconPosition="left" class="w-full">
                     <InputIcon :class="loading ? 'fa-solid fa-spinner animate-spin' : icon" />
@@ -311,8 +391,8 @@ defineEmits(['valueChange'])
                     <InputText size="small" :id :disabled :placeholder :class="invalid ? 'p-invalid' : ''"
                         @change="$emit('valueChange', $event)" v-model="input" :type :required
                         :aria-describedby="id + '-help'" class="w-full" :pt="{
-                            input: '!text-sm'
-                        }" />
+            input: '!text-sm'
+        }" />
                 </span>
                 <label v-if="floatLabel && label" :for="id" class="">{{ label }}</label>
             </span>

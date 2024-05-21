@@ -19,11 +19,11 @@ class TypeShip extends Model implements Auditable
     protected $appends = ['count_ships',];
 
     protected $casts = [
-        'length' => 'decimal:2',
-        'breadth' => 'decimal:2',
-        'draught' => 'decimal:2',
-        'depth' => 'decimal:2',
-        'full_load' => 'decimal:2',
+        'length' => 'integer',
+        'breadth' => 'integer',
+        'draught' => 'integer',
+        'depth' => 'integer',
+        'full_load' => 'integer',
     ];
 
     protected function render(): Attribute
