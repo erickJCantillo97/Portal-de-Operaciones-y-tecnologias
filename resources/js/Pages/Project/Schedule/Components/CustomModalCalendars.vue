@@ -212,7 +212,7 @@ function compareDates(date) {
 
     if (existeFestivo) {
         if (existeFestivo.isWorking) {
-        return 1
+            return 1
         } else {
             return 2
         }
@@ -368,12 +368,17 @@ function convertirHorasARecurrent(objeto) {
 }
 
 function save() {
-    console.log(form.value)
-    let data={
-        name:form.value.name,
-        exeptions:form.value.holidays,
-        recurrent:convertirHorasARecurrent(form.value.daysWeek)
-    } 
+    let aux = deepCopy(form.value)
+    aux.holidays.forEach((item) => {
+        item.startDay = new Date(item.startDay).toLocaleDateString('es-CO', { year: 'numeric', month: 'numeric', day: 'numeric' });
+        item.endDay = new Date(item.endDay).toLocaleDateString('es-CO', { year: 'numeric', month: 'numeric', day: 'numeric' });
+    });
+    let data = {
+        newCalendar: true,
+        name: aux.name,
+        exeptions: aux.holidays,
+        recurrent: convertirHorasARecurrent(aux.daysWeek)
+    }
     console.log(data)
 }
 
@@ -513,8 +518,8 @@ function save() {
     </CustomModal>
     <OverlayPanel ref="overlayAddExeption">
         <div class="flex flex-col w-96">
-            <CustomInput v-model:input="newExeption.description" placeholder="Descripcion del dia a agregar a exepciones"
-                label="Descripcion" />
+            <CustomInput v-model:input="newExeption.description"
+                placeholder="Descripcion del dia a agregar a exepciones" label="Descripcion" />
             <span class="grid grid-cols-2 gap-3">
                 <CustomInput v-model:input="newExeption.startDay" type="date" label="Dia inicio"
                     @value-change="newExeption.endDay = newExeption.startDay" />
