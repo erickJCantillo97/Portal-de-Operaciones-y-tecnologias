@@ -33,6 +33,9 @@ const props = defineProps({
     },
     optionsData: {
         type: Object
+    },
+    filterTaskMode: {
+        type: String
     }
 })
 
@@ -54,10 +57,13 @@ function format24h(hora) {
 
 async function getTaskDay() {
     tasks.value = { loading: true, data: [] }
-    await axios.post(route('actividadesDeultimonivelPorProyectos', props.project), { date: props.day }).then((res) => {
+    await axios.post(route('actividadesDeultimonivelPorProyectos', props.project), { date: props.day, mode: props.filterTaskMode }).then((res) => {
         tasks.value.data = res.data
-        tasks.value.loading = false
+
+    }).catch((error) => {
+        console.log(error)
     })
+    tasks.value.loading = false
 }
 getTaskDay()
 const option = ref()
@@ -86,7 +92,7 @@ function search(data, filter) {
         <div class="px-1 py-0.5">
             <IconField iconPosition="left">
                 <InputIcon class="pi pi-search"> </InputIcon>
-                <InputText v-model="input" placeholder="Filtar" :class="[type=='day'?'w-60':'w-full']" />
+                <InputText v-model="input" placeholder="Filtar" :class="[type == 'day' ? 'w-60' : 'w-full']" />
             </IconField>
         </div>
         <div v-for="task in tasks.data" class="w-full">

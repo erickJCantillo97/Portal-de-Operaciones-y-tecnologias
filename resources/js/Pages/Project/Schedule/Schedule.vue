@@ -531,7 +531,7 @@ const headerTpl = ({ currentPage, totalPages }) => `
     </dl>
     `;
 
-const footerTpl = ({ currentPage, totalPages }) => `
+const footerTpl = () => `
 <h3>© ${new Date().getFullYear()} TOP - COTECMAR</h3></div>
 `;
 const pdfExport = ref({
@@ -687,8 +687,7 @@ const url = [
         :icon="full ? 'fa-solid fa-minimize' : 'fa-solid fa-maximize'" severity="help" raised @click="full = !full" />
 </div>
 </div> -->
-            <CustomToolbar v-if="!load" :notes :listCalendar v-model:config="config" :project="props.project" v-model:gantt="ganttref.instance.value">
-            </CustomToolbar>
+            <CustomToolbar v-if="!load" :notes :listCalendar v-model:config="config" :project="props.project" v-model:gantt="ganttref.instance.value"/>
             <div v-else class="h-10 flex flex-col justify-center px-20">
                 <ProgressBar  mode="indeterminate" style="height: 6px"></ProgressBar>
             </div>
