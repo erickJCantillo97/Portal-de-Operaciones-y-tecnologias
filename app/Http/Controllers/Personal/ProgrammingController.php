@@ -543,61 +543,17 @@ class ProgrammingController extends Controller
 
         $date = Carbon::parse($request->date);
 
-        if ($date->isSunday()) {
-            return response()->json(
-                ExtendedSchedule::has('project')->has('task')->where('project_id', $project->id)
-                    // ->where('executor', 'LIKE', '%' . auth()->user()->oficina . '%')
-                    ->where('date', $date)
-                    ->get()->map(function ($task) use ($date) {
-                        return [
-                            'name' => $task['task']['name'],
-                            'id' => $task['id'],
-                            'task' => $task->task->task->name,
-                            'taskdad' => $task->task->task->name ?? '',
-                            'endDate' => $task['task']['endDate'],
-                            'startDate' => $task['task']['startDate'],
-                            'percentDone' => $task['task']['percentDone'],
-                            'shift' => $task->project->shift ? Shift::where('id', $task->project->shift)->first() : null,
-                            'employees' => DetailScheduleTime::groupBy('idUsuario')->where('idTask', $task['task']['id'])->where('fecha', $date)->select(
-                                Db::raw('MIN(nombre) as name'),
-                                Db::raw('MIN(idUsuario) as id'),
-                                Db::raw('MIN(idSchedule) as schedule'),
-                            )->get()->map(function ($d) use ($task, $date) {
-                                return [
-                                    'name' => $d->name,
-                                    'user_id' => $d->id,
-                                    'schedule' => $d->schedule,
-                                    'times' => DetailScheduleTime::where([
-                                        ['fecha', '=', $date],
-                                        ['idTask', '=', $task['id']],
-                                        ['idUsuario', '=', $d->id],
-                                    ])->get(),
-                                    'photo' =>  User::where('employeenumber',  str_pad(
-                                        $d->id,
-                                        8,
-                                        '0',
-                                        STR_PAD_LEFT
-                                    ))->first()->photo(),
-                                ];
-                            }),
-                        ];
-                    })
-            );
-        }
 
         return response()->json(
             VirtualTask::has('project')->has('task')
                 ->where('project_id', $project->id)
                 // ->where('executor', 'LIKE', '%' . auth()->user()->oficina . '%')
                 ->where('percentDone', '<', 100)
-                ->where('startDate', '<=', $date)
-                // ->where(function ($query) use ($request) {
-                //     $query->whereBetween('startdate', [$request->date_start, $request->date_end])
-                //         ->orWhereBetween('enddate', [$request->date_start, $request->date_end])
-                //         ->orWhere(function ($query) use ($request) {
-                //             $query->where('enddate', '>', $request->date_end)
-                //                 ->where('startdate', '<', $request->date_start);
-                //         });
+                // ->where('startDate', '<=', $date)
+                ->where(function ($query) use ($date) {
+                    return  $query->whereDate('enddate', '>=', $date)
+                        ->whereDate('startdate', '<=', $date);
+                })
                 ->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) use ($date) {
                     return [
                         'name' => $task['name'],
@@ -631,7 +587,7 @@ class ProgrammingController extends Controller
                             ];
                         }),
                     ];
-                }),
+                })
         );
     }
 

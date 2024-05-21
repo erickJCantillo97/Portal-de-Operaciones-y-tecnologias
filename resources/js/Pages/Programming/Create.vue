@@ -290,7 +290,7 @@ const saveCustomizedSchedule = async () => {
     await axios.post(route('programming.saveCustomizedSchedule'), {
         startShift: format24h(formEditShift.value.startShift),
         endShift: format24h(formEditShift.value.endShift),
-        schedule_time:scheduleTime.value.id
+        schedule_time: scheduleTime.value.id
     })
         .then((res) => {
             if (res.data.status) {
@@ -495,55 +495,58 @@ const optionsConfig = ref([
         field: 'progressProgramming',
         label: 'Ver avance',
         type: 'boolean',
-        default:true
+        default: true
     },
     {
         field: 'daysLateProgramming',
         label: 'Ver retraso',
         type: 'boolean',
-        default:true
+        default: true
     },
     {
         field: 'dateEndProgramming',
         label: 'Ver fecha final',
         type: 'boolean',
-        default:true
+        default: true
     },
     {
         field: 'shiftProgramming',
         label: 'Ver horario',
         type: 'boolean',
-        default:true
+        default: true
     },
     {
         field: 'showPersonProgramming',
         label: 'Mostrar personas',
         type: 'boolean',
-        default:true
+        default: true
     },
     {
         field: 'showProjectProgramming',
         label: 'Mostrar proyectos',
         type: 'boolean',
-        default:true
+        default: true
     },
     {
         field: 'colummnsProgramming',
         label: 'Cantidad de columnas',
         type: 'options',
         options: ['1', '2', '3', '4', '5', '6'],
-        default:'1'
+        default: '1'
     },
     {
         field: 'typeProgramming',
         label: 'Tipo de programacion',
         type: 'options',
         options: ['Diario', 'Semanal', 'Fin de actividad'],
-        default:'Diario'
+        default: 'Diario'
     },
 
 ])
 const optionsData = ref({})
+
+
+const filterTaskMode = ref('date')
 </script>
 
 <template>
@@ -553,7 +556,7 @@ const optionsData = ref({})
                 <div class="sm:flex gap-1 sm:justify-between h-20 sm:h-10 items-center sm:pr-1">
                     <div class="flex w-full justify-between items-center sm:w-fit space-x-4">
                         <p class="text-xl font-bold text-primary truncate">
-                            Programación
+                            Programación de Actividades
                         </p>
                         <p class="border h-min px-2 bg-primary rounded-lg text-white flex items-center">
                             {{ $page.props.auth.user.oficina }}
@@ -562,6 +565,13 @@ const optionsData = ref({})
                     <div class="sm:flex grid grid-cols-2 items-center gap-2 sm:space-x-2">
                         <MultiSelect v-model="projectsSelected" display="chip" :options="projects" optionLabel="name"
                             class="w-56 hidden sm:flex" placeholder="Seleccione un proyecto" @change="getTask()" />
+                        <ButtonGroup class="">
+                            <Button label="Hoy" :outlined="filterTaskMode != 'today'" />
+                            <Button label=" Mañana" :outlined="filterTaskMode != 'tomorrow'" />
+                            <Button label=" Atrasadas" :outlined="filterTaskMode != 'atrasadas'" />
+                            <Button label="Todas" :outlined="filterTaskMode != 'all'" />
+                        </ButtonGroup>
+
                         <Dropdown v-model="projectsSelected[0]" placeholder="Seleccione un proyecto" :options="projects"
                             optionLabel="name" @change="getTask()" class="sm:hidden flex" />
                         <ButtonGroup class="hidden sm:block">
@@ -587,18 +597,20 @@ const optionsData = ref({})
                                 <div v-for="data, index in diasSemana" class="flex w-full flex-col items-center"
                                     :class="[data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary rounded-t-md font-bold' : '']">
                                     <p class="capitalize border-b w-full truncate text-center" :key="data.key">{{
-                                data.day.toLocaleDateString('es-CO', {
-                                    weekday: 'long', year: 'numeric', month: 'numeric', day:
-                                        'numeric'
-                                }) }}
+        data.day.toLocaleDateString('es-CO', {
+            weekday: 'long', year: 'numeric', month: 'numeric', day:
+                'numeric'
+        }) }}
                                     </p>
                                 </div>
                             </span>
                         </div>
-                        <div v-if="projectsSelected.length > 0" class="h-full space-y-2 overflow-y-scroll pl-1 snap-mandatory snap-y">
+                        <div v-if="projectsSelected.length > 0"
+                            class="h-full space-y-2 overflow-y-scroll pl-1 snap-mandatory snap-y">
                             <div v-for="project in projectsSelected"
                                 class="snap-start grid-cols-10 ml-0.5 ursor-default h-full  border-indigo-200 rounded-l-md text-lg leading-6 grid">
-                                <div v-if="optionsData.showProjectProgramming?.data" class="flex flex-col items-center px-2">
+                                <div v-if="optionsData.showProjectProgramming?.data"
+                                    class="flex flex-col items-center px-2">
                                     <div class="flex h-full w-full items-center justify-center flex-col font-bold">
                                         <p>
                                             {{ project.name }}
@@ -642,11 +654,10 @@ const optionsData = ref({})
                             </div>
                         </div>
                     </div>
+
                     <div v-if="mode == 'date'"
                         class="h-full border overflow-hidden rounded-md flex flex-col justify-between">
-                        <p class="sm:block hidden w-full h-6 text-center bg-primary-light font-bold" :key="dates.key">
-                            Programacion del dia {{ dates.day.toLocaleDateString() }}
-                        </p>
+
                         <div class="h-full sm:p-1 overflow-hidden sm:overflow-y-auto space-y-1">
                             <div v-if="projectsSelected.length > 0" v-for="project in projectsSelected"
                                 class="border h-full w-full flex flex-col sm:flex-row sm:flex sm:p-1 divide-y-2 sm:divide-y-0 rounded-md hover:shadow-md ">
@@ -708,9 +719,9 @@ const optionsData = ref({})
                         </button>
                         <div class="grid grid-cols-2 space-x-1">
                             <p>{{ schedule_time.horaInicio.slice(0,
-                                schedule_time.horaInicio.lastIndexOf(':')) }}</p>
+        schedule_time.horaInicio.lastIndexOf(':')) }}</p>
                             <p>{{ schedule_time.horaFin.slice(0,
-                                schedule_time.horaFin.lastIndexOf(':')) }}</p>
+        schedule_time.horaFin.lastIndexOf(':')) }}</p>
                         </div>
                         <button @click="confirmDelete($event, schedule_time)"
                             class="rounded shadow-2xl px-1 hover:ring-1 ring-danger  hover:bg-danger-light">
@@ -734,7 +745,7 @@ const optionsData = ref({})
             </template>
         </Listbox>
         <div class="flex w-full pt-2 px-4 space-x-2 justify-center">
-            <!-- <Button label="Cancelar" severity="danger"/> -->
+            <!-- <Button label="Cancelar" /> -->
             <Button label="Programar" severity="success" />
         </div>
     </OverlayPanel>
@@ -749,9 +760,9 @@ const optionsData = ref({})
                     <p class="px-1 py-1 text-green-900 bg-green-200 rounded-md">
                         <!-- {{ scheduleTime }} -->
                         {{ format24h(scheduleTime.horaInicio.slice(0,
-                                scheduleTime.horaInicio.lastIndexOf(':'))) }}
+        scheduleTime.horaInicio.lastIndexOf(':'))) }}
                         {{ format24h(scheduleTime.horaFin.slice(0,
-                                scheduleTime.horaFin.lastIndexOf(':'))) }}
+        scheduleTime.horaFin.lastIndexOf(':'))) }}
                     </p>
                 </div>
                 <form @submit.prevent="" class="border w-full flex flex-col justify-between p-2 rounded-md space-y-3">

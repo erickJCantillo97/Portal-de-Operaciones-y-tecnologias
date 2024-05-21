@@ -346,6 +346,9 @@ const sugerenciaVisible = ref(false)
 const suggestions = ref([])
 const tipoReporte = ref('Sugerencia')
 
+
+
+
 const props = defineProps({
     optionsConfig: Array,
     href: {

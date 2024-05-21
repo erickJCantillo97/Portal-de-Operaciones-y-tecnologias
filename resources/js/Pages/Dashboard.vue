@@ -32,7 +32,8 @@ const props = defineProps({
             </div>
 
             <Task v-if="$page.props.auth.user.username == 'ecantillo'"></Task>
-            <Quotes v-if="$page.props.auth.user.oficina == 'DEEST' || $page.props.auth.user.username == 'elara'" />
+            <Quotes
+                v-if="$page.props.auth.user.oficina == 'DEEST' || $page.props.auth.user.username == 'elara' || $page.props.auth.user.oficina == 'DEPPC'" />
             <Planning v-if="$page.props.auth.user.oficina == 'DEPPC'" :projects="props.projects" />
             <!-- <Tools v-if="hasPermission('tool edit')" :projects="props.projects" /> -->
             <!-- <Projects v-else /> -->
