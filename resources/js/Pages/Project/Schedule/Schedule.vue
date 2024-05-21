@@ -19,13 +19,13 @@ const listCalendar = ref([]);
 const ganttref = ref()
 const loading = ref(false)
 const error = ref(false)
-const config=ref({
-    full:false,
-    readOnly:false,
-    canRedo:false,
-    canUndo:false,
+const config = ref({
+    full: false,
+    readOnly: false,
+    canRedo: false,
+    canUndo: false,
 })
-const load=ref(true)
+const load = ref(true)
 
 //#region funciones
 
@@ -390,17 +390,23 @@ const project = ref(
                 let gantt = ganttref.value.instance.value
                 config.value.canRedo = gantt.project.stm.canRedo
                 config.value.canUndo = gantt.project.stm.canUndo
+                gantt.zoomToFit({
+                    leftMargin: 50,
+                    rightMargin: 50
+                });
                 getNotes()
             },
             load: (e) => {
-                // onExpandAllClick()
-                // onZoomToFitClick()
                 let gantt = ganttref.value.instance.value
                 gantt.zoomOutFull();
                 gantt.expandAll();
                 listCalendar.value = e.response.calendars.rows;
                 getNotes()
-                load.value=false
+                load.value = false
+                gantt.zoomToFit({
+                    leftMargin: 50,
+                    rightMargin: 50
+                });
             }
         },
     },
@@ -508,12 +514,11 @@ const ganttConfig = ref({
     },
     keyMap: {
         // This is a function from the existing Gantt API
-        'Ctrl+Shift+Q': () => onAddTaskClick(),
-        'Ctrl+Shift+e': () => onExportPDF(),
-        'Ctrl+z': () => undo(),
-        'Ctrl+y': () => redo(),
+        'Ctrl+z': () => { ganttref.value.instance.value.project.stm.undo() },
+        'Ctrl+y': () => ganttref.value.instance.value.project.stm.redo(),
         'Ctrl+i': 'indent',
         'Ctrl+o': 'outdent',
+        'Ctrl+m': (e) => { },
     },
 })
 
@@ -600,7 +605,8 @@ const url = [
 </script>
 <template>
     <AppLayout :href="url">
-        <div id="ganttContainer" :class="config.full ? 'fixed bg-white z-50 top-0 left-0 h-screen w-screen' : 'h-full w-full'"
+        <div id="ganttContainer"
+            :class="config.full ? 'fixed bg-white z-50 top-0 left-0 h-screen w-screen' : 'h-full w-full'"
             class="flex flex-col overflow-y-auto gap-y-1">
             <div class="rounded-t-lg h-8 flex justify-between cursor-default">
                 <span class="bg-blue-800 flex justify-between rounded-tl-lg w-full">
@@ -687,16 +693,17 @@ const url = [
         :icon="full ? 'fa-solid fa-minimize' : 'fa-solid fa-maximize'" severity="help" raised @click="full = !full" />
 </div>
 </div> -->
-            <CustomToolbar v-if="!load" :notes :listCalendar v-model:config="config" :project="props.project" v-model:gantt="ganttref.instance.value"/>
+            <CustomToolbar v-if="!load" :notes :listCalendar v-model:config="config" :project="props.project"
+                v-model:gantt="ganttref.instance.value" />
             <div v-else class="h-10 flex flex-col justify-center px-20">
-                <ProgressBar  mode="indeterminate" style="height: 6px"></ProgressBar>
+                <ProgressBar mode="indeterminate" style="height: 6px"></ProgressBar>
             </div>
-            <BryntumGantt :filterFeature="true" :taskEditFeature="taskEdit"
-                :projectLinesFeature="false" :timelineScrollButtons="true" :cellEditFeature="cellEdit"
-                :pdfExportFeature="pdfExport" :mspExportFeature="true" :projectLines="true"
-                :baselinesFeature="baselines" ref="ganttref" class="h-full" :printFeature="true" v-bind="ganttConfig"
-                :dependenciesFeature="{ radius: 5 }" :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip"
-                :criticalPathsFeature="criticalPaths" :nonWorkingTimeFeature="nonWorkingTime" />
+            <BryntumGantt :filterFeature="true" :taskEditFeature="taskEdit" :projectLinesFeature="false"
+                :timelineScrollButtons="true" :cellEditFeature="cellEdit" :pdfExportFeature="pdfExport"
+                :mspExportFeature="true" :projectLines="true" :baselinesFeature="baselines" ref="ganttref"
+                class="h-full" :printFeature="true" v-bind="ganttConfig" :dependenciesFeature="{ radius: 5 }"
+                :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip" :criticalPathsFeature="criticalPaths"
+                :nonWorkingTimeFeature="nonWorkingTime" />
         </div>
     </AppLayout>
     <!-- <OverlayPanel id="setLB" ref="setLB" :pt="{ content: '!p-1' }">

@@ -356,7 +356,7 @@ const importMSP = async () => {
 </script>
 
 <template>
-    <Button raised v-tooltip.bottom="'Importar desde MSProject'" icon="fa-solid fa-upload"
+    <Button :class raised v-tooltip.bottom="'Importar desde MSProject'" icon="fa-solid fa-upload"
         @click="modalImport = true" />
 
     <CustomModal v-model:visible="modalImport" icon="fa-solid fa-upload" titulo="Importar desde project" width="80vw">

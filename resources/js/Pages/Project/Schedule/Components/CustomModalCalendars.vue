@@ -233,7 +233,7 @@ function compareDates(date) {
 
 const references = [
     { class: 'bg-white', text: 'Laborable' },
-    { class: 'bg-blue-500 text-white', text: 'Laborable exepcion' },
+    { class: 'bg-blue-500 text-white', text: 'Laborable excepción' },
     { class: 'bg-red-500 text-white', text: 'No laborable' },
     { class: 'bg-yellow-500 text-white', text: 'Descanso' },
 ]
@@ -316,7 +316,7 @@ const calendar = ref()
 const loadSaveCalendar = ref()
 const formCalendar = ref({
     project: props.project.id,
-    calendar: props.project.calendar,
+    calendar: parseInt(props.project.calendar_id),
     newCalendar: false
 })
 const toggleCalendar = (event) => {
@@ -442,7 +442,7 @@ async function save() {
                             </div>
                         </template>
                     </Calendar>
-                    <div class="grid grid-cols-2 pr-5 gap-1">
+                    <div class="grid grid-cols-2 gap-1">
                         <span v-for="reference in references" class="flex gap-1 w-full cursor-default">
                             <div :class="reference.class" class=" w-full p-1 border rounded-md h-6 flex items-center">
                                 <p v-tooltip="reference.text" class="text-center w-full truncate">{{ reference.text }}
@@ -475,36 +475,38 @@ async function save() {
                             </div>
                         </TabPanel>
                         <TabPanel header="Semana laboral">
-                            <div class="flex justify-between p-1 rounded-md">
-                                <div class="w-5/6">
-                                    <p class="font-bold text-lg">Horario normal</p>
-                                    <ul class="flex gap-1 overflow-x-auto">
-                                        <li v-for="hour, index in form.hours" class="border rounded-md p-2">
-                                            <div class="flex items-center justify-between">
-                                                <p class="font-bold text-center">Intervalo {{ index + 1 }}</p>
-                                                <Button v-tooltip="index == 0 ? 'Añadir intervalo' : 'Quitar intervalo'"
-                                                    text
-                                                    :icon="index == 0 ? 'fa-solid fa-plus' : 'fa-solid fa-trash-can'"
-                                                    :severity="index == 0 ? 'success' : 'danger'"
-                                                    @click="index == 0 ? form.hours.push(hour) : form.hours.splice(index, 1)" />
-                                            </div>
-                                            <span class="flex gap-2 w-56">
-                                                <CustomInput label="Hora inicio" v-model:input="hour.start"
-                                                    type="time" />
-                                                <CustomInput label="Hora fin" v-model:input="hour.end" type="time" />
-                                            </span>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="flex w-full justify-end items-end">
-                                    <Button v-tooltip.top="'Aplicar a todos los dias activos'" severity="success"
+                            <div class="mb-3 border p-1 rounded-md">
+                                <p class="font-bold text-center w-full text-lg">Aplicar horario a toda la semana</p>
+                                <div class="flex">
+                                    <div class="w-5/6">
+                                        <ul class="flex gap-1 overflow-x-auto">
+                                            <li v-for="hour, index in form.hours" class="border rounded-md p-2">
+                                                <div class="flex items-center justify-between">
+                                                    <p class="font-bold text-center">Intervalo {{ index + 1 }}</p>
+                                                    <Button v-tooltip="index == 0 ? 'Añadir intervalo' : 'Quitar intervalo'"
+                                                        text
+                                                        :icon="index == 0 ? 'fa-solid fa-plus' : 'fa-solid fa-trash-can'"
+                                                        :severity="index == 0 ? 'success' : 'danger'"
+                                                        @click="index == 0 ? form.hours.push(hour) : form.hours.splice(index, 1)" />
+                                                </div>
+                                                <span class="flex gap-2 w-56">
+                                                    <CustomInput label="Hora inicio" v-model:input="hour.start"
+                                                        type="time" />
+                                                    <CustomInput label="Hora fin" v-model:input="hour.end" type="time" />
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="flex w-full justify-end items-end">
+                                        <Button v-tooltip.top="'Aplicar a todos los dias activos'" severity="success"
                                         label="Aplicar" @click="applyHoursDefault"></Button>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex">
+                            <div class="border rounded-md p-1 space-y-3">
                                 <div class="flex flex-col gap-2 p-1">
-                                    <p class="font-bold">Dias activos</p>
-                                    <ul class="border flex flex-col gap-1 w-min p-3 rounded-md">
+                                    <p class="font-bold text-lg">Horario por dias</p>
+                                    <ul class="border flex gap-1 w-min p-3 rounded-md">
                                         <li v-for="day in listDays" @click="selecDayWeek = day"
                                             :class="selecDayWeek.code == day.code ? 'border-success bg-success-light' : undefined"
                                             class="border flex justify-between gap-3 items-center hover:bg-primary-light p-2 cursor-pointer rounded-md">
@@ -516,30 +518,36 @@ async function save() {
                                         </li>
                                     </ul>
                                 </div>
-                                <div class="p-7 flex flex-col h-full w-full overflow-hidden max-w-full"
+                                <div class="flex flex-col h-full w-full overflow-hidden max-w-full"
                                     v-if="selecDayWeek.code">
                                     <p class="text-lg font-bold text-center mb-2">
                                         Personalizar horario de los dias {{ selecDayWeek.name }}
                                     </p>
-                                    <ul class="flex gap-1 overflow-x-auto">
-                                        <li v-for="hour, index in form.daysWeek[selecDayWeek.code].hours"
-                                            class="border rounded-md p-2">
-                                            <div class="flex items-center justify-between">
-                                                <p class="font-bold text-center">Intervalo {{ index + 1 }}</p>
-                                                <Button v-tooltip="index == 0 ? 'Añadir intervalo' : 'Quitar intervalo'"
-                                                    text
-                                                    :icon="index == 0 ? 'fa-solid fa-plus' : 'fa-solid fa-trash-can'"
-                                                    :severity="index == 0 ? 'success' : 'danger'"
-                                                    @click="index == 0 ? form.daysWeek[selecDayWeek.code].hours.push(hour) : form.daysWeek[selecDayWeek.code].hours.splice(index, 1)" />
-                                            </div>
-                                            <span class="flex gap-2 w-56">
-                                                <CustomInput label="Hora inicio" v-model:input="hour.start"
-                                                    type="time" />
-                                                <CustomInput label="Hora fin" v-model:input="hour.end" type="time" />
-                                            </span>
-                                        </li>
-                                    </ul>
-                                    <!-- {{ form.daysWeek[selecDayWeek] ?? null }} -->
+                                    <span v-if="form.daysWeek[selecDayWeek.code].active">
+                                        <ul class="flex gap-1 overflow-x-auto">
+                                            <li v-for="hour, index in form.daysWeek[selecDayWeek.code].hours"
+                                                class="border rounded-md p-2">
+                                                <div class="flex items-center justify-between">
+                                                    <p class="font-bold text-center">Intervalo {{ index + 1 }}</p>
+                                                    <Button v-tooltip="index == 0 ? 'Añadir intervalo' : 'Quitar intervalo'"
+                                                        text
+                                                        :icon="index == 0 ? 'fa-solid fa-plus' : 'fa-solid fa-trash-can'"
+                                                        :severity="index == 0 ? 'success' : 'danger'"
+                                                        @click="index == 0 ? form.daysWeek[selecDayWeek.code].hours.push(hour) : form.daysWeek[selecDayWeek.code].hours.splice(index, 1)" />
+                                                </div>
+                                                <span class="flex gap-2 w-56">
+                                                    <CustomInput label="Hora inicio" v-model:input="hour.start"
+                                                        type="time" />
+                                                    <CustomInput label="Hora fin" v-model:input="hour.end" type="time" />
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                    <span v-else>
+                                       <p class="text-center text-danger font-bold text-lg">
+                                        Dia desactivado
+                                       </p> 
+                                    </span>
                                 </div>
                             </div>
                         </TabPanel>
@@ -581,7 +589,7 @@ async function save() {
                 <Button severity="success" v-tooltip.rigth="'Nuevo Calendario'" icon="fa-solid fa-plus"
                     @click="newCalendar" />
             </div>
-            <Dropdown v-model="formCalendar.calendar" :options="listCalendar" optionLabel="name"
+            <Dropdown v-model="formCalendar.calendar" :options="listCalendar" optionLabel="name" option-value="id" option-label="name"
                 placeholder="Seleccione un calendario" checkmark :highlightOnSelect="false" class="w-full" showClear />
         </div>
 

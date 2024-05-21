@@ -221,8 +221,6 @@ const options = ref({
     ]
 })
 
-{/* <Button raised v-tooltip.bottom="'Ver notas'" :disabled="notes.data.length == 0" :loading="notes.load"
-    severity="success" icon="fa-regular fa-note-sticky" @click="visibleNotes = true" /> */}
 
 </script>
 <template>
@@ -236,16 +234,18 @@ const options = ref({
                     </span>
                 </span>
             </span>
-            <CustomImportGantt class="ml-1" v-model:gantt="gantt" v-if="!config.readOnly" :project="props.project"/>
+            <CustomImportGantt class="ml-1" v-model:gantt="gantt" v-if="!config.readOnly" :project="props.project" />
             <CustomNotesGantt class="ml-1" :notes="notes" v-model:taskFilter="taskFilter" />
-            <CustomModalCalendars class="ml-1" v-model:gantt="gantt" :listCalendar :project="props.project" v-if="!config.readOnly" />
+            <CustomModalCalendars class="ml-1" v-model:gantt="gantt" :listCalendar :project="props.project"
+                v-if="!config.readOnly" />
             <CustomColorSelect v-if="!config.readOnly" class="ml-1" @changeColorRow="changeColorRow($event)"
                 :gama="'200'" />
             <InputText v-model="taskFilter" @input="filterChange" placeholder="Buscar por actividad"
                 class="shadow-md ml-1 hidden sm:flex" />
             <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha"
                 @dateSelect="gantt.scrollToDate(fecha, { animate: 300, block: 'start' });"
-                placeholder="Buscar por fecha" class="hidden ml-1 sm:flex !h-8 shadow-md" showIcon :pt="{ input: '!h-8' }" />
+                placeholder="Buscar por fecha" class="hidden ml-1 sm:flex !h-8 shadow-md" showIcon
+                :pt="{ input: '!h-8' }" />
         </div>
         <div class="flex">
             <CustomExportGantt v-model:gantt="gantt" :project="props.project"></CustomExportGantt>
@@ -258,45 +258,16 @@ const options = ref({
             </span>
         </div>
     </div>
-    <!--
-            
-<Button raised icon="fa-solid fa-gear" v-tooltip.bottom="'Ajustes'" severity="secondary" @click="onSettingsShow" />
-<Button raised v-tooltip.bottom="'Guardar en linea base'" icon="fa-solid fa-grip-lines" @click="setLB.toggle($event);"
-    v-if="!readOnly" />
-<Button raised v-tooltip.bottom="'Ver lineas base'" icon="fa-solid fa-eye" @click="seeLB.toggle($event)" />
-<Button raised v-tooltip.bottom="'Exportar a PDF'" icon="fa-solid fa-file-pdf" @click="showModalExport()" />
-
-<Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input" icon="fa-solid fa-upload"
-    @click="modalImport = true" />
-
-<Button raised v-tooltip.bottom="'Ruta critica'" severity="danger" icon="fa-solid fa-circle-exclamation"
-    @click="showCritical()" />
-<Button raised v-tooltip.bottom="'Guardar'" severity="success" icon="fa-solid fa-save" @click="reload"
-    v-if="!readOnly" />
-<Button raised v-tooltip.bottom="'Ver notas'" :disabled="notes.data.length == 0" :loading="notes.load"
-    severity="success" icon="fa-regular fa-note-sticky" @click="visibleNotes = true" />
-
-<Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange"
-    placeholder="Buscar por fecha" class="hidden sm:flex !h-8 shadow-md" showIcon :pt="{ input: '!h-8' }" />
-<InputText v-model="texto" @input="onFilterChange" placeholder="Buscar por actividad"
-    class="shadow-md hidden sm:flex" />
-</div>
-<div class="flex gap-1">
-    <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"
-        :icon="readOnly ? 'fa-solid fa-pen-to-square' : 'fa-solid fa-eye'" severity="help" raised @click="editMode" />
-    <Button v-tooltip.left="full ? 'Pantalla normal' : 'Pantalla completa'"
-        :icon="full ? 'fa-solid fa-minimize' : 'fa-solid fa-maximize'" severity="help" raised @click="full = !full" />
-</div> -->
-
     <OverlayPanel ref="zoom" :pt="{ content: '!p-2' }">
         <div class="flex space-x-1">
             <Button raised icon="fa-solid fa-magnifying-glass-plus" v-tooltip.bottom="'Aumentar'" severity="primary"
                 @click="gantt.zoomIn()" />
             <Button raised icon="fa-solid fa-magnifying-glass-minus" v-tooltip.bottom="'Reducir'" severity="warning"
                 @click="gantt.zoomOut()" />
-            <Button raised icon="fa-solid fa-xmark" v-tooltip.bottom="'Reestablecer'" severity="danger"
-                @click="gantt.zoomOutFull()" />
+            <Button raised icon="fa-solid fa-xmark" v-tooltip.bottom="'Reestablecer'" severity="danger" @click="gantt.zoomToFit({
+            leftMargin: 50,
+            rightMargin: 50
+        })" />
         </div>
     </OverlayPanel>
-
 </template>
