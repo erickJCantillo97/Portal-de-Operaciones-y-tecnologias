@@ -384,6 +384,7 @@ const project = ref(
             beforeSync: (data) => {
                 // console.log(data)
                 loading.value = true
+                saveState()
             },
             sync: (e) => {
                 loading.value = false
@@ -400,6 +401,8 @@ const project = ref(
                 let gantt = ganttref.value.instance.value
                 gantt.zoomOutFull();
                 gantt.expandAll();
+                const state = JSON.parse(localStorage.getItem('docs-gantt-state'));
+                if (state) gantt.state = state;
                 listCalendar.value = e.response.calendars.rows;
                 getNotes()
                 load.value = false
@@ -504,14 +507,14 @@ const ganttConfig = ref({
         },
         { type: 'addnew', text: 'Añadir Columna', autoWidth: true },
     ],
-    subGridConfigs: {
-        locked: {
-            flex: 1
-        },
-        normal: {
-            flex: 1
-        }
-    },
+    // subGridConfigs: {
+    // locked: {
+    //     flex: 1
+    // },
+    // normal: {
+    //     flex:1
+    // }
+    // },
     keyMap: {
         // This is a function from the existing Gantt API
         'Ctrl+z': () => { ganttref.value.instance.value.project.stm.undo() },
@@ -579,15 +582,6 @@ const onSettingsMarginChange = () => {
     gantt.barMargin = barMargin.value;
 }
 
-const undo = () => {
-    let gantt = ganttref.value.instance.value
-    gantt.project.stm.undo()
-}
-const redo = () => {
-    let gantt = ganttref.value.instance.value
-    gantt.project.stm.redo()
-}
-
 //#endregion
 
 const url = [
@@ -602,10 +596,20 @@ const url = [
     }
 ]
 
+function showColumns() {
+    let gantt = ganttref.value.instance.value
+    console.log(gantt.state)
+}
+
+function saveState() {
+    // console.log(e)
+    let gantt = ganttref.value.instance.value
+    localStorage.setItem('docs-gantt-state', JSON.stringify(gantt.state));
+}
 </script>
 <template>
     <AppLayout :href="url">
-        <div id="ganttContainer"
+        <div id="ganttContainer" @click="saveState"
             :class="config.full ? 'fixed bg-white z-50 top-0 left-0 h-screen w-screen' : 'h-full w-full'"
             class="flex flex-col overflow-y-auto gap-y-1">
             <div class="rounded-t-lg h-8 flex justify-between cursor-default">
@@ -616,6 +620,7 @@ const url = [
                     <p :class="config.readOnly ? 'bg-success text-white font-bold ' : 'text-white bg-warning '"
                         class="px-3 flex items-center">{{ config.readOnly ? 'Modo lectura' : 'Modo edicion' }}</p>
                 </span>
+                <Button @click="showColumns"></Button>
                 <span v-if="!error"
                     v-tooltip.bottom="loading ? 'Sincronizando cambios...' : 'Todos los cambios estan guardados'"
                     class="w-48 justify-end px-2 flex items-center space-x-2 text-white bg-success rounded-tr-lg">
