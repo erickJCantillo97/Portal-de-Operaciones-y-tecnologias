@@ -9,6 +9,7 @@ import InputText from 'primevue/inputtext';
 import Calendar from 'primevue/calendar';
 import CustomExportGantt from './CustomExportGantt.vue';
 import CustomImportGantt from './CustomImportGantt.vue';
+import Sidebar from 'primevue/sidebar';
 const toast = useToast();
 const zoom = ref()
 
@@ -19,6 +20,7 @@ const props = defineProps({
     notes: Object,
     listCalendar: Array
 })
+const visibleSidebar=ref(false)
 
 const full = defineModel('full', {
     type: Boolean,
@@ -225,37 +227,40 @@ const options = ref({
 </script>
 <template>
     <div class="px-1 flex justify-between">
-        <div class="flex flex-wrap" :key="options.key">
-            <span v-for="item, index in options.buttonLeft">
+        <div class="flex flex-wrap space-x-1" :key="options.key">
+            <span v-for="item, index in options.buttonLeft" class="">
                 <span v-if="item?.show() ?? true">
                     <span v-if="item.type == 'button'">
-                        <Button class="ml-1" raised :icon="item.icon()" :disabled="item.disabled" :text="item.text"
+                        <Button class="" raised :icon="item.icon()" :disabled="item.disabled" :text="item.text"
                             v-tooltip.bottom="item.tooltip()" :severity="item.severity" @click="item.event" />
                     </span>
                 </span>
             </span>
-            <CustomImportGantt class="ml-1" v-model:gantt="gantt" v-if="!config.readOnly" :project="props.project" />
-            <CustomNotesGantt class="ml-1" :notes="notes" v-model:taskFilter="taskFilter" />
-            <CustomModalCalendars class="ml-1" v-model:gantt="gantt" :listCalendar :project="props.project"
-                v-if="!config.readOnly" />
-            <CustomColorSelect v-if="!config.readOnly" class="ml-1" @changeColorRow="changeColorRow($event)"
-                :gama="'200'" />
-            <InputText v-model="taskFilter" @input="filterChange" placeholder="Buscar por actividad"
-                class="shadow-md ml-1 hidden sm:flex" />
-            <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha"
-                @dateSelect="gantt.scrollToDate(fecha, { animate: 300, block: 'start' });"
-                placeholder="Buscar por fecha" class="hidden ml-1 sm:flex !h-8 shadow-md" showIcon
-                :pt="{ input: '!h-8' }" />
+            <span class="flex space-x-1" >
+                <CustomImportGantt class="" v-model:gantt="gantt" v-if="!config.readOnly" :project="props.project" />
+                <CustomNotesGantt class="" :notes="notes" v-model:taskFilter="taskFilter" />
+                <CustomModalCalendars class="" v-model:gantt="gantt" :listCalendar :project="props.project"
+                    v-if="!config.readOnly" />
+                <CustomColorSelect v-if="!config.readOnly" class="" @changeColorRow="changeColorRow($event)"
+                    :gama="'200'" />
+                <InputText v-model="taskFilter" @input="filterChange" placeholder="Buscar por actividad"
+                    class="shadow-md hidden sm:flex" />
+                <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha"
+                    @dateSelect="gantt.scrollToDate(fecha, { animate: 300, block: 'start' });"
+                    placeholder="Buscar por fecha" class="hidden sm:flex !h-8 shadow-md" showIcon
+                    :pt="{ input: '!h-8' }" />
+            </span>
         </div>
-        <div class="flex">
+        <div class="flex space-x-1">
             <CustomExportGantt v-model:gantt="gantt" :project="props.project"></CustomExportGantt>
             <span v-for="item, index in options.buttonRight">
                 <span v-if="item.type == 'button' && (item?.show() ?? true)">
-                    <Button class="ml-1" :raised="item.raised" :icon="item.icon()" :disabled="item.disabled"
+                    <Button class="" :raised="item.raised" :icon="item.icon()" :disabled="item.disabled"
                         :text="item.text" v-tooltip.bottom="item.tooltip()" :severity="item.severity"
                         @click="item.event" />
                 </span>
             </span>
+            <Button @click="visibleSidebar=true" text raised icon="fa-solid fa-bars"/>
         </div>
     </div>
     <OverlayPanel ref="zoom" :pt="{ content: '!p-2' }">
@@ -270,4 +275,7 @@ const options = ref({
         })" />
         </div>
     </OverlayPanel>
+    <Sidebar v-model:visible="visibleSidebar" :showCloseIcon="false" position="right">
+     En desarrollo
+    </Sidebar>
 </template>

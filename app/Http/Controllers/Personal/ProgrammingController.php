@@ -51,9 +51,16 @@ class ProgrammingController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        $projects = Project::active()->get()->map(function ($project) {
+    public function payroll(){
+        return Inertia::render('Programming/Create', [
+            'projects' => $this->getProjectWithSchedule(),
+            'type'=>'Planillación'
+        ]);
+    }
+
+    public function getProjectWithSchedule(){
+
+        return Project::active()->get()->map(function ($project) {
             $task = VirtualTask::where('project_id', $project->id)->whereNull('task_id')->first();
             return [
                 'name' => $project->name,
@@ -63,10 +70,12 @@ class ProgrammingController extends Controller
                 'avance' => $task->percentDone ?? 0,
             ];
         });
+    }
 
-
+    public function create()
+    {
         return Inertia::render('Programming/Create', [
-            'projects' => $projects,
+            'projects' => $this->getProjectWithSchedule(),
         ]);
     }
 
