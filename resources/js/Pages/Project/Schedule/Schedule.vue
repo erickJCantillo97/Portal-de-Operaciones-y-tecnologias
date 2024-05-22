@@ -596,11 +596,6 @@ const url = [
     }
 ]
 
-function showColumns() {
-    let gantt = ganttref.value.instance.value
-    console.log(gantt.state)
-}
-
 function saveState() {
     // console.log(e)
     let gantt = ganttref.value.instance.value
@@ -620,7 +615,7 @@ function saveState() {
                     <p :class="config.readOnly ? 'bg-success text-white font-bold ' : 'text-white bg-warning '"
                         class="px-3 flex items-center">{{ config.readOnly ? 'Modo lectura' : 'Modo edicion' }}</p>
                 </span>
-                <Button @click="showColumns"></Button>
+                <!-- <Button @click="showColumns"></Button> -->
                 <span v-if="!error"
                     v-tooltip.bottom="loading ? 'Sincronizando cambios...' : 'Todos los cambios estan guardados'"
                     class="w-48 justify-end px-2 flex items-center space-x-2 text-white bg-success rounded-tr-lg">

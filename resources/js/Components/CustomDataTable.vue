@@ -171,7 +171,7 @@ onMounted(() => {
 })
 
 const getTotalStatus = (field, data) => {
-    if (props.routeData) {
+    if (dataResponse) {
         return dataResponse.value.filter(obj => obj[field] == data).length
     }
     return props.data.filter(obj => obj[field] == data).length
