@@ -477,12 +477,13 @@ class ScheduleController extends Controller
 
     public function createCalendar(Request $request, Project $project)
     {
-        //dd( $request);
-        //return "OK";
-        // $request->exeptions = [];
-        // $request->recurrent = [];
         try {
             DB::beginTransaction();
+            $exist = Calendar::where('name', $request->name)->first();
+            if ($exist) {
+                return response()->json(['status' => false, 'mensaje' => 'Ya existe un calendario con nombre: '. $request->name]);
+
+            }
             if ($request->newCalendar) {
                 $calendar = Calendar::create([
                     'name'=> $request->name,
@@ -491,22 +492,25 @@ class ScheduleController extends Controller
                     'unspecifiedTimeIsWorking' => false
                 ]);
                 $calendar->save();
+                if(count($request->exeptions) > 0) {
                 foreach ($request->exeptions as $exeption) {
                     CalendarInterval::create([
+                        'name'=>$exeption['description'],
                         'calendar_id' => $calendar->id,
-                        'isWorking' => $exeption->isWorking,
+                        'isWorking' => $exeption['isWorking'],
                         'priority' => 30,
-                        'endDate' => $exeption->endDate,
-                        'startDate' => $exeption->startDate
+                        'endDate' => Carbon::parse($exeption['endDay'])->format('Y-m-d'),
+                        'startDate' =>Carbon::parse($exeption['startDay'])->format('Y-m-d')
                     ]);
                 }
+            }
                 foreach ($request->recurrent as $recurrent) {
                     CalendarInterval::create([
                         'calendar_id' => $calendar->id,
-                        'isWorking' => $recurrent->isWorking,
+                        'isWorking' => $recurrent['isWorking'],
                         'priority' => 20,
-                        'recurrentEndDate' => 'on '.$recurrent->day.' at '.$recurrent->endHour,
-                        'recurrentStartDate' => 'on '.$recurrent->day.' at '.$recurrent->startHour,
+                        'recurrentEndDate' => 'on '.$recurrent['day'].' at '.$recurrent['endHour'],
+                        'recurrentStartDate' => 'on '.$recurrent['day'].' at '.$recurrent['startHour'],
                     ]);
                 }
                 $project->calendar_id = $calendar->id ;
