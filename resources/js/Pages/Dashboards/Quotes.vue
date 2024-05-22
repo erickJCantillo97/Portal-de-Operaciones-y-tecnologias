@@ -18,6 +18,14 @@ import BeijingAQIChart from './Quotes/BeijingAQIChart.vue';
         <!-- <DataEstimatorCard class="shadow-md" /> -->
         <!-- <TableQuotes class="shadow-md col-span-1 md:col-span-2 mt-4" /> -->
         <DataEstimatorCard class="shadow-md rounded-b-md" />
-        <TableQuotes class="shadow-md col-span-1 md:col-span-2 mt-4" />
+        <TableQuotes class="shadow-lg col-span-1 md:col-span-2 mt-4" />
+        <TableQuotes class="shadow-lg col-span-1 md:col-span-2 mt-4" />
+        <TableQuotes class="shadow-lg col-span-1 md:col-span-2 mt-4" />
+
+        <BeijingAQIChart class="w-full col-span-3 shadow-md"></BeijingAQIChart>
+
+        <BeijingAQIChart class="w-full col-span-3 shadow-md"></BeijingAQIChart>
+
+
     </div>
 </template>
