@@ -601,15 +601,14 @@ const url = [
     }
 ]
 
-function saveState(e) {
-    console.log(e)
+function saveState() {
     let gantt = ganttref.value.instance.value
     localStorage.setItem('docs-gantt-state', JSON.stringify(gantt.state));
 }
 </script>
 <template>
     <AppLayout :href="url">
-        <div id="ganttContainer"
+        <div id="ganttContainer" @click="saveState()"
             :class="config.full ? 'fixed bg-white z-50 top-0 left-0 h-screen w-screen' : 'h-full w-full'"
             class="flex flex-col overflow-y-auto gap-y-1">
             <div class="rounded-t-lg h-8 flex justify-between cursor-default">
