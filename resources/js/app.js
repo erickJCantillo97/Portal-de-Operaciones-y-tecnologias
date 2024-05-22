@@ -21,16 +21,16 @@ import Ripple from 'primevue/ripple';
 import axios from 'axios';
 
 // Configura Axios con el interceptor para manejar el error 419
-axios.interceptors.response.use(
-    response => response,
-    error => {
-        // Verificar si el error corresponde a un error 419 (Token CSRF Mismatch)
-        if (error.response && error.response.status === 419) {
-            alert('esta accion es solo para peronas logueadas')
-        }
-        return Promise.reject(error);
-    }
-);
+// axios.interceptors.response.use(
+//     response => response,
+//     error => {
+//         // Verificar si el error corresponde a un error 419 (Token CSRF Mismatch)
+//         if (error.response && error.response.status === 419) {
+//             alert('esta accion es solo para peronas logueadas')
+//         }
+//         return Promise.reject(error);
+//     }
+// );
 const appName =
     import.meta.env.VITE_APP_NAME || "Portal";
 

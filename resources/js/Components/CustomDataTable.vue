@@ -171,7 +171,7 @@ onMounted(() => {
 })
 
 const getTotalStatus = (field, data) => {
-    if (props.routeData) {
+    if (dataResponse) {
         return dataResponse.value.filter(obj => obj[field] == data).length
     }
     return props.data.filter(obj => obj[field] == data).length
@@ -578,7 +578,7 @@ async function addItem(item) {
         :titulo="item.type == 'edit' ? 'Editando registro' : 'Nuevo registro'">
         <template #body>
             <span v-if="!$slots.modal">
-                <p class="rounded bg-warning text-white text-center">En pruebas</p>
+                <!-- <p class="rounded bg-warning text-white text-center">En pruebas</p> -->
                 <div class="grid grid-cols-4 w-full gap-x-2">
                     <span v-for="col in columnas" :class="[col.input == false ? 'hidden' : 'w-full', col.input?.class]">
                         <CustomInput :disabled="dataLoading" v-if="col.input != false" :label="col.header"

@@ -13,6 +13,7 @@ class UserObserver
     {
         if ($user->gerencia == 'GEMAM')
             $user->assignRole('ADMIN PPC GEMAM');
+        
         if($user->gerencia == 'GECON' && $user->oficina == '')
         redirect('dashboard');
     }
