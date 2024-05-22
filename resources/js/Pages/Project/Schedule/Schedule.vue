@@ -19,13 +19,13 @@ const listCalendar = ref([]);
 const ganttref = ref()
 const loading = ref(false)
 const error = ref(false)
-const config=ref({
-    full:false,
-    readOnly:false,
-    canRedo:false,
-    canUndo:false,
+const config = ref({
+    full: false,
+    readOnly: false,
+    canRedo: false,
+    canUndo: false,
 })
-const load=ref(true)
+const load = ref(true)
 
 //#region funciones
 
@@ -384,23 +384,32 @@ const project = ref(
             beforeSync: (data) => {
                 // console.log(data)
                 loading.value = true
+                saveState()
             },
             sync: (e) => {
                 loading.value = false
                 let gantt = ganttref.value.instance.value
                 config.value.canRedo = gantt.project.stm.canRedo
                 config.value.canUndo = gantt.project.stm.canUndo
+                gantt.zoomToFit({
+                    leftMargin: 50,
+                    rightMargin: 50
+                });
                 getNotes()
             },
             load: (e) => {
-                // onExpandAllClick()
-                // onZoomToFitClick()
                 let gantt = ganttref.value.instance.value
                 gantt.zoomOutFull();
                 gantt.expandAll();
+                const state = JSON.parse(localStorage.getItem('docs-gantt-state'));
+                if (state) gantt.state = state;
                 listCalendar.value = e.response.calendars.rows;
                 getNotes()
-                load.value=false
+                load.value = false
+                gantt.zoomToFit({
+                    leftMargin: 50,
+                    rightMargin: 50
+                });
             }
         },
     },
@@ -498,22 +507,21 @@ const ganttConfig = ref({
         },
         { type: 'addnew', text: 'Añadir Columna', autoWidth: true },
     ],
-    subGridConfigs: {
-        locked: {
-            flex: 1
-        },
-        normal: {
-            flex: 1
-        }
-    },
+    // subGridConfigs: {
+    // locked: {
+    //     flex: 1
+    // },
+    // normal: {
+    //     flex:1
+    // }
+    // },
     keyMap: {
         // This is a function from the existing Gantt API
-        'Ctrl+Shift+Q': () => onAddTaskClick(),
-        'Ctrl+Shift+e': () => onExportPDF(),
-        'Ctrl+z': () => undo(),
-        'Ctrl+y': () => redo(),
+        'Ctrl+z': () => { ganttref.value.instance.value.project.stm.undo() },
+        'Ctrl+y': () => ganttref.value.instance.value.project.stm.redo(),
         'Ctrl+i': 'indent',
         'Ctrl+o': 'outdent',
+        'Ctrl+m': (e) => { },
     },
 })
 
@@ -574,15 +582,6 @@ const onSettingsMarginChange = () => {
     gantt.barMargin = barMargin.value;
 }
 
-const undo = () => {
-    let gantt = ganttref.value.instance.value
-    gantt.project.stm.undo()
-}
-const redo = () => {
-    let gantt = ganttref.value.instance.value
-    gantt.project.stm.redo()
-}
-
 //#endregion
 
 const url = [
@@ -597,10 +596,16 @@ const url = [
     }
 ]
 
+function saveState() {
+    // console.log(e)
+    let gantt = ganttref.value.instance.value
+    localStorage.setItem('docs-gantt-state', JSON.stringify(gantt.state));
+}
 </script>
 <template>
     <AppLayout :href="url">
-        <div id="ganttContainer" :class="config.full ? 'fixed bg-white z-50 top-0 left-0 h-screen w-screen' : 'h-full w-full'"
+        <div id="ganttContainer" @click="saveState"
+            :class="config.full ? 'fixed bg-white z-50 top-0 left-0 h-screen w-screen' : 'h-full w-full'"
             class="flex flex-col overflow-y-auto gap-y-1">
             <div class="rounded-t-lg h-8 flex justify-between cursor-default">
                 <span class="bg-blue-800 flex justify-between rounded-tl-lg w-full">
@@ -610,6 +615,7 @@ const url = [
                     <p :class="config.readOnly ? 'bg-success text-white font-bold ' : 'text-white bg-warning '"
                         class="px-3 flex items-center">{{ config.readOnly ? 'Modo lectura' : 'Modo edicion' }}</p>
                 </span>
+                <!-- <Button @click="showColumns"></Button> -->
                 <span v-if="!error"
                     v-tooltip.bottom="loading ? 'Sincronizando cambios...' : 'Todos los cambios estan guardados'"
                     class="w-48 justify-end px-2 flex items-center space-x-2 text-white bg-success rounded-tr-lg">
@@ -687,16 +693,17 @@ const url = [
         :icon="full ? 'fa-solid fa-minimize' : 'fa-solid fa-maximize'" severity="help" raised @click="full = !full" />
 </div>
 </div> -->
-            <CustomToolbar v-if="!load" :notes :listCalendar v-model:config="config" :project="props.project" v-model:gantt="ganttref.instance.value"/>
+            <CustomToolbar v-if="!load" :notes :listCalendar v-model:config="config" :project="props.project"
+                v-model:gantt="ganttref.instance.value" />
             <div v-else class="h-10 flex flex-col justify-center px-20">
-                <ProgressBar  mode="indeterminate" style="height: 6px"></ProgressBar>
+                <ProgressBar mode="indeterminate" style="height: 6px"></ProgressBar>
             </div>
-            <BryntumGantt :filterFeature="true" :taskEditFeature="taskEdit"
-                :projectLinesFeature="false" :timelineScrollButtons="true" :cellEditFeature="cellEdit"
-                :pdfExportFeature="pdfExport" :mspExportFeature="true" :projectLines="true"
-                :baselinesFeature="baselines" ref="ganttref" class="h-full" :printFeature="true" v-bind="ganttConfig"
-                :dependenciesFeature="{ radius: 5 }" :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip"
-                :criticalPathsFeature="criticalPaths" :nonWorkingTimeFeature="nonWorkingTime" />
+            <BryntumGantt :filterFeature="true" :taskEditFeature="taskEdit" :projectLinesFeature="false"
+                :timelineScrollButtons="true" :cellEditFeature="cellEdit" :pdfExportFeature="pdfExport"
+                :mspExportFeature="true" :projectLines="true" :baselinesFeature="baselines" ref="ganttref"
+                class="h-full" :printFeature="true" v-bind="ganttConfig" :dependenciesFeature="{ radius: 5 }"
+                :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip" :criticalPathsFeature="criticalPaths"
+                :nonWorkingTimeFeature="nonWorkingTime" />
         </div>
     </AppLayout>
     <!-- <OverlayPanel id="setLB" ref="setLB" :pt="{ content: '!p-1' }">
