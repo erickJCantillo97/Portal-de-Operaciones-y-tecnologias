@@ -40,7 +40,10 @@ export default {
 
       myChart.setOption(
         ({
-
+          title: {
+            text: 'Grafica De Control.',
+            subtext: 'Variaciación porcentual costo directo estimado vs ejecutado'
+          },
           tooltip: {
             trigger: 'axis',
             formatter: '{b}: {c}%',
@@ -57,6 +60,7 @@ export default {
             },
             {
               type: 'category',
+              position: 'bottom',
               axisTick: {
                 alignWithLabel: true
               },
@@ -82,7 +86,7 @@ export default {
             },
           },
           toolbox: {
-            right: 10,
+            right: 1,
             feature: {
               dataZoom: {
                 yAxisIndex: 'none'
@@ -91,17 +95,14 @@ export default {
               saveAsImage: {}
             }
           },
-          // dataZoom: [
-          //   {
-          //     start: '2015-04-01',
-          //     end: '2015-04-01',
-          //     startValue: '2015-04-01',
-          //     endValue: '2022-04-01',
-          //   },
-          //   {
-          //     type: 'inside'
-          //   }
-          // ],
+          dataZoom: [
+            {
+              start: '2015-04-01',
+              end: '2015-04-01',
+              startValue: '2015-04-01',
+              endValue: '2022-04-01',
+            }
+          ],
           visualMap: {
             top: 50,
             right: 10,
@@ -134,7 +135,7 @@ export default {
           series: [{
             label: {
               show: true,
-              position: 'top',
+              position: 'bottom',
               formatter: '{b}',
               fontSize: 10,
             },
