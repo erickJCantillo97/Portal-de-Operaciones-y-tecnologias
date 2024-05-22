@@ -377,10 +377,10 @@ function convertirHorasARecurrent(objeto) {
 
 async function save() {
     let aux = deepCopy(form.value)
-    aux.holidays.forEach((item) => {
-        item.startDay = new Date(item.startDay).toLocaleDateString('es-CO', { year: 'numeric', month: 'numeric', day: 'numeric' });
-        item.endDay = new Date(item.endDay).toLocaleDateString('es-CO', { year: 'numeric', month: 'numeric', day: 'numeric' });
-    });
+    // aux.holidays.forEach((item) => {
+    //     item.startDay = new Date(item.startDay).toLocaleDateString('es-CO', { year: 'numeric', month: 'numeric', day: 'numeric' });
+    //     item.endDay = new Date(item.endDay).toLocaleDateString('es-CO', { year: 'numeric', month: 'numeric', day: 'numeric' });
+    // });
     let data = {
         newCalendar: true,
         name: aux.name,
@@ -389,7 +389,7 @@ async function save() {
     }
     console.log(data)
     await axios.post(route('create.calendar', props.project.id), data)
-        .then(async () => {
+        .then(async (res) => {
             if (res.data.status) {
                 toast.add({
                     severity: 'success',
