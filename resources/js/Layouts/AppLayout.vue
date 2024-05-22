@@ -310,27 +310,29 @@
 <script setup>
 import {
     ChevronDownIcon, ArrowLeftCircleIcon,
-    QuestionMarkCircleIcon,
-    XCircleIcon
+    // QuestionMarkCircleIcon,
+    // XCircleIcon
 } from '@heroicons/vue/20/solid'
-const { eventListener, handleDataEvents } = useBroadcastNotifications()
-const { formatDateTime24h } = useCommonUtilities()
-const { toast } = useSweetalert()
+// const { eventListener, handleDataEvents } = useBroadcastNotifications()
+// const { formatDateTime24h } = useCommonUtilities()
+// const { toast } = useSweetalert()
 import "@/composable/push.min.js"
-import { useCommonUtilities } from '@/composable/useCommonUtilities'
-import { Menu, MenuButton, MenuItems, MenuItem, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+// import { useCommonUtilities } from '@/composable/useCommonUtilities'
+import { Menu, MenuButton, MenuItems, MenuItem,
+    //  Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot 
+    } from '@headlessui/vue'
 import { ref, onMounted } from 'vue'
 import { router, Link } from '@inertiajs/vue3'
-import { useBroadcastNotifications } from '@/composable/useBroadcastNotifications'
-import { useSweetalert } from '@/composable/sweetAlert'
+// import { useBroadcastNotifications } from '@/composable/useBroadcastNotifications'
+// import { useSweetalert } from '@/composable/sweetAlert'
 import Breadcrumb from 'primevue/breadcrumb';
 import ConfirmPopup from 'primevue/confirmpopup';
 import DolarTRM from "@/Components/DolarTRM.vue"
 import DropdownSetting from '@/Components/DropdownSetting.vue'
 import FlyoutNotificationsMenu from '@/Components/FlyoutNotificationsMenu.vue'
 import Footer from "@/Components/Footer.vue"
-import html2canvas from 'html2canvas'
-import RadioButton from 'primevue/radiobutton'
+// import html2canvas from 'html2canvas'
+// import RadioButton from 'primevue/radiobutton'
 import Toast from 'primevue/toast'
 import NotificationItem from '@/Components/NotificationItem.vue'
 import NoContentToShow from '@/Components/NoContentToShow.vue';
@@ -497,9 +499,6 @@ const navigation = [
                 dev: false,
                 show: true
             },
-            // { name: 'Programación', href: '#' },
-            // { name: 'Parte Diario', href: '#' },
-            // { name: 'Informes', href: '#' },
         ],
     },
     {
@@ -516,7 +515,7 @@ const navigation = [
             },
             {
                 name: 'Planilla',
-                href: 'programming',
+                href: 'payroll',
                 dev: true,
                 show: true,
             },
@@ -526,9 +525,6 @@ const navigation = [
                 dev: true,
                 show: true,
             },
-            // { name: 'Programación', href: '#' },
-            // { name: 'Parte Diario', href: '#' },
-            // { name: 'Informes', href: '#' },
         ],
     },
     {

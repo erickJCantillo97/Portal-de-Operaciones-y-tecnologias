@@ -27,7 +27,7 @@ const config = ref({
 })
 const load = ref(true)
 
-//#region funciones
+//#region Clases
 
 if (!Widget.factoryable.registry.resourcelist) {
     class ResourceList extends List {
@@ -148,6 +148,7 @@ if (!Widget.factoryable.registry.TaskManagerColumn) {
 
         static get defaults() {
             return {
+                id: 'manager',
                 // the column is mapped to "priority" field of the Task model
                 field: 'manager',
                 // the column title
@@ -193,7 +194,6 @@ if (!Widget.factoryable.registry.TaskManagerColumn) {
     }
     ColumnStore.registerColumnType(TaskManagerColumn);
 }
-
 if (!Widget.factoryable.registry.TaskRowcolorColumn) {
     class TaskRowcolorColumn extends Column {
         // unique alias of the column
@@ -208,6 +208,7 @@ if (!Widget.factoryable.registry.TaskRowcolorColumn) {
 
         static get defaults() {
             return {
+                id: 'rowcolor',
                 // the column is mapped to "priority" field of the Task model
                 field: 'rowcolor',
                 // the column title
@@ -410,6 +411,10 @@ const project = ref(
                     leftMargin: 50,
                     rightMargin: 50
                 });
+            },
+            loadFail: (e) => {
+                let gantt = ganttref.value.instance.value
+                gantt.project.load()
             }
         },
     },
@@ -423,10 +428,10 @@ const ganttConfig = ref({
         { id: 'wbs', type: 'wbs', text: 'EDT', autoWidth: true }, //gecon
         { id: 'sequence', type: 'sequence', text: 'Secuencia', autoWidth: true },//gemam
         {
-            type: 'manager', autoWidth: true, text: 'Responsable'  //gemam
+            id: 'manager',type: 'manager', autoWidth: true, text: 'Responsable'  //gemam
         },
         {
-            type: 'executor', autoWidth: true, text: 'Ejecutor' //gemam
+            id: 'executor', type: 'executor', autoWidth: true, text: 'Ejecutor' //gemam
         },
         { id: 'name', type: 'name', autoWidth: true, text: 'Actividad' },
         { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true, autoWidth: true },
@@ -505,7 +510,7 @@ const ganttConfig = ref({
                     `;
             }
         },
-        { type: 'addnew', text: 'Añadir Columna', autoWidth: true },
+        {  id: 'addnew', type: 'addnew', text: 'Añadir Columna', autoWidth: true },
     ],
     // subGridConfigs: {
     // locked: {
@@ -597,14 +602,13 @@ const url = [
 ]
 
 function saveState() {
-    // console.log(e)
     let gantt = ganttref.value.instance.value
     localStorage.setItem('docs-gantt-state', JSON.stringify(gantt.state));
 }
 </script>
 <template>
     <AppLayout :href="url">
-        <div id="ganttContainer" @click="saveState"
+        <div id="ganttContainer" @click="saveState()"
             :class="config.full ? 'fixed bg-white z-50 top-0 left-0 h-screen w-screen' : 'h-full w-full'"
             class="flex flex-col overflow-y-auto gap-y-1">
             <div class="rounded-t-lg h-8 flex justify-between cursor-default">
@@ -629,76 +633,12 @@ function saveState() {
                     <i class="fa-solid fa-triangle-exclamation"></i>
                 </span>
             </div>
-            <!-- <div class="px-1 flex justify-between">
-                <div class="flex flex-wrap gap-1">
-                    <Button raised icon="fa-solid fa-plus" v-tooltip.bottom="'Nueva actividad'" severity="success"
-                        @click=onAddTaskClick() v-if="!readOnly" />
-                    <Button raised icon="fa-solid fa-pen" v-tooltip.bottom="'Editar Actividad'" severity="warning"
-                        @click="onEditTaskClick()" v-if="!readOnly" />
-                    <Button icon="fa-solid fa-rotate-left" severity="secondary" @click="undo()" text
-                        :disabled="!canUndo" v-if="!readOnly" v-tooltip.bottom="'Deshacer'" />
-                    <Button icon="fa-solid fa-rotate-right" severity="secondary" @click="redo()" text
-                        :disabled="!canRedo" v-if="!readOnly" v-tooltip.bottom="'Rehacer'" />
-                    <Button raised icon="fa-solid fa-chevron-down" v-tooltip.bottom="'Expandir todo'"
-                        severity="secondary" @click="onExpandAllClick()" />
-                    <Button raised icon="fa-solid fa-chevron-up" v-tooltip.bottom="'Contraer todo'" severity="secondary"
-                        @click="onCollapseAllClick()" />
-                    <SplitButton raised v-tooltip.bottom="'Colorear'" v-if="!readOnly" :model="colors" text
-                        @click="changeColorRow(colorRow)" :pt="{
-        menu: {
-            root: 'flex',
-            menu: 'grid grid-cols-6 items-center gap-1 flex-wrap space-y-0',
-            menuitem: 'm-0 w-min'
-        }
-    }">
-                        <template #icon>
-                            <div :class="colorRow" class="w-8 h-6"></div>
-                        </template>
-<template #menubuttonicon>
-                            <i class="fa-solid fa-fill-drip"></i>
-                        </template>
-<template #item="{ item }">
-                            <div :class="item.value" v-tooltip="item.name" @click="changeColorRow(item.value)"
-                                class="w-8 h-6 border cursor-pointer hover:ring-1" />
-                        </template>
-</SplitButton>
-<Button raised icon="fa-solid fa-gear" v-tooltip.bottom="'Ajustes'" severity="secondary" @click="onSettingsShow" />
-<Button raised icon="fa-solid fa-magnifying-glass" v-tooltip.bottom="'Zoom'" severity="secondary"
-    @click="zoom.toggle($event)" />
-<Button raised v-tooltip.bottom="'Agregar Calendario'" icon="fa-regular fa-calendar-plus" v-if="!readOnly"
-    @click="toggleCalendar" />
-<Button raised v-tooltip.bottom="'Guardar en linea base'" icon="fa-solid fa-grip-lines" @click="setLB.toggle($event);"
-    v-if="!readOnly" />
-<Button raised v-tooltip.bottom="'Ver lineas base'" icon="fa-solid fa-eye" @click="seeLB.toggle($event)" />
-<Button raised v-tooltip.bottom="'Exportar a PDF'" icon="fa-solid fa-file-pdf" @click="showModalExport()" />
-<Button raised v-tooltip.bottom="'Exportar a XML'" icon="fa-solid fa-file-arrow-down" @click="onExport()" />
-<Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input" icon="fa-solid fa-upload"
-    @click="modalImport = true" />
-<Button raised v-tooltip.bottom="'Ruta critica'" severity="danger" icon="fa-solid fa-circle-exclamation"
-    @click="showCritical()" />
-<Button raised v-tooltip.bottom="'Guardar'" severity="success" icon="fa-solid fa-save" @click="reload"
-    v-if="!readOnly" />
-<Button raised v-tooltip.bottom="'Ver notas'" :disabled="notes.data.length == 0" :loading="notes.load"
-    severity="success" icon="fa-regular fa-note-sticky" @click="visibleNotes = true" />
-
-<Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange"
-    placeholder="Buscar por fecha" class="hidden sm:flex !h-8 shadow-md" showIcon :pt="{ input: '!h-8' }" />
-<InputText v-model="texto" @input="onFilterChange" placeholder="Buscar por actividad"
-    class="shadow-md hidden sm:flex" />
-</div>
-<div class="flex gap-1">
-    <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"
-        :icon="readOnly ? 'fa-solid fa-pen-to-square' : 'fa-solid fa-eye'" severity="help" raised @click="editMode" />
-    <Button v-tooltip.left="full ? 'Pantalla normal' : 'Pantalla completa'"
-        :icon="full ? 'fa-solid fa-minimize' : 'fa-solid fa-maximize'" severity="help" raised @click="full = !full" />
-</div>
-</div> -->
             <CustomToolbar v-if="!load" :notes :listCalendar v-model:config="config" :project="props.project"
                 v-model:gantt="ganttref.instance.value" />
             <div v-else class="h-10 flex flex-col justify-center px-20">
                 <ProgressBar mode="indeterminate" style="height: 6px"></ProgressBar>
             </div>
-            <BryntumGantt :filterFeature="true" :taskEditFeature="taskEdit" :projectLinesFeature="false"
+            <BryntumGantt @catchAll="saveState" :filterFeature="true" :taskEditFeature="taskEdit" :projectLinesFeature="false"
                 :timelineScrollButtons="true" :cellEditFeature="cellEdit" :pdfExportFeature="pdfExport"
                 :mspExportFeature="true" :projectLines="true" :baselinesFeature="baselines" ref="ganttref"
                 class="h-full" :printFeature="true" v-bind="ganttConfig" :dependenciesFeature="{ radius: 5 }"

@@ -364,7 +364,7 @@ function convertirHorasARecurrent(objeto) {
             const startHour = new Date(hora.start).toLocaleTimeString('es-CO', { hour12: false, hour: '2-digit', minute: '2-digit' });
             const endHour = new Date(hora.end).toLocaleTimeString('es-CO', { hour12: false, hour: '2-digit', minute: '2-digit' });
             resultado.push({
-                isWorking: true,
+                isWorking: objeto[dia].active,
                 day: dia,
                 startHour,
                 endHour
@@ -377,10 +377,11 @@ function convertirHorasARecurrent(objeto) {
 
 async function save() {
     let aux = deepCopy(form.value)
-    aux.holidays.forEach((item) => {
-        item.startDay = new Date(item.startDay).toLocaleDateString('es-CO', { year: 'numeric', month: 'numeric', day: 'numeric' });
-        item.endDay = new Date(item.endDay).toLocaleDateString('es-CO', { year: 'numeric', month: 'numeric', day: 'numeric' });
-    });
+    // aux.holidays.forEach((item) => {
+    //     item.startDay = new Date(item.startDay).toLocaleDateString('es-CO', { year: 'numeric', month: 'numeric', day: 'numeric' });
+    //     item.endDay = new Date(item.endDay).toLocaleDateString('es-CO', { year: 'numeric', month: 'numeric', day: 'numeric' });
+    // });
+    console.log(aux)
     let data = {
         newCalendar: true,
         name: aux.name,
@@ -389,7 +390,7 @@ async function save() {
     }
     console.log(data)
     await axios.post(route('create.calendar', props.project.id), data)
-        .then(async () => {
+        .then(async (res) => {
             if (res.data.status) {
                 toast.add({
                     severity: 'success',
