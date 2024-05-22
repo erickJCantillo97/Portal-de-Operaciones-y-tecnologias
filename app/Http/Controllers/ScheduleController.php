@@ -482,7 +482,6 @@ class ScheduleController extends Controller
             $exist = Calendar::where('name', $request->name)->first();
             if ($exist) {
                 return response()->json(['status' => false, 'mensaje' => 'Ya existe un calendario con nombre: '. $request->name]);
-
             }
             if ($request->newCalendar) {
                 $calendar = Calendar::create([
@@ -505,13 +504,23 @@ class ScheduleController extends Controller
                 }
             }
                 foreach ($request->recurrent as $recurrent) {
-                    CalendarInterval::create([
-                        'calendar_id' => $calendar->id,
-                        'isWorking' => $recurrent['isWorking'],
-                        'priority' => 20,
-                        'recurrentEndDate' => 'on '.$recurrent['day'].' at '.$recurrent['endHour'],
-                        'recurrentStartDate' => 'on '.$recurrent['day'].' at '.$recurrent['startHour'],
-                    ]);
+                    if($recurrent['isWorking']){
+                        CalendarInterval::firstOrCreate([
+                            'calendar_id' => $calendar->id,
+                            'isWorking' => $recurrent['isWorking'],
+                            'priority' => 20,
+                            'recurrentEndDate' => 'on '.$recurrent['day'].' at '.$recurrent['endHour'],
+                            'recurrentStartDate' => 'on '.$recurrent['day'].' at '.$recurrent['startHour'],
+                        ]);
+                    }else{
+                        CalendarInterval::firstOrCreate([
+                            'calendar_id' => $calendar->id,
+                            'isWorking' => $recurrent['isWorking'],
+                            'priority' => 20,
+                            'recurrentEndDate' => 'on '.strtoupper(Carbon::createFromFormat('l',$recurrent['day'])->addDay()->format('l')).' at 00:00',
+                            'recurrentStartDate' => 'on '.$recurrent['day'].' at 00:00',
+                        ]); 
+                    }
                 }
                 $project->calendar_id = $calendar->id ;
                 $project->save();
