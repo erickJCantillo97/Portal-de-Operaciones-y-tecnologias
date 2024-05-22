@@ -364,7 +364,7 @@ function convertirHorasARecurrent(objeto) {
             const startHour = new Date(hora.start).toLocaleTimeString('es-CO', { hour12: false, hour: '2-digit', minute: '2-digit' });
             const endHour = new Date(hora.end).toLocaleTimeString('es-CO', { hour12: false, hour: '2-digit', minute: '2-digit' });
             resultado.push({
-                isWorking: true,
+                isWorking: objeto[dia].active,
                 day: dia,
                 startHour,
                 endHour
@@ -381,6 +381,7 @@ async function save() {
     //     item.startDay = new Date(item.startDay).toLocaleDateString('es-CO', { year: 'numeric', month: 'numeric', day: 'numeric' });
     //     item.endDay = new Date(item.endDay).toLocaleDateString('es-CO', { year: 'numeric', month: 'numeric', day: 'numeric' });
     // });
+    console.log(aux)
     let data = {
         newCalendar: true,
         name: aux.name,
