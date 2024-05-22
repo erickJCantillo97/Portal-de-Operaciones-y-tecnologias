@@ -558,7 +558,8 @@ class ProgrammingController extends Controller
             });
         } else {
             $query->where(function ($query) use ($date) {
-                return  $query->whereDate('enddate', '>=', $date)
+                return  $query->whereDate('enddate', '<=', $date)
+
                     ->where('percentDone', '<', 100);
             });
         }
