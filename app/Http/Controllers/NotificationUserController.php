@@ -13,7 +13,7 @@ class NotificationUserController extends Controller
      */
     public function index()
     {
-        $notifications = NotificationUser::orderBy('date', 'DESC')->take(9)->get();
+        $notifications = NotificationUser::orderBy('date', 'DESC')->take(10)->get();
 
         return response()->json([
             'notifications' => $notifications,
@@ -40,7 +40,7 @@ class NotificationUserController extends Controller
         try {
             NotificationUser::create($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
     }
 
@@ -72,7 +72,7 @@ class NotificationUserController extends Controller
         try {
             $notificationUser->update($validateData);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
         }
     }
 
@@ -84,7 +84,7 @@ class NotificationUserController extends Controller
         try {
             NotificationUser::find($getNotification)->delete();
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
+            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
         }
     }
 }

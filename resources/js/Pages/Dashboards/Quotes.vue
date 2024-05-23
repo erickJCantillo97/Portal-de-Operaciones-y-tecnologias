@@ -24,7 +24,7 @@ import BeijingAQIChart from './Quotes/BeijingAQIChart.vue';
 
         <BeijingAQIChart class="w-full col-span-3 shadow-md"></BeijingAQIChart>
 
-        <BeijingAQIChart class="w-full col-span-3 shadow-md"></BeijingAQIChart>
+        <!-- <BeijingAQIChart class="w-full col-span-3 shadow-md"></BeijingAQIChart> -->
 
 
     </div>
