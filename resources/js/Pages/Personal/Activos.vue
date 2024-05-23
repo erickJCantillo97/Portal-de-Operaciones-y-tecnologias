@@ -1,24 +1,10 @@
 <script setup>
-import { useCommonUtilities } from '@/composable/useCommonUtilities';
-import '../../../sass/dataTableCustomized.scss';
-import { FilterMatchMode } from 'primevue/api';
-import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
 import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import Button from '../../Components/Button.vue';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
-import UserTable from '@/Components/UserTable.vue';
 import CustomDataTable from '@/Components/CustomDataTable.vue';
-
-const { currencyFormat, formatDate } = useCommonUtilities()
 
 const props = defineProps({
     personal: Array
-})
-
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 
 const columnas = [
@@ -40,7 +26,8 @@ const url = [
 </script>
 <template>
     <AppLayout :href="url">
-        <CustomDataTable class="w-full" exportRute="export.personal" :data="personal" :columnas :rows-default="100" />
-
+        <div class="w-full h-full">
+            <CustomDataTable class="w-full" exportRute="export.personal" :data="personal" :columnas :rows-default="100" />
+        </div>
     </AppLayout>
 </template>
