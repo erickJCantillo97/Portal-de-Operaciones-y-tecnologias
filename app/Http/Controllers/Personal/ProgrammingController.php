@@ -51,14 +51,16 @@ class ProgrammingController extends Controller
         ]);
     }
 
-    public function payroll(){
+    public function payroll()
+    {
         return Inertia::render('Programming/Create', [
             'projects' => $this->getProjectWithSchedule(),
-            'type'=>'Planillación'
+            'type' => 'Planillación'
         ]);
     }
 
-    public function getProjectWithSchedule(){
+    public function getProjectWithSchedule()
+    {
 
         return Project::active()->get()->map(function ($project) {
             $task = VirtualTask::where('project_id', $project->id)->whereNull('task_id')->first();
@@ -123,6 +125,7 @@ class ProgrammingController extends Controller
                 'task_id' => 'required',
                 'employee_id' => 'required',
                 'name' => 'required',
+                'costo_hora' => 'required',
                 'fecha' => 'required|date', //fecha seleccionada del calendario
             ]);
             $date = Carbon::parse($validateData['fecha']);
@@ -139,7 +142,7 @@ class ProgrammingController extends Controller
                 $conflict[$date->format('Y-m-d')] = $exist;
                 $status = false;
             } else {
-                $employee = Employee::where('Num_SAP', 'LIKE', '%' . $validateData['employee_id'])->first();
+                // $employee = Employee::where('Num_SAP', 'LIKE', '%' . $validateData['employee_id'])->first();
                 $schedule = Schedule::firstOrNew([
                     'task_id' => $validateData['task_id'],
                     'employee_id' => $validateData['employee_id'],
@@ -160,7 +163,7 @@ class ProgrammingController extends Controller
                     'resource' => $validateData['employee_id'],
                     'units' => 100,
                     'name' => $validateData['name'],
-                    'costo_hora' => $employee->Costo_Hora,
+                    'costo_hora' => $validateData['costo_hora'],
                 ]);
                 $status = true;
             }
@@ -323,12 +326,6 @@ class ProgrammingController extends Controller
                     ['idTask', '=', $task],
                     ['idUsuario', '=', $d->id],
                 ])->get(),
-                'photo' =>  User::where('employeenumber',  str_pad(
-                    $d->id,
-                    8,
-                    '0',
-                    STR_PAD_LEFT
-                ))->first()->photo(),
             ];
         });
         // return Schedule::where('fecha', $fecha)->with('scheduleTimes')->where('task_id', $taskId)->get()->sortBy([
@@ -574,9 +571,6 @@ class ProgrammingController extends Controller
         }
         // ->where('startDate', '<=', $date)
 
-
-
-
         return response()->json(
             $query->whereNotIn('id', array_unique($taskWithSubTasks))->get()->map(function ($task) use ($date) {
                 return [
@@ -602,12 +596,6 @@ class ProgrammingController extends Controller
                                 ['idTask', '=', $task['id']],
                                 ['idUsuario', '=', $d->id],
                             ])->get(),
-                            'photo' =>  User::where('employeenumber',  str_pad(
-                                $d->id,
-                                8,
-                                '0',
-                                STR_PAD_LEFT
-                            ))->first()->photo(),
                         ];
                     }),
                 ];

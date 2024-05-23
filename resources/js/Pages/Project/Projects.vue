@@ -31,7 +31,7 @@ const { toast } = useSweetalert()
 const { confirmDelete } = useSweetalert()
 
 const addAct = (event, p) => {
-    router.get(route('createSchedule.create',p.uuid ))
+    router.get(route('createSchedule.create', p.uuid))
     // projectSelect.value = p
     // op.value.toggle(event)
 }
@@ -179,7 +179,7 @@ const buttons = [
 ]
 
 const goToProjectOverview = (event, data) => {
-    
+
     try {
         router.get(route('projects.goToProjectOverview', data.id))
     } catch (error) {
@@ -208,9 +208,9 @@ const routes = {
 <template>
     <AppLayout :href="url">
         <div class="w-full h-full overflow-y-auto">
-            <CustomDataTable :routes  title="Proyectos" :filterButtons="filterButtons" :data="projects" :rows-default="100"
-                :columnas="columnas" :actions="buttons" @addDoc="addDoc" @addAct="addAct" @editClic="editClic"
-                @deleteClic="deleteClic" @goToProjectOverview="goToProjectOverview">
+            <CustomDataTable :routes title="Proyectos" :filterButtons="filterButtons" :data="projects"
+                :rows-default="100" :columnas="columnas" :actions="buttons" @addDoc="addDoc" @addAct="addAct"
+                @editClic="editClic" @deleteClic="deleteClic" @buttonRowClick="goToProjectOverview">
                 <template #buttonHeader>
                     <Button @click="addItem" severity="success" v-if="hasPermission('projects create')"
                         icon="fa-solid fa-plus" label="Agregar" outlined />
