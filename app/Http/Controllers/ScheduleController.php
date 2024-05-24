@@ -52,6 +52,15 @@ class ScheduleController extends Controller
     public function get(Project $project)
     {
         $project->programming_resources = 'CARGO';
+        $projectWithCalendar = ProjectWithCalendar::where('project_id',$project->id)->select('calendar_id')->get()->map(function ($item){
+            return intval($item->calendar_id);
+        })->toArray();
+        $assignCalendar = Calendar::whereIn('id',$projectWithCalendar)->get();
+        $assignCalendar = $assignCalendar->each(function ($item) {
+                $item->exeptions = CalendarInterval::where('calendar_id',$item->id)->whereNotNull('startDate')->get()->toArray();
+                $item->intervals = CalendarInterval::where('calendar_id',$item->id)->whereNotNull('recurrentEndDate')->get()->toArray();
+        });
+       // return $assignCalendar;
         $personal = getPersonalUser()->map(function ($p) {
             return [
                 'id' => $p['Num_SAP'],
@@ -96,7 +105,7 @@ class ScheduleController extends Controller
             'success' => true,
             'project' =>  [
                 'calendar' => intval($project->calendar_id), // calendario por defecto
-                'startDate' => "2024-04-04T06:30:00",
+                'startDate' => $project->start_date,
                 'hoursPerDay' => doubleval($project->hoursPerDay),
                 'daysPerWeek' => doubleval($project->daysPerWeek),
                 'daysPerMonth' => doubleval($project->daysPerMonth),
@@ -113,7 +122,7 @@ class ScheduleController extends Controller
             'assignments' => ['rows' => Assignment::get()],
             'timeRanges' => ['rows' => []],
             'shift' => Shift::whereNull('user')->select('id', 'name')->get()->toArray(),
-            'assignCalendar' => Calendar::all()->select('id', 'name')->toArray()
+            'assignCalendar' => $assignCalendar
         ]);
     }
 
@@ -168,10 +177,8 @@ class ScheduleController extends Controller
         $rowsDependecy = [];
         $removedDependecy = [];
         $assgimentRows = [];
-        // $removedAssignments = [];
         $calendars = [];
         $calendarsDetails = [];
-        //return dd($request->calendars['added']);
         if (isset($request->tasks['added'])) {
             foreach ($request->tasks['added'] as $task) {
                 if (!isset($task['parentId'])) {
@@ -210,7 +217,6 @@ class ScheduleController extends Controller
         if (isset($request->tasks['updated'])) {
            
             foreach ($request->tasks['updated'] as $task) {
-                //return  $task['note'];
                 $taskUpdate = Task::where('id', $task['id'])->first();
                 $taskUpdate->update([
                     'name' => $task['name'] ?? $taskUpdate->name,
@@ -224,7 +230,7 @@ class ScheduleController extends Controller
                     'manager' => $task['manager'] ?? $taskUpdate->manager,
                     'manuallyScheduled' => $task['manuallyScheduled'] ?? $taskUpdate->manuallyScheduled,
                     'parentIndex' => $task['parentIndex'] ?? intval($taskUpdate->parentIndex),
-                    'note' => isset($task['note']) == true ?$task['note']: $taskUpdate->note,
+                    'note' => $request->has("tasks.updated.0.note") ? $task['note']: $taskUpdate->note,
                     'calendar_id' => $task['calendar'] ?? $taskUpdate->calendar,
                     'rowcolor' => $task['rowcolor'] ?? $taskUpdate->rowcolor
                 ]);
@@ -427,7 +433,7 @@ class ScheduleController extends Controller
             $project->direction = $request->project['added']['direction'];
             $project->daysPerWeek = $request->project['added']['daysPerWeek'];
             $project->hoursPerDay = $request->project['added']['hoursPerDay'];
-            $project->startDate = $request->project['added']['startDate'];
+            $project->start_date = $request->project['added']['startDate'];
             $project->update();
         }
         return response()->json([

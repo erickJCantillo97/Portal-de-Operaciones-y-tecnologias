@@ -22,7 +22,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
-
+use App\Models\Projects\Calendar;
+use App\Models\Projects\CalendarInterval;
+use App\Models\Projects\ProjectWithCalendar;
 class ProjectController extends Controller
 {
     public function __construct()
@@ -60,7 +62,8 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request);
+        
+      
         $validateData = $request->validate([
             'name' => 'required|unique:projects,name',
             'contract_id' => 'nullable',
@@ -79,12 +82,39 @@ class ProjectController extends Controller
             'daysPerWeek' => 'nullable',
             'daysPerMonth' => 'nullable',
             'shift' => 'nullable',
+            'calendar_id'=> 'nullable',
             // 'ships' => 'nullable|array'
         ]);
-
         try {
             $validateData['gerencia'] = auth()->user()->gerencia;
             $validateData['shift'] = 1;
+        
+            //creación y asignación del calendario por defecto al proyecto
+            $calendar = Calendar::create([
+                'name'=> 'Calendario Predeterminado',
+                'expanded'=>1,
+                'version'=> 2,
+                'unspecifiedTimeIsWorking' => false
+            ]);
+            $calendar->save();
+            $days = explode(',','MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY,SATURDAY,SUNDAY');
+            foreach ($days as $day) {
+                CalendarInterval::create([
+                    'calendar_id' => $calendar->id,
+                    'isWorking' => true,
+                    'priority' => 30,
+                    'recurrentEndDate' => 'on '.$day.' at 12:00',
+                    'recurrentStartDate' =>'on '.$day.' at 07:00'
+                ]);
+                CalendarInterval::create([
+                    'calendar_id' => $calendar->id,
+                    'isWorking' => true,
+                    'priority' => 30,
+                    'recurrentEndDate' => 'on '.$day.' at 16:30',
+                    'recurrentStartDate' =>'on '.$day.' at 13:00'
+                ]);
+            }
+            $validateData['calendar_id'] = $calendar->id;
             $project = Project::create($validateData);
             foreach ($request->ships as $ship) {
                 ProjectsShip::create([
@@ -92,11 +122,14 @@ class ProjectController extends Controller
                     'ship_id' => $ship,
                 ]);
             }
+            ProjectWithCalendar::firstOrCreate([
+                'project_id' => $project->id,
+                'calendar_id' => $calendar->id
+            ]);
             Mail::to([$project->contract->quote->customer->email])->send(
                 new CreateProjectMail($project, $project->contract->quote->customer->name)
             );
-
-
+         
             return response()->json([
                 'project_id' => $project->id
             ]);
