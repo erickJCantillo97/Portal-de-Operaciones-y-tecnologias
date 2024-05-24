@@ -26,8 +26,8 @@ const toast = useToast();
 
 defineProps({
     projects: Array,
-    type:{
-        default:'Programación'
+    type: {
+        default: 'Programación'
     }
 })
 
@@ -224,7 +224,7 @@ async function onDrop(task, fecha) {
                 toast.add({ severity: 'error', group: "customToast", text: 'No se puede mover a otra fecha, use copiar', life: 2000 })
             }
         } else {
-            await axios.post(route('programming.store'), { task_id: task.id, employee_id: personDrag.value.Num_SAP, name: personDrag.value.Nombres_Apellidos, fecha })
+            await axios.post(route('programming.store'), { task_id: task.id, employee: personDrag.value, fecha, start: task.shift.startShift, end: task.shift.endShift })
                 .then((res) => {
                     if (res.data.status) {
                         toast.add({ severity: 'success', group: "customToast", text: 'Persona programada', life: 2000 })
@@ -558,7 +558,7 @@ const filterTaskMode = ref(null)
                 <div class="sm:flex gap-1 sm:justify-between h-20 sm:h-10 items-center sm:pr-1">
                     <div class="flex w-full justify-between items-center sm:w-fit space-x-4">
                         <p class="text-xl font-bold text-primary truncate">
-                            {{type}}
+                            {{ type }}
                         </p>
                         <p class="border h-min px-2 bg-primary rounded-lg text-white flex items-center">
                             {{ $page.props.auth.user.oficina }}
@@ -569,15 +569,17 @@ const filterTaskMode = ref(null)
                             class="w-56 hidden sm:flex" placeholder="Seleccione un proyecto" @change="getTask()" />
                         <!-- {{ dates.day. }} -->
                         <ButtonGroup>
-                        <Button :icon="filterTaskMode == 'atrasadas'?'fa-solid fa-filter':undefined" label="Atrasadas"
-                            @click="filterTaskMode == 'atrasadas' ? filterTaskMode = null : filterTaskMode = 'atrasadas'"
-                            :outlined="filterTaskMode != 'atrasadas'" />
-                        <Button :icon="filterTaskMode == 'all'?'fa-solid fa-filter':undefined" label="Todas" @click="filterTaskMode == 'all' ? filterTaskMode = null : filterTaskMode = 'all'"
-                            :outlined="filterTaskMode != 'all'" />
+                            <Button :icon="filterTaskMode == 'atrasadas' ? 'fa-solid fa-filter' : undefined"
+                                label="Atrasadas"
+                                @click="filterTaskMode == 'atrasadas' ? filterTaskMode = null : filterTaskMode = 'atrasadas'"
+                                :outlined="filterTaskMode != 'atrasadas'" />
+                            <Button :icon="filterTaskMode == 'all' ? 'fa-solid fa-filter' : undefined" label="Todas"
+                                @click="filterTaskMode == 'all' ? filterTaskMode = null : filterTaskMode = 'all'"
+                                :outlined="filterTaskMode != 'all'" />
                         </ButtonGroup>
                         <Dropdown v-model="projectsSelected[0]" placeholder="Seleccione un proyecto" :options="projects"
                             optionLabel="name" @change="getTask()" class="sm:hidden flex" />
-                            <ButtonGroup class="">
+                        <ButtonGroup class="">
                             <Button label="Hoy" v-if="mode != 'week'" @click="dates.day = new Date()"
                                 :outlined="(dates.day.toDateString() != new Date().toDateString())" />
                             <Button label="Mañana" v-if="mode != 'week'"
@@ -639,9 +641,9 @@ const filterTaskMode = ref(null)
                                     <div v-for="data, index in diasSemana" class="flex flex-col h-full items-center"
                                         :class="[index > 5 ? 'bg-warning-light' : '', data.day.toISOString().split('T')[0] == date.toISOString().split('T')[0] ? 'bg-secondary' : '']">
                                         <TaskProgramming :project="project.id" :day="data.day" @menu="taskRightClick"
-                                            :key="dates.day + project.id + mode + filterTaskMode" type="week" @drop="onDrop" :filterTaskMode
-                                            v-model:itemDrag="personDrag" @togglePerson="togglePerson" :dataRightClick
-                                            :optionsData />
+                                            :key="dates.day + project.id + mode + filterTaskMode" type="week"
+                                            @drop="onDrop" :filterTaskMode v-model:itemDrag="personDrag"
+                                            @togglePerson="togglePerson" :dataRightClick :optionsData />
                                     </div>
                                 </span>
                             </div>

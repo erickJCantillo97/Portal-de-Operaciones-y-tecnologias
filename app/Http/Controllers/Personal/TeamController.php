@@ -37,35 +37,33 @@ class TeamController extends Controller
             'description' => 'required',
         ]);
 
-        $status = true;
+        // $status = true;
         try {
             DB::beginTransaction();
             $validateData['user_id'] = auth()->user()->id;
             $validateData['gerencia'] = auth()->user()->gerencia;
-            $team = Team::create($validateData);
-            if ($team && $status) {
-                foreach ($request->personal as $persona) {
-                    if ($status) {
-                        $workingTeams = WorkingTeams::create([
-                            'user_num_sap' => $persona['Num_SAP'],
-                            'team_id' => $team->id,
-                            'user_id' => auth()->user()->id
-                        ]);
-                        $status = $workingTeams;
-                    }
-                }
-            }
-            $status = $team && $status;
+            Team::create($validateData);
+            // if ($team && $status) {
+            //     foreach ($request->personal as $persona) {
+            //         if ($status) {
+            //             $workingTeams = WorkingTeams::create([
+            //                 'user_num_sap' => $persona['Num_SAP'],
+            //                 'team_id' => $team->id,
+            //                 'user_id' => auth()->user()->id
+            //             ]);
+            //             $status = $workingTeams;
+            //         }
+            //     }
+            // }
+            // $status = $team && $status;
+            // if ($status) {
+            DB::commit();
+            return response()->json(['status' => true, 'mensaje' => 'Grupo creado']);
+            // }
         } catch (Exception $e) {
             DB::rollBack();
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
-        }
-        if ($status) {
-            DB::commit();
-            return back()->with('message', 'Grupo Creado');
-        } else {
-            DB::rollBack();
-            return back()->withErrors('message', 'Ocurrio un Error Al Crear el Grupo');
+            return response()->json(['status' => false, 'mensaje' => 'Error no controlado ', 'error' => $e]);
+            // return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
     }
 
@@ -91,13 +89,16 @@ class TeamController extends Controller
     public function update(Request $request, Team $team)
     {
         $validateData = $request->validate([
-            //
+            'name' => 'required|max:20',
+            'description' => 'required',
         ]);
-
         try {
+            DB::beginTransaction();
             $team->update($validateData);
+            DB::commit();
+            return response()->json(['status' => true, 'mensaje' => 'Grupo actualizado']);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : ' . $e);
+            return response()->json(['status' => false, 'mensaje' => 'Error no controlado ', 'error' => $e]);
         }
     }
 
@@ -107,9 +108,55 @@ class TeamController extends Controller
     public function destroy(Team $team)
     {
         try {
+            DB::beginTransaction();
             $team->delete();
+            DB::commit();
+            return response()->json(['status' => true, 'mensaje' => 'Grupo eliminado']);
         } catch (Exception $e) {
-            return back()->withErrors('message', 'Ocurrio un Error Al eliminar : ' . $e);
+            return response()->json(['status' => false, 'mensaje' => 'Error no controlado ', 'error' => $e]);
+        }
+    }
+
+    public function addPersonTeam(Team $team, Request $request)
+    {
+        $person = $request->validate([
+            'Num_SAP' => 'required',
+        ]);
+        try {
+            DB::beginTransaction();
+            WorkingTeams::firstOrCreate([
+                'user_num_sap' => $person['Num_SAP'],
+                'team_id' => $team->id,
+                'user_id' => auth()->user()->id
+            ]);
+            DB::commit();
+            return response()->json(['status' => true, 'mensaje' => 'Persona agregada al grupo ' . $team->name]);
+            // }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => false, 'mensaje' => 'Error no controlado ', 'error' => $e]);
+            // return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
+        }
+    }
+    public function removePersonTeam(Team $team, Request $request)
+    {
+        $person = $request->validate([
+            'Num_SAP' => 'required',
+        ]);
+        try {
+            DB::beginTransaction();
+
+            WorkingTeams::where([
+                'user_num_sap' => $person['Num_SAP'],
+                'team_id' => $team->id,
+            ])->delete();
+            DB::commit();
+            return response()->json(['status' => true, 'mensaje' => 'Persona eliminada del grupo ' . $team->name]);
+            // }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => false, 'mensaje' => 'Error no controlado ', 'error' => $e]);
+            // return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);
         }
     }
 }

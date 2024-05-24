@@ -125,10 +125,10 @@ const dataLoading = ref(false)
 
 async function getData() {
     dataLoading.value = true
-    await axios.get(route(props.routes.get, props.parameterData), props.requestData).then((res) => {
-        dataResponse.value = res.data
+
+    await axios.get(route(props.routeData, props.parameterData))
+    .then((res) => {
     })
-    dataLoading.value = false
 }
 const selectedElement = ref([]);
 

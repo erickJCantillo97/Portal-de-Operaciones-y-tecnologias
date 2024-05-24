@@ -12,17 +12,40 @@ import CustomModal from '@/Components/CustomModal.vue'
 const confirm = useConfirm()
 const toast = useToast()
 
-const openBaseActivitiesModal = ref(false)
+const openProcessModal = ref(false)
 const loading = ref(false)
 const customInputLoading = ref(false)
-const baseActivities = ref([])
+const subsystem = ref([])
 
 const formData = useForm({
+    subsystem_id: '',
+    maintenance_type: '',
     name: ''
 })
 
+const maintenance_type_options = [
+    {
+        id: 0,
+        name: 'PREDICTIVO O DIAGNÓSTICO'
+    },
+    {
+        id: 1,
+        name: 'PREVENTIVO'
+    },
+    {
+        id: 2,
+        name: 'CORRECTIVO'
+    },
+    {
+        id: 3,
+        name: 'CAMBIO, REEMPLAZO O MONTAJE'
+    }
+]
+
 //#region CustomDatatable
 const columns = [
+    { field: 'subsystem_id', header: 'Subsistema', filter: true },
+    { field: 'maintenance_type', header: 'Tipo de Mantenimiento', filter: true },
     { field: 'name', header: 'Nombre', filter: true }
 ]
 
@@ -32,19 +55,35 @@ const buttons = [
 ]
 //#endregion
 
+const getSubSystems = async () => {
+    loading.value = true
+    customInputLoading.value = true
+    await axios.get(route('process.index'))
+        .then((res) => {
+            subsystem.value = res.data.map((value) => {
+                return {
+                    ...value,
+                    name: value.code + '. ' + value.name
+                }
+            })
+            loading.value = false
+            customInputLoading.value = false
+        })
+}
+
 //#region CRUD
 const submit = () => {
     try {
-        formData.post(route('baseActivities.store'), formData, {
+        formData.post(route('process.store'), formData, {
             preserveScroll: true,
             onSuccess: () => {
                 toast.add({
                     severity: 'success',
                     group: "customToast",
-                    text: `Se ha guardado la actividad base ${formData.name} correctamente`,
+                    text: `Se ha guardado el proceso ${formData.name} correctamente`,
                     life: 2000
                 })
-                openBaseActivitiesModal.value = false
+                openProcessModal.value = false
                 saveLoading.value = true
                 formData.reset()
             },
@@ -52,7 +91,7 @@ const submit = () => {
                 toast.add({
                     severity: 'error',
                     group: "customToast",
-                    text: `Ha ocurrido un error al intentar guardar la actividad base ${formData.name}, error: ` + error,
+                    text: `Ha ocurrido un error al intentar guardar el proceso ${formData.name}, error: ` + error,
                     life: 2000
                 })
             }
@@ -62,16 +101,21 @@ const submit = () => {
     }
 }
 
-const editBaseActivities = (event, data) => {
+const editProcess = (event, data) => {
+    console.log(data)
+    console.log(formData.subsystem_id)
+    formData.subsystem_id = parseInt(data.subsystem_id) || ''
+    console.log(formData.subsystem_id)
+    formData.code = data.code || ''
     formData.name = data.name || ''
-    openBaseActivitiesModal.value = true
+    openSubSystemModal.value = true
 }
 
-const deleteBaseActivities = (event, baseActivities_id) => {
+const deleteProcess = (event, process_id) => {
     confirm.require({
         target: event.currentTarget,
         message: {
-            message: '¿Está seguro de eliminar esta actividad base?',
+            message: '¿Está seguro de eliminar este proceso?',
             subMessage: 'No se puede deshacer esta acción'
         },
         icon: 'pi pi-exclamation-triangle text-danger',
@@ -80,13 +124,13 @@ const deleteBaseActivities = (event, baseActivities_id) => {
         rejectLabel: 'No',
         acceptLabel: 'Sí',
         accept: () => {
-            formData.delete(route('baseActivities.destroy', baseActivities_id.id), {
+            formData.delete(route('process.destroy', process_id.id), {
                 preserveScroll: true,
                 onSuccess: () => {
                     toast.add({
                         severity: 'success',
                         group: "customToast",
-                        text: `Se ha eliminado la actividad base ${formData.name} correctamente`,
+                        text: `Se ha eliminado el proceso ${formData.name} correctamente`,
                         life: 2000
                     })
                 },
@@ -94,7 +138,7 @@ const deleteBaseActivities = (event, baseActivities_id) => {
                     toast.add({
                         severity: 'error',
                         group: "customToast",
-                        text: `Ha ocurrido un error al intentar eliminar la actividad base ${formData.name}, error: ` + error,
+                        text: `Ha ocurrido un error al intentar eliminar el proceso ${formData.name}, error: ` + error,
                         life: 2000
                     })
                 }
@@ -106,35 +150,44 @@ const deleteBaseActivities = (event, baseActivities_id) => {
 }
 //endregion
 
-const addBaseActivities = () => {
-    openBaseActivitiesModal.value = true
+const addProcess = () => {
+    getSubSystems()
+    openProcessModal.value = true
 }
 </script>
 <template>
     <div class="size-full overflow-y-auto">
-        <CustomDataTable route-data="baseActivities.index" :rows-default="100" :columnas="columns" :actions="buttons"
-            @edit="editBaseActivities" @delete="deleteBaseActivities" :loading>
+        <CustomDataTable route-data="process.index" :rows-default="100" :columnas="columns" :actions="buttons"
+            @edit="editProcess" @delete="deleteProcess" :loading>
             <template #buttonHeader>
-                <Button @click="addBaseActivities" severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
+                <Button @click="addProcess" severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
             </template>
         </CustomDataTable>
     </div>
 
-    <CustomModal v-model:visible="openBaseActivitiesModal" width="30vw">
+    <CustomModal v-model:visible="openProcessModal" width="30vw">
         <template #icon>
             <i class="fa-solid fa-cloud-arrow-up text-white text-xl"></i>
         </template>
         <template #titulo>
-            <p class="text-white">Añadir Actividad Base</p>
+            <p class="text-white">Añadir Proceso</p>
         </template>
         <template #body>
             <div class="flex flex-col gap-4">
+                <!--Subsistema-->
+                <CustomInput type="dropdown" optionLabel="name" optionValue="id" :options="subsystem" label="Subsistema"
+                    placeholder="Selecione un Subsistema" v-model:input="formData.subsystem_id"
+                    :loading="customInputLoading" />
+                <!--Código-->
+                <CustomInput type="dropdown" optionLabel="name" optionValue="id" label="Tipo de Mantenimiento"
+                    :options="maintenance_type_options" placeholder="Seleccione Tipo de Mantenimiento"
+                    v-model:input="formData.maintenance_type" />
                 <!--Nombre-->
-                <CustomInput label="Nombre" placeholder="Escriba Nombre de la Actividad Base" v-model:input="formData.name" />
+                <CustomInput label="Nombre" placeholder="Escriba Nombre del SubSistema" v-model:input="formData.name" />
             </div>
         </template>
         <template #footer>
-            <Button label="Cancelar" severity="danger" icon="fa fa-circle-xmark" @click="openBaseActivitiesModal = false" />
+            <Button label="Cancelar" severity="danger" icon="fa fa-circle-xmark" @click="openProcessModal = false" />
             <Button label="Guardar" severity="success" icon="pi pi-save" :loading="false" @click="submit()" />
         </template>
     </CustomModal>

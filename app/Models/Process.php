@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\SWBS\SubSystem;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,4 +15,9 @@ class Process extends Model implements Auditable
     use SoftDeletes;
 
     protected $guarded = [];
+
+    public function subsystem()
+    {
+        return $this->belongsTo(SubSystem::class);
+    }
 }

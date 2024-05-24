@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('processes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('subsystem_id')->unsigned();
+            $table->unsignedBigInteger('process_id')->unsigned();
             $table->foreign('subsystem_id')->references('id')->on('sub_systems');
             $table->enum("maintenance_type",['PREDICTIVO O DIAGNOSTICO', 'PREVENTIVO', 'CORRECTIVO', 'CAMBIO, REEMPLAZO O MONTAJE']);
             $table->string('name');

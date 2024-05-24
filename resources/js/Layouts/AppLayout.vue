@@ -295,11 +295,11 @@
             <div class="flex flex-col items-center text-center w-full gap-3 p-3">
                 <!-- {{ console.log(slotProps.message) }} -->
                 <i :class="slotProps.message.icon" class="text-4xl"></i>
-                <span v-if="slotProps.message.message.subMessage===undefined?true:false">
-                    <p class="font-bold w-60">{{ slotProps.message.message}}</p>
+                <span v-if="slotProps.message.message.subMessage === undefined ? true : false">
+                    <p class="font-bold w-60">{{ slotProps.message.message }}</p>
                 </span>
                 <span v-else>
-                    <p class="font-bold w-60">{{ slotProps.message.message.message}}</p>
+                    <p class="font-bold w-60">{{ slotProps.message.message.message }}</p>
                     <p class="w-60">{{ slotProps.message.message.subMessage}}</p>
                 </span>
             </div>
@@ -318,9 +318,10 @@ import {
 // const { toast } = useSweetalert()
 import "@/composable/push.min.js"
 // import { useCommonUtilities } from '@/composable/useCommonUtilities'
-import { Menu, MenuButton, MenuItems, MenuItem,
+import {
+    Menu, MenuButton, MenuItems, MenuItem,
     //  Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot 
-    } from '@headlessui/vue'
+} from '@headlessui/vue'
 import { ref, onMounted } from 'vue'
 import { router, Link } from '@inertiajs/vue3'
 // import { useBroadcastNotifications } from '@/composable/useBroadcastNotifications'
@@ -415,7 +416,7 @@ const logout = () => {
 //     } catch (error) {
 //         console.log(error)
 //     }
-   
+
 // }
 
 const notifications = ref([])
