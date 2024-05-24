@@ -1,34 +1,55 @@
 <script setup>
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
 import { KeyIcon, SquaresPlusIcon, ClockIcon } from '@heroicons/vue/24/outline'
 import { ref } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import BaseActivities from './../Components/SWBS/BaseActivities.vue'
 import ConstructiveGroup from './../Components/SWBS/ConstructiveGroup.vue'
-import CustomUpload from '@/Components/CustomUpload.vue'
-import Gerencias from '../Components/Gerencias.vue'
-import Processes from './../Components/SWBS/Processes.vue'
-import Shifts from './../Components/Shifts.vue'
+import CostClasses from '../Components/CostClasses.vue'
+import Managments from '../Components/Managments.vue'
+import Process from './../Components/SWBS/Process.vue'
+// import Shifts from './../Components/Shifts.vue'
 import SubSystems from './../Components/SWBS/SubSystems.vue'
 import Systems from './../Components/SWBS/Systems.vue'
 import Warehouses from '../Components/Warehouses.vue'
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
+import CustomUpload from '@/Components/CustomUpload.vue'
+
+/**TODO
+ * CRUD Sistema: Grupo Constructivo, Código y Descripción
+ * CRUD Subsistema: Sistema, Código y Descripción
+ * CRUD Proceso: Subsistema, Código y Descripción
+ * CRUD Actividades Básica: Proceso, Código y Descripción
+*/
 
 const menu = ref('VB')
 
 const navigation = [
     { name: 'Variables Basicas', value: 'VB', icon: SquaresPlusIcon, current: true },
     { name: 'SWBS', value: 'SW', icon: KeyIcon, current: false },
-    { name: 'Horarios', value: 'SC', icon: ClockIcon, current: false }, //SC->schedules
+    // { name: 'Horarios', value: 'SC', icon: ClockIcon, current: false }, //SC->schedules
     // { name: 'Sugerencias', value: 'SU', icon: UserGroupIcon, current: false },
     // { name: 'Clases de Costo', value: 'CC', icon: SquaresPlusIcon, current: false },
 ]
 
-/**
- * CRUD Sistema: Grupo Constructivo, Código y Descripción
- * CRUD Subsistema: Sistema, Código y Descripción
- * CRUD Proceso: Subsistema, Código y Descripción
- * CRUD Actividades Básica: Proceso, Código y Descripción
-*/
+const tabsPanelsSWBS = [
+    { header: 'Grupos Constructivos', component: ConstructiveGroup },
+    { header: 'Sistemas', component: Systems },
+    { header: 'Subsistemas', component: SubSystems },
+    { header: 'Procesos', component: Process },
+    { header: 'Actividades Básicas', component: BaseActivities }
+]
+
+const tabsPanelsBasicsVariables = [
+    { header: 'Gerencias', component: Managments },
+    { header: 'Clases de Costos', component: CostClasses },
+    { header: 'Almacenes', component: Warehouses },
+]
+
+// const tabsPanelsSchedule = [
+//     { header: 'Horario', component: Shifts },
+// ]
+
 </script>
 <template>
     <AppLayout>
@@ -48,126 +69,67 @@ const navigation = [
 
             <div class="space-y-6 sm:px-6 lg:col-span-10 lg:px-0">
                 <div class="w-full">
-                    <div class="w-full p-2 mx-auto bg-white rounded-2xl" v-if="menu == 'VB'">
+                    <!--Basic Variables-->
+                    <div class="mx-auto w-full rounded-2xl shadow-sm bg-white p-2" v-if="menu == 'VB'">
                         <div>
-                            <h3 class="text-base font-semibold leading-6 text-gray-900">Variables de Sistema</h3>
-                            <p class="mt-1 text-sm text-justify text-gray-500">Aquí encontrarás las variables en la que
-                                se
-                                sustenta la aplicación, <strong class="text-red-800">
+                            <h3 class="text-base font-semibold leading-6 text-gray-900">
+                                Variables de Sistema
+                            </h3>
+                            <p class="mt-1 text-sm text-justify text-gray-500">
+                                Aquí encontrarás las variables en la que
+                                se sustenta la aplicación,
+                                <span class="text-red-600 font-extrabold text-md uppercase underline">
                                     ¡proceda con precaución!
-                                </strong> o ponte en contacto con los administradores del sistema.</p>
+                                </span>
+                                o ponte en contacto con los administradores del sistema.
+                            </p>
                         </div>
-                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
-                            <DisclosureButton
-                                class="flex justify-between w-full items-center px-4 py-2 text-sm font-medium text-left text-white uppercase bg-primary  rounded-lg  focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
-                                <span>Gerencias</span>
-                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
-                            </DisclosureButton>
-                            <DisclosurePanel class="pt-4 pb-2 h-[50vh] text-sm text-gray-500">
-                                <Gerencias />
-                            </DisclosurePanel>
-                        </Disclosure>
-                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
-                            <DisclosureButton
-                                class="flex justify-between w-full px-4 py-2 items-center text-sm font-medium text-left text-white uppercase bg-primary  rounded-lg  focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
-                                <span>Clases de Costo</span>
-                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
-                            </DisclosureButton>
-                            <DisclosurePanel class="pt-4 pb-2 text-sm text-gray-500">
-                                <div class="flex justify-center">
-                                    <CustomUpload mode="advanced" label-button="Subir Archivo de clases de Costo"
-                                        titleModal="Clases de costo" tooltip="Subir Clases" accept=".xlsx,.xls"
-                                        :url="route('dashboard')" severity="success" />
-                                </div>
-                            </DisclosurePanel>
-                        </Disclosure>
-                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
-                            <DisclosureButton
-                                class="flex justify-between w-full items-center px-4 py-2 text-sm font-medium text-left text-white uppercase bg-primary  rounded-lg  focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
-                                <span>Almacenes</span>
-                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
-                            </DisclosureButton>
-                            <DisclosurePanel class="pt-4 pb-2 h-[50vh] text-sm text-gray-500">
-                                <Warehouses />
-                            </DisclosurePanel>
-                        </Disclosure>
+
+                        <TabView>
+                            <TabPanel v-for="(tabs, index) in tabsPanelsBasicsVariables" :key="index"
+                                :header="tabs.header">
+                                <component :is="tabs.component" />
+                            </TabPanel>
+                        </TabView>
                     </div>
-                    <div class="w-full p-2 mx-auto bg-white rounded-2xl" v-if="menu == 'SW'">
+
+                    <!--SWBS-->
+                    <div class="mx-auto w-full rounded-2xl shadow-sm bg-white p-2" v-if="menu == 'SW'">
                         <div>
-                            <h3 class="text-base font-semibold leading-6 text-gray-900">SWBS</h3>
-                            <p class="mt-1 text-sm text-justify text-gray-500">Aquí encontrarás la base de datos que
-                                soporta
+                            <h3 class="text-base font-semibold leading-6 text-gray-900">
+                                SWBS
+                            </h3>
+                            <p class="mt-1 text-sm text-justify text-gray-500">
+                                Aquí encontrarás la base de datos que soporta
                                 el SWBS en el sistema, añade nuevas actividades, sistemas, subsistemas y grupos
                                 constructivos.</p>
                         </div>
-                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
-                            <DisclosureButton
-                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-blue-700 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
-                                <span>Grupos Constructivos</span>
-                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
-                            </DisclosureButton>
-                            <DisclosurePanel class="pb-2 text-sm text-gray-500">
-                                <ConstructiveGroup />
-                            </DisclosurePanel>
-                        </Disclosure>
-                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
-                            <DisclosureButton
-                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-blue-700 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
-                                <span>Sistemas</span>
-                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
-                            </DisclosureButton>
-                            <DisclosurePanel class="pb-2 text-sm text-gray-500">
-                                <Systems />
-                            </DisclosurePanel>
-                        </Disclosure>
-                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
-                            <DisclosureButton
-                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-blue-700 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
-                                <span>Sub-Sistemas</span>
-                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
-                            </DisclosureButton>
-                            <DisclosurePanel class="pb-2 text-sm text-gray-500">
-                                <SubSystems />
-                            </DisclosurePanel>
-                        </Disclosure>
-                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
-                            <DisclosureButton
-                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-blue-700 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
-                                <span>Proceso</span>
-                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
-                            </DisclosureButton>
-                            <DisclosurePanel class="pb-2 text-sm text-gray-500">
-                                <Processes></Processes>
-                            </DisclosurePanel>
-                        </Disclosure>
-                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
-                            <DisclosureButton
-                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white bg-primary  rounded-lg hover:bg-blue-700 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
-                                <span>Actividades basicas</span>
-                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
-                            </DisclosureButton>
-                            <DisclosurePanel class="pb-2 text-sm text-gray-500">
-                                <BaseActivities></BaseActivities>
-                            </DisclosurePanel>
-                        </Disclosure>
+
+                        <TabView>
+                            <TabPanel v-for="(tabs, index) in tabsPanelsSWBS" :key="index" :header="tabs.header">
+                                <component :is="tabs.component" />
+                            </TabPanel>
+                        </TabView>
                     </div>
-                    <div class="w-full p-2 mx-auto bg-white rounded-2xl" v-if="menu == 'SC'">
+
+                    <!--Schedule-->
+                    <!-- <div class="mx-auto w-full rounded-2xl shadow-sm bg-white p-2" v-if="menu == 'SC'">
                         <div>
-                            <h3 class="text-base font-semibold leading-6 text-gray-900">Horarios</h3>
-                            <p class="mt-1 text-sm text-justify text-gray-500">Aquí encontrarás los horarios basicos
-                                parametrizados</p>
+                            <h3 class="text-base font-semibold leading-6 text-gray-900">
+                                Horarios
+                            </h3>
+                            <p class="mt-1 text-sm text-justify text-gray-500">
+                                Aquí encontrarás los horarios basicos
+                                parametrizados.
+                            </p>
                         </div>
-                        <Disclosure as="div" class="mt-2" v-slot="{ open }">
-                            <DisclosureButton
-                                class="flex justify-between items-center w-full px-4 py-2 text-sm font-medium text-left text-white uppercase bg-primary  rounded-lg hover:bg-blue-700 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
-                                <span>Horarios</span>
-                                <i class="fa-solid fa-chevron-up" :class="open ? 'rotate-180 transform' : ''"></i>
-                            </DisclosureButton>
-                            <DisclosurePanel class="pt-4 pb-2 text-sm text-gray-500">
-                                <Shifts />
-                            </DisclosurePanel>
-                        </Disclosure>
-                    </div>
+
+                        <TabView>
+                            <TabPanel v-for="(tabs, index) in tabsPanelsSchedule" :key="index" :header="tabs.header">
+                                <component :is="tabs.component" />
+                            </TabPanel>
+                        </TabView>
+                    </div> -->
                 </div>
             </div>
         </div>

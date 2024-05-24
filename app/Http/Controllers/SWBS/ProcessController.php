@@ -3,26 +3,28 @@
 namespace App\Http\Controllers\SWBS;
 
 use App\Http\Controllers\Controller;
-use App\Models\Process;
-use Exception;
 use App\Http\Requests\StoreprocessRequest;
 use App\Http\Requests\UpdateprocessRequest;
-use Illuminate\Http\Request as HttpRequest;
+use App\Models\Process;
+use Exception;
+use Illuminate\Http\Request;
 
 class ProcessController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(HttpRequest $request)
+    public function index(Request $request)
     {
-        $process = Process::orderBy('id')->get();
-        if($request->subSystem){
+        $process = Process::with('subsystem')->get();
+        if ($request->subSystem) {
             $process = Process::where('subsystem_id', $request->subSystem)->get();
         }
-        return response()->json([
-                $process
-            ], 200);
+
+        return response()->json(
+            $process,
+            200
+        );
     }
 
     /**
@@ -39,12 +41,14 @@ class ProcessController extends Controller
     public function store(StoreprocessRequest $request)
     {
         $validateData = $request->validate([
-            //
+            'subsystem_id' => 'required|numeric',
+            'maintenance_type' => 'required',
+            'name' => 'required',
         ]);
 
-        try{
+        try {
             process::create($validateData);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : '.$e);
         }
     }
@@ -71,12 +75,14 @@ class ProcessController extends Controller
     public function update(UpdateprocessRequest $request, process $process)
     {
         $validateData = $request->validate([
-            //
+            'subsystem_id' => 'required|numeric',
+            'maintenance_type' => 'required',
+            'name' => 'required',
         ]);
 
-        try{
+        try {
             $process->update($validateData);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Actualizar : '.$e);
         }
     }
@@ -86,9 +92,9 @@ class ProcessController extends Controller
      */
     public function destroy(process $process)
     {
-        try{
+        try {
             $process->delete();
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al eliminar : '.$e);
         }
     }

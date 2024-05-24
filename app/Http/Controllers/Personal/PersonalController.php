@@ -255,27 +255,21 @@ class PersonalController extends Controller
         $personal = getPersonalUser();
         $scheduleComplete = [];
         $scheduleNotComplete = [];
-        foreach ($personal as $person) {
-            // $schedule = Schedule::where('employee_id',  $person['Num_SAP'])->where('fecha', $request->date)->pluck('id')->toArray();
+        // $schedule = Schedule::where('employee_id',  $person['Num_SAP'])->where('fecha', $request->date)->pluck('id')->toArray();
 
-            $horas_acumulados = DetailScheduleTime::where('idUsuario', $person['Num_SAP'])->where('fecha', $request->date)->selectRaw('SUM(datediff(mi,horaInicio, horaFin)) as diferencia_acumulada')->get();
-            $hours = $horas_acumulados[0]->diferencia_acumulada / 60;
-            if ($hours > 8.5) {
+        $horas_acumulados = DetailScheduleTime::where('oficina', auth()->user()->oficina)->where('fecha', $request->date)->selectRaw('SUM(datediff(mi,hora_inicio, hora_fin)) as diferencia_acumulada')->selectRaw('MIN(nameUser) as name')->groupBy('idUsuario')->get();
+        foreach ($horas_acumulados as $hours) {
+            $dif = $hours->diferencia_acumulada / 60;
+            if ($dif  > 8.5) {
                 array_push($scheduleComplete, [
-                    'name' => $person['Nombres_Apellidos'],
-                    'hours' => $hours,
-                    'cargo' => $person['Cargo'],
-                    'photo' => $person['photo']
-                ]);
-            } else {
-                array_push($scheduleNotComplete, [
-                    'name' => $person['Nombres_Apellidos'],
-                    'hours' => $hours,
-                    'cargo' => $person['Cargo'],
-                    'photo' => $person['photo']
+                    'name' => $hours->name,
+                    'hours' => $dif,
                 ]);
             }
         }
+        // $hours = $horas_acumulados[0]->diferencia_acumulada / 60;
+
+
         return response()->json([
             'programados' => $scheduleComplete,
             'noProgramados' => $scheduleNotComplete
