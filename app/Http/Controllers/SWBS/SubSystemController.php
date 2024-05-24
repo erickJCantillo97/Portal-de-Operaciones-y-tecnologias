@@ -14,14 +14,15 @@ class SubSystemController extends Controller
      */
     public function index(Request $request)
     {
-
         $subsystems = SubSystem::with('system')->get();
-        if($request->system){
+        if ($request->system) {
             $subsystems = SubSystem::where('system_id', $request->system)->orderBy('code')->get();
         }
-        return response()->json([
+
+        return response()->json(
             $subsystems,
-        ]);
+            200
+        );
     }
 
     /**
@@ -38,7 +39,9 @@ class SubSystemController extends Controller
     public function store(Request $request)
     {
         $validateData = $request->validate([
-            //
+            'system_id' => 'required|numeric',
+            'code' => 'required|numeric|unique:sub_systems',
+            'name' => 'required',
         ]);
 
         try {

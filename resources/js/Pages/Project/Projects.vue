@@ -44,6 +44,7 @@ const addItem = () => {
     router.get(route('projects.create'))
     clearError()
 }
+
 const deleteClic = (event, data) => {
     confirmDelete(data.id, 'Proyecto', 'projects')
 }
@@ -179,7 +180,7 @@ const buttons = [
 ]
 
 const goToProjectOverview = (event, data) => {
-    
+
     try {
         router.get(route('projects.goToProjectOverview', data.id))
     } catch (error) {

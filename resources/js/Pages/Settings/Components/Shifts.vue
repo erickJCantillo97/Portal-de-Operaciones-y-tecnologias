@@ -1,15 +1,17 @@
 <script setup>
-import '/resources/sass/dataTableCustomized.scss';
-import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import { ref, onMounted } from 'vue';
+import '/resources/sass/dataTableCustomized.scss'
+import { FilterMatchMode, FilterOperator } from 'primevue/api'
+import { ref, onMounted } from 'vue'
 import { useSweetalert } from '@/composable/sweetAlert'
-import Button from 'primevue/button';
-import Calendar from 'primevue/calendar';
-import Column from 'primevue/column';
-import CustomModal from '@/Components/CustomModal.vue';
-import DataTable from 'primevue/datatable';
-import InputNumber from 'primevue/inputnumber';
-import InputText from 'primevue/inputtext';
+import Button from 'primevue/button'
+import CustomInput from '@/Components/CustomInput.vue'
+import Calendar from 'primevue/calendar'
+import Column from 'primevue/column'
+import CustomModal from '@/Components/CustomModal.vue'
+import DataTable from 'primevue/datatable'
+import CustomDataTable from '@/Components/CustomDataTable.vue'
+import InputNumber from 'primevue/inputnumber'
+import InputText from 'primevue/inputtext'
 
 const { confirmDelete } = useSweetalert();
 const { toast } = useSweetalert();
@@ -23,7 +25,7 @@ const shift = ref({
     endBreak: '',
 })
 
-const shiftDialog = ref(false)
+const shiftDialog = ref(true)
 
 const loading = ref(false);
 const shifts = ref([])
@@ -31,14 +33,29 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 
-const getHours = () => {
+//#region CustomDatatable
+const columns = [
+    { field: 'name', header: 'Nombre', filter: true },
+    { field: 'Horario', header: 'Horario', filter: true },
+    { field: 'timeBreak', header: 'Descanso', filter: true },
+    { field: 'Horas', header: 'Horas', filter: true },
+    { field: 'Adicionales', header: 'Adicionales', filter: true },
+    { field: 'status', header: 'Estado', filter: true },
+]
+
+const buttons = [
+    { event: 'edit', severity: 'warning', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false },
+    { event: 'delete', severity: 'danger', icon: 'fa-regular fa-trash-can', class: '!h-8', text: true, outlined: false, rounded: false },
+]
+//#endregion
+
+const getHours = async () => {
     loading.value = true;
-    axios.get(route('shift.index')).then(
-        (res) => {
+    await axios.get(route('shift.index'))
+        .then((res) => {
             shifts.value = res.data[0]
             loading.value = false;
-        }
-    );
+        })
 }
 
 onMounted(() => {
@@ -67,7 +84,7 @@ function format24h(hora) {
         tiempo = new Date("1970-01-01T" + hora).toLocaleString('es-CO',
             { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
     }
-    console.log(tiempo)
+    // console.log(tiempo)
     return tiempo
 }
 
@@ -173,7 +190,15 @@ const calcularDiferencia = (start, end) => {
 }
 </script>
 <template>
-    <div class="w-full px-auto">
+    <div class="size-full overflow-y-auto">
+        <CustomDataTable :data="shifts" route-data="shift.index" :rows-default="100" :columnas="columns"
+            :actions="buttons" @edit="editShift" @delete="deleteShift" :loading>
+            <template #buttonHeader>
+                <Button @click="createShift" severity="success" icon="fa-solid fa-plus" label="Agregar" outlined />
+            </template>
+        </CustomDataTable>
+    </div>
+    <!-- <div class="w-full px-auto">
         <DataTable id="tabla" stripedRows class="p-datatable-sm" :value="shifts" v-model:filters="filters" dataKey="id"
             filterDisplay="menu" :loading="loading" :globalFilterFields="['name', 'descripcion']"
             currentPageReportTemplate=" {first} al {last} de {totalRecords}"
@@ -192,11 +217,11 @@ const calcularDiferencia = (start, end) => {
                                 v-model="filters.global.value" placeholder="Buscar..." />
                         </span>
                     </div>
-                        <Button @click="createShift()" title="Crear horario" label="Nuevo" icon="pi pi-plus" severity="success" class="!h-8"/>
+                    <Button @click="createShift()" title="Crear horario" label="Nuevo" icon="pi pi-plus"
+                        severity="success" class="!h-8" />
                 </div>
             </template>
 
-            <!--COLUMNAS-->
             <Column field="name" header="Nombre" class="w-1/6"></Column>
             <Column header="Horario" class="">
                 <template #body="slotProps">
@@ -222,7 +247,8 @@ const calcularDiferencia = (start, end) => {
             <Column field="status" header="Estado" class="w-1/12">
                 <template #body="slotProps">
                     <Button @click="shiftSave(slotProps.data.status == false, slotProps.data)" class="!h-8"
-                        :severity="(slotProps.data.status == true) ? 'success' : 'danger'" :label="(slotProps.data.status == true) ? 'Activo' : 'Inactivo'"/>
+                        :severity="(slotProps.data.status == true) ? 'success' : 'danger'"
+                        :label="(slotProps.data.status == true) ? 'Activo' : 'Inactivo'" />
 
                 </template>
             </Column>
@@ -230,17 +256,18 @@ const calcularDiferencia = (start, end) => {
                 <template #body="slotProps">
                     <div class="flex justify-center space-x-1">
                         <div title="Editar">
-                            <Button severity="primary" text icon="fa-solid fa-pen" @click="editShift(slotProps.data)" class="!h-8"/>
+                            <Button severity="primary" text icon="fa-solid fa-pen" @click="editShift(slotProps.data)"
+                                class="!h-8" />
                         </div>
                         <div title="Eliminar">
-                            <Button severity="danger" text icon="fa-solid fa-trash" @click="deleteShift(slotProps.data.id)" class="!h-8"/>
+                            <Button severity="danger" text icon="fa-solid fa-trash"
+                                @click="deleteShift(slotProps.data.id)" class="!h-8" />
                         </div>
                     </div>
                 </template>
             </Column>
-            <!-- <Column field="descripcion" header="Descripción"></Column> -->
         </DataTable>
-    </div>
+    </div> -->
 
     <!--MODAL-->
     <CustomModal v-model:visible=shiftDialog width="30rem">
@@ -254,28 +281,13 @@ const calcularDiferencia = (start, end) => {
             <div class="mt-5">
                 <div class="grid grid-cols-2 gap-5">
                     <div class="space-y-3">
-                        <span class="p-float-label">
-                            <InputText class="alturah8" id="name" v-model="shift.name" />
-                            <label for="name">Nombre</label>
-                        </span>
-                        <span class="p-float-label">
-                            <Calendar name="start" id="start" timeOnly hourFormat="24" v-model="shift.startShift"
-                                class="alturah8" :pt="{
-                                    input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
-                                }" />
-                            <label for="startShift" class="">Hora inicio</label>
-                        </span>
-                        <span class="p-float-label">
-                            <Calendar name="endShift" id="start" timeOnly hourFormat="24" v-model="shift.endShift"
-                                class="alturah8" :pt="{
-                                    input: { class: 'rounded-md border-0 ring-1 ring-inset ring-gray-300 text-center' }
-                                }" />
-                            <label for="endShift" class="">Hora fin</label>
-                        </span>
-                        <span class="p-float-label">
-                            <InputNumber class="alturah8" id="timeBreak" v-model="shift.timeBreak" :minFractionDigits="2" />
-                            <label for="timeBreak" class="">Descanso en horas </label>
-                        </span>
+                        <CustomInput label="Nombre" placeholder="Nombre del Turno" v-model:input="shift.name" />
+                        <CustomInput label="Hora inicio" type="time" v-model:input="shift.startShift" :stepMinute="30"
+                            id="start" placeholder="Hora de inicio" :required="true" />
+                        <CustomInput label="Hora fin" type="time" id="end" v-model:input="shift.endShift"
+                            :stepMinute="30" placeholder="Hora de fin" :required="true" />
+                        <CustomInput label="Descanso" type="number" v-model:input="shift.timeBreak" suffix="Hora"
+                            id="break" placeholder="Descanso en horas" :required="true" />
                     </div>
 
                     <div class="flex flex-col justify-center items-center w-full h-full space-y-2">
@@ -285,7 +297,7 @@ const calcularDiferencia = (start, end) => {
                             </p>
                             <p>{{ calcularDiferencia(String(shift.startShift),
                                 String(shift.endShift)) - shift.timeBreak
-                            }}
+                                }}
                                 Horas</p>
                         </div>
                         <div class="flex justify-between w-full text-warning"
@@ -302,8 +314,10 @@ const calcularDiferencia = (start, end) => {
             </div>
         </template>
         <template #footer>
-            <Button type="button" severity="primary" class="!h-8" icon="fa-solid fa-floppy-disk" @click="shiftSave(true, shift)" outline label="Guardar"/>
-            <Button type="button" severity="danger" class="!h-8" icon="fa-solid fa-xmark" @click="shiftDialog = false" outline label="Cancelar"/>
+            <Button type="button" severity="danger" class="!h-8" icon="fa-solid fa-circle-xmark"
+                @click="shiftDialog = false" outline label="Cancelar" />
+            <Button type="button" severity="success" class="!h-8" icon="fa-solid fa-floppy-disk"
+                @click="shiftSave(true, shift)" outline label="Guardar" />
         </template>
     </CustomModal>
 </template>

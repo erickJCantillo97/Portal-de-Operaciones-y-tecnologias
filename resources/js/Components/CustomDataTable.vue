@@ -98,11 +98,13 @@ const dataResponse = defineModel('dataResponse', {
     type: Array,
     default: []
 })
+
 const dataLoading = ref(false)
 
 async function getData() {
     dataLoading.value = true
-    await axios.get(route(props.routeData, props.parameterData)).then((res) => {
+    await axios.get(route(props.routeData, props.parameterData))
+    .then((res) => {
         dataResponse.value = res.data
     })
     dataLoading.value = false
