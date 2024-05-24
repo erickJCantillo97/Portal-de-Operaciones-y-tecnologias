@@ -31,7 +31,7 @@ const { toast } = useSweetalert()
 const { confirmDelete } = useSweetalert()
 
 const addAct = (event, p) => {
-    router.get(route('createSchedule.create',p.uuid ))
+    router.get(route('createSchedule.create', p.uuid))
     // projectSelect.value = p
     // op.value.toggle(event)
 }
@@ -176,7 +176,7 @@ const buttons = [
     { event: 'addDoc', severity: 'primary', class: '', icon: 'fa-solid fa-cloud-arrow-up', text: true, outlined: false, rounded: false },
     { event: 'addAct', severity: 'primary', class: '', icon: 'fa-regular fa-calendar-plus', text: true, outlined: false, rounded: false, show: hasPermission('schedule create') },
     { event: 'editClic', severity: 'primary', class: '', icon: 'fa-solid fa-pencil', text: true, outlined: false, rounded: false, show: hasPermission('projects edit') },
-    { event: 'deleteClic', severity: 'danger', icon: 'fa-regular fa-trash-can', class: '!h-8', text: true, outlined: false, rounded: false, show: hasPermission('projects delete') },
+    // { event: 'deleteClic', severity: 'danger', icon: 'fa-regular fa-trash-can', class: '!h-8', text: true, outlined: false, rounded: false, show: hasPermission('projects delete') },
 ]
 
 const goToProjectOverview = (event, data) => {
@@ -196,14 +196,22 @@ const url = [
         active: true
     }
 ]
+
+const routes = {
+    get: 'projects.index',
+    // update: hasPermission('projects edit') ? 'typeShips.update' : undefined,
+    // store: hasPermission('typeShip edit') ? 'typeShips.store' : undefined,
+    delete: hasPermission('projects create') ? 'projects.destroy' : undefined,
+}
+
 </script>
 
 <template>
     <AppLayout :href="url">
         <div class="w-full h-full overflow-y-auto">
-            <CustomDataTable routeData="projects.index"  title="Proyectos" :filterButtons="filterButtons" :data="projects" :rows-default="100"
-                :columnas="columnas" :actions="buttons" @addDoc="addDoc" @addAct="addAct" @editClic="editClic"
-                @deleteClic="deleteClic" @goToProjectOverview="goToProjectOverview">
+            <CustomDataTable :routes title="Proyectos" :filterButtons="filterButtons" :data="projects"
+                :rows-default="100" :columnas="columnas" :actions="buttons" @addDoc="addDoc" @addAct="addAct"
+                @editClic="editClic" @deleteClic="deleteClic" @buttonRowClick="goToProjectOverview">
                 <template #buttonHeader>
                     <Button @click="addItem" severity="success" v-if="hasPermission('projects create')"
                         icon="fa-solid fa-plus" label="Agregar" outlined />

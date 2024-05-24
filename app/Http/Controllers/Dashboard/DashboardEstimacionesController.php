@@ -17,7 +17,8 @@ class DashboardEstimacionesController extends Controller
 
     public function getQuotesStatus(Request $request)
     {
-        $status = $request->status == 'Entregada' || !$request->status ? 'Proceso' : $request->status;
+        // $status = $request->status == 'Entregada' || !$request->status ? 'Proceso' : $request->status;
+        $status = $request->status;
         $quotes = QuoteVersion::has('quote')->with('quoteTypeShips', 'quote')->get()->filter(function ($quote) use ($status) {
             $hoy = Carbon::now();
             $ultimo_jueves = $hoy->previous(Carbon::THURSDAY);
@@ -45,6 +46,7 @@ class DashboardEstimacionesController extends Controller
 
     public function getQuotesManurity()
     {
+        // $year = $request->year ?? Carbon::now()->year;
         $maturities =  QuoteTypeShip::whereNotNull('maturity')->select(DB::raw('count(id) as value'), DB::raw('UPPER(maturity) as name'))
             ->groupBy('maturity')
             ->orderBy('maturity')
@@ -57,6 +59,7 @@ class DashboardEstimacionesController extends Controller
 
     public function getStatusWeek()
     {
+        // $year = $request->year ?? Carbon::now()->year;
         $quotes = QuoteVersion::get()->filter(function ($quote) {
             $hoy = Carbon::now();
             $ultimo_jueves = $hoy->previous(Carbon::THURSDAY);
@@ -76,7 +79,8 @@ class DashboardEstimacionesController extends Controller
 
     public function getAvgManurities()
     {
-        $promedioPorDificultad = QuoteVersion::whereDate('expeted_answer_date', '<>', '1970-01-01')->join('quote_type_ships', 'quote_versions.id', '=', 'quote_type_ships.quote_version_id')
+        $year = $request->year ?? Carbon::now()->year;
+        $promedioPorDificultad = QuoteVersion::whereYear('expeted_answer_date', '<>', '2024')->join('quote_type_ships', 'quote_versions.id', '=', 'quote_type_ships.quote_version_id')
             ->select('quote_type_ships.maturity', DB::raw('AVG(DATEDIFF(day, quote_versions.expeted_answer_date, quote_versions.estimador_anaswer_date)) AS promedio'))
             ->groupBy('quote_type_ships.maturity')
             ->whereNotNull('quote_type_ships.maturity')
@@ -95,6 +99,7 @@ class DashboardEstimacionesController extends Controller
     }
     public function getEstimatorData()
     {
+        $year = $request->year ?? Carbon::now()->year;
         $people = QuoteVersion::whereNotNull('estimador_anaswer_date')->whereYear('estimador_anaswer_date', '!=', '1970')->select(DB::raw('AVG(DATEDIFF(day, expeted_answer_date, estimador_anaswer_date)) AS promedio'), 'estimador_name')
             ->groupBy('estimador_name')
             ->get()->map(function ($quote) {
@@ -118,15 +123,35 @@ class DashboardEstimacionesController extends Controller
 
     public function getQuotesCountry(Request $request)
     {
-
+        $year = $request->year ?? Carbon::now()->year;
         $countQuoteCountry = QuoteVersion::join('customers', 'quote_versions.customer_id', '=', 'customers.id')
             ->select('customers.country_en as country', DB::raw('COUNT(quote_versions.id) AS value'))
             ->groupBy('customers.country_en')
+            ->orderBy('value', 'desc')
             ->get();
 
         return [
             'values' => $countQuoteCountry->map(function ($value) {
                 return [$value['country'], $value['value']];
+            }),
+
+            'status' => true
+        ];
+    }
+    public function getQuotesCustomers(Request $request)
+    {
+        $year = $request->year ?? Carbon::now()->year;
+        // AÑadir el filtro por año actual en la base de datos de estimaciones para el dashboard
+        $countQuoteCustomers = QuoteVersion::whereYear('quote_versions.expeted_answer_date', '2024')->join('customers', 'quote_versions.customer_id', '=', 'customers.id')
+            ->select('customers.name as customer', DB::raw('COUNT(customers.id) AS value'))
+            ->groupBy('customers.name')
+            ->orderBy('value', 'desc')
+            ->take(10)
+            ->get();
+
+        return [
+            'values' => $countQuoteCustomers->map(function ($value) {
+                return ['cliente' => $value['customer'], 'estimaciones' => $value['value']];
             }),
 
             'status' => true

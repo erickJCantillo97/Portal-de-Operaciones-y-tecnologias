@@ -49,7 +49,7 @@ const getTipologias = async () => {
             showArticleListTipologies.value = false
             showNoTipologies.value = true
           }
-          // loadingProjects.value = false
+          loadingProjects.value = false
           // listTipologia.value++
         })
     } else {
@@ -94,7 +94,8 @@ const getProjects = async () => {
   try {
     await axios(route('projects.index'))
       .then(res => {
-        projectsOptions.value = res.data.projects
+        projectsOptions.value = res.data
+
       })
   } catch (error) {
     console.log('Nada')

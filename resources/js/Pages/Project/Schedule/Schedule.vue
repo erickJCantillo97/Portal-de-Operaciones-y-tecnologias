@@ -1,60 +1,33 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { onMounted, ref } from 'vue';
-import '@bryntum/gantt/gantt.material.css';
 import '@bryntum/gantt/locales/gantt.locale.Es.js';
+import '@bryntum/gantt/gantt.material.css';
 import { BryntumGantt } from '@bryntum/gantt-vue-3';
 import { DateHelper, List, LocaleManager, StringHelper, Widget, ColumnStore, Column, TaskModel } from '@bryntum/gantt';
-import Slider from 'primevue/slider'
 import { useToast } from "primevue/usetoast";
-import InputText from 'primevue/inputtext';
-import Calendar from 'primevue/calendar';
-import OverlayPanel from 'primevue/overlaypanel';
-import Checkbox from 'primevue/checkbox';
-import CustomModal from '@/Components/CustomModal.vue';
-import FileUpload from 'primevue/fileupload';
-import CustomInput from '@/Components/CustomInput.vue';
-import Dropdown from 'primevue/dropdown';
-import MultiSelect from 'primevue/multiselect';
-import Sidebar from 'primevue/sidebar';
-import Empty from '@/Components/Empty.vue';
+import CustomToolbar from './Components/CustomToolbar.vue';
+import ProgressBar from 'primevue/progressbar';
 import { usePage } from '@inertiajs/vue3';
-import SplitButton from 'primevue/splitbutton';
-import CustomModalCalendars from './Components/CustomModalCalendars.vue';
 
+LocaleManager.applyLocale('Es');
 const toast = useToast();
-const fontSize = ref('10px')
 const props = defineProps({
     project: Object
 })
-
-LocaleManager.applyLocale('Es');
+const listCalendar = ref([]);
 const ganttref = ref()
 const loading = ref(false)
 const error = ref(false)
-const canRedo = ref()
-const canUndo = ref()
+const config = ref({
+    full: false,
+    readOnly: false,
+    canRedo: false,
+    canUndo: false,
+})
+const load = ref(true)
 
-//#region funciones
-const headerTpl = ({ currentPage, totalPages }) => `
-    <div class="flex space-x-3 items-center">
-        <div class="p-0.5 bg-white">
-            <img src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
-        </div>
-        <h3>${props.project.name}</h3>
-    </div>
-    <dl>
-        <dt>Fecha y hora de impresion: ${DateHelper.format(new Date(), 'll LT')}</dt>
-        <dd c>Impreso por: ${usePage().props.auth.user.name}</dd>
-        <dd>${totalPages ? `Pagina: ${currentPage + 1}/${totalPages}` : ''}</dd>
-    </dl>
-    `;
-
-const footerTpl = ({ currentPage, totalPages }) => `
-<h3>© ${new Date().getFullYear()} TOP - COTECMAR</h3></div>
-`;
-
-// console.log(usePage().props.auth.user.name)
+//#region Clases
 
 if (!Widget.factoryable.registry.resourcelist) {
     class ResourceList extends List {
@@ -104,216 +77,7 @@ if (!Widget.factoryable.registry.resourcelist) {
     }
     ResourceList.initClass();
 }
-class Importer {
 
-    constructor(config) {
-        this.gantt = config.ganttImport;
-        this.defaultColumns = config.defaultColumns;
-    }
-
-    async importData(data) {
-        const
-            me = this,
-
-            project = new me.gantt.projectModelClass({
-                silenceInitialCommit: false,
-                // To save imported data provide `sync` url and set `autoSync` true, or call `gantt.project.sync()` manually after data is imported.
-                autoSync: false,
-            });
-
-        me.project = project;
-        me.calendarManager = project.calendarManagerStore;
-        me.taskStore = project.taskStore;
-        me.assignmentStore = project.assignmentStore;
-        me.resourceStore = project.resourceStore;
-        me.dependencyStore = project.dependencyStore;
-
-        Object.assign(me, {
-            calendarMap: {},
-            resourceMap: {},
-            taskMap: {}
-        });
-
-        me.importCalendars(data);
-
-        const tasks = me.getTaskTree(Array.isArray(data.tasks) ? data.tasks : [data.tasks]);
-
-        me.importResources(data);
-        me.importAssignments(data);
-
-        me.taskStore.rootNode.appendChild(tasks[0].children);
-
-        me.importDependencies(data);
-
-        me.importProject(data);
-
-        // Assign the new project to the gantt before launching commitAsync()
-        // to let Gantt resolve possible scheduling conflicts
-        me.gantt.project = project;
-
-        await me.project.commitAsync();
-
-        me.importColumns(data);
-
-        return project;
-    }
-
-    // region RESOURCES
-    importResources(data) {
-        this.resourceStore.add(data.resources.map(this.processResource, this));
-    }
-
-    processResource(data) {
-        const { id } = data;
-
-        delete data.id;
-
-        data.calendar = this.calendarMap[data.calendar];
-
-        const resource = new this.resourceStore.modelClass(data);
-
-        this.resourceMap[id] = resource;
-
-        return resource;
-    }
-    // endregion
-
-    // region DEPENDENCIES
-    importDependencies(data) {
-        this.dependencyStore.add(data.dependencies.map(this.processDependency, this));
-    }
-
-    processDependency(data) {
-        const
-            me = this,
-            { fromEvent, toEvent } = data;
-
-        delete data.id;
-
-        const dep = new me.dependencyStore.modelClass(data);
-
-        dep.fromEvent = me.taskMap[fromEvent].id;
-        dep.toEvent = me.taskMap[toEvent].id;
-
-        return dep;
-    }
-    // endregion
-
-    // region ASSIGNMENTS
-    importAssignments(data) {
-        this.assignmentStore.add(data.assignments.map(this.processAssignment, this));
-    }
-
-    processAssignment(data) {
-        const me = this;
-
-        delete data.id;
-
-        return new me.assignmentStore.modelClass({
-            units: data.units,
-            event: me.taskMap[data.event],
-            resource: me.resourceMap[data.resource]
-        });
-    }
-    // endregion
-
-    // region TASKS
-    getTaskTree(tasks) {
-        return tasks.map(this.processTask, this);
-    }
-
-    processTask(data) {
-        const
-            me = this,
-            { id, children } = data;
-
-        delete data.children;
-        delete data.id;
-        delete data.milestone;
-
-        data.calendar = me.calendarMap[data.calendar];
-
-        const t = new me.taskStore.modelClass(data);
-
-        if (children) {
-            t.appendChild(me.getTaskTree(children));
-        }
-
-        t._id = id;
-        me.taskMap[t._id] = t;
-
-        return t;
-    }
-    // endregion
-
-    // region CALENDARS
-    processCalendarChildren(children) {
-        return children.map(this.processCalendar, this);
-    }
-
-    processCalendar(data) {
-        const
-            me = this,
-            { id, children } = data,
-            intervals = data.intervals;
-
-        delete data.children;
-        delete data.id;
-
-        const t = new me.calendarManager.modelClass(Object.assign(data, { intervals }));
-
-        if (children) {
-            t.appendChild(me.processCalendarChildren(children));
-        }
-
-        t._id = id;
-        me.calendarMap[t._id] = t;
-
-        return t;
-    }
-
-    // Entry point of calendars loading
-    importCalendars(data) {
-        this.calendarManager.add(this.processCalendarChildren(data.calendars.children));
-    }
-    // endregion
-
-    // region Columns
-
-    importColumns(data) {
-        let columns = data.columns.map(this.processColumn, this).filter(column => column);
-
-        const columnStore = this.gantt.subGrids.locked.columns;
-
-        // if no columns extracted apply default set (if configured)
-        if (!columns.length && this.defaultColumns) {
-            columns = this.defaultColumns;
-        }
-
-        if (columns.length) {
-            columnStore.removeAll(true);
-            columnStore.add(columns);
-        }
-    }
-
-    processColumn(data) {
-        const columnClass = this.gantt.columns.constructor.getColumnClass(data.type);
-
-        // ignore unknown columns (or columns that classes are not loaded)
-        if (columnClass) {
-            return Object.assign({ region: 'locked' }, data);
-        }
-    }
-
-    // endregion
-
-    importProject(data) {
-        if ('calendar' in data.project) {
-            data.project.calendar = this.calendarMap[data.project.calendar];
-        }
-        Object.assign(this.project, data.project);
-    }
-}
 if (!Widget.factoryable.registry.TaskExecutorColumn) {
     class TaskExecutorColumn extends Column {
         // unique alias of the column
@@ -384,6 +148,7 @@ if (!Widget.factoryable.registry.TaskManagerColumn) {
 
         static get defaults() {
             return {
+                id: 'manager',
                 // the column is mapped to "priority" field of the Task model
                 field: 'manager',
                 // the column title
@@ -429,7 +194,6 @@ if (!Widget.factoryable.registry.TaskManagerColumn) {
     }
     ColumnStore.registerColumnType(TaskManagerColumn);
 }
-
 if (!Widget.factoryable.registry.TaskRowcolorColumn) {
     class TaskRowcolorColumn extends Column {
         // unique alias of the column
@@ -444,6 +208,7 @@ if (!Widget.factoryable.registry.TaskRowcolorColumn) {
 
         static get defaults() {
             return {
+                id: 'rowcolor',
                 // the column is mapped to "priority" field of the Task model
                 field: 'rowcolor',
                 // the column title
@@ -461,23 +226,20 @@ class Task extends TaskModel {
 
     get cls() {
         let obj = {}
-        if (super.getData('rowcolor')!='none'){
+        if (super.getData('rowcolor') != 'default') {
             obj[super.getData('rowcolor')] = true
             return Object.assign(super.cls, obj);
         }
-        super.cls={}
+        super.cls = {}
         return super.cls
     }
 }
 //#endregion
 
 onMounted(() => {
-    onExpandAllClick()
     editMode()
 })
 
-const full = ref(false)
-const readOnly = ref()
 const nonWorkingTime = ref(true)
 const notes = ref({ load: true, data: [] })
 async function getNotes() {
@@ -496,8 +258,8 @@ const editMode = () => {
     let gantt = ganttref.value.instance.value
     gantt.readOnly = !gantt.readOnly
     gantt.project.autoSync = !gantt.readOnly
-    readOnly.value = gantt.readOnly
-    if (readOnly.value == false) {
+    config.value.readOnly = gantt.readOnly
+    if (config.value.readOnly == false) {
         gantt.project.stm.enable()
     }
 }
@@ -524,44 +286,44 @@ const timeRanges = ref({
 })
 
 const baselines = ref({
-    // Custom tooltip template for baselines
-    template(data) {
-        const
-            me = this,
-            { baseline } = data,
-            { task } = baseline,
-            delayed = task.startDate > baseline.startDate,
-            overrun = task.durationMS > baseline.durationMS;
+    // // Custom tooltip template for baselines
+    // template(data) {
+    //     const
+    //         me = this,
+    //         { baseline } = data,
+    //         { task } = baseline,
+    //         delayed = task.startDate > baseline.startDate,
+    //         overrun = task.durationMS > baseline.durationMS;
 
-        let { decimalPrecision } = me;
+    //     let { decimalPrecision } = me;
 
-        if (decimalPrecision == null) {
-            decimalPrecision = me.client.durationDisplayPrecision;
-        }
+    //     if (decimalPrecision == null) {
+    //         decimalPrecision = me.client.durationDisplayPrecision;
+    //     }
 
-        const
-            multiplier = Math.pow(10, decimalPrecision),
-            displayDuration = Math.round(baseline.duration * multiplier) / multiplier;
+    //     const
+    //         multiplier = Math.pow(10, decimalPrecision),
+    //         displayDuration = Math.round(baseline.duration * multiplier) / multiplier;
 
-        return `
-                    <div class="b-gantt-task-title">${StringHelper.encodeHtml(task.name)} (${me.L('Linea Base ')} ${baseline.parentIndex + 1})</div>
-                    <table>
-                    <tr><td>${me.L('Inicio')}:</td><td>${data.startClockHtml}</td></tr>
-                    ${baseline.milestone ? '' : `
-                        <tr><td>${me.L('Fin')}:</td><td>${data.endClockHtml}</td></tr>
-                        <tr><td>${me.L('Duracion')}:</td><td class="b-right">${displayDuration + ' ' + DateHelper.getLocalizedNameOfUnit(baseline.durationUnit, baseline.duration !== 1)}</td></tr>
-                    `}
-                    </table>
-                    ${delayed ? `
-                        <h4 class="statusmessage b-baseline-delay"><i class="statusicon b-fa b-fa-exclamation-triangle"></i>${me.L('Inicio retrasado por')} ${DateHelper.formatDelta(task.startDate - baseline.startDate)}</h4>
-                    ` : ''}
-                    ${overrun ? `
-                        <h4 class="statusmessage b-baseline-overrun"><i class="statusicon b-fa b-fa-exclamation-triangle"></i>${me.L('Atrasado por')} ${DateHelper.formatDelta(task.durationMS - baseline.durationMS)}</h4>
-                    ` : ''}
-                    `;
-    },
+    //     return `
+    //                 <div class="b-gantt-task-title">${StringHelper.encodeHtml(task.name)} (${me.L('Linea Base ')} ${baseline.parentIndex + 1})</div>
+    //                 <table>
+    //                 <tr><td>${me.L('Inicio')}:</td><td>${data.startClockHtml}</td></tr>
+    //                 ${baseline.milestone ? '' : `
+    //                     <tr><td>${me.L('Fin')}:</td><td>${data.endClockHtml}</td></tr>
+    //                     <tr><td>${me.L('Duracion')}:</td><td class="b-right">${displayDuration + ' ' + DateHelper.getLocalizedNameOfUnit(baseline.durationUnit, baseline.duration !== 1)}</td></tr>
+    //                 `}
+    //                 </table>
+    //                 ${delayed ? `
+    //                     <h4 class="statusmessage b-baseline-delay"><i class="statusicon b-fa b-fa-exclamation-triangle"></i>${me.L('Inicio retrasado por')} ${DateHelper.formatDelta(task.startDate - baseline.startDate)}</h4>
+    //                 ` : ''}
+    //                 ${overrun ? `
+    //                     <h4 class="statusmessage b-baseline-overrun"><i class="statusicon b-fa b-fa-exclamation-triangle"></i>${me.L('Atrasado por')} ${DateHelper.formatDelta(task.durationMS - baseline.durationMS)}</h4>
+    //                 ` : ''}
+    //                 `;
+    // },
 
-    renderer: baselineRenderer
+    // renderer: baselineRenderer
 })
 
 const cellEdit = ref({
@@ -623,21 +385,36 @@ const project = ref(
             beforeSync: (data) => {
                 // console.log(data)
                 loading.value = true
+                saveState()
             },
             sync: (e) => {
                 loading.value = false
                 let gantt = ganttref.value.instance.value
-                canRedo.value = gantt.project.stm.canRedo
-                canUndo.value = gantt.project.stm.canUndo
+                config.value.canRedo = gantt.project.stm.canRedo
+                config.value.canUndo = gantt.project.stm.canUndo
+                gantt.zoomToFit({
+                    leftMargin: 50,
+                    rightMargin: 50
+                });
                 getNotes()
             },
             load: (e) => {
-                onExpandAllClick()
-                onZoomToFitClick()
+                let gantt = ganttref.value.instance.value
+                gantt.zoomOutFull();
+                gantt.expandAll();
+                const state = JSON.parse(localStorage.getItem('docs-gantt-state'));
+                if (state) gantt.state = state;
                 listCalendar.value = e.response.calendars.rows;
-                listShift.value = e.response.shift;
-                formCalendar.value.project = props.project.id;
                 getNotes()
+                load.value = false
+                gantt.zoomToFit({
+                    leftMargin: 50,
+                    rightMargin: 50
+                });
+            },
+            loadFail: (e) => {
+                let gantt = ganttref.value.instance.value
+                gantt.project.load()
             }
         },
     },
@@ -651,10 +428,10 @@ const ganttConfig = ref({
         { id: 'wbs', type: 'wbs', text: 'EDT', autoWidth: true }, //gecon
         { id: 'sequence', type: 'sequence', text: 'Secuencia', autoWidth: true },//gemam
         {
-            type: 'manager', autoWidth: true, text: 'Responsable'  //gemam
+            id: 'manager',type: 'manager', autoWidth: true, text: 'Responsable'  //gemam
         },
         {
-            type: 'executor', autoWidth: true, text: 'Ejecutor' //gemam
+            id: 'executor', type: 'executor', autoWidth: true, text: 'Ejecutor' //gemam
         },
         { id: 'name', type: 'name', autoWidth: true, text: 'Actividad' },
         { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true, autoWidth: true },
@@ -733,241 +510,71 @@ const ganttConfig = ref({
                     `;
             }
         },
-        { type: 'addnew', text: 'Añadir Columna', autoWidth: true },
+        {  id: 'addnew', type: 'addnew', text: 'Añadir Columna', autoWidth: true },
     ],
-    subGridConfigs: {
-        locked: {
-            flex: 1
-        },
-        normal: {
-            flex: 1
-        }
-    },
+    // subGridConfigs: {
+    // locked: {
+    //     flex: 1
+    // },
+    // normal: {
+    //     flex:1
+    // }
+    // },
     keyMap: {
         // This is a function from the existing Gantt API
-        'Ctrl+Shift+Q': () => onAddTaskClick(),
-        'Ctrl+Shift+e': () => onExportPDF(),
-        'Ctrl+z': () => undo(),
-        'Ctrl+y': () => redo(),
+        'Ctrl+z': () => { ganttref.value.instance.value.project.stm.undo() },
+        'Ctrl+y': () => ganttref.value.instance.value.project.stm.redo(),
         'Ctrl+i': 'indent',
         'Ctrl+o': 'outdent',
+        'Ctrl+m': (e) => { },
     },
 })
-//#endRegion
 
-//#region toolbar
-const onAddTaskClick = async () => {
-    let gantt = ganttref.value.instance.value
-    if (project.value.calendar_id != null) {
-        const added = gantt.taskStore.rootNode.appendChild({
-            name: "Nueva tarea",
-            duration: 1
-        });
-        gantt.indent(added)
-        // wait for immediate commit to calculate new task fields
-        await gantt.project.commitAsync();
+const headerTpl = ({ currentPage, totalPages }) => `
+    <div class="flex space-x-3 items-center">
+        <div class="p-0.5 bg-white">
+            <img src="https://top.cotecmar.com/svg/cotecmar-logo.svg"/>
+        </div>
+        <h3>${props.project.name}</h3>
+    </div>
+    <dl>
+        <dt>Fecha y hora de impresion: ${DateHelper.format(new Date(), 'll LT')}</dt>
+        <dd c>Impreso por: ${usePage().props.auth.user.name}</dd>
+        <dd>${totalPages ? `Pagina: ${currentPage + 1}/${totalPages}` : ''}</dd>
+    </dl>
+    `;
 
-        // scroll to the added task
-        await gantt.scrollRowIntoView(added);
-
-        gantt.features.cellEdit.startEditing({
-            record: added,
-            field: "name"
-        });
-    } else {
-        toast.add({ severity: 'error', group: 'customToast', text: 'Primero debe asociar un calendario', life: 2000 });
-    }
-}
-
-const onEditTaskClick = () => {
-    let gantt = ganttref.value.instance.value
-    if (gantt.selectedRecord) {
-        gantt.editTask(gantt.selectedRecord);
-    } else {
-        toast.add({ severity: 'error', group: 'customToast', text: 'Debe seleccionar la tarea a editar', life: 2000 });
-    }
-}
-
-const onExpandAllClick = () => {
-    try {
-        let gantt = ganttref.value.instance.value
-        gantt.expandAll();
-    } catch (error) {
-        // console.log(error)
-    }
-}
-
-//recojer todas las tareas
-const onCollapseAllClick = () => {
-    try {
-        let gantt = ganttref.value.instance.value
-        gantt.collapseAll();
-    } catch (error) {
-        // console.log(error)
-    }
-
-}
-
-const zoom = ref()
-function onZoomInClick() {
-    try {
-        let gantt = ganttref.value.instance.value
-        gantt.zoomIn();
-    } catch (error) {
-        // console.log(error)
-    }
-}
-
-function onZoomOutClick() {
-    try {
-        let gantt = ganttref.value.instance.value
-        gantt.zoomOut();
-    } catch (error) {
-        // console.log(error)
-    }
-}
-
-function onZoomToFitClick() {
-    try {
-        let gantt = ganttref.value.instance.value
-        gantt.zoomToFit({
-            leftMargin: 50,
-            rightMargin: 50
-        });
-    } catch (error) {
-        // console.log(error)
-    }
-
-}
-
-const fecha = ref()
-function onStartDateChange() {
-    // console.log(event)
-    let gantt = ganttref.value.instance.value
-    gantt.scrollToDate(fecha.value, { animate: 300, block: 'start' });
-
-    // gantt.startDate = DateHelper.add(event, -1, "week");
-
-    // gantt.project.setStartDate(event);
-}
-
-const texto = ref()
-function onFilterChange() {
-    let gantt = ganttref.value.instance.value
-    if (texto.value === "") {
-        gantt.taskStore.clearFilters();
-    } else {
-        texto.value = texto.value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        gantt.taskStore.filter({
-            filters: task =>
-                task.name && task.name.match(new RegExp(texto.value, "i")),
-            replace: true
-        });
-    }
-}
-
-const setLB = ref();
-const seeLB = ref();
-const setBaseline = (index) => {
-    let gantt = ganttref.value.instance.value
-    gantt.taskStore.setBaseline(index);
-}
-
-const selectedLb = ref({})
-
-const toggleBaselineVisible = () => {
-    let gantt = ganttref.value.instance.value
-    // console.log(selectedLb.value)
-    Object.entries(selectedLb.value).forEach(element => {
-        // console.log(element[0])
-        gantt.element.classList[element[1] ? 'remove' : 'add'](`b-hide-baseline-${element[0]}`);
-    });
-}
-
-function baselineRenderer({ baselineRecord, taskRecord, renderData }) {
-    if (baselineRecord.endDate.getTime() + 24 * 3600 * 1000 < taskRecord.endDate.getTime()) {
-        renderData.className['b-baseline-behind'] = 1;
-    }
-    else if (taskRecord.endDate < baselineRecord.endDate) {
-        renderData.className['b-baseline-ahead'] = 1;
-    }
-    else {
-        renderData.className['b-baseline-on-time'] = 1;
-    }
-}
-// #region exportar
-const visibleExport = ref({
-    modal: false,
-    load: false
-})
-const columnsExport = ref([])
-function showModalExport() {
-    let gantt = ganttref.value.instance.value
-    columnsExport.value = gantt.columns.map((c) => {
-        if (c.type != 'addnew' && c.text != null) {
-            return { text: c.text, type: c.id }
-        }
-    }).filter((c) => c !== undefined)
-    visibleExport.value.modal = true
-}
-
-
+const footerTpl = () => `
+<h3>© ${new Date().getFullYear()} TOP - COTECMAR</h3></div>
+`;
 const pdfExport = ref({
     exportServer: 'https://dev.bryntum.com:8082',
     headerTpl,
     footerTpl,
-    orientation: 'landscape',
-    paperFormat: 'Letter',
-    keepRegionSizes: { locked: true },
-    columns: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'],
-    repeatHeader: true,
-    exporterType: 'multipagevertical',
-    fileFormat: 'pdf',
-    fileName: 'Cronograma-' + props.project.name + '-' + DateHelper.format(new Date(), 'YYYY-MM-DD')
+    // orientation: 'landscape',
+    // paperFormat: 'Letter',
+    // keepRegionSizes: { locked: true },
+    // columns: ['wbs', 'name', 'percentdone', 'duration', 'startdate', 'enddate'],
+    // repeatHeader: true,
+    // exporterType: 'multipagevertical',
+    // fileFormat: 'pdf',
+    // fileName: 'Cronograma-' + props.project.name + '-' + DateHelper.format(new Date(), 'YYYY-MM-DD')
 })
 
-
-const exportSchedule = async () => {
-    visibleExport.value.load = true
-    let gantt = ganttref.value.instance.value
-    await gantt.features.pdfExport.export({ columns: pdfExport.value.columns })
-        .then(result => {
-            // console.log(result)
-            toast.add({ text: 'Exportando...', severity: 'success', group: 'customToast', life: 3000 });
-            visibleExport.value.modal = false
-        })
-        .catch((error) => {
-            toast.add({ text: 'Ha ocurrido un error', severity: 'error', group: 'customToast', life: 3000 });
-            console.log(error)
-        });
-    visibleExport.value.load = false
-}
-
-const onExport = () => {
-    let gantt = ganttref.value.instance.value
-    // give a filename based on task name
-    const filename = props.project.SAP_code + '-' + props.project.name + '.xml'
-    // call the export to download the XML file
-    gantt.features.mspExport.export({
-        filename
-    });
-}
-// #endregion
-
-const setConf = ref()
 const rowHeight = ref()
 const barMargin = ref()
 const barMarginMax = ref()
 
-const onSettingsShow = (event) => {
-    let gantt = ganttref.value.instance.value
-    rowHeight.value = gantt.rowHeight;
-    barMargin.value = gantt.barMargin;
-    barMarginMax.value = gantt.rowHeight / 2 - 5;
-    setConf.value.toggle(event)
-}
+// const onSettingsShow = (event) => {
+//     let gantt = ganttref.value.instance.value
+//     rowHeight.value = gantt.rowHeight;
+//     barMargin.value = gantt.barMargin;
+//     barMarginMax.value = gantt.rowHeight / 2 - 5;
+//     setConf.value.toggle(event)
+// }
 
 //ajuste de altura de filas
+
 const onSettingsRowHeightChange = () => {
     let gantt = ganttref.value.instance.value
     gantt.rowHeight = rowHeight.value;
@@ -979,157 +586,9 @@ const onSettingsMarginChange = () => {
     let gantt = ganttref.value.instance.value
     gantt.barMargin = barMargin.value;
 }
-const modalImport = ref(false)
-const fileMSP = ref()
-const ganttrefimport = ref()
-const ganttConfigImporter = ref({
-    emptyText: 'Seleccione un archivo',
-    startDate: new Date(),
-    endDate: new Date((new Date).getFullYear(), (new Date).getMonth(), (new Date).getDate() + 30),
-    rowHeight: 28,
-    dependencyIdField: 'sequenceNumber',
-    columns: [
-        { id: 'wbs', type: 'wbs', text: 'EDT' },
-        { id: 'sequence', type: 'sequence', text: 'Secuencia' },
-        { id: 'name', type: 'name', },
-        { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true },
-        { id: 'duration', type: 'duration', text: 'Duración' },
-        { id: 'startdate', type: 'startdate', text: 'Fecha Inicio' },
-        { id: 'enddate', type: 'enddate', text: 'Fecha fin' },
-        { type: 'addnew', text: 'Añadir Columna' },
-    ],
-    subGridConfigs: {
-        locked: {
-            flex: 1
-        },
-        normal: {
-            flex: 1
-        }
-    },
-}
-)
-let auxproj
-const btnImport = ref(true)
-const uploadMSP = async (file) => {
-    let ganttImport = ganttrefimport.value.instance.value
-    const importer = new Importer({
-        // gantt panel reference
-        ganttImport,
-        // Columns that should be shown by the Gantt
-        // if the imported file does not provide columns list
-        defaultColumns: [
-            { id: 'wbs', type: 'wbs', text: 'EDT' },
-            { id: 'name', type: 'name', },
-            { id: 'percentdone', type: 'percentdone', text: 'Avance', showCircle: true },
-            { id: 'duration', type: 'duration', text: 'Duración' },
-            { id: 'startdate', type: 'startdate', text: 'Fecha Inicio' },
-            { id: 'enddate', type: 'enddate', text: 'Fecha fin' },
-            { type: 'addnew', text: 'Añadir Columna' },
-        ]
-    });
-    const formData = new FormData();
-
-    formData.append('mppFile', file);
-
-    ganttImport.maskBody('Importando, espere por favor ...');
-
-    try {
-        await axios.post(route('ganttImporter'), formData)
-            .then(async (res) => {
-                if (res.status == 200) {
-                    const { project } = ganttImport;
-                    await importer.importData(res.data);
-                    auxproj = res.data.project
-                    // project.destroy();
-                    ganttImport.setStartDate(ganttImport.project.startDate);
-                    await ganttImport.scrollToDate(ganttImport.project.startDate, { block: 'start' });
-                    btnImport.value = false
-                } else {
-                    console.log(res)
-                    toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
-                }
-            })
-            .catch((error) => {
-                console.log(error)
-                toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
-            })
-        ganttImport.unmaskBody();
-    }
-    catch (error) {
-        toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
-        console.log(error);
-        ganttImport.unmaskBody();
-    }
-}
-const loadImport = ref(false)
-const importMSP = async () => {
-    loadImport.value = true
-    let ganttImport = ganttrefimport.value.instance.value
-    let gantt = ganttref.value.instance.value
-    let project = {
-        autoSync: false,
-        autoLoad: false,
-        transport: {
-            sync: {
-                url: route('syncGantt', props.project),
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                credentials: 'include'
-            }
-        },
-        validateResponse: true,
-        listeners: {
-            syncFail: (e) => {
-                console.log(e)
-                toast.add({ text: 'Ha ocurrido un error, verifique el archivo e intente nuevamente', severity: 'error', group: 'customToast', life: 3000 });
-                loadImport.value = false
-            },
-        }
-    }
-    Object.assign(ganttImport.project, project)
-    const dataImport = JSON.parse(JSON.stringify(ganttImport.project))
-    const projectImport = dataImport.project
-    const calendarImport = dataImport.calendarsData.find((calendar) => { return calendar.id === projectImport.calendar })
-    await axios.post(route('before.sync', props.project), { project: auxproj, calendar: calendarImport })
-        .then(async (res) => {
-            // console.log(res)
-            await ganttImport.project.sync()
-            await gantt.project.load()
-            toast.add({ text: 'Importado correctamente', severity: 'info', group: 'customToast', life: 3000 });
-        })
-        .catch((error) => {
-            console.log(error)
-            toast.add({ text: 'Hubo un error', severity: 'info', group: 'customToast', life: 3000 });
-        })
-    modalImport.value = false
-    loadImport.value = false
-}
-
-const undo = () => {
-    let gantt = ganttref.value.instance.value
-    gantt.project.stm.undo()
-}
-const redo = () => {
-    let gantt = ganttref.value.instance.value
-    gantt.project.stm.redo()
-}
-
-const critical = ref(false)
-const showCritical = () => {
-    critical.value = !critical.value
-    let gantt = ganttref.value.instance.value
-    gantt.features.criticalPaths.disabled = critical.value
-}
-
-const visibleNotes = ref(false)
 
 //#endregion
 
-//#region calendario
-const newCalendarModal = ref()
-const newCalendarData = ref({})
 const url = [
     {
         ruta: 'projects.index',
@@ -1142,197 +601,25 @@ const url = [
     }
 ]
 
-const calendar = ref();
-const calendarCreate = ref(true);
-
-const listDays = ref([
-    { name: 'Lunes', code: "MONDAY" },
-    { name: 'Martes', code: "TUESDAY" },
-    { name: 'Miercoles', code: "WEDNESDAY" },
-    { name: 'Jueves', code: "THURSDAY" },
-    { name: 'Viernes', code: "FRIDAY" },
-    { name: 'Sabado', code: "SATURDAY" },
-    { name: 'Domingo', code: "SUNDAY" }
-]);
-const listCalendar = ref([]);
-const loadSaveCalendar = ref(false);
-const listShift = ref([]);
-const formCalendar = ref({
-    newCalendar: false,
-    project: '',
-    calendar: null,
-    name: '',
-    days: [],
-    shift: null,
-    isWorking: []
-})
-const toggleCalendar = (event) => {
-    formCalendar.value.newCalendar = false;
-    calendarCreate.value = true;
-    calendar.value.toggle(event);
-}
-const newCalendar = () => {
-    calendarCreate.value = false;
-    formCalendar.value.newCalendar = true;
-    newCalendarModal.value = true
-    calendar.value.hide();
-}
-const reload = () => {
+function saveState() {
     let gantt = ganttref.value.instance.value
-    gantt.project.load();
+    localStorage.setItem('docs-gantt-state', JSON.stringify(gantt.state));
 }
-async function setCalendarToProject() {
-    let gantt = ganttref.value.instance.value
-    loadSaveCalendar.value = true
-    await axios.post(route('assignment.calendar'), formCalendar.value).then(async (res) => {
-        if (res.data.status) {
-            toast.add({
-                severity: 'success',
-                group: 'customToast',
-                text: res.data.mensaje,
-                life: 4000
-            })
-            await gantt.project.setCalendar(formCalendar.value.calendar);
-        } else {
-            toast.add({
-                severity: 'error',
-                group: 'customToast',
-                text: res.data.mensaje,
-                life: 4000
-            })
-        }
-    })
-    loadSaveCalendar.value = false
-}
-const submit = async () => {
-    loadSaveCalendar.value = true;
-    let gantt = ganttref.value.instance.value
-    let error = false;
-    if (formCalendar.value.newCalendar) {
-        if (formCalendar.value.name == '') {
-            toast.add({
-                severity: 'error',
-                group: 'customToast',
-                text: 'Debe ingresar el nombre del calendario',
-                life: 2000
-            });
-
-            error = true;
-        } else if (formCalendar.value.days == []) {
-            toast.add({
-                severity: 'error',
-                group: 'customToast',
-                text: 'Debe deleccionar al menos 1 dia',
-                life: 2000
-            });
-            error = true;
-        } else if (formCalendar.value.shift == null) {
-            toast.add({
-                severity: 'error',
-                group: 'customToast',
-                text: 'Debe deleccionar al menos 1 dia',
-                life: 3000
-            });
-            error = true;
-        }
-    } else {
-        if (formCalendar.value.calendar == null) {
-            toast.add({
-                severity: 'error',
-                group: 'customToast',
-                text: 'Debe seleccionar un calendario',
-                life: 3000
-            });
-            error = true;
-        }
-    }
-    if (!error) {
-        loadSaveCalendar.value = true;
-        await axios.post(route('assignment.calendar'), formCalendar.value).then((res) => {
-            console.log(res.data);
-            if (res.data.status) {
-                toast.add({
-                    severity: 'success',
-                    group: 'customToast',
-                    text: res.data.mensaje,
-                    life: 4000
-                })
-                loadSaveCalendar.value = false;
-                gantt.project.load();
-                calendar.value.hide();
-            } else {
-                toast.add({
-                    severity: 'error',
-                    group: 'customToast',
-                    text: res.data.mensaje,
-                    life: 4000
-                })
-            }
-        }).catch((e) => {
-            console.log(e);
-            toast.add({
-                severity: 'error',
-                group: 'customToast',
-                text: e.mensaje,
-                life: 4000
-            })
-        })
-    } else {
-
-        loadSaveCalendar.value = false;
-    }
-}
-//#endregion
-
-//#region cambio color
-
-const colorRow = ref('bg-green-200')
-const colors = [
-    { value: 'none', name: 'Sin fondo' },
-    { value: 'bg-red-200', name: 'Rojo' },
-    { value: 'bg-green-200', name: 'Verde' },
-    { value: 'bg-yellow-200', name: 'Amarillo' },
-    { value: 'bg-blue-200', name: 'Azul' },
-    { value: 'bg-orange-200', name: 'Naranja' },
-    { value: 'bg-cyan-200', name: 'Acua' },
-    { value: 'bg-amber-200', name: 'Ámbar' },
-    { value: 'bg-lime-200', name: 'Lima' },
-    { value: 'bg-emerald-200', name: 'Esmeralda' },
-    { value: 'bg-teal-200', name: 'Turquesa' },
-    { value: 'bg-sky-200', name: 'Cielo' },
-    { value: 'bg-indigo-200', name: 'Índigo' },
-    { value: 'bg-violet-200', name: 'Violeta' },
-    { value: 'bg-purple-200', name: 'Purpura' },
-    { value: 'bg-fuchsia-200', name: 'Fucsia' },
-    { value: 'bg-pink-200', name: 'Rosado' },
-    { value: 'bg-rose-200', name: 'Rosa' },
-]
-function changeColorRow(color) {
-    colorRow.value = color
-    let gantt = ganttref.value.instance.value
-    if (gantt.selectedRecords.length > 0) {
-        gantt.selectedRecords.forEach((task) => {
-            task.set('rowcolor', color)
-        })
-    } else {
-        toast.add({ severity: 'error', group: 'customToast', text: 'Debe seleccionar la tarea a editar', life: 2000 });
-    }
-}
-
-//#endregion
 </script>
 <template>
     <AppLayout :href="url">
-        <div id="ganttContainer" :class="full ? 'fixed bg-white z-50 top-0 left-0 h-screen w-screen' : 'h-full w-full'"
+        <div id="ganttContainer" @click="saveState()"
+            :class="config.full ? 'fixed bg-white z-50 top-0 left-0 h-screen w-screen' : 'h-full w-full'"
             class="flex flex-col overflow-y-auto gap-y-1">
             <div class="rounded-t-lg h-8 flex justify-between cursor-default">
                 <span class="bg-blue-800 flex justify-between rounded-tl-lg w-full">
                     <p class="text-md pl-3 flex items-center font-semibold capitalize text-white">
                         {{ props.project.name }}
                     </p>
-                    <p :class="readOnly ? 'bg-success text-white font-bold ' : 'text-white bg-warning '"
-                        class="px-3 flex items-center">{{ readOnly ? 'Modo lectura' : 'Modo edicion' }}</p>
+                    <p :class="config.readOnly ? 'bg-success text-white font-bold ' : 'text-white bg-warning '"
+                        class="px-3 flex items-center">{{ config.readOnly ? 'Modo lectura' : 'Modo edicion' }}</p>
                 </span>
+                <!-- <Button @click="showColumns"></Button> -->
                 <span v-if="!error"
                     v-tooltip.bottom="loading ? 'Sincronizando cambios...' : 'Todos los cambios estan guardados'"
                     class="w-48 justify-end px-2 flex items-center space-x-2 text-white bg-success rounded-tr-lg">
@@ -1346,87 +633,20 @@ function changeColorRow(color) {
                     <i class="fa-solid fa-triangle-exclamation"></i>
                 </span>
             </div>
-            <div class="px-1 flex justify-between">
-                <div class="flex flex-wrap gap-1">
-                    <Button raised icon="fa-solid fa-plus" v-tooltip.bottom="'Nueva actividad'" severity="success"
-                        @click=onAddTaskClick() v-if="!readOnly" />
-                    <Button raised icon="fa-solid fa-pen" v-tooltip.bottom="'Editar Actividad'" severity="warning"
-                        @click="onEditTaskClick()" v-if="!readOnly" />
-                    <Button icon="fa-solid fa-rotate-left" severity="secondary" @click="undo()" text
-                        :disabled="!canUndo" v-if="!readOnly" v-tooltip.bottom="'Deshacer'" />
-                    <Button icon="fa-solid fa-rotate-right" severity="secondary" @click="redo()" text
-                        :disabled="!canRedo" v-if="!readOnly" v-tooltip.bottom="'Rehacer'" />
-                    <Button raised icon="fa-solid fa-chevron-down" v-tooltip.bottom="'Expandir todo'"
-                        severity="secondary" @click="onExpandAllClick()" />
-                    <Button raised icon="fa-solid fa-chevron-up" v-tooltip.bottom="'Contraer todo'" severity="secondary"
-                        @click="onCollapseAllClick()" />
-                    <SplitButton raised v-tooltip.bottom="'Colorear'" v-if="!readOnly" :model="colors" text
-                        @click="changeColorRow(colorRow)" :pt="{
-        menu: {
-            root: 'flex',
-            menu: 'grid grid-cols-6 items-center gap-1 flex-wrap space-y-0',
-            menuitem: 'm-0 w-min'
-        }
-    }">
-                        <template #icon>
-                            <div :class="colorRow" class="w-8 h-6"></div>
-                        </template>
-                        <template #menubuttonicon>
-                            <i class="fa-solid fa-fill-drip"></i>
-                        </template>
-                        <template #item="{ item }">
-                            <div :class="item.value" v-tooltip="item.name" @click="changeColorRow(item.value)"
-                                class="w-8 h-6 border cursor-pointer hover:ring-1" />
-                        </template>
-                    </SplitButton>
-                    <Button raised icon="fa-solid fa-gear" v-tooltip.bottom="'Ajustes'" severity="secondary"
-                        @click="onSettingsShow" />
-                    <Button raised icon="fa-solid fa-magnifying-glass" v-tooltip.bottom="'Zoom'" severity="secondary"
-                        @click="zoom.toggle($event)" />
-                    <Button raised v-tooltip.bottom="'Agregar Calendario'" icon="fa-regular fa-calendar-plus"
-                        v-if="!readOnly" @click="toggleCalendar" />
-                    <Button raised v-tooltip.bottom="'Guardar en linea base'" icon="fa-solid fa-grip-lines"
-                        @click="setLB.toggle($event);" v-if="!readOnly" />
-                    <Button raised v-tooltip.bottom="'Ver lineas base'" icon="fa-solid fa-eye"
-                        @click="seeLB.toggle($event)" />
-                    <Button raised v-tooltip.bottom="'Exportar a PDF'" icon="fa-solid fa-file-pdf"
-                        @click="showModalExport()" />
-                    <Button raised v-tooltip.bottom="'Exportar a XML'" icon="fa-solid fa-file-arrow-down"
-                        @click="onExport()" />
-                    <Button raised v-tooltip.bottom="'Importar desde MSProject'" v-if="!readOnly" type="input"
-                        icon="fa-solid fa-upload" @click="modalImport = true" />
-                    <Button raised v-tooltip.bottom="'Ruta critica'" severity="danger"
-                        icon="fa-solid fa-circle-exclamation" @click="showCritical()" />
-                    <Button raised v-tooltip.bottom="'Guardar'" severity="success" icon="fa-solid fa-save"
-                        @click="reload" v-if="!readOnly" />
-                    <Button raised v-tooltip.bottom="'Ver notas'" :disabled="notes.data.length == 0"
-                        :loading="notes.load" severity="success" icon="fa-regular fa-note-sticky"
-                        @click="visibleNotes = true" />
-
-                    <Calendar dateFormat="dd/mm/yy" :manualInput="false" v-model="fecha" @dateSelect="onStartDateChange"
-                        placeholder="Buscar por fecha" class="hidden sm:flex !h-8 shadow-md" showIcon
-                        :pt="{ input: '!h-8' }" />
-                    <InputText v-model="texto" @input="onFilterChange" placeholder="Buscar por actividad"
-                        class="shadow-md hidden sm:flex" />
-                </div>
-                <div class="flex gap-1">
-                    <Button v-tooltip.left="readOnly ? 'Modo edicion' : 'Solo lectura'"
-                        :icon="readOnly ? 'fa-solid fa-pen-to-square' : 'fa-solid fa-eye'" severity="help" raised
-                        @click="editMode" />
-                    <Button v-tooltip.left="full ? 'Pantalla normal' : 'Pantalla completa'"
-                        :icon="full ? 'fa-solid fa-minimize' : 'fa-solid fa-maximize'" severity="help" raised
-                        @click="full = !full" />
-                </div>
+            <CustomToolbar v-if="!load" :notes :listCalendar v-model:config="config" :project="props.project"
+                v-model:gantt="ganttref.instance.value" />
+            <div v-else class="h-10 flex flex-col justify-center px-20">
+                <ProgressBar mode="indeterminate" style="height: 6px"></ProgressBar>
             </div>
-            <BryntumGantt :style="'font-size:' + fontSize + ';'" :filterFeature="true" :taskEditFeature="taskEdit"
-                :projectLinesFeature="false" :timelineScrollButtons="true" :cellEditFeature="cellEdit"
-                :pdfExportFeature="pdfExport" :mspExportFeature="true" :projectLines="true"
-                :baselinesFeature="baselines" ref="ganttref" class="h-full" :printFeature="true" v-bind="ganttConfig"
-                :dependenciesFeature="{ radius: 5 }" :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip"
-                :criticalPathsFeature="criticalPaths" :nonWorkingTimeFeature="nonWorkingTime" />
+            <BryntumGantt @catchAll="saveState" :filterFeature="true" :taskEditFeature="taskEdit" :projectLinesFeature="false"
+                :timelineScrollButtons="true" :cellEditFeature="cellEdit" :pdfExportFeature="pdfExport"
+                :mspExportFeature="true" :projectLines="true" :baselinesFeature="baselines" ref="ganttref"
+                class="h-full" :printFeature="true" v-bind="ganttConfig" :dependenciesFeature="{ radius: 5 }"
+                :timeRangesFeature="timeRanges" :taskTooltipFeature="taskTooltip" :criticalPathsFeature="criticalPaths"
+                :nonWorkingTimeFeature="nonWorkingTime" />
         </div>
     </AppLayout>
-    <OverlayPanel id="setLB" ref="setLB" :pt="{ content: '!p-1' }">
+    <!-- <OverlayPanel id="setLB" ref="setLB" :pt="{ content: '!p-1' }">
         <div class="flex flex-col space-y-1">
             <p>Lineas base</p>
             <span v-for="index in 4">
@@ -1461,143 +681,9 @@ function changeColorRow(color) {
                     :options="['5px', '6px', '7px', '8px', '9px', '10px', '11px', '12px', '13px', '14px']" />
             </span>
         </div>
-    </OverlayPanel>
-    <OverlayPanel id="zoom" ref="zoom" :pt="{ content: '!p-2' }">
-        <div class="flex space-x-1">
-            <Button raised icon="fa-solid fa-magnifying-glass-plus" v-tooltip.bottom="'Aumentar'" severity="primary"
-                @click="onZoomInClick()" />
-            <Button raised icon="fa-solid fa-magnifying-glass-minus" v-tooltip.bottom="'Reducir'" severity="warning"
-                @click="onZoomOutClick()" />
-            <Button raised icon="fa-solid fa-xmark" v-tooltip.bottom="'Reestablecer'" severity="danger"
-                @click="onZoomToFitClick()" />
-        </div>
-    </OverlayPanel>
-    <CustomModal v-model:visible="modalImport" icon="fa-solid fa-upload" titulo="Importar desde project" width="80vw">
-        <template #body>
-            <div class="w-full flex h-[70vh] flex-col">
-                <div class="flex space-x-4 items-center">
-                    <p>Seleccione el archivo a importar</p>
-                    <FileUpload mode="basic" class="h-8" v-model:input="fileMSP" accept=".mpp"
-                        @select="uploadMSP($event.files[0])" />
-                </div>
-                <BryntumGantt ref="ganttrefimport" class="h-full" v-bind="ganttConfigImporter" />
-            </div>
-        </template>
-        <template #footer>
-            <Button severity="danger" label="Cancelar" :disabled="loadImport" @click="modalImport = false" />
-            <Button severity="success" :loading="loadImport" label="Importar" :disabled="btnImport"
-                @click="importMSP" />
-        </template>
-    </CustomModal>
-    <OverlayPanel ref="calendar" class="w-96">
-        <div v-if="calendarCreate" class="flex flex-col gap-2 mb-2">
-            <div class="flex justify-between items-center gap-2">
-                <label class="">Asignación de calendario</label>
-                <Button severity="success" v-tooltip.rigth="'Nuevo Calendario'" icon="fa-solid fa-plus"
-                    @click="newCalendar" />
-            </div>
-            <Dropdown v-model="formCalendar.calendar" :options="listCalendar" optionLabel="name"
-                placeholder="Seleccione un calendario" checkmark :highlightOnSelect="false" class="w-full" showClear />
-        </div>
-        <!-- F0rmulario de creación -->
+    </OverlayPanel> -->
 
-        <div v-if="!calendarCreate">
-            <h1 class="text-center">Nuevo Calendario</h1>
-            <CustomInput label="Nombre" id="name" v-model:input="formCalendar.name"
-                placeholder="Nombre del Calendario" />
-            <br>
-            <section class="grid grid-cols-2 gap-2">
-                <MultiSelect v-model="formCalendar.days" :options="listDays" optionLabel="name"
-                    placeholder="Seleccione días" :maxSelectedLabels="3" class="w-full md:w-20rem" display="chip" />
-                <Dropdown v-model="formCalendar.shift" :options="listShift" optionLabel="name"
-                    placeholder="Seleccione horario" checkmark :highlightOnSelect="false" class="w-full" showClear />
-                <div class="flex align-items-center">
-                    <Checkbox v-model="formCalendar.isWorking" inputId="isWorking" name="Día Laboral"
-                        value="isWorking" />
-                    <label for="isWorking" class="ml-2"> Día Laboral </label>
-                </div><br>
-            </section>
-        </div>
-        <span class="flex justify-end">
-            <Button severity="success" :loading="loadSaveCalendar" label="Guardar"
-                @click="calendarCreate ? setCalendarToProject() : submit()" />
-        </span>
-    </OverlayPanel>
-
-    <Sidebar v-model:visible="visibleNotes" header="Notas del proyecto" position="right">
-        <div class="border-t w-full space-y-2 p-1">
-            <div v-if="notes.data.length == 0" class="mt-10">
-                <Empty message="No hay notas" />
-            </div>
-            <div v-else v-for="note, index in notes.data"
-                @click="(texto == note.name ? texto = '' : texto = note.name); onFilterChange()"
-                class="border cursor-pointer rounded-md p-1 hover:bg-primary-light"
-                :class="texto == note.name ? 'bg-success-light' : ''">
-                <label :for="index + note.id" class="font-bold w-full text-center">{{ note.name }}</label>
-                <p class="w-full border rounded-md overflow-hidden p-1 text-ellipsis">
-                    {{ note.note }}
-                </p>
-            </div>
-        </div>
-    </Sidebar>
-
-    <!-- #region prueba exportar -->
-    <CustomModal v-model:visible="visibleExport.modal" icon="fa-solid fa-file-export" titulo="Exportar cronograma"
-        width="40vw">
-        <template #body>
-            <div class="space-y-4">
-                <div class="w-full">
-                    <label for="exportName">Nombre del archivo</label>
-                    <InputText id="exportName" class="w-full" v-model="pdfExport.fileName" />
-                </div>
-                <div class="w-full">
-                    <label for="columns">Seleccionar columnas a exportar</label>
-                    <MultiSelect v-model="pdfExport.columns" option-value="type" option-label="text" class="w-full"
-                        id="columns" display="chip" :options="columnsExport">
-                    </MultiSelect>
-                    <!-- {{ columnsExport }} -->
-                </div>
-                <div class="grid grid-cols-3 gap-4">
-                    <div class="w-full">
-                        <label for="orientation">Orientación</label>
-                        <Dropdown v-model="pdfExport.orientation" option-value="value" option-label="text"
-                            class="w-full" id="orientation"
-                            :options="[{ text: 'Panoramica', value: 'landscape' }, { text: 'Retrato', value: 'portrait' }]">
-                        </Dropdown>
-                    </div>
-                    <div class="w-full">
-                        <label for="format">Formato de hoja</label>
-                        <Dropdown v-model="pdfExport.paperFormat" option-value="value" option-label="text"
-                            class="w-full" id="format"
-                            :options="[{ text: 'A1', value: 'A1' }, { text: 'A2', value: 'A2' }, { text: 'A3', value: 'A3' }, { text: 'A4', value: 'A4' }, { text: 'A5', value: 'A5' }, { text: 'Oficio', value: 'Legal' }, { text: 'Carta', value: 'Letter' }]">
-                        </Dropdown>
-                    </div>
-                    <div class="w-full">
-                        <label for="fileformat">Formato de archivo</label>
-                        <Dropdown v-model="pdfExport.fileFormat" option-value="value" option-label="text" class="w-full"
-                            id="fileformat" :options="[{ text: 'PDF', value: 'pdf' }, { text: 'PNG', value: 'png' }]">
-                        </Dropdown>
-                    </div>
-                </div>
-            </div>
-        </template>
-        <template #footer>
-            <span class="pr-4 mt-4 space-x-2">
-                <Button label="Cancelar" :loading="visibleExport.load" severity="danger"
-                    icon="fa-regular fa-circle-xmark" @click="visibleExport.modal = false" />
-                <Button label="Exportar" :loading="visibleExport.load" severity="success" icon="fa-solid fa-download"
-                    @click="exportSchedule()" />
-            </span>
-        </template>
-    </CustomModal>
-    <!-- #endregion -->
-
-    <!-- #region prueba exportar -->
-
-    <CustomModalCalendars v-model:visible="newCalendarModal" :project="props.project"/>
-    <!-- #endregion -->
 </template>
-
 
 <style>
 .b-export-header,

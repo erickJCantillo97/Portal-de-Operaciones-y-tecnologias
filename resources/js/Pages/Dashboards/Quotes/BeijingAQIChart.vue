@@ -40,15 +40,19 @@ export default {
 
       myChart.setOption(
         ({
-
+          title: {
+            text: 'Grafica De Control.',
+            subtext: 'Variaciación porcentual costo directo estimado vs ejecutado'
+          },
           tooltip: {
             trigger: 'axis',
             formatter: '{b}: {c}%',
           },
           grid: {
-            left: '5%',
-            right: '15%',
-            bottom: '10%'
+            top: '18%',
+            left: '3%',
+            right: '3%',
+            bottom: '5%'
           },
           xAxis: [
             {
@@ -57,6 +61,7 @@ export default {
             },
             {
               type: 'category',
+              position: 'bottom',
               axisTick: {
                 alignWithLabel: true
               },
@@ -82,7 +87,7 @@ export default {
             },
           },
           toolbox: {
-            right: 10,
+            right: 1,
             feature: {
               dataZoom: {
                 yAxisIndex: 'none'
@@ -91,19 +96,12 @@ export default {
               saveAsImage: {}
             }
           },
-          // dataZoom: [
-          //   {
-          //     start: '2015-04-01',
-          //     end: '2015-04-01',
-          //     startValue: '2015-04-01',
-          //     endValue: '2022-04-01',
-          //   },
-          //   {
-          //     type: 'inside'
-          //   }
-          // ],
+          dataZoom: {
+            start: 70,
+            type: 'inside'
+          },
           visualMap: {
-            top: 50,
+            top: 30,
             right: 10,
             pieces: [
               {
@@ -134,37 +132,12 @@ export default {
           series: [{
             label: {
               show: true,
-              position: 'top',
+              position: 'bottom',
               formatter: '{b}',
               fontSize: 10,
             },
-            name: 'Gráfica de Control',
             type: 'line',
             data: this.variations,
-
-            markLine: {
-              silent: true,
-              lineStyle: {
-                color: '#333'
-              },
-              data: [
-                {
-                  yAxis: 50
-                },
-                {
-                  yAxis: 100
-                },
-                {
-                  yAxis: 150
-                },
-                {
-                  yAxis: 200
-                },
-                {
-                  yAxis: 300
-                }
-              ]
-            }
           }]
         })
       )
@@ -238,7 +211,9 @@ export default {
         '2019',
         '2020',
         '2021',
-        '2022'
+        '2022',
+        '2023',
+        '2024'
       ]
     }
   }

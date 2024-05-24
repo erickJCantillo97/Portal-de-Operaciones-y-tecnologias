@@ -20,7 +20,7 @@ defineProps({
                 class="truncate text-center text-xs font-bold text-[#3b3f5c] hover:font-bold sm:text-sm dark:text-white-dark">
                 {{ label }}
             </h4>
-            <count-up class="text-primary text-xl sm:text-2xl text-center" :startVal="0" :end-val="value" :duration="3">
+            <count-up class="text-primary  text-center" :startVal="0" :end-val="value" :duration="3">
             </count-up>
         </div>
     </div>

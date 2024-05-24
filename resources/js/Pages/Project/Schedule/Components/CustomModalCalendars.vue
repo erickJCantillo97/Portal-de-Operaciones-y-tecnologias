@@ -10,19 +10,21 @@ import MultiSelect from 'primevue/multiselect';
 import TabPanel from 'primevue/tabpanel';
 import TabView from 'primevue/tabview';
 import OverlayPanel from 'primevue/overlaypanel';
+import Dropdown from 'primevue/dropdown';
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 
 const props = defineProps({
-    project: Object
+    project: Object,
+    listCalendar: Array,
+    class: String
 })
 
 const yearsSelect = ref([(new Date).getFullYear()])
 const holidays = ref({})
 const selecDayWeek = ref({})
-// holidays.value[yearsSelect.value[0]] = getDays.getColombiaHolidaysByYear(yearsSelect.value[0])
 const newCalendarData = ref({})
-const visible = defineModel('visible', {
-    required: true
-})
+const visible = ref()
 const form = ref({
     project: props.project.id,
     name: null,
@@ -163,7 +165,7 @@ function activateHolidays(option) {
     if (yearsSelect.value.length == 0) {
         form.value.statusHolidays = false
     }
-    form.value.holidays = form.value.holidays.filter(day => day.type !== 'Festivo legal');
+    form.value.holidays = form.value.holidays.filter(day => day.type !== 'Festivo');
     yearsSelect.value.sort((a, b) => a - b)
     yearsSelect.value.forEach(year => {
         getholidays(year)
@@ -174,8 +176,9 @@ function activateHolidays(option) {
                     form.value.holidays.push({
                         startDay: holiday.holiday,
                         endDay: holiday.holiday,
-                        text: holiday.celebration,
-                        type: 'Festivo legal'
+                        description: holiday.celebration,
+                        type: 'Festivo',
+                        isWorking: false
                     });
                 }
             });
@@ -206,20 +209,14 @@ function compareDates(date) {
 
 
     const existeFestivo = form.value.holidays.find(h => {
-        // console.log(formatDate(day))
         return formatDate(day) >= h.startDay && formatDate(day) <= h.endDay;
     });
 
     if (existeFestivo) {
-        if (existeFestivo.type == 'Festivo legal') {
-            return 2
-        } else if (existeFestivo.type == 'Festivo local') {
-            return 4
-        }
-        else if (existeFestivo.type == 'Vacaciones colectivas') {
-            return 5
+        if (existeFestivo.isWorking) {
+            return 1
         } else {
-            return 6
+            return 2
         }
     }
 
@@ -230,26 +227,22 @@ function compareDates(date) {
             return 1;
         }
     }
-
     return 3;
 }
 
 
 const references = [
     { class: 'bg-white', text: 'Laborable' },
-    { class: 'bg-blue-500 text-white', text: 'Laborable modificado' },
-    { class: 'bg-red-500 text-white', text: 'Festivo legal' },
-    { class: 'bg-yellow-500 text-white', text: 'No laborable' },
-    { class: 'bg-orange-500 text-white', text: 'Festivo local' },
-    { class: 'bg-green-500 text-white', text: 'Vacaciones colectivas' },
-    { class: 'bg-pink-500 text-white', text: 'Otros' },
+    { class: 'bg-blue-500 text-white', text: 'Laborable excepción' },
+    { class: 'bg-red-500 text-white', text: 'No laborable' },
+    { class: 'bg-yellow-500 text-white', text: 'Descanso' },
 ]
 
 const columnas = [
+    { field: 'description', header: 'Descripcion', filter: 'true' },
     { field: 'startDay', header: 'Dia inicio', type: 'date', filter: 'true' },
     { field: 'endDay', header: 'Dia fin', type: 'date', filter: 'true' },
-    { field: 'text', header: 'Descripcion', filter: 'true' },
-    { field: 'type', header: 'Tipo', filter: 'true' },
+    { field: 'isWorking', header: 'Laborable', filter: 'true', type: 'boolean' },
 ]
 const actions = [
     { event: 'deleteClic', severity: 'danger', icon: 'fa-solid fa-trash', class: '!h-8', text: true, outlined: false, rounded: false },
@@ -297,33 +290,143 @@ const toggle = (event) => {
 }
 
 const newExeption = ref({
-    text: null,
+    description: null,
     startDay: null,
     endDay: null,
-    type: 'No laborable'
+    startHour: null,
+    endHour: null,
+    type: 'Personalizado',
+    isWorking: false
 })
 function addExeption() {
     form.value.holidays.push(newExeption.value)
     newExeption.value = {
-        text: null,
+        description: null,
         startDay: null,
         endDay: null,
-        type: null
+        startHour: null,
+        endHour: null,
+        type: 'Personalizado',
+        isWorking: false
     }
     overlayAddExeption.value.hide()
 }
 
+const calendar = ref()
+const loadSaveCalendar = ref()
+const formCalendar = ref({
+    project: props.project.id,
+    calendar: parseInt(props.project.calendar_id),
+    newCalendar: false
+})
+const toggleCalendar = (event) => {
+    calendar.value.toggle(event);
+}
+const newCalendar = () => {
+    visible.value = true
+    calendar.value.hide();
+}
+const gantt = defineModel('gantt', {
+    type: Object,
+})
+async function setCalendarToProject() {
+    if(formCalendar.value.calendar != null){
+    loadSaveCalendar.value = true
+    await axios.post(route('create.calendar',formCalendar.value.project), formCalendar.value).then(async (res) => {
+        if (res.data.status) {
+            toast.add({
+                severity: 'success',
+                group: 'customToast',
+                text: res.data.mensaje,
+                life: 4000
+            })
+           await gantt.value.project.load();
+        } else {
+            toast.add({
+                severity: 'error',
+                group: 'customToast',
+                text: res.data.mensaje,
+                life: 4000
+            })
+        }
+    })
+    loadSaveCalendar.value = false
+}
+}
 
-function save() {
-    console.log(form.value)
+
+function convertirHorasARecurrent(objeto) {
+    const dias = Object.keys(objeto);
+    const resultado = [];
+    for (const dia of dias) {
+        const horas = objeto[dia].hours;
+        for (const hora of horas) {
+            const startHour = new Date(hora.start).toLocaleTimeString('es-CO', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const endHour = new Date(hora.end).toLocaleTimeString('es-CO', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            resultado.push({
+                isWorking: objeto[dia].active,
+                day: dia,
+                startHour,
+                endHour
+            });
+        }
+    }
+
+    return resultado;
+}
+
+async function save() {
+    let aux = deepCopy(form.value)
+    // aux.holidays.forEach((item) => {
+    //     item.startDay = new Date(item.startDay).toLocaleDateString('es-CO', { year: 'numeric', month: 'numeric', day: 'numeric' });
+    //     item.endDay = new Date(item.endDay).toLocaleDateString('es-CO', { year: 'numeric', month: 'numeric', day: 'numeric' });
+    // });
+    console.log(aux)
+    let data = {
+        newCalendar: true,
+        name: aux.name,
+        exeptions: aux.holidays,
+        recurrent: convertirHorasARecurrent(aux.daysWeek)
+    }
+    console.log(data)
+    await axios.post(route('create.calendar', props.project.id), data)
+        .then(async (res) => {
+            if (res.data.status) {
+                toast.add({
+                    severity: 'success',
+                    group: 'customToast',
+                    text: res.data.mensaje,
+                    life: 4000
+                })
+                await gantt.value.project.setCalendar(formCalendar.value.calendar);
+            } else {
+                toast.add({
+                    severity: 'error',
+                    group: 'customToast',
+                    text: res.data.mensaje,
+                    life: 4000
+                })
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+            toast.add({
+                severity: 'error',
+                group: 'customToast',
+                text: 'Error no controlado',
+                life: 4000
+            })
+        })
 }
 
 
 </script>
 
 <template>
+    <Button :class raised v-tooltip.bottom="'Agregar Calendario'" icon="fa-solid fa-calendar-plus"
+        @click="toggleCalendar" />
     <CustomModal v-model:visible="visible" :closeOnEscape="false" icon="fa-solid fa-file-export"
-        :titulo="'Nuevo calendario para el projecto: ' + project.name" width="90vw">
+        :titulo="'Nuevo calendario para el projecto: ' + project.name" width="80vw">
         <template #body>
             <div class="flex gap-2 h-[75vh]">
                 <div class="space-y-1 w-min flex flex-col items-center">
@@ -340,10 +443,11 @@ function save() {
                             </div>
                         </template>
                     </Calendar>
-                    <div class="grid grid-cols-2 pr-5 gap-1">
-                        <span v-for="reference in references" class="flex gap-1 w-full">
+                    <div class="grid grid-cols-2 gap-1">
+                        <span v-for="reference in references" class="flex gap-1 w-full cursor-default">
                             <div :class="reference.class" class=" w-full p-1 border rounded-md h-6 flex items-center">
-                                <p class="text-center w-full">{{ reference.text }}</p>
+                                <p v-tooltip="reference.text" class="text-center w-full truncate">{{ reference.text }}
+                                </p>
                             </div>
                         </span>
                     </div>
@@ -365,43 +469,45 @@ function save() {
                                 </div>
                             </div>
                             <div class="h-[85%] border rounded-md">
-                                <CustomDataTable title="Exepciones" :actions :showAdd="true" :data="form.holidays"
-                                    @addClick="toggle" :columnas :showHeader="true" :paginator="false"
-                                    @deleteClic="removeExeption">
+                                <CustomDataTable showItem title="Exepciones" :actions :showAdd="true"
+                                    :data="form.holidays" @addClick="toggle" :columnas :showHeader="true"
+                                    :paginator="false" @deleteClic="removeExeption">
                                 </CustomDataTable>
                             </div>
                         </TabPanel>
                         <TabPanel header="Semana laboral">
-                            <div class="flex justify-between p-1 rounded-md">
-                                <div class="w-5/6">
-                                    <p class="font-bold text-lg">Horario normal</p>
-                                    <ul class="flex gap-1 overflow-x-auto">
-                                        <li v-for="hour, index in form.hours" class="border rounded-md p-2">
-                                            <div class="flex items-center justify-between">
-                                                <p class="font-bold text-center">Intervalo {{ index + 1 }}</p>
-                                                <Button v-tooltip="index == 0 ? 'Añadir intervalo' : 'Quitar intervalo'"
-                                                    text
-                                                    :icon="index == 0 ? 'fa-solid fa-plus' : 'fa-solid fa-trash-can'"
-                                                    :severity="index == 0 ? 'success' : 'danger'"
-                                                    @click="index == 0 ? form.hours.push(hour) : form.hours.splice(index, 1)" />
-                                            </div>
-                                            <span class="flex gap-2 w-56">
-                                                <CustomInput label="Hora inicio" v-model:input="hour.start"
-                                                    type="time" />
-                                                <CustomInput label="Hora fin" v-model:input="hour.end" type="time" />
-                                            </span>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="flex w-full justify-end items-end">
-                                    <Button v-tooltip.top="'Aplicar a todos los dias activos'" severity="success"
+                            <div class="mb-3 border p-1 rounded-md">
+                                <p class="font-bold text-center w-full text-lg">Aplicar horario a toda la semana</p>
+                                <div class="flex">
+                                    <div class="w-5/6">
+                                        <ul class="flex gap-1 overflow-x-auto">
+                                            <li v-for="hour, index in form.hours" class="border rounded-md p-2">
+                                                <div class="flex items-center justify-between">
+                                                    <p class="font-bold text-center">Intervalo {{ index + 1 }}</p>
+                                                    <Button v-tooltip="index == 0 ? 'Añadir intervalo' : 'Quitar intervalo'"
+                                                        text
+                                                        :icon="index == 0 ? 'fa-solid fa-plus' : 'fa-solid fa-trash-can'"
+                                                        :severity="index == 0 ? 'success' : 'danger'"
+                                                        @click="index == 0 ? form.hours.push(hour) : form.hours.splice(index, 1)" />
+                                                </div>
+                                                <span class="flex gap-2 w-56">
+                                                    <CustomInput label="Hora inicio" v-model:input="hour.start"
+                                                        type="time" />
+                                                    <CustomInput label="Hora fin" v-model:input="hour.end" type="time" />
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="flex w-full justify-end items-end">
+                                        <Button v-tooltip.top="'Aplicar a todos los dias activos'" severity="success"
                                         label="Aplicar" @click="applyHoursDefault"></Button>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex">
+                            <div class="border rounded-md p-1 space-y-3">
                                 <div class="flex flex-col gap-2 p-1">
-                                    <p class="font-bold">Dias activos</p>
-                                    <ul class="border flex flex-col gap-1 w-min p-3 rounded-md">
+                                    <p class="font-bold text-lg">Horario por dias</p>
+                                    <ul class="border flex gap-1 w-min p-3 rounded-md">
                                         <li v-for="day in listDays" @click="selecDayWeek = day"
                                             :class="selecDayWeek.code == day.code ? 'border-success bg-success-light' : undefined"
                                             class="border flex justify-between gap-3 items-center hover:bg-primary-light p-2 cursor-pointer rounded-md">
@@ -413,30 +519,36 @@ function save() {
                                         </li>
                                     </ul>
                                 </div>
-                                <div class="p-7 flex flex-col h-full w-full overflow-hidden max-w-full"
+                                <div class="flex flex-col h-full w-full overflow-hidden max-w-full"
                                     v-if="selecDayWeek.code">
                                     <p class="text-lg font-bold text-center mb-2">
                                         Personalizar horario de los dias {{ selecDayWeek.name }}
                                     </p>
-                                    <ul class="flex gap-1 overflow-x-auto">
-                                        <li v-for="hour, index in form.daysWeek[selecDayWeek.code].hours"
-                                            class="border rounded-md p-2">
-                                            <div class="flex items-center justify-between">
-                                                <p class="font-bold text-center">Intervalo {{ index + 1 }}</p>
-                                                <Button v-tooltip="index == 0 ? 'Añadir intervalo' : 'Quitar intervalo'"
-                                                    text
-                                                    :icon="index == 0 ? 'fa-solid fa-plus' : 'fa-solid fa-trash-can'"
-                                                    :severity="index == 0 ? 'success' : 'danger'"
-                                                    @click="index == 0 ? form.daysWeek[selecDayWeek.code].hours.push(hour) : form.daysWeek[selecDayWeek.code].hours.splice(index, 1)" />
-                                            </div>
-                                            <span class="flex gap-2 w-56">
-                                                <CustomInput label="Hora inicio" v-model:input="hour.start"
-                                                    type="time" />
-                                                <CustomInput label="Hora fin" v-model:input="hour.end" type="time" />
-                                            </span>
-                                        </li>
-                                    </ul>
-                                    <!-- {{ form.daysWeek[selecDayWeek] ?? null }} -->
+                                    <span v-if="form.daysWeek[selecDayWeek.code].active">
+                                        <ul class="flex gap-1 overflow-x-auto">
+                                            <li v-for="hour, index in form.daysWeek[selecDayWeek.code].hours"
+                                                class="border rounded-md p-2">
+                                                <div class="flex items-center justify-between">
+                                                    <p class="font-bold text-center">Intervalo {{ index + 1 }}</p>
+                                                    <Button v-tooltip="index == 0 ? 'Añadir intervalo' : 'Quitar intervalo'"
+                                                        text
+                                                        :icon="index == 0 ? 'fa-solid fa-plus' : 'fa-solid fa-trash-can'"
+                                                        :severity="index == 0 ? 'success' : 'danger'"
+                                                        @click="index == 0 ? form.daysWeek[selecDayWeek.code].hours.push(hour) : form.daysWeek[selecDayWeek.code].hours.splice(index, 1)" />
+                                                </div>
+                                                <span class="flex gap-2 w-56">
+                                                    <CustomInput label="Hora inicio" v-model:input="hour.start"
+                                                        type="time" />
+                                                    <CustomInput label="Hora fin" v-model:input="hour.end" type="time" />
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                    <span v-else>
+                                       <p class="text-center text-danger font-bold text-lg">
+                                        Dia desactivado
+                                       </p> 
+                                    </span>
                                 </div>
                             </div>
                         </TabPanel>
@@ -451,18 +563,39 @@ function save() {
     </CustomModal>
     <OverlayPanel ref="overlayAddExeption">
         <div class="flex flex-col w-96">
-            <CustomInput v-model:input="newExeption.text" placeholder="Descripcion del dia a agregar a exepciones" label="Descripcion" />
+            <CustomInput v-model:input="newExeption.description"
+                placeholder="Descripcion del dia a agregar a exepciones" label="Descripcion" />
             <span class="grid grid-cols-2 gap-3">
-                <CustomInput v-model:input="newExeption.startDay"  type="date" label="Dia inicio" @value-change="newExeption.endDay=null" />
-                <CustomInput v-model:input="newExeption.endDay" :minDate="newExeption.startDay" type="date" label="Dia fin" />
+                <CustomInput v-model:input="newExeption.startDay" type="date" label="Dia inicio"
+                    @value-change="newExeption.endDay = newExeption.startDay" />
+                <CustomInput v-model:input="newExeption.endDay" :minDate="newExeption.startDay" type="date"
+                    label="Dia fin" />
             </span>
-            <span class=" grid grid-cols-2">
-                <CustomInput label="Tipo" v-model:input="newExeption.type" type="dropdown"
-                    :options="['No laborable','Festivo local', 'Vacaciones colectivas', 'Otros']" />
+            <span class="space-y-2 mt-2">
+                <CustomInput label="Laborable" v-model:input="newExeption.isWorking" type="boolean" />
+                <span class="flex gap-2">
+                    <CustomInput label="Hora inicio" v-model:input="newExeption.startHour" type="time" />
+                    <CustomInput label="Hora fin" v-model:input="newExeption.endHour" type="time" />
+                </span>
                 <span class="flex items-end justify-end">
                     <Button severity="success" label="Agregar" icon="fa-solid fa-plus" @click="addExeption" />
                 </span>
             </span>
         </div>
+    </OverlayPanel>
+    <OverlayPanel ref="calendar" class="w-96">
+        <div class="flex flex-col gap-2 mb-2">
+            <div class="flex justify-between items-center gap-2">
+                <label class="">Asignación de calendario</label>
+                <Button severity="success" v-tooltip.rigth="'Nuevo Calendario'" icon="fa-solid fa-plus"
+                    @click="newCalendar" />
+            </div>
+            <Dropdown v-model="formCalendar.calendar" :options="listCalendar" optionLabel="name" option-value="id" option-label="name"
+                placeholder="Seleccione un calendario" checkmark :highlightOnSelect="false" class="w-full" showClear />
+        </div>
+
+        <span class="flex justify-end">
+            <Button severity="success" label="Guardar" :loading="loadSaveCalendar" @click="setCalendarToProject()" />
+        </span>
     </OverlayPanel>
 </template>

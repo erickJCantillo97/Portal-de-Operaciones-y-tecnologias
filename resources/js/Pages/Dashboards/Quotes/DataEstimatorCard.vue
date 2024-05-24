@@ -20,12 +20,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="max-h-80 mb-8">
+  <div class="mb-8">
     <div class="bg-primary text-center sticky rounded-t-lg">
       <h3 class="text-white text-lg font-semibold">Tiempo Promedio de Respuesta de Estimadores</h3>
     </div>
     <CardSkeleton v-if="showCardSkeleton" />
-    <div class="block space-y-2 h-72 p-1 overflow-y-auto">
+    <div class="block space-y-2 bp-1 overflow-y-auto">
       <div v-for="person in  people" :key="person.email"
         class="relative flex items-center space-x-3 rounded-lg shadow-xl bg-white p-2 border-0" type="text">
         <div class="flex-shrink-0">
