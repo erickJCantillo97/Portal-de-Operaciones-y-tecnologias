@@ -87,7 +87,7 @@ class ProgrammingController extends Controller
         $programmin = DetailScheduleTime::where('fecha', $date->format('Y-m-d'))
             ->orderBy('idproyecto')
             ->orderBy('idTask')
-            ->where('Oficina', auth()->user()->oficina)
+            ->where('gerencia', auth()->user()->gerencia)
             ->get()->map(function ($d) {
                 return [
                     'task' => $d['nombreTask'],
@@ -117,20 +117,20 @@ class ProgrammingController extends Controller
      */
     public function store(Request $request)
     {
-        DB::beginTransaction();
         $status = false;
         $conflict = [];
+        $validateData = $request->validate([
+            'task_id' => 'required',
+            'employee' => 'required',
+            'start' => 'required',
+            'end' => 'required',
+            'fecha' => 'required|date', //fecha seleccionada del calendario
+        ]);
+        // return $validateData['employee']['Num_SAP'];
+        DB::beginTransaction();
         try {
-            $validateData = $request->validate([
-                'task_id' => 'required',
-                'employee_id' => 'required',
-                'name' => 'required',
-                'costo_hora' => 'required',
-                'fecha' => 'required|date', //fecha seleccionada del calendario
-            ]);
             $date = Carbon::parse($validateData['fecha']);
-            $task = VirtualTask::find($validateData['task_id']);
-            $exist = DetailScheduleTime::where('idUsuario', $validateData['employee_id'])
+            $exist = DetailScheduleTime::where('idUsuario', $validateData['employee']['Num_SAP'])
                 ->where('fecha', $date->format('Y-m-d'))
                 ->where('idTask', '!=', $validateData['task_id'])
                 ->get();
@@ -142,28 +142,33 @@ class ProgrammingController extends Controller
                 $conflict[$date->format('Y-m-d')] = $exist;
                 $status = false;
             } else {
-                // $employee = Employee::where('Num_SAP', 'LIKE', '%' . $validateData['employee_id'])->first();
+
                 $schedule = Schedule::firstOrNew([
                     'task_id' => $validateData['task_id'],
-                    'employee_id' => $validateData['employee_id'],
-                    'name' => $validateData['name'],
+                    'employee_id' => $validateData['employee']['Num_SAP'],
+                    'name' => $validateData['employee']['Nombres_Apellidos'],
+                    'cargo' => $validateData['employee']['Cargo'],
+                    'oficina' => auth()->user()->oficina,
+                    'gerencia' => auth()->user()->gerencia,
                     'fecha' => $date->format('Y-m-d'),
                 ]);
                 $schedule->save();
 
-                ScheduleTime::firstOrCreate([
+                $shceduleTime = ScheduleTime::firstOrCreate([
                     'schedule_id' => $schedule->id,
-                    'hora_inicio' => Carbon::parse($task->project->shiftObject->startShift)->format('H:i'),
-                    'hora_fin' => Carbon::parse($task->project->shiftObject->endShift)->format('H:i'),
+                    'hora_inicio' => $validateData['start'],
+                    'hora_fin' => $validateData['end'],
+                    'cost' => $validateData['employee']['Costo_Hora'],
                 ]);
+
                 /* adicional de guardar en schedule y scheduleTime, se guarda en la tabla Assignment para 
                 que pueda aparecer en los recursos del gantt */
                 Assignment::firstOrCreate([
                     'event' => $validateData['task_id'],
-                    'resource' => $validateData['employee_id'],
+                    'resource' => $validateData['employee']['Num_SAP'],
                     'units' => 100,
-                    'name' => $validateData['name'],
-                    'costo_hora' => $validateData['costo_hora'],
+                    'name' => $validateData['employee']['Nombres_Apellidos'],
+                    'costo_hora' => $validateData['employee']['Costo_Hora'],
                 ]);
                 $status = true;
             }
@@ -312,8 +317,8 @@ class ProgrammingController extends Controller
     public function getSchedule($fecha, $task)
     {
 
-        return DetailScheduleTime::groupBy('idUsuario')->where('Oficina', auth()->user()->oficina)->where('idTask', $task)->where('fecha', $fecha)->select(
-            Db::raw('MIN(nombre) as name'),
+        return DetailScheduleTime::groupBy('idUsuario')->where('oficina', auth()->user()->oficina)->where('idTask', $task)->where('fecha', $fecha)->select(
+            Db::raw('MIN(nameUser) as name'),
             Db::raw('MIN(idUsuario) as id'),
             Db::raw('MIN(idSchedule) as schedule'),
         )->get()->map(function ($d) use ($task, $fecha) {
@@ -360,8 +365,6 @@ class ProgrammingController extends Controller
         $advances = ProgrammingAdvance::whereBetween('date', [Carbon::now(), $friday])->where('user_id', auth()->user()->id)->get();
 
         $advancesIDs = $advances->pluck('task_id');
-
-
 
         $times = DetailScheduleTime::whereNotIn('idTask', $advancesIDs)->whereBetween('fecha', [Carbon::now(), $friday])->orderBy('fecha')->where('idUsuario', $employee)->get()->map(function ($time) use ($date) {
             return [
@@ -539,10 +542,7 @@ class ProgrammingController extends Controller
 
     public function endNivelActivitiesByProject(Project $project, Request $request)
     {
-        // $request->date_end ='2024-01-01';
-        // $request->date_start = '2024-05-05';
-        // $request->idProject = 1;
-        // dd($request->all());
+
         $taskWithSubTasks = VirtualTask::has('project')->whereNotNull('task_id')->select('task_id')->get()->map(function ($task) {
             return $task['task_id'];
         })->toArray();
@@ -582,8 +582,8 @@ class ProgrammingController extends Controller
                     'startDate' => $task['startDate'],
                     'percentDone' => $task['percentDone'],
                     'shift' => $task->project->shift ? Shift::where('id', $task->project->shift)->first() : null,
-                    'employees' => DetailScheduleTime::groupBy('idUsuario')->where('Oficina', auth()->user()->oficina)->where('idTask', $task['id'])->where('fecha', $date)->select(
-                        Db::raw('MIN(nombre) as name'),
+                    'employees' => DetailScheduleTime::groupBy('idUsuario')->where('idTask', $task['id'])->where('fecha', $date)->select(
+                        Db::raw('MIN(nameUser) as name'),
                         Db::raw('MIN(idUsuario) as id'),
                         Db::raw('MIN(idSchedule) as schedule'),
                     )->get()->map(function ($d) use ($task, $date) {
