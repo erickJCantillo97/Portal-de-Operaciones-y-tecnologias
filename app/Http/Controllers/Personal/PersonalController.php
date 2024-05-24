@@ -26,21 +26,25 @@ class PersonalController extends Controller
      */
     public function index(Request $request)
     {
-        // dd($request->all());
-        $groups = Team::where('user_id', auth()->user()->id)->orderBy('name')->get();
-
-        if ($request->id) {
-            $group = Team::find($request->id);
-            return inertia('Personal/Index', [
-                'miPersonal' => getPersonalGroup($request->id),
-                'group' =>  $group,
-                'groups' =>   $groups
-            ]);
+        if ($request->expectsJson()) {
+            return response()->json(getPersonalUser());
         }
-        return inertia('Personal/Index', [
-            'miPersonal' => getPersonalUser(),
-            'groups' =>   $groups
-        ]);
+        return inertia('Personal/Index');
+        // dd($request->all());
+        // $groups = Team::where('user_id', auth()->user()->id)->orderBy('name')->get();
+
+        // if ($request->id) {
+        //     $group = Team::find($request->id);
+        //     return inertia('Personal/Index', [
+        //         'miPersonal' => getPersonalGroup($request->id),
+        //         'group' =>  $group,
+        //         'groups' =>   $groups
+        //     ]);
+        // }
+        // return inertia('Personal/Index', [
+        //     'miPersonal' => getPersonalUser(),
+        //     'groups' =>   $groups
+        // ]);
     }
     /* Esta funcion devulve el persona a cargo del usuario logeado o las personas del grupo pasado por parametros */
     public function getPersonalUser($id = null)
@@ -48,6 +52,19 @@ class PersonalController extends Controller
         return response()->json([
             'personal' => isset($id) ? getPersonalGroup($id) : getPersonalUser(),
         ]);
+    }
+
+    public function groups()
+    {
+        return response()->json(
+            Team::where('user_id', auth()->user()->id)->orderBy('name')->get(),
+        );
+    }
+    public function personsGroups(Team $team)
+    {
+        return response()->json(
+            getPersonalGroup($team->id),
+        );
     }
 
     /**
