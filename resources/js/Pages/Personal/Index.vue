@@ -76,7 +76,7 @@ getGroups()
 const personsGroups = ref()
 const groupSelected = ref()
 async function getPersonsGroups(option) {
-    if (option==undefined){
+    if (option == undefined) {
         load.value.personsGroups = true
     }
     try {
@@ -202,7 +202,7 @@ const deleteGroup = async (id) => {
 
 const addMemberToGroup = async (user) => {
     // console.log(user)
-    user.load=true
+    user.load = true
     if (groupSelected.value) {
         await axios.post(route('add.person.team', groupSelected.value.id), { Num_SAP: user.Num_SAP })
             .then((res) => {
@@ -220,16 +220,16 @@ const addMemberToGroup = async (user) => {
                 console.log(error)
             })
     }
-    user.load=false
+    user.load = false
 }
 const removeMemberToGroup = async (user) => {
     // console.log(user)
-    user.load=true
+    user.load = true
     if (groupSelected.value) {
         await axios.post(route('remove.person.team', groupSelected.value.id), { Num_SAP: user.Num_SAP })
             .then(async (res) => {
                 if (res.data.status) {
-                    personsGroups.value=personsGroups.value.filter(person => person.Num_SAP != user.Num_SAP)
+                    personsGroups.value = personsGroups.value.filter(person => person.Num_SAP != user.Num_SAP)
                     toast.add({ severity: 'success', text: res.data.mensaje, group: 'customToast', life: 5000 })
                 }
                 else {
@@ -241,7 +241,7 @@ const removeMemberToGroup = async (user) => {
                 console.log(error)
             })
     }
-    user.load=false
+    user.load = false
 }
 
 // #endregion
@@ -290,9 +290,10 @@ const url = [
                 <TabPanel :pt="{ root: 'w-full' }">
                     <template #header>
                         <div class="flex justify-center w-full items-center space-x-4">
+                            <i class="fa-solid fa-people-arrows text-lg"></i>
                             <span class="font-bold">Mi personal</span>
                             <Button @click="showNew()" v-if="hasPermission('programming create')"
-                                icon="fa-solid fa-plus" outlined label="Agregar"></Button>
+                                icon="fa-solid fa-plus" outlined v-tooltip="'Agregar una persona a mi grupo'" label="Agregar"></Button>
                         </div>
                     </template>
                     <div class="h-[80vh]">
@@ -303,8 +304,11 @@ const url = [
                 </TabPanel>
                 <TabPanel :pt="{ root: 'w-full h-full' }">
                     <template #header>
-                        <div class="flex justify-center w-full items-center">
-                            <span class="font-bold">Mis grupos</span>
+                        <div class="h-full w-full flex justify-center space-x-3 items-center">
+                            <i class="fa-solid text-lg fa-people-group"></i>
+                            <p class="h-8 flex items-center">
+                                Mis grupos
+                            </p>
                         </div>
                     </template>
                     <div class=" h-[75vh] grid w-full space-x-2 grid-cols-2">
@@ -355,9 +359,7 @@ const url = [
                             <Accordion :activeIndex="0">
                                 <!--Miembros del grupo-->
                                 <AccordionTab header="Miembros del Grupo" :pt="{
-        root: '!border-0 !ring-0',
-        headerAction: '!bg-slate-200 !px-4 !py-1 mb-1',
-        headerTitle: '!text-sm',
+        headerAction: 'text-black !bg-slate-200 !px-4 !py-1 mb-1',
         content: '!max-h-[60vh] overflow-y-auto'
     }">
                                     <span v-if="!groupSelected">
@@ -373,8 +375,9 @@ const url = [
                                     <div v-else v-for="member of personsGroups" class="flex justify-between">
                                         <UserTable :user="member" :photo="true" />
                                         <div>
-                                            <Button severity="danger" :loading="member.load?member.load:false" @click="removeMemberToGroup(member)"
-                                                icon="fa-regular fa-trash-can" text />
+                                            <Button severity="danger" :loading="member.load ? member.load : false"
+                                                @click="removeMemberToGroup(member)" icon="fa-regular fa-trash-can"
+                                                text />
                                         </div>
                                     </div>
                                     <!-- {{ personsGroups }} -->
@@ -382,15 +385,14 @@ const url = [
 
                                 <!--Agregar personal al grupo-->
                                 <AccordionTab header="Agregar personal al grupo" :pt="{
-        root: '!border-0 !ring-0',
-        headerAction: '!bg-slate-200 !px-4 !py-1 mb-1',
-        headerTitle: '!text- sm',
+        headerAction: 'text-black !bg-slate-200 !px-4 !py-1 mb-1',
         content: '!h-[60vh] overflow-y-auto'
     }">
                                     <div v-for="member of personalData" class="flex justify-between space-y-4">
                                         <UserTable :user="member" :photo="true" />
                                         <div>
-                                            <Button :disabled="!groupSelected" :loading="member.load?member.load:false" severity="success"
+                                            <Button :disabled="!groupSelected"
+                                                :loading="member.load ? member.load : false" severity="success"
                                                 @click="addMemberToGroup(member)" icon="fa-solid fa-plus" outlined />
                                         </div>
                                     </div>
