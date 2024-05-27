@@ -22,6 +22,15 @@ const loading = ref(false)
 const moveList = ref('') // De donde proviene (oldIndex)
 const sourceListIndex = ref(null) // Donde está (newIndex)
 
+const route = ref()
+const file = ref()
+
+const quotesTest = ref([
+    {
+        title: 'Hola'
+    }
+])
+
 const inProcessFormData = ref({
     id: null,
     schedule_id: null,
@@ -55,7 +64,7 @@ const getTaskPendientes = () => {
 }
 
 onMounted(() => {
-    getTaskPendientes()
+    // getTaskPendientes()
 })
 
 const handleDragStart = (event, move) => {
@@ -204,7 +213,7 @@ const doneSubmit = () => {
             Gestión de Actividades Semanal
         </h2>
     </div>
-    <!--ASIGNADAS-->
+    <!--ESTIMACIONES PENDIENTES-->
     <div class="grid grid-cols-3 gap-x-2 p-2 ">
         <div class="bg-orange-100 h-full rounded-lg p-4 hover:shadow-md hover:shadow-orange-500">
             <div
@@ -219,8 +228,7 @@ const doneSubmit = () => {
                     <span class="text-white text-sm font-semibold">{{ pending.length }}</span>
                 </div>
             </div>
-
-            <draggable :list="pending" @start="handleDragStart($event, 'pending')" @end="handleDragEnd"
+            <!-- <draggable :list="pending" @start="handleDragStart($event, 'pending')" @end="handleDragEnd"
                 @change="handleDrop('pending')" :group="'taskss'" :animation="200" ghost-class="ghost-card"
                 class="px-2 h-full opacity-70" key="pending">
                 <template #item="{ element }">
@@ -248,20 +256,33 @@ const doneSubmit = () => {
                             <div class="text-center p-2 text-xs text-danger" v-if="element.differentDays < 0">
                                 {{ element.differentDays }} Dias de retraso
                             </div>
-                            <!-- <Knob v-model="element.percentDone" :size="50" readonly /> -->
+                        </div>
+                    </div>
+                </template>
+</draggable> -->
+            <draggable :list="quotesTest" @start="handleDragStart($event, 'pending')" @end="handleDragEnd"
+                @change="handleDrop('pending')" :group="'taskss'" :animation="200" ghost-class="ghost-card"
+                class="px-2 h-full opacity-70" key="pending">
+                <template #item="{ element }">
+                    <div
+                        class="mb-2 flex items-center justify-between space-x-8 rounded-lg bg-white p-4 hover:border hover:border-orange-500 cursor-grab">
+                        <div class="space-y-4">
+                            <h3 class="font-bold text-primary text-sm" v-tooltip="element.title">
+                                {{ element.title }}
+                            </h3>
                         </div>
                     </div>
                 </template>
             </draggable>
         </div>
-        <!--EN PROCESO-->
+        <!--EN PROCESO DE FIRMA-->
         <div class="bg-blue-100 h-full rounded-lg p-4 hover:shadow-md hover:shadow-primary">
             <div
                 class="sticky top-0 mb-1 flex w-full justify-between rounded-lg bg-gradient-to-l from-blue-200 p-2 backdrop-blur-sm">
                 <div class="flex space-x-2 justify-center items-center">
                     <i class="fa-solid fa-clock text-blue-400"></i>
                     <h1 class="font-extrabold text-primary">
-                        En Proceso
+                        En Proceso de Firma
                     </h1>
                 </div>
                 <div class="flex w-8 items-center justify-center rounded-full bg-primary p-1">
@@ -279,17 +300,17 @@ const doneSubmit = () => {
                             <h3 class="font-bold text-primary text-sm">
                                 {{ truncateString(element.title, 80) }}
                             </h3>
-                            <Tag v-tooltip="`${truncateString(element.project, 60)}`" severity="info"
+                            <!-- <Tag v-tooltip="`${truncateString(element.project, 60)}`" severity="info"
                                 class="cursor-default" :value="`${truncateString(element.project, 40)}`" rounded :pt="{
 
-                    }" />
+                                }" />
                             <div class="flex overflow-x-auto space-x-4 w-[22vw] text-sm cursor-default">
                                 <div class="italic p-1 text-nowrap border text-emerald-700 rounded-lg bg-emerald-100">
                                     {{ element.start }} -{{ element.end }}
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
-                        <div class="flex flex-col justify-center items-center space-y-2 -ml-6">
+                        <!-- <div class="flex flex-col justify-center items-center space-y-2 -ml-6">
                             <Knob v-model="element.progress" valueTemplate="{value}%" :size="50" readonly />
                             <div class="flex">
                                 <Button @click="inProcessEdit()" v-tooltip.bottom="'Editar'" severity="secondary" text
@@ -297,19 +318,19 @@ const doneSubmit = () => {
                                 <Button @click="inProcessDelete()" v-tooltip.bottom="'Eliminar'" severity="secondary"
                                     text icon="fa fa-trash-can hover:text-red-600" />
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </template>
             </draggable>
         </div>
-        <!--DONE-->
+        <!--FIRMADAS-->
         <div class="bg-emerald-100 h-full rounded-lg p-4 hover:shadow-md hover:shadow-emerald-500">
             <div
                 class="sticky top-0 mb-1 flex w-full justify-between rounded-lg bg-gradient-to-l from-emerald-200 p-2 backdrop-blur-sm">
                 <div class="flex space-x-2 justify-center items-center">
                     <i class="fa-solid fa-circle-check text-emerald-500"></i>
                     <h1 class="font-extrabold text-emerald-600">
-                        Completadas
+                        Firmadas
                     </h1>
                 </div>
                 <div class="flex w-8 items-center justify-center rounded-full bg-emerald-500 p-1">
@@ -363,45 +384,19 @@ const doneSubmit = () => {
             </span>
         </template>
         <template #body>
-            <div class="space-y-2 mb-4">
-                <div class="text-xl text-center font-extrabold text-primary border-b border-primary">
-
-                    {{ inProcess[sourceListIndex].project }}
-                </div>
-                <div>
-                    <span class="text-primary font-bold text-lg">
-                        Actividad:
-                    </span>
-                    <span class="text-lg">
-                        {{ inProcess[sourceListIndex].title }}
-                    </span>
-                </div>
-
-                <CustomInput type="number" :max="99" label="Porcentaje de avance"
-                    v-model:input="inProcessFormData.progress" />
-                <div class="flex w-full justify-between items-center space-x-4">
-                    <CustomInput type="time" class="w-full text-center" label="Hora de Inicio"
-                        v-model:input="inProcessFormData.start" />
-                    <CustomInput type="time" class="w-full text-center" label="Hora Fin"
-                        v-model:input="inProcessFormData.end" />
-                </div>
-                <div>
-                    <div class="flex overflow-x-auto space-x-4 w-[22vw] text-sm cursor-default">
-                        <div class="italic p-1 text-nowrap border text-emerald-700 rounded-lg bg-emerald-100">
-                            12:00 - 16:30
-                        </div>
-                    </div>
-                </div>
+            <div class="grid grid-cols-2 w-full space-x-2">
+                <CustomInput label="Ruta" v-model:input="route" optionLabel="name"
+                    placeholder="Escriba o pegue la ruta a la carpeta de los documentos" />
+                <CustomInput type="file" v-model:input="file" label="Subir Archivo" acceptFile="application/pdf" />
             </div>
         </template>
         <template #footer>
-            <Button @click="getTaskPendientes" label="Cancelar" severity="danger" icon="fa fa-circle-xmark"></Button>
-            <Button @click="inProcessSubmit()" label="Guardar" severity="success" icon="pi pi-save"></Button>
-
+            <!-- <Button @click="getTaskPendientes" label="Cancelar" severity="danger" icon="fa fa-circle-xmark" />
+            <Button @click="inProcessSubmit()" label="Guardar" severity="success" icon="pi pi-save" /> -->
+            <Button @click="inProcessModal = false" label="Cancelar" severity="danger" icon="fa fa-circle-xmark" />
+            <Button @click="alert('Guardado')" label="Guardar" severity="success" icon="pi pi-save" />
         </template>
     </CustomModal>
-
-
 
     <CustomModal v-model:visible="doneModal" :closable="false">
         <template #icon>

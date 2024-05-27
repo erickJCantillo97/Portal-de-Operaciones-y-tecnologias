@@ -125,7 +125,7 @@ const dataLoading = ref(false)
 
 async function getData() {
     dataLoading.value = true
-    await axios.get(route(props.routeData, props.parameterData))
+    await axios.get(route(props.routes.get, props.parameterData))
     .then((res) => {
         dataResponse.value = res.data
     })

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
+import { usePermissions } from '@/composable/permission'
 import { useToast } from "primevue/usetoast"
 import AppLayout from '@/Layouts/AppLayout.vue'
 import Button from 'primevue/button'
@@ -8,8 +9,7 @@ import CustomDataTable from '@/Components/CustomDataTable.vue'
 import CustomInput from '@/Components/CustomInput.vue'
 import CustomModal from '@/Components/CustomModal.vue'
 import RequirementSlideOver from './RequirementSlideOver.vue'
-import { usePermissions } from '@/composable/permission'
-import axios from 'axios'
+
 const { hasRole, hasPermission } = usePermissions()
 
 // const emit = defineEmits(['materialsLoaded'])
