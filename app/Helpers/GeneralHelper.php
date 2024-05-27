@@ -1,7 +1,9 @@
 <?php
 
 use Carbon\Carbon;
-
+use App\Models\Projects\Calendar;
+use App\Models\Projects\CalendarInterval;
+use App\Models\Projects\ProjectWithCalendar;
 function collisionsPerIntervals($date1, $date2, $date3, $date4)
 {
 
@@ -29,4 +31,32 @@ function collisionsPerIntervals($date1, $date2, $date3, $date4)
         return [$inicio_interseccion, $fin_interseccion];
     }
     return false;
+}
+
+function createDefaultCalendar(){
+    $calendar = Calendar::create([
+        'name'=> 'Calendario Predeterminado',
+        'expanded'=>1,
+        'version'=> 2,
+        'unspecifiedTimeIsWorking' => false
+    ]);
+    $calendar->save();
+    $days = explode(',','MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY,SATURDAY,SUNDAY');
+    foreach ($days as $day) {
+        CalendarInterval::create([
+            'calendar_id' => $calendar->id,
+            'isWorking' => true,
+            'priority' => 30,
+            'recurrentEndDate' => 'on '.$day.' at 12:00',
+            'recurrentStartDate' =>'on '.$day.' at 07:00'
+        ]);
+        CalendarInterval::create([
+            'calendar_id' => $calendar->id,
+            'isWorking' => true,
+            'priority' => 30,
+            'recurrentEndDate' => 'on '.$day.' at 16:30',
+            'recurrentStartDate' =>'on '.$day.' at 13:00'
+        ]);
+    }
+    return $calendar;
 }
