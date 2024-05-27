@@ -212,7 +212,7 @@ const doneSubmit = () => {
                 <div class="flex space-x-2 justify-center items-center">
                     <i class="fa-solid fa-circle-exclamation text-orange-400"></i>
                     <h1 class="font-extrabold text-orange-500">
-                        Actividades Pendientes
+                        Estimaciones Pendientes
                     </h1>
                 </div>
                 <div class="flex w-8 items-center justify-center rounded-full bg-orange-500 p-1">

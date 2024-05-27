@@ -1,12 +1,13 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue"
-import PayrollTable from "./PayrollTable.vue";
+import KanbanQuotes from "@/Pages/Dashboards/Quotes/KanbanQuotes.vue"
+import PayrollTable from "./PayrollTable.vue"
 import Planning from "@/Pages/Dashboards/Projects/Planning.vue"
-import Quotes from "./Dashboards/Quotes.vue";
+import Quotes from "./Dashboards/Quotes.vue"
 import QuotesCard from "@/Pages/Dashboards/Quotes/QuotesCards.vue"
-import Task from "./Dashboards/Personal/Task.vue";
+import Task from "./Dashboards/Personal/Task.vue"
 import UserHeader from "@/Components/sections/UserHeader.vue"
-import WareHouse from "./Dashboards/WareHouse.vue";
+import WareHouse from "./Dashboards/WareHouse.vue"
 
 const props = defineProps({
     projects: Array,
@@ -32,10 +33,11 @@ const props = defineProps({
                     v-if="$page.props.auth.user.oficina == 'DEPPC' || $page.props.auth.user.oficina=='OFTIC'" />
             </div>
 
-            <Task v-if="$page.props.auth.user.username == 'ecantillo' || $page.props.auth.user.oficina=='OFTIC'" />
+            <!-- <Task v-if="$page.props.auth.user.username == 'ecantillo' || $page.props.auth.user.oficina=='OFTIC'" /> -->
+            <KanbanQuotes v-if="$page.props.auth.user.username == 'ecantillo' || $page.props.auth.user.oficina=='OFTIC'" />
             <!-- <PayrollTable /> -->
-            <Quotes v-if="$page.props.auth.user.oficina == 'DEEST' || $page.props.auth.user.username == 'elara'|| $page.props.auth.user.oficina =='rgutierrez'" />
-            <Planning v-if="$page.props.auth.user.oficina == 'DEPPC' || $page.props.auth.user.oficina=='OFTIC'" :projects="props.projects" />
+            <Quotes v-if="$page.props.auth.user.oficina == 'DEEST' || $page.props.auth.user.username == 'elara'|| $page.props.auth.user.oficina =='OFTIC'" />
+            <!-- <Planning v-if="$page.props.auth.user.oficina == 'DEPPC' || $page.props.auth.user.oficina=='OFTIC'" :projects="props.projects" /> -->
             <!-- <Tools v-if="hasPermission('tool edit')" :projects="props.projects" /> -->
             <!-- <Projects v-else /> -->
             <!-- <CustomUpload mode="advanced" :multiple="true" accept=".xlsx,.xls" url="prueba"/> -->
