@@ -426,7 +426,7 @@ const url = [
                     <tab-content
                         :title="$page.props.auth.user.gerencia == 'GECON' ? 'Información Contractual' : 'INFORMACION DEL PROYECTO'"
                         class="h-[45vh] overflow-y-auto" icon="fa-solid fa-file-signature" :beforeChange="beforeChange">
-                        <div class="border gap-4 border-gray-200 rounded-lg p-4 md:grid md:grid-cols-2">
+                        <div class="border gap-4 border-gray-200 rounded-lg p-4 md:grid md:grid-cols-3">
                             <!--CAMPO NOMBRE DEL PROYECTO (name)-->
                             <CustomInput label="Nombre del Proyecto" placeholder="Escriba el nombre del proyecto"
                                 v-model:input="formData.name" :errorMessage="errors.name"
@@ -435,6 +435,8 @@ const url = [
                             <CustomInput label="Código SAP" placeholder="Escriba el código de SAP"
                                 v-model:input="formData.SAP_code" :errorMessage="$page.props.errors.SAP_code"
                                 :invalid="$page.props.errors.SAP_code ? true : false" />
+                                <CustomInput type="date" label="Fecha De Inicio" v-model:input="formData.start_date"
+                                    :disabled="!formData.contract_id" />
                             <!--CAMPO ALCANCE DEL PROYECTO (scope)-->
                             <CustomInput label="Alcance del Proyecto" type="dropdown"
                                 placeholder="Seleccione Alcance del Proyecto" v-model:input="formData.scope" showClear

@@ -138,6 +138,7 @@ class DashboardEstimacionesController extends Controller
             'status' => true
         ];
     }
+
     public function getQuotesCustomers(Request $request)
     {
         $year = $request->year ?? Carbon::now()->year;
