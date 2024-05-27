@@ -22,7 +22,7 @@ const toast = useToast();
 const { confirmDelete } = useSweetalert()
 const { hasRole, hasPermission } = usePermissions()
 
-const personalData = ref()
+const personalData = ref([])
 const personalActive = ref([])
 const groups = ref([])
 const load = ref({
@@ -73,7 +73,7 @@ async function getGroups() {
 }
 getGroups()
 
-const personsGroups = ref()
+const personsGroups = ref([])
 const groupSelected = ref()
 async function getPersonsGroups(option) {
     if (option == undefined) {
@@ -205,11 +205,10 @@ const addMemberToGroup = async (user) => {
     user.load = true
     if (groupSelected.value) {
         await axios.post(route('add.person.team', groupSelected.value.id), { Num_SAP: user.Num_SAP })
-            .then((res) => {
+            .then(async(res) => {
                 if (res.data.status) {
-                    getPersonsGroups('fast')
+                    await getPersonsGroups('fast')
                     toast.add({ severity: 'success', text: res.data.mensaje, group: 'customToast', life: 5000 })
-                    // crudGroup.value.hide()
                 }
                 else {
                     console.log(res)
@@ -388,7 +387,7 @@ const url = [
         headerAction: 'text-black !bg-slate-200 !px-4 !py-1 mb-1',
         content: '!h-[60vh] overflow-y-auto'
     }">
-                                    <div v-for="member of personalData" class="flex justify-between space-y-4">
+                                    <div v-for="member of personalData.filter(pd=>!personsGroups.some(pg=>pg.Num_SAP===pd.Num_SAP) )" class="flex justify-between space-y-4">
                                         <UserTable :user="member" :photo="true" />
                                         <div>
                                             <Button :disabled="!groupSelected"
