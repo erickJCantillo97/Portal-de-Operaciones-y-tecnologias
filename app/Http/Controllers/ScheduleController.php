@@ -130,38 +130,18 @@ class ScheduleController extends Controller
     {
         try {
             DB::beginTransaction();
-            $calendarSave = Calendar::firstOrCreate([
-                'expanded' => $request->calendar['expanded'],
-                'version' => $request->calendar['version'],
-                'name' => $request->calendar['name'],
-                'unspecifiedTimeIsWorking' => $request->calendar['unspecifiedTimeIsWorking'],
-            ]);
-            $calendarSave->save();
-            if (isset($request->calendar['intervals'])) {
-                foreach ($request->calendar['intervals'] as $intervals) {
-                    CalendarInterval::firstOrCreate([
-                        'calendar_id' => $calendarSave->id,
-                        'isWorking' => $intervals['isWorking'],
-                        'priority' => $intervals['priority'],
-                        'name' => isset($intervals['name']) == true ? $intervals['name'] : null,
-                        'recurrentStartDate' => isset($intervals['recurrentStartDate']) == true ?  $intervals['recurrentStartDate'] : null,
-                        'recurrentEndDate' => isset($intervals['recurrentEndDate'])  == true ? $intervals['recurrentEndDate'] : null,
-                        'startDate' => isset($intervals['startDate']) == true ? $intervals['startDate'] : null,
-                        'endDate' => isset($intervals['endDate']) == true ? $intervals['endDate'] : null
-                    ]);
-                }
-            }
+            $calendar = createDefaultCalendar();
             ProjectWithCalendar::firstOrCreate([
                 'project_id' => $project->id,
-                'calendar_id' => $calendarSave->id
+                'calendar_id' => $calendar->id
             ]);
-            $project->calendar_id = $calendarSave->id;
+            $project->calendar_id = $calendar->id;
             $project->hoursPerDay = $request->project['hoursPerDay'];
             $project->daysPerWeek = $request->project['daysPerWeek'];
             $project->daysPerMonth = $request->project['daysPerMonth'];
             $project->save();
             DB::commit();
-            return response()->json(['status' => true, 'mensaje' => 'Calendario asignado al proyecto correctamente', 'calendarId' => $calendarSave->id]);
+            return response()->json(['status' => true, 'mensaje' => 'Calendario asignado al proyecto correctamente', 'calendarId' => $calendar->id]);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json(['status' => false, 'mensaje' => $e->getMessage()]);
@@ -382,51 +362,51 @@ class ScheduleController extends Controller
             }
             DB::commit();
         }
-        if (isset($request->calendars['added'])) {
-            //return dd($request->calendars['added']);
-            FacadesDB::beginTransaction();
-            foreach ($request->calendars['added'] as $calendar) {
-                $calendarsDetails = [];
-                $calendarSave = Calendar::firstOrCreate([
-                    'expanded' => $calendar['expanded'],
-                    'version' => $calendar['version'],
-                    'name' => $calendar['name'],
-                    'unspecifiedTimeIsWorking' => $calendar['unspecifiedTimeIsWorking'],
-                ]);
-                $calendarSave->save();
-                if (isset($calendar['intervals']['added'])) {
-                    foreach ($calendar['intervals']['added'] as $intervals) {
-                        CalendarInterval::firstOrCreate([
-                            'calendar_id' => $calendarSave->id,
-                            'isWorking' => $intervals['isWorking'],
-                            'priority' => $intervals['priority'],
-                            'recurrentStartDate' => isset($intervals['recurrentStartDate']) == true ?  $intervals['recurrentStartDate'] : null,
-                            'recurrentEndDate' => isset($intervals['recurrentEndDate'])  == true ? $intervals['recurrentEndDate'] : null,
-                            'startDate' => isset($intervals['startDate']) == true ? substr($intervals['startDate'],0,strlen($intervals['startDate'])-6) : null,
-                            'endDate' => isset($intervals['endDate']) == true ? substr($intervals['endDate'],0,strlen($intervals['endDate'])-6) : null,
-                            'name' => isset($intervals['name']) ? $intervals['name'] : null
-                        ]);
-                        array_push($calendarsDetails, [
-                            'id' => $intervals['$PhantomId'],
-                            'recurrentStartDate' => isset($intervals['recurrentStartDate']) == true ? $intervals['recurrentStartDate'] : '',
-                            'recurrentEndDate' => isset($intervals['recurrentEndDate'])  == true ? $intervals['recurrentEndDate'] : '',
-                            'isWorking' => $intervals['isWorking']
-                        ]);
-                    }
-                }
-                array_push($calendars, [
-                    'id' => $calendar['$PhantomId'],
-                    'name' => $calendar['name'],
-                    'intervals' => $calendarsDetails
-                ]);
-                ProjectWithCalendar::firstOrCreate([
-                    'project_id' => $project->id,
-                    'calendar_id' => $calendarSave->id
-                ]);
-            }
-            // return dd($calendars);
-            DB::commit();
-        }
+        // if (isset($request->calendars['added'])) {
+        //     //return dd($request->calendars['added']);
+        //     FacadesDB::beginTransaction();
+        //     foreach ($request->calendars['added'] as $calendar) {
+        //         $calendarsDetails = [];
+        //         $calendarSave = Calendar::firstOrCreate([
+        //             'expanded' => $calendar['expanded'],
+        //             'version' => $calendar['version'],
+        //             'name' => $calendar['name'],
+        //             'unspecifiedTimeIsWorking' => $calendar['unspecifiedTimeIsWorking'],
+        //         ]);
+        //         $calendarSave->save();
+        //         if (isset($calendar['intervals']['added'])) {
+        //             foreach ($calendar['intervals']['added'] as $intervals) {
+        //                 CalendarInterval::firstOrCreate([
+        //                     'calendar_id' => $calendarSave->id,
+        //                     'isWorking' => $intervals['isWorking'],
+        //                     'priority' => $intervals['priority'],
+        //                     'recurrentStartDate' => isset($intervals['recurrentStartDate']) == true ?  $intervals['recurrentStartDate'] : null,
+        //                     'recurrentEndDate' => isset($intervals['recurrentEndDate'])  == true ? $intervals['recurrentEndDate'] : null,
+        //                     'startDate' => isset($intervals['startDate']) == true ? substr($intervals['startDate'],0,strlen($intervals['startDate'])-6) : null,
+        //                     'endDate' => isset($intervals['endDate']) == true ? substr($intervals['endDate'],0,strlen($intervals['endDate'])-6) : null,
+        //                     'name' => isset($intervals['name']) ? $intervals['name'] : null
+        //                 ]);
+        //                 array_push($calendarsDetails, [
+        //                     'id' => $intervals['$PhantomId'],
+        //                     'recurrentStartDate' => isset($intervals['recurrentStartDate']) == true ? $intervals['recurrentStartDate'] : '',
+        //                     'recurrentEndDate' => isset($intervals['recurrentEndDate'])  == true ? $intervals['recurrentEndDate'] : '',
+        //                     'isWorking' => $intervals['isWorking']
+        //                 ]);
+        //             }
+        //         }
+        //         array_push($calendars, [
+        //             'id' => $calendar['$PhantomId'],
+        //             'name' => $calendar['name'],
+        //             'intervals' => $calendarsDetails
+        //         ]);
+        //         ProjectWithCalendar::firstOrCreate([
+        //             'project_id' => $project->id,
+        //             'calendar_id' => $calendarSave->id
+        //         ]);
+        //     }
+        //     // return dd($calendars);
+        //     DB::commit();
+        // }
         if (isset($request->project['added'])) {
             $project->calendar_id = $request->project['added']['calendar'];
             $project->daysPerMonth = $request->project['added']['daysPerMonth'];
@@ -485,10 +465,6 @@ class ScheduleController extends Controller
     {
         try {
             DB::beginTransaction();
-            $exist = Calendar::where('name', $request->name)->first();
-            if ($exist) {
-                return response()->json(['status' => false, 'mensaje' => 'Ya existe un calendario con nombre: '. $request->name]);
-            }
             if ($request->newCalendar) {
                 $calendar = Calendar::create([
                     'name'=> $request->name,
