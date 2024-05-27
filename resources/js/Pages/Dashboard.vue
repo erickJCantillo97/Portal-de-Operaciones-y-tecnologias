@@ -30,14 +30,17 @@ const props = defineProps({
             <div class="grid grid-cols-1 md:grid-cols-2 max-w-full">
                 <UserHeader class="col-span-1" />
                 <QuotesCard class="col-span-1" :showIndicators="false"
-                    v-if="$page.props.auth.user.oficina == 'DEPPC' || $page.props.auth.user.oficina=='OFTIC'" />
+                    v-if="$page.props.auth.user.oficina == 'DEPPC' || $page.props.auth.user.oficina == 'OFTIC'" />
             </div>
 
             <!-- <Task v-if="$page.props.auth.user.username == 'ecantillo' || $page.props.auth.user.oficina=='OFTIC'" /> -->
-            <KanbanQuotes v-if="$page.props.auth.user.username == 'ecantillo' || $page.props.auth.user.oficina=='OFTIC'" />
+            <KanbanQuotes
+                v-if="$page.props.auth.user.username == 'ecantillo' || $page.props.auth.user.oficina == 'OFTIC'" />
             <!-- <PayrollTable /> -->
-            <Quotes v-if="$page.props.auth.user.oficina == 'DEEST' || $page.props.auth.user.username == 'elara'|| $page.props.auth.user.oficina =='OFTIC'" />
-            <!-- <Planning v-if="$page.props.auth.user.oficina == 'DEPPC' || $page.props.auth.user.oficina=='OFTIC'" :projects="props.projects" /> -->
+            <Quotes
+                v-if="$page.props.auth.user.oficina == 'DEEST' || $page.props.auth.user.username == 'elara' || $page.props.auth.user.oficina == 'DEPPC'" />
+            <Planning v-if="$page.props.auth.user.oficina == 'DEPPC' || $page.props.auth.user.oficina == 'OFTIC'"
+                :projects="props.projects" />
             <!-- <Tools v-if="hasPermission('tool edit')" :projects="props.projects" /> -->
             <!-- <Projects v-else /> -->
             <!-- <CustomUpload mode="advanced" :multiple="true" accept=".xlsx,.xls" url="prueba"/> -->

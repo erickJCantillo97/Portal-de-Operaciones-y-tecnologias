@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Quotes;
 
 use App\Http\Controllers\Controller;
+use App\Models\Personal\Employee;
 use App\Models\Projects\Customer;
 use App\Models\Projects\TypeShip;
 use App\Models\Quotes\Quote;
@@ -13,35 +14,45 @@ use App\Notifications\QuoteNotify;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class QuoteController extends Controller
 {
+    protected $estados = [
+        'Proceso',
+        'Entregada',
+        'Pendiente por Firma',
+        'Firmada',
+        'No Firmada',
+        'Contratada',
+    ];
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $quotes = Quote::with('version', 'version.quoteTypeShips')->orderBy('consecutive', 'DESC')->get()->map(function ($quote) {
+
+
+        $quotes = DB::table('quote_last_status_view')->orderBy('consecutive', 'DESC')->get()->map(function ($quote) {
             return [
-                'id' => $quote['id'],
-                'name' => $quote['name'],
-                'gerencia' => $quote['gerencia'],
-                'status' => $quote['version']['status'],
-                'offer_type' => $quote['version']['offer_type'],
-                'get_status' => $quote['version']['get_status'],
-                'estimador' => $quote['version']['estimador_name'],
-                'customer' => $quote['version']['customer']['name'] ?? '',
-                'version_id' => $quote['version']['id'],
-                'version' => $quote['version']['version'],
-                'created_at' => $quote['version']['created_at'],
-                'expeted_answer_date' => $quote['version']['expeted_answer_date'],
-                'consecutive' => $quote['version']['consecutive'],
-                'products' => $quote['version']['quoteTypeShips'],
-                'total_cost' => collect($quote['version']['total_cost']),
-                'clases' => implode(', ', collect($quote['version']['quoteTypeShips'])->pluck('name')->toArray())
+                'version_id' => $quote->id,
+                'name' => $quote->name,
+                // 'gerencia' => $quote->gerencia,
+                'status' => $quote->status,
+                // 'offer_type' => $quote->version->offer_type,
+                'get_status' => $this->estados[$quote->status],
+                'estimador' => $quote->estimador_name,
+                'customer' => $quote->customer_name,
+                'version' => $quote->version,
+                'created_at' => $quote->created_at,
+                'expeted_answer_date' => $quote->expeted_answer_date,
+                'consecutive' => $quote->consecutive,
+                // 'products' => $quote->version']->quoteTypeShips'],
+                // 'total_cost' => collect($quote['version']['total_cost']),
+                // 'clases' => implode(', ', collect($quote['version']['quoteTypeShips'])->pluck('name')->toArray())
             ];
         });
         $quote = null;
@@ -89,65 +100,56 @@ class QuoteController extends Controller
             'coin' => 'nullable|string',
             'observation' => 'nullable|string',
         ]);
-        $empleado = collect(searchEmpleados('Num_SAP', $validateData['estimador_id']))->first();
+        $empleado = Employee::where('Num_SAP', $validateData['estimador_id'])->first();
 
-        try {
-            $validateData['gerencia'] = auth()->user()->gerencia;
+        $validateData['gerencia'] = auth()->user()->gerencia;
 
-            $validateData['estimador_name'] = $empleado['Usuario'];
+        $validateData['estimador_name'] = $empleado['Usuario'];
 
-            $quote = Quote::create([
-                'gerencia' => auth()->user()->gerencia,
-                'consecutive' => Quote::max('consecutive') + 1,
-                'user_id' => auth()->user()->id,
-                'name' => $validateData['name']
-            ]); //Creamos en la BD y guardamos la estimacion en una variable
-            $version = $request->action == 2 ? $quote->version->version + 1 : 1;
+        $quote = Quote::create([
+            'gerencia' => auth()->user()->gerencia,
+            'consecutive' => Quote::max('consecutive') + 1,
+            'user_id' => auth()->user()->id,
+            'name' => $validateData['name']
+        ]); //Creamos en la BD y guardamos la estimacion en una variable
+        $version = $request->action == 2 ? $quote->version->version + 1 : 1;
 
-            $quoteVersion = QuoteVersion::create([
-                'quote_id' => $quote->id,
-                'version' => $version,
-                'estimador_id' => $validateData['estimador_id'],
-                'estimador_name' => $validateData['estimador_name'],
-                'customer_id' => $validateData['customer_id'] ?? null,
-                'observation' => $validateData['observation'] ?? '',
-                'expeted_answer_date' => $validateData['expeted_answer_date'],
-                'offer_type' => $validateData['offer_type'],
-                'coin' => $validateData['coin'],
-            ])->id; // Creamos una nueva version 1, con el consecutivo de la variable que se utilizó antes
+        $quoteVersion = QuoteVersion::create([
+            'quote_id' => $quote->id,
+            'version' => $version,
+            'estimador_id' => $validateData['estimador_id'],
+            'estimador_name' => $validateData['estimador_name'],
+            'customer_id' => $validateData['customer_id'] ?? null,
+            'observation' => $validateData['observation'] ?? '',
+            'expeted_answer_date' => $validateData['expeted_answer_date'],
+            'offer_type' => $validateData['offer_type'],
+            'coin' => $validateData['coin'],
+        ])->id; // Creamos una nueva version 1, con el consecutivo de la variable que se utilizó antes
 
-            $quote->current_version_id = $quoteVersion;
+        $quote->current_version_id = $quoteVersion;
 
-            $quote->save();
-            if (isset($request->type_ships)) {
-                foreach (TypeShip::whereIn('id', $request->type_ships)->get() as $typeShip) {
-                    QuoteTypeShip::create([
-                        'quote_version_id' => $quoteVersion,
-                        'type_ship_id' => $typeShip->id,
-                        'name' => $typeShip->name,
-                    ]);
-                }
+        $quote->save();
+        if (isset($request->type_ships)) {
+            foreach (TypeShip::whereIn('id', $request->type_ships)->get() as $typeShip) {
+                QuoteTypeShip::create([
+                    'quote_version_id' => $quoteVersion,
+                    'type_ship_id' => $typeShip->id,
+                    'name' => $typeShip->name,
+                ]);
             }
-            QuoteStatus::create([
-                'status' => 0,
-                'user_id' => auth()->user()->id,
-                'quote_version_id' => $quoteVersion,
-                'fecha' => Carbon::now()
-            ]);
-            $quote = QuoteVersion::with('quote', 'quoteTypeShips')->where('id', $quoteVersion)->first();
-            Notification::route('mail', ['ecantillo@cotecmar.com' => $validateData['estimador_name'], 'GBUELVAS@cotecmar.com' => $validateData['estimador_name']])->notify(new QuoteNotify($validateData['estimador_name'], $quote, 'asignament'));
-            return response()->json([
-                'status' => true,
-                'quote' => $quote
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => "Ocurrió un error al crear la Cotizacion",
-                'errorCode' => 500,
-                'error' => $e->getMessage()
-            ]);
         }
+        QuoteStatus::create([
+            'status' => 0,
+            'user_id' => auth()->user()->id,
+            'quote_version_id' => $quoteVersion,
+            'fecha' => Carbon::now()
+        ]);
+        $quote = QuoteVersion::with('quote', 'quoteTypeShips')->where('id', $quoteVersion)->first();
+        Notification::route('mail', ['ecantillo@cotecmar.com' => $validateData['estimador_name'], 'GBUELVAS@cotecmar.com' => $validateData['estimador_name']])->notify(new QuoteNotify($validateData['estimador_name'], $quote, 'asignament'));
+        return response()->json([
+            'status' => true,
+            'quote' => $quote
+        ]);
     }
 
     /**

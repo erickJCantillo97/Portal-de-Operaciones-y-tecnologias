@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Quotes;
 
 use App\Http\Controllers\Controller;
 use App\Models\Quotes\QuoteStatus;
+use App\Models\Quotes\QuoteVersion;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -41,6 +42,11 @@ class QuoteStatusController extends Controller
         $validateData['user_id'] = auth()->user()->id;
 
         try {
+            if ($validateData['status'] > 0) {
+                QuoteVersion::find($validateData['quote_version_id'])->update([
+                    'estimador_anaswer_date' => $validateData['fecha'],
+                ]);
+            }
             QuoteStatus::create($validateData);
         } catch (Exception $e) {
             return back()->withErrors('message', 'Ocurrio un Error Al Crear : ' . $e);

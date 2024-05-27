@@ -15,6 +15,7 @@ use Inertia\Inertia;
 
 class QuoteVersionController extends Controller
 {
+    
     /**
      * Display a listing of the resource.
      */

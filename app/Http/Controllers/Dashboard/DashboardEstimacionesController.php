@@ -79,8 +79,8 @@ class DashboardEstimacionesController extends Controller
 
     public function getAvgManurities()
     {
-        $year = $request->year ?? Carbon::now()->year;
-        $promedioPorDificultad = QuoteVersion::whereYear('expeted_answer_date', '<>', '2024')->join('quote_type_ships', 'quote_versions.id', '=', 'quote_type_ships.quote_version_id')
+        $year = request('year') ?? Carbon::now()->year;
+        $promedioPorDificultad = QuoteVersion::whereYear('expeted_answer_date', $year)->join('quote_type_ships', 'quote_versions.id', '=', 'quote_type_ships.quote_version_id')
             ->select('quote_type_ships.maturity', DB::raw('AVG(DATEDIFF(day, quote_versions.expeted_answer_date, quote_versions.estimador_anaswer_date)) AS promedio'))
             ->groupBy('quote_type_ships.maturity')
             ->whereNotNull('quote_type_ships.maturity')

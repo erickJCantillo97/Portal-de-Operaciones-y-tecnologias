@@ -40,19 +40,22 @@ const rowClic = (event) => {
 }
 </script>
 <template>
-    <CustomDataTable @rowClic="rowClic" :data="quotes" title="Estimaciones" :loading="loading" :showColumns="false"
-        :paginator="false" :columnas="columnas" :filter="false">
-        <template #buttonHeader>
-            <Dropdown v-model="filter" class="h-8" @change="getQuotes()" :options="filters" :pt="{
-        root: '!ring-0 !border-0',
-        token: '!p-0',
-        item: ' !p-2',
-        input: '!p-0'
-    }">
-                <template #value="slotProps">
-                    <Button :label="slotProps.value" text></Button>
-                </template>
-            </Dropdown>
-        </template>
-    </CustomDataTable>
+    <div class="shadow-md rounded-sm">
+        <CustomDataTable @rowClic="rowClic" :data="quotes" title="Estimaciones" :loading="loading" :showColumns="false"
+            :paginator="false" :columnas="columnas" :filter="false">
+            <template #buttonHeader>
+                <Dropdown v-model="filter" class="h-8" @change="getQuotes()" :options="filters" :pt="{
+            root: '!ring-0 !border-0',
+            token: '!p-0',
+            item: ' !p-2',
+            input: '!p-0'
+        }">
+                    <template #value="slotProps">
+                        <Button :label="slotProps.value" text></Button>
+                    </template>
+                </Dropdown>
+            </template>
+        </CustomDataTable>
+    </div>
+
 </template>
